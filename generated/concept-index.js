@@ -367,6 +367,11 @@
       "revisitedBy": [],
       "usedBy": []
     },
+    "gt-content-address": {
+      "introducedBy": "git-inside-names-from-content",
+      "revisitedBy": [],
+      "usedBy": []
+    },
     "gt-detached-head": {
       "introducedBy": "git-point-at-a-commit",
       "revisitedBy": [
@@ -381,7 +386,9 @@
     },
     "gt-git-folder": {
       "introducedBy": "git-inside-hidden-folder",
-      "revisitedBy": [],
+      "revisitedBy": [
+        "git-inside-names-from-content"
+      ],
       "usedBy": []
     },
     "gt-hash": {
@@ -2264,6 +2271,15 @@
       "revisits": [],
       "uses": []
     },
+    "git-inside-names-from-content": {
+      "introduces": [
+        "gt-content-address"
+      ],
+      "revisits": [
+        "gt-git-folder"
+      ],
+      "uses": []
+    },
     "git-make-a-branch": {
       "introduces": [
         "gt-revision",
@@ -3321,6 +3337,10 @@
     "gt-conflict": {
       "term": "Conflict",
       "def": "When two branches rewrote the same lines, git stops and hands the file back for you to decide."
+    },
+    "gt-content-address": {
+      "term": "Content address",
+      "def": "An object's name, worked out from the bytes inside it rather than chosen by anyone. The same content always gets the same forty characters, so identical things are stored once and any change gives a completely different name."
     },
     "gt-detached-head": {
       "term": "Detached HEAD",

@@ -1442,6 +1442,19 @@
               "pill": "gentle",
               "time": "15 min",
               "kind": "lesson"
+            },
+            {
+              "id": "git-inside-names-from-content",
+              "track": "git-inside",
+              "part": "things-with-names-made-of-content",
+              "href": "content/git-inside/01-things-with-names-made-of-content/02-git-inside-names-from-content/",
+              "key": "git_inside_names_from_content_awarded",
+              "total": 1,
+              "title": "Why does git name things by their contents?",
+              "blurb": "Forty characters of hex, worked out from the bytes themselves. See where that name comes from, why two identical files are one object, and what happens to the name when you change a single letter.",
+              "pill": "gentle",
+              "time": "15 min",
+              "kind": "lesson"
             }
           ]
         },

@@ -152,6 +152,10 @@
       "blurb": "La carpeta que crea `git init`, leída línea a línea antes de haber guardado nada. Casi todo está vacío, y por eso se ve entero de una sola vez.",
       "title": "¿Qué hay en esa carpeta oculta?"
     },
+    "git-inside-names-from-content": {
+      "blurb": "Cuarenta caracteres en hexadecimal, sacados de los propios bytes. Mira de dónde sale ese nombre, por qué dos archivos idénticos son un solo objeto y qué le pasa al nombre si cambias una sola letra.",
+      "title": "¿Por qué git nombra las cosas por su contenido?"
+    },
     "git-make-a-branch": {
       "blurb": "Separa una línea de trabajo y haz commits ahí sin tocar `main`. Crea una rama, súbete a ella y mira cómo el grafo se bifurca mientras la línea anterior se queda quieta.",
       "title": "Crear una rama y trabajar en ella"

@@ -1,0 +1,4 @@
+{
+  "concept.gt-content-address.term": "Content address",
+  "concept.gt-content-address.def": "An object's name, worked out from the bytes inside it rather than chosen by anyone. The same content always gets the same forty characters, so identical things are stored once and any change gives a completely different name."
+}

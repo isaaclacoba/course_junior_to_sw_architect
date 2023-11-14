@@ -215,6 +215,10 @@
       "def": "Cuando dos ramas reescribieron las mismas líneas, git se detiene y te devuelve el archivo para que decidas tú.",
       "term": "Conflicto"
     },
+    "gt-content-address": {
+      "def": "El nombre de un objeto, calculado a partir de los bytes que contiene en lugar de elegido por nadie. El mismo contenido recibe siempre los mismos cuarenta caracteres, así que lo idéntico se guarda una sola vez y cualquier cambio da un nombre completamente distinto.",
+      "term": "Dirección por contenido"
+    },
     "gt-detached-head": {
       "def": "Estar en un commit directamente en vez de en una rama, así que un commit hecho ahí no tiene ningún nombre de rama que lo sujete.",
       "term": "HEAD desacoplado"
