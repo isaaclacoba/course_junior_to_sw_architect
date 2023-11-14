@@ -215,6 +215,10 @@
       "def": "Una instantánea guardada de los archivos que elegiste, con un mensaje corto que dice cuál fue el cambio.",
       "term": "Commit"
     },
+    "gt-commit-object": {
+      "def": "El objeto que escribe un guardado: cinco líneas cortas de texto que nombran el tree de ese guardado, el guardado anterior, quién escribió el trabajo, quién lo guardó y por qué. Su id sale de esas líneas, igual que en cualquier otro objeto.",
+      "term": "Objeto commit"
+    },
     "gt-conflict": {
       "def": "Cuando dos ramas reescribieron las mismas líneas, git se detiene y te devuelve el archivo para que decidas tú.",
       "term": "Conflicto"

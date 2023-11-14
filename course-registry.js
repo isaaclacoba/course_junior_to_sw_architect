@@ -191,6 +191,7 @@
     { track: "git-inside", part: "things-with-names-made-of-content", id: "git-inside-names-from-content", href: "content/git-inside/01-things-with-names-made-of-content/02-git-inside-names-from-content/", kind: "lesson", path: "content/git-inside/01-things-with-names-made-of-content/02-git-inside-names-from-content" },
     { track: "git-inside", part: "things-with-names-made-of-content", id: "git-inside-blob", href: "content/git-inside/01-things-with-names-made-of-content/03-git-inside-blob/", kind: "lesson", path: "content/git-inside/01-things-with-names-made-of-content/03-git-inside-blob" },
     { track: "git-inside", part: "things-with-names-made-of-content", id: "git-inside-tree", href: "content/git-inside/01-things-with-names-made-of-content/04-git-inside-tree/", kind: "lesson", path: "content/git-inside/01-things-with-names-made-of-content/04-git-inside-tree" },
+    { track: "git-inside", part: "things-with-names-made-of-content", id: "git-inside-commit-object", href: "content/git-inside/01-things-with-names-made-of-content/05-git-inside-commit-object/", kind: "lesson", path: "content/git-inside/01-things-with-names-made-of-content/05-git-inside-commit-object" },
   ];
 
   var byIdIndex = {};

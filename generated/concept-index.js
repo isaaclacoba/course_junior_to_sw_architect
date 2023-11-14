@@ -369,6 +369,11 @@
         "git-merge-a-branch"
       ]
     },
+    "gt-commit-object": {
+      "introducedBy": "git-inside-commit-object",
+      "revisitedBy": [],
+      "usedBy": []
+    },
     "gt-conflict": {
       "introducedBy": "git-settle-a-conflict",
       "revisitedBy": [],
@@ -377,7 +382,8 @@
     "gt-content-address": {
       "introducedBy": "git-inside-names-from-content",
       "revisitedBy": [
-        "git-inside-blob"
+        "git-inside-blob",
+        "git-inside-commit-object"
       ],
       "usedBy": []
     },
@@ -503,7 +509,9 @@
     },
     "gt-tree": {
       "introducedBy": "git-inside-tree",
-      "revisitedBy": [],
+      "revisitedBy": [
+        "git-inside-commit-object"
+      ],
       "usedBy": []
     },
     "gt-working-tree": {
@@ -2287,6 +2295,16 @@
       ],
       "uses": []
     },
+    "git-inside-commit-object": {
+      "introduces": [
+        "gt-commit-object"
+      ],
+      "revisits": [
+        "gt-tree",
+        "gt-content-address"
+      ],
+      "uses": []
+    },
     "git-inside-hidden-folder": {
       "introduces": [
         "gt-git-folder"
@@ -3369,6 +3387,10 @@
     "gt-commit": {
       "term": "Commit",
       "def": "A saved snapshot of the files you picked, with a short message saying what the change was."
+    },
+    "gt-commit-object": {
+      "term": "Commit object",
+      "def": "The object one save writes: five short lines of text naming the tree for that save, the save before it, who wrote the work, who saved it, and why. Its id comes from those lines, like every other object."
     },
     "gt-conflict": {
       "term": "Conflict",

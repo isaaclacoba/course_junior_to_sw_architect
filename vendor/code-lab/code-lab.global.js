@@ -5913,11 +5913,13 @@ ${written}` : written;
     if (!scene || !Array.isArray(scene.acts)) return null;
     const acts = scene.acts.slice();
     const want = scene.fresh === void 0 ? 1 : Math.max(0, Math.min(scene.fresh, acts.length));
+    const OPENABLE = ["blob", "tree", "commit"];
     return {
       lens: scene.lens === "chain" || scene.lens === "both" ? scene.lens : "folder",
       acts,
       fresh: want === 0 ? [] : acts.slice(acts.length - want),
       detail: scene.detail === "full" ? "full" : "core",
+      open: OPENABLE.includes(scene.open) ? scene.open : void 0,
       note: scene.note,
       author: scene.author || DEFAULT_AUTHOR
     };
@@ -6046,6 +6048,21 @@ ${written}` : written;
   function short(id) {
     return id.slice(0, 7);
   }
+  function openObject(replay, type) {
+    let found = null;
+    for (const object of replay.store.objects.values()) {
+      if (object.type === type) found = object;
+    }
+    if (!found) return null;
+    if (found.entries) {
+      return {
+        id: found.id,
+        type,
+        text: found.entries.map((e) => `${e.mode} blob ${e.id}	${e.name}`).join("\n")
+      };
+    }
+    return { id: found.id, type, text: new TextDecoder().decode(found.body) };
+  }
 
   // src/dom/objects-view.ts
   var ObjectsView = class {
@@ -6057,9 +6074,11 @@ ${written}` : written;
       this.folderEl.className = "cl-ob-folder";
       this.chainEl = document.createElement("div");
       this.chainEl.className = "cl-ob-chain";
+      this.openEl = document.createElement("pre");
+      this.openEl.className = "cl-ob-open";
       this.noteEl = document.createElement("p");
       this.noteEl.className = "cl-ob-cap";
-      this.el.append(this.folderEl, this.chainEl, this.noteEl);
+      this.el.append(this.folderEl, this.chainEl, this.openEl, this.noteEl);
     }
     sync(ctx) {
       const scene = resolveObjects(ctx.model.objects);
@@ -6071,6 +6090,12 @@ ${written}` : written;
       this.chainEl.hidden = !wantsChain;
       if (wantsFolder) this.folderEl.innerHTML = folderHtml(replay, this.labels, scene.detail);
       if (wantsChain) this.chainEl.innerHTML = chainHtml(chainRows(replay), this.labels);
+      const opened = scene.open ? openObject(replay, scene.open) : null;
+      this.openEl.hidden = !opened;
+      if (opened) {
+        this.openEl.innerHTML = `<span class="cl-ob-openhead">${escapeHtml4(opened.type)} ${short(opened.id)}</span>
+` + escapeHtml4(opened.text);
+      }
       this.noteEl.innerHTML = scene.note ? escapeHtml4(scene.note) : "";
       this.noteEl.hidden = !scene.note;
     }

@@ -1481,6 +1481,19 @@
               "pill": "gentle",
               "time": "15 min",
               "kind": "lesson"
+            },
+            {
+              "id": "git-inside-commit-object",
+              "track": "git-inside",
+              "part": "things-with-names-made-of-content",
+              "href": "content/git-inside/01-things-with-names-made-of-content/05-git-inside-commit-object/",
+              "key": "git_inside_commit_object_awarded",
+              "total": 1,
+              "title": "What is a save actually made of?",
+              "blurb": "The commit object, opened and read line by line. Five lines of plain text - a tree, an author, a time, a message - and one of them is what turns separate saves into a history.",
+              "pill": "gentle",
+              "time": "15 min",
+              "kind": "lesson"
             }
           ]
         },
