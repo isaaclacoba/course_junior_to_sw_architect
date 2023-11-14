@@ -7,64 +7,56 @@ Design: [git-inside-track.md](../architecture/git-inside-track.md). Brief:
 ## The four rules every lesson obeys
 
 1. **Do not go around the commands.** The track is never ORGANISED by commands -
-   no lesson is titled after one, and the learner never types one. But where a
-   principle IS a command's doing, the command is named. Lesson 1 shows the
-   repository `git init` just made, and says so.
-2. **Close by naming what you deferred**, and which lesson pays it back. An empty
-   picture with no promise reads as laziness.
-3. **One new concept per lesson**, ~15 for the track. A lesson needing two is
-   usually two lessons, or one of them belongs to a neighbour.
-4. **5-7 steps.** A lesson that cannot fill five steps merges into its neighbour.
-   Every step must change the picture or change what the picture MEANS.
+   no lesson is titled after one, no learner types one. But where a principle IS
+   a command's doing, the command is named.
+2. **Close by naming what you deferred**, and which lesson pays it back.
+3. **One new concept per lesson**, ~15 for the track.
+4. **5-7 steps.** A lesson that cannot fill five merges into its neighbour, and
+   every step must change the picture or change what the picture MEANS.
 
 ## Track shape
 
-`objects` scene throughout. `L` = lens. Concepts are `gt-` and introduced once.
+`objects` scene throughout. Lens: f=folder, c=chain, b=both. Every fact in the
+last column was checked against real git 2.34, not assumed.
 
-| # | Lesson id | The question it owns | L | Concept | Names |
-|---|---|---|---|---|---|
-| **Part 1 - things with names made of content** ||||||
-| 1 | `hidden-folder` | What did that one command just make? | f | `gt-git-folder` | `git init` |
-| 2 | `names-from-content` | Why does git name things by their bytes? | f | `gt-content-address` | `git hash-object` |
-| 3 | `blob` | Where did your file's name go? | f | `gt-blob` | - |
-| 4 | `tree` | What remembers it was called `notes.md`? | c | `gt-tree` | - |
-| 5 | `commit-object` | What is a save actually made of? | b | `gt-commit-object` | `git commit` |
-| **Part 2 - names that move** ||||||
-| 6 | `ref-file` | Why is making a branch instant? | f | `gt-ref-file` | `git branch` |
-| 7 | `head-file` | How does git know where you are? | f | `gt-head-file` | `git switch` |
-| 8 | `index-file` | What is the staging area, as a file? | f | `gt-index-file` | `git add` |
-| 9 | `immutable` | Edit one line - what does git change? | c | `gt-immutable` | - |
-| **Part 3 - the store over time** ||||||
-| 10 | `reachable` | What makes something still there? | c | `gt-reachable` | - |
-| 11 | `copies-not-moves` | Why does a rewritten save get a new name? | c | `gt-rewrite` | `git rebase`, `git commit --amend` |
-| 12 | `packfile` | Is every version really its own file? | f | `gt-packfile` | `git gc` |
-| **Part 4 - more than one copy** ||||||
-| 13 | `clone` | What does copying a repository copy? | b | `gt-clone` | `git clone` |
-| 14 | `remote-ref` | How can git know you are ahead of them? | f | `gt-remote-ref` | `git fetch` |
-| 15 | `recap` | What is a repository, then? | b | - | - |
+| # | Lesson | Concept | Names | What it puts on screen |
+|---|---|---|---|---|
+| **Part 1 - things with names made of content** |||||
+| 1 | What is in that hidden folder? | `gt-git-folder` | `init`, `add` | The whole real skeleton; `HEAD` holding `ref: refs/heads/main`; two files of yours that do not cross |
+| 2 | Why does git name things by their contents? | `gt-content-address` | `hash-object` | `blob 12\0hello world\n` -> `3b18e51...`; same bytes give the same name; change one letter and all forty change |
+| 3 | Where did your file's name go? | `gt-blob` | - | A blob holds content and NOTHING else - no name, no date, no author. Two files with identical text are ONE object |
+| 4 | What remembers it was called `notes.md`? | `gt-tree` | - | A tree entry: `100644 notes.md` plus the blob id. A folder is a tree naming a tree |
+| 5 | What is a save actually made of? | `gt-commit-object` | `commit` | The commit's five lines - tree, parent, author, committer, message. Follow them down to your bytes |
+| **Part 2 - names that move** |||||
+| 6 | Why is making a branch instant? | `gt-ref-file` | `branch` | `refs/heads/main` is **41 bytes**: forty hex characters and a newline |
+| 7 | How does git know where you are? | `gt-head-file` | `switch` | `HEAD` rewritten from one ref name to another. Detached HEAD is the id itself, with no name in between |
+| 8 | What is the staging area, as a file? | `gt-index-file` | `add` | `.git/index` is **binary** - it starts with `DIRC`. `git ls-files --stage` reads it out: `100644 <blob> 0 notes.md` |
+| 9 | Edit one line - what does git change? | `gt-immutable` | - | Two blobs, two trees, two commits. The FIRST blob is untouched and still there |
+| **Part 3 - the store over time** |||||
+| 10 | What makes something still there? | `gt-reachable` | - | The walk from every name. Point `main` one save back and three objects go unreachable while staying on disk |
+| 11 | Why does a rewritten save get a new name? | `gt-rewrite` | `amend`, `rebase` | Amend: old id `7c0da92`, new id `34ed54e`. The old commit is still readable and no longer reachable |
+| 12 | Is every version really its own file? | `gt-packfile` | `gc` | Three loose objects become one `.pack` and one `.idx`, and the loose files are gone |
+| **Part 4 - more than one copy** |||||
+| 13 | What does copying a repository copy? | `gt-clone` | `clone` | A second store beside yours holding the same ids - because the ids come from the content |
+| 14 | How can git know you are ahead of them? | `gt-remote-ref` | `fetch` | `refs/remotes/origin/main` - your written note of where they were when you last looked |
+| 15 | What is a repository, then? | - | - | Objects and names, whole, in one picture. Carries the end-of-track question |
 
 ## Progression rationale
 
-- **The store is built bottom-up, and nothing is used before it is built.** A
-  commit (5) cannot be explained before a tree (4), which cannot be explained
-  before a blob (3), which needs content addressing (2). Part 1 is the only part
-  whose order is forced; the rest could be reordered and deliberately are not.
-- **Difficulty steps up twice.** At 9, where the learner must hold "nothing is
-  ever changed" against everyday experience of editing files. And at 11, the
-  first lesson whose subject is something that did NOT happen - the original
-  objects are still there, and nothing points at them.
-- **Parts 3 and 4 are existence-and-shape.** Packfiles, gc, remotes and rebase
-  are in scope so a learner knows they exist and roughly what they do to the
-  store. No lesson goes into delta encoding or the wire protocol.
-- **Every part closes on `both`** except part 2, whose ideas are all files.
+- **Part 1's order is forced and nothing else's is.** A commit (5) needs a tree
+  (4) needs a blob (3) needs content addressing (2). The later parts could be
+  reordered and deliberately are not - each closes a question part 1 opened.
+- **Difficulty steps up twice.** At 9, holding "nothing is ever changed" against
+  the everyday experience of editing a file. At 11, the first lesson whose
+  subject is something that did NOT happen.
+- **Parts 3 and 4 are existence-and-shape**: a learner should know packfiles, gc,
+  remotes and rewriting exist and what they do to the store. No delta encoding
+  and no wire protocol.
 
 ## Concept graph
 
-Fourteen new `gt-` ids, one per lesson but the recap. They do not collide with
-the twenty the practical track owns, and where the two tracks meet they stay
-deliberately separate: practice owns `gt-staging-area` (the pile you are about to
-save), this track owns `gt-index-file` (the file that holds it). Same for
-`gt-branch` (a line of work) against `gt-ref-file` (41 bytes on disk).
-
-`gt-object-store` was introduced in the first draft of lesson 1 and is now folded
-into `gt-git-folder` - one concept per lesson.
+Fourteen new `gt-` ids, one per lesson but the recap, none colliding with the
+twenty the practical track owns. Where the tracks meet they stay separate on
+purpose: practice owns `gt-staging-area` (the pile you are about to save), this
+track owns `gt-index-file` (the binary file that holds it); practice owns
+`gt-branch` (a line of work), this track owns `gt-ref-file` (41 bytes on disk).

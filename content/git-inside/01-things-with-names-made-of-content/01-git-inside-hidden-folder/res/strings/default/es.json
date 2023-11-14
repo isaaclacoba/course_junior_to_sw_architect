@@ -11,7 +11,7 @@
   "step.1.narr": "Casi todo puedes ignorarlo hoy. `config` guarda los ajustes de este repositorio, `description` lo usa un visor web antiguo y `hooks/` son una docena de scripts de ejemplo, todos desactivados. **Tres cosas** cargan con la idea entera: `objects/`, `refs/heads/` y `HEAD`.",
   "step.2.narr": "Empieza por la única que no está vacía. `HEAD` es un archivo de texto con **una sola línea dentro**, y la línea está ahí mismo: `ref: refs/heads/main`. No contiene tu trabajo. Contiene el nombre de un nombre - y ese nombre todavía no existe.",
   "step.3.narr": "Ese nombre viviría en `refs/heads/`, un archivo pequeño por cada rama. El tuyo está vacío, así que `main` es una rama que git espera, no una que tengas. Aparece en cuanto guardas algo por primera vez.",
-  "step.4.narr": "Y en `objects/` va **todo lo que git guarda**, un archivo por cada cosa. Escribe un archivo tuyo y aparece bajo tu carpeta - no en `objects/`. Escribe un segundo y pasa lo mismo. Git no está pendiente de lo que tecleas.",
+  "step.4.narr": "Y en `objects/` va **todo lo que git guarda**, un archivo por cada cosa. Escribe un archivo tuyo y aparece bajo tu carpeta - no en `objects/`. Escribe un segundo y pasa lo mismo. Git no está pendiente de lo que tecleas: `git add` es el comando que cruza un archivo al otro lado, y hasta que no lo ejecutes, `objects/` sigue vacía.",
   "step.5.narr": "Así que un repositorio son tres partes: un sitio para las cosas, un sitio para los nombres y una línea que dice en qué nombre estás. Dos están vacías y una está esperando. La siguiente lección llena `objects/` - y el nombre que recibe ese archivo no lo elige nadie.",
   "step.0.note": "todo lo que crea git init",
   "step.1.note": "ajustes, ejemplos, y las tres que importan",

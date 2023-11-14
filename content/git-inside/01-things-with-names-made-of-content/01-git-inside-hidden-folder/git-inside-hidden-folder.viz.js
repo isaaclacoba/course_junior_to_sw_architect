@@ -44,7 +44,7 @@
         objects: { lens: "folder", acts: [], fresh: 0, note: "refs/heads/ - no names yet" }
       },
       {
-        narr: "And `objects/` is where **everything git keeps** goes, one file per thing. Write a file of your own and it shows up under your folder - not in `objects/`. Write a second one, same story. Git is not watching you type.",
+        narr: "And `objects/` is where **everything git keeps** goes, one file per thing. Write a file of your own and it shows up under your folder - not in `objects/`. Write a second one, same story. Git is not watching you type: `git add` is the command that carries a file across, and until you run it, `objects/` stays empty.",
         objects: { lens: "folder", acts: [NOTES, TODO], fresh: 2, note: "two files of yours, none of git's" }
       },
       {
