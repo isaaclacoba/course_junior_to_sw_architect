@@ -188,6 +188,9 @@
     { track: "git", part: "fixing-mistakes", id: "git-undo-with-reset", href: "content/git/04-fixing-mistakes/04-git-undo-with-reset/", kind: "lesson", path: "content/git/04-fixing-mistakes/04-git-undo-with-reset" },
     { track: "git", part: "fixing-mistakes", id: "git-rebase", href: "content/git/04-fixing-mistakes/06-git-rebase/", kind: "lesson", path: "content/git/04-fixing-mistakes/06-git-rebase" },
     { track: "git-inside", part: "things-with-names-made-of-content", id: "git-inside-hidden-folder", href: "content/git-inside/01-things-with-names-made-of-content/01-git-inside-hidden-folder/", kind: "lesson", path: "content/git-inside/01-things-with-names-made-of-content/01-git-inside-hidden-folder" },
+    { track: "git-inside", part: "things-with-names-made-of-content", id: "git-inside-names-from-content", href: "content/git-inside/01-things-with-names-made-of-content/02-git-inside-names-from-content/", kind: "lesson", path: "content/git-inside/01-things-with-names-made-of-content/02-git-inside-names-from-content" },
+    { track: "git-inside", part: "things-with-names-made-of-content", id: "git-inside-blob", href: "content/git-inside/01-things-with-names-made-of-content/03-git-inside-blob/", kind: "lesson", path: "content/git-inside/01-things-with-names-made-of-content/03-git-inside-blob" },
+    { track: "git-inside", part: "things-with-names-made-of-content", id: "git-inside-tree", href: "content/git-inside/01-things-with-names-made-of-content/04-git-inside-tree/", kind: "lesson", path: "content/git-inside/01-things-with-names-made-of-content/04-git-inside-tree" },
   ];
 
   var byIdIndex = {};
