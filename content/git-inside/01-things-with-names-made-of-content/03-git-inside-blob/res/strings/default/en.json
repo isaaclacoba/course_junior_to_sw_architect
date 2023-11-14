@@ -1,0 +1,4 @@
+{
+  "concept.gt-blob.term": "Blob",
+  "concept.gt-blob.def": "The object git writes for a file's contents. It holds the bytes and nothing else - no file name, no date, no author - which is why two identical files are one blob and why renaming costs nothing."
+}

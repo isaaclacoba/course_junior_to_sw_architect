@@ -1,0 +1,4 @@
+{
+  "concept.gt-tree.term": "Tree",
+  "concept.gt-tree.def": "The object that holds file names. It is a list, and each row is a mode, a name, and the id of the object with that name - so a tree is what turns a pile of nameless blobs back into your folder."
+}

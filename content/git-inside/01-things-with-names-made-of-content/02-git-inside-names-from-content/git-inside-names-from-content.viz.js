@@ -57,11 +57,11 @@
         objects: { lens: "folder", acts: [WRITE, STORE, COPY, STORE_COPY], fresh: 2, note: "two files, still one object" }
       },
       {
-        narr: "Change one character - `hello world!` - and add it. The new name is **a0423896973644771497bdc03eb99d5281615b51**. Not close to the first one. Not similar. A one-letter edit changes every character of the name, and that is exactly what makes it useful for spotting whether two things are the same.",
+        narr: "Change one character - `hello world!` - and add it. The new name is **a0423896973644771497bdc03eb99d5281615b51**. Every character of it is different. A one-letter edit changes the whole name, and that is what makes it useful for spotting whether two things are the same.",
         objects: { lens: "folder", acts: [WRITE, STORE, COPY, STORE_COPY, SHOUT, STORE_SHOUT], fresh: 2, note: "one letter changed, forty characters changed" }
       },
       {
-        narr: "So an object's name is a fingerprint of what is inside it. Nothing else about the file went into it - and that should bother you slightly, because the name `notes.md` is nowhere in that object. The next lesson opens one up and shows you exactly what git kept.",
+        narr: "An object's name is a fingerprint of what is inside it. Nothing else about the file went into it - and that should bother you slightly, because the name `notes.md` is nowhere in that object. The next lesson opens one up and shows you exactly what git kept.",
         objects: { lens: "folder", acts: [WRITE, STORE, COPY, STORE_COPY, SHOUT, STORE_SHOUT], fresh: 0, note: "two objects, three files, and no file names anywhere" }
       }
     ]

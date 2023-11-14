@@ -203,6 +203,10 @@
       "def": "Reemplazar el commit que acabas de hacer por uno corregido, en vez de dejar el fallo en la historia.",
       "term": "Enmendar un commit"
     },
+    "gt-blob": {
+      "def": "El objeto que git escribe para el contenido de un archivo. Contiene los bytes y nada más - ni nombre de archivo, ni fecha, ni autor - y por eso dos archivos idénticos son un solo blob y renombrar no cuesta nada.",
+      "term": "Blob"
+    },
     "gt-branch": {
       "def": "Un nombre que apunta a un commit y avanza contigo cuando haces commits, para que dos líneas de trabajo puedan crecer a la vez.",
       "term": "Rama"
@@ -278,6 +282,10 @@
     "gt-tag": {
       "def": "Un nombre fijado a un commit que nunca se mueve, para marcar una versión que merece poder encontrarse otra vez.",
       "term": "Etiqueta"
+    },
+    "gt-tree": {
+      "def": "El objeto que guarda los nombres de archivo. Es una lista, y cada fila es un modo, un nombre y el id del objeto que se llama así - o sea que un tree es lo que convierte un montón de blobs sin nombre otra vez en tu carpeta.",
+      "term": "Tree"
     },
     "gt-working-tree": {
       "def": "Tus archivos en la carpeta tal y como están ahora mismo, incluidos los cambios que aún no le has contado a git.",

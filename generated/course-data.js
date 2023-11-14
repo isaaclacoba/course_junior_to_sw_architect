@@ -1455,6 +1455,32 @@
               "pill": "gentle",
               "time": "15 min",
               "kind": "lesson"
+            },
+            {
+              "id": "git-inside-blob",
+              "track": "git-inside",
+              "part": "things-with-names-made-of-content",
+              "href": "content/git-inside/01-things-with-names-made-of-content/03-git-inside-blob/",
+              "key": "git_inside_blob_awarded",
+              "total": 1,
+              "title": "Where did your file's name go?",
+              "blurb": "Open the object git wrote and find out what it does NOT contain. No file name, no date, no author - just your bytes, which is why two identical files are the same object and why renaming is free.",
+              "pill": "gentle",
+              "time": "15 min",
+              "kind": "lesson"
+            },
+            {
+              "id": "git-inside-tree",
+              "track": "git-inside",
+              "part": "things-with-names-made-of-content",
+              "href": "content/git-inside/01-things-with-names-made-of-content/04-git-inside-tree/",
+              "key": "git_inside_tree_awarded",
+              "total": 1,
+              "title": "What remembers it was called notes.md?",
+              "blurb": "A blob has no file name, so something else must hold it. Meet the second kind of object - a plain list of name-and-id pairs - and see that it is named by its own contents, exactly like everything else.",
+              "pill": "gentle",
+              "time": "15 min",
+              "kind": "lesson"
             }
           ]
         },

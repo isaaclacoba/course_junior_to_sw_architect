@@ -1,20 +1,24 @@
 {
   "_comment": [
-    "The grandfather clause (D-sw-factory-13, D-sw-factory-14).",
-    "The recall rung requires a journal row proving prior decisions were read",
-    "before the work started. That rule was ratified on 2026-08-06. Every feature",
-    "listed here already existed by then, so the demand cannot be satisfied",
-    "honestly - you cannot recall-before-starting work that has already finished.",
-    "Clearing it would mean writing a row asserting a recall that never happened,",
-    "and the FSM would then treat that lie as evidence.",
+    "Features that predate the FSM (D-sw-factory-18, D-sw-factory-19).",
     "",
-    "Exempt means ONE thing: the recall rung reads satisfied for that feature.",
-    "Grounding, deciding, specifying, building and verifying are still checked in",
-    "full. Nothing started after the rule belongs here, and the tool never adds to",
-    "this list by itself - it only warns when an entry no longer has a brief."
+    "The six rungs rest on four sources, and they are not equally trustworthy on",
+    "old work. recall/grounding/deciding come from journal rows that had to be",
+    "written BEFORE the work, so they cannot be satisfied after the fact. building",
+    "comes from checkboxes, and those are under-reported - wow-enforcement claimed",
+    "0 of 5 steps done while all 5 deliverables had shipped.",
+    "",
+    "So the tool claims NOTHING about the features listed here. It does not mark",
+    "their rungs satisfied - that would assert they passed a bar they never faced,",
+    "and would forge the evidence the FSM exists to demand. It reports them as",
+    "untracked: no phase, no ladder, no advice.",
+    "",
+    "To opt one back in, delete its line. From that moment it is measured in full.",
+    "The tool never adds to this list by itself; it only warns when an entry no",
+    "longer has a brief."
   ],
-  "recallExemptReason": "predates the rule",
-  "recallExempt": [
+  "untrackedReason": "predates the FSM",
+  "untracked": [
     "concept-i18n",
     "decision-log",
     "drill-engine-conformance",

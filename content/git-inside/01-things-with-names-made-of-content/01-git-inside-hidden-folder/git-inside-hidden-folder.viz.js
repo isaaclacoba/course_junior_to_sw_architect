@@ -40,7 +40,7 @@
         objects: { lens: "folder", acts: [], fresh: 0, note: "HEAD - one line of text" }
       },
       {
-        narr: "That name would live in `refs/heads/`, one small file per branch. Yours is empty, so `main` is a branch git is expecting rather than one you have. It appears the moment you first save something.",
+        narr: "That name would live in `refs/heads/`, one small file per branch. Yours is empty, so `main` is a branch git is expecting. It appears the moment you first save something.",
         objects: { lens: "folder", acts: [], fresh: 0, note: "refs/heads/ - no names yet" }
       },
       {
@@ -48,7 +48,7 @@
         objects: { lens: "folder", acts: [NOTES, TODO], fresh: 2, note: "two files of yours, none of git's" }
       },
       {
-        narr: "So a repository is three parts: a place for things, a place for names, and one line saying which name you are on. Two are empty and one is expecting. The next lesson fills `objects/` - and the name that file gets is chosen by nobody.",
+        narr: "A repository is three parts: a place for things, a place for names, and one line saying which name you are on. Two are empty and one is expecting. The next lesson fills `objects/` - and the name that file gets is chosen by nobody.",
         objects: { lens: "folder", acts: [NOTES, TODO], fresh: 0, note: "a repository, before its first save" }
       }
     ]

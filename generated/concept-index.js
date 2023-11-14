@@ -337,6 +337,13 @@
       ],
       "usedBy": []
     },
+    "gt-blob": {
+      "introducedBy": "git-inside-blob",
+      "revisitedBy": [
+        "git-inside-tree"
+      ],
+      "usedBy": []
+    },
     "gt-branch": {
       "introducedBy": "git-make-a-branch",
       "revisitedBy": [
@@ -369,7 +376,9 @@
     },
     "gt-content-address": {
       "introducedBy": "git-inside-names-from-content",
-      "revisitedBy": [],
+      "revisitedBy": [
+        "git-inside-blob"
+      ],
       "usedBy": []
     },
     "gt-detached-head": {
@@ -491,6 +500,11 @@
       "usedBy": [
         "git-settle-a-conflict"
       ]
+    },
+    "gt-tree": {
+      "introducedBy": "git-inside-tree",
+      "revisitedBy": [],
+      "usedBy": []
     },
     "gt-working-tree": {
       "introducedBy": "git-first-commit",
@@ -2264,6 +2278,15 @@
         "gt-head"
       ]
     },
+    "git-inside-blob": {
+      "introduces": [
+        "gt-blob"
+      ],
+      "revisits": [
+        "gt-content-address"
+      ],
+      "uses": []
+    },
     "git-inside-hidden-folder": {
       "introduces": [
         "gt-git-folder"
@@ -2277,6 +2300,15 @@
       ],
       "revisits": [
         "gt-git-folder"
+      ],
+      "uses": []
+    },
+    "git-inside-tree": {
+      "introduces": [
+        "gt-tree"
+      ],
+      "revisits": [
+        "gt-blob"
       ],
       "uses": []
     },
@@ -3326,6 +3358,10 @@
       "term": "Amending",
       "def": "Replacing the commit you just made with a corrected one, rather than leaving the mistake in the history."
     },
+    "gt-blob": {
+      "term": "Blob",
+      "def": "The object git writes for a file's contents. It holds the bytes and nothing else - no file name, no date, no author - which is why two identical files are one blob and why renaming costs nothing."
+    },
     "gt-branch": {
       "term": "Branch",
       "def": "A name that points at a commit and moves forward with you as you commit, so two lines of work can grow side by side."
@@ -3401,6 +3437,10 @@
     "gt-tag": {
       "term": "Tag",
       "def": "A name pinned to one commit that never moves, for marking a version worth finding again."
+    },
+    "gt-tree": {
+      "term": "Tree",
+      "def": "The object that holds file names. It is a list, and each row is a mode, a name, and the id of the object with that name - so a tree is what turns a pile of nameless blobs back into your folder."
     },
     "gt-working-tree": {
       "term": "Working tree",
