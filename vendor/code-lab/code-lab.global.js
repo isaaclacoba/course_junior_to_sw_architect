@@ -6104,7 +6104,13 @@ ${written}` : written;
     }
     if (store.worktree.size) {
       lines2.push("", escapeHtml4(labels.objYourFolder));
-      for (const [path] of store.worktree) lines2.push(`  ${escapeHtml4(path)}`);
+      const width = Math.max(...[...store.worktree.keys()].map((p) => p.length));
+      for (const [path, text] of store.worktree) {
+        const firstLine = text.split("\n")[0];
+        const shown = firstLine.length > 30 ? `${firstLine.slice(0, 29)}\u2026` : firstLine;
+        const pad = " ".repeat(width - path.length);
+        lines2.push(`  ${escapeHtml4(path)}${pad}   ${dim(escapeHtml4(shown))}`);
+      }
     }
     return lines2.join("\n");
   }
