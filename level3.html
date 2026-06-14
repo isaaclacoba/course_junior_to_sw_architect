@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Level 3 - C# Automation OO Trainer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css"
+    />
+  </head>
+  <body>
+    <div class="noise"></div>
+    <main class="layout">
+      <section class="hero">
+        <p class="eyebrow">Advanced applied practice</p>
+        <h1>Level 3: C# OO + Test Automation Gap Trainer</h1>
+        <p class="subtitle">
+          Practice interfaces, dependency injection, page objects, and orchestration using
+          automation-themed scenarios with deeper abstraction.
+        </p>
+        <p class="subtitle"><strong id="courseXpLabel">Course XP: 0</strong></p>
+        <p class="subtitle"><a href="index.html">Back to level selector</a></p>
+        <div class="xp-bar-wrap">
+          <span class="xp-label" id="xpLabel">XP 0</span>
+          <div class="xp-track"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+        </div>
+      </section>
+
+      <section class="card" aria-live="polite">
+        <header class="challenge-head">
+          <div>
+            <p id="challengeMeta" class="meta"></p>
+            <h2 id="challengeTitle"></h2>
+            <p id="challengeContext" class="context"></p>
+          </div>
+          <div class="badge-group">
+            <span id="conceptBadge" class="badge"></span>
+            <span id="progressBadge" class="badge ghost"></span>
+          </div>
+        </header>
+
+        <div class="code-wrap">
+          <pre class="line-numbers"><code id="codeBlock" class="language-csharp"></code></pre>
+        </div>
+
+        <div id="outputPanel" class="output-panel" hidden>
+          <span class="output-label">Console Output</span>
+          <pre id="outputContent" class="output-content"></pre>
+        </div>
+
+        <section class="coach" aria-live="polite">
+          <h3>Concept Coach</h3>
+          <p id="coachSummary" class="context"></p>
+          <ul id="coachPoints" class="coach-list"></ul>
+          <h4>Quick Terms</h4>
+          <dl id="coachGlossary" class="coach-glossary"></dl>
+          <h4>Diagram Coach</h4>
+          <p id="coachDiagramCaption" class="context"></p>
+          <div id="coachDiagram" class="coach-diagram" aria-label="Concept diagram"></div>
+        </section>
+
+        <section class="fill-section">
+          <h3 id="fillHeading" hidden>Fill The Missing Pieces</h3>
+          <div id="wordBank" class="word-bank" aria-label="Available tokens"></div>
+          <div id="inputsContainer" class="inputs"></div>
+        </section>
+
+        <section class="actions">
+          <button id="checkBtn" class="btn primary" type="button">Check Answers</button>
+          <button id="hintBtn" class="btn" type="button">Show Next Hint</button>
+          <button id="revealBtn" class="btn danger" type="button">Reveal Answers</button>
+          <button id="resetBtn" class="btn" type="button">Reset Challenge</button>
+        </section>
+
+        <section id="resultPanel" class="result-panel" hidden>
+          <h3 id="resultTitle"></h3>
+          <p id="resultBody"></p>
+          <ul id="resultList"></ul>
+        </section>
+
+        <footer class="nav-row">
+          <button id="prevBtn" class="btn" type="button">Previous</button>
+          <button id="nextBtn" class="btn primary" type="button">Next Challenge</button>
+        </footer>
+      </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

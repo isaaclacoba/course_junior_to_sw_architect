@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Level 1 - Software and OO Foundations</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  </head>
+  <body>
+    <div class="noise"></div>
+    <main class="layout">
+      <section class="hero">
+        <p class="eyebrow">Foundation track</p>
+        <h1>Level 1: Why We Program + OO Basics</h1>
+        <p class="subtitle">
+          This level explains what software models, how variables represent state, how functions change state,
+          and then how classes organize state + behavior.
+        </p>
+        <p class="subtitle"><strong id="courseXpLabel">Course XP: 0</strong></p>
+        <p class="subtitle"><a href="level1-coding.html">Switch to Level 1 Microcoding Track</a></p>
+        <p class="subtitle"><a href="index.html">Back to level selector</a></p>
+      </section>
+
+      <section class="card level1-shell" aria-live="polite">
+        <header class="challenge-head">
+          <div>
+            <p id="l1Meta" class="meta"></p>
+            <h2 id="l1Title"></h2>
+            <p id="l1Context" class="context"></p>
+          </div>
+          <div class="badge-group">
+            <span id="l1Concept" class="badge"></span>
+            <span id="l1Progress" class="badge ghost"></span>
+          </div>
+        </header>
+
+        <section class="coach">
+          <h3>Concept Explanation</h3>
+          <p id="l1Explain" class="context"></p>
+          <ul id="l1Points" class="coach-list"></ul>
+        </section>
+
+        <section class="coach">
+          <h3>High-Level Diagram</h3>
+          <div id="l1Diagram" class="coach-diagram"></div>
+        </section>
+
+        <section class="coach">
+          <h3>Mini Knowledge Check</h3>
+          <p id="l1Question" class="context"></p>
+          <div id="l1Options" class="options"></div>
+          <p id="l1Feedback" class="context"></p>
+        </section>
+
+        <footer class="nav-row">
+          <button id="l1Prev" class="btn" type="button">Previous Topic</button>
+          <button id="l1Next" class="btn primary" type="button">Next Topic</button>
+        </footer>
+      </section>
+    </main>
+
+    <script src="level1.js"></script>
+  </body>
+</html>

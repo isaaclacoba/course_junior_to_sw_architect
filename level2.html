@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Level 2 - C# Core Coding Drills</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  </head>
+  <body>
+    <div class="noise"></div>
+    <main class="layout">
+      <section class="hero">
+        <p class="eyebrow">Guided coding practice</p>
+        <h1>Level 2: C# Core Coding Drills</h1>
+        <p class="subtitle">
+          Short programming tasks to refresh syntax and core OO concepts before advanced automation
+          patterns. Write small valid C# pieces with immediate feedback.
+        </p>
+        <p class="subtitle"><strong id="courseXpLabel">Course XP: 0</strong></p>
+        <p class="subtitle"><a href="index.html">Back to level selector</a></p>
+      </section>
+
+      <section class="card" aria-live="polite">
+        <header class="challenge-head">
+          <div>
+            <p id="l2Meta" class="meta"></p>
+            <h2 id="l2Title"></h2>
+            <p id="l2Context" class="context"></p>
+          </div>
+          <div class="badge-group">
+            <span id="l2Concept" class="badge"></span>
+            <span id="l2Progress" class="badge ghost"></span>
+          </div>
+        </header>
+
+        <div class="code-wrap">
+          <pre class="line-numbers"><code id="l2Code" class="language-csharp"></code></pre>
+        </div>
+
+        <section class="coach">
+          <h3>Coach</h3>
+          <ul id="l2Points" class="coach-list"></ul>
+          <h4>Concept Diagram</h4>
+          <div id="l2Diagram" class="coach-diagram"></div>
+        </section>
+
+        <section class="fill-section">
+          <h3>Write Missing C# Code</h3>
+          <div id="l2Inputs" class="inputs"></div>
+        </section>
+
+        <section class="actions">
+          <button id="l2Check" class="btn primary" type="button">Check</button>
+          <button id="l2Hint" class="btn" type="button">Hint</button>
+          <button id="l2Reset" class="btn" type="button">Reset</button>
+        </section>
+
+        <section id="l2Result" class="result-panel" hidden>
+          <h3 id="l2ResultTitle"></h3>
+          <p id="l2ResultBody"></p>
+          <ul id="l2ResultList"></ul>
+        </section>
+
+        <footer class="nav-row">
+          <button id="l2Prev" class="btn" type="button">Previous Drill</button>
+          <button id="l2Next" class="btn primary" type="button">Next Drill</button>
+        </footer>
+      </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="level2.js"></script>
+  </body>
+</html>
