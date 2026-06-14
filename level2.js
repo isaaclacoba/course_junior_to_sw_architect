@@ -20,8 +20,27 @@ const drills = [
   A[age variable] --> B[stores value]
   B --> C[printed to console]`,
     blanks: [
-      { id: 1, label: "Assign an integer", answer: "30", hints: ["Use a simple whole number."] },
-      { id: 2, label: "Print variable value", answer: "age", hints: ["Print the variable, not a fixed literal."] },
+      {
+        id: 1,
+        label: "Assign an integer",
+        answer: "30",
+        hints: ["Use a simple whole number."],
+        explain: [
+          { text: "int declares a variable that can hold a whole number. age is the name we chose for it.", highlight: "int age = {{1}}" },
+          { text: "The = sign puts a value into the variable. You just need to put a number after it.", highlight: "int age = {{1}}" },
+          { text: "This line reads age and prints whatever number is stored in it.", highlight: "Console.WriteLine({{2}})" },
+        ],
+      },
+      {
+        id: 2,
+        label: "Print variable value",
+        answer: "age",
+        hints: ["Print the variable, not a fixed literal."],
+        explain: [
+          { text: "age is the variable we filled with a number just above.", highlight: "int age = {{1}}" },
+          { text: "Console.WriteLine prints whatever you put inside the parentheses. Putting age here means it prints the number stored in age — not the word 'age'.", highlight: "Console.WriteLine({{2}})" },
+        ],
+      },
     ],
   },
   {
@@ -48,8 +67,27 @@ public static void Main()
   A[value] --> B[AddOne]
   B --> C[value + 1]`,
     blanks: [
-      { id: 1, label: "Return incremented value", answer: "value + 1", hints: ["Increase by exactly one."] },
-      { id: 2, label: "Print updated variable", answer: "count", hints: ["Print the variable modified in Main."] },
+      {
+        id: 1,
+        label: "Return incremented value",
+        answer: "value + 1",
+        hints: ["Increase by exactly one."],
+        explain: [
+          { text: "AddOne is a function. It takes a number called value as input and must give back a new number.", highlight: "public static int AddOne(int value)" },
+          { text: "return sends the result back to whoever called the function. The function stops after return.", highlight: "return {{1}}" },
+          { text: "The function is named AddOne — so the result must be value plus 1. The + symbol means add.", highlight: "return {{1}}" },
+        ],
+      },
+      {
+        id: 2,
+        label: "Print updated variable",
+        answer: "count",
+        hints: ["Print the variable modified in Main."],
+        explain: [
+          { text: "count starts at 5. The next line calls AddOne and stores the result back into count.", highlight: "count = AddOne(count)" },
+          { text: "Console.WriteLine prints whatever is in the parentheses. We want to see the updated count after AddOne ran.", highlight: "Console.WriteLine({{2}})" },
+        ],
+      },
     ],
   },
   {
@@ -82,8 +120,28 @@ public static void Main()
   B --> C[Increment]
   C --> D[Value changes]`,
     blanks: [
-      { id: 1, label: "Instantiate class", answer: "Counter", hints: ["Use class name after new."] },
-      { id: 2, label: "Call update method", answer: "Increment", hints: ["Call method that adds one."] },
+      {
+        id: 1,
+        label: "Instantiate class",
+        answer: "Counter",
+        hints: ["Use class name after new."],
+        explain: [
+          { text: "Counter is the class defined above. It is the blueprint that describes what a counter looks like and what it can do.", highlight: "public class Counter" },
+          { text: "new creates a real object in memory using that blueprint. You must name which class to use right after new.", highlight: "var counter = new {{1}}()" },
+          { text: "counter is the variable that holds a reference to the new object. The lines below use it.", highlight: "var counter = new {{1}}()" },
+        ],
+      },
+      {
+        id: 2,
+        label: "Call update method",
+        answer: "Increment",
+        hints: ["Call method that adds one."],
+        explain: [
+          { text: "Increment is defined inside Counter. When called, it runs Value = Value + 1.", highlight: "public void Increment()" },
+          { text: "The dot after counter means: call something on this object. Increment() calls the method.", highlight: "counter.{{2}}()" },
+          { text: "This prints Value to confirm the increment happened.", highlight: "Console.WriteLine(counter.Value)" },
+        ],
+      },
     ],
   },
   {
@@ -118,8 +176,28 @@ Console.WriteLine(wallet.{{2}}());`,
   B --> C[_amount private field]
   A --> D[GetAmount]`,
     blanks: [
-      { id: 1, label: "Getter method name", answer: "GetAmount", hints: ["Follow GetX style."] },
-      { id: 2, label: "Call getter", answer: "GetAmount", hints: ["Use method from blank 1."] },
+      {
+        id: 1,
+        label: "Getter method name",
+        answer: "GetAmount",
+        hints: ["Follow GetX style."],
+        explain: [
+          { text: "_amount is private. Nothing outside Wallet can read or set it directly.", highlight: "private int _amount" },
+          { text: "SetAmount is the write door — it puts a value into _amount.", highlight: "public void SetAmount(int value)" },
+          { text: "This is the read door. It is public, returns an int, and simply gives back _amount.", highlight: "public int {{1}}()" },
+          { text: "return _amount sends the stored value out to the caller.", highlight: "return _amount" },
+        ],
+      },
+      {
+        id: 2,
+        label: "Call getter",
+        answer: "GetAmount",
+        hints: ["Use method from blank 1."],
+        explain: [
+          { text: "wallet.SetAmount(50) stored 50 inside _amount.", highlight: "wallet.SetAmount(50)" },
+          { text: "To read _amount from outside the class, we must go through the public method. The dot after wallet calls it on that object.", highlight: "Console.WriteLine(wallet.{{2}}())" },
+        ],
+      },
     ],
   },
   {
@@ -154,13 +232,32 @@ Console.WriteLine(pet.{{2}}());`,
   B --> D[Woof]
   C --> E[Meow]`,
     blanks: [
-      { id: 1, label: "Choose concrete implementation", answer: "Dog", hints: ["Use a class that inherits Animal."] },
-      { id: 2, label: "Call abstract contract", answer: "Speak", hints: ["Method returns sound."] },
+      {
+        id: 1,
+        label: "Choose concrete implementation",
+        answer: "Dog",
+        hints: ["Use a class that inherits Animal."],
+        explain: [
+          { text: "Animal is abstract — you cannot create an Animal directly. Dog and Cat are concrete classes that extend Animal.", highlight: "public abstract class Animal" },
+          { text: "new Dog() creates a Dog object in memory. It can be stored in an Animal variable because Dog is a kind of Animal.", highlight: "Animal pet = new {{1}}()" },
+          { text: "pet is typed as Animal. C# will decide which Speak to call based on the actual object at runtime.", highlight: "Animal pet = new {{1}}()" },
+        ],
+      },
+      {
+        id: 2,
+        label: "Call abstract contract",
+        answer: "Speak",
+        hints: ["Method returns sound."],
+        explain: [
+          { text: "Speak is declared in Animal and overridden in both Dog and Cat with different return values.", highlight: "public abstract string Speak()" },
+          { text: "pet.Speak() calls Speak through the Animal reference. Because pet holds a Dog, C# runs Dog's version and returns Woof.", highlight: "Console.WriteLine(pet.{{2}}())" },
+        ],
+      },
     ],
   },
 ];
 
-const state = drills.map((d) => d.blanks.map(() => ({ value: "", hint: -1, explain: false })));
+const state = drills.map((d) => d.blanks.map(() => ({ value: "", hint: -1 })));
 let i = 0;
 
 const l2Meta = document.getElementById("l2Meta");
@@ -222,22 +319,47 @@ function withSlots(snippet) {
   return snippet.replace(/\{\{(\d+)\}\}/g, (_, n) => `__${n}__`);
 }
 
-function explainLine(snippet, blankId) {
-  const marker = `{{${blankId}}}`;
-  const line = snippet
-    .split("\n")
-    .find((candidate) => candidate.includes(marker));
+let currentHighlightEl = null;
 
-  if (!line) {
-    return "Fill the missing part so the code works as one complete idea.";
+function clearCodeHighlight() {
+  if (currentHighlightEl) {
+    currentHighlightEl.remove();
+    currentHighlightEl = null;
   }
-
-  return `You are completing this line: ${line.replace(marker, "____").trim()}`;
 }
 
-function simpleExplain(drill, blank) {
-  const firstHint = blank.hints && blank.hints.length > 0 ? blank.hints[0] : "Think about what this line should do.";
-  return `${explainLine(drill.snippet, blank.id)} This blank is about: ${blank.label}. ${firstHint}`;
+function applyCodeHighlight(snippet, highlightStr) {
+  clearCodeHighlight();
+  if (!highlightStr || !l2CodeWrap) return;
+  const pre = l2CodeWrap.querySelector("pre");
+  if (!pre) return;
+
+  const clean = highlightStr.replace(/\{\{\d+\}\}/g, "").trim();
+  if (!clean) return;
+  const lines = snippet.split("\n");
+  const lineIndex = lines.findIndex((l) =>
+    l.replace(/\{\{\d+\}\}/g, "").includes(clean)
+  );
+  if (lineIndex < 0) return;
+
+  const lineSpans = pre.querySelectorAll(".line-numbers-rows > span");
+  if (!lineSpans[lineIndex]) return;
+
+  const span = lineSpans[lineIndex];
+  const preRect = pre.getBoundingClientRect();
+  const spanRect = span.getBoundingClientRect();
+  const top = spanRect.top - preRect.top + pre.scrollTop;
+  const height = Math.max(spanRect.height, 20);
+
+  const hl = document.createElement("div");
+  hl.className = "code-line-hl";
+  hl.style.top = `${top}px`;
+  hl.style.height = `${height}px`;
+  pre.style.position = "relative";
+  pre.appendChild(hl);
+  currentHighlightEl = hl;
+
+  hl.scrollIntoView({ block: "nearest", behavior: "smooth" });
 }
 
 let explainOverlay;
@@ -254,6 +376,7 @@ function ensureExplainOverlay() {
 
   explainCard = document.createElement("div");
   explainCard.className = "explain-card";
+  explainCard.hidden = true;
 
   const closeBtn = document.createElement("button");
   closeBtn.type = "button";
@@ -264,12 +387,12 @@ function ensureExplainOverlay() {
   explainTitle = document.createElement("h4");
   explainTitle.className = "explain-title";
 
-  explainBody = document.createElement("p");
+  explainBody = document.createElement("div");
   explainBody.className = "explain-text";
 
   explainCard.append(explainTitle, explainBody, closeBtn);
-  explainOverlay.appendChild(explainCard);
   document.body.appendChild(explainOverlay);
+  document.body.appendChild(explainCard);
 
   explainOverlay.addEventListener("click", (event) => {
     if (event.target === explainOverlay) closeExplainOverlay();
@@ -279,30 +402,76 @@ function ensureExplainOverlay() {
 function closeExplainOverlay() {
   if (!explainOverlay) return;
   explainOverlay.hidden = true;
+  if (explainCard) explainCard.hidden = true;
+  explainOverlay.style.clipPath = "";
+  clearCodeHighlight();
   if (l2CodeWrap) l2CodeWrap.classList.remove("code-spotlight");
 }
 
-function positionExplainCard() {
-  if (!l2CodeWrap || !explainCard) return;
-  const rect = l2CodeWrap.getBoundingClientRect();
-  const cardWidth = Math.min(560, window.innerWidth - 32);
-  const left = Math.max(16, Math.min(rect.left + 18, window.innerWidth - cardWidth - 16));
-  const top = Math.max(16, rect.top + 18);
-  explainCard.style.left = `${left}px`;
-  explainCard.style.top = `${top}px`;
+function updateOverlayClipPath() {
+  if (!l2CodeWrap || !explainOverlay) return;
+  const r = l2CodeWrap.getBoundingClientRect();
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const d = `M0 0 H${vw} V${vh} H0 Z M${r.left} ${r.top} H${r.right} V${r.bottom} H${r.left} Z`;
+  explainOverlay.style.clipPath = `path(evenodd, '${d}')`;
 }
 
-function showExplainOverlay(blank, message) {
+function positionExplainCard() {
+  if (!explainCard) return;
+  const cardWidth = Math.min(560, window.innerWidth - 32);
+  const left = Math.max(16, Math.floor((window.innerWidth - cardWidth) / 2));
+  explainCard.style.left = `${left}px`;
+  explainCard.style.top = "";
+  explainCard.style.bottom = "16px";
+  explainCard.style.maxHeight = `${Math.floor(window.innerHeight * 0.38)}px`;
+  explainCard.style.overflowY = "auto";
+}
+
+function showExplainOverlay(steps, snippet) {
   ensureExplainOverlay();
-  explainTitle.textContent = `Blank ${blank.id}: ${blank.label}`;
-  explainBody.textContent = message;
+  explainTitle.textContent = "What this part of the code does";
+  explainBody.innerHTML = "";
+
+  const ol = document.createElement("ol");
+  ol.className = "explain-steps";
+
+  steps.forEach((step) => {
+    const li = document.createElement("li");
+    li.className = "explain-step";
+    li.textContent = step.text;
+    li.addEventListener("mouseenter", () => {
+      ol.querySelectorAll(".explain-step").forEach((el) => el.classList.remove("active"));
+      li.classList.add("active");
+      applyCodeHighlight(snippet, step.highlight);
+    });
+    ol.appendChild(li);
+  });
+
+  explainBody.appendChild(ol);
+
+  if (steps.length > 0) {
+    ol.firstChild.classList.add("active");
+    applyCodeHighlight(snippet, steps[0].highlight);
+  }
+
   explainOverlay.hidden = false;
-  if (l2CodeWrap) l2CodeWrap.classList.add("code-spotlight");
-  positionExplainCard();
+  if (explainCard) explainCard.hidden = false;
+  if (l2CodeWrap) {
+    l2CodeWrap.scrollIntoView({ behavior: "instant", block: "start" });
+    l2CodeWrap.classList.add("code-spotlight");
+  }
+  requestAnimationFrame(() => {
+    updateOverlayClipPath();
+    positionExplainCard();
+  });
 }
 
 window.addEventListener("resize", () => {
-  if (explainOverlay && !explainOverlay.hidden) positionExplainCard();
+  if (explainOverlay && !explainOverlay.hidden) {
+    updateOverlayClipPath();
+    positionExplainCard();
+  }
 });
 
 async function renderDiagram(drill) {
@@ -377,7 +546,7 @@ function render() {
     explainBtn.className = "btn explain-btn";
     explainBtn.textContent = "Explain this part";
     explainBtn.addEventListener("click", () => {
-      showExplainOverlay(b, `Simple explain: ${simpleExplain(d, b)}`);
+      showExplainOverlay(Array.isArray(b.explain) ? b.explain : [], d.snippet);
     });
 
     row.append(label, input, hint, explainBtn);
@@ -448,7 +617,7 @@ function check() {
 }
 
 function resetDrill() {
-  state[i] = drills[i].blanks.map(() => ({ value: "", hint: -1, explain: false }));
+  state[i] = drills[i].blanks.map(() => ({ value: "", hint: -1 }));
   render();
 }
 
