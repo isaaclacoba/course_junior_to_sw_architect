@@ -119,11 +119,16 @@ var b = {{1}};`,
     title: "Encapsulation Accessor",
     concept: "Encapsulation",
     context: "Expose controlled read access to private state.",
-    snippet: `private int _balance;
-public int {{1}}()
+    snippet: `public class BankAccount
 {
-    return _balance;
+    private int _balance;
+
+    public int {{1}}()
+    {
+        return _balance;
+    }
 }`,
+
     points: ["Private state should be accessed through methods.", "Public API should be explicit."],
     blanks: [
       {
@@ -248,9 +253,10 @@ Console.WriteLine(car.GetWheelCount());
 
     public OrderService(IRepository repo)
     {
-        {{1}}
+        {{1}} // field assignment goes here
     }
 }`,
+
     points: ["Composition uses collaborators.", "Constructor stores required dependency."],
     blanks: [
       {
@@ -261,7 +267,7 @@ Console.WriteLine(car.GetWheelCount());
         explain: [
           { text: "_repo is the field that stores the repository this service will use. It is private — only code inside this class can reach it.", highlight: "private readonly IRepository _repo" },
           { text: "The constructor receives repo from outside. Someone who creates an OrderService must hand it in.", highlight: "public OrderService(IRepository repo)" },
-          { text: "This line saves the incoming repo into _repo so every method in the class can use it later. Without this line, _repo stays empty.", highlight: "{{1}}" },
+          { text: "This line saves the incoming repo into _repo so every method in the class can use it later. Without this line, _repo stays empty.", highlight: "field assignment goes here" },
         ],
       },
     ],
@@ -501,8 +507,6 @@ const l1cResultBody = document.getElementById("l1cResultBody");
 const l1cResultList = document.getElementById("l1cResultList");
 const courseXpLabel = document.getElementById("courseXpLabel");
 const l1cCodeWrap = l1cCode.closest(".code-wrap");
-const l1cCard = l1cCode.closest(".card");
-let cardDimEl = null;
 
 const l1cPrev = document.getElementById("l1cPrev");
 const l1cNext = document.getElementById("l1cNext");
@@ -568,6 +572,7 @@ function applyCodeHighlight(snippet, highlightStr) {
   if (!pre) return;
 
   const clean = highlightStr.replace(/\{\{\d+\}\}/g, "").trim();
+  if (!clean) return;
   const lines = snippet.split("\n");
   const lineIndex = lines.findIndex((l) =>
     l.replace(/\{\{\d+\}\}/g, "").includes(clean)
@@ -631,10 +636,19 @@ function ensureExplainOverlay() {
 function closeExplainOverlay() {
   if (!explainOverlay) return;
   explainOverlay.hidden = true;
+  explainOverlay.style.clipPath = "";
   clearCodeHighlight();
   if (l1cCodeWrap) l1cCodeWrap.classList.remove("code-spotlight");
-  if (l1cCard) l1cCard.classList.remove("code-focus");
-  if (cardDimEl) { cardDimEl.remove(); cardDimEl = null; }
+}
+
+function updateOverlayClipPath() {
+  if (!l1cCodeWrap || !explainOverlay) return;
+  const r = l1cCodeWrap.getBoundingClientRect();
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  // SVG path with evenodd fill: outer viewport rect + inner code-wrap rect = transparent hole
+  const d = `M0 0 H${vw} V${vh} H0 Z M${r.left} ${r.top} H${r.right} V${r.bottom} H${r.left} Z`;
+  explainOverlay.style.clipPath = `path(evenodd, '${d}')`;
 }
 
 function positionExplainCard() {
@@ -645,10 +659,8 @@ function positionExplainCard() {
   const gap = 12;
   const left = Math.max(16, Math.min(rect.left, window.innerWidth - cardWidth - 16));
 
-  // Prefer placing the explanation above the code block to avoid covering source lines.
   let top = rect.top - cardHeight - gap;
   if (top < 16) {
-    // If there is not enough room above, place it below the code block instead.
     top = Math.min(window.innerHeight - cardHeight - 16, rect.bottom + gap);
   }
 
@@ -684,20 +696,16 @@ function showExplainOverlay(steps, snippet) {
   }
 
   explainOverlay.hidden = false;
+  updateOverlayClipPath();
   if (l1cCodeWrap) l1cCodeWrap.classList.add("code-spotlight");
-  if (l1cCard) {
-    l1cCard.classList.add("code-focus");
-    if (!cardDimEl) {
-      cardDimEl = document.createElement("div");
-      cardDimEl.className = "card-dim";
-      l1cCard.appendChild(cardDimEl);
-    }
-  }
   positionExplainCard();
 }
 
 window.addEventListener("resize", () => {
-  if (explainOverlay && !explainOverlay.hidden) positionExplainCard();
+  if (explainOverlay && !explainOverlay.hidden) {
+    updateOverlayClipPath();
+    positionExplainCard();
+  }
 });
 
 function render() {
