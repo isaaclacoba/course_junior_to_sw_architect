@@ -615,6 +615,7 @@ function ensureExplainOverlay() {
 
   explainCard = document.createElement("div");
   explainCard.className = "explain-card";
+  explainCard.hidden = true;
 
   const closeBtn = document.createElement("button");
   closeBtn.type = "button";
@@ -629,8 +630,8 @@ function ensureExplainOverlay() {
   explainBody.className = "explain-text";
 
   explainCard.append(explainTitle, explainBody, closeBtn);
-  explainOverlay.appendChild(explainCard);
   document.body.appendChild(explainOverlay);
+  document.body.appendChild(explainCard);
 
   explainOverlay.addEventListener("click", (event) => {
     if (event.target === explainOverlay) closeExplainOverlay();
@@ -640,6 +641,7 @@ function ensureExplainOverlay() {
 function closeExplainOverlay() {
   if (!explainOverlay) return;
   explainOverlay.hidden = true;
+  if (explainCard) explainCard.hidden = true;
   explainOverlay.style.clipPath = "";
   clearCodeHighlight();
   if (l1cCodeWrap) l1cCodeWrap.classList.remove("code-spotlight");
@@ -694,6 +696,7 @@ function showExplainOverlay(steps, snippet) {
   }
 
   explainOverlay.hidden = false;
+  if (explainCard) explainCard.hidden = false;
   if (l1cCodeWrap) {
     // Scroll code to top of viewport so there is always room at the bottom for the card.
     l1cCodeWrap.scrollIntoView({ behavior: "instant", block: "start" });
