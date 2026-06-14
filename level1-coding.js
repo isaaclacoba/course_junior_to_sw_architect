@@ -656,20 +656,14 @@ function updateOverlayClipPath() {
 }
 
 function positionExplainCard() {
-  if (!l1cCodeWrap || !explainCard) return;
-  const rect = l1cCodeWrap.getBoundingClientRect();
-  const cardHeight = explainCard.offsetHeight || 180;
+  if (!explainCard) return;
   const cardWidth = Math.min(560, window.innerWidth - 32);
-  const gap = 12;
-  const left = Math.max(16, Math.min(rect.left, window.innerWidth - cardWidth - 16));
-
-  let top = rect.top - cardHeight - gap;
-  if (top < 16) {
-    top = Math.min(window.innerHeight - cardHeight - 16, rect.bottom + gap);
-  }
-
+  const left = Math.max(16, Math.floor((window.innerWidth - cardWidth) / 2));
   explainCard.style.left = `${left}px`;
-  explainCard.style.top = `${top}px`;
+  explainCard.style.top = "";
+  explainCard.style.bottom = "16px";
+  explainCard.style.maxHeight = `${Math.floor(window.innerHeight * 0.38)}px`;
+  explainCard.style.overflowY = "auto";
 }
 
 function showExplainOverlay(steps, snippet) {
@@ -701,13 +695,15 @@ function showExplainOverlay(steps, snippet) {
 
   explainOverlay.hidden = false;
   if (l1cCodeWrap) {
-    // Scroll the code block into the viewport first (instant so getBoundingClientRect is up to date).
-    l1cCodeWrap.scrollIntoView({ behavior: "instant", block: "center" });
+    // Scroll code to top of viewport so there is always room at the bottom for the card.
+    l1cCodeWrap.scrollIntoView({ behavior: "instant", block: "start" });
     l1cCodeWrap.classList.add("code-spotlight");
   }
-  updateOverlayClipPath();
-  // Defer card positioning by one frame so layout reflects the scroll.
-  requestAnimationFrame(positionExplainCard);
+  // Defer both clip-path and card position to the same frame after scroll settles.
+  requestAnimationFrame(() => {
+    updateOverlayClipPath();
+    positionExplainCard();
+  });
 }
 
 window.addEventListener("resize", () => {
