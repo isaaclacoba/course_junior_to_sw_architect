@@ -109,8 +109,7 @@ h1 {
   z-index: 900;
 }
 
-.card.code-focus::before {
-  content: '';
+.card-dim {
   position: absolute;
   inset: 0;
   background: rgba(18, 22, 30, 0.62);

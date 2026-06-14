@@ -502,6 +502,7 @@ const l1cResultList = document.getElementById("l1cResultList");
 const courseXpLabel = document.getElementById("courseXpLabel");
 const l1cCodeWrap = l1cCode.closest(".code-wrap");
 const l1cCard = l1cCode.closest(".card");
+let cardDimEl = null;
 
 const l1cPrev = document.getElementById("l1cPrev");
 const l1cNext = document.getElementById("l1cNext");
@@ -633,6 +634,7 @@ function closeExplainOverlay() {
   clearCodeHighlight();
   if (l1cCodeWrap) l1cCodeWrap.classList.remove("code-spotlight");
   if (l1cCard) l1cCard.classList.remove("code-focus");
+  if (cardDimEl) { cardDimEl.remove(); cardDimEl = null; }
 }
 
 function positionExplainCard() {
@@ -683,7 +685,14 @@ function showExplainOverlay(steps, snippet) {
 
   explainOverlay.hidden = false;
   if (l1cCodeWrap) l1cCodeWrap.classList.add("code-spotlight");
-  if (l1cCard) l1cCard.classList.add("code-focus");
+  if (l1cCard) {
+    l1cCard.classList.add("code-focus");
+    if (!cardDimEl) {
+      cardDimEl = document.createElement("div");
+      cardDimEl.className = "card-dim";
+      l1cCard.appendChild(cardDimEl);
+    }
+  }
   positionExplainCard();
 }
 
