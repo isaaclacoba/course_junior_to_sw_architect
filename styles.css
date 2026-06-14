@@ -104,6 +104,21 @@ h1 {
   animation: rise 600ms ease-out;
 }
 
+.card.code-focus {
+  position: relative;
+  z-index: 900;
+}
+
+.card.code-focus::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(18, 22, 30, 0.62);
+  border-radius: inherit;
+  z-index: 2;
+  pointer-events: none;
+}
+
 .challenge-head {
   display: flex;
   justify-content: space-between;
@@ -146,7 +161,7 @@ h1 {
 
 .code-wrap.code-spotlight {
   position: relative;
-  z-index: 900;
+  z-index: 3;
   box-shadow: 0 0 0 3px #ffe7a6;
 }
 
@@ -447,7 +462,7 @@ input.almost {
 .explain-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(18, 22, 30, 0.74);
+  background: rgba(18, 22, 30, 0.55);
   z-index: 850;
 }
 
