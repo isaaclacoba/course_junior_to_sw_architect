@@ -421,6 +421,7 @@ Console.WriteLine($"Notifications sent: {service.{{7}}()}");
         hints: ["Use the Log method parameter directly."],
         explain: [
           { text: "Log is a method that receives a text value called message as its input.", highlight: "void Log(string message)" },
+          { text: "The => symbol is a shorthand for a method body with a single action. It means: when this method runs, do exactly what follows the arrow.", highlight: "public void Log(string message) => Console.WriteLine({{1}})" },
           { text: "Console.WriteLine prints to the screen. We want to print whatever was passed in as message.", highlight: "public void Log(string message) => Console.WriteLine({{1}})" },
         ],
       },
@@ -595,6 +596,9 @@ function applyCodeHighlight(snippet, highlightStr) {
   pre.style.position = "relative";
   pre.appendChild(hl);
   currentHighlightEl = hl;
+
+  // Scroll the highlighted line into view inside the code block.
+  hl.scrollIntoView({ block: "nearest", behavior: "smooth" });
 }
 
 let explainOverlay;
@@ -696,9 +700,14 @@ function showExplainOverlay(steps, snippet) {
   }
 
   explainOverlay.hidden = false;
+  if (l1cCodeWrap) {
+    // Scroll the code block into the viewport first (instant so getBoundingClientRect is up to date).
+    l1cCodeWrap.scrollIntoView({ behavior: "instant", block: "center" });
+    l1cCodeWrap.classList.add("code-spotlight");
+  }
   updateOverlayClipPath();
-  if (l1cCodeWrap) l1cCodeWrap.classList.add("code-spotlight");
-  positionExplainCard();
+  // Defer card positioning by one frame so layout reflects the scroll.
+  requestAnimationFrame(positionExplainCard);
 }
 
 window.addEventListener("resize", () => {
