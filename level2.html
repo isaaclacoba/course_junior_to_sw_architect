@@ -26,10 +26,15 @@
     <main class="layout">
       <section class="hero">
         <p class="eyebrow">Guided coding practice</p>
-        <h1>Level 2: C# Core Coding Drills</h1>
+        <h1>Level 2: SOLID, One Step at a Time</h1>
         <p class="subtitle">
-          Short programming tasks to refresh syntax and core OO concepts before advanced automation
-          patterns. Write small valid C# pieces with immediate feedback.
+          One small test-automation codebase, improved one principle per drill. Each drill shows the
+          problem first, where it fits in the bigger picture, then one small thing for you to write.
+        </p>
+        <p class="subtitle solid-intro">
+          <strong>SOLID</strong> is five habits for writing classes that are easy to change without
+          breaking other code. The five letters — S, O, L, I, D — are what this level walks through,
+          one at a time.
         </p>
         <p class="subtitle"><strong id="courseXpLabel">Course XP: 0</strong></p>
         <p class="subtitle"><a href="index.html">Back to level selector</a></p>
@@ -48,6 +53,16 @@
           </div>
         </header>
 
+        <section class="pain-box">
+          <h3>The problem</h3>
+          <p id="l2Pain"></p>
+        </section>
+
+        <section class="map-box">
+          <h3>Where this fits</h3>
+          <p id="l2Map"></p>
+        </section>
+
         <div class="code-wrap">
           <pre class="line-numbers"><code id="l2Code" class="language-csharp"></code></pre>
         </div>
@@ -60,13 +75,14 @@
         </section>
 
         <section class="fill-section">
-          <h3>Write Missing C# Code</h3>
+          <h3>Your move</h3>
           <div id="l2Inputs" class="inputs"></div>
         </section>
 
         <section class="actions">
           <button id="l2Check" class="btn primary" type="button">Check</button>
           <button id="l2Hint" class="btn" type="button">Hint</button>
+          <button id="l2Answers" class="btn" type="button">Show answers</button>
           <button id="l2Reset" class="btn" type="button">Reset</button>
         </section>
 
@@ -74,6 +90,12 @@
           <h3 id="l2ResultTitle"></h3>
           <p id="l2ResultBody"></p>
           <ul id="l2ResultList"></ul>
+        </section>
+
+        <section id="l2Summary" class="summary-section" hidden>
+          <p id="l2SummaryIntro" class="context"></p>
+          <ul id="l2SummaryList" class="summary-list"></ul>
+          <p id="l2SummaryClose" class="summary-close"></p>
         </section>
 
         <footer class="nav-row">

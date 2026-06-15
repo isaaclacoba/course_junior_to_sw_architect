@@ -17,6 +17,10 @@
   box-sizing: border-box;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 body {
   margin: 0;
   font-family: "Space Grotesk", sans-serif;
@@ -136,6 +140,68 @@ h1 {
 
 .badge.ghost {
   background: transparent;
+}
+
+.pain-box,
+.map-box {
+  margin: 0.9rem 0;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.pain-box {
+  border-left: 4px solid var(--danger);
+  background: rgba(155, 44, 44, 0.06);
+}
+
+.map-box {
+  border-left: 4px solid var(--primary);
+  background: rgba(31, 111, 95, 0.07);
+}
+
+.pain-box h3,
+.map-box h3 {
+  margin: 0 0 0.3rem;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pain-box p,
+.map-box p {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+.summary-section {
+  margin-top: 0.6rem;
+}
+
+.summary-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.8rem 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.summary-list li {
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--primary);
+  border-radius: 12px;
+  background: rgba(31, 111, 95, 0.06);
+}
+
+.summary-list li strong {
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.summary-close {
+  font-weight: 700;
+  color: var(--primary-2);
 }
 
 .code-wrap {
