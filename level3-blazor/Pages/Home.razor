@@ -37,13 +37,7 @@
     }
 
     <section class="editor-wrap">
-        <pre class="gutter" @ref="_gutter">@LineNumbers</pre>
-        <textarea class="editor"
-                  @ref="_editor"
-                  spellcheck="false"
-                  @bind="_code"
-                  @bind:event="oninput"
-                  @onscroll="SyncGutter"></textarea>
+        <div class="monaco-host" @ref="_editorHost"></div>
     </section>
 
     <section class="cap-actions">
@@ -74,6 +68,16 @@
                                 <span class="friendly">@e.Friendly</span>
                             }
                             <span class="raw">@e.Raw</span>
+                            @if (e.Why is not null)
+                            {
+                                <button class="why-toggle" @onclick="() => ToggleWhy(e)">
+                                    @(_openWhy.Contains(e) ? "Hide why" : "Learn why")
+                                </button>
+                                @if (_openWhy.Contains(e))
+                                {
+                                    <p class="why-text">@e.Why</p>
+                                }
+                            }
                         </li>
                     }
                 </ul>
@@ -106,6 +110,10 @@
                         @if (!c.Passed)
                         {
                             <div class="hint-zone">
+                                @if (c.Anchors.Count > 0)
+                                {
+                                    <button class="btn tiny point" @onclick="() => ShowWhere(c)">Show me where</button>
+                                }
                                 @{ var shown = HintLevel(m.Id); }
                                 @for (var r = 0; r < shown; r++)
                                 {
@@ -125,6 +133,20 @@
                                     </button>
                                 }
                             </div>
+                        }
+                        @if (m.Why is not null)
+                        {
+                            <button class="why-toggle" @onclick="() => ToggleMilestoneWhy(m.Id)">
+                                @(_openMilestoneWhy.Contains(m.Id) ? "Hide why" : "Learn why")
+                            </button>
+                            @if (_openMilestoneWhy.Contains(m.Id))
+                            {
+                                <p class="why-text">@m.Why</p>
+                                @if (_milestoneSvg.TryGetValue(m.Id, out var svg) && !string.IsNullOrEmpty(svg))
+                                {
+                                    <div class="why-diagram">@((MarkupString)svg)</div>
+                                }
+                            }
                         }
                     </li>
                 }
@@ -156,23 +178,17 @@
     private CompileResult? _result;
     private IReadOnlyList<MilestoneResult>? _checks;
     private readonly Dictionary<int, int> _hintLevels = new();
+    private readonly HashSet<CompileError> _openWhy = new();
+    private readonly HashSet<int> _openMilestoneWhy = new();
+    private readonly Dictionary<int, string> _milestoneSvg = new();
     private bool _allPassed;
     private bool _gaveUp;
     private bool _busy;
     private bool _ready;
-    private ElementReference _editor;
-    private ElementReference _gutter;
+    private ElementReference _editorHost;
+    private bool _editorReady;
 
     private int PassedCount => _checks?.Count(c => c.Passed) ?? 0;
-
-    private string LineNumbers
-    {
-        get
-        {
-            var lines = _code.Count(c => c == '\n') + 1;
-            return string.Join('\n', Enumerable.Range(1, lines));
-        }
-    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -180,8 +196,31 @@
         _ready = true;
     }
 
-    private async Task SyncGutter()
-        => await JS.InvokeVoidAsync("level3Capstone.syncGutter", _editor, _gutter);
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("level3Capstone.initEditor", _editorHost, _code);
+            _editorReady = true;
+        }
+    }
+
+    private async Task PullCode()
+    {
+        if (_editorReady)
+        {
+            _code = await JS.InvokeAsync<string>("level3Capstone.getValue");
+        }
+    }
+
+    private async Task ShowMarkers()
+    {
+        var markers = _result?.Errors
+            .Where(e => e.Line is not null)
+            .Select(e => new { line = e.Line, column = e.Column, message = e.Raw })
+            ?? Enumerable.Empty<object>();
+        await JS.InvokeVoidAsync("level3Capstone.setMarkers", markers);
+    }
 
     private IEnumerable<(Milestone m, MilestoneResult c)> Pairs()
         => _checks is null
@@ -197,18 +236,61 @@
         if (current < max) _hintLevels[id] = current + 1;
     }
 
+    private void ToggleWhy(CompileError e)
+    {
+        if (!_openWhy.Add(e)) _openWhy.Remove(e);
+    }
+
+    private async Task ToggleMilestoneWhy(int id)
+    {
+        if (!_openMilestoneWhy.Add(id))
+        {
+            _openMilestoneWhy.Remove(id);
+            return;
+        }
+
+        var milestone = Milestones.First(m => m.Id == id);
+        if (milestone.Diagram is not null && !_milestoneSvg.ContainsKey(id))
+        {
+            _milestoneSvg[id] = await JS.InvokeAsync<string>("level3Capstone.renderMermaid", milestone.Diagram);
+        }
+
+        // Open the explanation and point at the code at the same time.
+        var result = _checks?.FirstOrDefault(c => c.Id == id);
+        if (result is { Anchors.Count: > 0 })
+        {
+            await JS.InvokeVoidAsync("level3Capstone.highlightSpans", result.Anchors);
+        }
+    }
+
+    private async Task ShowWhere(MilestoneResult result)
+    {
+        if (result.Anchors.Count > 0)
+        {
+            await JS.InvokeVoidAsync("level3Capstone.highlightSpans", result.Anchors);
+        }
+    }
+
     private async Task Run()
     {
+        await PullCode();
         _busy = true;
         _result = null;
+        _openWhy.Clear();
+        await JS.InvokeVoidAsync("level3Capstone.clearHighlights");
         await Task.Yield();
         _result = await Compiler.RunAsync(_code);
         _busy = false;
+        await ShowMarkers();
     }
 
     private async Task CheckProgress()
     {
+        await PullCode();
         _busy = true;
+        _openMilestoneWhy.Clear();
+        _milestoneSvg.Clear();
+        await JS.InvokeVoidAsync("level3Capstone.clearHighlights");
         await Task.Yield();
         var checks = StructuralChecks.Run(_code);
         _checks = checks;
@@ -233,14 +315,17 @@
         }
     }
 
-    private void GiveUp()
+    private async Task GiveUp()
     {
         _code = Capstone.ReferenceSolution;
         _result = null;
         _gaveUp = true;
+        await JS.InvokeVoidAsync("level3Capstone.setValue", _code);
+        await JS.InvokeVoidAsync("level3Capstone.setMarkers", Enumerable.Empty<object>());
+        await JS.InvokeVoidAsync("level3Capstone.clearHighlights");
     }
 
-    private void Reset()
+    private async Task Reset()
     {
         _code = Capstone.StarterCode;
         _result = null;
@@ -248,5 +333,10 @@
         _allPassed = false;
         _gaveUp = false;
         _hintLevels.Clear();
+        _openMilestoneWhy.Clear();
+        _milestoneSvg.Clear();
+        await JS.InvokeVoidAsync("level3Capstone.setValue", _code);
+        await JS.InvokeVoidAsync("level3Capstone.setMarkers", Enumerable.Empty<object>());
+        await JS.InvokeVoidAsync("level3Capstone.clearHighlights");
     }
 }
