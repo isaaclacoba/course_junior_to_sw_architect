@@ -1,6 +1,15 @@
 # Work Log
 
-- Start: 2026-06-14 13:26:47 CEST
+- Start: 2026-06-17 15:43:30 CEST | Task: Redesign Level 3 capstone milestone ladder to enforce dependency injection in small junior-friendly steps - inject the formatter (no interface, pure function), abstract+inject+swap the reporter (interface, side effect), with concept notes teaching when an interface earns its place.
+- End: 2026-06-17 15:57:41 CEST | Result: Grew ladder from 5 to 7 milestones (added 'inject the formatter, don't build it' and 'prove substitutability'); tightened reporter step to require interface-typed injection and no Console. in TestRunner; added Roslyn checks for formatter injection, console-welding, and two-reporter substitution; added per-milestone 'Learn why' concept notes mapping each step to SRP/DI/DIP/OCP/LSP and the interface-vs-over-engineering rule; updated StarterCode/ReferenceSolution to inject the formatter and run both reporters. Build clean.
+
+- Start: 2026-06-17 16:09:07 CEST | Task: Add Level-2-style 'point with the finger' interactivity to the Level 3 capstone - glow the student's own offending line in Monaco, a 'Show me where' button, and a per-milestone dependency mini-diagram.
+- End: 2026-06-17 16:15:32 CEST | Result: StructuralChecks now returns CodeAnchor spans (problem/target) located via Roslyn for the student's own code (e.g. inline new TestFormatter()); added Monaco highlightSpans/clearHighlights using deltaDecorations with red/green glow + glyph-margin dots; 'Learn why' and a new 'Show me where' button now scroll to and glow the exact line; added a Mermaid mini-diagram per milestone (rendered via mermaid 10.9.1 renderMermaid interop) showing the welded->injected arrow flip; highlights cleared on Run/Check/Reset/GiveUp. Build clean.
+
+- Start: 2026-06-17 16:16:00 CEST | Task: SOLID audit of the capstone code and atomic commits of the session's work.
+- End: 2026-06-17 16:26:43 CEST | Result: Flagged StructuralChecks.Run as the flagship violation - one method parsed the code, held all 7 milestone rules, and built every anchor (SRP), with results assembled from three positionally-coupled arrays so extending it meant editing three spots in lockstep (OCP). Fixed by introducing IMilestoneRule strategies (one rule per milestone, matched by Id) and a shared CapstoneSyntax parsed once (DRY); Run() now just maps rules over Capstone.Milestones. Noted but deferred as over-engineering/higher-risk: CompilerService hint switches (idiomatic lookup), Home.razor multi-concern @code block. Committed atomically: feature baseline, then the refactor, then docs. Build clean.
+
+
 - Task: Build frontend-only interactive C# OO automation learning quiz (gap-filling + hints + scoring).
 - End: 2026-06-14 13:30:09 CEST
 - Result: Delivered frontend-only training app with 5 C# OO automation-themed gap-fill challenges, hints, and feedback.
