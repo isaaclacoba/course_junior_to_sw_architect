@@ -40,6 +40,11 @@
                 } catch (e) {
                     // Ignore cross-origin issues when not embedded.
                 }
+            },
+            syncGutter: function (editor, gutter) {
+                if (editor && gutter) {
+                    gutter.scrollTop = editor.scrollTop;
+                }
             }
         };
     </script>

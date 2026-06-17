@@ -158,10 +158,28 @@ code {
     border-radius: 14px;
     overflow: hidden;
     box-shadow: 0 18px 50px rgba(39, 40, 52, 0.12);
+    display: flex;
+    background: #1c1d25;
+}
+
+.gutter {
+    margin: 0;
+    padding: 1rem 0.6rem 1rem 0.9rem;
+    min-height: 340px;
+    border-right: 1px solid rgba(244, 240, 232, 0.12);
+    font-family: 'IBM Plex Mono', 'Consolas', monospace;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    background: #16171e;
+    color: #6b6f7e;
+    text-align: right;
+    user-select: none;
+    overflow: hidden;
+    white-space: pre;
 }
 
 .editor {
-    width: 100%;
+    flex: 1;
     min-height: 340px;
     border: 0;
     padding: 1rem;
@@ -172,6 +190,8 @@ code {
     color: #f4f0e8;
     resize: vertical;
     tab-size: 4;
+    white-space: pre;
+    overflow-wrap: normal;
 }
 
 .editor:focus {

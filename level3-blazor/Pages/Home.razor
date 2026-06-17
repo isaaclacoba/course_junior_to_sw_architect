@@ -37,10 +37,13 @@
     }
 
     <section class="editor-wrap">
+        <pre class="gutter" @ref="_gutter">@LineNumbers</pre>
         <textarea class="editor"
+                  @ref="_editor"
                   spellcheck="false"
                   @bind="_code"
-                  @bind:event="oninput"></textarea>
+                  @bind:event="oninput"
+                  @onscroll="SyncGutter"></textarea>
     </section>
 
     <section class="cap-actions">
@@ -157,14 +160,28 @@
     private bool _gaveUp;
     private bool _busy;
     private bool _ready;
+    private ElementReference _editor;
+    private ElementReference _gutter;
 
     private int PassedCount => _checks?.Count(c => c.Passed) ?? 0;
+
+    private string LineNumbers
+    {
+        get
+        {
+            var lines = _code.Count(c => c == '\n') + 1;
+            return string.Join('\n', Enumerable.Range(1, lines));
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
         await Compiler.InitAsync();
         _ready = true;
     }
+
+    private async Task SyncGutter()
+        => await JS.InvokeVoidAsync("level3Capstone.syncGutter", _editor, _gutter);
 
     private IEnumerable<(Milestone m, MilestoneResult c)> Pairs()
         => _checks is null
