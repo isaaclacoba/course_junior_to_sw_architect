@@ -1,0 +1,234 @@
+@page "/"
+@using Level3Capstone.Services
+@inject CompilerService Compiler
+@inject IJSRuntime JS
+
+<div class="capstone">
+    <header class="cap-head">
+        <p class="eyebrow">Level 3 capstone</p>
+        <h1>SOLID in practice</h1>
+        <p class="lead">Refactor a small, working program one step at a time. It compiles and runs right here in your browser.</p>
+        <p class="back-link"><a href="../index.html">Back to level selector</a></p>
+    </header>
+
+    <section class="brief">
+        <h3>The goal</h3>
+        <p>
+            This <code>TestRunner</code> works, but it does three jobs at once and is welded to the console.
+            Reshape it so each job lives where it belongs. You do not have to do it all at once - chip away,
+            and watch the milestones below fill in as you go.
+        </p>
+    </section>
+
+    <section class="progress-wrap">
+        <div class="progress-head">
+            <strong>Progress</strong>
+            <span>@PassedCount / @Milestones.Length</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width:@(PassedCount * 100 / Milestones.Length)%"></div>
+        </div>
+    </section>
+
+    @if (!_ready)
+    {
+        <p class="preparing">Preparing the C# compiler...</p>
+    }
+
+    <section class="editor-wrap">
+        <textarea class="editor"
+                  spellcheck="false"
+                  @bind="_code"
+                  @bind:event="oninput"></textarea>
+    </section>
+
+    <section class="cap-actions">
+        <button class="btn primary" @onclick="Run" disabled="@(_busy || !_ready)">
+            @(_busy ? "Working..." : "Run")
+        </button>
+        <button class="btn" @onclick="CheckProgress" disabled="@(_busy || !_ready)">Check progress</button>
+        <button class="btn" @onclick="Reset" disabled="@_busy">Reset code</button>
+    </section>
+
+    @if (_result is not null)
+    {
+        @if (_result.Errors.Count > 0)
+        {
+            <section class="panel errors">
+                <h3>Let's fix this first</h3>
+                <p class="errors-note">Often a single early mistake (a missing or extra <code>{ } ( ) ;</code>) is enough to confuse the rest. Fix the top one first, then run again.</p>
+                <ul>
+                    @foreach (var e in _result.Errors)
+                    {
+                        <li>
+                            @if (e.Line is not null)
+                            {
+                                <span class="loc">Line @e.Line@(e.Column is not null ? $", col {e.Column}" : "")</span>
+                            }
+                            @if (e.Friendly is not null)
+                            {
+                                <span class="friendly">@e.Friendly</span>
+                            }
+                            <span class="raw">@e.Raw</span>
+                        </li>
+                    }
+                </ul>
+            </section>
+        }
+        else
+        {
+            <section class="panel output">
+                <h3>Output</h3>
+                <pre>@_result.Output</pre>
+                @if (_result.RuntimeError is not null)
+                {
+                    <p class="runtime-error">Runtime error: @_result.RuntimeError</p>
+                }
+            </section>
+        }
+    }
+
+    @if (_checks is not null)
+    {
+        <section class="panel checks">
+            <h3>Milestones</h3>
+            <ul class="check-list">
+                @foreach (var (m, c) in Pairs())
+                {
+                    <li class="@(c.Passed ? "pass" : "fail")">
+                        <span class="mark">@(c.Passed ? "DONE" : "TODO")</span>
+                        <span class="label">@c.Title</span>
+                        <span class="detail">@c.Detail</span>
+                        @if (!c.Passed)
+                        {
+                            <div class="hint-zone">
+                                @{ var shown = HintLevel(m.Id); }
+                                @for (var r = 0; r < shown; r++)
+                                {
+                                    var hint = m.Hints[r];
+                                    <div class="hint">
+                                        <span class="hint-text">@hint.Text</span>
+                                        @if (hint.Code is not null)
+                                        {
+                                            <pre class="hint-code">@hint.Code</pre>
+                                        }
+                                    </div>
+                                }
+                                @if (shown < m.Hints.Length)
+                                {
+                                    <button class="btn tiny" @onclick="() => RevealHint(m.Id)">
+                                        @(shown == 0 ? "I'm stuck - nudge me" : "Still stuck - more")
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </li>
+                }
+            </ul>
+
+            @if (_allPassed)
+            {
+                <p class="cap-done">All milestones done. You refactored it yourself - capstone complete.</p>
+            }
+        </section>
+    }
+
+    <section class="give-up">
+        @if (!_gaveUp)
+        {
+            <button class="btn ghost" @onclick="GiveUp">I give up - show me a full solution</button>
+        }
+        else
+        {
+            <p class="give-up-note">No shame in it - study this, then try again from Reset.</p>
+        }
+    </section>
+</div>
+
+@code {
+    private static Milestone[] Milestones => Capstone.Milestones;
+
+    private string _code = Capstone.StarterCode;
+    private CompileResult? _result;
+    private IReadOnlyList<MilestoneResult>? _checks;
+    private readonly Dictionary<int, int> _hintLevels = new();
+    private bool _allPassed;
+    private bool _gaveUp;
+    private bool _busy;
+    private bool _ready;
+
+    private int PassedCount => _checks?.Count(c => c.Passed) ?? 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Compiler.InitAsync();
+        _ready = true;
+    }
+
+    private IEnumerable<(Milestone m, MilestoneResult c)> Pairs()
+        => _checks is null
+            ? Enumerable.Empty<(Milestone, MilestoneResult)>()
+            : Milestones.Zip(_checks, (m, c) => (m, c));
+
+    private int HintLevel(int id) => _hintLevels.TryGetValue(id, out var v) ? v : 0;
+
+    private void RevealHint(int id)
+    {
+        var current = HintLevel(id);
+        var max = Milestones.First(m => m.Id == id).Hints.Length;
+        if (current < max) _hintLevels[id] = current + 1;
+    }
+
+    private async Task Run()
+    {
+        _busy = true;
+        _result = null;
+        await Task.Yield();
+        _result = await Compiler.RunAsync(_code);
+        _busy = false;
+    }
+
+    private async Task CheckProgress()
+    {
+        _busy = true;
+        await Task.Yield();
+        var checks = StructuralChecks.Run(_code);
+        _checks = checks;
+        var nowAll = checks.All(c => c.Passed);
+        if (nowAll && !_allPassed)
+        {
+            await AwardXp();
+        }
+        _allPassed = nowAll;
+        _busy = false;
+    }
+
+    private async Task AwardXp()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("level3Capstone.awardXp", 50);
+        }
+        catch
+        {
+            // XP bridge is optional; ignore if not embedded.
+        }
+    }
+
+    private void GiveUp()
+    {
+        _code = Capstone.ReferenceSolution;
+        _result = null;
+        _gaveUp = true;
+    }
+
+    private void Reset()
+    {
+        _code = Capstone.StarterCode;
+        _result = null;
+        _checks = null;
+        _allPassed = false;
+        _gaveUp = false;
+        _hintLevels.Clear();
+    }
+}

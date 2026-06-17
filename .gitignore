@@ -1,0 +1,7 @@
+# Blazor build output and the published copy (CI rebuilds these)
+level3-blazor/bin/
+level3-blazor/obj/
+level3-blazor/publish/
+level3-app/
+blazor-publish/
+_site/

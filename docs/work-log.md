@@ -55,3 +55,12 @@
 
 - Start: 2026-06-15 19:42:30 CEST | Task: Add final recap page summarizing the SOLID lesson after drill 10.
 - End: 2026-06-15 19:42:30 CEST | Result: Added summary entry (11th page) with per-letter recap + closing thread to testing; render hides practice sections and shows recap; progress reads "Recap" and drills now count out of 10.
+
+- Start: 2026-06-15 19:57:04 CEST | Task: Level 3 as Blazor WebAssembly app that compiles and runs student C# in-browser (Roslyn in WASM), SOLID capstone (test-automation theme), embedded in existing site via iframe.
+- End: 2026-06-15 20:42:35 CEST | Result: Built guided gamified Level 3 capstone. 5 structural milestones (S formatter extract, S TestRunner stops formatting, D reporter interface, D inject reporter, O second reporter) detected via Roslyn syntax analysis in StructuralChecks.cs. Home.razor: progress bar, per-milestone opt-in "I'm stuck" 3-rung hint ladders (concept -> direction -> skeleton), friendly compiler-error translation (CS-code map), gated "I give up" reveal of reference solution. Builds clean; running on :5099.
+
+- Start: 2026-06-17 14:15:34 CEST | Task: Fix compiler errors showing no line numbers + suppress cascade; link Blazor capstone from index; make it runnable on Windows.
+- End: 2026-06-17 14:15:34 CEST | Result: CompilerService now attaches Line/Column to each diagnostic, shows only syntax errors when parse fails (kills the misleading namespace/boot/duplicate-Program cascade), dedupes/sorts/caps at 6. Home.razor renders a red "Line N, col M" badge + root-cause-first note. Published Blazor to level3-app/ with base href="./"; added Capstone card to index.html and back-to-selector link. Added serve.cmd/serve.sh and README HTTP-serving instructions (Blazor WASM cannot run from file://). Verified all resources serve 200 over HTTP.
+
+- Start: 2026-06-17 14:41:48 CEST | Task: Host the site on GitHub Pages (Blazor capstone + static levels), no PAT.
+- End: 2026-06-17 14:41:48 CEST | Result: Added .github/workflows/deploy.yml (CI builds Blazor with .NET 8, assembles static site + published level3-app via rsync, rewrites base href to ./, adds .nojekyll, deploys with actions/deploy-pages using built-in GITHUB_TOKEN). Added .gitignore for bin/obj/publish/level3-app. No binaries committed; every push to master republishes.
