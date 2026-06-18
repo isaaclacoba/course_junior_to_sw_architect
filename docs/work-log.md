@@ -1,5 +1,8 @@
 # Work Log
 
+- Start: 2026-06-18 09:50:55 CEST | Task: Build Level 4 'Reuse without regret' - a reading-to-understand module (no code writing) hammering inheritance vs composition vs polymorphism, decision spine is-a/has-a + favor composition, diamond problem as the core 'why', animal-themed and gently absurd, tying back to the SOLID capstone. New level4.html + level4.js cloning the Level 1 quiz engine plus a Prism code panel.
+- End: 2026-06-18 09:59:17 CEST | Done: Added level4.html (Prism C# code panel + Level 1 quiz shell, l4-prefixed ids), level4.js (12 read-and-predict cards across 3 sections A/B/C; diamond problem centerpiece; capstone IReporter tie-back; shared course_global_xp, level4_awarded once-only 10 XP, mermaid neutral diagrams), and a Level 4 card on index.html. Verified: node --check passes, all l4 ids wired, CSS hooks present, assets serve HTTP 200.
+
 - Start: 2026-06-17 15:43:30 CEST | Task: Redesign Level 3 capstone milestone ladder to enforce dependency injection in small junior-friendly steps - inject the formatter (no interface, pure function), abstract+inject+swap the reporter (interface, side effect), with concept notes teaching when an interface earns its place.
 - End: 2026-06-17 15:57:41 CEST | Result: Grew ladder from 5 to 7 milestones (added 'inject the formatter, don't build it' and 'prove substitutability'); tightened reporter step to require interface-typed injection and no Console. in TestRunner; added Roslyn checks for formatter injection, console-welding, and two-reporter substitution; added per-milestone 'Learn why' concept notes mapping each step to SRP/DI/DIP/OCP/LSP and the interface-vs-over-engineering rule; updated StarterCode/ReferenceSolution to inject the formatter and run both reporters. Build clean.
 

@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Level 4 - Reuse Without Regret</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  </head>
+  <body>
+    <div class="noise"></div>
+    <main class="layout">
+      <section class="hero">
+        <p class="eyebrow">Reuse track</p>
+        <h1>Level 4: Reuse Without Regret</h1>
+        <p class="subtitle">
+          Inheritance, composition, and the polymorphism payoff - by reading code, not writing it.
+          You answer one question: is this an honest <em>is-a</em>, or really a <em>has-a</em>?
+          Read slowly. An architect skims these in five minutes; the point is to earn that speed.
+        </p>
+        <p class="subtitle"><strong id="courseXpLabel">Course XP: 0</strong></p>
+        <p class="subtitle"><a href="index.html">Back to level selector</a></p>
+      </section>
+
+      <section class="card level1-shell" aria-live="polite">
+        <header class="challenge-head">
+          <div>
+            <p id="l4Meta" class="meta"></p>
+            <h2 id="l4Title"></h2>
+            <p id="l4Context" class="context"></p>
+          </div>
+          <div class="badge-group">
+            <span id="l4Concept" class="badge"></span>
+            <span id="l4Progress" class="badge ghost"></span>
+          </div>
+        </header>
+
+        <section class="coach">
+          <h3>Read the code</h3>
+          <div class="code-wrap">
+            <pre class="line-numbers"><code id="l4Code" class="language-csharp"></code></pre>
+          </div>
+        </section>
+
+        <section class="coach">
+          <h3>What is going on</h3>
+          <p id="l4Explain" class="context"></p>
+          <ul id="l4Points" class="coach-list"></ul>
+        </section>
+
+        <section class="coach">
+          <h3>Picture it</h3>
+          <div id="l4Diagram" class="coach-diagram"></div>
+        </section>
+
+        <section class="coach">
+          <h3>Your call</h3>
+          <p id="l4Question" class="context"></p>
+          <div id="l4Options" class="options"></div>
+          <p id="l4Feedback" class="context"></p>
+        </section>
+
+        <footer class="nav-row">
+          <button id="l4Prev" class="btn" type="button">Previous</button>
+          <button id="l4Next" class="btn primary" type="button">Next</button>
+        </footer>
+      </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="level4.js"></script>
+  </body>
+</html>
