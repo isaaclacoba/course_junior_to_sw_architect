@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bridge - Reading Objects</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css"
+    />
+    <link rel="stylesheet" href="vendor/code-lab/code-lab.css" />
+  </head>
+  <body>
+    <div class="noise"></div>
+    <main class="layout">
+      <section class="hero">
+        <p class="eyebrow">Bridge between micro-coding and SOLID</p>
+        <h1>Reading Objects</h1>
+        <p class="subtitle">
+          A gentle step up from single-token drills. Read how a few objects work together, give one
+          job to one place, and trace what the code does before you run it. No new theory - just the
+          habits the SOLID drills will lean on.
+        </p>
+        <p class="subtitle"><strong id="courseXpLabel">Course XP: 0</strong></p>
+        <p class="subtitle"><a href="index.html">Back to level selector</a></p>
+      </section>
+
+      <section class="card" aria-live="polite">
+        <header class="challenge-head">
+          <div>
+            <p id="roMeta" class="meta"></p>
+            <h2 id="roTitle"></h2>
+            <p id="roContext" class="context"></p>
+          </div>
+          <div class="badge-group">
+            <span id="roConcept" class="badge"></span>
+            <span id="roProgress" class="badge ghost"></span>
+          </div>
+        </header>
+
+        <div class="code-wrap">
+          <pre class="line-numbers"><code id="roCode" class="language-csharp"></code></pre>
+        </div>
+        <div class="code-actions">
+          <button id="roRun" class="btn" type="button" hidden>Run this example</button>
+        </div>
+        <pre id="roOutput" class="run-output" hidden></pre>
+
+        <section class="coach">
+          <h3>Goal</h3>
+          <ul id="roPoints" class="coach-list"></ul>
+        </section>
+
+        <section class="fill-section">
+          <h3>Complete The Code</h3>
+          <div id="roInputs" class="inputs"></div>
+        </section>
+
+        <section class="actions">
+          <button id="roCheck" class="btn primary" type="button">Check</button>
+          <button id="roHint" class="btn" type="button">Hint</button>
+          <button id="roShow" class="btn danger" type="button">Show Answer</button>
+          <button id="roReset" class="btn" type="button">Reset Drill</button>
+        </section>
+
+        <section id="roResult" class="result-panel" hidden>
+          <h3 id="roResultTitle"></h3>
+          <p id="roResultBody"></p>
+          <ul id="roResultList"></ul>
+        </section>
+
+        <footer class="nav-row">
+          <button id="roPrev" class="btn" type="button">Previous Drill</button>
+          <button id="roNext" class="btn primary" type="button">Next Drill</button>
+        </footer>
+      </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="vendor/code-lab/code-lab.global.js"></script>
+    <script src="reading-objects.js"></script>
+    <script src="drill-engine.js"></script>
+  </body>
+</html>

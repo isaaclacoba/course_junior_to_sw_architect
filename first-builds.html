@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bridge - First Builds</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="vendor/code-lab/code-lab.css" />
+    <style>
+      .code-editor {
+        width: 100%;
+        min-height: 320px;
+        resize: vertical;
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        tab-size: 4;
+        padding: 1rem;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(8, 10, 18, 0.85);
+        color: #e8ecff;
+        white-space: pre;
+        overflow: auto;
+      }
+      .expected-line {
+        font-family: "IBM Plex Mono", monospace;
+      }
+      .result-panel.is-pass {
+        border-color: rgba(80, 220, 150, 0.5);
+      }
+      .result-panel.is-fail {
+        border-color: rgba(240, 130, 120, 0.5);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="noise"></div>
+    <main class="layout">
+      <section class="hero">
+        <p class="eyebrow">Bridge between micro-coding and the capstone</p>
+        <h1>First Builds</h1>
+        <p class="subtitle">
+          Five small programs you write from scratch and run. Each one is a single win - a class, a
+          method, a constructor, an interface - and together they are the exact moves the capstone
+          asks for. No blanks to fill: write the code, run it, match the output.
+        </p>
+        <p class="subtitle"><strong id="courseXpLabel">Course XP: 0</strong></p>
+        <p class="subtitle"><a href="index.html">Back to level selector</a></p>
+      </section>
+
+      <section class="card" aria-live="polite">
+        <header class="challenge-head">
+          <div>
+            <p id="fbMeta" class="meta"></p>
+            <h2 id="fbTitle"></h2>
+            <p id="fbContext" class="context"></p>
+          </div>
+          <div class="badge-group">
+            <span id="fbConcept" class="badge"></span>
+            <span id="fbProgress" class="badge ghost"></span>
+          </div>
+        </header>
+
+        <section class="coach">
+          <h3>Goal</h3>
+          <ul id="fbGoal" class="coach-list"></ul>
+          <p class="context">
+            Expected output: <strong id="fbExpected" class="expected-line"></strong>
+          </p>
+        </section>
+
+        <section class="fill-section">
+          <h3>Your Code</h3>
+          <textarea id="fbEditor" class="code-editor" spellcheck="false"></textarea>
+        </section>
+
+        <section class="actions">
+          <button id="fbRun" class="btn primary" type="button">Run</button>
+          <button id="fbSolution" class="btn danger" type="button">Show Solution</button>
+          <button id="fbReset" class="btn" type="button">Reset</button>
+        </section>
+
+        <pre id="fbOutput" class="run-output" hidden></pre>
+
+        <section id="fbResult" class="result-panel" hidden>
+          <h3 id="fbResultTitle"></h3>
+          <p id="fbResultBody"></p>
+        </section>
+
+        <footer class="nav-row">
+          <button id="fbPrev" class="btn" type="button">Previous Build</button>
+          <button id="fbNext" class="btn primary" type="button">Next Build</button>
+        </footer>
+      </section>
+    </main>
+
+    <script src="vendor/code-lab/code-lab.global.js"></script>
+    <script src="first-builds.js"></script>
+  </body>
+</html>
