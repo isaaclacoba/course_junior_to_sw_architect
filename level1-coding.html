@@ -19,6 +19,7 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css"
     />
+    <link rel="stylesheet" href="vendor/code-lab/code-lab.css" />
   </head>
   <body>
     <div class="noise"></div>
@@ -51,6 +52,10 @@
         <div class="code-wrap">
           <pre class="line-numbers"><code id="l1cCode" class="language-csharp"></code></pre>
         </div>
+        <div class="code-actions">
+          <button id="l1cRun" class="btn" type="button" hidden>Run this example</button>
+        </div>
+        <pre id="l1cOutput" class="run-output" hidden></pre>
 
         <section class="coach">
           <h3>Goal</h3>
@@ -85,6 +90,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="vendor/code-lab/code-lab.global.js"></script>
     <script src="level1-coding.js"></script>
   </body>
 </html>

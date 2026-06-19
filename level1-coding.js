@@ -491,8 +491,319 @@ Console.WriteLine($"Notifications sent: {service.{{7}}()}");
   },
 ];
 
+// Complete, runnable C# for each drill, index-aligned with `drills`. The drill
+// snippets are teaching fragments (some are class-only or use top-level
+// statements after type declarations, which do not compile on their own), so
+// each one is paired here with a valid program that produces visible output.
+// These are what the Run button compiles and runs through the shared code-lab
+// Roslyn/WASM host.
+const runnablePrograms = [
+  // 0 - Model State With Variables
+  `using System;
+
+class Program
+{
+    static void Main()
+    {
+        var doorOpen = true;
+        Console.WriteLine(doorOpen);
+    }
+}`,
+  // 1 - Behavior As Transformation
+  `using System;
+
+class Program
+{
+    static int Double(int x)
+    {
+        return x * 2;
+    }
+
+    static void Main()
+    {
+        Console.WriteLine(Double(5));
+    }
+}`,
+  // 2 - Instantiate A Class
+  `using System;
+
+public class Counter
+{
+    public int Value;
+
+    public void Increment()
+    {
+        Value = Value + 1;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var counter = new Counter();
+        counter.Increment();
+        Console.WriteLine(counter.Value);
+    }
+}`,
+  // 3 - Reference Assignment
+  `using System;
+
+public class User { }
+
+class Program
+{
+    static void Main()
+    {
+        var a = new User();
+        var b = a;
+        Console.WriteLine(Object.ReferenceEquals(a, b));
+    }
+}`,
+  // 4 - Encapsulation Accessor
+  `using System;
+
+public class BankAccount
+{
+    private int _balance;
+
+    public int GetBalance()
+    {
+        return _balance;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var account = new BankAccount();
+        Console.WriteLine(account.GetBalance());
+    }
+}`,
+  // 5 - Polymorphic Call
+  `using System;
+using System.Collections.Generic;
+
+public abstract class Animal
+{
+    public abstract string Speak();
+}
+
+public class Dog : Animal
+{
+    public override string Speak() => "Woof";
+}
+
+public class Cat : Animal
+{
+    public override string Speak() => "Meow";
+}
+
+class Program
+{
+    static void Main()
+    {
+        var pets = new List<Animal> { new Dog(), new Cat() };
+        foreach (var pet in pets)
+        {
+            Console.WriteLine(pet.Speak());
+        }
+    }
+}`,
+  // 6 - Inheritance Declaration
+  `using System;
+
+public class Vehicle
+{
+    public virtual int GetWheelCount()
+    {
+        return 0;
+    }
+}
+
+public class Car : Vehicle
+{
+    public override int GetWheelCount()
+    {
+        return 4;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var car = new Car();
+        Console.WriteLine(car.GetWheelCount());
+    }
+}`,
+  // 7 - Composition Field
+  `using System;
+
+public interface IRepository { }
+
+public class OrderService
+{
+    private readonly IRepository _repo;
+
+    public OrderService(IRepository repo)
+    {
+        _repo = repo;
+    }
+}
+
+public class FakeRepository : IRepository { }
+
+class Program
+{
+    static void Main()
+    {
+        var service = new OrderService(new FakeRepository());
+        Console.WriteLine("OrderService created with its repository");
+    }
+}`,
+  // 8 - Dependency Injection
+  `using System;
+
+public interface ILogger
+{
+    void Log(string message);
+}
+
+public class ConsoleLogger : ILogger
+{
+    public void Log(string message) => Console.WriteLine(message);
+}
+
+public class ReportService
+{
+    private readonly ILogger _logger;
+
+    public ReportService(ILogger logger)
+    {
+        _logger = logger;
+    }
+
+    public void Run() => _logger.Log("Report generated");
+}
+
+class Program
+{
+    static void Main()
+    {
+        var logger = new ConsoleLogger();
+        var service = new ReportService(logger);
+        service.Run();
+    }
+}`,
+  // 9 - Closing Synthesis
+  `using System;
+using System.Collections.Generic;
+
+public interface ILogger
+{
+    void Log(string message);
+}
+
+public class ConsoleLogger : ILogger
+{
+    public void Log(string message) => Console.WriteLine(message);
+}
+
+public abstract class Notification
+{
+    protected readonly ILogger _logger;
+
+    protected Notification(ILogger logger)
+    {
+        _logger = logger;
+    }
+
+    public abstract string BuildMessage(string userName);
+}
+
+public class EmailNotification : Notification
+{
+    public EmailNotification(ILogger logger) : base(logger) { }
+
+    public override string BuildMessage(string userName)
+    {
+        _logger.Log("Email notification selected");
+        return $"Email for {userName}";
+    }
+}
+
+public class SmsNotification : Notification
+{
+    public SmsNotification(ILogger logger) : base(logger) { }
+
+    public override string BuildMessage(string userName)
+    {
+        _logger.Log("SMS notification selected");
+        return $"SMS for {userName}";
+    }
+}
+
+public class NotificationService
+{
+    private readonly List<Notification> _notifications;
+    private int _sentCount;
+
+    public NotificationService(List<Notification> notifications)
+    {
+        _notifications = notifications;
+    }
+
+    public void SendAll(string userName)
+    {
+        foreach (var notification in _notifications)
+        {
+            var message = notification.BuildMessage(userName);
+            Console.WriteLine(message);
+            _sentCount = AddOne(_sentCount);
+        }
+    }
+
+    public int GetSentCount()
+    {
+        return _sentCount;
+    }
+
+    private int AddOne(int value)
+    {
+        return value + 1;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        var logger = new ConsoleLogger();
+        var notifications = new List<Notification>
+        {
+            new EmailNotification(logger),
+            new SmsNotification(logger)
+        };
+
+        var sameRef = notifications;
+        var service = new NotificationService(notifications);
+        service.SendAll("Isaac");
+
+        Console.WriteLine($"Notifications sent: {service.GetSentCount()}");
+        Console.WriteLine($"Same object in memory: {Object.ReferenceEquals(notifications, sameRef)}");
+    }
+}`,
+];
+
 let idx = 0;
 const progress = drills.map((d) => d.blanks.map(() => ({ value: "", hint: -1, explain: false })));
+
+// The C# runner comes from the shared code-lab package (vendored IIFE bundle on
+// window.CodeLab). It relays code to the Roslyn/WASM compiler host over a
+// same-origin hidden iframe, the same engine Level 2, Level 4 and the capstone use.
+const runner = new CodeLab.RoslynIframeRunner({ url: "level3-app/index.html?runner=1" });
 
 const l1cMeta = document.getElementById("l1cMeta");
 const l1cTitle = document.getElementById("l1cTitle");
@@ -506,6 +817,8 @@ const l1cResult = document.getElementById("l1cResult");
 const l1cResultTitle = document.getElementById("l1cResultTitle");
 const l1cResultBody = document.getElementById("l1cResultBody");
 const l1cResultList = document.getElementById("l1cResultList");
+const l1cRun = document.getElementById("l1cRun");
+const l1cOutput = document.getElementById("l1cOutput");
 const courseXpLabel = document.getElementById("courseXpLabel");
 const l1cCodeWrap = l1cCode.closest(".code-wrap");
 
@@ -733,6 +1046,12 @@ function render() {
   l1cCode.textContent = withGaps(d.snippet);
   Prism.highlightElement(l1cCode);
 
+  l1cRun.hidden = false;
+  l1cRun.disabled = false;
+  l1cRun.textContent = "Run this example";
+  l1cOutput.hidden = true;
+  l1cOutput.textContent = "";
+  l1cOutput.classList.remove("is-error");
   l1cPoints.innerHTML = "";
   d.points.forEach((point) => {
     const li = document.createElement("li");
@@ -888,5 +1207,36 @@ l1cHint.addEventListener("click", showHint);
 l1cCheck.addEventListener("click", check);
 l1cShow.addEventListener("click", showAnswer);
 l1cReset.addEventListener("click", resetDrill);
+
+function showOutput(text, isError) {
+  l1cOutput.hidden = false;
+  l1cOutput.textContent = text;
+  l1cOutput.classList.toggle("is-error", Boolean(isError));
+}
+
+l1cRun.addEventListener("click", async () => {
+  const code = runnablePrograms[idx];
+  if (!code) return;
+
+  l1cRun.disabled = true;
+  l1cRun.textContent = "Running...";
+  showOutput("Compiling and running...", false);
+
+  try {
+    const result = await runner.run(code);
+    if (result.errors && result.errors.length) {
+      showOutput(result.errors.map((e) => e.friendly || e.raw).join("\n"), true);
+    } else if (result.runtimeError) {
+      showOutput(`${result.output}\n${result.runtimeError}`.trim(), true);
+    } else {
+      showOutput(result.output || "(no output)", false);
+    }
+  } catch (err) {
+    showOutput(err.message || "Could not run the example.", true);
+  } finally {
+    l1cRun.disabled = false;
+    l1cRun.textContent = "Run this example";
+  }
+});
 
 render();

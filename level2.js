@@ -652,8 +652,15 @@ const l2Result = document.getElementById("l2Result");
 const l2ResultTitle = document.getElementById("l2ResultTitle");
 const l2ResultBody = document.getElementById("l2ResultBody");
 const l2ResultList = document.getElementById("l2ResultList");
+const l2Run = document.getElementById("l2Run");
+const l2Output = document.getElementById("l2Output");
 const courseXpLabel = document.getElementById("courseXpLabel");
 const l2CodeWrap = l2Code.closest(".code-wrap");
+
+// The C# runner comes from the shared code-lab package (vendored IIFE bundle on
+// window.CodeLab). It relays code to the Roslyn/WASM compiler host over a
+// same-origin hidden iframe, the same engine Level 4 and the capstone use.
+const runner = new CodeLab.RoslynIframeRunner({ url: "level3-app/index.html?runner=1" });
 
 const l2Summary = document.getElementById("l2Summary");
 const l2SummaryIntro = document.getElementById("l2SummaryIntro");
@@ -707,6 +714,17 @@ function normalize(s) {
 
 function withSlots(snippet) {
   return snippet.replace(/\{\{(\d+)\}\}/g, (_, n) => `__${n}__`);
+}
+
+// Build a complete, runnable program from a drill: fill every {{n}} slot with
+// its correct answer, then wrap the fragment in a class so the loose Main and
+// any helper types become valid C#. This is what the Run button compiles.
+function toRunnable(drill) {
+  const filled = drill.snippet.replace(/\{\{(\d+)\}\}/g, (_, n) => {
+    const blank = drill.blanks.find((b) => String(b.id) === n);
+    return blank ? blank.answer : "";
+  });
+  return `using System;\n\nclass __Lab\n{\n${filled}\n}`;
 }
 
 let currentHighlightEl = null;
@@ -882,10 +900,12 @@ async function renderDiagram(drill) {
 }
 
 function setPracticeVisible(visible) {
-  const sections = [l2PainBox, l2MapBox, l2CodeWrap, l2Coach, l2FillSection, l2Actions];
+  const runRow = l2Run.closest(".code-actions");
+  const sections = [l2PainBox, l2MapBox, l2CodeWrap, runRow, l2Coach, l2FillSection, l2Actions];
   sections.forEach((el) => {
     if (el) el.hidden = !visible;
   });
+  if (!visible) l2Output.hidden = true;
   if (l2Summary) l2Summary.hidden = visible;
 }
 
@@ -936,6 +956,12 @@ function render() {
   l2Code.textContent = withSlots(d.snippet);
   Prism.highlightElement(l2Code);
 
+  l2Run.hidden = false;
+  l2Run.disabled = false;
+  l2Run.textContent = "Run this example";
+  l2Output.hidden = true;
+  l2Output.textContent = "";
+  l2Output.classList.remove("is-error");
   l2Points.innerHTML = "";
   d.points.forEach((point) => {
     const li = document.createElement("li");
@@ -1072,5 +1098,36 @@ l2Hint.addEventListener("click", showHint);
 l2Check.addEventListener("click", check);
 l2Answers.addEventListener("click", showAnswers);
 l2Reset.addEventListener("click", resetDrill);
+
+function showOutput(text, isError) {
+  l2Output.hidden = false;
+  l2Output.textContent = text;
+  l2Output.classList.toggle("is-error", Boolean(isError));
+}
+
+l2Run.addEventListener("click", async () => {
+  const d = drills[i];
+  if (d.summary) return;
+
+  l2Run.disabled = true;
+  l2Run.textContent = "Running...";
+  showOutput("Compiling and running...", false);
+
+  try {
+    const result = await runner.run(toRunnable(d));
+    if (result.errors && result.errors.length) {
+      showOutput(result.errors.map((e) => e.friendly || e.raw).join("\n"), true);
+    } else if (result.runtimeError) {
+      showOutput(`${result.output}\n${result.runtimeError}`.trim(), true);
+    } else {
+      showOutput(result.output || "(no output)", false);
+    }
+  } catch (err) {
+    showOutput(err.message || "Could not run the example.", true);
+  } finally {
+    l2Run.disabled = false;
+    l2Run.textContent = "Run this example";
+  }
+});
 
 render();
