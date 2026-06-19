@@ -328,7 +328,7 @@ public class Program
       { lines: 9, text: "WakeUp() builds its own prefix 'Quack-' then appends the engine's result: 'Quack-' + 'vroom'." },
       { lines: 12, text: "So this line prints Quack-vroom." },
     ],
-    mermaid: "flowchart LR\n  RoboDuck -->|has-a| Engine\n  RoboDuck --> Out[\"Quack-\" + \"vroom\"]",
+    mermaid: "flowchart LR\n  RoboDuck -->|has-a| Engine\n  RoboDuck --> Out[\"Quack-vroom\"]",
     question: "What does WakeUp() print?",
     options: [
       { text: "Quack-vroom", correct: true },
@@ -441,7 +441,7 @@ public class Program
       { lines: 7, text: "Now the trap. `Penguin : Bird` says 'a Penguin IS-A Bird'. In code, that colon is not just a label - it is a promise that a Penguin can do EVERYTHING a Bird can do, including Fly(). We wrote that promise without thinking, because in real life a penguin is a kind of bird." },
       { lines: 10, text: "Here is where the promise breaks. We make a Penguin and call pingu.Fly(). A real penguin cannot fly - but the code compiles and runs with zero complaints, printing 'up we go!'. The type system happily lets us call behaviour this object should never have. The 'is-a' was a lie, and nothing - not the compiler, not a warning - stopped us. That is the danger: inheritance forced a capability onto Penguin that does not belong to it. (You will meet this again as the Liskov rule: a subclass must be safely usable everywhere its parent is.)" },
     ],
-    mermaid: "flowchart LR\n  Bird --> Penguin\n  Penguin -->|inherits Fly\\(\\)| Oops[\"but cannot fly\"]",
+    mermaid: "flowchart LR\n  Bird --> Penguin\n  Penguin -->|inherits Fly| Oops[\"but cannot fly\"]",
     question: "Why is Penguin : Bird a design trap?",
     options: [
       { text: "Penguin inherits Fly() but cannot fly - the is-a promise is a lie", correct: true },
