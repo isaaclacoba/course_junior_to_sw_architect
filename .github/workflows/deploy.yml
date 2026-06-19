@@ -28,7 +28,7 @@ jobs:
 
       - name: Publish capstone host (code-lab submodule + course exercise)
         run: >
-          dotnet publish level3-host/compiler-host -c Release
+          dotnet publish code-lab/compiler-host -c Release
           -p:ExerciseSource=${{ github.workspace }}/level3-exercise
           -o blazor-publish
 
@@ -38,7 +38,7 @@ jobs:
           rsync -a \
             --exclude='.git' \
             --exclude='.github' \
-            --exclude='level3-host' \
+            --exclude='code-lab' \
             --exclude='level3-exercise' \
             --exclude='level3-app' \
             --exclude='blazor-publish' \

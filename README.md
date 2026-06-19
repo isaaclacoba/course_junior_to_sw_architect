@@ -44,7 +44,7 @@ Then open `http://localhost:8080`.
 
 ## Rebuilding the Capstone
 
-The capstone host is the generic code-lab engine, pulled in as the `level3-host/`
+The capstone host is the generic code-lab engine, pulled in as the `code-lab/`
 git submodule. The exercise (content + structural checks) lives in this repo under
 `level3-exercise/` and is injected into the host at build time via the
 `ExerciseSource` MSBuild property. `level3-app/` is the published (git-ignored)
@@ -52,7 +52,7 @@ output. After changing the host or the exercise, regenerate it with:
 
 ```
 git submodule update --init --recursive
-dotnet publish level3-host/compiler-host -c Release \
+dotnet publish code-lab/compiler-host -c Release \
   -p:ExerciseSource="$PWD/level3-exercise" -o blazor-publish
 rm -rf level3-app && cp -r blazor-publish/wwwroot level3-app
 ```
