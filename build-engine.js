@@ -39,19 +39,8 @@
   const nextBtn = el("Next");
   const xpLabel = document.getElementById("courseXpLabel");
 
-  // Cold Blazor WASM load + first Roslyn compile can take ~1 min, so the
-  // default 30s ready timeout is too tight; generous timeouts avoid poisoning
-  // the cached ready promise during warm-up.
-  const runner = new CodeLab.RoslynIframeRunner({
-    url: runnerUrl,
-    readyTimeout: 120000,
-    runTimeout: 60000,
-  });
+  const runner = new CodeLab.RoslynIframeRunner({ url: runnerUrl });
   const editor = new CodeLab.MonacoEditor();
-
-  // A complete, trivial program used to JIT-warm Roslyn in the background.
-  const WARM_PROGRAM =
-    "public class __Warm { public static void Main() { } }";
 
   const code = tasks.map((t) => t.starter);
   const awarded = JSON.parse(localStorage.getItem(awardedKey) || "{}");
@@ -174,15 +163,13 @@
     }
   }
 
-  // Start the runtime download as soon as the page loads (overlapping with the
-  // user reading the task), then trigger one throwaway compile so the first
-  // real run skips the slow first-compile JIT.
+  // The runner warms itself on construction; reflect that in the button so the
+  // user knows the first run is being prepared.
   async function warmUp() {
     runBtn.disabled = true;
     runBtn.textContent = "Preparing compiler...";
     try {
-      await runner.preload();
-      await runner.run(WARM_PROGRAM);
+      await runner.warm();
     } catch (err) {
       // Warm-up is best effort; the user can still click Run, which retries.
     } finally {

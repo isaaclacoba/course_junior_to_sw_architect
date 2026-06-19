@@ -767,16 +767,23 @@ ${result.runtimeError}`.trim(),
   }
 
   // src/runners/roslyn-iframe.ts
+  var DEFAULT_WARM_PROGRAM = "public class __Warm { public static void Main() { } }";
   var RoslynIframeRunner = class {
     constructor(config) {
       this.iframe = null;
       this.readyPromise = null;
+      this.warmPromise = null;
       this.seq = 0;
       this.pending = /* @__PURE__ */ new Map();
       this.onMessage = (e) => this.handleMessage(e);
       this.url = config.url;
-      this.readyTimeout = config.readyTimeout ?? 3e4;
-      this.runTimeout = config.runTimeout ?? 2e4;
+      this.readyTimeout = config.readyTimeout ?? 12e4;
+      this.runTimeout = config.runTimeout ?? 6e4;
+      this.warmProgram = config.warmProgram ?? DEFAULT_WARM_PROGRAM;
+      if (config.autoWarm ?? true) {
+        void this.warm().catch(() => {
+        });
+      }
     }
     handleMessage(event) {
       if (event.origin !== window.location.origin) return;
@@ -816,6 +823,16 @@ ${result.runtimeError}`.trim(),
     async preload() {
       await this.ensureFrame();
     }
+    /** Load the runtime and JIT the backend with a throwaway compile so the first
+     *  real run is fast. Idempotent: repeated calls share one warm-up. */
+    async warm() {
+      if (this.warmPromise) return this.warmPromise;
+      this.warmPromise = (async () => {
+        await this.ensureFrame();
+        await this.run(this.warmProgram);
+      })();
+      return this.warmPromise;
+    }
     async run(code) {
       await this.ensureFrame();
       const id = ++this.seq;
@@ -838,6 +855,7 @@ ${result.runtimeError}`.trim(),
       this.iframe?.remove();
       this.iframe = null;
       this.readyPromise = null;
+      this.warmPromise = null;
     }
   };
   return __toCommonJS(src_exports);
