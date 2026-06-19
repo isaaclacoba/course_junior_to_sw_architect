@@ -20,6 +20,23 @@ public class RoboCat { private Heart _heart = new Heart(); }
 // 3) POLYMORPHISM - neither is-a nor has-a, but the PAYOFF both unlock:
 Animal pet = new Cat();   // hold a Cat in an Animal-shaped variable
 pet.Speak();              // one call, many behaviours -> "Meow"`,
+    runCode: `using System;
+
+public class Animal { public virtual string Speak() => "..."; }
+public class Cat : Animal { public override string Speak() => "Meow"; }
+
+public class Heart { public void Beat() => Console.WriteLine("...beat..."); }
+public class RoboCat { private Heart _heart = new Heart(); public void Live() => _heart.Beat(); }
+
+public class Program
+{
+    public static void Main()
+    {
+        Animal pet = new Cat();          // inheritance + polymorphism
+        Console.WriteLine(pet.Speak());  // -> Meow
+        new RoboCat().Live();            // composition -> ...beat...
+    }
+}`,
     explain:
       "It is easy to picture inheritance, composition and polymorphism as three options on the same menu. They are not. Inheritance (is-a) and composition (has-a) are two ways to combine code. Polymorphism is the reward you collect afterwards.",
     points: [
@@ -119,6 +136,28 @@ public class Dog
 {
     private readonly Voice _voice = new Voice("Woof");
     public void Bark() => _voice.Speak();
+}`,
+    runCode: `using System;
+
+public class Voice
+{
+    private readonly string _sound;
+    public Voice(string sound) => _sound = sound;
+    public void Speak() => Console.WriteLine(_sound);
+}
+
+public class Dog
+{
+    private readonly Voice _voice = new Voice("Woof");
+    public void Bark() => _voice.Speak();
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        new Dog().Bark();   // delegates to the held Voice -> Woof
+    }
 }`,
     explain:
       "Here Dog does not inherit anything. It keeps a Voice as a field and delegates to it. That holding relationship is composition: a has-a. The Dog is built out of smaller parts it owns. The move where Bark() forwards the call to _voice has a name - delegation - and it is the engine behind patterns you will meet later, like the Decorator (a wrapper that delegates to an inner object and adds a little on top).",
@@ -314,6 +353,28 @@ public class Parrot2
     private readonly Wings _wings = new Wings();
     public void Fly() => _wings.Fly();
 }`,
+    runCode: `using System;
+
+// Version A - inheritance (is-a)
+public class Bird { public void Fly() => Console.WriteLine("A: flap"); }
+public class Parrot : Bird { }
+
+// Version B - composition (has-a)
+public class Wings { public void Fly() => Console.WriteLine("B: flap"); }
+public class Parrot2
+{
+    private readonly Wings _wings = new Wings();
+    public void Fly() => _wings.Fly();
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        new Parrot().Fly();    // inherited
+        new Parrot2().Fly();   // delegated
+    }
+}`,
     explain:
       "Version A makes Parrot a kind of Bird (is-a, inheritance). Version B gives Parrot2 a Wings field it delegates to (has-a, composition). Both let a parrot fly; they differ in how the ability is obtained.",
     points: [
@@ -403,6 +464,26 @@ public class Program
 public class Cat     : Animal { }   // fine: walks
 public class Fish    : Animal { }   // ...also "walks". On land. Uh oh.
 public class RoboCat : Cat    { }   // inherits the surprise too`,
+    runCode: `using System;
+
+public class Animal
+{
+    public virtual void Move() => Console.WriteLine("walks");
+}
+
+public class Cat     : Animal { }
+public class Fish    : Animal { }
+public class RoboCat : Cat    { }
+
+public class Program
+{
+    public static void Main()
+    {
+        new Cat().Move();      // fine: walks
+        new Fish().Move();     // walks... on land. Uh oh.
+        new RoboCat().Move();  // inherits the surprise too
+    }
+}`,
     explain:
       "Inheritance couples children to a parent's implementation. The moment Animal.Move() decides everyone 'walks', Fish walks on land and RoboCat inherits it through Cat. One edit rippled to types the author never looked at. The deeper the tree, the worse it gets.",
     points: [
@@ -493,6 +574,28 @@ public class Duck
     public string Swim() => _swim.Go();
     public string Fly()  => _fly.Go();
 }`,
+    runCode: `using System;
+
+public class Swimming { public string Go() => "swim"; }
+public class Flying   { public string Go() => "fly"; }
+
+public class Duck
+{
+    private readonly Swimming _swim = new Swimming();   // has-a
+    private readonly Flying   _fly  = new Flying();     // has-a
+    public string Swim() => _swim.Go();
+    public string Fly()  => _fly.Go();
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        var duck = new Duck();
+        Console.WriteLine(duck.Swim());   // swim
+        Console.WriteLine(duck.Fly());    // fly
+    }
+}`,
     explain:
       "No parents, no diamond. Duck holds a Swimming and a Flying and names each one when it delegates. There is never a question of 'which Go() wins' because you call _swim.Go() or _fly.Go() explicitly. Want a third ability? Add a third field. This is exactly why the advice is 'favour composition over inheritance'.",
     points: [
@@ -528,6 +631,28 @@ public class TestRunner
     private readonly IReporter _reporter;             // HAS-A, injected
     public TestRunner(IReporter reporter) => _reporter = reporter;
     // _reporter.Send(...) runs ConsoleReporter OR SilentReporter - same call.
+}`,
+    runCode: `using System;
+
+public interface IReporter { void Send(string msg); }
+public class ConsoleReporter : IReporter { public void Send(string m) => Console.WriteLine(m); }
+public class SilentReporter  : IReporter { public void Send(string m) { } }
+
+public class TestRunner
+{
+    private readonly IReporter _reporter;             // HAS-A, injected
+    public TestRunner(IReporter reporter) => _reporter = reporter;
+    public void Run() => _reporter.Send("3 tests passed");
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        new TestRunner(new ConsoleReporter()).Run();  // prints
+        new TestRunner(new SilentReporter()).Run();   // stays quiet
+        Console.WriteLine("(the silent reporter printed nothing above)");
+    }
 }`,
     explain:
       "TestRunner has-a IReporter (composition, handed in through the constructor). Any class that implements IReporter slots in, and the same _reporter.Send(...) call behaves differently for each (polymorphism). No inheritance of TestRunner was needed. Keeper rule: can you honestly say A is-a B - always, everywhere, forever? If not, or if you need to mix behaviours, compose instead.",
@@ -577,6 +702,12 @@ class ArrayLessonSource {
 }
 
 const lessonSource = new ArrayLessonSource(lessons);
+
+// Walk-through and C# runner come from the shared code-lab package
+// (vendored IIFE bundle on window.CodeLab). The runner relays code to the
+// Level 3 Roslyn/WASM capstone over a same-origin hidden iframe.
+const tour = new CodeLab.Tour({ language: "csharp" });
+const runner = new CodeLab.RoslynIframeRunner({ url: "level3-app/index.html?runner=1" });
 
 let lessonIndex = 0;
 
@@ -736,8 +867,8 @@ l4Next.addEventListener("click", () => {
 
 l4Walk.addEventListener("click", () => {
   const lesson = lessonSource.at(lessonIndex);
-  if (window.codeTour && Array.isArray(lesson.walk) && lesson.walk.length) {
-    window.codeTour.open({
+  if (Array.isArray(lesson.walk) && lesson.walk.length) {
+    tour.open({
       title: `Walk-through: ${lesson.title}`,
       code: lesson.code,
       steps: lesson.walk,
@@ -753,14 +884,14 @@ function showOutput(text, isError) {
 
 l4Run.addEventListener("click", async () => {
   const lesson = lessonSource.at(lessonIndex);
-  if (!lesson.runCode || !window.codeRunner) return;
+  if (!lesson.runCode) return;
 
   l4Run.disabled = true;
   l4Run.textContent = "Running...";
   showOutput("Compiling and running...", false);
 
   try {
-    const result = await window.codeRunner.run(lesson.runCode);
+    const result = await runner.run(lesson.runCode);
     if (result.errors && result.errors.length) {
       const lines = result.errors.map((e) => (e.friendly || e.raw)).join("\n");
       showOutput(lines, true);
