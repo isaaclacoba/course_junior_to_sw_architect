@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>C# Learning Levels</title>
+    <title>The C# Object-Oriented Course</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -11,106 +11,426 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
+    <style>
+      body {
+        background: #fbfbf8;
+        color: #1b1d22;
+      }
+      .noise { display: none; }
+      .c-wrap {
+        max-width: 840px;
+        margin: 0 auto;
+        padding: 76px 24px 110px;
+      }
+      .c-head { margin-bottom: 8px; }
+      .c-eyebrow {
+        font-family: "IBM Plex Mono", monospace;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        font-size: 0.72rem;
+        color: #1f6f5f;
+        margin: 0 0 16px;
+      }
+      .c-title {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(2.1rem, 4.5vw, 3rem);
+        line-height: 1.08;
+        letter-spacing: -0.02em;
+        margin: 0 0 16px;
+      }
+      .c-lead {
+        font-size: 1.08rem;
+        line-height: 1.65;
+        color: #565b68;
+        max-width: 58ch;
+        margin: 0 0 36px;
+      }
+      .c-progress {
+        background: #fff;
+        border: 1px solid #ecece6;
+        border-radius: 18px;
+        padding: 22px 24px;
+      }
+      .c-progress-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+      }
+      .c-progress-label { font-weight: 600; font-size: 0.98rem; }
+      .c-progress-stats {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.82rem;
+        color: #8b8f9a;
+      }
+      .c-bar {
+        height: 9px;
+        border-radius: 99px;
+        background: #eceae3;
+        overflow: hidden;
+      }
+      .c-bar-fill {
+        height: 100%;
+        width: 0;
+        background: #1f6f5f;
+        border-radius: 99px;
+        transition: width 0.5s ease;
+      }
+      .c-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 24px;
+        background: #1f6f5f;
+        color: #fff;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1rem;
+        padding: 14px 24px;
+        border-radius: 12px;
+        transition: background 0.2s ease, transform 0.2s ease;
+      }
+      .c-cta:hover { background: #174f44; transform: translateY(-1px); }
+      .c-cta::after { content: "\2192"; font-size: 1.1em; }
+
+      .c-path { list-style: none; margin: 60px 0 0; padding: 0; position: relative; }
+      .c-path::before {
+        content: "";
+        position: absolute;
+        left: 13px;
+        top: 10px;
+        bottom: 40px;
+        width: 2px;
+        background: #e6e4dc;
+      }
+      .c-stage-head { margin: 44px 0 20px; padding-left: 44px; }
+      .c-stage-head:first-child { margin-top: 0; }
+      .c-stage-kicker {
+        font-family: "IBM Plex Mono", monospace;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        font-size: 0.7rem;
+        color: #a89e8c;
+        margin: 0 0 5px;
+      }
+      .c-stage-title {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 1.3rem;
+        margin: 0;
+      }
+      .c-step { position: relative; margin: 0 0 14px; }
+      .c-card {
+        display: block;
+        position: relative;
+        padding: 22px 24px 22px 56px;
+        background: #fff;
+        border: 1px solid #ecece6;
+        border-radius: 16px;
+        text-decoration: none;
+        color: inherit;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+      }
+      .c-card:hover {
+        border-color: #d6d3c8;
+        box-shadow: 0 14px 34px -20px rgba(31, 111, 95, 0.45);
+        transform: translateY(-2px);
+      }
+      .c-node {
+        position: absolute;
+        left: 5px;
+        top: 25px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 2px solid #cfccc1;
+        z-index: 1;
+      }
+      .c-card[data-status="progress"] .c-node {
+        border-color: #1f6f5f;
+        box-shadow: inset 0 0 0 3px #1f6f5f;
+      }
+      .c-card[data-status="final"] .c-node { border-color: #1f6f5f; }
+      .c-card[data-status="done"] .c-node { background: #1f6f5f; border-color: #1f6f5f; }
+      .c-card[data-status="done"] .c-node::after {
+        content: "";
+        position: absolute;
+        left: 5px;
+        top: 2px;
+        width: 4px;
+        height: 8px;
+        border: solid #fff;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+      }
+      .c-card-top {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 14px;
+      }
+      .c-card-title {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 1.18rem;
+        margin: 0;
+      }
+      .c-status {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.7rem;
+        white-space: nowrap;
+        color: #a4a9b4;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .c-card[data-status="progress"] .c-status { color: #9a6700; }
+      .c-card[data-status="done"] .c-status { color: #1f6f5f; }
+      .c-card[data-status="final"] .c-status { color: #1f6f5f; }
+      .c-card-blurb {
+        color: #565b68;
+        line-height: 1.6;
+        font-size: 0.96rem;
+        margin: 10px 0 16px;
+        max-width: 60ch;
+      }
+      .c-card-meta { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+      .c-pill {
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 4px 12px;
+        border-radius: 99px;
+      }
+      .c-pill--gentle { background: #e7f1ee; color: #1f6f5f; }
+      .c-pill--steady { background: #fbf0db; color: #8a5a00; }
+      .c-pill--challenging { background: #fbe6e3; color: #a33028; }
+      .c-meta-time {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 0.78rem;
+        color: #9398a3;
+      }
+      .c-meta-time::before { content: "~\00a0"; }
+      .c-foot {
+        margin-top: 52px;
+        padding-left: 44px;
+        color: #a4a9b4;
+        font-size: 0.85rem;
+      }
+    </style>
   </head>
   <body>
-    <div class="noise"></div>
-    <main class="layout">
-      <section class="hero">
-        <p class="eyebrow">Learning path selector</p>
-        <h1>C# Foundations and OO Progression</h1>
-        <p class="subtitle">
-          Two tracks, one path. Build understanding on the theory and micro-exercise track, then
-          prove it on the programming track where your C# compiles and runs in the browser.
+    <main class="c-wrap">
+      <header class="c-head">
+        <p class="c-eyebrow">Object-oriented C#, from scratch</p>
+        <h1 class="c-title">Learn to write C# the way good software is built</h1>
+        <p class="c-lead">
+          A single guided path. First you build a clear picture of how objects think, then you write
+          real C# that compiles and runs right here in your browser. Take it one lesson at a time -
+          your progress is saved as you go.
         </p>
-      </section>
+        <div class="c-progress">
+          <div class="c-progress-row">
+            <span class="c-progress-label">Your progress</span>
+            <span class="c-progress-stats" id="cStats">0 / 0 lessons</span>
+          </div>
+          <div class="c-bar"><div class="c-bar-fill" id="cBarFill"></div></div>
+        </div>
+        <a class="c-cta" id="cCta" href="level1.html">Start the course</a>
+      </header>
 
-      <section class="track">
-        <header class="track-head">
-          <p class="eyebrow">Track 1</p>
-          <h2>Theory and micro-exercises</h2>
-          <p class="track-sub">Read, predict, and write short fragments to lock in the concepts.</p>
-        </header>
+      <ol class="c-path">
+        <li class="c-stage-head">
+          <p class="c-stage-kicker">Part one</p>
+          <h2 class="c-stage-title">Understand the ideas</h2>
+        </li>
 
-        <div class="level-grid">
-          <article class="card level-card">
-            <p class="meta">Recommended first</p>
-            <h3>Level 1: Foundations</h3>
-            <p class="context">
-              Why software exists, state vs behavior, variables/functions, class vs instance,
-              encapsulation, polymorphism basics, and dependency injection intro.
-            </p>
-            <div class="btn-row">
-              <a class="btn primary" href="level1.html">Theory</a>
-              <a class="btn" href="level1-coding.html">Micro-exercises</a>
+        <li class="c-step">
+          <a class="c-card" href="level1.html" data-key="level1_theory_awarded" data-total="10">
+            <span class="c-node" aria-hidden="true"></span>
+            <div class="c-card-top">
+              <h3 class="c-card-title">Foundations</h3>
+              <span class="c-status">Not started</span>
             </div>
-          </article>
-
-          <article class="card level-card">
-            <p class="meta">Bridge to SOLID</p>
-            <h3>Reading Objects</h3>
-            <p class="context">
-              A gentle step up from single-token drills. Read how a few objects work together, give
-              one job to one place, and trace the output before you run it - the habits the SOLID
-              drills will lean on, with no new theory.
+            <p class="c-card-blurb">
+              Start here. What software is really for, and why we group data and behaviour into
+              objects. Plain language and short questions - no code to write yet.
             </p>
-            <a class="btn" href="reading-objects.html">Open Reading Objects</a>
-          </article>
+            <div class="c-card-meta">
+              <span class="c-pill c-pill--gentle">Gentle</span>
+              <span class="c-meta-time">20 min</span>
+            </div>
+          </a>
+        </li>
 
-          <article class="card level-card">
-            <p class="meta">After Level 1</p>
-            <h3>Level 2: Core C# Coding Drills</h3>
-            <p class="context">
-              Quick exercises that force writing short C# fragments: variables, functions,
-              class/instance, encapsulation, and polymorphism basics.
+        <li class="c-step">
+          <a class="c-card" href="level1-coding.html" data-key="level1_coding_awarded" data-total="10">
+            <span class="c-node" aria-hidden="true"></span>
+            <div class="c-card-top">
+              <h3 class="c-card-title">Practice the Basics</h3>
+              <span class="c-status">Not started</span>
+            </div>
+            <p class="c-card-blurb">
+              Fill in small pieces of real C# - variables, methods, classes - until the core ideas
+              feel natural. Each answer runs so you see it work.
             </p>
-            <a class="btn" href="level2.html">Open Level 2</a>
-          </article>
+            <div class="c-card-meta">
+              <span class="c-pill c-pill--gentle">Gentle</span>
+              <span class="c-meta-time">25 min</span>
+            </div>
+          </a>
+        </li>
 
-          <article class="card level-card">
-            <p class="meta">Reuse - read to understand</p>
-            <h3>Level 4: Reuse Without Regret</h3>
-            <p class="context">
-              Inheritance, composition, and the polymorphism payoff - taught by reading code, not
-              writing it. Decide is-a vs has-a, see why C# forbids two parents (the diamond
-              problem), and learn when to favour composition. Includes a guided code tour and
-              runnable examples.
+        <li class="c-step">
+          <a class="c-card" href="reading-objects.html" data-key="reading_objects_awarded" data-total="10">
+            <span class="c-node" aria-hidden="true"></span>
+            <div class="c-card-top">
+              <h3 class="c-card-title">Reading Objects</h3>
+              <span class="c-status">Not started</span>
+            </div>
+            <p class="c-card-blurb">
+              Follow how a few objects work together. Give each one a single, clear job and predict
+              what the code prints before you run it.
             </p>
-            <a class="btn" href="level4.html">Open Level 4</a>
-          </article>
-        </div>
-      </section>
+            <div class="c-card-meta">
+              <span class="c-pill c-pill--steady">Steady</span>
+              <span class="c-meta-time">25 min</span>
+            </div>
+          </a>
+        </li>
 
-      <section class="track">
-        <header class="track-head">
-          <p class="eyebrow">Track 2</p>
-          <h2>Programming tasks</h2>
-          <p class="track-sub">Write real C# that compiles and runs in the browser.</p>
-        </header>
-
-        <div class="level-grid">
-          <article class="card level-card">
-            <p class="meta">Bridge to the capstone</p>
-            <h3>First Builds</h3>
-            <p class="context">
-              Five small programs you write from scratch and run: a class, a method, a constructor,
-              an interface, a second implementation. Each is one win, and together they are the
-              exact moves the capstone asks for. Write the code, run it, match the output.
+        <li class="c-step">
+          <a class="c-card" href="level2.html" data-key="level2_awarded" data-total="10">
+            <span class="c-node" aria-hidden="true"></span>
+            <div class="c-card-top">
+              <h3 class="c-card-title">The SOLID Principles</h3>
+              <span class="c-status">Not started</span>
+            </div>
+            <p class="c-card-blurb">
+              Five habits that keep code easy to change. Spot each problem in a real test-automation
+              project, then fix it the right way.
             </p>
-            <a class="btn" href="first-builds.html">Open First Builds</a>
-          </article>
+            <div class="c-card-meta">
+              <span class="c-pill c-pill--steady">Steady</span>
+              <span class="c-meta-time">35 min</span>
+            </div>
+          </a>
+        </li>
 
-          <article class="card level-card">
-            <p class="meta">First programming exercise</p>
-            <h3>Capstone: SOLID in practice</h3>
-            <p class="context">
-              Refactor a real, broken program one milestone at a time. Your C# compiles and runs
-              in the browser, with friendly errors, opt-in hints, and a worked solution if you get
-              stuck. Needs the site served over HTTP (see README).
+        <li class="c-step">
+          <a class="c-card" href="level4.html" data-key="level4_awarded" data-total="12">
+            <span class="c-node" aria-hidden="true"></span>
+            <div class="c-card-top">
+              <h3 class="c-card-title">Reuse Without Regret</h3>
+              <span class="c-status">Not started</span>
+            </div>
+            <p class="c-card-blurb">
+              When to inherit, when to build from parts, and why one object with two parents causes
+              trouble. Learn it by reading working code, with a guided walkthrough.
             </p>
-            <a class="btn primary" href="level3-app/">Open Capstone</a>
-          </article>
-        </div>
-      </section>
+            <div class="c-card-meta">
+              <span class="c-pill c-pill--steady">Steady</span>
+              <span class="c-meta-time">30 min</span>
+            </div>
+          </a>
+        </li>
+
+        <li class="c-stage-head">
+          <p class="c-stage-kicker">Part two</p>
+          <h2 class="c-stage-title">Build it for real</h2>
+        </li>
+
+        <li class="c-step">
+          <a class="c-card" href="first-builds.html" data-key="first_builds_awarded" data-total="5">
+            <span class="c-node" aria-hidden="true"></span>
+            <div class="c-card-top">
+              <h3 class="c-card-title">First Builds</h3>
+              <span class="c-status">Not started</span>
+            </div>
+            <p class="c-card-blurb">
+              Write five small programs from scratch and run them - a class, a method, a constructor,
+              an interface, and a second version behind it. Each one is a quick win.
+            </p>
+            <div class="c-card-meta">
+              <span class="c-pill c-pill--steady">Steady</span>
+              <span class="c-meta-time">30 min</span>
+            </div>
+          </a>
+        </li>
+
+        <li class="c-step">
+          <a class="c-card" href="level3-app/" data-final="1">
+            <span class="c-node" aria-hidden="true"></span>
+            <div class="c-card-top">
+              <h3 class="c-card-title">Capstone: SOLID in Practice</h3>
+              <span class="c-status">Final challenge</span>
+            </div>
+            <p class="c-card-blurb">
+              Put it all together. Refactor a real, broken program one step at a time. Your C#
+              compiles and runs, with friendly errors, optional hints, and a worked solution if you
+              get stuck.
+            </p>
+            <div class="c-card-meta">
+              <span class="c-pill c-pill--challenging">Challenging</span>
+              <span class="c-meta-time">60 min</span>
+            </div>
+          </a>
+        </li>
+      </ol>
+
+      <p class="c-foot">Progress is stored in this browser. Clearing site data resets the course.</p>
     </main>
+
+    <script>
+      (function () {
+        var XP_KEY = "course_global_xp";
+        function awardedCount(key) {
+          try {
+            return Object.keys(JSON.parse(localStorage.getItem(key) || "{}")).length;
+          } catch (e) {
+            return 0;
+          }
+        }
+        var cards = Array.prototype.slice.call(document.querySelectorAll(".c-card"));
+        var tracked = 0;
+        var done = 0;
+        var firstOpen = null;
+        var finalCard = null;
+        cards.forEach(function (card) {
+          if (card.getAttribute("data-final")) {
+            card.setAttribute("data-status", "final");
+            finalCard = card;
+            return;
+          }
+          tracked += 1;
+          var key = card.getAttribute("data-key");
+          var need = parseInt(card.getAttribute("data-total") || "0", 10);
+          var count = awardedCount(key);
+          var status = "todo";
+          if (need && count >= need) status = "done";
+          else if (count > 0) status = "progress";
+          card.setAttribute("data-status", status);
+          var statusEl = card.querySelector(".c-status");
+          if (statusEl) {
+            statusEl.textContent =
+              status === "done" ? "Completed" : status === "progress" ? "In progress" : "Not started";
+          }
+          if (status === "done") done += 1;
+          else if (!firstOpen) firstOpen = card;
+        });
+        var pct = tracked ? Math.round((done / tracked) * 100) : 0;
+        var fill = document.getElementById("cBarFill");
+        if (fill) fill.style.width = pct + "%";
+        var xp = parseInt(localStorage.getItem(XP_KEY) || "0", 10);
+        var stats = document.getElementById("cStats");
+        if (stats) stats.textContent = done + " / " + tracked + " lessons \u00b7 " + xp + " XP";
+        var cta = document.getElementById("cCta");
+        if (cta) {
+          var target = firstOpen || finalCard;
+          if (target) cta.setAttribute("href", target.getAttribute("href"));
+          cta.textContent =
+            done === 0 ? "Start the course" : firstOpen ? "Continue where you left off" : "Take on the Capstone";
+        }
+      })();
+    </script>
   </body>
 </html>
