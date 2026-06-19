@@ -22,75 +22,30 @@
     <link rel="stylesheet" href="vendor/code-lab/code-lab.css" />
   </head>
   <body>
-    <div class="noise"></div>
     <main class="layout">
-      <section class="hero">
-        <p class="eyebrow">Part one · Understand the ideas</p>
-        <h1>Reading Objects</h1>
-        <p class="subtitle">
-          A gentle step up from single-token drills. Read how a few objects work together, give one
-          job to one place, and trace what the code does before you run it. No new theory - just the
-          habits the SOLID drills will lean on.
-        </p>
-        <p class="subtitle"><strong id="courseXpLabel">Course XP: 0</strong></p>
-        <p class="subtitle"><a href="index.html">Back to the course</a></p>
-      </section>
-
-      <section class="card" aria-live="polite">
-        <header class="challenge-head">
-          <div>
-            <p id="roMeta" class="meta"></p>
-            <h2 id="roTitle"></h2>
-            <p id="roContext" class="context"></p>
-          </div>
-          <div class="badge-group">
-            <span id="roConcept" class="badge"></span>
-            <span id="roProgress" class="badge ghost"></span>
-          </div>
-        </header>
-
-        <div class="code-wrap">
-          <pre class="line-numbers"><code id="roCode" class="language-csharp"></code></pre>
-        </div>
-        <div class="code-actions">
-          <button id="roRun" class="btn" type="button" hidden>Run</button>
-        </div>
-        <pre id="roOutput" class="run-output" hidden></pre>
-
-        <section class="coach">
-          <h3>Goal</h3>
-          <ul id="roPoints" class="coach-list"></ul>
-        </section>
-
-        <section class="fill-section">
-          <h3>Complete The Code</h3>
-          <div id="roInputs" class="inputs"></div>
-        </section>
-
-        <section class="actions">
-          <button id="roCheck" class="btn primary" type="button">Check</button>
-          <button id="roHint" class="btn" type="button">Hint</button>
-          <button id="roShow" class="btn danger" type="button">Show Answer</button>
-          <button id="roReset" class="btn" type="button">Reset</button>
-        </section>
-
-        <section id="roResult" class="result-panel" hidden>
-          <h3 id="roResultTitle"></h3>
-          <p id="roResultBody"></p>
-          <ul id="roResultList"></ul>
-        </section>
-
-        <footer class="nav-row">
-          <button id="roPrev" class="btn" type="button">Previous</button>
-          <button id="roNext" class="btn primary" type="button">Next</button>
-        </footer>
-      </section>
+      <section class="hero" id="pageHero"></section>
     </main>
+
+    <script>
+      window.PAGE = {
+        hero: {
+          eyebrow: "Part one \u00b7 Understand the ideas",
+          title: "Reading Objects",
+          intro: [
+            "A gentle step up from single-token drills. Read how a few objects work together, give one job to one place, and trace what the code does before you run it. No new theory - just the habits the SOLID drills will lean on.",
+          ],
+          links: [{ href: "index.html", label: "Back to the course" }],
+        },
+        archetype: "drill",
+        prefix: "ro",
+      };
+    </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
     <script src="vendor/code-lab/code-lab.global.js"></script>
+    <script src="page-shell.js"></script>
     <script src="reading-objects.js"></script>
     <script src="drill-engine.js"></script>
   </body>

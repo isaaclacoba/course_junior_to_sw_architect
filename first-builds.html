@@ -12,85 +12,29 @@
     />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="vendor/code-lab/code-lab.css" />
-    <style>
-      #fbEditor {
-        height: 24rem;
-        border-radius: 8px;
-        overflow: hidden;
-      }
-      .expected-line {
-        font-family: "IBM Plex Mono", monospace;
-      }
-      .result-panel.is-pass {
-        border-color: rgba(80, 220, 150, 0.5);
-      }
-      .result-panel.is-fail {
-        border-color: rgba(240, 130, 120, 0.5);
-      }
-    </style>
   </head>
   <body>
-    <div class="noise"></div>
     <main class="layout">
-      <section class="hero">
-        <p class="eyebrow">Part two · Build it for real</p>
-        <h1>First Builds</h1>
-        <p class="subtitle">
-          Five small programs you write from scratch and run. Each one is a single win - a class, a
-          method, a constructor, an interface - and together they are the exact moves the capstone
-          asks for. No blanks to fill: write the code, run it, match the output.
-        </p>
-        <p class="subtitle"><strong id="courseXpLabel">Course XP: 0</strong></p>
-        <p class="subtitle"><a href="index.html">Back to the course</a></p>
-      </section>
-
-      <section class="card" aria-live="polite">
-        <header class="challenge-head">
-          <div>
-            <p id="fbMeta" class="meta"></p>
-            <h2 id="fbTitle"></h2>
-            <p id="fbContext" class="context"></p>
-          </div>
-          <div class="badge-group">
-            <span id="fbConcept" class="badge"></span>
-            <span id="fbProgress" class="badge ghost"></span>
-          </div>
-        </header>
-
-        <section class="coach">
-          <h3>Goal</h3>
-          <ul id="fbGoal" class="coach-list"></ul>
-          <p class="context">
-            Expected output: <strong id="fbExpected" class="expected-line"></strong>
-          </p>
-        </section>
-
-        <section class="fill-section">
-          <h3>Your Code</h3>
-          <div id="fbEditor"></div>
-        </section>
-
-        <section class="actions">
-          <button id="fbRun" class="btn primary" type="button">Run</button>
-          <button id="fbSolution" class="btn danger" type="button">Show Solution</button>
-          <button id="fbReset" class="btn" type="button">Reset</button>
-        </section>
-
-        <pre id="fbOutput" class="run-output" hidden></pre>
-
-        <section id="fbResult" class="result-panel" hidden>
-          <h3 id="fbResultTitle"></h3>
-          <p id="fbResultBody"></p>
-        </section>
-
-        <footer class="nav-row">
-          <button id="fbPrev" class="btn" type="button">Previous</button>
-          <button id="fbNext" class="btn primary" type="button">Next</button>
-        </footer>
-      </section>
+      <section class="hero" id="pageHero"></section>
     </main>
 
+    <script>
+      window.PAGE = {
+        hero: {
+          eyebrow: "Part two \u00b7 Build it for real",
+          title: "First Builds",
+          intro: [
+            "Five small programs you write from scratch and run. Each one is a single win - a class, a method, a constructor, an interface - and together they are the exact moves the capstone asks for. No blanks to fill: write the code, run it, match the output.",
+          ],
+          links: [{ href: "index.html", label: "Back to the course" }],
+        },
+        archetype: "build",
+        prefix: "fb",
+      };
+    </script>
+
     <script src="vendor/code-lab/code-lab.global.js"></script>
+    <script src="page-shell.js"></script>
     <script src="first-builds.js"></script>
     <script src="build-engine.js"></script>
   </body>

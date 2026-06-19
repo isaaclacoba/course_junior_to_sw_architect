@@ -14,19 +14,8 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   </head>
   <body>
-    <div class="noise"></div>
     <main class="layout">
-      <section class="hero">
-        <p class="eyebrow">Part one · Understand the ideas</p>
-        <h1>Level 1: Why We Program + OO Basics</h1>
-        <p class="subtitle">
-          This level explains what software models, how variables represent state, how functions change state,
-          and then how classes organize state + behavior.
-        </p>
-        <p class="subtitle"><strong id="courseXpLabel">Course XP: 0</strong></p>
-        <p class="subtitle"><a href="level1-coding.html">Switch to Level 1 Microcoding Track</a></p>
-        <p class="subtitle"><a href="index.html">Back to the course</a></p>
-      </section>
+      <section class="hero" id="pageHero"></section>
 
       <section class="card level1-shell" aria-live="polite">
         <header class="challenge-head">
@@ -66,6 +55,22 @@
       </section>
     </main>
 
+    <script>
+      window.PAGE = {
+        hero: {
+          eyebrow: "Part one \u00b7 Understand the ideas",
+          title: "Level 1: Why We Program + OO Basics",
+          intro: [
+            "This level explains what software models, how variables represent state, how functions change state, and then how classes organize state + behavior.",
+          ],
+          links: [
+            { href: "level1-coding.html", label: "Switch to Level 1 Microcoding Track" },
+            { href: "index.html", label: "Back to the course" },
+          ],
+        },
+      };
+    </script>
+    <script src="page-shell.js"></script>
     <script src="level1.js"></script>
   </body>
 </html>

@@ -907,3 +907,22 @@ input.almost {
   color: var(--ink-soft);
 }
 
+/* ---------------------------------------------------------- Build editor */
+.code-editor-host {
+  height: 24rem;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.expected-line {
+  font-family: "IBM Plex Mono", monospace;
+}
+
+.result-panel.is-pass {
+  border-color: rgba(80, 220, 150, 0.5);
+}
+
+.result-panel.is-fail {
+  border-color: rgba(240, 130, 120, 0.5);
+}
+

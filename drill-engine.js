@@ -64,6 +64,10 @@
     check: el("Check"),
     show: el("Show"),
     reset: el("Reset"),
+    summary: el("Summary"),
+    summaryIntro: el("SummaryIntro"),
+    summaryList: el("SummaryList"),
+    summaryClose: el("SummaryClose"),
   };
   const courseXpLabel = document.getElementById("courseXpLabel");
   const codeWrap = els.code ? els.code.closest(".code-wrap") : null;
@@ -283,13 +287,53 @@
   // ---- render -------------------------------------------------------------
   function setOptional(node, value) {
     if (!node) return;
+    const host = node.closest(".pain-box, .map-box") || node;
     if (value) {
       node.textContent = value;
-      node.hidden = false;
+      host.hidden = false;
     } else {
       node.textContent = "";
-      node.hidden = true;
+      host.hidden = true;
     }
+  }
+
+  const practiceCount = drills.filter((d) => !d.summary).length;
+
+  function setPracticeVisible(visible) {
+    const hosts = [
+      els.pain && els.pain.closest(".pain-box"),
+      els.map && els.map.closest(".map-box"),
+      els.code && els.code.closest(".code-wrap"),
+      els.run && els.run.closest(".code-actions"),
+      els.points && els.points.closest(".coach"),
+      els.inputs && els.inputs.closest(".fill-section"),
+      els.check && els.check.closest(".actions"),
+    ];
+    hosts.forEach((h) => {
+      if (h) h.hidden = !visible;
+    });
+    if (!visible && els.output) els.output.hidden = true;
+    if (els.summary) els.summary.hidden = visible;
+  }
+
+  function renderSummary(d) {
+    setPracticeVisible(false);
+    if (els.result) els.result.hidden = true;
+    if (els.summaryIntro) els.summaryIntro.textContent = d.summaryIntro || "";
+    if (els.summaryList) {
+      els.summaryList.innerHTML = "";
+      (d.summaryItems || []).forEach((item) => {
+        const li = document.createElement("li");
+        const strong = document.createElement("strong");
+        strong.textContent = item.title || "";
+        li.appendChild(strong);
+        li.appendChild(document.createTextNode(item.text || ""));
+        els.summaryList.appendChild(li);
+      });
+    }
+    if (els.summaryClose) els.summaryClose.textContent = d.summaryClose || "";
+    if (els.prev) els.prev.disabled = idx === 0;
+    if (els.next) els.next.disabled = idx === drills.length - 1;
   }
 
   function render() {
@@ -302,10 +346,20 @@
     if (els.meta) els.meta.textContent = metaLabel;
     els.title.textContent = d.title;
     setOptional(els.context, d.context);
+    if (els.concept) els.concept.textContent = d.concept || "";
+    if (els.progress)
+      els.progress.textContent = d.summary
+        ? "Recap"
+        : `${progressNoun} ${idx + 1} / ${practiceCount}`;
+
+    if (d.summary) {
+      renderSummary(d);
+      return;
+    }
+
+    setPracticeVisible(true);
     setOptional(els.pain, d.pain);
     setOptional(els.map, d.map);
-    if (els.concept) els.concept.textContent = d.concept || "";
-    if (els.progress) els.progress.textContent = `${progressNoun} ${idx + 1} / ${drills.length}`;
 
     els.code.textContent = withGaps(d.snippet);
     if (window.Prism) Prism.highlightElement(els.code);

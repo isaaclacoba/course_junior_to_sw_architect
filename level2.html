@@ -23,97 +23,35 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   </head>
   <body>
-    <div class="noise"></div>
     <main class="layout">
-      <section class="hero">
-        <p class="eyebrow">Part one · Understand the ideas</p>
-        <h1>Level 2: SOLID, One Step at a Time</h1>
-        <p class="subtitle">
-          One small test-automation codebase, improved one principle per drill. Each drill shows the
-          problem first, where it fits in the bigger picture, then one small thing for you to write.
-        </p>
-        <p class="subtitle solid-intro">
-          <strong>SOLID</strong> is five habits for writing classes that are easy to change without
-          breaking other code. The five letters — S, O, L, I, D — are what this level walks through,
-          one at a time.
-        </p>
-        <p class="subtitle"><strong id="courseXpLabel">Course XP: 0</strong></p>
-        <p class="subtitle"><a href="index.html">Back to the course</a></p>
-      </section>
-
-      <section class="card" aria-live="polite">
-        <header class="challenge-head">
-          <div>
-            <p id="l2Meta" class="meta"></p>
-            <h2 id="l2Title"></h2>
-            <p id="l2Context" class="context"></p>
-          </div>
-          <div class="badge-group">
-            <span id="l2Concept" class="badge"></span>
-            <span id="l2Progress" class="badge ghost"></span>
-          </div>
-        </header>
-
-        <section class="pain-box">
-          <h3>The problem</h3>
-          <p id="l2Pain"></p>
-        </section>
-
-        <section class="map-box">
-          <h3>Where this fits</h3>
-          <p id="l2Map"></p>
-        </section>
-
-        <div class="code-wrap">
-          <pre class="line-numbers"><code id="l2Code" class="language-csharp"></code></pre>
-        </div>
-        <div class="code-actions">
-          <button id="l2Run" class="btn" type="button" hidden>Run</button>
-        </div>
-        <pre id="l2Output" class="run-output" hidden></pre>
-
-        <section class="coach">
-          <h3>Coach</h3>
-          <ul id="l2Points" class="coach-list"></ul>
-          <h4>Concept Diagram</h4>
-          <div id="l2Diagram" class="coach-diagram"></div>
-        </section>
-
-        <section class="fill-section">
-          <h3>Your move</h3>
-          <div id="l2Inputs" class="inputs"></div>
-        </section>
-
-        <section class="actions">
-          <button id="l2Check" class="btn primary" type="button">Check</button>
-          <button id="l2Hint" class="btn" type="button">Hint</button>
-          <button id="l2Answers" class="btn" type="button">Show Answer</button>
-          <button id="l2Reset" class="btn" type="button">Reset</button>
-        </section>
-
-        <section id="l2Result" class="result-panel" hidden>
-          <h3 id="l2ResultTitle"></h3>
-          <p id="l2ResultBody"></p>
-          <ul id="l2ResultList"></ul>
-        </section>
-
-        <section id="l2Summary" class="summary-section" hidden>
-          <p id="l2SummaryIntro" class="context"></p>
-          <ul id="l2SummaryList" class="summary-list"></ul>
-          <p id="l2SummaryClose" class="summary-close"></p>
-        </section>
-
-        <footer class="nav-row">
-          <button id="l2Prev" class="btn" type="button">Previous</button>
-          <button id="l2Next" class="btn primary" type="button">Next</button>
-        </footer>
-      </section>
+      <section class="hero" id="pageHero"></section>
     </main>
+
+    <script>
+      window.PAGE = {
+        hero: {
+          eyebrow: "Part one \u00b7 Understand the ideas",
+          title: "Level 2: SOLID, One Step at a Time",
+          intro: [
+            "One small test-automation codebase, improved one principle per drill. Each drill shows the problem first, where it fits in the bigger picture, then one small thing for you to write.",
+            {
+              html: "<strong>SOLID</strong> is five habits for writing classes that are easy to change without breaking other code. The five letters \u2014 S, O, L, I, D \u2014 are what this level walks through, one at a time.",
+              class: "subtitle solid-intro",
+            },
+          ],
+          links: [{ href: "index.html", label: "Back to the course" }],
+        },
+        archetype: "drill",
+        prefix: "l2",
+      };
+    </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
     <script src="vendor/code-lab/code-lab.global.js"></script>
+    <script src="page-shell.js"></script>
     <script src="level2.js"></script>
+    <script src="drill-engine.js"></script>
   </body>
 </html>

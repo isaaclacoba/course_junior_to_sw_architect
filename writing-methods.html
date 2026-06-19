@@ -12,85 +12,29 @@
     />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="vendor/code-lab/code-lab.css" />
-    <style>
-      #wmEditor {
-        height: 24rem;
-        border-radius: 8px;
-        overflow: hidden;
-      }
-      .expected-line {
-        font-family: "IBM Plex Mono", monospace;
-      }
-      .result-panel.is-pass {
-        border-color: rgba(80, 220, 150, 0.5);
-      }
-      .result-panel.is-fail {
-        border-color: rgba(240, 130, 120, 0.5);
-      }
-    </style>
   </head>
   <body>
-    <div class="noise"></div>
     <main class="layout">
-      <section class="hero">
-        <p class="eyebrow">Part one · Understand the ideas</p>
-        <h1>Methods</h1>
-        <p class="subtitle">
-          A method is a named piece of behaviour: hand it some input, it hands back an answer - the
-          same idea as a check you used to run by hand. The syntax here is small on purpose. The real
-          goal is to feel what a method is for: write a rule once, then reuse it.
-        </p>
-        <p class="subtitle"><strong id="courseXpLabel">Course XP: 0</strong></p>
-        <p class="subtitle"><a href="index.html">Back to the course</a></p>
-      </section>
-
-      <section class="card" aria-live="polite">
-        <header class="challenge-head">
-          <div>
-            <p id="wmMeta" class="meta"></p>
-            <h2 id="wmTitle"></h2>
-            <p id="wmContext" class="context"></p>
-          </div>
-          <div class="badge-group">
-            <span id="wmConcept" class="badge"></span>
-            <span id="wmProgress" class="badge ghost"></span>
-          </div>
-        </header>
-
-        <section class="coach">
-          <h3>Goal</h3>
-          <ul id="wmGoal" class="coach-list"></ul>
-          <p class="context">
-            Expected output: <strong id="wmExpected" class="expected-line"></strong>
-          </p>
-        </section>
-
-        <section class="fill-section">
-          <h3>Your Code</h3>
-          <div id="wmEditor"></div>
-        </section>
-
-        <section class="actions">
-          <button id="wmRun" class="btn primary" type="button">Run</button>
-          <button id="wmSolution" class="btn danger" type="button">Show Solution</button>
-          <button id="wmReset" class="btn" type="button">Reset</button>
-        </section>
-
-        <pre id="wmOutput" class="run-output" hidden></pre>
-
-        <section id="wmResult" class="result-panel" hidden>
-          <h3 id="wmResultTitle"></h3>
-          <p id="wmResultBody"></p>
-        </section>
-
-        <footer class="nav-row">
-          <button id="wmPrev" class="btn" type="button">Previous</button>
-          <button id="wmNext" class="btn primary" type="button">Next</button>
-        </footer>
-      </section>
+      <section class="hero" id="pageHero"></section>
     </main>
 
+    <script>
+      window.PAGE = {
+        hero: {
+          eyebrow: "Part one \u00b7 Understand the ideas",
+          title: "Methods",
+          intro: [
+            "A method is a named piece of behaviour: hand it some input, it hands back an answer - the same idea as a check you used to run by hand. The syntax here is small on purpose. The real goal is to feel what a method is for: write a rule once, then reuse it.",
+          ],
+          links: [{ href: "index.html", label: "Back to the course" }],
+        },
+        archetype: "build",
+        prefix: "wm",
+      };
+    </script>
+
     <script src="vendor/code-lab/code-lab.global.js"></script>
+    <script src="page-shell.js"></script>
     <script src="writing-methods.js"></script>
     <script src="build-engine.js"></script>
   </body>

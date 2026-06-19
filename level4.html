@@ -23,19 +23,8 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   </head>
   <body>
-    <div class="noise"></div>
     <main class="layout">
-      <section class="hero">
-        <p class="eyebrow">Part one · Understand the ideas</p>
-        <h1>Level 4: Reuse Without Regret</h1>
-        <p class="subtitle">
-          Inheritance, composition, and the polymorphism payoff - by reading code, not writing it.
-          You answer one question: is this an honest <em>is-a</em>, or really a <em>has-a</em>?
-          Read slowly. An architect skims these in five minutes; the point is to earn that speed.
-        </p>
-        <p class="subtitle"><strong id="courseXpLabel">Course XP: 0</strong></p>
-        <p class="subtitle"><a href="index.html">Back to the course</a></p>
-      </section>
+      <section class="hero" id="pageHero"></section>
 
       <section class="card level1-shell" aria-live="polite">
         <header class="challenge-head">
@@ -91,6 +80,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
     <script src="vendor/code-lab/code-lab.global.js"></script>
+    <script>
+      window.PAGE = {
+        hero: {
+          eyebrow: "Part one \u00b7 Understand the ideas",
+          title: "Level 4: Reuse Without Regret",
+          intro: [
+            "Inheritance, composition, and the polymorphism payoff - by reading code, not writing it. You answer one question: is this an honest <em>is-a</em>, or really a <em>has-a</em>? Read slowly. An architect skims these in five minutes; the point is to earn that speed.",
+          ],
+          links: [{ href: "index.html", label: "Back to the course" }],
+        },
+      };
+    </script>
+    <script src="page-shell.js"></script>
     <script src="level4.js"></script>
   </body>
 </html>
