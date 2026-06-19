@@ -352,6 +352,23 @@ public class Penguin : Bird { }
 
 var pingu = new Penguin();
 pingu.Fly();   // compiles happily. Pingu launches off the iceberg.`,
+    runCode: `using System;
+
+public class Bird
+{
+    public void Fly() => Console.WriteLine("up we go!");
+}
+
+public class Penguin : Bird { }
+
+public class Program
+{
+    public static void Main()
+    {
+        var pingu = new Penguin();
+        pingu.Fly();   // compiles happily, even though penguins cannot fly
+    }
+}`,
     explain:
       "A penguin is a bird in biology, but in code `Penguin : Bird` promises a Penguin can do everything a Bird can - including Fly(). It cannot. The hierarchy lets you call behaviour the type should never have. The model lies, and nothing stops you.",
     points: [
@@ -359,9 +376,9 @@ pingu.Fly();   // compiles happily. Pingu launches off the iceberg.`,
       "Penguin inherits Fly() but cannot honour it - a broken promise.",
     ],
     walk: [
-      { lines: 3, text: "Bird can Fly(). Every Bird is expected to do this." },
-      { lines: 7, text: "`Penguin : Bird` promises a Penguin is fully usable as a Bird - including Fly()." },
-      { lines: 10, text: "So pingu.Fly() compiles happily, even though a penguin cannot fly. The is-a promise was a lie - and nothing stopped you." },
+      { lines: 3, text: "Start with the parent. Bird has one method, Fly(). The idea baked into this class is simple: every Bird can fly. Hold on to that promise - it is the whole point." },
+      { lines: 7, text: "Now the trap. `Penguin : Bird` says 'a Penguin IS-A Bird'. In code, that colon is not just a label - it is a promise that a Penguin can do EVERYTHING a Bird can do, including Fly(). We wrote that promise without thinking, because in real life a penguin is a kind of bird." },
+      { lines: 10, text: "Here is where the promise breaks. We make a Penguin and call pingu.Fly(). A real penguin cannot fly - but the code compiles and runs with zero complaints, printing 'up we go!'. The type system happily lets us call behaviour this object should never have. The 'is-a' was a lie, and nothing - not the compiler, not a warning - stopped us. That is the danger: inheritance forced a capability onto Penguin that does not belong to it. (You will meet this again as the Liskov rule: a subclass must be safely usable everywhere its parent is.)" },
     ],
     mermaid: "flowchart LR\n  Bird --> Penguin\n  Penguin -->|inherits Fly\\(\\)| Oops[\"but cannot fly\"]",
     question: "Why is Penguin : Bird a design trap?",
@@ -393,9 +410,9 @@ public class RoboCat : Cat    { }   // inherits the surprise too`,
       "Some descendants (Fish) never fit the new behaviour.",
     ],
     walk: [
-      { lines: 4, text: "Someone edits one line in the base class: now every Animal 'walks'." },
-      { lines: 8, text: "Fish inherits that change blindly - it 'walks' on land. It never fit the new behaviour." },
-      { lines: 9, text: "RoboCat inherits it too, through Cat. One edit rippled all the way down the tree to types nobody re-checked." },
+      { lines: 4, text: "This is the parent everyone shares. Today someone edits one single line in Animal so that Move() prints 'walks'. They are only thinking about animals that walk - they never look at the classes below." },
+      { lines: 8, text: "But Fish inherited Move() from Animal without changing it. The moment the parent says 'walks', Fish silently 'walks' too - on land. Nobody touched the Fish class, yet its behaviour just changed and is now wrong. That is the danger: a child is welded to whatever the parent decides, even when it does not fit." },
+      { lines: 9, text: "And it does not stop at direct children. RoboCat inherits from Cat, which inherits from Animal, so the same one-line edit reaches RoboCat too - two levels down. One small change at the top rippled all the way through a tree of classes the author never re-checked. The deeper the inheritance, the more places a single edit can quietly break. That is the fragile base class problem." },
     ],
     mermaid:
       "flowchart TB\n  Animal[\"Animal.Move() changed\"] --> Cat\n  Animal --> Fish\n  Cat --> RoboCat\n  Fish --> Bad[\"walks on land?!\"]",
@@ -419,6 +436,24 @@ public class Flyer   : Animal { public new string Greet() => "hi from Flyer"; }
 
 // public class Duck : Swimmer, Flyer   // <-- C# REFUSES this line.
 // duck.Greet();  // Swimmer's Greet or Flyer's Greet? Nobody can say.`,
+    runCode: `using System;
+
+public class Animal { public string Greet() => "hi from Animal"; }
+
+public class Swimmer : Animal { public new string Greet() => "hi from Swimmer"; }
+public class Flyer   : Animal { public new string Greet() => "hi from Flyer"; }
+
+// The diamond: try to inherit from BOTH parents. C# refuses to compile this.
+public class Duck : Swimmer, Flyer { }
+
+public class Program
+{
+    public static void Main()
+    {
+        var duck = new Duck();
+        Console.WriteLine(duck.Greet());   // which Greet()? Nobody can say.
+    }
+}`,
     explain:
       "Picture Duck inheriting from both Swimmer and Flyer, which both descend from Animal. The inheritance graph forms a diamond. Now Duck.Greet() is ambiguous: two parents offer it, and the compiler cannot choose. To avoid this whole class of bug, C# forbids inheriting from more than one class. That single restriction is the strongest practical argument for composition.",
     points: [
@@ -426,10 +461,11 @@ public class Flyer   : Animal { public new string Greet() => "hi from Flyer"; }
       "C# bans multiple class inheritance to dodge the diamond.",
     ],
     walk: [
-      { lines: 1, text: "One shared root: Animal, with a Greet()." },
-      { lines: [3, 4], text: "Two parents, Swimmer and Flyer, each redefine Greet() differently." },
-      { lines: 6, text: "If Duck inherited from both, the inheritance graph forms a diamond - and C# flatly refuses this line." },
-      { lines: 7, text: "Because Duck.Greet() would be ambiguous: Swimmer's version or Flyer's? Nobody can say. That is the diamond problem." },
+      { lines: 1, text: "Start at the top of the family. Animal has one method, Greet(). Everything below will be a kind of Animal, so they all start with this same Greet()." },
+      { lines: 3, text: "Swimmer is a kind of Animal, but it rewrites Greet() to say 'hi from Swimmer'. The word 'new' just means 'I am deliberately replacing the parent's version with my own'." },
+      { lines: 4, text: "Flyer is also a kind of Animal, and it ALSO rewrites Greet() - but to say 'hi from Flyer'. So now we have two siblings that each define their own, different Greet()." },
+      { lines: 6, text: "Now imagine a Duck that wants to be both a Swimmer and a Flyer, so we try to give it two parents: `Duck : Swimmer, Flyer`. That is the line C# refuses to even compile. Here is why it is a real problem, not a rule for its own sake..." },
+      { lines: 7, text: "If that Duck existed and you wrote `duck.Greet()`, the computer would have to run ONE method. But it inherited two different Greet()s: Swimmer's ('hi from Swimmer') and Flyer's ('hi from Flyer'). There is no rule for which one wins - both are equally valid. The compiler cannot guess your intent, so instead of picking wrong, it refuses the whole design. Four classes arranged in a diamond (Animal at top, Swimmer and Flyer in the middle, Duck at the bottom) create this trap - that is the diamond problem." },
     ],
     mermaid:
       "flowchart TB\n  Animal --> Swimmer\n  Animal --> Flyer\n  Swimmer --> Duck\n  Flyer --> Duck\n  Duck --> Q[\"Greet\\(\\) = ???\"]",
@@ -517,6 +553,30 @@ public class TestRunner
     answerWhy: "TestRunner has-a IReporter (composition) and any implementation slots in (polymorphism). You already shipped this - now you can name it.",
   },
 ];
+
+// LessonSource is the seam between this UI and wherever lessons come from.
+// Today the lessons live inline (ArrayLessonSource). Later, without touching the
+// rendering code below, this can become a JsonLessonSource that fetches one file
+// per lesson (static, GitHub Pages friendly) or an ApiLessonSource. The contract:
+//   async init()      load whatever is needed before the first render
+//   count()           how many lessons
+//   at(index)         the lesson at a 0-based index
+class ArrayLessonSource {
+  constructor(lessons) {
+    this._lessons = lessons;
+  }
+  async init() {
+    // Data is already in memory; nothing to load.
+  }
+  count() {
+    return this._lessons.length;
+  }
+  at(index) {
+    return this._lessons[index];
+  }
+}
+
+const lessonSource = new ArrayLessonSource(lessons);
 
 let lessonIndex = 0;
 
@@ -623,8 +683,8 @@ function renderOptions(lesson) {
 }
 
 function renderLesson() {
-  const lesson = lessons[lessonIndex];
-  const remaining = lessons.length - (lessonIndex + 1);
+  const lesson = lessonSource.at(lessonIndex);
+  const remaining = lessonSource.count() - (lessonIndex + 1);
 
   renderCourseXP();
 
@@ -632,7 +692,7 @@ function renderLesson() {
   l4Title.textContent = lesson.title;
   l4Context.textContent = lesson.context;
   l4Concept.textContent = lesson.concept;
-  l4Progress.textContent = `Card ${lessonIndex + 1} / ${lessons.length}`;
+  l4Progress.textContent = `Card ${lessonIndex + 1} / ${lessonSource.count()}`;
 
   l4Code.textContent = lesson.code;
   if (window.Prism) Prism.highlightElement(l4Code);
@@ -661,7 +721,7 @@ function renderLesson() {
   l4Output.classList.remove("is-error");
 
   l4Prev.disabled = lessonIndex === 0;
-  l4Next.disabled = lessonIndex === lessons.length - 1;
+  l4Next.disabled = lessonIndex === lessonSource.count() - 1;
 }
 
 l4Prev.addEventListener("click", () => {
@@ -675,7 +735,7 @@ l4Next.addEventListener("click", () => {
 });
 
 l4Walk.addEventListener("click", () => {
-  const lesson = lessons[lessonIndex];
+  const lesson = lessonSource.at(lessonIndex);
   if (window.codeTour && Array.isArray(lesson.walk) && lesson.walk.length) {
     window.codeTour.open({
       title: `Walk-through: ${lesson.title}`,
@@ -692,7 +752,7 @@ function showOutput(text, isError) {
 }
 
 l4Run.addEventListener("click", async () => {
-  const lesson = lessons[lessonIndex];
+  const lesson = lessonSource.at(lessonIndex);
   if (!lesson.runCode || !window.codeRunner) return;
 
   l4Run.disabled = true;
@@ -717,4 +777,7 @@ l4Run.addEventListener("click", async () => {
   }
 });
 
-renderLesson();
+(async function start() {
+  await lessonSource.init();
+  renderLesson();
+})();
