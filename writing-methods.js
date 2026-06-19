@@ -60,9 +60,9 @@
       goal: [
         "Keep the same Category method.",
         "Call it for ages 16, 18 and 40 and print each result.",
-        "The output must include a line that is exactly minor.",
+        "The output must be exactly three lines: minor, adult, adult.",
       ],
-      expected: "minor",
+      expected: ["minor", "adult", "adult"],
       starter:
         'using System;\n\nclass Program\n{\n    static string Category(int age)\n    {\n        if (age >= 18)\n        {\n            return "adult";\n        }\n        return "minor";\n    }\n\n    static void Main()\n    {\n        // TODO: print Category for 16, then 18, then 40\n    }\n}\n',
       solution:

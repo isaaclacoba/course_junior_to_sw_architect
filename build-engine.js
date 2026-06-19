@@ -76,6 +76,26 @@
     resultBody.textContent = body;
   }
 
+  // expected as a string: any output line equals it.
+  // expected as an array: the non-empty output lines equal that exact sequence.
+  function matches(out, expected) {
+    const lines = out.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+    if (Array.isArray(expected)) {
+      return (
+        lines.length === expected.length &&
+        expected.every((e, i) => lines[i] === e)
+      );
+    }
+    return lines.some((line) => line === expected);
+  }
+
+  function describeExpected(expected) {
+    if (Array.isArray(expected)) {
+      return `Expected these lines, in order:\n${expected.join("\n")}\nAdjust your code and run again.`;
+    }
+    return `Expected a line equal to "${expected}". Adjust your code and run again.`;
+  }
+
   function render() {
     const task = tasks[idx];
     if (meta) meta.textContent = metaLabel;
@@ -83,7 +103,11 @@
     context.textContent = task.context;
     if (concept) concept.textContent = task.concept;
     progress.textContent = `${progressNoun} ${idx + 1} / ${tasks.length}`;
-    if (expected) expected.textContent = task.expected;
+    if (expected) {
+      expected.textContent = Array.isArray(task.expected)
+        ? task.expected.join("\n")
+        : task.expected;
+    }
     editor.setValue(code[idx]);
 
     goal.innerHTML = "";
@@ -124,11 +148,11 @@
       }
       const out = (res.output || "").trim();
       showOutput(out || "(no output)", false);
-      if (out.split(/\r?\n/).some((line) => line.trim() === task.expected)) {
+      if (matches(out, task.expected)) {
         award(idx);
-        showResult(true, `Output matched "${task.expected}". XP awarded.`);
+        showResult(true, "Output matched what the task asked for. XP awarded.");
       } else {
-        showResult(false, `Expected a line equal to "${task.expected}". Adjust your code and run again.`);
+        showResult(false, describeExpected(task.expected));
       }
     } catch (err) {
       showOutput(err.message || "Could not run the code.", true);
