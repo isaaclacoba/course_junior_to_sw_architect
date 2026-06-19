@@ -190,9 +190,7 @@
     }
   });
 
-  Promise.resolve(
-    window.ensureMonaco ? window.ensureMonaco() : null
-  )
+  Promise.resolve(CodeLab.loadMonaco())
     .then(() => editor.mount(editorHost, { value: code[0], language: "csharp", readOnly: false }))
     .then(() => {
       renderXP();

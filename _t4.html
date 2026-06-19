@@ -1,0 +1,25 @@
+<!doctype html>
+<html><head><meta charset="utf-8"></head><body>
+<script>
+function log(m){console.log("T4 "+m);}
+(async()=>{
+  const f=document.createElement("iframe");
+  f.style.width="1000px";f.style.height="800px";
+  f.src="writing-methods.html";document.body.appendChild(f);
+  await new Promise(r=>f.addEventListener("load",r));
+  const doc=f.contentDocument;
+  // wait for monaco
+  for(let i=0;i<60;i++){if(doc.querySelector("#wmEditor .monaco-editor"))break;await new Promise(r=>setTimeout(r,1000));}
+  // go to card 4 (index 3): click Next 3 times
+  for(let n=0;n<3;n++){doc.getElementById("wmNext").click();await new Promise(r=>setTimeout(r,300));}
+  log("title="+doc.getElementById("wmTitle").textContent);
+  // show solution then run -> should pass
+  doc.getElementById("wmSolution").click();await new Promise(r=>setTimeout(r,500));
+  doc.getElementById("wmRun").click();
+  const rt=doc.getElementById("wmResultTitle");
+  for(let i=0;i<60;i++){if(rt.textContent==="Passed"||rt.textContent==="Not yet")break;await new Promise(r=>setTimeout(r,1000));}
+  log("solution result="+rt.textContent+" | out="+(doc.getElementById("wmOutput").textContent||"").replace(/\n/g,","));
+  log("DONE");
+})();
+</script>
+</body></html>
