@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bridge - First Builds</title>
+    <title>Methods - write a check once, run it many times</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="vendor/code-lab/code-lab.css" />
     <style>
-      #fbEditor {
+      #wmEditor {
         height: 24rem;
         border-radius: 8px;
         overflow: hidden;
@@ -33,59 +33,59 @@
     <div class="noise"></div>
     <main class="layout">
       <section class="hero">
-        <p class="eyebrow">Bridge between micro-coding and the capstone</p>
-        <h1>First Builds</h1>
+        <p class="eyebrow">Part one - From reader to writer</p>
+        <h1>Methods</h1>
         <p class="subtitle">
-          Five small programs you write from scratch and run. Each one is a single win - a class, a
-          method, a constructor, an interface - and together they are the exact moves the capstone
-          asks for. No blanks to fill: write the code, run it, match the output.
+          A method is a named piece of behaviour: hand it some input, it hands back an answer - the
+          same idea as a check you used to run by hand. The syntax here is small on purpose. The real
+          goal is to feel what a method is for: write a rule once, then reuse it.
         </p>
         <p class="subtitle"><strong id="courseXpLabel">Course XP: 0</strong></p>
-        <p class="subtitle"><a href="index.html">Back to level selector</a></p>
+        <p class="subtitle"><a href="index.html">Back to the course</a></p>
       </section>
 
       <section class="card" aria-live="polite">
         <header class="challenge-head">
           <div>
-            <p id="fbMeta" class="meta"></p>
-            <h2 id="fbTitle"></h2>
-            <p id="fbContext" class="context"></p>
+            <p id="wmMeta" class="meta"></p>
+            <h2 id="wmTitle"></h2>
+            <p id="wmContext" class="context"></p>
           </div>
           <div class="badge-group">
-            <span id="fbConcept" class="badge"></span>
-            <span id="fbProgress" class="badge ghost"></span>
+            <span id="wmConcept" class="badge"></span>
+            <span id="wmProgress" class="badge ghost"></span>
           </div>
         </header>
 
         <section class="coach">
           <h3>Goal</h3>
-          <ul id="fbGoal" class="coach-list"></ul>
+          <ul id="wmGoal" class="coach-list"></ul>
           <p class="context">
-            Expected output: <strong id="fbExpected" class="expected-line"></strong>
+            Expected output: <strong id="wmExpected" class="expected-line"></strong>
           </p>
         </section>
 
         <section class="fill-section">
           <h3>Your Code</h3>
-          <div id="fbEditor"></div>
+          <div id="wmEditor"></div>
         </section>
 
         <section class="actions">
-          <button id="fbRun" class="btn primary" type="button">Run</button>
-          <button id="fbSolution" class="btn danger" type="button">Show Solution</button>
-          <button id="fbReset" class="btn" type="button">Reset</button>
+          <button id="wmRun" class="btn primary" type="button">Run</button>
+          <button id="wmSolution" class="btn danger" type="button">Show Solution</button>
+          <button id="wmReset" class="btn" type="button">Reset</button>
         </section>
 
-        <pre id="fbOutput" class="run-output" hidden></pre>
+        <pre id="wmOutput" class="run-output" hidden></pre>
 
-        <section id="fbResult" class="result-panel" hidden>
-          <h3 id="fbResultTitle"></h3>
-          <p id="fbResultBody"></p>
+        <section id="wmResult" class="result-panel" hidden>
+          <h3 id="wmResultTitle"></h3>
+          <p id="wmResultBody"></p>
         </section>
 
         <footer class="nav-row">
-          <button id="fbPrev" class="btn" type="button">Previous Build</button>
-          <button id="fbNext" class="btn primary" type="button">Next Build</button>
+          <button id="wmPrev" class="btn" type="button">Previous Step</button>
+          <button id="wmNext" class="btn primary" type="button">Next Step</button>
         </footer>
       </section>
     </main>
@@ -93,7 +93,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js"></script>
     <script src="monaco-boot.js"></script>
     <script src="vendor/code-lab/code-lab.global.js"></script>
-    <script src="first-builds.js"></script>
+    <script src="writing-methods.js"></script>
     <script src="build-engine.js"></script>
   </body>
 </html>

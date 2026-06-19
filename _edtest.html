@@ -1,0 +1,33 @@
+<!doctype html>
+<html><head><meta charset="utf-8"></head><body>
+<iframe id="a" src="writing-methods.html" style="width:1100px;height:1400px"></iframe>
+<iframe id="b" src="first-builds.html" style="width:1100px;height:1400px"></iframe>
+<script>
+function drive(id, tag) {
+  const f = document.getElementById(id);
+  let phase = 0;
+  f.addEventListener("load", () => {
+    const t = setInterval(() => {
+      const d = f.contentDocument;
+      const title = (d.querySelector("h2[id$=Title]") || {}).textContent || "";
+      const clEditor = d.querySelector(".cl-ta-input") ? "yes" : "no";
+      if (phase === 0 && title && clEditor === "yes") {
+        phase = 1;
+        console.log(tag + " codelab_editor=" + clEditor + " | title=" + title);
+        d.querySelector("[id$=Solution]").click();
+        d.querySelector("[id$=Run]").click();
+      } else if (phase === 1) {
+        const res = d.querySelector("[id$=Result]:not([hidden])");
+        const out = (d.querySelector("[id$=Output]") || {}).textContent || "";
+        if (res && out && !out.startsWith("Compiling")) {
+          clearInterval(t);
+          const rt = (d.querySelector("[id$=ResultTitle]") || {}).textContent || "";
+          console.log(tag + " output=" + out.replace(/\n/g, "\\n") + " | result=" + rt);
+        }
+      }
+    }, 500);
+  });
+}
+drive("a", "WMTEST");
+drive("b", "FBTEST");
+</script></body></html>
