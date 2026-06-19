@@ -57,6 +57,27 @@ body {
   gap: 1rem;
 }
 
+.track {
+  display: grid;
+  gap: 0.9rem;
+  animation: rise 600ms ease-out;
+}
+
+.track-head {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.track-head h2 {
+  margin: 0.1rem 0 0;
+  font-size: clamp(1.3rem, 2.2vw, 1.7rem);
+}
+
+.track-sub {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
 .level-card {
   display: grid;
   gap: 0.7rem;

@@ -21,8 +21,8 @@ to use the Capstone you must serve the folder over HTTP.
 - Windows: double-click `serve.cmd`
 - macOS/Linux: run `./serve.sh`
 
-Then open `http://localhost:8080` and click through the levels. Everything
-(Levels 1-3 and the Capstone) works from there.
+Then open `http://localhost:8080` and click through the levels. The theory and
+micro-exercise track and the Capstone programming task all work from there.
 
 ### If Python is not available
 
@@ -35,11 +35,11 @@ dotnet serve -p 8080                          # from this folder
 
 Then open `http://localhost:8080`.
 
-- `index.html`: level selector
+- `index.html`: track selector
 - `level1.html`: Level 1 theory track (foundations)
 - `level1-coding.html`: Level 1 microcoding track (1 short drill per theory topic)
 - `level2.html`: core C# coding drills (short writing exercises)
-- `level3.html`: applied OO automation gap-fill exercises
+- `level4.html`: Reuse Without Regret (read-to-understand inheritance/composition/polymorphism, guided code tour, runnable examples)
 - `level3-app/`: Capstone (live C# compile + run, published Blazor app)
 
 ## Rebuilding the Capstone
@@ -57,12 +57,8 @@ sed -i 's|<base href="/" />|<base href="./" />|' level3-app/index.html
 
 ## Customization
 
-Edit `app.js` and modify the `challenges` array:
-
-- `type`: Android or Web
-- `title`, `context`, `concept`
-- `snippet`: include placeholders like `{{1}}`, `{{2}}`
-- `blanks`: expected answer, label, and hint list
+Edit the lesson data arrays in each level's script (for example `level4.js`) to
+add or change cards.
 
 ## Training Tip
 
