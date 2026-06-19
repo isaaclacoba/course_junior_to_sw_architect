@@ -74,7 +74,11 @@
 
   const runner =
     runnablePrograms.length && window.CodeLab
-      ? new CodeLab.RoslynIframeRunner({ url: runnerUrl })
+      ? new CodeLab.RoslynIframeRunner({
+          url: runnerUrl,
+          readyTimeout: 120000,
+          runTimeout: 60000,
+        })
       : null;
 
   let idx = 0;
@@ -579,6 +583,15 @@
   if (els.show) els.show.addEventListener("click", showAnswer);
   if (els.reset) els.reset.addEventListener("click", resetDrill);
   if (els.run) els.run.addEventListener("click", runExample);
+
+  // Warm the runtime and JIT the compiler in the background so the first
+  // "Run this example" click is fast instead of paying the ~1 min cold start.
+  if (runner) {
+    runner
+      .preload()
+      .then(() => runner.run("public class __Warm { public static void Main() { } }"))
+      .catch(() => {});
+  }
 
   render();
 })();
