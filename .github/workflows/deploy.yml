@@ -36,13 +36,13 @@ jobs:
         run: |
           mkdir _site
           rsync -a \
-            --exclude='.git' \
-            --exclude='.github' \
-            --exclude='code-lab' \
-            --exclude='level3-exercise' \
-            --exclude='level3-app' \
-            --exclude='blazor-publish' \
-            --exclude='_site' \
+            --exclude='/.git' \
+            --exclude='/.github' \
+            --exclude='/code-lab' \
+            --exclude='/level3-exercise' \
+            --exclude='/level3-app' \
+            --exclude='/blazor-publish' \
+            --exclude='/_site' \
             ./ _site/
           cp -r blazor-publish/wwwroot _site/level3-app
           touch _site/.nojekyll
