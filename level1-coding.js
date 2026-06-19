@@ -1048,7 +1048,7 @@ function render() {
 
   l1cRun.hidden = false;
   l1cRun.disabled = false;
-  l1cRun.textContent = "Run this example";
+  l1cRun.textContent = "Run";
   l1cOutput.hidden = true;
   l1cOutput.textContent = "";
   l1cOutput.classList.remove("is-error");
@@ -1183,7 +1183,7 @@ function showAnswer() {
 
   l1cResultTitle.textContent = "Answer revealed";
   l1cResultBody.textContent =
-    "You can review the expected solution in the inputs, then use Reset Drill to try again from scratch.";
+    "You can review the expected solution in the inputs, then use Reset to try again from scratch.";
   l1cResultList.innerHTML = "";
   d.blanks.forEach((b) => {
     const li = document.createElement("li");
@@ -1235,7 +1235,7 @@ l1cRun.addEventListener("click", async () => {
     showOutput(err.message || "Could not run the example.", true);
   } finally {
     l1cRun.disabled = false;
-    l1cRun.textContent = "Run this example";
+    l1cRun.textContent = "Run";
   }
 });
 

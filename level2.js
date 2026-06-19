@@ -958,7 +958,7 @@ function render() {
 
   l2Run.hidden = false;
   l2Run.disabled = false;
-  l2Run.textContent = "Run this example";
+  l2Run.textContent = "Run";
   l2Output.hidden = true;
   l2Output.textContent = "";
   l2Output.classList.remove("is-error");
@@ -1126,7 +1126,7 @@ l2Run.addEventListener("click", async () => {
     showOutput(err.message || "Could not run the example.", true);
   } finally {
     l2Run.disabled = false;
-    l2Run.textContent = "Run this example";
+    l2Run.textContent = "Run";
   }
 });
 

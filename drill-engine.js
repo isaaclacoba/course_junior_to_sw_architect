@@ -316,7 +316,7 @@
     if (els.run) {
       els.run.hidden = !canRun;
       els.run.disabled = false;
-      els.run.textContent = "Run this example";
+      els.run.textContent = "Run";
     }
     if (els.output) {
       els.output.hidden = true;
@@ -467,7 +467,7 @@
 
     els.resultTitle.textContent = "Answer revealed";
     els.resultBody.textContent =
-      "You can review the expected solution in the inputs, then use Reset Drill to try again from scratch.";
+      "You can review the expected solution in the inputs, then use Reset to try again from scratch.";
     els.resultList.innerHTML = "";
     d.blanks.forEach((b) => {
       const li = document.createElement("li");
@@ -505,7 +505,7 @@
       showOutput(err.message || "Could not run the example.", true);
     } finally {
       els.run.disabled = false;
-      els.run.textContent = "Run this example";
+      els.run.textContent = "Run";
     }
   }
 

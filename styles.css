@@ -1,11 +1,11 @@
 :root {
-  --bg-1: #f4f0e8;
-  --bg-2: #d8e4d8;
-  --bg-3: #e8d2c2;
-  --ink: #1c1d25;
-  --ink-soft: #4d5060;
-  --card: rgba(255, 255, 255, 0.8);
-  --line: rgba(28, 29, 37, 0.15);
+  --bg-1: #fbfbf8;
+  --bg-2: #f3f3ee;
+  --bg-3: #ecece6;
+  --ink: #1b1d22;
+  --ink-soft: #565b68;
+  --card: #ffffff;
+  --line: #ecece6;
   --primary: #1f6f5f;
   --primary-2: #174f44;
   --danger: #9b2c2c;
@@ -26,19 +26,11 @@ body {
   font-family: "Space Grotesk", sans-serif;
   color: var(--ink);
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 10% 15%, #fff8f2 0%, transparent 32%),
-    radial-gradient(circle at 88% 20%, #dceee0 0%, transparent 37%),
-    linear-gradient(125deg, var(--bg-1), var(--bg-2) 52%, var(--bg-3));
+  background: var(--bg-1);
 }
 
 .noise {
-  pointer-events: none;
-  position: fixed;
-  inset: 0;
-  background-image: radial-gradient(rgba(0, 0, 0, 0.05) 0.4px, transparent 0.4px);
-  background-size: 4px 4px;
-  opacity: 0.18;
+  display: none;
 }
 
 .layout {
@@ -103,7 +95,7 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.11em;
   font-size: 0.78rem;
-  color: var(--primary-2);
+  color: var(--primary);
   font-weight: 700;
 }
 
@@ -121,12 +113,12 @@ h1 {
 
 .card {
   background: var(--card);
-  backdrop-filter: blur(8px);
   border: 1px solid var(--line);
-  border-radius: 18px;
-  padding: 1.2rem;
-  box-shadow: 0 18px 50px rgba(39, 40, 52, 0.12);
+  border-radius: 16px;
+  padding: 1.4rem;
+  box-shadow: 0 14px 34px -22px rgba(31, 111, 95, 0.28);
   animation: rise 600ms ease-out;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 
@@ -151,7 +143,7 @@ h1 {
 
 .badge {
   align-self: flex-start;
-  background: #f1ece2;
+  background: #f3f3ee;
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 0.28rem 0.58rem;
@@ -367,10 +359,10 @@ h4 {
 
 .coach {
   margin-top: 1rem;
-  border: 1px solid #2f344024;
+  border: 1px solid var(--line);
   border-radius: 12px;
   padding: 0.75rem 0.8rem;
-  background: linear-gradient(180deg, #fffcf7, #fffefc);
+  background: #fafaf7;
 }
 
 .fill-section {
@@ -625,10 +617,13 @@ input.almost {
   color: #232532;
   font-weight: 700;
   cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease,
+    transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .btn:hover {
   transform: translateY(-1px);
+  box-shadow: 0 10px 24px -16px rgba(31, 111, 95, 0.55);
 }
 
 .btn.primary {

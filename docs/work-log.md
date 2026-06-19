@@ -1,5 +1,7 @@
 # Work Log
 
+- Start: 2026-06-19 20:09:27 | Task: Unify the level/lesson pages with the index theme. The index uses a bright flat minimal look (solid background, flat white cards, teal accent), while the level pages share a warm gradient/glassy styles.css. Retheme the shared styles.css to match the index, unify hover/transitions, and standardize cosmetic wording (back-links, action buttons, nav buttons, hero eyebrows, Course XP label). Lesson content stays untouched.
+
 - Start: 2026-06-19 19:45:00 | Task: The write-and-run lessons (Methods, First Builds) were using CodeLab.TextareaEditor, not the real Monaco editor that level3-app uses. Switch them to Monaco and add a project instruction file so the wrong editor is never used again.
 - End: 2026-06-19 19:50:57 | Result: Added monaco-boot.js (shared Monaco CDN loader exposing window.monaco + client-side C# completions, mirroring level3-app's setup). Switched build-engine.js from CodeLab.TextareaEditor to CodeLab.MonacoEditor, awaiting window.ensureMonaco() before mount. Updated writing-methods.html and first-builds.html: dropped Prism, load the Monaco loader + monaco-boot.js before the code-lab bundle, gave the editor host an explicit height (Monaco needs a sized container). Added .github/instructions/code-editor.instructions.md making CodeLab.MonacoEditor the only approved editor and documenting the lesson wiring contract. Headless-verified both pages: monaco=yes, editable (readOnly=false), Run grades to Passed (Methods -> OK, First Builds -> hello). Temp harness removed.
 

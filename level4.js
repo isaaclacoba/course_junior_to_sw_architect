@@ -846,7 +846,7 @@ function renderLesson() {
 
   l4Run.hidden = !lesson.runCode;
   l4Run.disabled = false;
-  l4Run.textContent = "Run this example";
+  l4Run.textContent = "Run";
   l4Output.hidden = true;
   l4Output.textContent = "";
   l4Output.classList.remove("is-error");
@@ -904,7 +904,7 @@ l4Run.addEventListener("click", async () => {
     showOutput(err.message || "Could not run the example.", true);
   } finally {
     l4Run.disabled = false;
-    l4Run.textContent = "Run this example";
+    l4Run.textContent = "Run";
   }
 });
 
