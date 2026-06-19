@@ -19,13 +19,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
-      - name: Publish Blazor capstone
-        run: dotnet publish level3-blazor -c Release -o blazor-publish
+      - name: Publish capstone host (code-lab submodule + course exercise)
+        run: >
+          dotnet publish level3-host/compiler-host -c Release
+          -p:ExerciseSource=${{ github.workspace }}/level3-exercise
+          -o blazor-publish
 
       - name: Assemble site
         run: |
@@ -33,13 +38,13 @@ jobs:
           rsync -a \
             --exclude='.git' \
             --exclude='.github' \
-            --exclude='level3-blazor' \
+            --exclude='level3-host' \
+            --exclude='level3-exercise' \
             --exclude='level3-app' \
             --exclude='blazor-publish' \
             --exclude='_site' \
             ./ _site/
           cp -r blazor-publish/wwwroot _site/level3-app
-          sed -i 's|<base href="/" />|<base href="./" />|' _site/level3-app/index.html
           touch _site/.nojekyll
 
       - uses: actions/upload-pages-artifact@v3

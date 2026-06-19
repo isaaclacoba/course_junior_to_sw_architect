@@ -44,16 +44,20 @@ Then open `http://localhost:8080`.
 
 ## Rebuilding the Capstone
 
-The `level3-app/` folder is a published copy of `level3-blazor/`. After changing
-the Blazor source, regenerate it with:
+The capstone host is the generic code-lab engine, pulled in as the `level3-host/`
+git submodule. The exercise (content + structural checks) lives in this repo under
+`level3-exercise/` and is injected into the host at build time via the
+`ExerciseSource` MSBuild property. `level3-app/` is the published (git-ignored)
+output. After changing the host or the exercise, regenerate it with:
 
 ```
-cd level3-blazor
-dotnet publish -c Release -o publish
-cd ..
-rm -rf level3-app && cp -r level3-blazor/publish/wwwroot level3-app
-sed -i 's|<base href="/" />|<base href="./" />|' level3-app/index.html
+git submodule update --init --recursive
+dotnet publish level3-host/compiler-host -c Release \
+  -p:ExerciseSource="$PWD/level3-exercise" -o blazor-publish
+rm -rf level3-app && cp -r blazor-publish/wwwroot level3-app
 ```
+
+The host source already sets `<base href="./" />`, so no rewrite is needed.
 
 ## Customization
 
