@@ -105,7 +105,7 @@ public class CompilerService
             "UserProgram",
             new[] { tree },
             _references,
-            new CSharpCompilationOptions(OutputKind.ConsoleApplication));
+            new CSharpCompilationOptions(OutputKind.ConsoleApplication, concurrentBuild: false));
 
         using var ms = new MemoryStream();
         var emit = compilation.Emit(ms);

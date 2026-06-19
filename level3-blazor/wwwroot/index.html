@@ -225,6 +225,36 @@
             }
         };
     </script>
+    <script>
+        // Headless bridge host: when this app is embedded as a hidden iframe with
+        // ?runner=1, RunnerBridge calls codeRunnerHost.init with a .NET reference.
+        // We relay run requests from the parent window to the compiler and post
+        // results back. Only same-origin parents are honoured.
+        window.codeRunnerHost = {
+            _ref: null,
+            init: function (dotNetRef) {
+                this._ref = dotNetRef;
+                window.addEventListener("message", async function (event) {
+                    if (event.origin !== window.location.origin) return;
+                    const data = event.data || {};
+                    if (data.type !== "coderunner:run") return;
+
+                    let result;
+                    try {
+                        result = await dotNetRef.invokeMethodAsync("Run", data.code || "");
+                    } catch (err) {
+                        result = { compiled: false, output: "", runtimeError: String(err), errors: [] };
+                    }
+                    const target = event.source || window.parent;
+                    if (target) target.postMessage({ type: "coderunner:result", id: data.id, result: result }, event.origin);
+                });
+
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({ type: "coderunner:ready" }, window.location.origin);
+                }
+            }
+        };
+    </script>
 </body>
 
 </html>

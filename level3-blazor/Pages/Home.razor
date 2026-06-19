@@ -3,7 +3,14 @@
 @using Level3Capstone.Services
 @inject CompilerService Compiler
 @inject IJSRuntime JS
+@inject NavigationManager Nav
 
+@if (_runnerMode)
+{
+    <RunnerBridge />
+}
+else
+{
 <div class="capstone">
     <header class="cap-head">
         <p class="eyebrow">Level 3 capstone</p>
@@ -170,10 +177,12 @@
         }
     </section>
 </div>
+}
 
 @code {
     private static Milestone[] Milestones => Capstone.Milestones;
 
+    private bool _runnerMode;
     private string _code = Capstone.StarterCode;
     private CompileResult? _result;
     private IReadOnlyList<MilestoneResult>? _checks;
@@ -192,13 +201,17 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var query = new Uri(Nav.Uri).Query;
+        _runnerMode = query.Contains("runner=1", StringComparison.OrdinalIgnoreCase);
+        if (_runnerMode) return;
+
         await Compiler.InitAsync();
         _ready = true;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender && !_runnerMode)
         {
             await JS.InvokeVoidAsync("level3Capstone.initEditor", _editorHost, _code);
             _editorReady = true;
