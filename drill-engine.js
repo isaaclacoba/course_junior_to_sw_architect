@@ -251,7 +251,7 @@
     steps.forEach((step) => {
       const li = document.createElement("li");
       li.className = "explain-step";
-      li.textContent = step.text;
+      li.innerHTML = renderInline(step.text);
       li.addEventListener("mouseenter", () => {
         ol.querySelectorAll(".explain-step").forEach((e) => e.classList.remove("active"));
         li.classList.add("active");
@@ -353,7 +353,7 @@
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "btn";
-        btn.textContent = opt.text;
+        btn.innerHTML = renderInline(opt.text);
         if (quizState[idx].chosen === i) {
           btn.classList.add(opt.correct ? "correct" : "wrong");
         }

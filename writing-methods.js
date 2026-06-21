@@ -13,8 +13,8 @@
       context:
         "A method is a named piece of behaviour that gives back an answer. You ran checks like this by hand as a tester - now the code holds the check.",
       goal: [
-        "Make Status() return the text \"OK\".",
-        "Run it. The output should be OK.",
+        "Make `Status()` return the text `\"OK\"`.",
+        "Run it. The output should be `OK`.",
       ],
       expected: "OK",
       starter:
@@ -26,10 +26,10 @@
       title: "Give the method some input",
       concept: "Parameter",
       context:
-        "Real checks depend on data. A parameter is the value you hand in when you call the method.",
+        "Real checks depend on data. A `parameter` is the value you hand in when you call the method.",
       goal: [
-        "Make Label(int age) return \"Age: \" followed by the age.",
-        "Main calls Label(18), so the output should be Age: 18.",
+        "Make `Label(int age)` return `\"Age: \"` followed by the `age`.",
+        "`Main` calls `Label(18)`, so the output should be `Age: 18`.",
       ],
       expected: "Age: 18",
       starter:
@@ -43,8 +43,8 @@
       context:
         "A method can hold a rule, the way a test holds a pass/fail condition. Same input always gives the same answer.",
       goal: [
-        "Return \"adult\" when age is 18 or more, otherwise \"minor\".",
-        "Main calls Category(20), so the output should be adult.",
+        "Return `\"adult\"` when `age` is 18 or more, otherwise `\"minor\"`.",
+        "`Main` calls `Category(20)`, so the output should be `adult`.",
       ],
       expected: "adult",
       starter:
@@ -58,9 +58,9 @@
       context:
         "This is the payoff. You wrote the rule once; now run it against several inputs without repeating yourself.",
       goal: [
-        "Keep the same Category method.",
+        "Keep the same `Category` method.",
         "Call it for ages 16, 18 and 40 and print each result.",
-        "The output must be exactly three lines: minor, adult, adult.",
+        "The output must be exactly three lines: `minor`, `adult`, `adult`.",
       ],
       expected: ["minor", "adult", "adult"],
       starter:
@@ -74,8 +74,8 @@
       context:
         "Methods can call each other, so a bigger answer is just small checks combined. This is the habit every later lesson builds on.",
       goal: [
-        "Summary(int age) should return \"Status: \" followed by Category(age).",
-        "Main calls Summary(20), so the output should be Status: adult.",
+        "`Summary(int age)` should return `\"Status: \"` followed by `Category(age)`.",
+        "`Main` calls `Summary(20)`, so the output should be `Status: adult`.",
       ],
       expected: "Status: adult",
       starter:

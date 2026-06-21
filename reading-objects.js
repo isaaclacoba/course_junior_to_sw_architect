@@ -32,7 +32,7 @@ public static void Main()
     Console.WriteLine(greeter.Greet(new {{2}}()));
 }`,
     points: [
-      "Greeter does not know the hour itself; it asks a Clock.",
+      "`Greeter` does not know the hour itself; it asks a `Clock`.",
       "Objects get work done by talking to other objects.",
     ],
     blanks: [
@@ -42,8 +42,8 @@ public static void Main()
         answer: "Hour",
         hints: ["The method on Clock that returns the hour."],
         explain: [
-          { text: "Clock has one method, Hour, that returns the current hour as a number.", highlight: "public int Hour() => 9" },
-          { text: "Greeter calls clock.Hour() to find out the time. It relies on Clock for that fact.", highlight: "int h = clock.{{1}}()" },
+          { text: "`Clock` has one method, `Hour`, that returns the current hour as a number.", highlight: "public int Hour() => 9" },
+          { text: "`Greeter` calls `clock.Hour()` to find out the time. It relies on `Clock` for that fact.", highlight: "int h = clock.{{1}}()" },
         ],
       },
       {
@@ -52,8 +52,8 @@ public static void Main()
         answer: "Clock",
         hints: ["Greet needs a Clock argument."],
         explain: [
-          { text: "Greet expects a Clock. We build one with new Clock() and hand it over.", highlight: "public string Greet(Clock clock)" },
-          { text: "new Clock() creates the object Greeter will talk to.", highlight: "greeter.Greet(new {{2}}())" },
+          { text: "`Greet` expects a `Clock`. We build one with `new Clock()` and hand it over.", highlight: "public string Greet(Clock clock)" },
+          { text: "`new Clock()` creates the object `Greeter` will talk to.", highlight: "greeter.Greet(new {{2}}())" },
         ],
       },
     ],
@@ -61,7 +61,7 @@ public static void Main()
   {
     title: "Ask Another Object For Data",
     concept: "Delegation",
-    context: "Cart does not store prices. It asks a PriceList. Wire up both calls.",
+    context: "`Cart` does not store prices. It asks a `PriceList`. Wire up both calls.",
     snippet: `public class PriceList
 {
     public int PriceOf(string item) => item == "book" ? 10 : 5;
@@ -84,7 +84,7 @@ public static void Main()
     Console.WriteLine(cart.{{2}}("book", 3));
 }`,
     points: [
-      "Cart delegates the price question to PriceList.",
+      "`Cart` delegates the price question to `PriceList`.",
       "Each object owns one kind of knowledge.",
     ],
     blanks: [
@@ -94,8 +94,8 @@ public static void Main()
         answer: "PriceOf",
         hints: ["The method that returns a price for an item."],
         explain: [
-          { text: "PriceList knows prices. PriceOf returns the price for a given item.", highlight: "public int PriceOf(string item)" },
-          { text: "Cart asks _prices.PriceOf(item) instead of hard-coding prices itself.", highlight: "return _prices.{{1}}(item) * qty" },
+          { text: "`PriceList` knows prices. `PriceOf` returns the price for a given item.", highlight: "public int PriceOf(string item)" },
+          { text: "`Cart` asks `_prices.PriceOf(item)` instead of hard-coding prices itself.", highlight: "return _prices.{{1}}(item) * qty" },
         ],
       },
       {
@@ -104,8 +104,8 @@ public static void Main()
         answer: "Total",
         hints: ["The method that multiplies price by quantity."],
         explain: [
-          { text: "Total combines the looked-up price with the quantity.", highlight: "public int Total(string item, int qty)" },
-          { text: "cart.Total(\"book\", 3) returns 10 * 3 = 30.", highlight: "Console.WriteLine(cart.{{2}}(\"book\", 3))" },
+          { text: "`Total` combines the looked-up price with the quantity.", highlight: "public int Total(string item, int qty)" },
+          { text: "`cart.Total(\"book\", 3)` returns `10 * 3 = 30`.", highlight: "Console.WriteLine(cart.{{2}}(\"book\", 3))" },
         ],
       },
     ],
@@ -128,7 +128,7 @@ public static void Main()
     Console.WriteLine(r.Area(4, 5));
 }`,
     points: [
-      "Area does exactly one thing: width times height.",
+      "`Area` does exactly one thing: `width` times `height`.",
       "A method with one job is easy to name and trust.",
     ],
     blanks: [
@@ -138,8 +138,8 @@ public static void Main()
         answer: "width * height",
         hints: ["Multiply the two sides."],
         explain: [
-          { text: "Area takes the two sides as input and returns their product.", highlight: "public int Area(int width, int height)" },
-          { text: "width * height is the one calculation this method exists to do.", highlight: "return {{1}}" },
+          { text: "`Area` takes the two sides as input and returns their product.", highlight: "public int Area(int width, int height)" },
+          { text: "`width * height` is the one calculation this method exists to do.", highlight: "return {{1}}" },
         ],
       },
     ],
@@ -165,7 +165,7 @@ public static void Main()
     Console.WriteLine(checkout.Pay(10, 2));
 }`,
     points: [
-      "Pay both calculates and formats. Two jobs, one method.",
+      "`Pay` both calculates and formats. Two jobs, one method.",
       "Change the wording and you risk breaking the maths beside it.",
       "Two reasons to change living in one place is a warning sign.",
     ],
@@ -176,7 +176,7 @@ public static void Main()
         answer: "total",
         hints: ["Put the calculated number into the wording."],
         explain: [
-          { text: "total is the result of the maths job on the line above.", highlight: "int total = price * qty" },
+          { text: "`total` is the result of the maths job on the line above.", highlight: "int total = price * qty" },
           { text: "The wording job glues that number onto some text. The two jobs are tangled in one method.", highlight: "string receipt = \"Total: \" + {{1}}" },
         ],
       },
@@ -185,7 +185,7 @@ public static void Main()
   {
     title: "Extract The Job Into A Method",
     concept: "Separate the jobs",
-    context: "The wording job has moved into its own method. Call it from Pay.",
+    context: "The wording job has moved into its own method. Call it from `Pay`.",
     snippet: `public class Checkout
 {
     public string Pay(int price, int qty)
@@ -205,7 +205,7 @@ public static void Main()
     Console.WriteLine(new Checkout().Pay(10, 2));
 }`,
     points: [
-      "Pay now does the maths and hands the wording to a helper.",
+      "`Pay` now does the maths and hands the wording to a helper.",
       "Each method has one clear job again.",
     ],
     blanks: [
@@ -215,8 +215,8 @@ public static void Main()
         answer: "FormatReceipt",
         hints: ["The method whose only job is the text."],
         explain: [
-          { text: "FormatReceipt is the new home for the wording job.", highlight: "private string FormatReceipt(int total)" },
-          { text: "Pay calls FormatReceipt(total) instead of building the text inline.", highlight: "return {{1}}(total)" },
+          { text: "`FormatReceipt` is the new home for the wording job.", highlight: "private string FormatReceipt(int total)" },
+          { text: "`Pay` calls `FormatReceipt(total)` instead of building the text inline.", highlight: "return {{1}}(total)" },
         ],
       },
     ],
@@ -245,7 +245,7 @@ public static void Main()
     Console.WriteLine(new Checkout().Pay(10, 2));
 }`,
     points: [
-      "Checkout now owns the maths; ReceiptFormatter owns the wording.",
+      "`Checkout` now owns the maths; `ReceiptFormatter` owns the wording.",
       "Change the receipt text without ever touching the price logic.",
     ],
     blanks: [
@@ -255,8 +255,8 @@ public static void Main()
         answer: "ReceiptFormatter",
         hints: ["The class whose only job is the receipt text."],
         explain: [
-          { text: "ReceiptFormatter is a separate class holding only the wording job.", highlight: "public class ReceiptFormatter" },
-          { text: "new ReceiptFormatter() builds one for Checkout to use.", highlight: "var formatter = new {{1}}()" },
+          { text: "`ReceiptFormatter` is a separate class holding only the wording job.", highlight: "public class ReceiptFormatter" },
+          { text: "`new ReceiptFormatter()` builds one for `Checkout` to use.", highlight: "var formatter = new {{1}}()" },
         ],
       },
       {
@@ -265,8 +265,8 @@ public static void Main()
         answer: "Format",
         hints: ["The method that returns the text."],
         explain: [
-          { text: "Format turns the total into the receipt text.", highlight: "public string Format(int total)" },
-          { text: "formatter.Format(total) gives back \"Total: 20\".", highlight: "return formatter.{{2}}(total)" },
+          { text: "`Format` turns the total into the receipt text.", highlight: "public string Format(int total)" },
+          { text: "`formatter.Format(total)` gives back `\"Total: 20\"`.", highlight: "return formatter.{{2}}(total)" },
         ],
       },
     ],
@@ -274,7 +274,7 @@ public static void Main()
   {
     title: "Same Name, Two Classes",
     concept: "The object decides",
-    context: "Both classes have an Area method. The object you build decides which one runs. Build a Circle.",
+    context: "Both classes have an `Area` method. The object you build decides which one runs. Build a `Circle`.",
     snippet: `public class Square
 {
     public int Area() => 9;
@@ -292,7 +292,7 @@ public static void Main()
     Console.WriteLine(shape.{{2}}());
 }`,
     points: [
-      "Square.Area and Circle.Area share a name but differ in result.",
+      "`Square.Area` and `Circle.Area` share a name but differ in result.",
       "Which one runs depends on the object that was built.",
     ],
     blanks: [
@@ -302,8 +302,8 @@ public static void Main()
         answer: "Circle",
         hints: ["The comment says which shape to build."],
         explain: [
-          { text: "Circle has its own Area returning 12.", highlight: "public class Circle" },
-          { text: "Because we build a Circle, calling Area runs Circle's version.", highlight: "var shape = new {{1}}()" },
+          { text: "`Circle` has its own `Area` returning `12`.", highlight: "public class Circle" },
+          { text: "Because we build a `Circle`, calling `Area` runs `Circle`'s version.", highlight: "var shape = new {{1}}()" },
         ],
       },
       {
@@ -312,8 +312,8 @@ public static void Main()
         answer: "Area",
         hints: ["The method both classes share."],
         explain: [
-          { text: "Both classes define Area, so the call looks the same either way.", highlight: "public int Area() => 12" },
-          { text: "shape.Area() prints 12 here, because shape is a Circle.", highlight: "Console.WriteLine(shape.{{2}}())" },
+          { text: "Both classes define `Area`, so the call looks the same either way.", highlight: "public int Area() => 12" },
+          { text: "`shape.Area()` prints `12` here, because `shape` is a `Circle`.", highlight: "Console.WriteLine(shape.{{2}}())" },
         ],
       },
     ],
@@ -321,7 +321,7 @@ public static void Main()
   {
     title: "Use What Is Handed In",
     concept: "Receive, don't build",
-    context: "Mailer is given its Outbox instead of creating one. Use the handed-in object, and build one to pass in.",
+    context: "`Mailer` is given its `Outbox` instead of creating one. Use the handed-in object, and build one to pass in.",
     snippet: `public class Outbox
 {
     public string Send(string msg) => "sent: " + msg;
@@ -345,7 +345,7 @@ public static void Main()
     Console.WriteLine(mailer.Notify("Sam"));
 }`,
     points: [
-      "Mailer receives its Outbox through the constructor.",
+      "`Mailer` receives its `Outbox` through the constructor.",
       "A collaborator handed in from outside is easy to swap later.",
     ],
     blanks: [
@@ -355,8 +355,8 @@ public static void Main()
         answer: "Send",
         hints: ["The method on Outbox that emits a message."],
         explain: [
-          { text: "Outbox.Send emits a message and returns a confirmation string.", highlight: "public string Send(string msg) => \"sent: \" + msg" },
-          { text: "Mailer uses the outbox it was given, without building its own.", highlight: "return _outbox.{{1}}(\"hello \" + who)" },
+          { text: "`Outbox.Send` emits a message and returns a confirmation string.", highlight: "public string Send(string msg) => \"sent: \" + msg" },
+          { text: "`Mailer` uses the outbox it was given, without building its own.", highlight: "return _outbox.{{1}}(\"hello \" + who)" },
         ],
       },
       {
@@ -365,8 +365,8 @@ public static void Main()
         answer: "Outbox",
         hints: ["Mailer's constructor needs an Outbox."],
         explain: [
-          { text: "The constructor asks for an Outbox from outside.", highlight: "public Mailer(Outbox outbox)" },
-          { text: "new Outbox() makes the one we hand in. Handing it in is the key idea.", highlight: "var mailer = new Mailer(new {{2}}())" },
+          { text: "The constructor asks for an `Outbox` from outside.", highlight: "public Mailer(Outbox outbox)" },
+          { text: "`new Outbox()` makes the one we hand in. Handing it in is the key idea.", highlight: "var mailer = new Mailer(new {{2}}())" },
         ],
       },
     ],
@@ -392,7 +392,7 @@ public static void Main()
     Console.WriteLine(counter.{{1}}());
 }`,
     points: [
-      "_count starts at 0 and Add raises it by one each time.",
+      "`_count` starts at `0` and `Add` raises it by one each time.",
       "Reading code line by line tells you the result before running it.",
     ],
     blanks: [
@@ -402,8 +402,8 @@ public static void Main()
         answer: "Value",
         hints: ["The method that returns _count."],
         explain: [
-          { text: "Add runs three times, so _count becomes 3.", highlight: "public void Add() => _count++" },
-          { text: "Value returns _count. Tracing the three Adds tells you it prints 3.", highlight: "public int Value() => _count" },
+          { text: "`Add` runs three times, so `_count` becomes `3`.", highlight: "public void Add() => _count++" },
+          { text: "`Value` returns `_count`. Tracing the three `Add`s tells you it prints `3`.", highlight: "public int Value() => _count" },
         ],
       },
     ],
@@ -411,7 +411,7 @@ public static void Main()
   {
     title: "Wire Two Objects And Run",
     concept: "Put it together",
-    context: "Final drill: a Worker uses a log that is handed to it. Complete both blanks, then press Run.",
+    context: "Final drill: a `Worker` uses a log that is handed to it. Complete both blanks, then press Run.",
     snippet: `public class ConsoleLog
 {
     public void Write(string msg) => Console.WriteLine(msg);
@@ -435,7 +435,7 @@ public static void Main()
     worker.Do();
 }`,
     points: [
-      "Worker is handed a ConsoleLog and uses it to report.",
+      "`Worker` is handed a `ConsoleLog` and uses it to report.",
       "Two small objects collaborating is the shape of most real code.",
     ],
     blanks: [
@@ -445,8 +445,8 @@ public static void Main()
         answer: "Write",
         hints: ["The method on ConsoleLog that prints."],
         explain: [
-          { text: "ConsoleLog.Write prints a message to the screen.", highlight: "public void Write(string msg) => Console.WriteLine(msg)" },
-          { text: "Worker calls the log it was handed instead of printing directly.", highlight: "_log.{{1}}(\"work done\")" },
+          { text: "`ConsoleLog.Write` prints a message to the screen.", highlight: "public void Write(string msg) => Console.WriteLine(msg)" },
+          { text: "`Worker` calls the log it was handed instead of printing directly.", highlight: "_log.{{1}}(\"work done\")" },
         ],
       },
       {
@@ -455,8 +455,8 @@ public static void Main()
         answer: "Worker",
         hints: ["The class that takes a log and does the job."],
         explain: [
-          { text: "Worker needs a ConsoleLog handed into its constructor.", highlight: "public Worker(ConsoleLog log)" },
-          { text: "new Worker(log) wires the two objects together before Do runs.", highlight: "var worker = new {{2}}(log)" },
+          { text: "`Worker` needs a `ConsoleLog` handed into its constructor.", highlight: "public Worker(ConsoleLog log)" },
+          { text: "`new Worker(log)` wires the two objects together before `Do` runs.", highlight: "var worker = new {{2}}(log)" },
         ],
       },
     ],

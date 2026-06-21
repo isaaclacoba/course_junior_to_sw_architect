@@ -8,10 +8,10 @@
       title: "A class with one method",
       concept: "Objects",
       context:
-        "An object groups data and behaviour. Here a method returns a value and Main prints it.",
+        "An object groups data and behaviour. Here a method returns a value and `Main` prints it.",
       goal: [
-        "Make Greeting.Say() return the text \"hello\".",
-        "Run it and confirm the output is hello.",
+        "Make `Greeting.Say()` return the text `\"hello\"`.",
+        "Run it and confirm the output is `hello`.",
       ],
       expected: "hello",
       starter:
@@ -23,10 +23,10 @@
       title: "One method, one job",
       concept: "Single job",
       context:
-        "A method should do one clear thing. Format turns a pass/fail flag into a word.",
+        "A method should do one clear thing. `Format` turns a pass/fail flag into a word.",
       goal: [
-        "Return \"PASS\" when passed is true, otherwise \"FAIL\".",
-        "Main calls Format(true), so the output should be PASS.",
+        "Return `\"PASS\"` when `passed` is `true`, otherwise `\"FAIL\"`.",
+        "`Main` calls `Format(true)`, so the output should be `PASS`.",
       ],
       expected: "PASS",
       starter:
@@ -38,10 +38,10 @@
       title: "Hand the work in",
       concept: "Inject",
       context:
-        "Instead of building its tools, a class can receive them through its constructor. That is dependency injection - the same move the capstone asks for.",
+        "Instead of building its tools, a class can receive them through its `constructor`. That is dependency injection - the same move the capstone asks for.",
       goal: [
-        "Store the formatter passed into the constructor.",
-        "Run() should print PASS.",
+        "Store the `formatter` passed into the constructor.",
+        "`Run()` should print `PASS`.",
       ],
       expected: "PASS",
       starter:
@@ -53,10 +53,10 @@
       title: "Depend on an interface",
       concept: "Abstraction",
       context:
-        "An interface is a promise about what a type can do, not how. Code that depends on the interface does not care which class fills it.",
+        "An `interface` is a promise about what a type can do, not how. Code that depends on the interface does not care which class fills it.",
       goal: [
-        "Declare the method on IReporter so the call compiles.",
-        "The output should be PASS.",
+        "Declare the method on `IReporter` so the call compiles.",
+        "The output should be `PASS`.",
       ],
       expected: "PASS",
       starter:
@@ -68,10 +68,10 @@
       title: "Swap in a new reporter",
       concept: "Open to extend",
       context:
-        "Because callers depend on IReporter, you can add a new reporter without touching the old one. New behaviour by adding a class, not editing existing code.",
+        "Because callers depend on `IReporter`, you can add a new reporter without touching the old one. New behaviour by adding a class, not editing existing code.",
       goal: [
-        "Implement EmojiReporter.Report to return \"OK\" when passed, otherwise \"X\".",
-        "Main now uses EmojiReporter, so the output should be OK.",
+        "Implement `EmojiReporter.Report` to return `\"OK\"` when passed, otherwise `\"X\"`.",
+        "`Main` now uses `EmojiReporter`, so the output should be `OK`.",
       ],
       expected: "OK",
       starter:

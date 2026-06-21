@@ -148,6 +148,14 @@ ${result.runtimeError}`.trim(),
   }
 
   // src/tour.ts
+  function escapeHtml2(text) {
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function renderInline(text) {
+    return text.split(/(`[^`]+`)/).map(
+      (seg) => seg.length > 1 && seg.startsWith("`") && seg.endsWith("`") ? `<code class="cl-inline-code">${escapeHtml2(seg.slice(1, -1))}</code>` : escapeHtml2(seg)
+    ).join("");
+  }
   var Tour = class {
     constructor(config = {}) {
       this.titleId = `cl-tour-title-${Math.random().toString(36).slice(2)}`;
@@ -289,7 +297,7 @@ ${result.runtimeError}`.trim(),
         el.classList.toggle("is-dim", flags[i].dim);
       });
       const model = makeTour(this.state.steps.length, this.state.index);
-      this.narration.textContent = step.text || "";
+      this.narration.innerHTML = renderInline(step.text || "");
       this.pulseNarration();
       this.counter.textContent = counterLabel(model);
       this.prevBtn.disabled = atFirst(model);

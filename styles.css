@@ -139,7 +139,11 @@ h1 {
 .coach-list code,
 .quiz-feedback code,
 .summary-list code,
-.summary-close code {
+.summary-close code,
+.options code,
+.explain-step code,
+.feedback code,
+:not(pre) > code {
   font-family: "IBM Plex Mono", ui-monospace, monospace;
   font-size: 0.86em;
   background: #eef1f6;

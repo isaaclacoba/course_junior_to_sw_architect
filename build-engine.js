@@ -193,7 +193,7 @@
     goal.innerHTML = "";
     task.goal.forEach((g) => {
       const li = document.createElement("li");
-      li.textContent = g;
+      li.innerHTML = renderInline(g);
       goal.appendChild(li);
     });
 

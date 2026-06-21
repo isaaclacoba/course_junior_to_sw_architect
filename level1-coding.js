@@ -13,9 +13,9 @@ Console.WriteLine(doorOpen);`,
         answer: "true",
         hints: ["Use a boolean literal."],
         explain: [
-          { text: "var creates a variable called doorOpen — a named place in memory to store data.", highlight: "var doorOpen" },
-          { text: "The = sign puts a value into it. Because it is a door, the only options are true (open) or false (closed).", highlight: "var doorOpen = {{1}}" },
-          { text: "This line reads doorOpen and prints what is stored there to the screen.", highlight: "Console.WriteLine(doorOpen)" },
+          { text: "`var` creates a variable called `doorOpen` — a named place in memory to store data.", highlight: "var doorOpen" },
+          { text: "The `=` sign puts a value into it. Because it is a door, the only options are `true` (open) or `false` (closed).", highlight: "var doorOpen = {{1}}" },
+          { text: "This line reads `doorOpen` and prints what is stored there to the screen.", highlight: "Console.WriteLine(doorOpen)" },
         ],
       },
     ],
@@ -31,7 +31,7 @@ int Double(int x)
 }`,
     points: [
       "Function names should communicate intent clearly.",
-      "Here, 'Double' means output is exactly 2 times input.",
+      "Here, '`Double`' means output is exactly `2` times input.",
     ],
     blanks: [
       {
@@ -40,10 +40,10 @@ int Double(int x)
         answer: "x * 2",
         hints: ["Multiply by 2."],
         explain: [
-          { text: "This is the function header. It says: I take a whole number called x as input, and I give back a whole number.", highlight: "int Double(int x)" },
-          { text: "return sends a value back to whoever called this function. The function stops after return.", highlight: "return {{1}}" },
-          { text: "The name Double means the output must be exactly 2 times the input. If x is 5, the answer is 10.", highlight: "// Double means" },
-          { text: "The * symbol means multiply.", highlight: "return {{1}}" },
+          { text: "This is the function header. It says: I take a whole number called `x` as input, and I give back a whole number.", highlight: "int Double(int x)" },
+          { text: "`return` sends a value back to whoever called this function. The function stops after `return`.", highlight: "return {{1}}" },
+          { text: "The name `Double` means the output must be exactly `2` times the input. If `x` is `5`, the answer is `10`.", highlight: "// Double means" },
+          { text: "The `*` symbol means multiply.", highlight: "return {{1}}" },
         ],
       },
     ],
@@ -67,7 +67,7 @@ counter.{{2}}();
 Console.WriteLine(counter.Value);`,
     points: [
       "Use the class name declared in the snippet.",
-      "Call the method that changes Value.",
+      "Call the method that changes `Value`.",
     ],
     blanks: [
       {
@@ -76,9 +76,9 @@ Console.WriteLine(counter.Value);`,
         answer: "Counter",
         hints: ["Use the class declared above."],
         explain: [
-          { text: "Counter is the blueprint. It defines what data the counter holds (Value) and what it can do (Increment).", highlight: "public class Counter" },
-          { text: "new tells C# to build an actual object in memory using that blueprint. You have to say which blueprint to use.", highlight: "var counter = new {{1}}()" },
-          { text: "The object is stored in the variable counter so we can use it in the lines below.", highlight: "var counter = new {{1}}()" },
+          { text: "`Counter` is the blueprint. It defines what data the counter holds (`Value`) and what it can do (`Increment`).", highlight: "public class Counter" },
+          { text: "`new` tells C# to build an actual object in memory using that blueprint. You have to say which blueprint to use.", highlight: "var counter = new {{1}}()" },
+          { text: "The object is stored in the variable `counter` so we can use it in the lines below.", highlight: "var counter = new {{1}}()" },
         ],
       },
       {
@@ -87,9 +87,9 @@ Console.WriteLine(counter.Value);`,
         answer: "Increment",
         hints: ["Call the method that adds 1 to Value."],
         explain: [
-          { text: "The dot after counter means: go inside this object and call something on it.", highlight: "counter.{{2}}()" },
-          { text: "Increment is defined inside Counter. When called, it runs Value = Value + 1 — it adds one to the stored number.", highlight: "public void Increment()" },
-          { text: "This last line prints Value so we can see the change actually happened.", highlight: "Console.WriteLine(counter.Value)" },
+          { text: "The dot after `counter` means: go inside this object and call something on it.", highlight: "counter.{{2}}()" },
+          { text: "`Increment` is defined inside `Counter`. When called, it runs `Value = Value + 1` — it adds one to the stored number.", highlight: "public void Increment()" },
+          { text: "This last line prints `Value` so we can see the change actually happened.", highlight: "Console.WriteLine(counter.Value)" },
         ],
       },
     ],
@@ -108,9 +108,9 @@ var b = {{1}};`,
         answer: "a",
         hints: ["Use the variable already holding the object reference."],
         explain: [
-          { text: "new User() creates an object in memory. The variable a holds the address of where that object lives — not the object itself.", highlight: "var a = new User()" },
-          { text: "This line does not create a second object. It copies the address stored in a and puts it into b.", highlight: "var b = {{1}}" },
-          { text: "After this, both a and b hold the same address — they point to the exact same object.", highlight: "var b = {{1}}" },
+          { text: "`new User()` creates an object in memory. The variable `a` holds the address of where that object lives — not the object itself.", highlight: "var a = new User()" },
+          { text: "This line does not create a second object. It copies the address stored in `a` and puts it into `b`.", highlight: "var b = {{1}}" },
+          { text: "After this, both `a` and `b` hold the same address — they point to the exact same object.", highlight: "var b = {{1}}" },
         ],
       },
     ],
@@ -137,9 +137,9 @@ var b = {{1}};`,
         answer: "GetBalance",
         hints: ["Use Get + field meaning."],
         explain: [
-          { text: "_balance is private. Nothing outside this class can read or change it directly.", highlight: "private int _balance" },
-          { text: "This is a public method — the only way outside code can read the balance. It returns a whole number.", highlight: "public int {{1}}()" },
-          { text: "return _balance sends the stored value out. The caller gets the number without touching the field.", highlight: "return _balance" },
+          { text: "`_balance` is `private`. Nothing outside this class can read or change it directly.", highlight: "private int _balance" },
+          { text: "This is a `public` method — the only way outside code can read the balance. It returns a whole number.", highlight: "public int {{1}}()" },
+          { text: "`return _balance` sends the stored value out. The caller gets the number without touching the field.", highlight: "return _balance" },
         ],
       },
     ],
@@ -173,8 +173,8 @@ foreach (var pet in pets)
 // Woof
 // Meow`,
     points: [
-      "Caller code stays the same: pet.Speak() for every element.",
-      "Runtime type (Dog or Cat) decides which Speak implementation runs.",
+      "Caller code stays the same: `pet.Speak()` for every element.",
+      "Runtime type (`Dog` or `Cat`) decides which `Speak` implementation runs.",
     ],
     blanks: [
       {
@@ -183,10 +183,10 @@ foreach (var pet in pets)
         answer: "Speak",
         hints: ["Use the same method for Dog and Cat.", "This method is declared in Animal."],
         explain: [
-          { text: "Animal is the shared type. Both Dog and Cat inherit from it — they are specific kinds of Animal.", highlight: "public abstract class Animal" },
-          { text: "Dog has its own Speak that returns Woof. Cat has its own that returns Meow. Same method name, different behavior.", highlight: "public override string Speak() => \"Woof\"" },
-          { text: "The loop goes through each animal one at a time. pet holds the current one on each pass.", highlight: "foreach (var pet in pets)" },
-          { text: "The same call runs for every animal. C# decides at runtime which Speak version to use — Dog's or Cat's.", highlight: "Console.WriteLine(pet.{{1}}())" },
+          { text: "`Animal` is the shared type. Both `Dog` and `Cat` inherit from it — they are specific kinds of `Animal`.", highlight: "public abstract class Animal" },
+          { text: "`Dog` has its own `Speak` that returns `Woof`. `Cat` has its own that returns `Meow`. Same method name, different behavior.", highlight: "public override string Speak() => \"Woof\"" },
+          { text: "The loop goes through each animal one at a time. `pet` holds the current one on each pass.", highlight: "foreach (var pet in pets)" },
+          { text: "The same call runs for every animal. C# decides at runtime which `Speak` version to use — `Dog`'s or `Cat`'s.", highlight: "Console.WriteLine(pet.{{1}}())" },
         ],
       },
     ],
@@ -217,7 +217,7 @@ Console.WriteLine(car.GetWheelCount());
 // Output:
 // 4`,
     points: [
-      "Inheritance models an is-a relation: Car is a Vehicle.",
+      "Inheritance models an is-a relation: `Car` is a `Vehicle`.",
       "Derived classes can override base behavior to provide specific results.",
     ],
     blanks: [
@@ -227,8 +227,8 @@ Console.WriteLine(car.GetWheelCount());
         answer: "Vehicle",
         hints: ["Use the class declared above Car."],
         explain: [
-          { text: "Vehicle is the base class. It has a GetWheelCount method that returns 0 — it does not know what kind of vehicle it is.", highlight: "public class Vehicle" },
-          { text: "The colon means Car inherits from Vehicle. Car gets all of Vehicle's code and can replace what it needs.", highlight: "public class Car : {{1}}" },
+          { text: "`Vehicle` is the base class. It has a `GetWheelCount` method that returns `0` — it does not know what kind of vehicle it is.", highlight: "public class Vehicle" },
+          { text: "The colon means `Car` inherits from `Vehicle`. `Car` gets all of `Vehicle`'s code and can replace what it needs.", highlight: "public class Car : {{1}}" },
         ],
       },
       {
@@ -237,8 +237,8 @@ Console.WriteLine(car.GetWheelCount());
         answer: "4",
         hints: ["A standard car has four wheels in this example."],
         explain: [
-          { text: "override means Car is replacing Vehicle's version of GetWheelCount with its own. Vehicle returns 0. Car returns the real number.", highlight: "public override int GetWheelCount()" },
-          { text: "A car has 4 wheels. When we call car.GetWheelCount(), this Car version runs — not the one inside Vehicle.", highlight: "return {{2}}" },
+          { text: "`override` means `Car` is replacing `Vehicle`'s version of `GetWheelCount` with its own. `Vehicle` returns `0`. `Car` returns the real number.", highlight: "public override int GetWheelCount()" },
+          { text: "A car has `4` wheels. When we call `car.GetWheelCount()`, this `Car` version runs — not the one inside `Vehicle`.", highlight: "return {{2}}" },
         ],
       },
     ],
@@ -265,9 +265,9 @@ Console.WriteLine(car.GetWheelCount());
         answer: "_repo = repo;",
         hints: ["Assign constructor parameter to field."],
         explain: [
-          { text: "_repo is the field that stores the repository this service will use. It is private — only code inside this class can reach it.", highlight: "private readonly IRepository _repo" },
-          { text: "The constructor receives repo from outside. Someone who creates an OrderService must hand it in.", highlight: "public OrderService(IRepository repo)" },
-          { text: "This line saves the incoming repo into _repo so every method in the class can use it later. Without this line, _repo stays empty.", highlight: "field assignment goes here" },
+          { text: "`_repo` is the field that stores the repository this service will use. It is `private` — only code inside this class can reach it.", highlight: "private readonly IRepository _repo" },
+          { text: "The constructor receives `repo` from outside. Someone who creates an `OrderService` must hand it in.", highlight: "public OrderService(IRepository repo)" },
+          { text: "This line saves the incoming `repo` into `_repo` so every method in the class can use it later. Without this line, `_repo` stays empty.", highlight: "field assignment goes here" },
         ],
       },
     ],
@@ -306,9 +306,9 @@ var service = new ReportService({{1}});`,
         answer: "logger",
         hints: ["Pass the collaborator variable."],
         explain: [
-          { text: "ReportService needs a logger. Its constructor asks for one — it must be provided from the outside.", highlight: "public ReportService(ILogger logger)" },
-          { text: "A few lines above, a ConsoleLogger was created and stored in the variable logger.", highlight: "var logger = new ConsoleLogger()" },
-          { text: "Here we pass that logger in when creating the service. ReportService will use it without knowing how it was built.", highlight: "var service = new ReportService({{1}})" },
+          { text: "`ReportService` needs a logger. Its constructor asks for one — it must be provided from the outside.", highlight: "public ReportService(ILogger logger)" },
+          { text: "A few lines above, a `ConsoleLogger` was created and stored in the variable `logger`.", highlight: "var logger = new ConsoleLogger()" },
+          { text: "Here we pass that `logger` in when creating the service. `ReportService` will use it without knowing how it was built.", highlight: "var service = new ReportService({{1}})" },
         ],
       },
     ],
@@ -410,7 +410,7 @@ Console.WriteLine($"Notifications sent: {service.{{7}}()}");
   Console.WriteLine($"Same object in memory: {Object.ReferenceEquals(notifications, sameRef)}");`,
     points: [
       "One program combines all Level 1 ideas in a realistic flow.",
-      "Polymorphism happens in foreach: same call, different runtime behavior.",
+      "Polymorphism happens in `foreach`: same call, different runtime behavior.",
       "Dependency injection and composition appear through constructor-provided collaborators.",
     ],
     blanks: [
@@ -420,9 +420,9 @@ Console.WriteLine($"Notifications sent: {service.{{7}}()}");
         answer: "message",
         hints: ["Use the Log method parameter directly."],
         explain: [
-          { text: "Log is a method that receives a text value called message as its input.", highlight: "void Log(string message)" },
-          { text: "The => symbol is a shorthand for a method body with a single action. It means: when this method runs, do exactly what follows the arrow.", highlight: "public void Log(string message) => Console.WriteLine({{1}})" },
-          { text: "Console.WriteLine prints to the screen. We want to print whatever was passed in as message.", highlight: "public void Log(string message) => Console.WriteLine({{1}})" },
+          { text: "`Log` is a method that receives a text value called `message` as its input.", highlight: "void Log(string message)" },
+          { text: "The `=>` symbol is a shorthand for a method body with a single action. It means: when this method runs, do exactly what follows the arrow.", highlight: "public void Log(string message) => Console.WriteLine({{1}})" },
+          { text: "`Console.WriteLine` prints to the screen. We want to print whatever was passed in as `message`.", highlight: "public void Log(string message) => Console.WriteLine({{1}})" },
         ],
       },
       {
@@ -431,8 +431,8 @@ Console.WriteLine($"Notifications sent: {service.{{7}}()}");
         answer: "ILogger",
         hints: ["Use the interface, not a concrete logger class."],
         explain: [
-          { text: "ILogger is an interface — a contract that says: any class that implements me must have a Log method.", highlight: "public interface ILogger" },
-          { text: "The constructor uses ILogger rather than ConsoleLogger. Any class with a Log method can be passed in here — keeping Notification flexible.", highlight: "protected Notification({{2}} logger)" },
+          { text: "`ILogger` is an interface — a contract that says: any class that implements me must have a `Log` method.", highlight: "public interface ILogger" },
+          { text: "The constructor uses `ILogger` rather than `ConsoleLogger`. Any class with a `Log` method can be passed in here — keeping `Notification` flexible.", highlight: "protected Notification({{2}} logger)" },
         ],
       },
       {
@@ -441,8 +441,8 @@ Console.WriteLine($"Notifications sent: {service.{{7}}()}");
         answer: "SMS",
         hints: ["Match the class intent in uppercase."],
         explain: [
-          { text: "EmailNotification returns a message that starts with Email.", highlight: "return $\"Email for" },
-          { text: "SmsNotification does the same thing, but for SMS. Both classes have the same method name with different content — that is polymorphism.", highlight: "return $\"{{3}} for" },
+          { text: "`EmailNotification` returns a message that starts with `Email`.", highlight: "return $\"Email for" },
+          { text: "`SmsNotification` does the same thing, but for `SMS`. Both classes have the same method name with different content — that is polymorphism.", highlight: "return $\"{{3}} for" },
         ],
       },
       {
@@ -452,7 +452,7 @@ Console.WriteLine($"Notifications sent: {service.{{7}}()}");
         hints: ["Use a list containing the base notification type."],
         explain: [
           { text: "This field stores all the notification objects the service will work with.", highlight: "private readonly List<Notification> _notifications" },
-          { text: "The constructor receives the list from outside. The type must match the field — a List containing Notification objects.", highlight: "public NotificationService({{4}} notifications)" },
+          { text: "The constructor receives the list from outside. The type must match the field — a `List` containing `Notification` objects.", highlight: "public NotificationService({{4}} notifications)" },
         ],
       },
       {
@@ -461,8 +461,8 @@ Console.WriteLine($"Notifications sent: {service.{{7}}()}");
         answer: "1",
         hints: ["Increase the counter by one each send."],
         explain: [
-          { text: "AddOne is a helper method. It takes a number and gives back that number increased by some amount.", highlight: "private int AddOne(int value)" },
-          { text: "The method is called AddOne, so the number to add is 1. value + __ is where the increase happens.", highlight: "return value + {{5}}" },
+          { text: "`AddOne` is a helper method. It takes a number and gives back that number increased by some amount.", highlight: "private int AddOne(int value)" },
+          { text: "The method is called `AddOne`, so the number to add is `1`. `value` + __ is where the increase happens.", highlight: "return value + {{5}}" },
         ],
       },
       {
@@ -471,8 +471,8 @@ Console.WriteLine($"Notifications sent: {service.{{7}}()}");
         answer: "notifications",
         hints: ["Use the variable that already stores the List<Notification>."],
         explain: [
-          { text: "notifications was already created above as a list with two items in it.", highlight: "var notifications = new List<Notification>" },
-          { text: "This line does not build a new list. It copies the address stored in notifications into sameRef.", highlight: "var sameRef = {{6}}" },
+          { text: "`notifications` was already created above as a list with two items in it.", highlight: "var notifications = new List<Notification>" },
+          { text: "This line does not build a new list. It copies the address stored in `notifications` into `sameRef`.", highlight: "var sameRef = {{6}}" },
           { text: "This checks whether both variables point to the exact same object in memory.", highlight: "Object.ReferenceEquals(notifications, sameRef)" },
         ],
       },
@@ -482,8 +482,8 @@ Console.WriteLine($"Notifications sent: {service.{{7}}()}");
         answer: "GetSentCount",
         hints: ["Use the public method that exposes private _sentCount."],
         explain: [
-          { text: "_sentCount counts how many notifications were sent. It is private — outside code cannot read it directly.", highlight: "private int _sentCount" },
-          { text: "GetSentCount is the public method that returns its value. The name describes exactly what it gives you.", highlight: "public int GetSentCount()" },
+          { text: "`_sentCount` counts how many notifications were sent. It is `private` — outside code cannot read it directly.", highlight: "private int _sentCount" },
+          { text: "`GetSentCount` is the `public` method that returns its value. The name describes exactly what it gives you.", highlight: "public int GetSentCount()" },
           { text: "We call it here to print the total after all notifications were sent.", highlight: "service.{{7}}()" },
         ],
       },

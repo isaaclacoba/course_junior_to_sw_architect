@@ -201,6 +201,26 @@ const topics = [
   },
 ];
 
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+// Render plain prose, turning `backtick` spans into inline <code> so a
+// programming term reads as code. Plain text (no backticks) is unchanged.
+function renderInline(text) {
+  return String(text || "")
+    .split(/(`[^`]+`)/)
+    .map((seg) =>
+      seg.length > 1 && seg.startsWith("`") && seg.endsWith("`")
+        ? `<code>${escapeHtml(seg.slice(1, -1))}</code>`
+        : escapeHtml(seg)
+    )
+    .join("");
+}
+
 let topicIndex = 0;
 const selectedAnswer = new Map();
 
@@ -271,7 +291,7 @@ async function renderLevel1Diagram(topic) {
 }
 
 function setFeedback(text, isGood) {
-  l1Feedback.textContent = text;
+  l1Feedback.innerHTML = renderInline(text);
   l1Feedback.style.color = isGood ? "var(--good)" : "var(--warn)";
 }
 
@@ -295,7 +315,7 @@ function renderOptions(topic) {
     btn.type = "button";
     btn.className = "btn";
     const letter = String.fromCharCode(65 + idx);
-    btn.textContent = `${letter}) ${option.text}`;
+    btn.innerHTML = renderInline(`${letter}) ${option.text}`);
 
     btn.addEventListener("click", () => {
       selectedAnswer.set(topicIndex, option.text);
@@ -323,16 +343,16 @@ function renderTopic() {
 
   l1Meta.textContent = `Foundations · ${remaining} topics remaining`;
   l1Title.textContent = topic.title;
-  l1Context.textContent = topic.context;
+  l1Context.innerHTML = renderInline(topic.context);
   l1Concept.textContent = topic.concept;
   l1Progress.textContent = `Topic ${topicIndex + 1} / ${topics.length}`;
-  l1Explain.textContent = shortExplain.endsWith(".") ? shortExplain : `${shortExplain}.`;
-  l1Question.textContent = `Question (choose 1): ${topic.question}`;
+  l1Explain.innerHTML = renderInline(shortExplain.endsWith(".") ? shortExplain : `${shortExplain}.`);
+  l1Question.innerHTML = renderInline(`Question (choose 1): ${topic.question}`);
 
   l1Points.innerHTML = "";
   topic.points.slice(0, 2).forEach((point) => {
     const li = document.createElement("li");
-    li.textContent = point;
+    li.innerHTML = renderInline(point);
     l1Points.appendChild(li);
   });
 
