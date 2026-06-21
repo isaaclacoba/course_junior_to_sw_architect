@@ -57,6 +57,7 @@
     resultBody: el("ResultBody"),
     resultList: el("ResultList"),
     run: el("Run"),
+    errors: el("Errors"),
     output: el("Output"),
     prev: el("Prev"),
     next: el("Next"),
@@ -377,6 +378,7 @@
       els.output.textContent = "";
       els.output.classList.remove("is-error");
     }
+    clearErrors();
 
     els.points.innerHTML = "";
     (d.points || []).forEach((point) => {
@@ -538,6 +540,21 @@
     els.output.classList.toggle("is-error", Boolean(isError));
   }
 
+  function clearErrors() {
+    if (els.errors && window.CodeLab && CodeLab.showErrorPanel)
+      CodeLab.showErrorPanel(els.errors, []);
+  }
+
+  // Capstone-quality compile-error panel, shared via code-lab.
+  function showErrors(list) {
+    if (els.errors && window.CodeLab && CodeLab.showErrorPanel) {
+      if (els.output) els.output.hidden = true;
+      return CodeLab.showErrorPanel(els.errors, list);
+    }
+    showOutput((list || []).map((e) => e.friendly || e.raw).join("\n"), true);
+    return Boolean(list && list.length);
+  }
+
   async function runExample() {
     const code = runnablePrograms[idx];
     if (!code || !runner) return;
@@ -545,14 +562,17 @@
     els.run.disabled = true;
     els.run.textContent = "Running...";
     showOutput("Compiling and running...", false);
+    clearErrors();
 
     try {
       const result = await runner.run(code);
       if (result.errors && result.errors.length) {
-        showOutput(result.errors.map((e) => e.friendly || e.raw).join("\n"), true);
+        showErrors(result.errors);
       } else if (result.runtimeError) {
+        clearErrors();
         showOutput(`${result.output}\n${result.runtimeError}`.trim(), true);
       } else {
+        clearErrors();
         showOutput(result.output || "(no output)", false);
       }
     } catch (err) {

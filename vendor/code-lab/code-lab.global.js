@@ -41,7 +41,9 @@ var CodeLab = (() => {
     normalizeLines: () => normalizeLines,
     presentRun: () => presentRun,
     prev: () => prev,
+    renderErrorPanel: () => renderErrorPanel,
     selectRunCode: () => selectRunCode,
+    showErrorPanel: () => showErrorPanel,
     splitCodeLines: () => splitCodeLines
   });
 
@@ -858,6 +860,62 @@ ${result.runtimeError}`.trim(),
       this.warmPromise = null;
     }
   };
+
+  // src/dom/error-panel.ts
+  var DEFAULT_LABELS2 = {
+    heading: "Let's fix this first",
+    note: "Often a single early mistake (a missing or extra { } ( ) ;) is enough to confuse the rest. Fix the top one first, then run again."
+  };
+  function locText(e) {
+    if (e.line == null) return "";
+    return e.column != null ? `Line ${e.line}, col ${e.column}` : `Line ${e.line}`;
+  }
+  function renderErrorPanel(errors, labels = {}) {
+    const l = { ...DEFAULT_LABELS2, ...labels };
+    const section = document.createElement("section");
+    section.className = "cl-errors";
+    const heading = document.createElement("h3");
+    heading.textContent = l.heading;
+    section.appendChild(heading);
+    const note = document.createElement("p");
+    note.className = "cl-errors-note";
+    note.textContent = l.note;
+    section.appendChild(note);
+    const list = document.createElement("ul");
+    for (const e of errors) {
+      const li = document.createElement("li");
+      const loc = locText(e);
+      if (loc) {
+        const locEl = document.createElement("span");
+        locEl.className = "cl-error-loc";
+        locEl.textContent = loc;
+        li.appendChild(locEl);
+      }
+      if (e.friendly) {
+        const friendly = document.createElement("span");
+        friendly.className = "cl-error-friendly";
+        friendly.textContent = e.friendly;
+        li.appendChild(friendly);
+      }
+      const raw = document.createElement("span");
+      raw.className = "cl-error-raw";
+      raw.textContent = e.raw;
+      li.appendChild(raw);
+      list.appendChild(li);
+    }
+    section.appendChild(list);
+    return section;
+  }
+  function showErrorPanel(host, errors, labels) {
+    host.textContent = "";
+    if (!errors || errors.length === 0) {
+      host.hidden = true;
+      return false;
+    }
+    host.appendChild(renderErrorPanel(errors, labels));
+    host.hidden = false;
+    return true;
+  }
   return __toCommonJS(src_exports);
 })();
 //# sourceMappingURL=code-lab.global.js.map

@@ -28,6 +28,7 @@
   const progress = el("Progress");
   const expected = el("Expected");
   const goal = el("Goal");
+  const errors = el("Errors");
   const output = el("Output");
   const result = el("Result");
   const resultTitle = el("ResultTitle");
@@ -68,6 +69,25 @@
     output.classList.toggle("is-error", Boolean(isError));
   }
 
+  function hideOutput() {
+    output.hidden = true;
+    output.textContent = "";
+  }
+
+  // Render the shared capstone-quality compile-error panel (or clear it).
+  function showErrors(list) {
+    if (errors && CodeLab.showErrorPanel) {
+      return CodeLab.showErrorPanel(errors, list);
+    }
+    // Fallback: keep the old text output if the shared renderer is missing.
+    showOutput((list || []).map((e) => e.friendly || e.raw).join("\n"), true);
+    return Boolean(list && list.length);
+  }
+
+  function clearErrors() {
+    if (errors && CodeLab.showErrorPanel) CodeLab.showErrorPanel(errors, []);
+  }
+
   function showResult(ok, body) {
     result.hidden = false;
     result.classList.toggle("is-pass", ok);
@@ -87,6 +107,18 @@
       );
     }
     return lines.some((line) => line === expected);
+  }
+
+  // Optional technique gate: a task may require the source to satisfy patterns
+  // (e.g. actually use a loop), so a hardcoded answer that prints the expected
+  // output is not enough. Returns the first failing requirement, or null.
+  function unmetRequirement(source, requirements) {
+    if (!Array.isArray(requirements)) return null;
+    for (const req of requirements) {
+      const re = req.pattern instanceof RegExp ? req.pattern : new RegExp(req.pattern);
+      if (!re.test(source)) return req.message || "Your code does not meet this task's requirement yet.";
+    }
+    return null;
   }
 
   function describeExpected(expected) {
@@ -118,6 +150,7 @@
     });
 
     output.hidden = true;
+    clearErrors();
     result.hidden = true;
     prevBtn.disabled = idx === 0;
     nextBtn.disabled = idx === tasks.length - 1;
@@ -130,17 +163,20 @@
     runBtn.disabled = true;
     runBtn.textContent = "Running...";
     showOutput("Compiling and running...", false);
+    clearErrors();
     result.hidden = true;
 
     try {
       const res = await runner.run(code[idx]);
       if (res.errors && res.errors.length) {
-        showOutput(res.errors.map((e) => e.friendly || e.raw).join("\n"), true);
+        hideOutput();
+        showErrors(res.errors);
         if (editor.setMarkers) editor.setMarkers(res.errors);
         showResult(false, "The code did not compile. Read the errors above and try again.");
         return;
       }
       if (editor.setMarkers) editor.setMarkers([]);
+      clearErrors();
       if (res.runtimeError) {
         showOutput(`${res.output}\n${res.runtimeError}`.trim(), true);
         showResult(false, "It ran but threw an error. Fix it and run again.");
@@ -148,11 +184,14 @@
       }
       const out = (res.output || "").trim();
       showOutput(out || "(no output)", false);
-      if (matches(out, task.expected)) {
+      const unmet = unmetRequirement(code[idx], task.requireSource);
+      if (!matches(out, task.expected)) {
+        showResult(false, describeExpected(task.expected));
+      } else if (unmet) {
+        showResult(false, unmet);
+      } else {
         award(idx);
         showResult(true, "Output matched what the task asked for. XP awarded.");
-      } else {
-        showResult(false, describeExpected(task.expected));
       }
     } catch (err) {
       showOutput(err.message || "Could not run the code.", true);
@@ -188,6 +227,7 @@
     editor.setValue(code[idx]);
     if (editor.setMarkers) editor.setMarkers([]);
     output.hidden = true;
+    clearErrors();
     result.hidden = true;
   });
   prevBtn.addEventListener("click", () => {

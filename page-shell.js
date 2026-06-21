@@ -82,6 +82,7 @@
         <div class="code-actions">
           <button id="${p}Run" class="btn" type="button" hidden>Run</button>
         </div>
+        <div id="${p}Errors" class="run-errors" hidden></div>
         <pre id="${p}Output" class="run-output" hidden></pre>
 
         <section class="coach">
@@ -155,6 +156,7 @@
           <button id="${p}Reset" class="btn" type="button">Reset</button>
         </section>
 
+        <div id="${p}Errors" class="run-errors" hidden></div>
         <pre id="${p}Output" class="run-output" hidden></pre>
 
         <section id="${p}Result" class="result-panel" hidden>
