@@ -104,7 +104,7 @@ Console.WriteLine(adult);`,
       title: "Repeat with while",
       concept: "while loop",
       context:
-        "A `while` loop checks its condition before each pass and keeps going until that condition is false.",
+        "A `while` loop checks its condition before each pass and keeps going until that condition is false. To move toward the end, use `n--`, shorthand for `n = n - 1` (decrement) that lowers `n` by one - its twin `n++` adds one.",
       quiz: {
         question: "What makes a `while` loop stop?",
         options: [
@@ -122,7 +122,7 @@ while (n {{1}} 0)
 }`,
       points: [
         "The condition is checked before each pass.",
-        "Change the variable inside, or the loop never ends.",
+        "`n--` subtracts one from `n` each pass, or the loop never ends.",
       ],
       blanks: [
         {
@@ -150,7 +150,7 @@ while (n {{1}} 0)
       title: "Count with for",
       concept: "for loop",
       context:
-        "A `for` loop packs the counter setup, the condition, and the step into one header.",
+        "A `for` loop packs the counter setup, the condition, and the step into one header. The step `i++` is shorthand for `i = i + 1` (increment) that raises `i` by one after each pass - `i--` would lower it.",
       quiz: {
         question: "What is the order of the three parts in a `for` header?",
         options: [
@@ -166,7 +166,7 @@ while (n {{1}} 0)
 }`,
       points: [
         "The start runs once, before the first pass.",
-        "The step runs after each pass.",
+        "The step `i++` runs after each pass to add one to `i`.",
       ],
       blanks: [
         {
