@@ -59,7 +59,7 @@
         message: "It prints 2 here, but the count is wrong for other inputs. Add up the true values instead of returning a fixed number.",
       },
       starter:
-        'using System;\n\npublic class PassCounter\n{\n    public int Count(bool[] results)\n    {\n        int passed = 0;\n        // TODO: count how many results are true\n        return passed;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var counter = new PassCounter();\n        bool[] results = { true, false, true };\n        Console.WriteLine(counter.Count(results));\n    }\n}\n',
+        'using System;\n\npublic class PassCounter\n{\n    public int Count(bool[] results)\n    {\n        // TODO: count how many results are true, then return the count\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var counter = new PassCounter();\n        bool[] results = { true, false, true };\n        Console.WriteLine(counter.Count(results));\n    }\n}\n',
       solution:
         'using System;\n\npublic class PassCounter\n{\n    public int Count(bool[] results)\n    {\n        int passed = 0;\n        foreach (var r in results)\n        {\n            if (r) passed++;\n        }\n        return passed;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var counter = new PassCounter();\n        bool[] results = { true, false, true };\n        Console.WriteLine(counter.Count(results));\n    }\n}\n',
     },

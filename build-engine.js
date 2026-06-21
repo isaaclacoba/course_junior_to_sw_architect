@@ -300,7 +300,14 @@
   });
 
   Promise.resolve(CodeLab.loadMonaco())
-    .then(() => editor.mount(editorHost, { value: code[0], language: "csharp", readOnly: false }))
+    .then(() =>
+      editor.mount(editorHost, {
+        value: code[0],
+        language: "csharp",
+        readOnly: false,
+        autoHeight: { minHeight: 160, maxHeight: 640 },
+      })
+    )
     .then(() => {
       renderXP();
       render();

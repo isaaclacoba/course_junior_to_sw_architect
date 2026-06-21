@@ -471,6 +471,21 @@ ${result.runtimeError}`.trim(),
         scrollBeyondLastLine: false,
         bracketPairColorization: { enabled: true }
       });
+      if (opts.autoHeight) this.enableAutoHeight(host, opts.autoHeight);
+    }
+    // Drive the host height from Monaco's content height so the editor is exactly
+    // as tall as the code it holds, clamped to optional min/max bounds. Width is
+    // still handled by automaticLayout.
+    enableAutoHeight(host, bounds) {
+      const min = bounds.minHeight ?? 0;
+      const max = bounds.maxHeight ?? Number.POSITIVE_INFINITY;
+      const resize = () => {
+        const height = Math.min(max, Math.max(min, this.editor.getContentHeight()));
+        host.style.height = `${height}px`;
+        this.editor.layout({ width: host.clientWidth, height });
+      };
+      this.editor.onDidContentSizeChange(resize);
+      resize();
     }
     getValue() {
       return this.editor ? this.editor.getValue() : "";
