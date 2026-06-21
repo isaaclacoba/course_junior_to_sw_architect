@@ -85,7 +85,7 @@
         message: "Right for this example only. Add up whatever numbers you are given, not a fixed total.",
       },
       starter:
-        'using System;\n\npublic class Totals\n{\n    public int Sum(int[] durations)\n    {\n        int total = 0;\n        // TODO: add every duration into total\n        return total;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var totals = new Totals();\n        int[] durations = { 3, 5, 2 };\n        Console.WriteLine(totals.Sum(durations));\n    }\n}\n',
+        'using System;\n\npublic class Totals\n{\n    public int Sum(int[] durations)\n    {\n        // TODO: add every duration together, then return the total\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var totals = new Totals();\n        int[] durations = { 3, 5, 2 };\n        Console.WriteLine(totals.Sum(durations));\n    }\n}\n',
       solution:
         'using System;\n\npublic class Totals\n{\n    public int Sum(int[] durations)\n    {\n        int total = 0;\n        foreach (var d in durations)\n        {\n            total += d;\n        }\n        return total;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var totals = new Totals();\n        int[] durations = { 3, 5, 2 };\n        Console.WriteLine(totals.Sum(durations));\n    }\n}\n',
     },
@@ -111,7 +111,7 @@
         message: "9 is right for this example only. Compare the values you are given and keep the biggest.",
       },
       starter:
-        'using System;\n\npublic class Durations\n{\n    public int Slowest(int[] times)\n    {\n        int slowest = 0;\n        // TODO: return the largest time\n        return slowest;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var times = new Durations();\n        int[] values = { 4, 9, 2 };\n        Console.WriteLine(times.Slowest(values));\n    }\n}\n',
+        'using System;\n\npublic class Durations\n{\n    public int Slowest(int[] times)\n    {\n        // TODO: find and return the largest time\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var times = new Durations();\n        int[] values = { 4, 9, 2 };\n        Console.WriteLine(times.Slowest(values));\n    }\n}\n',
       solution:
         'using System;\n\npublic class Durations\n{\n    public int Slowest(int[] times)\n    {\n        int slowest = 0;\n        foreach (var t in times)\n        {\n            if (t > slowest) slowest = t;\n        }\n        return slowest;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var times = new Durations();\n        int[] values = { 4, 9, 2 };\n        Console.WriteLine(times.Slowest(values));\n    }\n}\n',
     },
@@ -138,7 +138,7 @@
         message: "50% is right for this example only. Work the percentage out from the real pass count and results.Length.",
       },
       starter:
-        'using System;\n\npublic class PassRate\n{\n    public string Percent(bool[] results)\n    {\n        int passed = 0;\n        // TODO: return the share that passed, e.g. "50%"\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var rate = new PassRate();\n        bool[] results = { true, true, false, false };\n        Console.WriteLine(rate.Percent(results));\n    }\n}\n',
+        'using System;\n\npublic class PassRate\n{\n    public string Percent(bool[] results)\n    {\n        // TODO: count the passes, then return their share as a percent, e.g. "50%"\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var rate = new PassRate();\n        bool[] results = { true, true, false, false };\n        Console.WriteLine(rate.Percent(results));\n    }\n}\n',
       solution:
         'using System;\n\npublic class PassRate\n{\n    public string Percent(bool[] results)\n    {\n        int passed = 0;\n        foreach (var r in results)\n        {\n            if (r) passed++;\n        }\n        int percent = passed * 100 / results.Length;\n        return $"{percent}%";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var rate = new PassRate();\n        bool[] results = { true, true, false, false };\n        Console.WriteLine(rate.Percent(results));\n    }\n}\n',
     },

@@ -11,15 +11,15 @@
       title: "Branch with if / else",
       concept: "if / else",
       context:
-        "An if runs its block only when its condition is true. An else covers every other case.",
+        "An `if` runs its block only when its condition is true. An `else` covers every other case.",
       quiz: {
-        question: "When does the else block run?",
+        question: "When does the `else` block run?",
         options: [
           { text: "Only when the if condition is false", correct: true },
           { text: "Always, right after the if block", correct: false },
           { text: "Only when the if condition is true", correct: false },
         ],
-        answerWhy: "else is the fallback - it runs exactly when the if condition was false.",
+        answerWhy: "`else` is the fallback - it runs exactly when the `if` condition was false.",
       },
       snippet: `int score = 40;
 if (score {{1}} 50)
@@ -31,8 +31,8 @@ if (score {{1}} 50)
     Console.WriteLine("Fail");
 }`,
       points: [
-        "if runs its block when the condition is true.",
-        "else handles every remaining case.",
+        "`if` runs its block when the condition is true.",
+        "`else` handles every remaining case.",
       ],
       blanks: [
         {
@@ -60,7 +60,7 @@ if (score {{1}} 50)
       title: "Combine conditions",
       concept: "Boolean logic",
       context:
-        "Comparisons produce a bool. Join them with && (and), || (or), and flip one with ! (not).",
+        "Comparisons produce a bool. Join them with `&&` (and), `||` (or), and flip one with `!` (not).",
       quiz: {
         question: "Which operator is true only when BOTH sides are true?",
         options: [
@@ -68,7 +68,7 @@ if (score {{1}} 50)
           { text: "||", correct: false },
           { text: "!", correct: false },
         ],
-        answerWhy: "&& needs both sides true; || needs just one; ! flips a single bool.",
+        answerWhy: "`&&` needs both sides true; `||` needs just one; `!` flips a single bool.",
       },
       snippet: `int age = 25;
 bool working = true;
@@ -76,8 +76,8 @@ bool adult = age >= 18 {{1}} age < 65;
 bool resting = {{2}}working;
 Console.WriteLine(adult);`,
       points: [
-        "&& is true only when both sides are true.",
-        "! turns true into false and false into true.",
+        "`&&` is true only when both sides are true.",
+        "`!` turns true into false and false into true.",
       ],
       blanks: [
         {
@@ -104,9 +104,9 @@ Console.WriteLine(adult);`,
       title: "Repeat with while",
       concept: "while loop",
       context:
-        "A while loop checks its condition before each pass and keeps going until that condition is false.",
+        "A `while` loop checks its condition before each pass and keeps going until that condition is false.",
       quiz: {
-        question: "What makes a while loop stop?",
+        question: "What makes a `while` loop stop?",
         options: [
           { text: "Its condition becomes false", correct: true },
           { text: "It always runs exactly ten times", correct: false },
@@ -150,15 +150,15 @@ while (n {{1}} 0)
       title: "Count with for",
       concept: "for loop",
       context:
-        "A for loop packs the counter setup, the condition, and the step into one header.",
+        "A `for` loop packs the counter setup, the condition, and the step into one header.",
       quiz: {
-        question: "What is the order of the three parts in a for header?",
+        question: "What is the order of the three parts in a `for` header?",
         options: [
           { text: "start; condition; step", correct: true },
           { text: "condition; start; step", correct: false },
           { text: "step; condition; start", correct: false },
         ],
-        answerWhy: "for (start; condition; step) - initialise once, test before each pass, step after each pass.",
+        answerWhy: "`for (start; condition; step)` - initialise once, test before each pass, step after each pass.",
       },
       snippet: `for (int i = {{1}}; i < 3; i{{2}})
 {
@@ -194,9 +194,9 @@ while (n {{1}} 0)
       title: "Walk a collection with foreach",
       concept: "foreach",
       context:
-        "A foreach loop hands you each item in a collection in turn - no counter to manage.",
+        "A `foreach` loop hands you each item in a collection in turn - no counter to manage.",
       quiz: {
-        question: "What does foreach give you on each pass?",
+        question: "What does `foreach` give you on each pass?",
         options: [
           { text: "The next item in the collection", correct: true },
           { text: "The current index number", correct: false },
@@ -239,15 +239,15 @@ foreach ({{1}} name in names)
       title: "Skip and stop: continue / break",
       concept: "break / continue",
       context:
-        "Inside a loop, continue jumps to the next pass and break leaves the loop entirely.",
+        "Inside a loop, `continue` jumps to the next pass and `break` leaves the loop entirely.",
       quiz: {
-        question: "What does continue do inside a loop?",
+        question: "What does `continue` do inside a loop?",
         options: [
           { text: "Skips the rest of this pass and starts the next one", correct: true },
           { text: "Stops the loop entirely", correct: false },
           { text: "Restarts the whole program", correct: false },
         ],
-        answerWhy: "continue skips to the next pass; break is the one that stops the loop.",
+        answerWhy: "`continue` skips to the next pass; `break` is the one that stops the loop.",
       },
       snippet: `for (int i = 0; i < 5; i++)
 {
@@ -256,8 +256,8 @@ foreach ({{1}} name in names)
     Console.WriteLine(i);
 }`,
       points: [
-        "continue skips the rest of the current pass.",
-        "break ends the loop right away.",
+        "`continue` skips the rest of the current pass.",
+        "`break` ends the loop right away.",
       ],
       blanks: [
         {
@@ -284,15 +284,15 @@ foreach ({{1}} name in names)
       title: "Pick a case with switch",
       concept: "switch",
       context:
-        "A switch matches one value against several cases. Each case ends with break so it does not fall into the next.",
+        "A `switch` matches one value against several cases. Each `case` ends with `break` so it does not fall into the next.",
       quiz: {
-        question: "Why does each case usually end with break?",
+        question: "Why does each `case` usually end with `break`?",
         options: [
           { text: "To stop execution falling into the next case", correct: true },
           { text: "To repeat the same case again", correct: false },
           { text: "It is decorative and does nothing", correct: false },
         ],
-        answerWhy: "Without break, control falls through into the following case's code.",
+        answerWhy: "Without `break`, control falls through into the following case's code.",
       },
       snippet: `int day = 2;
 switch ({{1}})
@@ -308,8 +308,8 @@ switch ({{1}})
         break;
 }`,
       points: [
-        "switch compares one value against each case.",
-        "break ends a case so it does not fall through.",
+        "`switch` compares one value against each case.",
+        "`break` ends a case so it does not fall through.",
       ],
       blanks: [
         {
@@ -341,12 +341,12 @@ switch ({{1}})
         "Control flow decides which lines run and how often. These are the same tools you will use inside methods and across objects next.",
       summaryItems: [
         { title: "if / else - ", text: "run a block only when a condition holds, with a fallback." },
-        { title: "Boolean logic - ", text: "combine comparisons with &&, ||, and ! to form conditions." },
+        { title: "Boolean logic - ", text: "combine comparisons with `&&`, `||`, and `!` to form conditions." },
         { title: "while - ", text: "repeat as long as a condition stays true." },
         { title: "for - ", text: "count with a start, condition, and step in one header." },
         { title: "foreach - ", text: "visit each item in a collection without an index." },
         { title: "break / continue - ", text: "leave a loop early or skip to the next pass." },
-        { title: "switch - ", text: "branch on one value across several cases, each ended by break." },
+        { title: "switch - ", text: "branch on one value across several cases, each ended by `break`." },
       ],
       summaryClose: "Next up: Methods - package these steps into a rule you can name and reuse.",
       blanks: [],

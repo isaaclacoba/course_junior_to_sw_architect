@@ -116,6 +116,24 @@
   function withGaps(snippet) {
     return snippet.replace(/\{\{(\d+)\}\}/g, (_, n) => `__${n}__`);
   }
+  function escapeHtml(text) {
+    return String(text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+  // Render plain prose, turning `backtick` spans into inline <code> so a
+  // programming term reads as code. Plain text (no backticks) is unchanged.
+  function renderInline(text) {
+    return (text || "")
+      .split(/(`[^`]+`)/)
+      .map((seg) =>
+        seg.length > 1 && seg.startsWith("`") && seg.endsWith("`")
+          ? `<code>${escapeHtml(seg.slice(1, -1))}</code>`
+          : escapeHtml(seg)
+      )
+      .join("");
+  }
 
   // ---- code line highlight ------------------------------------------------
   let currentHighlightEl = null;
@@ -314,7 +332,9 @@
     }
     const correct = Boolean(d.quiz.options[chosen] && d.quiz.options[chosen].correct);
     els.quizFeedback.hidden = false;
-    els.quizFeedback.textContent = `${correct ? "Correct. " : "Not quite. "}${d.quiz.answerWhy || ""}`.trim();
+    els.quizFeedback.innerHTML = renderInline(
+      `${correct ? "Correct. " : "Not quite. "}${d.quiz.answerWhy || ""}`.trim()
+    );
     els.quizFeedback.classList.toggle("is-good", correct);
     els.quizFeedback.classList.toggle("is-bad", !correct);
   }
@@ -326,7 +346,7 @@
       return;
     }
     els.quiz.hidden = false;
-    if (els.question) els.question.textContent = d.quiz.question || "";
+    if (els.question) els.question.innerHTML = renderInline(d.quiz.question || "");
     if (els.options) {
       els.options.innerHTML = "";
       d.quiz.options.forEach((opt, i) => {
@@ -354,7 +374,7 @@
     if (!node) return;
     const host = node.closest(".pain-box, .map-box") || node;
     if (value) {
-      node.textContent = value;
+      node.innerHTML = renderInline(value);
       host.hidden = false;
     } else {
       node.textContent = "";
@@ -385,19 +405,21 @@
   function renderSummary(d) {
     setPracticeVisible(false);
     if (els.result) els.result.hidden = true;
-    if (els.summaryIntro) els.summaryIntro.textContent = d.summaryIntro || "";
+    if (els.summaryIntro) els.summaryIntro.innerHTML = renderInline(d.summaryIntro || "");
     if (els.summaryList) {
       els.summaryList.innerHTML = "";
       (d.summaryItems || []).forEach((item) => {
         const li = document.createElement("li");
         const strong = document.createElement("strong");
-        strong.textContent = item.title || "";
+        strong.innerHTML = renderInline(item.title || "");
         li.appendChild(strong);
-        li.appendChild(document.createTextNode(item.text || ""));
+        const span = document.createElement("span");
+        span.innerHTML = renderInline(item.text || "");
+        li.appendChild(span);
         els.summaryList.appendChild(li);
       });
     }
-    if (els.summaryClose) els.summaryClose.textContent = d.summaryClose || "";
+    if (els.summaryClose) els.summaryClose.innerHTML = renderInline(d.summaryClose || "");
     if (els.prev) els.prev.disabled = idx === 0;
     if (els.next) els.next.disabled = idx === drills.length - 1;
   }
@@ -450,7 +472,7 @@
     els.points.innerHTML = "";
     (d.points || []).forEach((point) => {
       const li = document.createElement("li");
-      li.textContent = point;
+      li.innerHTML = renderInline(point);
       els.points.appendChild(li);
     });
 
