@@ -25,6 +25,8 @@
   const title = el("Title");
   const context = el("Context");
   const concept = el("Concept");
+  const example = el("Example");
+  const exampleWrap = el("ExampleWrap");
   const progress = el("Progress");
   const expected = el("Expected");
   const goal = el("Goal");
@@ -145,12 +147,41 @@
     return `Expected a line equal to "${expected}". Adjust your code and run again.`;
   }
 
+  // Render plain text but turn `backtick` spans into inline <code> so a pattern
+  // mentioned in prose reads as code, not running text.
+  function escapeHtml(s) {
+    return s
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function renderInline(text) {
+    return (text || "")
+      .split(/(`[^`]+`)/)
+      .map((seg) =>
+        seg.length > 1 && seg.startsWith("`") && seg.endsWith("`")
+          ? `<code>${escapeHtml(seg.slice(1, -1))}</code>`
+          : escapeHtml(seg)
+      )
+      .join("");
+  }
+
   function render() {
     const task = tasks[idx];
     if (meta) meta.textContent = metaLabel;
     title.textContent = task.title;
-    context.textContent = task.context;
+    context.innerHTML = renderInline(task.context);
     if (concept) concept.textContent = task.concept;
+    if (example && exampleWrap) {
+      if (task.example) {
+        example.textContent = task.example;
+        exampleWrap.hidden = false;
+      } else {
+        example.textContent = "";
+        exampleWrap.hidden = true;
+      }
+    }
     progress.textContent = `${progressNoun} ${idx + 1} / ${tasks.length}`;
     if (expected) {
       expected.textContent = Array.isArray(task.expected)

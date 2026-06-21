@@ -135,6 +135,38 @@ h1 {
   margin: 0.25rem 0;
 }
 
+.context code {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.86em;
+  background: #eef1f6;
+  border: 1px solid #dfe3ea;
+  border-radius: 5px;
+  padding: 0.05rem 0.32rem;
+  color: #1d2130;
+}
+
+.example-box {
+  margin: 0.9rem 0 0;
+}
+
+.example-box h3 {
+  margin: 0 0 0.45rem;
+}
+
+.code-example {
+  margin: 0;
+  padding: 0.8rem 0.95rem;
+  background: #1d2130;
+  color: #d8f0df;
+  border: 1px solid #2f3440;
+  border-radius: 10px;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  white-space: pre;
+  overflow-x: auto;
+}
+
 .badge-group {
   display: flex;
   flex-direction: column;

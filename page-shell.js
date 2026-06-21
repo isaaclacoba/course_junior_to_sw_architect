@@ -137,6 +137,11 @@
           </div>
         </header>
 
+        <section id="${p}ExampleWrap" class="example-box" hidden>
+          <h3>Here's the pattern</h3>
+          <pre class="code-example"><code id="${p}Example" class="language-csharp"></code></pre>
+        </section>
+
         <section class="coach">
           <h3>Goal</h3>
           <ul id="${p}Goal" class="coach-list"></ul>
