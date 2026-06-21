@@ -492,6 +492,31 @@ h4 {
   gap: 0.55rem;
 }
 
+.quiz-box {
+  margin: 0.6rem 0 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-soft, #f6f8fb);
+}
+
+.quiz-box h3 {
+  margin: 0 0 0.4rem;
+}
+
+.quiz-feedback {
+  margin: 0.6rem 0 0;
+  font-weight: 600;
+}
+
+.quiz-feedback.is-good {
+  color: var(--good);
+}
+
+.quiz-feedback.is-bad {
+  color: var(--danger);
+}
+
 .options .btn.correct {
   background: #e4f4ea;
   border-color: var(--good);
@@ -941,7 +966,7 @@ input.almost {
 
 /* ---------------------------------------------------------- Build editor */
 .code-editor-host {
-  height: 24rem;
+  min-height: 10rem;
   border-radius: 8px;
   overflow: hidden;
 }

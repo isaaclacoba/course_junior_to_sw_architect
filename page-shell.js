@@ -76,6 +76,13 @@
           <p id="${p}Map"></p>
         </section>
 
+        <section id="${p}Quiz" class="quiz-box" hidden>
+          <h3>Knowledge check</h3>
+          <p id="${p}Question" class="context"></p>
+          <div id="${p}Options" class="options"></div>
+          <p id="${p}QuizFeedback" class="quiz-feedback" hidden></p>
+        </section>
+
         <div class="code-wrap">
           <pre class="line-numbers"><code id="${p}Code" class="language-csharp"></code></pre>
         </div>

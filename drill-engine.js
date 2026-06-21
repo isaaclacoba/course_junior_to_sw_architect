@@ -20,7 +20,9 @@
 //
 // Drill object: { title, concept, context, snippet (with {{n}} blanks), points[],
 //   blanks[{ id, label, answer, accept?[], hints[], explain[{ text, highlight }] }],
-//   pain?, map?, mermaid? }.
+//   pain?, map?, mermaid?, quiz?{ question, options[{ text, correct }], answerWhy } }.
+// A card with a quiz shows the knowledge check above the fill-in-the-blank; the
+// right option must also be picked before the card awards XP.
 (function () {
   const cfg = window.DRILL_CONFIG;
   if (!cfg) {
@@ -48,6 +50,10 @@
     map: el("Map"),
     concept: el("Concept"),
     progress: el("Progress"),
+    quiz: el("Quiz"),
+    question: el("Question"),
+    options: el("Options"),
+    quizFeedback: el("QuizFeedback"),
     code: el("Code"),
     points: el("Points"),
     diagram: el("Diagram"),
@@ -80,6 +86,8 @@
 
   let idx = 0;
   const progress = drills.map((d) => d.blanks.map(() => ({ value: "", hint: -1 })));
+  // Per-card quiz state: which option index the learner picked (-1 = none).
+  const quizState = drills.map(() => ({ chosen: -1 }));
   const awarded = JSON.parse(localStorage.getItem(awardedKey) || "{}");
 
   // ---- XP -----------------------------------------------------------------
@@ -285,6 +293,62 @@
     }
   }
 
+  // ---- optional multiple-choice quiz -------------------------------------
+  // A card may pose a knowledge-check question above the fill-in-the-blank.
+  // Picking an option gives immediate feedback; the right pick is also required
+  // before the card pays XP (see check()).
+  function quizAnswered(d, i) {
+    if (!d.quiz) return true;
+    const chosen = quizState[i].chosen;
+    return chosen >= 0 && Boolean(d.quiz.options[chosen] && d.quiz.options[chosen].correct);
+  }
+
+  function setQuizFeedback(d) {
+    if (!els.quizFeedback) return;
+    const chosen = quizState[idx].chosen;
+    if (chosen < 0) {
+      els.quizFeedback.hidden = true;
+      els.quizFeedback.textContent = "";
+      els.quizFeedback.classList.remove("is-good", "is-bad");
+      return;
+    }
+    const correct = Boolean(d.quiz.options[chosen] && d.quiz.options[chosen].correct);
+    els.quizFeedback.hidden = false;
+    els.quizFeedback.textContent = `${correct ? "Correct. " : "Not quite. "}${d.quiz.answerWhy || ""}`.trim();
+    els.quizFeedback.classList.toggle("is-good", correct);
+    els.quizFeedback.classList.toggle("is-bad", !correct);
+  }
+
+  function renderQuiz(d) {
+    if (!els.quiz) return;
+    if (!d.quiz) {
+      els.quiz.hidden = true;
+      return;
+    }
+    els.quiz.hidden = false;
+    if (els.question) els.question.textContent = d.quiz.question || "";
+    if (els.options) {
+      els.options.innerHTML = "";
+      d.quiz.options.forEach((opt, i) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn";
+        btn.textContent = opt.text;
+        if (quizState[idx].chosen === i) {
+          btn.classList.add(opt.correct ? "correct" : "wrong");
+        }
+        btn.addEventListener("click", () => {
+          quizState[idx].chosen = i;
+          [...els.options.children].forEach((c) => c.classList.remove("correct", "wrong"));
+          btn.classList.add(opt.correct ? "correct" : "wrong");
+          setQuizFeedback(d);
+        });
+        els.options.appendChild(btn);
+      });
+    }
+    setQuizFeedback(d);
+  }
+
   // ---- render -------------------------------------------------------------
   function setOptional(node, value) {
     if (!node) return;
@@ -304,6 +368,7 @@
     const hosts = [
       els.pain && els.pain.closest(".pain-box"),
       els.map && els.map.closest(".map-box"),
+      els.quiz,
       els.code && els.code.closest(".code-wrap"),
       els.run && els.run.closest(".code-actions"),
       els.points && els.points.closest(".coach"),
@@ -361,6 +426,8 @@
     setPracticeVisible(true);
     setOptional(els.pain, d.pain);
     setOptional(els.map, d.map);
+
+    renderQuiz(d);
 
     els.code.textContent = withGaps(d.snippet);
     if (window.Prism) Prism.highlightElement(els.code);
@@ -486,12 +553,15 @@
     });
 
     els.resultTitle.textContent = `${ok} / ${d.blanks.length} correct`;
-    els.resultBody.textContent =
-      ok === d.blanks.length
+    const blanksDone = ok === d.blanks.length;
+    const quizOk = quizAnswered(d, idx);
+    els.resultBody.textContent = !blanksDone
+      ? "Keep going. Use the hint and try again."
+      : quizOk
         ? "Good progress. This concept is now reinforced in code form."
-        : "Keep going. Use the hint and try again.";
+        : "Blanks are correct. Now pick the right answer to the knowledge check above to finish this card.";
 
-    if (ok === d.blanks.length && !awarded[idx]) {
+    if (blanksDone && quizOk && !awarded[idx]) {
       addCourseXP(awardAmount);
       markAwarded(idx);
     }
@@ -502,12 +572,21 @@
       li.textContent = m;
       els.resultList.appendChild(li);
     });
+    if (d.quiz && !quizOk) {
+      const li = document.createElement("li");
+      li.textContent =
+        quizState[idx].chosen < 0
+          ? "Knowledge check: not answered yet"
+          : "Knowledge check: try another option";
+      els.resultList.appendChild(li);
+    }
 
     els.result.hidden = false;
   }
 
   function resetDrill() {
     progress[idx] = drills[idx].blanks.map(() => ({ value: "", hint: -1 }));
+    quizState[idx].chosen = -1;
     render();
   }
 
