@@ -24,6 +24,12 @@
       requireSource: [
         { pattern: ITERATES, message: "Count the passes by looping over results - returning a fixed number does not count." },
       ],
+      verify: {
+        main:
+          'class Program\n{\n    static void Main()\n    {\n        var counter = new ResultCounter();\n        bool[] results = { true, true, true };\n        Console.WriteLine(counter.CountPasses(results));\n    }\n}\n',
+        expected: "3",
+        message: "Your code printed 2 for this example but returns the wrong count for other inputs. Actually count the true values instead of returning a fixed number.",
+      },
       starter:
         'using System;\n\npublic class ResultCounter\n{\n    public int CountPasses(bool[] results)\n    {\n        // TODO: loop over results and count how many are true\n        return 0;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var counter = new ResultCounter();\n        bool[] results = { true, false, true };\n        Console.WriteLine(counter.CountPasses(results));\n    }\n}\n',
       solution:
@@ -44,6 +50,12 @@
         { pattern: ITERATES, message: "Loop over the checks instead of hardcoding the count." },
         { pattern: /\.\s*Run\s*\(/, message: "Actually run each check by calling Run()." },
       ],
+      verify: {
+        main:
+          'class Program\n{\n    static void Main()\n    {\n        var suite = new Suite(new ICheck[]\n        {\n            new AlwaysPass(),\n            new AlwaysPass(),\n            new AlwaysPass(),\n        });\n        Console.WriteLine(suite.Summarize());\n    }\n}\n',
+        expected: "3 / 3 passed",
+        message: "Your summary is right for this example but wrong for other inputs. Run each check and count the real passes instead of hardcoding the number.",
+      },
       starter:
         'using System;\n\npublic interface ICheck\n{\n    bool Run();\n}\n\npublic class AlwaysPass : ICheck\n{\n    public bool Run() => true;\n}\n\npublic class AlwaysFail : ICheck\n{\n    public bool Run() => false;\n}\n\npublic class Suite\n{\n    private readonly ICheck[] _checks;\n\n    public Suite(ICheck[] checks)\n    {\n        _checks = checks;\n    }\n\n    public string Summarize()\n    {\n        // TODO: run every check, count the passes,\n        // and return "{passed} / {total} passed"\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var suite = new Suite(new ICheck[]\n        {\n            new AlwaysPass(),\n            new AlwaysFail(),\n            new AlwaysPass(),\n        });\n        Console.WriteLine(suite.Summarize());\n    }\n}\n',
       solution:
@@ -64,6 +76,12 @@
         { pattern: /_check\s*\.\s*Run\s*\(/, message: "Run the check (call _check.Run())." },
         { pattern: /_reporter\s*\.\s*Report\s*\(/, message: "Hand the result to the reporter (call _reporter.Report(...))." },
       ],
+      verify: {
+        main:
+          'public class _ProbeFail : ICheck { public bool Run() => false; }\nclass Program\n{\n    static void Main()\n    {\n        var runner = new TestRunner(new _ProbeFail(), new WordReporter());\n        Console.WriteLine(runner.Run());\n    }\n}\n',
+        expected: "FAIL",
+        message: "It prints PASS here, but a failing check should report FAIL. Run the check and report its real result instead of a fixed word.",
+      },
       starter:
         'using System;\n\npublic interface ICheck { bool Run(); }\npublic interface IReporter { string Report(bool passed); }\n\npublic class AlwaysPass : ICheck { public bool Run() => true; }\npublic class WordReporter : IReporter { public string Report(bool passed) => passed ? "PASS" : "FAIL"; }\n\npublic class TestRunner\n{\n    private readonly ICheck _check;\n    private readonly IReporter _reporter;\n\n    public TestRunner(ICheck check, IReporter reporter)\n    {\n        // TODO: keep both collaborators\n    }\n\n    public string Run()\n    {\n        // TODO: run the check, then report the result\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var runner = new TestRunner(new AlwaysPass(), new WordReporter());\n        Console.WriteLine(runner.Run());\n    }\n}\n',
       solution:
@@ -83,6 +101,12 @@
       requireSource: [
         { pattern: ITERATES, message: "Count the passes by looping over results - returning a fixed number does not count." },
       ],
+      verify: {
+        main:
+          'class Program\n{\n    static void Main()\n    {\n        var report = new Report(new ResultCounter(), new SummaryFormatter());\n        bool[] results = { true, true, true };\n        Console.WriteLine(report.Build(results));\n    }\n}\n',
+        expected: "3/3",
+        message: "Right for this example, wrong for other inputs. Count the true results instead of returning a fixed number.",
+      },
       starter:
         'using System;\n\npublic class ResultCounter\n{\n    public int CountPasses(bool[] results)\n    {\n        // TODO: return how many results are true\n        return 0;\n    }\n}\n\npublic class SummaryFormatter\n{\n    public string Format(int passed, int total) => $"{passed}/{total}";\n}\n\npublic class Report\n{\n    private readonly ResultCounter _counter;\n    private readonly SummaryFormatter _formatter;\n\n    public Report(ResultCounter counter, SummaryFormatter formatter)\n    {\n        _counter = counter;\n        _formatter = formatter;\n    }\n\n    public string Build(bool[] results)\n        => _formatter.Format(_counter.CountPasses(results), results.Length);\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var report = new Report(new ResultCounter(), new SummaryFormatter());\n        bool[] results = { true, false, true };\n        Console.WriteLine(report.Build(results));\n    }\n}\n',
       solution:
@@ -102,6 +126,12 @@
         { pattern: ITERATES, message: "Count the passes by looping over results, don't hardcode the rate." },
         { pattern: /results\s*\.\s*Length|results\s*\.\s*Count/, message: "Work out the percentage from the number of results." },
       ],
+      verify: {
+        main:
+          'class Program\n{\n    static void Main()\n    {\n        ISummaryReporter reporter = new PassRateReporter();\n        bool[] results = { true, true, true, true };\n        Console.WriteLine(reporter.Report(results));\n    }\n}\n',
+        expected: "100%",
+        message: "50% is right for this example only. Compute the percentage from the real pass count instead of hardcoding it.",
+      },
       starter:
         'using System;\n\npublic interface ISummaryReporter\n{\n    string Report(bool[] results);\n}\n\npublic class PassRateReporter : ISummaryReporter\n{\n    public string Report(bool[] results)\n    {\n        // TODO: count the passes and return their share as a percent, e.g. "50%"\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        ISummaryReporter reporter = new PassRateReporter();\n        bool[] results = { true, true, false, false };\n        Console.WriteLine(reporter.Report(results));\n    }\n}\n',
       solution:
@@ -122,6 +152,12 @@
         { pattern: ITERATES, message: "Loop over the checks instead of printing fixed lines." },
         { pattern: /\.\s*Name\b/, message: "Print each check's Name property." },
       ],
+      verify: {
+        main:
+          'class Program\n{\n    static void Main()\n    {\n        var pipeline = new Pipeline(new ICheck[]\n        {\n            new Check("alpha", false),\n            new Check("beta", true),\n        });\n        pipeline.Report();\n    }\n}\n',
+        expected: ["alpha: FAIL", "beta: PASS"],
+        message: "Those lines are right for this example only. Print each check's real Name and result instead of fixed text.",
+      },
       starter:
         'using System;\n\npublic interface ICheck\n{\n    string Name { get; }\n    bool Run();\n}\n\npublic class Check : ICheck\n{\n    public string Name { get; }\n    private readonly bool _result;\n\n    public Check(string name, bool result)\n    {\n        Name = name;\n        _result = result;\n    }\n\n    public bool Run() => _result;\n}\n\npublic class Pipeline\n{\n    private readonly ICheck[] _checks;\n\n    public Pipeline(ICheck[] checks)\n    {\n        _checks = checks;\n    }\n\n    public void Report()\n    {\n        // TODO: print one line per check: "{Name}: PASS" or "{Name}: FAIL"\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var pipeline = new Pipeline(new ICheck[]\n        {\n            new Check("login", true),\n            new Check("logout", false),\n        });\n        pipeline.Report();\n    }\n}\n',
       solution:

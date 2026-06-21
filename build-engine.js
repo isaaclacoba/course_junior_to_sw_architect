@@ -121,6 +121,23 @@
     return null;
   }
 
+  // Hidden verification: re-run the learner's own classes against a different
+  // entry point (task.verify.main) with different inputs. A hardcoded answer
+  // that prints the expected value for the visible case fails here. The visible
+  // Main is the last top-level Program class, so we replace it with the probe.
+  function buildProbe(source, probeMain) {
+    const m = source.search(/(?:public\s+)?(?:static\s+)?(?:partial\s+)?class\s+Program\b/);
+    const base = m >= 0 ? source.slice(0, m) : source;
+    return base + probeMain;
+  }
+
+  async function passesHiddenVerify(source, verify) {
+    const probe = await runner.run(buildProbe(source, verify.main));
+    if (probe.errors && probe.errors.length) return false;
+    if (probe.runtimeError) return false;
+    return matches((probe.output || "").trim(), verify.expected);
+  }
+
   function describeExpected(expected) {
     if (Array.isArray(expected)) {
       return `Expected these lines, in order:\n${expected.join("\n")}\nAdjust your code and run again.`;
@@ -189,6 +206,12 @@
         showResult(false, describeExpected(task.expected));
       } else if (unmet) {
         showResult(false, unmet);
+      } else if (task.verify && !(await passesHiddenVerify(code[idx], task.verify))) {
+        showResult(
+          false,
+          task.verify.message ||
+            "Your code printed the right answer for this example, but a hidden check with different inputs failed. Make the logic work for any input, not just this one."
+        );
       } else {
         award(idx);
         showResult(true, "Output matched what the task asked for. XP awarded.");
