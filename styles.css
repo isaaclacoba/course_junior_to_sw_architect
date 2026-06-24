@@ -284,6 +284,42 @@ h1 {
   padding-left: 3.2em;
 }
 
+/* Theory (prose) mode: the snippet reads as a sentence with numbered blanks,
+   not as code. Used by drill-engine when DRILL_CONFIG.mode === "theory". */
+.code-wrap.prose-mode {
+  background: #fff;
+  border-color: #ecece6;
+}
+.code-wrap.prose-mode pre[class*="language-"],
+.code-wrap.prose-mode pre {
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-size: 1.04rem;
+  line-height: 1.75;
+  color: #2a2d35;
+  white-space: normal;
+  padding: 1.05rem 1.25rem;
+}
+.code-wrap.prose-mode pre.line-numbers {
+  padding-left: 1.25rem;
+}
+.code-wrap.prose-mode code {
+  white-space: normal;
+}
+.cloze {
+  display: inline-block;
+  width: 3em;
+  margin: 0 0.12em;
+  border-bottom: 2px solid #1f6f5f;
+  vertical-align: baseline;
+}
+.cloze-n {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #1f6f5f;
+  vertical-align: super;
+  margin-right: 1px;
+}
+
 .output-panel {
   margin-top: 0.65rem;
   border: 1px solid #2a3a2a;

@@ -39,6 +39,11 @@
   const awardAmount = typeof cfg.awardAmount === "number" ? cfg.awardAmount : 20;
   const progressNoun = cfg.progressNoun || "Drill";
   const metaLabel = cfg.metaLabel || "";
+  // Theory mode renders the snippet as prose with numbered blank slots instead
+  // of highlighted C#, so the same engine drives fill-in-the-blank theory cards.
+  const mode = cfg.mode === "theory" ? "theory" : "code";
+  const inputPlaceholder =
+    cfg.inputPlaceholder || (mode === "theory" ? "Type your answer" : "Write short C# code");
 
   const el = (suffix) => document.getElementById(prefix + suffix);
 
@@ -131,6 +136,21 @@
         seg.length > 1 && seg.startsWith("`") && seg.endsWith("`")
           ? `<code>${escapeHtml(seg.slice(1, -1))}</code>`
           : escapeHtml(seg)
+      )
+      .join("");
+  }
+
+  // Render a theory snippet as prose: escape, turn `backtick` spans into inline
+  // code, replace each {{n}} with a numbered blank slot, and keep line breaks.
+  function renderProse(text) {
+    return (text || "")
+      .split(/(`[^`]+`)/)
+      .map((seg) =>
+        seg.length > 1 && seg.startsWith("`") && seg.endsWith("`")
+          ? `<code>${escapeHtml(seg.slice(1, -1))}</code>`
+          : escapeHtml(seg)
+              .replace(/\{\{(\d+)\}\}/g, (_, n) => `<sup class="cloze-n">${n}</sup><span class="cloze"></span>`)
+              .replace(/\n/g, "<br>")
       )
       .join("");
   }
@@ -451,8 +471,29 @@
 
     renderQuiz(d);
 
-    els.code.textContent = withGaps(d.snippet);
-    if (window.Prism) Prism.highlightElement(els.code);
+    if (mode === "theory") {
+      if (codeWrap) {
+        codeWrap.classList.add("prose-mode");
+        codeWrap.hidden = !d.snippet;
+      }
+      // Drop the language-* class so Prism's auto-highlight skips this element
+      // and the prose (with its blank slots) is not re-tokenised as code.
+      els.code.className = "prose-text";
+      els.code.innerHTML = d.snippet ? renderProse(d.snippet) : "";
+    } else {
+      if (codeWrap) {
+        codeWrap.classList.remove("prose-mode");
+        codeWrap.hidden = false;
+      }
+      els.code.className = "language-csharp";
+      els.code.textContent = withGaps(d.snippet);
+      if (window.Prism) Prism.highlightElement(els.code);
+    }
+
+    const fillSection = els.inputs ? els.inputs.closest(".fill-section") : null;
+    const fillHeading = fillSection ? fillSection.querySelector("h3") : null;
+    if (fillHeading)
+      fillHeading.textContent = mode === "theory" ? "Fill in the blanks" : "Complete the code";
 
     renderDiagram(d);
 
@@ -488,7 +529,7 @@
       const input = document.createElement("input");
       input.id = `${prefix}-${i}`;
       input.value = s[i].value;
-      input.placeholder = "Write short C# code";
+      input.placeholder = inputPlaceholder;
       input.addEventListener("input", (e) => {
         s[i].value = e.target.value;
         input.classList.remove("correct", "wrong", "almost");
@@ -580,7 +621,9 @@
     els.resultBody.textContent = !blanksDone
       ? "Keep going. Use the hint and try again."
       : quizOk
-        ? "Good progress. This concept is now reinforced in code form."
+        ? mode === "theory"
+          ? "Nice - the idea and the recall both check out."
+          : "Good progress. This concept is now reinforced in code form."
         : "Blanks are correct. Now pick the right answer to the knowledge check above to finish this card.";
 
     if (blanksDone && quizOk && !awarded[idx]) {
