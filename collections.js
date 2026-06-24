@@ -211,7 +211,7 @@ Console.WriteLine(legs[{{2}}] + " legs");`,
     title: "Check before you read",
     concept: "Safe lookup",
     context:
-      "Reading a key that was never stored throws an error. `ContainsKey` lets you check first - handy when a snake shows up and you need a polite answer.",
+      "Reading a key that was never stored throws an error, so check first. Every dictionary has a built-in method for this: `ContainsKey`. You call it on the dictionary - `legs.ContainsKey(\"puppy\")` - and it hands back `true` if that key exists or `false` if it does not.",
     snippet: `var legs = new Dictionary<string, int>();
 legs["puppy"] = 4;
 
@@ -220,18 +220,18 @@ if (legs.{{1}}("snake"))
 else
     Console.WriteLine({{2}});`,
     points: [
-      "`ContainsKey` returns a `bool` - true only when the key is present.",
-      "Guarding the lookup avoids a crash on a missing key.",
+      "`ContainsKey` is a method on every dictionary; call it as `legs.ContainsKey(key)`.",
+      "It returns a `bool` - `true` only when the key is present - so you can guard the lookup and avoid a crash.",
     ],
     blanks: [
       {
         id: 1,
-        label: "Is the key present?",
+        label: "The dictionary method that checks whether a key exists",
         answer: "ContainsKey",
-        hints: ["A method that returns true when the dictionary has that key."],
+        hints: ["Call the dictionary's `ContainsKey` method - note the capital C and K."],
         explain: [
-          { text: "Only `\"puppy\"` was stored, so `\"snake\"` is missing.", highlight: "legs[\"puppy\"] = 4" },
-          { text: "`ContainsKey(\"snake\")` returns `false`, so the `else` branch runs.", highlight: "if (legs.{{1}}(\"snake\"))" },
+          { text: "`ContainsKey` is the method shown above; you call it on `legs` to ask whether a key is there.", highlight: "if (legs.{{1}}(\"snake\"))" },
+          { text: "Only `\"puppy\"` was stored, so `legs.ContainsKey(\"snake\")` returns `false` and the `else` branch runs.", highlight: "legs[\"puppy\"] = 4" },
         ],
       },
       {
