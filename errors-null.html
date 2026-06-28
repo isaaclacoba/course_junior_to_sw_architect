@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Errors and null - C# Course</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css"
+    />
+    <link rel="stylesheet" href="vendor/code-lab/code-lab.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <section class="hero" id="pageHero"></section>
+    </main>
+
+    <script>
+      window.PAGE = {
+        hero: {
+          eyebrow: "Part three \u00b7 Know the language",
+          title: "Errors and null",
+          intro: [
+            "The two most common ways a program falls over: something goes wrong, or a value is not there. Learn to catch failures with try/catch, clean up with finally, raise your own with throw, and handle missing values with null, ?? and ?. Fill the gaps, then press Run to see each one work.",
+          ],
+          links: [{ href: "index.html", label: "Back to the course" }],
+        },
+        archetype: "drill",
+        prefix: "en",
+      };
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="vendor/code-lab/code-lab.global.js"></script>
+    <script src="page-shell.js"></script>
+    <script src="errors-null.js"></script>
+    <script src="drill-engine.js"></script>
+  </body>
+</html>
