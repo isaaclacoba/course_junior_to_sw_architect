@@ -17,6 +17,7 @@
   const xpKey = cfg.xpKey || "course_global_xp";
   const awardedKey = cfg.awardedKey;
   const awardAmount = cfg.awardAmount || 20;
+  const nextHref = (window.PAGE && window.PAGE.nextHref) || "index.html";
 
   const el = (suffix) => document.getElementById(prefix + suffix);
 
@@ -35,6 +36,10 @@
   const result = el("Result");
   const resultTitle = el("ResultTitle");
   const resultBody = el("ResultBody");
+  const summary = el("Summary");
+  const summaryIntro = el("SummaryIntro");
+  const summaryList = el("SummaryList");
+  const summaryClose = el("SummaryClose");
   const runBtn = el("Run");
   const solutionBtn = el("Solution");
   const resetBtn = el("Reset");
@@ -47,6 +52,9 @@
 
   const code = tasks.map((t) => t.starter);
   const awarded = JSON.parse(localStorage.getItem(awardedKey) || "{}");
+  // A trailing recap card (task.summary) is content, not a build - exclude it
+  // from the count shown and from XP.
+  const buildCount = tasks.filter((t) => !t.summary).length;
   let idx = 0;
 
   function loadXP() {
@@ -167,12 +175,64 @@
       .join("");
   }
 
+  // Toggle the build workflow (example, goal, editor, actions, output) on or off
+  // so a trailing recap card can show only its summary, like the drill engine.
+  function setPracticeVisible(visible) {
+    const hosts = [
+      exampleWrap,
+      goal && goal.closest(".coach"),
+      editorHost && editorHost.closest(".fill-section"),
+      runBtn && runBtn.closest(".actions"),
+    ];
+    hosts.forEach((h) => {
+      if (h) h.hidden = !visible;
+    });
+    if (!visible) {
+      if (output) output.hidden = true;
+      clearErrors();
+      if (result) result.hidden = true;
+    }
+    if (summary) summary.hidden = visible;
+  }
+
+  function renderSummary(task) {
+    setPracticeVisible(false);
+    if (summaryIntro) summaryIntro.innerHTML = renderInline(task.summaryIntro || "");
+    if (summaryList) {
+      summaryList.innerHTML = "";
+      (task.summaryItems || []).forEach((item) => {
+        const li = document.createElement("li");
+        const strong = document.createElement("strong");
+        strong.innerHTML = renderInline(item.title || "");
+        li.appendChild(strong);
+        const span = document.createElement("span");
+        span.innerHTML = renderInline(item.text || "");
+        li.appendChild(span);
+        summaryList.appendChild(li);
+      });
+    }
+    if (summaryClose) summaryClose.innerHTML = renderInline(task.summaryClose || "");
+  }
+
   function render() {
     const task = tasks[idx];
     if (meta) meta.textContent = metaLabel;
     title.textContent = task.title;
     context.innerHTML = renderInline(task.context);
     if (concept) concept.textContent = task.concept;
+    progress.textContent = task.summary
+      ? "Recap"
+      : `${progressNoun} ${idx + 1} / ${buildCount}`;
+
+    if (task.summary) {
+      renderSummary(task);
+      prevBtn.disabled = idx === 0;
+      nextBtn.disabled = false;
+      nextBtn.textContent = idx === tasks.length - 1 ? "Next lesson" : "Next";
+      return;
+    }
+
+    setPracticeVisible(true);
     if (example && exampleWrap) {
       if (task.example) {
         example.textContent = task.example;
@@ -182,7 +242,6 @@
         exampleWrap.hidden = true;
       }
     }
-    progress.textContent = `${progressNoun} ${idx + 1} / ${tasks.length}`;
     if (expected) {
       expected.textContent = Array.isArray(task.expected)
         ? task.expected.join("\n")
@@ -201,7 +260,8 @@
     clearErrors();
     result.hidden = true;
     prevBtn.disabled = idx === 0;
-    nextBtn.disabled = idx === tasks.length - 1;
+    nextBtn.disabled = false;
+    nextBtn.textContent = idx === tasks.length - 1 ? "Next lesson" : "Next";
   }
 
   async function run() {
@@ -296,6 +356,8 @@
       code[idx] = editor.getValue();
       idx += 1;
       render();
+    } else {
+      window.location.href = nextHref;
     }
   });
 

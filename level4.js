@@ -872,7 +872,8 @@ function renderLesson() {
   l4Output.classList.remove("is-error");
 
   l4Prev.disabled = lessonIndex === 0;
-  l4Next.disabled = lessonIndex === lessonSource.count() - 1;
+  l4Next.disabled = false;
+  l4Next.textContent = lessonIndex === lessonSource.count() - 1 ? "Next lesson" : "Next";
 }
 
 l4Prev.addEventListener("click", () => {
@@ -881,8 +882,12 @@ l4Prev.addEventListener("click", () => {
 });
 
 l4Next.addEventListener("click", () => {
-  lessonIndex += 1;
-  renderLesson();
+  if (lessonIndex < lessonSource.count() - 1) {
+    lessonIndex += 1;
+    renderLesson();
+  } else {
+    window.location.href = (window.PAGE && window.PAGE.nextHref) || "index.html";
+  }
 });
 
 l4Walk.addEventListener("click", () => {

@@ -441,7 +441,10 @@
     }
     if (els.summaryClose) els.summaryClose.innerHTML = renderInline(d.summaryClose || "");
     if (els.prev) els.prev.disabled = idx === 0;
-    if (els.next) els.next.disabled = idx === drills.length - 1;
+    if (els.next) {
+      els.next.disabled = false;
+      els.next.textContent = idx === drills.length - 1 ? "Next lesson" : "Next";
+    }
   }
 
   function render() {
@@ -556,7 +559,10 @@
 
     els.result.hidden = true;
     if (els.prev) els.prev.disabled = idx === 0;
-    if (els.next) els.next.disabled = idx === drills.length - 1;
+    if (els.next) {
+      els.next.disabled = false;
+      els.next.textContent = idx === drills.length - 1 ? "Next lesson" : "Next";
+    }
   }
 
   // ---- actions ------------------------------------------------------------
@@ -728,6 +734,7 @@
   }
 
   // ---- wiring -------------------------------------------------------------
+  const nextHref = (window.PAGE && window.PAGE.nextHref) || "index.html";
   if (els.prev)
     els.prev.addEventListener("click", () => {
       idx -= 1;
@@ -735,8 +742,12 @@
     });
   if (els.next)
     els.next.addEventListener("click", () => {
-      idx += 1;
-      render();
+      if (idx < drills.length - 1) {
+        idx += 1;
+        render();
+      } else {
+        window.location.href = nextHref;
+      }
     });
   if (els.hint) els.hint.addEventListener("click", showHint);
   if (els.check) els.check.addEventListener("click", check);

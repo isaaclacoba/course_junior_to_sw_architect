@@ -15,7 +15,7 @@
       context:
         "A generic type works with any kind of value. You write a placeholder - `T` - in angle brackets, and the caller picks the real type. You have used `List<T>` already; now write your own. Define a `Box<T>` that holds one value of whatever type `T` is.",
       example:
-        "// List<T> is generic - it works for any T:\nList<int> nums = new List<int>();\n\n// You can define your own generic type the same way:\n// public class Holder<T> { ... }",
+        "// A property (get) plus a constructor that fills it:\npublic class Crate\n{\n    public string Label { get; }\n    public Crate(string label) { Label = label; }\n}\n\n// Box<T> has the same shape - just write T where string is.",
       goal: [
         "Define `public class Box<T>` with a `T Value` set through its constructor.",
         "Main makes a `Box<int>` holding 7 and prints `Value`, so the output is 7.",
@@ -67,7 +67,7 @@
       context:
         "A type can take more than one placeholder. `Pair<A, B>` holds two values whose types can differ - like a name and an age. Separate the placeholders with a comma.",
       example:
-        "// Two placeholders, separated by a comma:\n// public class Duo<A, B> { ... }\n// new Duo<string, bool>(\"on\", true)",
+        "// Two properties, both filled by the constructor:\npublic class Point\n{\n    public int X { get; }\n    public int Y { get; }\n    public Point(int x, int y) { X = x; Y = y; }\n}\n\n// Pair<A, B> is the same shape, with A and B instead of int.",
       goal: [
         "Define `public class Pair<A, B>` with a `First` of type `A` and a `Second` of type `B`, both set in the constructor.",
         "Main makes a `Pair<string, int>` of \"age\" and 3 and prints `First + \": \" + Second`, so the output is age: 3.",

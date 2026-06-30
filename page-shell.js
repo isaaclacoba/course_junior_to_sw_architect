@@ -176,11 +176,45 @@
           <p id="${p}ResultBody"></p>
         </section>
 
+        <section id="${p}Summary" class="summary-section" hidden>
+          <p id="${p}SummaryIntro" class="context"></p>
+          <ul id="${p}SummaryList" class="summary-list"></ul>
+          <p id="${p}SummaryClose" class="summary-close"></p>
+        </section>
+
         <footer class="nav-row">
           <button id="${p}Prev" class="btn" type="button">Previous</button>
           <button id="${p}Next" class="btn primary" type="button">Next</button>
         </footer>
       </section>`;
+  }
+
+  // Course order, so a lesson's final "Next" advances to the next lesson
+  // instead of dead-ending. Maintained in one place; a page may override by
+  // setting window.PAGE.nextHref itself.
+  const PRACTICAL = [
+    "level1.html", "level1-coding.html", "control-flow.html", "writing-methods.html",
+    "reading-objects.html", "level4.html", "first-builds.html", "wiring-it-up.html",
+    "collections.html", "data-shapes.html", "linq.html", "errors-null.html", "generics.html",
+    "encapsulation.html", "interfaces.html", "polymorphism.html", "composition.html",
+    "dependency-injection.html", "level2.html", "level3-app/",
+  ];
+  const THEORY = [
+    "theory-1.html", "theory-2.html", "theory-3.html", "theory-4.html", "theory-5.html",
+    "theory-6.html", "theory-7.html", "theory-8.html", "theory-9.html", "theory-10.html",
+    "theory-11.html", "theory-12.html", "theory-13.html", "theory-14.html",
+  ];
+  if (!page.nextHref) {
+    const current = (location.pathname.split("/").pop() || "").toLowerCase();
+    let href = "index.html";
+    for (const list of [PRACTICAL, THEORY]) {
+      const i = list.findIndex((f) => f.toLowerCase() === current);
+      if (i >= 0) {
+        href = i < list.length - 1 ? list[i + 1] : "index.html";
+        break;
+      }
+    }
+    page.nextHref = href;
   }
 
   hero.innerHTML = heroHTML(page.hero);

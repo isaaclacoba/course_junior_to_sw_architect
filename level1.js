@@ -360,7 +360,8 @@ function renderTopic() {
   void renderLevel1Diagram(topic);
 
   l1Prev.disabled = topicIndex === 0;
-  l1Next.disabled = topicIndex === topics.length - 1;
+  l1Next.disabled = false;
+  l1Next.textContent = topicIndex === topics.length - 1 ? "Next lesson" : "Next";
 }
 
 l1Prev.addEventListener("click", () => {
@@ -369,8 +370,12 @@ l1Prev.addEventListener("click", () => {
 });
 
 l1Next.addEventListener("click", () => {
-  topicIndex += 1;
-  renderTopic();
+  if (topicIndex < topics.length - 1) {
+    topicIndex += 1;
+    renderTopic();
+  } else {
+    window.location.href = (window.PAGE && window.PAGE.nextHref) || "index.html";
+  }
 });
 
 renderTopic();

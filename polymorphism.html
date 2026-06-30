@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Build with objects - Why many versions?</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="vendor/code-lab/code-lab.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <section class="hero" id="pageHero"></section>
+    </main>
+
+    <script>
+      window.PAGE = {
+        hero: {
+          eyebrow: "Part four \u00b7 Build with objects",
+          title: "Why many versions?",
+          intro: [
+            "Why have several versions of the same logic instead of one method full of branches? An if-per-animal method that keeps growing, versus one call each animal resolves itself, one loop over a whole pen, choosing the animal at runtime, and adding one without touching the loop.",
+          ],
+          links: [{ href: "index.html", label: "Back to the course" }],
+        },
+        archetype: "build",
+        prefix: "poly",
+      };
+    </script>
+
+    <script src="vendor/code-lab/code-lab.global.js"></script>
+    <script src="page-shell.js"></script>
+    <script src="polymorphism.js"></script>
+    <script src="build-engine.js"></script>
+  </body>
+</html>
