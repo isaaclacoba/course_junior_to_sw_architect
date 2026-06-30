@@ -28,7 +28,7 @@
         { pattern: /\.\s*Speak\s*\(/, message: "Return the cat's `Speak()`." },
       ],
       starter:
-        'using System;\n\npublic class Cat\n{\n    public string Speak() => "Meow";\n}\n\npublic class Keeper\n{\n    public string Greet()\n    {\n        // TODO: build a new Cat here and return its Speak()\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine(new Keeper().Greet());\n    }\n}\n',
+        'using System;\n\npublic class Cat\n{\n    public string Speak() => "Meow";\n}\n\npublic class Keeper\n{\n    public string Greet()\n    {\n        // TODO: make a Cat right here and have it speak\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine(new Keeper().Greet());\n    }\n}\n',
       solution:
         'using System;\n\npublic class Cat\n{\n    public string Speak() => "Meow";\n}\n\npublic class Keeper\n{\n    public string Greet()\n    {\n        var pet = new Cat();\n        return pet.Speak();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine(new Keeper().Greet());\n    }\n}\n',
     },
@@ -49,7 +49,7 @@
         { pattern: /\.\s*Speak\s*\(/, message: "Return the dog's `Speak()`." },
       ],
       starter:
-        'using System;\n\npublic class Dog\n{\n    public string Speak() => "Woof";\n}\n\npublic class Keeper\n{\n    public string Greet()\n    {\n        // TODO: this used to build a Cat - change it to a Dog\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine(new Keeper().Greet());\n    }\n}\n',
+        'using System;\n\npublic class Dog\n{\n    public string Speak() => "Woof";\n}\n\npublic class Keeper\n{\n    public string Greet()\n    {\n        // TODO: the keeper now needs a Dog instead - build one here and have it speak\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine(new Keeper().Greet());\n    }\n}\n',
       solution:
         'using System;\n\npublic class Dog\n{\n    public string Speak() => "Woof";\n}\n\npublic class Keeper\n{\n    public string Greet()\n    {\n        var pet = new Dog();\n        return pet.Speak();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine(new Keeper().Greet());\n    }\n}\n',
     },
@@ -69,7 +69,7 @@
         { pattern: /_dog\s*\.\s*Speak/, message: "Use the dog you were handed: `_dog.Speak()`." },
       ],
       starter:
-        'using System;\n\npublic class Dog\n{\n    public string Speak() => "Woof";\n}\n\npublic class Keeper\n{\n    private readonly Dog _dog;\n\n    public Keeper(Dog dog)\n    {\n        // TODO: keep the dog that was handed in\n    }\n\n    public string Greet()\n    {\n        // TODO: return _dog.Speak()\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var keeper = new Keeper(new Dog());\n        Console.WriteLine(keeper.Greet());\n    }\n}\n',
+        'using System;\n\npublic class Dog\n{\n    public string Speak() => "Woof";\n}\n\npublic class Keeper\n{\n    private readonly Dog _dog;\n\n    public Keeper(Dog dog)\n    {\n        // TODO: store the dog passed in, so Greet can use it later\n    }\n\n    public string Greet()\n    {\n        // TODO: have the kept dog speak\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var keeper = new Keeper(new Dog());\n        Console.WriteLine(keeper.Greet());\n    }\n}\n',
       solution:
         'using System;\n\npublic class Dog\n{\n    public string Speak() => "Woof";\n}\n\npublic class Keeper\n{\n    private readonly Dog _dog;\n\n    public Keeper(Dog dog)\n    {\n        _dog = dog;\n    }\n\n    public string Greet()\n    {\n        return _dog.Speak();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var keeper = new Keeper(new Dog());\n        Console.WriteLine(keeper.Greet());\n    }\n}\n',
     },
@@ -95,7 +95,7 @@
         message: "A dog must fit the same keeper. Depend on IAnimal so any animal can be injected.",
       },
       starter:
-        'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() => "Meow";\n}\n\npublic class Dog : IAnimal\n{\n    public string Speak() => "Woof";\n}\n\npublic class Keeper\n{\n    // TODO: hold an IAnimal, take one in the constructor, and use it in Greet\n\n    public string Greet()\n    {\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var keeper = new Keeper(new Cat());\n        Console.WriteLine(keeper.Greet());\n    }\n}\n',
+        'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() => "Meow";\n}\n\npublic class Dog : IAnimal\n{\n    public string Speak() => "Woof";\n}\n\npublic class Keeper\n{\n    // TODO: let the keeper be handed any IAnimal, and have Greet use it\n\n    public string Greet()\n    {\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var keeper = new Keeper(new Cat());\n        Console.WriteLine(keeper.Greet());\n    }\n}\n',
       solution:
         'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() => "Meow";\n}\n\npublic class Dog : IAnimal\n{\n    public string Speak() => "Woof";\n}\n\npublic class Keeper\n{\n    private readonly IAnimal _animal;\n    public Keeper(IAnimal animal) { _animal = animal; }\n\n    public string Greet()\n    {\n        return _animal.Speak();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var keeper = new Keeper(new Cat());\n        Console.WriteLine(keeper.Greet());\n    }\n}\n',
     },
@@ -121,7 +121,7 @@
         message: "The keeper must use the stand-in it is handed, so a ToyDog makes Greet say squeak.",
       },
       starter:
-        'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Keeper\n{\n    private readonly IAnimal _animal;\n    public Keeper(IAnimal animal) { _animal = animal; }\n    public string Greet() => _animal.Speak();\n}\n\npublic class ToyDog : IAnimal\n{\n    // TODO: always return "squeak"\n    public string Speak() => "";\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var keeper = new Keeper(new ToyDog());\n        string sound = keeper.Greet();\n        Console.WriteLine(sound == "squeak" ? "rehearsal ok" : "rehearsal off");\n    }\n}\n',
+        'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Keeper\n{\n    private readonly IAnimal _animal;\n    public Keeper(IAnimal animal) { _animal = animal; }\n    public string Greet() => _animal.Speak();\n}\n\npublic class ToyDog : IAnimal\n{\n    // TODO: the toy always makes the same pretend sound\n    public string Speak() => "";\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var keeper = new Keeper(new ToyDog());\n        string sound = keeper.Greet();\n        Console.WriteLine(sound == "squeak" ? "rehearsal ok" : "rehearsal off");\n    }\n}\n',
       solution:
         'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Keeper\n{\n    private readonly IAnimal _animal;\n    public Keeper(IAnimal animal) { _animal = animal; }\n    public string Greet() => _animal.Speak();\n}\n\npublic class ToyDog : IAnimal\n{\n    public string Speak() => "squeak";\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var keeper = new Keeper(new ToyDog());\n        string sound = keeper.Greet();\n        Console.WriteLine(sound == "squeak" ? "rehearsal ok" : "rehearsal off");\n    }\n}\n',
     },

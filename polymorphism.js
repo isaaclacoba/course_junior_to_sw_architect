@@ -30,7 +30,7 @@
         message: "Meow is right for the cat only. Each branch must answer for the animal it is asked about.",
       },
       starter:
-        'using System;\n\npublic class Zoo\n{\n    public string Sound(string kind)\n    {\n        // TODO: "cat" -> Meow ; "dog" -> Woof\n        return "?";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var zoo = new Zoo();\n        Console.WriteLine(zoo.Sound("cat"));\n    }\n}\n',
+        'using System;\n\npublic class Zoo\n{\n    public string Sound(string kind)\n    {\n        // TODO: answer with the right sound for "cat" and for "dog"\n        return "?";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var zoo = new Zoo();\n        Console.WriteLine(zoo.Sound("cat"));\n    }\n}\n',
       solution:
         'using System;\n\npublic class Zoo\n{\n    public string Sound(string kind)\n    {\n        if (kind == "cat") return "Meow";\n        if (kind == "dog") return "Woof";\n        return "?";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var zoo = new Zoo();\n        Console.WriteLine(zoo.Sound("cat"));\n    }\n}\n',
     },
@@ -53,7 +53,7 @@
         message: "The dog must return its own sound, whichever order the animals speak in.",
       },
       starter:
-        'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() => "Meow";\n}\n\npublic class Dog : IAnimal\n{\n    // TODO: return "Woof"\n    public string Speak() => "";\n}\n\nclass Program\n{\n    static void Main()\n    {\n        IAnimal a = new Cat();\n        IAnimal b = new Dog();\n        Console.WriteLine(a.Speak());\n        Console.WriteLine(b.Speak());\n    }\n}\n',
+        'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() => "Meow";\n}\n\npublic class Dog : IAnimal\n{\n    // TODO: give the dog its own sound\n    public string Speak() => "";\n}\n\nclass Program\n{\n    static void Main()\n    {\n        IAnimal a = new Cat();\n        IAnimal b = new Dog();\n        Console.WriteLine(a.Speak());\n        Console.WriteLine(b.Speak());\n    }\n}\n',
       solution:
         'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() => "Meow";\n}\n\npublic class Dog : IAnimal\n{\n    public string Speak() => "Woof";\n}\n\nclass Program\n{\n    static void Main()\n    {\n        IAnimal a = new Cat();\n        IAnimal b = new Dog();\n        Console.WriteLine(a.Speak());\n        Console.WriteLine(b.Speak());\n    }\n}\n',
     },
@@ -74,7 +74,7 @@
         { pattern: /foreach/, message: "Walk them with a single `foreach` loop." },
       ],
       starter:
-        'using System;\nusing System.Collections.Generic;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() => "Meow";\n}\n\npublic class Dog : IAnimal\n{\n    public string Speak() => "Woof";\n}\n\nclass Program\n{\n    static void Main()\n    {\n        // TODO: build a List<IAnimal> with a Cat then a Dog,\n        //       then foreach over it printing Speak() for each\n    }\n}\n',
+        'using System;\nusing System.Collections.Generic;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() => "Meow";\n}\n\npublic class Dog : IAnimal\n{\n    public string Speak() => "Woof";\n}\n\nclass Program\n{\n    static void Main()\n    {\n        // TODO: collect a Cat and a Dog together in one list,\n        //       then go through them and print what each one says\n    }\n}\n',
       solution:
         'using System;\nusing System.Collections.Generic;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() => "Meow";\n}\n\npublic class Dog : IAnimal\n{\n    public string Speak() => "Woof";\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var pen = new List<IAnimal> { new Cat(), new Dog() };\n        foreach (var a in pen)\n            Console.WriteLine(a.Speak());\n    }\n}\n',
     },
@@ -100,7 +100,7 @@
         message: "Woof is right for adopting a dog only. Return the animal that matches the name passed in.",
       },
       starter:
-        'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() => "Meow";\n}\n\npublic class Dog : IAnimal\n{\n    public string Speak() => "Woof";\n}\n\npublic class Shelter\n{\n    // TODO: return a new Dog when kind is "dog", otherwise a new Cat\n    public IAnimal Adopt(string kind)\n    {\n        return null;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var shelter = new Shelter();\n        IAnimal a = shelter.Adopt("dog");\n        Console.WriteLine(a.Speak());\n    }\n}\n',
+        'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() => "Meow";\n}\n\npublic class Dog : IAnimal\n{\n    public string Speak() => "Woof";\n}\n\npublic class Shelter\n{\n    // TODO: hand back the matching animal for the kind asked for\n    public IAnimal Adopt(string kind)\n    {\n        return null;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var shelter = new Shelter();\n        IAnimal a = shelter.Adopt("dog");\n        Console.WriteLine(a.Speak());\n    }\n}\n',
       solution:
         'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() => "Meow";\n}\n\npublic class Dog : IAnimal\n{\n    public string Speak() => "Woof";\n}\n\npublic class Shelter\n{\n    public IAnimal Adopt(string kind)\n    {\n        return kind == "dog" ? new Dog() : new Cat();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var shelter = new Shelter();\n        IAnimal a = shelter.Adopt("dog");\n        Console.WriteLine(a.Speak());\n    }\n}\n',
     },
@@ -120,7 +120,7 @@
         { pattern: /class\s+Owl\s*:\s*IAnimal/, message: "Make `Owl` keep the promise: `: IAnimal`." },
       ],
       starter:
-        'using System;\nusing System.Collections.Generic;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() => "Meow";\n}\n\npublic class Dog : IAnimal\n{\n    public string Speak() => "Woof";\n}\n\npublic class Owl : IAnimal\n{\n    // TODO: return "Hoot"\n    public string Speak() => "";\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var pen = new List<IAnimal>\n        {\n            new Cat(),\n            new Dog(),\n            new Owl(),\n        };\n        foreach (var a in pen)\n            Console.WriteLine(a.Speak());\n    }\n}\n',
+        'using System;\nusing System.Collections.Generic;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() => "Meow";\n}\n\npublic class Dog : IAnimal\n{\n    public string Speak() => "Woof";\n}\n\npublic class Owl : IAnimal\n{\n    // TODO: give the owl its own sound\n    public string Speak() => "";\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var pen = new List<IAnimal>\n        {\n            new Cat(),\n            new Dog(),\n            new Owl(),\n        };\n        foreach (var a in pen)\n            Console.WriteLine(a.Speak());\n    }\n}\n',
       solution:
         'using System;\nusing System.Collections.Generic;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() => "Meow";\n}\n\npublic class Dog : IAnimal\n{\n    public string Speak() => "Woof";\n}\n\npublic class Owl : IAnimal\n{\n    public string Speak() => "Hoot";\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var pen = new List<IAnimal>\n        {\n            new Cat(),\n            new Dog(),\n            new Owl(),\n        };\n        foreach (var a in pen)\n            Console.WriteLine(a.Speak());\n    }\n}\n',
     },

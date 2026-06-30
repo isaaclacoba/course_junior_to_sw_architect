@@ -27,7 +27,7 @@
         { pattern: /class\s+Dog\s*:\s*Animal/, message: "Make the is-a claim: `class Dog : Animal`." },
       ],
       starter:
-        'using System;\n\npublic class Animal\n{\n    public string Breathe() => "breathing";\n}\n\n// TODO: make Dog inherit Animal and add Fetch() returning "fetching"\npublic class Dog\n{\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var d = new Dog();\n        Console.WriteLine(d.Breathe());\n        Console.WriteLine(d.Fetch());\n    }\n}\n',
+        'using System;\n\npublic class Animal\n{\n    public string Breathe() => "breathing";\n}\n\n// TODO: a Dog is an Animal - say so, and give the dog its own Fetch() trick\npublic class Dog\n{\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var d = new Dog();\n        Console.WriteLine(d.Breathe());\n        Console.WriteLine(d.Fetch());\n    }\n}\n',
       solution:
         'using System;\n\npublic class Animal\n{\n    public string Breathe() => "breathing";\n}\n\npublic class Dog : Animal\n{\n    public string Fetch() => "fetching";\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var d = new Dog();\n        Console.WriteLine(d.Breathe());\n        Console.WriteLine(d.Fetch());\n    }\n}\n',
     },
@@ -53,7 +53,7 @@
         message: "HELLO is right for that one word only. Talk must pass the real Word to the megaphone.",
       },
       starter:
-        'using System;\n\npublic class Megaphone\n{\n    public string Boost(string s) => s.ToUpper();\n}\n\npublic class Parrot\n{\n    public string Word = "";\n\n    // TODO: hold a Megaphone, and return _mega.Boost(Word) from Talk()\n    public string Talk()\n    {\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var p = new Parrot { Word = "hello" };\n        Console.WriteLine(p.Talk());\n    }\n}\n',
+        'using System;\n\npublic class Megaphone\n{\n    public string Boost(string s) => s.ToUpper();\n}\n\npublic class Parrot\n{\n    public string Word = "";\n\n    // TODO: give the parrot its own Megaphone, and have Talk() use it on the Word\n    public string Talk()\n    {\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var p = new Parrot { Word = "hello" };\n        Console.WriteLine(p.Talk());\n    }\n}\n',
       solution:
         'using System;\n\npublic class Megaphone\n{\n    public string Boost(string s) => s.ToUpper();\n}\n\npublic class Parrot\n{\n    public string Word = "";\n    private Megaphone _mega = new Megaphone();\n\n    public string Talk()\n    {\n        return _mega.Boost(Word);\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var p = new Parrot { Word = "hello" };\n        Console.WriteLine(p.Talk());\n    }\n}\n',
     },
@@ -75,7 +75,7 @@
         { pattern: /Paws\s+\w+/, message: "Hold a `Paws` part." },
       ],
       starter:
-        'using System;\n\npublic class Wings { public string Fly() => "flying"; }\npublic class Fins  { public string Swim() => "swimming"; }\npublic class Paws  { public string Run() => "running"; }\n\npublic class Chimera\n{\n    // TODO: hold a Wings, a Fins and a Paws as parts\n\n    public string Go()\n    {\n        // TODO: return the wings\' Fly()\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine(new Chimera().Go());\n    }\n}\n',
+        'using System;\n\npublic class Wings { public string Fly() => "flying"; }\npublic class Fins  { public string Swim() => "swimming"; }\npublic class Paws  { public string Run() => "running"; }\n\npublic class Chimera\n{\n    // TODO: give the chimera three parts of its own: wings, fins and paws\n\n    public string Go()\n    {\n        // TODO: take off - use the wings part\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine(new Chimera().Go());\n    }\n}\n',
       solution:
         'using System;\n\npublic class Wings { public string Fly() => "flying"; }\npublic class Fins  { public string Swim() => "swimming"; }\npublic class Paws  { public string Run() => "running"; }\n\npublic class Chimera\n{\n    private Wings _wings = new Wings();\n    private Fins _fins = new Fins();\n    private Paws _paws = new Paws();\n\n    public string Go()\n    {\n        return _wings.Fly();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine(new Chimera().Go());\n    }\n}\n',
     },
@@ -96,7 +96,7 @@
         { pattern: /_paws\s*\.\s*Run/, message: "Ask the paws part with `_paws.Run()`." },
       ],
       starter:
-        'using System;\n\npublic class Wings { public string Fly() => "flying"; }\npublic class Fins  { public string Swim() => "swimming"; }\npublic class Paws  { public string Run() => "running"; }\n\npublic class Chimera\n{\n    private Wings _wings = new Wings();\n    private Fins _fins = new Fins();\n    private Paws _paws = new Paws();\n\n    public string Show()\n    {\n        // TODO: return _wings.Fly() + ", " + _fins.Swim() + ", " + _paws.Run()\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine(new Chimera().Show());\n    }\n}\n',
+        'using System;\n\npublic class Wings { public string Fly() => "flying"; }\npublic class Fins  { public string Swim() => "swimming"; }\npublic class Paws  { public string Run() => "running"; }\n\npublic class Chimera\n{\n    private Wings _wings = new Wings();\n    private Fins _fins = new Fins();\n    private Paws _paws = new Paws();\n\n    public string Show()\n    {\n        // TODO: ask all three parts in turn and join their moves with ", "\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine(new Chimera().Show());\n    }\n}\n',
       solution:
         'using System;\n\npublic class Wings { public string Fly() => "flying"; }\npublic class Fins  { public string Swim() => "swimming"; }\npublic class Paws  { public string Run() => "running"; }\n\npublic class Chimera\n{\n    private Wings _wings = new Wings();\n    private Fins _fins = new Fins();\n    private Paws _paws = new Paws();\n\n    public string Show()\n    {\n        return _wings.Fly() + ", " + _fins.Swim() + ", " + _paws.Run();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine(new Chimera().Show());\n    }\n}\n',
     },
@@ -122,7 +122,7 @@
         message: "The creature must use whatever legs it is handed. With DogLegs, Move should say running.",
       },
       starter:
-        'using System;\n\npublic interface ILegs\n{\n    string Run();\n}\n\npublic class DogLegs : ILegs\n{\n    public string Run() => "running";\n}\n\npublic class CheetahLegs : ILegs\n{\n    // TODO: return "sprinting"\n    public string Run() => "";\n}\n\npublic class Chimera\n{\n    private readonly ILegs _legs;\n    public Chimera(ILegs legs) { _legs = legs; }\n    public string Move() => _legs.Run();\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var c = new Chimera(new CheetahLegs());\n        Console.WriteLine(c.Move());\n    }\n}\n',
+        'using System;\n\npublic interface ILegs\n{\n    string Run();\n}\n\npublic class DogLegs : ILegs\n{\n    public string Run() => "running";\n}\n\npublic class CheetahLegs : ILegs\n{\n    // TODO: cheetah legs are fast - give them their own Run()\n    public string Run() => "";\n}\n\npublic class Chimera\n{\n    private readonly ILegs _legs;\n    public Chimera(ILegs legs) { _legs = legs; }\n    public string Move() => _legs.Run();\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var c = new Chimera(new CheetahLegs());\n        Console.WriteLine(c.Move());\n    }\n}\n',
       solution:
         'using System;\n\npublic interface ILegs\n{\n    string Run();\n}\n\npublic class DogLegs : ILegs\n{\n    public string Run() => "running";\n}\n\npublic class CheetahLegs : ILegs\n{\n    public string Run() => "sprinting";\n}\n\npublic class Chimera\n{\n    private readonly ILegs _legs;\n    public Chimera(ILegs legs) { _legs = legs; }\n    public string Move() => _legs.Run();\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var c = new Chimera(new CheetahLegs());\n        Console.WriteLine(c.Move());\n    }\n}\n',
     },

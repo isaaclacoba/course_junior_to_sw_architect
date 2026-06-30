@@ -55,7 +55,7 @@
         message: "Mittens: guilty is right for a guilty cat only. Decide the verdict from the flag, do not hardcode it.",
       },
       starter:
-        'using System;\n\npublic class Cat\n{\n    public string Name = "";\n    public bool KnockedSomethingOver;\n\n    // TODO: a Verdict() returning Name + ": guilty" when KnockedSomethingOver, otherwise Name + ": innocent"\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var c = new Cat { Name = "Mittens", KnockedSomethingOver = true };\n        Console.WriteLine(c.Verdict());\n    }\n}\n',
+        'using System;\n\npublic class Cat\n{\n    public string Name = "";\n    public bool KnockedSomethingOver;\n\n    // TODO: add a Verdict() that gives the name plus whether the cat is guilty or innocent\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var c = new Cat { Name = "Mittens", KnockedSomethingOver = true };\n        Console.WriteLine(c.Verdict());\n    }\n}\n',
       solution:
         'using System;\n\npublic class Cat\n{\n    public string Name = "";\n    public bool KnockedSomethingOver;\n\n    public string Verdict()\n    {\n        return Name + ": " + (KnockedSomethingOver ? "guilty" : "innocent");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var c = new Cat { Name = "Mittens", KnockedSomethingOver = true };\n        Console.WriteLine(c.Verdict());\n    }\n}\n',
     },
@@ -131,7 +131,7 @@
         message: "Right for the first two only. The one Verdict rule must serve every cat.",
       },
       starter:
-        'using System;\n\npublic class Cat\n{\n    public string Name = "";\n    public bool KnockedSomethingOver;\n\n    // The whole program judges cats through this one method. Change the wording here.\n    public string Verdict()\n    {\n        // TODO: return Name + ": naughty" when KnockedSomethingOver, otherwise Name + ": good"\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var a = new Cat { Name = "Mittens", KnockedSomethingOver = true };\n        var b = new Cat { Name = "Smudge", KnockedSomethingOver = false };\n        Console.WriteLine(a.Verdict());\n        Console.WriteLine(b.Verdict());\n    }\n}\n',
+        'using System;\n\npublic class Cat\n{\n    public string Name = "";\n    public bool KnockedSomethingOver;\n\n    // The whole program judges cats through this one method. Change the wording here.\n    public string Verdict()\n    {\n        // TODO: build the verdict from the name - naughty if it knocked something over, good if not\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var a = new Cat { Name = "Mittens", KnockedSomethingOver = true };\n        var b = new Cat { Name = "Smudge", KnockedSomethingOver = false };\n        Console.WriteLine(a.Verdict());\n        Console.WriteLine(b.Verdict());\n    }\n}\n',
       solution:
         'using System;\n\npublic class Cat\n{\n    public string Name = "";\n    public bool KnockedSomethingOver;\n\n    public string Verdict()\n    {\n        return Name + ": " + (KnockedSomethingOver ? "naughty" : "good");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var a = new Cat { Name = "Mittens", KnockedSomethingOver = true };\n        var b = new Cat { Name = "Smudge", KnockedSomethingOver = false };\n        Console.WriteLine(a.Verdict());\n        Console.WriteLine(b.Verdict());\n    }\n}\n',
     },
