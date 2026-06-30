@@ -176,7 +176,7 @@
         { title: "Debugging - ", text: "finding and fixing the cause, step by step." },
         { title: "Normal - ", text: "all software has bugs; finding and fixing is the skill." },
       ],
-      summaryClose: "That completes Part two. You now have the vocabulary of code - languages, variables, types, statements, decisions, functions and bugs. The practical track is where you write it all in real C#.",
+      summaryClose: "That completes Part two. You now have the vocabulary of code - languages, variables, types, statements, decisions, functions and bugs. Next, Part three: how software really runs, remembers and connects.",
       blanks: [],
     },
   ];

@@ -203,6 +203,8 @@
     "theory-1.html", "theory-2.html", "theory-3.html", "theory-4.html", "theory-5.html",
     "theory-6.html", "theory-7.html", "theory-8.html", "theory-9.html", "theory-10.html",
     "theory-11.html", "theory-12.html", "theory-13.html", "theory-14.html",
+    "theory-15.html", "theory-16.html", "theory-17.html", "theory-18.html", "theory-19.html",
+    "theory-20.html",
   ];
   if (!page.nextHref) {
     const current = (location.pathname.split("/").pop() || "").toLowerCase();
