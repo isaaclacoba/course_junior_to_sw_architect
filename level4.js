@@ -709,7 +709,10 @@ const lessonSource = new ArrayLessonSource(lessons);
 const tour = new CodeLab.Tour({ language: "csharp" });
 const runner = new CodeLab.RoslynIframeRunner({ url: "level3-app/index.html?runner=1" });
 
-let lessonIndex = 0;
+let lessonIndex = (function () {
+  const n = parseInt((location.hash || "").replace(/[^0-9]/g, ""), 10);
+  return Number.isFinite(n) ? Math.min(Math.max(n - 1, 0), lessonSource.count() - 1) : 0;
+})();
 
 const l4Meta = document.getElementById("l4Meta");
 const l4Title = document.getElementById("l4Title");
@@ -871,6 +874,7 @@ function renderLesson() {
   l4Output.textContent = "";
   l4Output.classList.remove("is-error");
 
+  try { history.replaceState(null, "", "#" + (lessonIndex + 1)); } catch (e) {}
   l4Prev.disabled = lessonIndex === 0;
   l4Next.disabled = false;
   l4Next.textContent = lessonIndex === lessonSource.count() - 1 ? "Next lesson" : "Next";
@@ -887,6 +891,15 @@ l4Next.addEventListener("click", () => {
     renderLesson();
   } else {
     window.location.href = (window.PAGE && window.PAGE.nextHref) || "index.html";
+  }
+});
+
+window.addEventListener("hashchange", () => {
+  const n = parseInt((location.hash || "").replace(/[^0-9]/g, ""), 10);
+  const next = Number.isFinite(n) ? Math.min(Math.max(n - 1, 0), lessonSource.count() - 1) : 0;
+  if (next !== lessonIndex) {
+    lessonIndex = next;
+    renderLesson();
   }
 });
 

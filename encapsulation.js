@@ -1,52 +1,53 @@
-// Part four - "Why objects?" (encapsulation). Write-from-scratch builds, same
-// engine and style as First Builds / Data shapes. It answers the junior's
-// question: why classes and methods at all - why not one big monolithic Main?
-// The five tasks build the answer by feel: group related data, put the behaviour
-// next to it, hide the inside, guard a rule, then change that rule in one place.
-// Each task is graded so the concept is unavoidable - a verify probe re-runs the
-// learner's type with different values, so a hardcoded answer fails.
-// Data only: build-engine.js reads window.BUILD_CONFIG. Animal flavour throughout.
+// Part four - "Why objects?" (encapsulation). Write-from-scratch builds: the
+// learner writes the class themselves; only the usage in Main is given. The five
+// tasks build the case for objects - hold related data together, put behaviour
+// with it, hide the inside, guard a rule, then change that rule in one place.
+// A verify probe re-runs the learner's own type with different values, so a
+// hardcoded answer fails. Data only: build-engine.js reads window.BUILD_CONFIG.
 (function () {
   "use strict";
 
   const tasks = [
     {
-      title: "Keep related data together",
+      title: "Write a class to hold state",
       concept: "Group state",
       context:
-        "In one big `Main`, a cat's name and whether it knocked something over are two loose variables. Nothing keeps them in step - it is easy to print one cat's name next to another cat's mischief. A `class` ties related data into one thing that travels together. Give `Cat` a `Name` and a `KnockedSomethingOver` so they cannot drift apart.",
+        "Loose variables drift apart - it is easy to print one cat's name next to another cat's mischief. A `class` ties related data into one thing. Write a `Cat` class that holds a `Name` and whether it `KnockedSomethingOver`, so they always travel together.",
       example:
-        'public class Dog\n{\n    public string Name = "";\n    public int Legs;\n}\n\nvar d = new Dog { Name = "Rex", Legs = 4 };',
+        'public class Dog\n{\n    public string Name = "";\n    public int Legs;\n}',
       goal: [
-        "Give `Cat` a `Name` (string) and a `KnockedSomethingOver` (bool).",
-        "Main builds Mittens, who did knock something over, so the output is Mittens: True.",
+        "Write a `Cat` class with a `Name` (string) and a `KnockedSomethingOver` (bool).",
+        "Main builds Mittens (guilty) and prints the result, so the output is Mittens: True.",
       ],
       expected: "Mittens: True",
+      requireSource: [
+        { pattern: /class\s+Cat/, message: "Write a `Cat` class of your own." },
+      ],
       verify: {
         main:
           'class Program\n{\n    static void Main()\n    {\n        var c = new Cat { Name = "Smudge", KnockedSomethingOver = false };\n        Console.WriteLine(c.Name + ": " + c.KnockedSomethingOver);\n    }\n}\n',
         expected: "Smudge: False",
-        message: "Mittens: True is right for that one cat only. Cat must hold whatever Name and flag it is given.",
+        message: "Mittens: True is right for that one cat only. Your Cat must hold whatever Name and flag it is given.",
       },
       starter:
-        'using System;\n\npublic class Cat\n{\n    // TODO: add a Name (string) and a KnockedSomethingOver (bool) so they travel together\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var c = new Cat { Name = "Mittens", KnockedSomethingOver = true };\n        Console.WriteLine(c.Name + ": " + c.KnockedSomethingOver);\n    }\n}\n',
+        'using System;\n\n// TODO: write a Cat class that holds two pieces of data:\n//   - a Name (string)\n//   - a KnockedSomethingOver (bool)\n\nclass Program\n{\n    static void Main()\n    {\n        var c = new Cat { Name = "Mittens", KnockedSomethingOver = true };\n        Console.WriteLine(c.Name + ": " + c.KnockedSomethingOver);\n    }\n}\n',
       solution:
         'using System;\n\npublic class Cat\n{\n    public string Name = "";\n    public bool KnockedSomethingOver;\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var c = new Cat { Name = "Mittens", KnockedSomethingOver = true };\n        Console.WriteLine(c.Name + ": " + c.KnockedSomethingOver);\n    }\n}\n',
     },
     {
-      title: "Put the behaviour next to the data",
+      title: "Put the behaviour with the data",
       concept: "Behaviour with state",
       context:
-        "In a monolith, the rule for turning that flag into a verdict floats somewhere far from the cat it talks about. An object keeps the behaviour beside the state it needs. Give `Cat` a `Verdict()` method, so the cat that knows what it did also knows how to own up to it.",
+        "An object keeps the behaviour beside the state it needs. The `Cat` already holds its data; now give it a `Verdict()` method that turns that data into a sentence. Write the method so the cat that knows what it did also knows how to own up to it.",
       example:
-        'public class Dog\n{\n    public string Name = "";\n    public string Greet() => Name + " says woof";\n}',
+        'public class Dog\n{\n    public string Name = "";\n    public string Greet()\n    {\n        return Name + " says woof";\n    }\n}',
       goal: [
-        "Add a `Verdict()` that returns `Name + \": guilty\"` when `KnockedSomethingOver`, otherwise `Name + \": innocent\"`.",
-        "Main judges Mittens, who is guilty, so the output is Mittens: guilty.",
+        "Add a `Verdict()` method to `Cat`. It returns the `Name`, then `\": guilty\"` if it knocked something over, otherwise `\": innocent\"`.",
+        "Main judges Mittens (guilty), so the output is Mittens: guilty.",
       ],
       expected: "Mittens: guilty",
       requireSource: [
-        { pattern: /string\s+Verdict\s*\(/, message: "Add a `Verdict()` method that returns a string." },
+        { pattern: /string\s+Verdict\s*\(/, message: "Write a `Verdict()` method that returns a string." },
       ],
       verify: {
         main:
@@ -55,98 +56,103 @@
         message: "Mittens: guilty is right for a guilty cat only. Decide the verdict from the flag, do not hardcode it.",
       },
       starter:
-        'using System;\n\npublic class Cat\n{\n    public string Name = "";\n    public bool KnockedSomethingOver;\n\n    // TODO: add a Verdict() that gives the name plus whether the cat is guilty or innocent\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var c = new Cat { Name = "Mittens", KnockedSomethingOver = true };\n        Console.WriteLine(c.Verdict());\n    }\n}\n',
+        'using System;\n\npublic class Cat\n{\n    public string Name = "";\n    public bool KnockedSomethingOver;\n\n    // TODO: write a Verdict() method.\n    // It returns Name, then ": guilty" if KnockedSomethingOver is true,\n    // otherwise ": innocent".\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var c = new Cat { Name = "Mittens", KnockedSomethingOver = true };\n        Console.WriteLine(c.Verdict());\n    }\n}\n',
       solution:
-        'using System;\n\npublic class Cat\n{\n    public string Name = "";\n    public bool KnockedSomethingOver;\n\n    public string Verdict()\n    {\n        return Name + ": " + (KnockedSomethingOver ? "guilty" : "innocent");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var c = new Cat { Name = "Mittens", KnockedSomethingOver = true };\n        Console.WriteLine(c.Verdict());\n    }\n}\n',
+        'using System;\n\npublic class Cat\n{\n    public string Name = "";\n    public bool KnockedSomethingOver;\n\n    public string Verdict()\n    {\n        if (KnockedSomethingOver)\n        {\n            return Name + ": guilty";\n        }\n        return Name + ": innocent";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var c = new Cat { Name = "Mittens", KnockedSomethingOver = true };\n        Console.WriteLine(c.Verdict());\n    }\n}\n',
     },
     {
       title: "Hide the inside",
       concept: "private state",
       context:
-        "If the treat count is a public field, any line anywhere can set it to nonsense, and a missing treat could come from anywhere. So the count is kept `private` - only the jar can touch it - with a read-only `Treats` to peek at it. Both are written for you; read them, then write the one method allowed to change the count.",
+        "If a count is a public field, any line anywhere can set it to nonsense. Write a `ScoreBoard` class that keeps its count `private`, so only the class itself can change it. The outside adds to it through a method and reads it through another - it can never reach in and corrupt it.",
       example:
-        'public class Clicks\n{\n    private int _n;\n    public int Count => _n;\n    public void Click() => _n++;\n}',
+        'public class Clicks\n{\n    private int _n;\n    public void Click() { _n++; }\n    public int Total() { return _n; }\n}',
       goal: [
-        "The `private` count and the read-only `Treats` are already written - leave them as they are.",
-        "Make `Give(bool goodBoy)` add one to the count only when `goodBoy` is true.",
+        "Write a `ScoreBoard` with a `private` count, a `Give(bool goodBoy)` that adds one only when `goodBoy` is true, and a `Total()` that returns the count.",
         "Main gives to true, true, false, so the output is 2.",
       ],
       expected: "2",
       requireSource: [
-        { pattern: /private/, message: "Keep the count `private` so only TreatJar can change it." },
+        { pattern: /class\s+ScoreBoard/, message: "Write a `ScoreBoard` class." },
+        { pattern: /private/, message: "Keep the count `private` so only ScoreBoard can change it." },
       ],
       verify: {
         main:
-          'class Program\n{\n    static void Main()\n    {\n        var jar = new TreatJar();\n        jar.Give(true);\n        jar.Give(false);\n        jar.Give(true);\n        jar.Give(true);\n        Console.WriteLine(jar.Treats);\n    }\n}\n',
+          'class Program\n{\n    static void Main()\n    {\n        var board = new ScoreBoard();\n        board.Give(true);\n        board.Give(false);\n        board.Give(true);\n        board.Give(true);\n        Console.WriteLine(board.Total());\n    }\n}\n',
         expected: "3",
         message: "2 is right for the first example only. Count the good boys you are actually given.",
       },
       starter:
-        'using System;\n\npublic class TreatJar\n{\n    private int _treats = 0;        // hidden inside - only TreatJar can change it\n    public int Treats => _treats;   // a read-only view: the outside can look, not touch\n\n    // TODO: add one treat only when goodBoy is true\n    public void Give(bool goodBoy)\n    {\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var jar = new TreatJar();\n        jar.Give(true);\n        jar.Give(true);\n        jar.Give(false);\n        Console.WriteLine(jar.Treats);\n    }\n}\n',
+        'using System;\n\n// TODO: write a ScoreBoard class.\n//   - keep a private count of treats\n//   - Give(bool goodBoy): add one only when goodBoy is true\n//   - Total(): return how many treats so far\n// Keeping the count private means only ScoreBoard can change it.\n\nclass Program\n{\n    static void Main()\n    {\n        var board = new ScoreBoard();\n        board.Give(true);\n        board.Give(true);\n        board.Give(false);\n        Console.WriteLine(board.Total());\n    }\n}\n',
       solution:
-        'using System;\n\npublic class TreatJar\n{\n    private int _treats;\n    public int Treats => _treats;\n\n    public void Give(bool goodBoy)\n    {\n        if (goodBoy) _treats++;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var jar = new TreatJar();\n        jar.Give(true);\n        jar.Give(true);\n        jar.Give(false);\n        Console.WriteLine(jar.Treats);\n    }\n}\n',
+        'using System;\n\npublic class ScoreBoard\n{\n    private int _treats;\n\n    public void Give(bool goodBoy)\n    {\n        if (goodBoy) _treats++;\n    }\n\n    public int Total()\n    {\n        return _treats;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var board = new ScoreBoard();\n        board.Give(true);\n        board.Give(true);\n        board.Give(false);\n        Console.WriteLine(board.Total());\n    }\n}\n',
     },
     {
       title: "Guard the rule",
       concept: "Protect an invariant",
       context:
-        "Hiding the field is not enough on its own. The one method allowed to change it can also defend it. A food bowl must never go down because someone tipped in a silly amount. `Fill` adds the scoops only when the number is positive, so a negative or zero is quietly ignored. The bowl keeps itself sensible no matter who calls it.",
+        "Hiding the field lets the class defend it. Write a `Bowl` whose food can never drop because of a silly amount: `Fill` adds scoops only when the number is positive, so a negative or zero is quietly ignored. The bowl keeps itself sensible no matter who calls it.",
       example:
-        'public class Jar\n{\n    private int _treats;\n    public int Treats => _treats;\n    public void Add(int n) { if (n > 0) _treats += n; }\n}',
+        'public class Jar\n{\n    private int _treats;\n    public void Add(int n) { if (n > 0) _treats += n; }\n    public int Treats() { return _treats; }\n}',
       goal: [
-        "Make `Fill(int scoops)` add `scoops` to the bowl, but ignore amounts of 0 or less.",
+        "Write a `Bowl` with a `private` food count, a `Fill(int scoops)` that ignores amounts of 0 or less, and an `Amount()` that returns the food.",
         "Main fills 10, then -5 (ignored), then 3, so the output is 13.",
       ],
       expected: "13",
+      requireSource: [
+        { pattern: /class\s+Bowl/, message: "Write a `Bowl` class." },
+        { pattern: /private/, message: "Keep the food count `private`." },
+      ],
       verify: {
         main:
-          'class Program\n{\n    static void Main()\n    {\n        var bowl = new Bowl();\n        bowl.Fill(100);\n        bowl.Fill(-1);\n        bowl.Fill(0);\n        bowl.Fill(50);\n        Console.WriteLine(bowl.Food);\n    }\n}\n',
+          'class Program\n{\n    static void Main()\n    {\n        var bowl = new Bowl();\n        bowl.Fill(100);\n        bowl.Fill(-1);\n        bowl.Fill(0);\n        bowl.Fill(50);\n        Console.WriteLine(bowl.Amount());\n    }\n}\n',
         expected: "150",
         message: "13 is right for the first example only. Add every positive amount and ignore the rest.",
       },
       starter:
-        'using System;\n\npublic class Bowl\n{\n    private int _food;\n    public int Food => _food;\n\n    // TODO: add scoops to the bowl, but ignore amounts of 0 or less\n    public void Fill(int scoops)\n    {\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var bowl = new Bowl();\n        bowl.Fill(10);\n        bowl.Fill(-5);   // nonsense - must be ignored\n        bowl.Fill(3);\n        Console.WriteLine(bowl.Food);\n    }\n}\n',
+        'using System;\n\n// TODO: write a Bowl class.\n//   - keep a private amount of food\n//   - Fill(int scoops): add scoops, but ignore 0 or less\n//   - Amount(): return the food in the bowl\n\nclass Program\n{\n    static void Main()\n    {\n        var bowl = new Bowl();\n        bowl.Fill(10);\n        bowl.Fill(-5);   // nonsense - must be ignored\n        bowl.Fill(3);\n        Console.WriteLine(bowl.Amount());\n    }\n}\n',
       solution:
-        'using System;\n\npublic class Bowl\n{\n    private int _food;\n    public int Food => _food;\n\n    public void Fill(int scoops)\n    {\n        if (scoops > 0) _food += scoops;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var bowl = new Bowl();\n        bowl.Fill(10);\n        bowl.Fill(-5);   // nonsense - must be ignored\n        bowl.Fill(3);\n        Console.WriteLine(bowl.Food);\n    }\n}\n',
+        'using System;\n\npublic class Bowl\n{\n    private int _food;\n\n    public void Fill(int scoops)\n    {\n        if (scoops > 0) _food += scoops;\n    }\n\n    public int Amount()\n    {\n        return _food;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var bowl = new Bowl();\n        bowl.Fill(10);\n        bowl.Fill(-5);   // nonsense - must be ignored\n        bowl.Fill(3);\n        Console.WriteLine(bowl.Amount());\n    }\n}\n',
     },
     {
       title: "Change it in one place",
       concept: "One reason to change",
       context:
-        "The whole program judges cats through `Cat.Verdict()`. Change the wording in that one method and every cat follows - no hunting through a giant `Main` for each spot. Reword the verdict from guilty/innocent to `naughty`/`good`, editing only `Verdict`.",
+        "By now you hide state and reach it through methods. A cat has nine lives. Write a `Cat` that is told how many lives are `used` in its constructor, keeps that count in a `private` field, and offers a `LivesLeft()` that returns `9 - used`. Main makes a couple of cats and asks each how many lives are left - the nine-lives rule lives in one private place.",
       example:
-        "// One method, every cat. Edit the rule once:\n// return Name + (KnockedSomethingOver ? \" naughty\" : \" good\");",
+        'public class Square\n{\n    private int _side;\n    public Square(int side) { _side = side; }\n    public int Area()\n    {\n        return _side * _side;\n    }\n}',
       goal: [
-        "Make `Verdict()` return `Name + \": naughty\"` when `KnockedSomethingOver`, otherwise `Name + \": good\"`.",
-        "Main judges a guilty cat and an innocent one, so the output is two lines: Mittens: naughty then Smudge: good.",
+        "Write a `Cat` whose constructor takes how many lives are `used`, stored in a `private` field, with a `LivesLeft()` returning `9 - used`.",
+        "Main makes cats with 1 and 3 lives used, so the output is two lines: 8 then 6.",
       ],
-      expected: ["Mittens: naughty", "Smudge: good"],
+      expected: ["8", "6"],
       requireSource: [
-        { pattern: /string\s+Verdict\s*\(/, message: "Keep the wording inside the one `Verdict()` method." },
+        { pattern: /class\s+Cat/, message: "Write the `Cat` class." },
+        { pattern: /private/, message: "Keep the used-lives count `private` - the outside should not touch it." },
       ],
       verify: {
         main:
-          'class Program\n{\n    static void Main()\n    {\n        var a = new Cat { Name = "Whiskers", KnockedSomethingOver = true };\n        var b = new Cat { Name = "Bubbles", KnockedSomethingOver = false };\n        var c = new Cat { Name = "Pumpkin", KnockedSomethingOver = true };\n        Console.WriteLine(a.Verdict());\n        Console.WriteLine(b.Verdict());\n        Console.WriteLine(c.Verdict());\n    }\n}\n',
-        expected: ["Whiskers: naughty", "Bubbles: good", "Pumpkin: naughty"],
-        message: "Right for the first two only. The one Verdict rule must serve every cat.",
+          'class Program\n{\n    static void Main()\n    {\n        var a = new Cat(0);\n        var b = new Cat(9);\n        var c = new Cat(4);\n        Console.WriteLine(a.LivesLeft());\n        Console.WriteLine(b.LivesLeft());\n        Console.WriteLine(c.LivesLeft());\n    }\n}\n',
+        expected: ["9", "0", "5"],
+        message: "Right for the first example only. Compute 9 - used for whatever each cat is given.",
       },
       starter:
-        'using System;\n\npublic class Cat\n{\n    public string Name = "";\n    public bool KnockedSomethingOver;\n\n    // The whole program judges cats through this one method. Change the wording here.\n    public string Verdict()\n    {\n        // TODO: build the verdict from the name - naughty if it knocked something over, good if not\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var a = new Cat { Name = "Mittens", KnockedSomethingOver = true };\n        var b = new Cat { Name = "Smudge", KnockedSomethingOver = false };\n        Console.WriteLine(a.Verdict());\n        Console.WriteLine(b.Verdict());\n    }\n}\n',
+        'using System;\n\n// TODO: a cat has nine lives. Write a Cat class that:\n//   - is told how many lives are used in its constructor\n//   - keeps that count in a private field (the outside cannot touch it)\n//   - has a LivesLeft() that returns 9 - used\n// Main builds cats and asks each how many lives are left.\n\nclass Program\n{\n    static void Main()\n    {\n        var a = new Cat(1);\n        var b = new Cat(3);\n        Console.WriteLine(a.LivesLeft());\n        Console.WriteLine(b.LivesLeft());\n    }\n}\n',
       solution:
-        'using System;\n\npublic class Cat\n{\n    public string Name = "";\n    public bool KnockedSomethingOver;\n\n    public string Verdict()\n    {\n        return Name + ": " + (KnockedSomethingOver ? "naughty" : "good");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var a = new Cat { Name = "Mittens", KnockedSomethingOver = true };\n        var b = new Cat { Name = "Smudge", KnockedSomethingOver = false };\n        Console.WriteLine(a.Verdict());\n        Console.WriteLine(b.Verdict());\n    }\n}\n',
+        'using System;\n\npublic class Cat\n{\n    private int _used;\n\n    public Cat(int used)\n    {\n        _used = used;\n    }\n\n    public int LivesLeft()\n    {\n        return 9 - _used;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var a = new Cat(1);\n        var b = new Cat(3);\n        Console.WriteLine(a.LivesLeft());\n        Console.WriteLine(b.LivesLeft());\n    }\n}\n',
     },
     {
       summary: true,
       title: "Why objects? - recap",
       concept: "Recap",
-      context: "That is why we bother with classes and methods instead of one long `Main`.",
+      context: "That is why we bother with classes and methods instead of one long Main.",
       summaryIntro:
         "Objects exist so related data and the rules that guard it live together, instead of being scattered through one giant Main.",
       summaryItems: [
-        { title: "Group state - ", text: "a `class` keeps related data together as one thing that travels as a unit." },
-        { title: "Behaviour with state - ", text: "put a method next to the data it works on, so the thing that knows also knows how to act." },
-        { title: "private - ", text: "hide a field so only the class can change it; expose a read-only view to look without touching." },
-        { title: "Guard the rule - ", text: "the one method allowed to write can reject nonsense, keeping the object always valid." },
+        { title: "Group state - ", text: "a `class` keeps related data together as one thing." },
+        { title: "Behaviour with state - ", text: "put a method next to the data it works on." },
+        { title: "private - ", text: "hide a field so only the class can change it." },
+        { title: "Guard the rule - ", text: "the one method that writes can reject nonsense." },
         { title: "One reason to change - ", text: "fix a rule once inside the object and every caller follows." },
       ],
       summaryClose: "Next: Why abstract? - pulling logic behind an interface.",

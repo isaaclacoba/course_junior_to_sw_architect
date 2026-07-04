@@ -55,7 +55,11 @@
   // A trailing recap card (task.summary) is content, not a build - exclude it
   // from the count shown and from XP.
   const buildCount = tasks.filter((t) => !t.summary).length;
-  let idx = 0;
+  function cardFromHash() {
+    const n = parseInt((location.hash || "").replace(/[^0-9]/g, ""), 10);
+    return Number.isFinite(n) ? Math.min(Math.max(n - 1, 0), tasks.length - 1) : 0;
+  }
+  let idx = cardFromHash();
 
   function loadXP() {
     return parseInt(localStorage.getItem(xpKey) || "0", 10);
@@ -216,6 +220,7 @@
 
   function render() {
     const task = tasks[idx];
+    try { history.replaceState(null, "", "#" + (idx + 1)); } catch (e) {}
     if (meta) meta.textContent = metaLabel;
     title.textContent = task.title;
     context.innerHTML = renderInline(task.context);
@@ -358,6 +363,15 @@
       render();
     } else {
       window.location.href = nextHref;
+    }
+  });
+
+  window.addEventListener("hashchange", () => {
+    const next = cardFromHash();
+    if (next !== idx) {
+      if (editor && editor.getValue) code[idx] = editor.getValue();
+      idx = next;
+      render();
     }
   });
 

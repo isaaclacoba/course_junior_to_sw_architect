@@ -89,7 +89,11 @@
       ? new CodeLab.RoslynIframeRunner({ url: runnerUrl })
       : null;
 
-  let idx = 0;
+  function cardFromHash() {
+    const n = parseInt((location.hash || "").replace(/[^0-9]/g, ""), 10);
+    return Number.isFinite(n) ? Math.min(Math.max(n - 1, 0), drills.length - 1) : 0;
+  }
+  let idx = cardFromHash();
   const progress = drills.map((d) => d.blanks.map(() => ({ value: "", hint: -1 })));
   // Per-card quiz state: which option index the learner picked (-1 = none).
   const quizState = drills.map(() => ({ chosen: -1 }));
@@ -450,6 +454,7 @@
   function render() {
     const d = drills[idx];
     const s = progress[idx];
+    try { history.replaceState(null, "", "#" + (idx + 1)); } catch (e) {}
 
     closeExplainOverlay();
     renderCourseXP();
@@ -749,6 +754,13 @@
         window.location.href = nextHref;
       }
     });
+  window.addEventListener("hashchange", () => {
+    const next = cardFromHash();
+    if (next !== idx) {
+      idx = next;
+      render();
+    }
+  });
   if (els.hint) els.hint.addEventListener("click", showHint);
   if (els.check) els.check.addEventListener("click", check);
   if (els.show) els.show.addEventListener("click", showAnswer);

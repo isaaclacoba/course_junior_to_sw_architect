@@ -221,7 +221,10 @@ function renderInline(text) {
     .join("");
 }
 
-let topicIndex = 0;
+let topicIndex = (function () {
+  const n = parseInt((location.hash || "").replace(/[^0-9]/g, ""), 10);
+  return Number.isFinite(n) ? Math.min(Math.max(n - 1, 0), topics.length - 1) : 0;
+})();
 const selectedAnswer = new Map();
 
 const l1Meta = document.getElementById("l1Meta");
@@ -359,6 +362,7 @@ function renderTopic() {
   renderOptions(topic);
   void renderLevel1Diagram(topic);
 
+  try { history.replaceState(null, "", "#" + (topicIndex + 1)); } catch (e) {}
   l1Prev.disabled = topicIndex === 0;
   l1Next.disabled = false;
   l1Next.textContent = topicIndex === topics.length - 1 ? "Next lesson" : "Next";
@@ -375,6 +379,15 @@ l1Next.addEventListener("click", () => {
     renderTopic();
   } else {
     window.location.href = (window.PAGE && window.PAGE.nextHref) || "index.html";
+  }
+});
+
+window.addEventListener("hashchange", () => {
+  const n = parseInt((location.hash || "").replace(/[^0-9]/g, ""), 10);
+  const next = Number.isFinite(n) ? Math.min(Math.max(n - 1, 0), topics.length - 1) : 0;
+  if (next !== topicIndex) {
+    topicIndex = next;
+    renderTopic();
   }
 });
 
