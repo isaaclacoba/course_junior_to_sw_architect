@@ -39,7 +39,7 @@
       title: "A keeper stuck on one animal",
       concept: "Concrete dependency",
       context:
-        "Here is the cost of not abstracting. Write a `Keeper` with a method `Greet(Cat c)` that returns `\"heard: \"` followed by what the cat says. Because it is typed to `Cat`, a dog will never fit it - even though a dog can speak too. The next task frees it.",
+        "Write a `Keeper` with a method `Greet(Cat c)` that returns `\"heard: \"` followed by what the cat says. Because it is typed to `Cat`, a dog will never fit it - even though a dog can speak too. That is the cost of tying a method to one class; the next task removes it.",
       example:
         'public class Host\n{\n    public string Introduce(Guest g)\n    {\n        return "meet " + g.Name();\n    }\n}',
       goal: [
@@ -89,7 +89,7 @@
       title: "Depend on the promise, not the animal",
       concept: "Program to an interface",
       context:
-        "Now write a `Keeper` whose `Greet` takes an `IAnimal` instead of a `Cat`. That one choice is the payoff of abstracting: the same method now greets a cat, a dog, or anything else that keeps the promise.",
+        "Now write a `Keeper` whose `Greet` takes an `IAnimal` instead of a `Cat`. That one change is all it takes: the same method now greets a cat, a dog, or anything else that keeps the promise.",
       example:
         'public class Stage\n{\n    public string Announce(IShape s)\n    {\n        return "area " + s.Area();\n    }\n}',
       goal: [

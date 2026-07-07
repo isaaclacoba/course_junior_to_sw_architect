@@ -79,11 +79,11 @@
       title: "The OS switches between them, fast",
       concept: "Time-sharing",
       context:
-        "The trick is speed. The operating system lets one process run for a tiny slice of time, then pauses it and lets the next one run, then the next - switching thousands of times a second. It happens so fast that every program looks like it is running smoothly at the same time.",
+        "The operating system lets one process run for a tiny slice of time, then pauses it and lets the next one run, then the next - switching thousands of times a second. It switches so quickly that every program appears to run at the same time.",
       quiz: {
         question: "How does one core appear to run many programs at once?",
         options: [
-          { text: "The OS switches between them very fast, giving each a tiny time slice", correct: true },
+          { text: "The OS switches between them thousands of times a second, giving each a tiny time slice", correct: true },
           { text: "It splits the screen into pieces", correct: false },
           { text: "It runs them more slowly so they fit", correct: false },
         ],
@@ -111,7 +111,7 @@
       title: "The scheduler decides who runs next",
       concept: "Scheduler",
       context:
-        "Something has to choose which process gets the next slice of time. That part of the operating system is the scheduler. It keeps every program moving and gives more attention to the ones that need it, like the app you are actively using.",
+        "Something has to choose which process gets the next slice of time. That part of the operating system is the scheduler. It makes sure every process gets a turn, and gives more turns to the ones that need it, like the app you are actively using.",
       quiz: {
         question: "Which part of the operating system decides which process runs next?",
         options: [
@@ -213,7 +213,7 @@
       summaryItems: [
         { title: "Process - ", text: "a running program, loaded into memory; the file on disk is just the program." },
         { title: "One at a time - ", text: "a single core carries out one instruction at a time." },
-        { title: "Time-sharing - ", text: "the OS gives each process a tiny slice of CPU time and switches very fast." },
+        { title: "Time-sharing - ", text: "the OS gives each process a tiny slice of CPU time and switches thousands of times a second." },
         { title: "Scheduler - ", text: "the part of the OS that picks which process runs next." },
         { title: "Cores - ", text: "several cores run several processes truly at once, but switching still continues." },
         { title: "Isolation - ", text: "each process has its own memory, so one cannot corrupt or crash another." },

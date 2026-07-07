@@ -11,7 +11,7 @@
       title: "new it inside (the tight knot)",
       concept: "Self-made dependency",
       context:
-        "The quickest thing is to build what you need right where you need it. The `Cat` is given. Write a `Keeper` whose `Greet()` makes a `new Cat()` inside and returns what it says. It works - which is exactly why the trouble it causes is easy to miss.",
+        "The quickest thing is to build what you need right where you need it. The `Cat` is given. Write a `Keeper` whose `Greet()` makes a `new Cat()` inside and returns what it says. It works - so the problem it creates is easy to miss.",
       example:
         'public string Use()\n{\n    var tool = new Hammer();\n    return tool.Hit();\n}',
       goal: [
@@ -32,7 +32,7 @@
       title: "To change it, you must edit the keeper",
       concept: "Hardwired dependency",
       context:
-        "Now the keeper needs a dog instead. Because the animal is built inside, the only way to change it is to open the `Keeper` and rewrite that line. Write a `Keeper` whose `Greet()` builds a `new Dog()` and returns what it says - and notice you had to come in here to do it.",
+        "Now the keeper needs a dog instead. Because the animal is built inside, the only way to change it is to open the `Keeper` and rewrite that line. Write a `Keeper` whose `Greet()` builds a `new Dog()` and returns what it says.",
       example:
         'public string Use()\n{\n    var tool = new Drill();\n    return tool.Spin();\n}',
       goal: [

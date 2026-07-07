@@ -167,7 +167,7 @@
       summary: true,
       context: "You now know how a program does more than march straight down a list.",
       summaryIntro:
-        "Programs choose and repeat: a condition is a yes/no value, if/else picks a path, and a loop repeats steps - all built from jumps.",
+        "Programs do more than run straight down a list. A condition is a yes/no value; `if`/`else` picks a path; a loop repeats steps while a condition holds. Underneath, all of them are the jumps from Part one.",
       summaryItems: [
         { title: "Decision - ", text: "choosing a path based on a condition." },
         { title: "Condition - ", text: "a yes/no value: true or false." },

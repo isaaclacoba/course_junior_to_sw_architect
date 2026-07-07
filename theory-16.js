@@ -13,7 +13,7 @@
       title: "Small things sit right in the slot",
       concept: "Value",
       context:
-        "A small thing, like a number, fits straight into its memory slot. The slot literally holds `7`. When the thing fits inside the slot itself, we call it a value.",
+        "A simple value, like a number, sits straight in its memory slot. The slot literally holds `7`. When the thing lives right inside the slot itself, we call it a value.",
       quiz: {
         question: "Where does a small number like 7 live?",
         options: [
@@ -44,7 +44,7 @@
       title: "Big things live elsewhere",
       concept: "Reference",
       context:
-        "Some things are too big for a single slot - a whole list, a picture, an object. So the thing itself lives on the heap, and the slot holds its address: a note saying where to find it. That note is a reference.",
+        "Some kinds of thing are not kept in the slot at all - a whole list, a picture, an object. These live on the heap, and the slot holds only its address: a note saying where to find it. That note is a reference. What decides this is the kind of thing (its type), not how big it happens to be.",
       quiz: {
         question: "If a thing is too big to fit in a slot, what does the slot hold instead?",
         options: [
@@ -77,7 +77,7 @@
       title: "A reference is a 'where to find it' note",
       concept: "Reference is an address",
       context:
-        "A reference does not contain the thing - it contains where the thing is, like a note that says 'warehouse, shelf 12'. Follow the note and you reach the real thing on the heap. The note is tiny; the thing it points to can be huge.",
+        "A reference does not contain the thing - it contains where the thing is, like a note that says 'warehouse, shelf 12'. Follow the note and you reach the real thing on the heap. The note itself is just an address; the real thing sits out on the heap.",
       quiz: {
         question: "What does a reference actually hold?",
         options: [
@@ -207,10 +207,10 @@
       summary: true,
       context: "You now know the difference that explains how objects really behave.",
       summaryIntro:
-        "Small things are held as values; big things live on the heap and are reached through a reference - and that changes what 'copying' means.",
+        "A value is held right inside its slot; a reference-type thing lives on the heap and the slot holds its address. Which one you get is decided by the type of the thing, not its size - and that changes what 'copying' means.",
       summaryItems: [
-        { title: "Value - ", text: "a small thing held right inside its slot." },
-        { title: "Reference - ", text: "the address of a bigger thing that lives on the heap." },
+        { title: "Value - ", text: "a thing held right inside its slot." },
+        { title: "Reference - ", text: "the address of a thing that lives on the heap." },
         { title: "Copy a value - ", text: "you get a separate, independent copy." },
         { title: "Copy a reference - ", text: "both names point to the one same thing." },
         { title: "Shared thing - ", text: "a change through one name is seen through the other." },

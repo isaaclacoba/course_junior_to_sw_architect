@@ -114,7 +114,7 @@
       title: "Add an animal, leave the loop alone",
       concept: "Open to new behaviour",
       context:
-        "Compare this with the first task, where a new animal meant editing the one method. Here the list and loop in `Main` are finished. Write a new `Owl` class that keeps the `IAnimal` promise and says `\"Hoot\"`; it joins the pen and the loop never changes.",
+        "In the first task, a new animal meant editing the one method. Here the list and loop in `Main` are finished. Write a new `Owl` class that keeps the `IAnimal` promise and says `\"Hoot\"`; it joins the pen and the loop never changes.",
       example:
         'public class Frog : IAnimal\n{\n    public string Speak()\n    {\n        return "Ribbit";\n    }\n}',
       goal: [
@@ -134,9 +134,9 @@
       summary: true,
       title: "Why many versions? - recap",
       concept: "Recap",
-      context: "Why a handful of small classes beats one method full of branches.",
+      context: "A handful of small classes beats one method full of branches.",
       summaryIntro:
-        "Polymorphism lets each type carry its own behaviour, so one call site quietly does the right thing for whatever it is given.",
+        "Polymorphism lets each type carry its own behaviour, so one call site does the right thing for whatever it is given.",
       summaryItems: [
         { title: "The type switch - ", text: "one method full of `if`s grows and gets risky with every kind." },
         { title: "One call, many behaviours - ", text: "`a.Speak()` is written once but resolves to the real object's version." },

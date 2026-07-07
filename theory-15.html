@@ -16,7 +16,6 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
     />
     <link rel="stylesheet" href="vendor/code-lab/code-lab.css" />
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   </head>
   <body>
     <main class="layout">
@@ -29,11 +28,10 @@
           eyebrow: "Theory \u00b7 Part three \u00b7 How software runs and connects",
           title: "Where data lives",
           intro: [
-            "Where a running program keeps its data. Memory as a row of numbered slots, a variable as a slot, and the two areas a program uses - the stack and the heap. Answer a quick check on each idea, then fill the gap in a plain sentence.",
+            "Every value your program touches while it runs has to sit somewhere, and that somewhere is memory. But memory is not one undivided space - it is a few areas, each suited to a different job. Step through below to see where a number, a variable, and an object each end up, and why.",
           ],
           links: [{ href: "index.html", label: "Back to the course" }],
         },
-        archetype: "drill",
         prefix: "th15",
       };
     </script>
@@ -42,8 +40,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
     <script src="vendor/code-lab/code-lab.global.js"></script>
+    <script src="theory-15.viz.js"></script>
     <script src="page-shell.js"></script>
-    <script src="theory-15.js"></script>
-    <script src="drill-engine.js"></script>
   </body>
 </html>

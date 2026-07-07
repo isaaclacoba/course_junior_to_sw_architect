@@ -178,7 +178,7 @@
         { title: "Request and response - ", text: "the ask out, the answer back." },
         { title: "API - ", text: "the menu of requests a server will answer." },
       ],
-      summaryClose: "Next lesson: how the code itself is saved, tracked and shared between people - version control.",
+      summaryClose: "Next lesson opens Part four - the development world: the code you did not write but build on, from the language's own toolbox to packages you pull in.",
       blanks: [],
     },
   ];

@@ -91,7 +91,7 @@
       title: "Guard the rule",
       concept: "Protect an invariant",
       context:
-        "Hiding the field lets the class defend it. Write a `Bowl` whose food can never drop because of a silly amount: `Fill` adds scoops only when the number is positive, so a negative or zero is quietly ignored. The bowl keeps itself sensible no matter who calls it.",
+        "Hiding the field lets the class defend it. Write a `Bowl` whose food can never drop because of a silly amount: `Fill` adds scoops only when the number is positive, so a negative or zero is ignored. The bowl keeps itself sensible no matter who calls it.",
       example:
         'public class Jar\n{\n    private int _treats;\n    public void Add(int n) { if (n > 0) _treats += n; }\n    public int Treats() { return _treats; }\n}',
       goal: [

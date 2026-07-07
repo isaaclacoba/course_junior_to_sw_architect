@@ -87,7 +87,7 @@
       title: "The OS guards your files",
       concept: "Permissions",
       context:
-        "Programs do not touch the drive directly. They ask the operating system to open, read, or save a file, and the OS checks permissions first. That is how it stops one program from quietly reading or wrecking another's files.",
+        "Programs do not touch the drive directly. They ask the operating system to open, read, or save a file, and the OS checks permissions first. That is how it stops one program from reading or wrecking another's files.",
       quiz: {
         question: "How does a program save a file?",
         options: [
@@ -119,7 +119,7 @@
       title: "Talking to your devices",
       concept: "Devices",
       context:
-        "The operating system also sits between programs and the hardware devices: the keyboard, the screen, the printer, the network. A program does not work the device itself - it asks the OS, and the OS works the device on its behalf.",
+        "The operating system also sits between programs and the hardware devices: the keyboard, the screen, the printer, the network. A program does not control the device itself - it asks the OS, and the OS handles the device on its behalf.",
       quiz: {
         question: "When a program shows something on screen, it...",
         options: [
@@ -129,7 +129,7 @@
         ],
         answerWhy: "Programs ask the OS to use devices like the screen; the OS handles the hardware on their behalf.",
       },
-      snippet: "The OS also sits between programs and the hardware {{1}} - keyboard, screen, printer, network. A program asks the OS, and the OS works the device.",
+      snippet: "The OS also sits between programs and the hardware {{1}} - keyboard, screen, printer, network. A program asks the OS, and the OS handles the device.",
       points: [
         "Programs reach hardware only through the operating system.",
         "This keeps programs simple and the hardware shared safely.",

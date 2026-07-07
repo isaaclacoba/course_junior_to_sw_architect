@@ -195,16 +195,16 @@
   const PRACTICAL = [
     "level1.html", "level1-coding.html", "control-flow.html", "writing-methods.html",
     "reading-objects.html", "level4.html", "first-builds.html", "wiring-it-up.html",
-    "collections.html", "data-shapes.html", "linq.html", "errors-null.html", "generics.html",
+    "collections.html", "data-shapes.html", "lambdas.html", "linq.html", "errors-null.html", "generics.html",
     "encapsulation.html", "interfaces.html", "polymorphism.html", "composition.html",
     "dependency-injection.html", "level2.html", "level3-app/",
   ];
   const THEORY = [
     "theory-1.html", "theory-2.html", "theory-3.html", "theory-4.html", "theory-5.html",
-    "theory-6.html", "theory-7.html", "theory-8.html", "theory-9.html", "theory-10.html",
-    "theory-11.html", "theory-12.html", "theory-13.html", "theory-14.html",
-    "theory-15.html", "theory-16.html", "theory-17.html", "theory-18.html", "theory-19.html",
-    "theory-20.html",
+    "theory-6.html", "theory-7.html", "theory-check-1.html", "theory-8.html", "theory-9.html", "theory-10.html",
+    "theory-11.html", "theory-12.html", "theory-13.html", "theory-14.html", "theory-check-2.html",
+    "theory-15.html", "theory-16.html", "theory-17.html", "theory-18.html", "theory-19.html", "theory-check-3.html",
+    "theory-21.html", "theory-20.html", "theory-check-4.html",
   ];
   if (!page.nextHref) {
     const current = (location.pathname.split("/").pop() || "").toLowerCase();
@@ -225,5 +225,46 @@
     hero.insertAdjacentHTML("afterend", drillCard(page.prefix));
   } else if (page.archetype === "build") {
     hero.insertAdjacentHTML("afterend", buildCard(page.prefix));
+  }
+
+  // Optional interactive visual for a lesson, supplied as a DECOUPLED data file
+  // (window.LESSON_VIZ, e.g. theory-N.viz.js) and mounted once, right under the
+  // hero. Keeps the lesson's text (drill data) and its visual (viz config) apart.
+  if (window.LESSON_VIZ && window.CodeLab && window.CodeLab.MemoryViz) {
+    const vizHost = document.createElement("section");
+    vizHost.className = "lesson-viz";
+    hero.insertAdjacentElement("afterend", vizHost);
+    if (!window.LESSON_VIZ.nextHref) window.LESSON_VIZ.nextHref = page.nextHref;
+    // Track progress: mark the lesson done + award XP when the last step is
+    // reached. The key is derived from the page (theory-5.html -> theory_5_awarded)
+    // so it matches the card on the index, unless the lesson sets its own.
+    if (!window.LESSON_VIZ.awardedKey) {
+      const file = (location.pathname.split("/").pop() || "").replace(/\.html$/, "");
+      if (/^[a-z0-9]+(-[a-z0-9]+)*$/i.test(file)) {
+        window.LESSON_VIZ.awardedKey = file.replace(/-/g, "_") + "_awarded";
+      }
+    }
+    try {
+      window.CodeLab.MemoryViz.create(vizHost, window.LESSON_VIZ);
+    } catch (err) {
+      console.error("lesson-viz mount failed", err);
+      vizHost.remove();
+    }
+  }
+
+  // Optional graded checkpoint, supplied as a DECOUPLED data file
+  // (window.QUIZ_CONFIG, e.g. theory-check-N.js) and mounted as the code-lab
+  // Quiz component - the assessment logic lives in code-lab, not here.
+  if (window.QUIZ_CONFIG && window.CodeLab && window.CodeLab.Quiz) {
+    const quizHost = document.createElement("section");
+    quizHost.className = "lesson-quiz";
+    hero.insertAdjacentElement("afterend", quizHost);
+    if (!window.QUIZ_CONFIG.nextHref) window.QUIZ_CONFIG.nextHref = page.nextHref;
+    try {
+      window.CodeLab.Quiz.create(quizHost, window.QUIZ_CONFIG);
+    } catch (err) {
+      console.error("quiz mount failed", err);
+      quizHost.remove();
+    }
   }
 })();

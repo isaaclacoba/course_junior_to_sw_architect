@@ -123,8 +123,6 @@
         "Both are just memory, used in two different ways.",
         "The two areas are the stack and the heap.",
       ],
-      mermaid:
-        "flowchart TB\n  M[\"A program's memory\"] --> S[\"The stack<br/>small, fast, automatic\"]\n  M --> H[\"The heap<br/>big, flexible, long-lived\"]",
       blanks: [
         {
           id: 1,
@@ -189,8 +187,6 @@
         "Things there last until they are no longer needed.",
         "Like renting a warehouse shelf, not holding a plate.",
       ],
-      mermaid:
-        "flowchart LR\n  H[\"The heap\"] --> A[\"a big thing\"]\n  H --> B[\"a long-lived thing\"]",
       blanks: [
         {
           id: 1,

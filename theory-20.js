@@ -136,7 +136,7 @@
       title: "How code is shared - recap",
       concept: "Recap",
       summary: true,
-      context: "That completes Part three - and the theory track.",
+      context: "That completes Part four - and the theory track.",
       summaryIntro:
         "Version control keeps the history of your code and lets a team work on it together, one saved snapshot at a time.",
       summaryItems: [
@@ -145,7 +145,7 @@
         { title: "History - ", text: "the timeline of commits you can look back through." },
         { title: "Sharing - ", text: "a team's commits come together into one project." },
       ],
-      summaryClose: "That completes Part three. Across the three theory parts you now see what a computer is, the vocabulary of code, and how software really runs, remembers, connects and is shared. With these foundations, the practical track is where you build it for real.",
+      summaryClose: "That completes the theory track. Across four parts you now see what a computer is, the vocabulary of code, how software really runs, remembers and connects, and the world of shared code and tools you build on. With these foundations, the practical track is where you build it for real.",
       blanks: [],
     },
   ];
@@ -153,7 +153,7 @@
   window.DRILL_CONFIG = {
     prefix: "th20",
     mode: "theory",
-    metaLabel: "How software runs \u00b7 How code is shared",
+    metaLabel: "The development world \u00b7 How code is shared",
     progressNoun: "Topic",
     awardedKey: "theory_20_awarded",
     awardAmount: 20,

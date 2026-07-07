@@ -40,7 +40,7 @@
       title: "The type decides what you can do",
       concept: "What you can do",
       context:
-        "The type decides what makes sense to do with a value. You can add two numbers; you can join two pieces of text; but adding a number to a word makes no sense.",
+        "The type decides what makes sense to do with a value. You can add two numbers; you can join two pieces of text; but adding a number to a word makes no sense in most languages - and the compiler is what catches the mismatch.",
       quiz: {
         question: "Why can't you always combine two values?",
         options: [

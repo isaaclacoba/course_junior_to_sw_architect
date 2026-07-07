@@ -373,16 +373,29 @@
     if (els.question) els.question.innerHTML = renderInline(d.quiz.question || "");
     if (els.options) {
       els.options.innerHTML = "";
-      d.quiz.options.forEach((opt, i) => {
+      const st = quizState[idx];
+      // Shuffle the option order once per card so the correct answer is not
+      // always in the same position. `chosen` still indexes the original array.
+      if (!st.order) {
+        st.order = d.quiz.options.map((_, i) => i);
+        for (let j = st.order.length - 1; j > 0; j--) {
+          const k = Math.floor(Math.random() * (j + 1));
+          const tmp = st.order[j];
+          st.order[j] = st.order[k];
+          st.order[k] = tmp;
+        }
+      }
+      st.order.forEach((orig) => {
+        const opt = d.quiz.options[orig];
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "btn";
         btn.innerHTML = renderInline(opt.text);
-        if (quizState[idx].chosen === i) {
+        if (st.chosen === orig) {
           btn.classList.add(opt.correct ? "correct" : "wrong");
         }
         btn.addEventListener("click", () => {
-          quizState[idx].chosen = i;
+          st.chosen = orig;
           [...els.options.children].forEach((c) => c.classList.remove("correct", "wrong"));
           btn.classList.add(opt.correct ? "correct" : "wrong");
           setQuizFeedback(d);

@@ -28,11 +28,10 @@
           eyebrow: "Theory \u00b7 Part one \u00b7 What a computer really is",
           title: "Running many programs at once",
           intro: [
-            "A CPU core does one instruction at a time, yet you keep a browser, music, and a chat app running together. This lesson explains how: a running program is a process, the operating system shares the CPU by switching between processes very fast, the scheduler decides who runs next, extra cores add some real at-once work, and each process is kept in its own separate memory. Answer a quick check on each idea, then fill the gap in a plain sentence.",
+            "A CPU core does one instruction at a time, yet you keep a browser, music, and a chat app running together. They are not quite running at once - the operating system switches between them faster than you notice, sharing the one core around. Step through below and watch two programs share a single computer.",
           ],
           links: [{ href: "index.html", label: "Back to the course" }],
         },
-        archetype: "drill",
         prefix: "th4",
       };
     </script>
@@ -41,8 +40,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
     <script src="vendor/code-lab/code-lab.global.js"></script>
+    <script src="theory-4.viz.js"></script>
     <script src="page-shell.js"></script>
-    <script src="theory-4.js"></script>
-    <script src="drill-engine.js"></script>
   </body>
 </html>

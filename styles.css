@@ -121,6 +121,18 @@ h1 {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.lesson-viz {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 1.2rem;
+  box-shadow: 0 14px 34px -22px rgba(31, 111, 95, 0.28);
+  animation: rise 600ms ease-out;
+  /* Break out wider than the 980px reading column so the two-column widget has room. */
+  width: min(1400px, 95vw);
+  margin-inline: calc(50% - min(1400px, 95vw) / 2);
+}
+
 
 
 .challenge-head {
@@ -1026,4 +1038,11 @@ input.almost {
 .result-panel.is-fail {
   border-color: rgba(240, 130, 120, 0.5);
 }
+
+/* checkpoint quiz styling lives in the code-lab component (.cl-quiz). This
+   wrapper only sets the checkpoint page's column width. */
+.lesson-quiz {
+  margin: 1.4rem 0;
+}
+
 

@@ -73,7 +73,7 @@
       title: "Logic errors",
       concept: "Logic error",
       context:
-        "A trickier kind runs fine but does the wrong thing - a logic error. The code is valid, so nothing complains; it just gives a wrong answer, like adding when you meant to subtract.",
+        "The other kind is harder to spot: the code is valid and runs fine, so nothing complains - it just does the wrong thing, like adding when you meant to subtract. That is a logic error.",
       quiz: {
         question: "What is a logic error?",
         options: [
@@ -104,7 +104,7 @@
       title: "Debugging",
       concept: "Debugging",
       context:
-        "Finding and fixing a bug is called debugging. It means checking what the program actually does, step by step, until you find where reality and intention part ways.",
+        "Finding and fixing a bug is called debugging. It means checking what the program actually does, step by step, until you find the point where it stops matching what you meant.",
       quiz: {
         question: "What is debugging?",
         options: [
