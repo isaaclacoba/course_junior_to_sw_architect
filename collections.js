@@ -138,14 +138,14 @@ public static void Main()
     cats.Add(new Cat { Name = "Mittens", KnockedSomethingOver = true });
     cats.Add(new Cat { Name = "Smudge", KnockedSomethingOver = false });
 
-    foreach (var c in cats)
+    foreach (var cat in cats)
     {
-        Console.WriteLine(c.Name + " guilty: " + c.{{2}});
+        Console.WriteLine(cat.Name + " guilty: " + cat.{{2}});
     }
 }`,
     points: [
       "`List<Cat>` holds whole objects, each with its own fields.",
-      "Inside the loop, `c` is one `Cat` you can read from.",
+      "Inside the loop, `cat` is one `Cat` you can read from.",
     ],
     blanks: [
       {
@@ -165,7 +165,7 @@ public static void Main()
         hints: ["The bool field on Cat."],
         explain: [
           { text: "`Cat` has a `KnockedSomethingOver` field holding `true` or `false`.", highlight: "public bool KnockedSomethingOver;" },
-          { text: "`c.KnockedSomethingOver` reads it for the current cat, printing `True` or `False`.", highlight: "Console.WriteLine(c.Name + \" guilty: \" + c.{{2}})" },
+          { text: "`cat.KnockedSomethingOver` reads it for the current cat, printing `True` or `False`.", highlight: "Console.WriteLine(cat.Name + \" guilty: \" + cat.{{2}})" },
         ],
       },
     ],
@@ -370,9 +370,9 @@ class Program
         cats.Add(new Cat { Name = "Mittens", KnockedSomethingOver = true });
         cats.Add(new Cat { Name = "Smudge", KnockedSomethingOver = false });
 
-        foreach (var c in cats)
+        foreach (var cat in cats)
         {
-            Console.WriteLine(c.Name + " guilty: " + c.KnockedSomethingOver);
+            Console.WriteLine(cat.Name + " guilty: " + cat.KnockedSomethingOver);
         }
     }
 }`,

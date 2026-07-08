@@ -25,14 +25,14 @@
       ],
       verify: {
         main:
-          'class Program\n{\n    static void Main()\n    {\n        var c = new Cat { Name = "Smudge", KnockedSomethingOver = false };\n        Console.WriteLine(c.Name + ": " + c.KnockedSomethingOver);\n    }\n}\n',
+          'class Program\n{\n    static void Main()\n    {\n        var cat = new Cat { Name = "Smudge", KnockedSomethingOver = false };\n        Console.WriteLine(cat.Name + ": " + cat.KnockedSomethingOver);\n    }\n}\n',
         expected: "Smudge: False",
         message: "Mittens: True is right for that one cat only. Your Cat must hold whatever Name and flag it is given.",
       },
       starter:
-        'using System;\n\n// TODO: write a Cat class that holds two pieces of data:\n//   - a Name (string)\n//   - a KnockedSomethingOver (bool)\n\nclass Program\n{\n    static void Main()\n    {\n        var c = new Cat { Name = "Mittens", KnockedSomethingOver = true };\n        Console.WriteLine(c.Name + ": " + c.KnockedSomethingOver);\n    }\n}\n',
+        'using System;\n\n// TODO: write a Cat class that holds two pieces of data:\n//   - a Name (string)\n//   - a KnockedSomethingOver (bool)\n\nclass Program\n{\n    static void Main()\n    {\n        var cat = new Cat { Name = "Mittens", KnockedSomethingOver = true };\n        Console.WriteLine(cat.Name + ": " + cat.KnockedSomethingOver);\n    }\n}\n',
       solution:
-        'using System;\n\npublic class Cat\n{\n    public string Name = "";\n    public bool KnockedSomethingOver;\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var c = new Cat { Name = "Mittens", KnockedSomethingOver = true };\n        Console.WriteLine(c.Name + ": " + c.KnockedSomethingOver);\n    }\n}\n',
+        'using System;\n\npublic class Cat\n{\n    public string Name = "";\n    public bool KnockedSomethingOver;\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var cat = new Cat { Name = "Mittens", KnockedSomethingOver = true };\n        Console.WriteLine(cat.Name + ": " + cat.KnockedSomethingOver);\n    }\n}\n',
     },
     {
       title: "Put the behaviour with the data",
@@ -51,14 +51,14 @@
       ],
       verify: {
         main:
-          'class Program\n{\n    static void Main()\n    {\n        var c = new Cat { Name = "Smudge", KnockedSomethingOver = false };\n        Console.WriteLine(c.Verdict());\n    }\n}\n',
+          'class Program\n{\n    static void Main()\n    {\n        var cat = new Cat { Name = "Smudge", KnockedSomethingOver = false };\n        Console.WriteLine(cat.Verdict());\n    }\n}\n',
         expected: "Smudge: innocent",
         message: "Mittens: guilty is right for a guilty cat only. Decide the verdict from the flag, do not hardcode it.",
       },
       starter:
-        'using System;\n\npublic class Cat\n{\n    public string Name = "";\n    public bool KnockedSomethingOver;\n\n    // TODO: write a Verdict() method.\n    // It returns Name, then ": guilty" if KnockedSomethingOver is true,\n    // otherwise ": innocent".\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var c = new Cat { Name = "Mittens", KnockedSomethingOver = true };\n        Console.WriteLine(c.Verdict());\n    }\n}\n',
+        'using System;\n\npublic class Cat\n{\n    public string Name = "";\n    public bool KnockedSomethingOver;\n\n    // TODO: write a Verdict() method.\n    // It returns Name, then ": guilty" if KnockedSomethingOver is true,\n    // otherwise ": innocent".\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var cat = new Cat { Name = "Mittens", KnockedSomethingOver = true };\n        Console.WriteLine(cat.Verdict());\n    }\n}\n',
       solution:
-        'using System;\n\npublic class Cat\n{\n    public string Name = "";\n    public bool KnockedSomethingOver;\n\n    public string Verdict()\n    {\n        if (KnockedSomethingOver)\n        {\n            return Name + ": guilty";\n        }\n        return Name + ": innocent";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var c = new Cat { Name = "Mittens", KnockedSomethingOver = true };\n        Console.WriteLine(c.Verdict());\n    }\n}\n',
+        'using System;\n\npublic class Cat\n{\n    public string Name = "";\n    public bool KnockedSomethingOver;\n\n    public string Verdict()\n    {\n        if (KnockedSomethingOver)\n        {\n            return Name + ": guilty";\n        }\n        return Name + ": innocent";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var cat = new Cat { Name = "Mittens", KnockedSomethingOver = true };\n        Console.WriteLine(cat.Verdict());\n    }\n}\n',
     },
     {
       title: "Hide the inside",
@@ -93,7 +93,7 @@
       context:
         "Hiding the field lets the class defend it. Write a `Bowl` whose food can never drop because of a silly amount: `Fill` adds scoops only when the number is positive, so a negative or zero is ignored. The bowl keeps itself sensible no matter who calls it.",
       example:
-        'public class Jar\n{\n    private int _treats;\n    public void Add(int n) { if (n > 0) _treats += n; }\n    public int Treats() { return _treats; }\n}',
+        'public class Jar\n{\n    private int _treats;\n    public void Add(int amount) { if (amount > 0) _treats += amount; }\n    public int Treats() { return _treats; }\n}',
       goal: [
         "Write a `Bowl` with a `private` food count, a `Fill(int scoops)` that ignores amounts of 0 or less, and an `Amount()` that returns the food.",
         "Main fills 10, then -5 (ignored), then 3, so the output is 13.",
@@ -132,14 +132,14 @@
       ],
       verify: {
         main:
-          'class Program\n{\n    static void Main()\n    {\n        var a = new Cat(0);\n        var b = new Cat(9);\n        var c = new Cat(4);\n        Console.WriteLine(a.LivesLeft());\n        Console.WriteLine(b.LivesLeft());\n        Console.WriteLine(c.LivesLeft());\n    }\n}\n',
+          'class Program\n{\n    static void Main()\n    {\n        var firstCat = new Cat(0);\n        var secondCat = new Cat(9);\n        var thirdCat = new Cat(4);\n        Console.WriteLine(firstCat.LivesLeft());\n        Console.WriteLine(secondCat.LivesLeft());\n        Console.WriteLine(thirdCat.LivesLeft());\n    }\n}\n',
         expected: ["9", "0", "5"],
         message: "Right for the first example only. Compute 9 - used for whatever each cat is given.",
       },
       starter:
-        'using System;\n\n// TODO: a cat has nine lives. Write a Cat class that:\n//   - is told how many lives are used in its constructor\n//   - keeps that count in a private field (the outside cannot touch it)\n//   - has a LivesLeft() that returns 9 - used\n// Main builds cats and asks each how many lives are left.\n\nclass Program\n{\n    static void Main()\n    {\n        var a = new Cat(1);\n        var b = new Cat(3);\n        Console.WriteLine(a.LivesLeft());\n        Console.WriteLine(b.LivesLeft());\n    }\n}\n',
+        'using System;\n\n// TODO: a cat has nine lives. Write a Cat class that:\n//   - is told how many lives are used in its constructor\n//   - keeps that count in a private field (the outside cannot touch it)\n//   - has a LivesLeft() that returns 9 - used\n// Main builds cats and asks each how many lives are left.\n\nclass Program\n{\n    static void Main()\n    {\n        var firstCat = new Cat(1);\n        var secondCat = new Cat(3);\n        Console.WriteLine(firstCat.LivesLeft());\n        Console.WriteLine(secondCat.LivesLeft());\n    }\n}\n',
       solution:
-        'using System;\n\npublic class Cat\n{\n    private int _used;\n\n    public Cat(int used)\n    {\n        _used = used;\n    }\n\n    public int LivesLeft()\n    {\n        return 9 - _used;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var a = new Cat(1);\n        var b = new Cat(3);\n        Console.WriteLine(a.LivesLeft());\n        Console.WriteLine(b.LivesLeft());\n    }\n}\n',
+        'using System;\n\npublic class Cat\n{\n    private int _used;\n\n    public Cat(int used)\n    {\n        _used = used;\n    }\n\n    public int LivesLeft()\n    {\n        return 9 - _used;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var firstCat = new Cat(1);\n        var secondCat = new Cat(3);\n        Console.WriteLine(firstCat.LivesLeft());\n        Console.WriteLine(secondCat.LivesLeft());\n    }\n}\n',
     },
     {
       summary: true,

@@ -39,22 +39,22 @@
       title: "A keeper stuck on one animal",
       concept: "Concrete dependency",
       context:
-        "Write a `Keeper` with a method `Greet(Cat c)` that returns `\"heard: \"` followed by what the cat says. Because it is typed to `Cat`, a dog will never fit it - even though a dog can speak too. That is the cost of tying a method to one class; the next task removes it.",
+        "Write a `Keeper` with a method `Greet(Cat cat)` that returns `\"heard: \"` followed by what the cat says. Because it is typed to `Cat`, a dog will never fit it - even though a dog can speak too. That is the cost of tying a method to one class; the next task removes it.",
       example:
-        'public class Host\n{\n    public string Introduce(Guest g)\n    {\n        return "meet " + g.Name();\n    }\n}',
+        'public class Host\n{\n    public string Introduce(Guest guest)\n    {\n        return "meet " + guest.Name();\n    }\n}',
       goal: [
-        "Write a `Keeper` class with a method `Greet(Cat c)` that returns `\"heard: \"` plus `c.Speak()`.",
+        "Write a `Keeper` class with a method `Greet(Cat cat)` that returns `\"heard: \"` plus `cat.Speak()`.",
         "Main greets a cat, so the output is heard: Meow.",
       ],
       expected: "heard: Meow",
       requireSource: [
         { pattern: /class\s+Keeper/, message: "Write a `Keeper` class." },
-        { pattern: /c\s*\.\s*Speak\s*\(/, message: "Build the line from the animal: `c.Speak()`." },
+        { pattern: /cat\s*\.\s*Speak\s*\(/, message: "Build the line from the animal: `cat.Speak()`." },
       ],
       starter:
-        'using System;\n\npublic class Cat\n{\n    public string Speak() { return "Meow"; }\n}\n\n// TODO: write a Keeper class with a method  string Greet(Cat c)\n//       that returns "heard: " followed by what the cat says.\n\nclass Program\n{\n    static void Main()\n    {\n        var keeper = new Keeper();\n        Console.WriteLine(keeper.Greet(new Cat()));\n    }\n}\n',
+        'using System;\n\npublic class Cat\n{\n    public string Speak() { return "Meow"; }\n}\n\n// TODO: write a Keeper class with a method  string Greet(Cat cat)\n//       that returns "heard: " followed by what the cat says.\n\nclass Program\n{\n    static void Main()\n    {\n        var keeper = new Keeper();\n        Console.WriteLine(keeper.Greet(new Cat()));\n    }\n}\n',
       solution:
-        'using System;\n\npublic class Cat\n{\n    public string Speak() { return "Meow"; }\n}\n\npublic class Keeper\n{\n    public string Greet(Cat c)\n    {\n        return "heard: " + c.Speak();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var keeper = new Keeper();\n        Console.WriteLine(keeper.Greet(new Cat()));\n    }\n}\n',
+        'using System;\n\npublic class Cat\n{\n    public string Speak() { return "Meow"; }\n}\n\npublic class Keeper\n{\n    public string Greet(Cat cat)\n    {\n        return "heard: " + cat.Speak();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var keeper = new Keeper();\n        Console.WriteLine(keeper.Greet(new Cat()));\n    }\n}\n',
     },
     {
       title: "Name the promise",
@@ -76,14 +76,14 @@
       ],
       verify: {
         main:
-          'class Program\n{\n    static void Main()\n    {\n        IAnimal a = new Cat();\n        Console.WriteLine(a.Speak());\n    }\n}\n',
+          'class Program\n{\n    static void Main()\n    {\n        IAnimal animal = new Cat();\n        Console.WriteLine(animal.Speak());\n    }\n}\n',
         expected: "Meow",
         message: "Woof is right for the dog only. Each animal must keep the promise in its own way.",
       },
       starter:
-        'using System;\n\n// TODO:\n//   1) write an interface IAnimal with one method: string Speak();\n//   2) write Cat : IAnimal (Speak returns "Meow")\n//   3) write Dog : IAnimal (Speak returns "Woof")\n\nclass Program\n{\n    static void Main()\n    {\n        IAnimal a = new Dog();\n        Console.WriteLine(a.Speak());\n    }\n}\n',
+        'using System;\n\n// TODO:\n//   1) write an interface IAnimal with one method: string Speak();\n//   2) write Cat : IAnimal (Speak returns "Meow")\n//   3) write Dog : IAnimal (Speak returns "Woof")\n\nclass Program\n{\n    static void Main()\n    {\n        IAnimal animal = new Dog();\n        Console.WriteLine(animal.Speak());\n    }\n}\n',
       solution:
-        'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() { return "Meow"; }\n}\n\npublic class Dog : IAnimal\n{\n    public string Speak() { return "Woof"; }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        IAnimal a = new Dog();\n        Console.WriteLine(a.Speak());\n    }\n}\n',
+        'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() { return "Meow"; }\n}\n\npublic class Dog : IAnimal\n{\n    public string Speak() { return "Woof"; }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        IAnimal animal = new Dog();\n        Console.WriteLine(animal.Speak());\n    }\n}\n',
     },
     {
       title: "Depend on the promise, not the animal",
@@ -91,9 +91,9 @@
       context:
         "Now write a `Keeper` whose `Greet` takes an `IAnimal` instead of a `Cat`. That one change is all it takes: the same method now greets a cat, a dog, or anything else that keeps the promise.",
       example:
-        'public class Stage\n{\n    public string Announce(IShape s)\n    {\n        return "area " + s.Area();\n    }\n}',
+        'public class Stage\n{\n    public string Announce(IShape shape)\n    {\n        return "area " + shape.Area();\n    }\n}',
       goal: [
-        "Write a `Keeper` with `Greet(IAnimal a)` returning `\"heard: \"` plus `a.Speak()`.",
+        "Write a `Keeper` with `Greet(IAnimal animal)` returning `\"heard: \"` plus `animal.Speak()`.",
         "Main greets a Dog through it, so the output is heard: Woof.",
       ],
       expected: "heard: Woof",
@@ -108,9 +108,9 @@
         message: "A cat must fit the same method. Depend on IAnimal so both animals pass through.",
       },
       starter:
-        'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() { return "Meow"; }\n}\n\npublic class Dog : IAnimal\n{\n    public string Speak() { return "Woof"; }\n}\n\n// TODO: write a Keeper with a method  string Greet(IAnimal a)\n//       that returns "heard: " followed by what the animal says.\n\nclass Program\n{\n    static void Main()\n    {\n        var keeper = new Keeper();\n        Console.WriteLine(keeper.Greet(new Dog()));\n    }\n}\n',
+        'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() { return "Meow"; }\n}\n\npublic class Dog : IAnimal\n{\n    public string Speak() { return "Woof"; }\n}\n\n// TODO: write a Keeper with a method  string Greet(IAnimal animal)\n//       that returns "heard: " followed by what the animal says.\n\nclass Program\n{\n    static void Main()\n    {\n        var keeper = new Keeper();\n        Console.WriteLine(keeper.Greet(new Dog()));\n    }\n}\n',
       solution:
-        'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() { return "Meow"; }\n}\n\npublic class Dog : IAnimal\n{\n    public string Speak() { return "Woof"; }\n}\n\npublic class Keeper\n{\n    public string Greet(IAnimal a)\n    {\n        return "heard: " + a.Speak();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var keeper = new Keeper();\n        Console.WriteLine(keeper.Greet(new Dog()));\n    }\n}\n',
+        'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() { return "Meow"; }\n}\n\npublic class Dog : IAnimal\n{\n    public string Speak() { return "Woof"; }\n}\n\npublic class Keeper\n{\n    public string Greet(IAnimal animal)\n    {\n        return "heard: " + animal.Speak();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var keeper = new Keeper();\n        Console.WriteLine(keeper.Greet(new Dog()));\n    }\n}\n',
     },
     {
       title: "A new animal walks in for free",
@@ -128,9 +128,9 @@
         { pattern: /class\s+Owl\s*:\s*IAnimal/, message: "Make `Owl` keep the promise: `: IAnimal`." },
       ],
       starter:
-        'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Keeper\n{\n    // Finished - do not change this.\n    public string Greet(IAnimal a) { return "heard: " + a.Speak(); }\n}\n\n// TODO: write a new Owl class that keeps the IAnimal promise\n//       and whose Speak() returns "Hoot".\n\nclass Program\n{\n    static void Main()\n    {\n        var keeper = new Keeper();\n        Console.WriteLine(keeper.Greet(new Owl()));\n    }\n}\n',
+        'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Keeper\n{\n    // Finished - do not change this.\n    public string Greet(IAnimal animal) { return "heard: " + animal.Speak(); }\n}\n\n// TODO: write a new Owl class that keeps the IAnimal promise\n//       and whose Speak() returns "Hoot".\n\nclass Program\n{\n    static void Main()\n    {\n        var keeper = new Keeper();\n        Console.WriteLine(keeper.Greet(new Owl()));\n    }\n}\n',
       solution:
-        'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Keeper\n{\n    public string Greet(IAnimal a) { return "heard: " + a.Speak(); }\n}\n\npublic class Owl : IAnimal\n{\n    public string Speak()\n    {\n        return "Hoot";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var keeper = new Keeper();\n        Console.WriteLine(keeper.Greet(new Owl()));\n    }\n}\n',
+        'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Keeper\n{\n    public string Greet(IAnimal animal) { return "heard: " + animal.Speak(); }\n}\n\npublic class Owl : IAnimal\n{\n    public string Speak()\n    {\n        return "Hoot";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var keeper = new Keeper();\n        Console.WriteLine(keeper.Greet(new Owl()));\n    }\n}\n',
     },
     {
       summary: true,

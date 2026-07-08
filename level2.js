@@ -494,7 +494,7 @@ public static void Main()
     context: "This is the problem version. Complete the hard-wired construction that ties the runner to the console.",
     snippet: `public class ConsoleReporter
 {
-    public void Send(string msg) => Console.WriteLine(msg);
+    public void Send(string message) => Console.WriteLine(message);
 }
 
 public class TestRunner
@@ -539,7 +539,7 @@ public static void Main()
         answer: "Send",
         hints: ["The method that emits a message."],
         explain: [
-          { text: "`Send` is how the reporter emits a message.", highlight: "public void Send(string msg) => Console.WriteLine(msg)" },
+          { text: "`Send` is how the reporter emits a message.", highlight: "public void Send(string message) => Console.WriteLine(message)" },
           { text: "The runner calls `_reporter.Send` directly. Fine on its own, but with the weld above, this always hits the real console.", highlight: "_reporter.{{2}}(\"test passed\")" },
         ],
       },
@@ -553,13 +553,13 @@ public static void Main()
     context: "The runner now receives its reporter. Inject one and call it through the interface.",
     snippet: `public interface IReporter
 {
-    void Send(string msg);
+    void Send(string message);
 }
 
 public class FakeReporter : IReporter
 {
     public string Last = "";
-    public void Send(string msg) => Last = msg;
+    public void Send(string message) => Last = message;
 }
 
 public class TestRunner
@@ -596,7 +596,7 @@ public static void Main()
         explain: [
           { text: "`FakeReporter` implements `IReporter` but just stores the message in `Last` instead of printing.", highlight: "public class FakeReporter : IReporter" },
           { text: "Building one gives the test a reporter it can inspect afterwards.", highlight: "var fake = new {{1}}()" },
-          { text: "This is the mock idea: a cheap stand-in used in place of the real dependency.", highlight: "public void Send(string msg) => Last = msg" },
+          { text: "This is the mock idea: a cheap stand-in used in place of the real dependency.", highlight: "public void Send(string message) => Last = message" },
         ],
       },
       {

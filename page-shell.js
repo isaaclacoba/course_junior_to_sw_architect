@@ -197,7 +197,8 @@
     "reading-objects.html", "level4.html", "first-builds.html", "wiring-it-up.html",
     "collections.html", "data-shapes.html", "lambdas.html", "linq.html", "errors-null.html", "generics.html",
     "encapsulation.html", "interfaces.html", "polymorphism.html", "composition.html",
-    "dependency-injection.html", "level2.html", "level3-app/",
+    "dependency-injection.html", "testing-basics.html", "test-doubles.html", "testable-design.html",
+    "level2.html", "level3-app/",
   ];
   const THEORY = [
     "theory-1.html", "theory-2.html", "theory-3.html", "theory-4.html", "theory-5.html",

@@ -1,223 +1,138 @@
-// Part three - "Lambdas". Runnable fill-in-the-blank drills (same engine and
-// style as Collections), placed right before LINQ because every LINQ operator
-// takes a lambda. Teaches the idea slowly: a lambda is a small function with no
-// name; the `=>` arrow; a true/false lambda (the shape LINQ needs); more than one
-// input; and handing a lambda to a method. .NET 8 lets `var` infer a lambda's
-// type, so no `Func<>` jargon is needed. Data only: drill-engine.js reads
-// window.DRILL_CONFIG; the Run button compiles runnablePrograms through the
-// shared code-lab Roslyn/WASM host. Animal flavour throughout.
+// Part three - "Lambdas". Write-from-scratch coding exercises (build-engine),
+// placed right before LINQ because every LINQ operator takes a lambda. This is a
+// junior's FIRST contact with lambdas, so it stays self-contained: only `var`,
+// simple arithmetic/comparison, and Console.WriteLine - no Array.Find, no LINQ,
+// no Func<>/Action<> jargon (var infers the type). One new idea per drill, each
+// answering "why do I care about lambdas?": (1) a tiny function you keep in a
+// variable, (2) it can answer a yes/no question - the shape LINQ will filter
+// with, (3) it can read the variables around it (capture) - the thing a plain
+// named method cannot, (4) so you can bake in a value you have now. The recap
+// bridges to LINQ and notes a normal method still works when a step deserves a
+// name. The learner completes each lambda body; only the usage is given. Data
+// only: build-engine.js reads window.BUILD_CONFIG; Run compiles through the
+// shared code-lab Roslyn/WASM host. Animal flavour throughout. The Main body is
+// left empty on purpose: the learner assembles a few simple lines - declare a
+// lambda, then actually use it over a small array with a loop. The worked example
+// shows that shape on a DIFFERENT subject (numbers/prices), so copying it will not
+// produce the answer; the learner adapts the data, the operator, and the output.
+(function () {
+  "use strict";
 
-const drills = [
-  {
-    title: "A function with no name",
-    concept: "Lambda",
-    context:
-      "A lambda is a small function you write right where you need it, with no name. `(int legs) => legs + 1` reads: take `legs`, give back `legs + 1`. The `=>` is the arrow - 'goes to'. Store it in a variable, then call it like any method. Add one leg to a four-legged friend.",
-    snippet: `var addLeg = (int legs) => legs + {{1}};
-Console.WriteLine(addLeg(4));`,
-    points: [
-      "A lambda is a function with no name.",
-      "`(input) => result` - the arrow means 'goes to'.",
-      "Store it in a variable, then call it like a method.",
-    ],
-    blanks: [
-      {
-        id: 1,
-        label: "How many legs to add",
-        answer: "1",
-        hints: ["Just one leg."],
-        explain: [
-          { text: "The lambda gives back `legs + 1`.", highlight: "var addLeg = (int legs) => legs + {{1}}" },
-          { text: "`addLeg(4)` works out `4 + 1`, so it prints `5`.", highlight: "Console.WriteLine(addLeg(4))" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "The arrow does the work",
-    concept: "The => arrow",
-    context:
-      "Whatever comes after the `=>` is what the lambda gives back. Here `n => n * 2` doubles whatever you pass in. Fill in the operator that doubles a number.",
-    snippet: `var doubleIt = (int n) => n {{1}} 2;
-Console.WriteLine(doubleIt(3));`,
-    points: [
-      "The left of `=>` is the input; the right is the result.",
-      "`doubleIt(3)` runs `3 * 2`.",
-    ],
-    blanks: [
-      {
-        id: 1,
-        label: "The operator that doubles n",
-        answer: "*",
-        hints: ["The multiply sign."],
-        explain: [
-          { text: "`n * 2` doubles the input.", highlight: "var doubleIt = (int n) => n {{1}} 2" },
-          { text: "So `doubleIt(3)` prints `6`.", highlight: "Console.WriteLine(doubleIt(3))" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "A lambda that answers yes or no",
-    concept: "A true/false lambda",
-    context:
-      "A lambda can give back `true` or `false`. `legs => legs == 4` asks 'does it have four legs?'. This yes/no kind is exactly what the next lesson, LINQ, hands to `Where` and `Count`. Ask whether a paw count means a dog.",
-    snippet: `var isDog = (int legs) => legs {{1}} 4;
-Console.WriteLine(isDog(4));`,
-    points: [
-      "A lambda can return a `bool` - true or false.",
-      "`==` checks whether two values are equal.",
-    ],
-    blanks: [
-      {
-        id: 1,
-        label: "Check that legs equals four",
-        answer: "==",
-        hints: ["Equality: two equals signs."],
-        explain: [
-          { text: "`legs == 4` is true only when there are exactly four legs.", highlight: "var isDog = (int legs) => legs {{1}} 4" },
-          { text: "`isDog(4)` is true, so it prints `True`.", highlight: "Console.WriteLine(isDog(4))" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "More than one input",
-    concept: "Two inputs",
-    context:
-      "A lambda can take several inputs, separated by commas. `(a, b) => a + b` adds two numbers. Give it the second number so the paws add up to five.",
-    snippet: `var add = (int a, int b) => a + b;
-Console.WriteLine(add(2, {{1}}));`,
-    points: [
-      "List inputs in the brackets, separated by commas.",
-      "`add(2, 3)` gives `2 + 3`.",
-    ],
-    blanks: [
-      {
-        id: 1,
-        label: "The second number, so the total is 5",
-        answer: "3",
-        hints: ["2 + ? = 5."],
-        explain: [
-          { text: "The lambda adds its two inputs.", highlight: "var add = (int a, int b) => a + b" },
-          { text: "`add(2, 3)` is `5`.", highlight: "Console.WriteLine(add(2, {{1}}))" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Hand a lambda to a method",
-    concept: "Passing a lambda",
-    context:
-      "Here is the real power: you can hand a lambda to a method, and it runs your lambda for you. `Array.Find` walks an array and returns the first item your lambda says `true` for. Find the first four-legged animal by its paw count.",
-    snippet: `int[] paws = { 2, 4, 2 };
-int firstFour = Array.Find(paws, p => p {{1}} 4);
-Console.WriteLine(firstFour);`,
-    points: [
-      "A method can take a lambda as an argument.",
-      "`Array.Find` runs your lambda on each item and returns the first match.",
-      "LINQ works the same way - it just gives you more of these methods.",
-    ],
-    blanks: [
-      {
-        id: 1,
-        label: "Match a paw count of exactly four",
-        answer: "==",
-        hints: ["The same equality check as before."],
-        explain: [
-          { text: "`Array.Find` keeps the first paw count your lambda says true for.", highlight: "int firstFour = Array.Find(paws, p => p {{1}} 4)" },
-          { text: "The first `4` in the array matches, so it prints `4`.", highlight: "Console.WriteLine(firstFour)" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Lambdas - recap",
-    concept: "Recap",
-    summary: true,
-    context: "You now have the small piece of syntax every LINQ query is built on.",
-    summaryIntro:
-      "A lambda is a short, nameless function you write inline. You store it, call it, and - most usefully - hand it to a method that runs it for you.",
-    summaryItems: [
-      { title: "Lambda - ", text: "a small function with no name, written where you need it." },
-      { title: "The => arrow - ", text: "input on the left, the result on the right." },
-      { title: "A yes/no lambda - ", text: "`x => x == 4` gives back true or false." },
-      { title: "Many inputs - ", text: "`(a, b) => a + b`, separated by commas." },
-      { title: "Pass it to a method - ", text: "a method can take your lambda and run it on each item." },
-    ],
-    summaryClose: "Next in this track: LINQ - every operator you meet takes a lambda exactly like these.",
-    blanks: [],
-  },
-];
-
-// Complete, runnable C# for each drill, index-aligned with `drills`.
-const runnablePrograms = [
-  // 0 - A function with no name
-  `using System;
-
-class Program
-{
-    static void Main()
+  const tasks = [
     {
-        var addLeg = (int legs) => legs + 1;
-        Console.WriteLine(addLeg(4));
-    }
-}`,
-  // 1 - The arrow does the work
-  `using System;
-
-class Program
-{
-    static void Main()
+      title: "Store it once, call it twice",
+      concept: "Reuse a stored function",
+      context:
+        "A lambda is a tiny function with no name. You keep it in a variable and call it as often as you like - that is the point of storing it. `(int legs) => legs + 1` reads: take `legs`, give back `legs + 1`. A stool has three legs, a chair has four; store the 'add a leg' function once and use it on both.",
+      example:
+        'var square = (int n) => n * n;\nConsole.WriteLine(square(2)); // 4\nConsole.WriteLine(square(3)); // 9',
+      goal: [
+        "Store a lambda `addLeg` that gives back `legs + 1`.",
+        "Call it on `3` and on `4`, printing each result - two lines: `4` then `5`.",
+      ],
+      expected: ["4", "5"],
+      requireSource: [
+        { pattern: /var\s+\w+\s*=/, message: "Store your lambda in a variable with `var`." },
+        { pattern: /=>/, message: "Write the function as a lambda using `=>`." },
+        { pattern: /\+\s*1/, message: "`addLeg` should give back `legs + 1`." },
+      ],
+      starter:
+        'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        // TODO: store a lambda `addLeg` that gives back legs + 1,\n        //       then print addLeg(3) and addLeg(4) on their own lines.\n\n    }\n}\n',
+      solution:
+        'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        var addLeg = (int legs) => legs + 1;\n        Console.WriteLine(addLeg(3));\n        Console.WriteLine(addLeg(4));\n    }\n}\n',
+    },
     {
-        var doubleIt = (int n) => n * 2;
-        Console.WriteLine(doubleIt(3));
-    }
-}`,
-  // 2 - A lambda that answers yes or no
-  `using System;
-
-class Program
-{
-    static void Main()
+      title: "Run a rule over a list",
+      concept: "Apply a yes/no rule",
+      context:
+        "A lambda can give back `true` or `false` - a small yes/no test. The useful part is running that one test over many items. Store `isFourLegged` (does a leg count equal four?), then walk the array with a `foreach` and count how many animals pass. This by-hand loop is exactly what LINQ will do for you next lesson.",
+      example:
+        'int[] nums = { 3, 12, 7, 20 };\nvar isBig = (int n) => n > 10;\nint big = 0;\nforeach (int n in nums)\n{\n    if (isBig(n)) big++;\n}\nConsole.WriteLine(big); // 2',
+      goal: [
+        "Store a lambda `isFourLegged` that returns whether a count equals `4`.",
+        "Loop over `legs` and count how many pass, then print the count - the output is `2`.",
+      ],
+      expected: "2",
+      requireSource: [
+        { pattern: /var\s+\w+\s*=/, message: "Store your lambda in a variable with `var`." },
+        { pattern: /==\s*4/, message: "Your rule should test `== 4`." },
+        { pattern: /\bfor(each)?\s*\(/, message: "Walk the array with a `foreach` loop." },
+      ],
+      starter:
+        'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int[] legs = { 2, 4, 8, 4 };\n        // TODO: store a lambda isFourLegged (a count == 4),\n        //       then loop over legs and print how many animals pass.\n\n    }\n}\n',
+      solution:
+        'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int[] legs = { 2, 4, 8, 4 };\n        var isFourLegged = (int count) => count == 4;\n        int total = 0;\n        foreach (int count in legs)\n        {\n            if (isFourLegged(count)) total++;\n        }\n        Console.WriteLine(total);\n    }\n}\n',
+    },
     {
-        var isDog = (int legs) => legs == 4;
-        Console.WriteLine(isDog(4));
-    }
-}`,
-  // 3 - More than one input
-  `using System;
-
-class Program
-{
-    static void Main()
+      title: "A rule that reads a local",
+      concept: "Capture",
+      context:
+        "Here is where a lambda earns its keep. Say the threshold sits in a variable, `minLegs`, set a line earlier. A lambda written right there can read `minLegs` on its own - a separate named method could not, it only sees what you pass it. Store `enough` (does a count reach `minLegs`?), then count how many animals clear the bar.",
+      example:
+        'int limit = 100;\nint[] prices = { 40, 250, 90, 30 };\nvar underLimit = (int p) => p <= limit;\nint cheap = 0;\nforeach (int p in prices)\n{\n    if (underLimit(p)) cheap++;\n}\nConsole.WriteLine(cheap); // 3',
+      goal: [
+        "Store a lambda `enough` that returns whether a count is `>= minLegs` (it reads the local `minLegs`).",
+        "Loop over `legs` and count how many reach `minLegs`, then print it - the output is `3`.",
+      ],
+      expected: "3",
+      requireSource: [
+        { pattern: /var\s+\w+\s*=/, message: "Store your lambda in a variable with `var`." },
+        { pattern: /=>[^;\n]*minLegs/, message: "Your lambda must read the local `minLegs` - that is the whole point." },
+        { pattern: /\bfor(each)?\s*\(/, message: "Walk the array with a `foreach` loop." },
+      ],
+      starter:
+        'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int minLegs = 4;\n        int[] legs = { 2, 4, 8, 4 };\n        // TODO: store a lambda enough (a count >= minLegs, reading minLegs),\n        //       then loop over legs and print how many reach minLegs.\n\n    }\n}\n',
+      solution:
+        'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int minLegs = 4;\n        int[] legs = { 2, 4, 8, 4 };\n        var enough = (int count) => count >= minLegs;\n        int total = 0;\n        foreach (int count in legs)\n        {\n            if (enough(count)) total++;\n        }\n        Console.WriteLine(total);\n    }\n}\n',
+    },
     {
-        var add = (int a, int b) => a + b;
-        Console.WriteLine(add(2, 3));
-    }
-}`,
-  // 4 - Hand a lambda to a method
-  `using System;
-
-class Program
-{
-    static void Main()
+      title: "Configure a step, then run it",
+      concept: "Capture to configure",
+      context:
+        "Because a lambda can read the values around it, you can bake one in. `bonus` is a plain number; store `reward` so it adds `bonus` to any score. The same lambda now carries `bonus` with it - loop over the scores and print each rewarded total. Change `bonus` once and every result follows.",
+      example:
+        'int tax = 5;\nint[] prices = { 20, 100 };\nvar withTax = (int p) => p + tax;\nforeach (int p in prices)\n{\n    Console.WriteLine(withTax(p)); // 25, 105\n}',
+      goal: [
+        "Store a lambda `reward` that gives back `score + bonus` (it reads the local `bonus`).",
+        "Loop over `scores` and print each rewarded total - two lines: `15` then `30`.",
+      ],
+      expected: ["15", "30"],
+      requireSource: [
+        { pattern: /var\s+\w+\s*=/, message: "Store your lambda in a variable with `var`." },
+        { pattern: /=>[^;\n]*bonus/, message: "Your step must add the captured `bonus`." },
+        { pattern: /\bfor(each)?\s*\(/, message: "Walk the array with a `foreach` loop." },
+      ],
+      starter:
+        'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int bonus = 10;\n        int[] scores = { 5, 20 };\n        // TODO: store a lambda reward (score + bonus, reading bonus),\n        //       then loop over scores and print each rewarded total.\n\n    }\n}\n',
+      solution:
+        'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int bonus = 10;\n        int[] scores = { 5, 20 };\n        var reward = (int score) => score + bonus;\n        foreach (int score in scores)\n        {\n            Console.WriteLine(reward(score));\n        }\n    }\n}\n',
+    },
     {
-        int[] paws = { 2, 4, 2 };
-        int firstFour = Array.Find(paws, p => p == 4);
-        Console.WriteLine(firstFour);
-    }
-}`,
-];
+      summary: true,
+      title: "Why care about lambdas? - recap",
+      concept: "Recap",
+      context: "So what is a lambda, and why keep one around?",
+      summaryIntro:
+        "A lambda is a tiny function with no name that you keep in a variable. It is worth caring about because you can package a small rule or step, run it over many items, and - unlike a plain named method - it can read the variables sitting around it.",
+      summaryItems: [
+        { title: "A function in a variable - ", text: "no name, stored once, called as often as you like." },
+        { title: "The arrow - ", text: "`(input) => result`: input on the left, the answer on the right." },
+        { title: "A rule over a list - ", text: "one small `foreach` runs your test on every item." },
+        { title: "Capture - ", text: "a lambda can read the locals beside it; a named method only sees what you pass it." },
+        { title: "Configure it - ", text: "bake in a value you have now, and the same lambda does a new job." },
+      ],
+      summaryClose: "Next: LINQ - `legs.Count(...)` and `scores.Select(...)` do that same foreach for you, in one line, with a lambda exactly like these. (When a step deserves a real name, a normal method still works - a lambda just wins when it is small, inline, or needs the values around it.)",
+    },
+  ];
 
-window.DRILL_CONFIG = {
-  prefix: "lam",
-  metaLabel: "Know the language \u00b7 Lambdas",
-  progressNoun: "Drill",
-  drills,
-  runnablePrograms,
-  runnerUrl: "level3-app/index.html?runner=1",
-  xpKey: "course_global_xp",
-  awardedKey: "lambdas_awarded",
-  awardAmount: 20,
-};
+  window.BUILD_CONFIG = {
+    prefix: "lam",
+    metaLabel: "Know the language \u00b7 Lambdas",
+    progressNoun: "Build",
+    tasks,
+    runnerUrl: "level3-app/index.html?runner=1",
+    xpKey: "course_global_xp",
+    awardedKey: "lambdas_awarded",
+    awardAmount: 20,
+  };
+})();

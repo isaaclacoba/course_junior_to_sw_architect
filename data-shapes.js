@@ -17,7 +17,7 @@
       context:
         "A property is data on an object you can read and write, with `{ get; set; }` doing the work behind the scenes. Give the `Cat` a `Name` property so the code below can set it and print it.",
       example:
-        'public class Dog\n{\n    public string Breed { get; set; }\n}\n\nvar d = new Dog();\nd.Breed = "corgi";\nConsole.WriteLine(d.Breed);',
+        'public class Dog\n{\n    public string Breed { get; set; }\n}\n\nvar dog = new Dog();\ndog.Breed = "corgi";\nConsole.WriteLine(dog.Breed);',
       goal: [
         "Add a `Name` property (with `get` and `set`) to `Cat` so it holds a string.",
         "Main sets Name to Mittens and prints it, so the output is Mittens.",
@@ -69,7 +69,7 @@
       context:
         "An `enum` is a type with a fixed set of named options - no stray strings to mistype. Define a `Mood` enum, then turn each mood into something the pet says.",
       example:
-        'enum Light { Red, Green }\n\nstring Go(Light l)\n{\n    switch (l)\n    {\n        case Light.Green: return "go";\n        default: return "stop";\n    }\n}',
+        'enum Light { Red, Green }\n\nstring Go(Light light)\n{\n    switch (light)\n    {\n        case Light.Green: return "go";\n        default: return "stop";\n    }\n}',
       goal: [
         "Define an `enum Mood` with `Sleepy`, `Hungry` and `Playful`.",
         "In `Say`, return `\"zzz\"` for Sleepy, `\"feed me\"` for Hungry, `\"woof\"` for Playful.",
@@ -96,7 +96,7 @@
       context:
         "A `struct` is a value type: assigning it makes a fresh copy, so changing the copy never touches the original. (A `class` would share one object, and the original would change too.) Define `Treats` as a struct and watch the copy stay separate.",
       example:
-        'struct Point { public int X; }\n\nvar a = new Point();\na.X = 1;\nvar b = a;   // copy\nb.X = 9;\nConsole.WriteLine(a.X);  // still 1',
+        'struct Point { public int X; }\n\nvar original = new Point();\noriginal.X = 1;\nvar copy = original;   // copy\ncopy.X = 9;\nConsole.WriteLine(original.X);  // still 1',
       goal: [
         "Define `Treats` as a `struct` with a public `int Count` field.",
         "Main copies the treats, changes the copy to 99, and prints the original's Count - which should still be 3.",
@@ -116,7 +116,7 @@
       context:
         "A `record` is a data type that compares by value: two records with the same contents are equal. (A `class` compares by reference, so two separate objects are never equal even with identical data.) Define an `Animal` record and check two equal ones.",
       example:
-        'record Color(string Name);\n\nvar a = new Color("red");\nvar b = new Color("red");\nConsole.WriteLine(a == b);  // True',
+        'record Color(string Name);\n\nvar first = new Color("red");\nvar second = new Color("red");\nConsole.WriteLine(first == second);  // True',
       goal: [
         "Define `record Animal(string Name, int Legs);`.",
         "Main makes two animals with the same Name and Legs and prints whether they are equal - which should be True.",
@@ -126,9 +126,9 @@
         { pattern: /record\s+Animal/, message: "Define `Animal` as a `record`, not a class." },
       ],
       starter:
-        'using System;\n\n// TODO: define record Animal(string Name, int Legs);\n\nclass Program\n{\n    static void Main()\n    {\n        var a = new Animal("puppy", 4);\n        var b = new Animal("puppy", 4);\n        Console.WriteLine(a == b);\n    }\n}\n',
+        'using System;\n\n// TODO: define record Animal(string Name, int Legs);\n\nclass Program\n{\n    static void Main()\n    {\n        var first = new Animal("puppy", 4);\n        var second = new Animal("puppy", 4);\n        Console.WriteLine(first == second);\n    }\n}\n',
       solution:
-        'using System;\n\npublic record Animal(string Name, int Legs);\n\nclass Program\n{\n    static void Main()\n    {\n        var a = new Animal("puppy", 4);\n        var b = new Animal("puppy", 4);\n        Console.WriteLine(a == b);\n    }\n}\n',
+        'using System;\n\npublic record Animal(string Name, int Legs);\n\nclass Program\n{\n    static void Main()\n    {\n        var first = new Animal("puppy", 4);\n        var second = new Animal("puppy", 4);\n        Console.WriteLine(first == second);\n    }\n}\n',
     },
   ];
 

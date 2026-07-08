@@ -53,14 +53,14 @@
       ],
       verify: {
         main:
-          'class Program\n{\n    static void Main()\n    {\n        IAnimal a = new Cat();\n        IAnimal b = new Dog();\n        Console.WriteLine(b.Speak());\n        Console.WriteLine(a.Speak());\n    }\n}\n',
+          'class Program\n{\n    static void Main()\n    {\n        IAnimal cat = new Cat();\n        IAnimal dog = new Dog();\n        Console.WriteLine(dog.Speak());\n        Console.WriteLine(cat.Speak());\n    }\n}\n',
         expected: ["Woof", "Meow"],
         message: "Each animal must return its own sound, whichever order they speak in.",
       },
       starter:
-        'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\n// TODO: write Cat : IAnimal (Speak returns "Meow")\n//       and Dog : IAnimal (Speak returns "Woof").\n\nclass Program\n{\n    static void Main()\n    {\n        IAnimal a = new Cat();\n        IAnimal b = new Dog();\n        Console.WriteLine(a.Speak());\n        Console.WriteLine(b.Speak());\n    }\n}\n',
+        'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\n// TODO: write Cat : IAnimal (Speak returns "Meow")\n//       and Dog : IAnimal (Speak returns "Woof").\n\nclass Program\n{\n    static void Main()\n    {\n        IAnimal cat = new Cat();\n        IAnimal dog = new Dog();\n        Console.WriteLine(cat.Speak());\n        Console.WriteLine(dog.Speak());\n    }\n}\n',
       solution:
-        'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() { return "Meow"; }\n}\n\npublic class Dog : IAnimal\n{\n    public string Speak() { return "Woof"; }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        IAnimal a = new Cat();\n        IAnimal b = new Dog();\n        Console.WriteLine(a.Speak());\n        Console.WriteLine(b.Speak());\n    }\n}\n',
+        'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() { return "Meow"; }\n}\n\npublic class Dog : IAnimal\n{\n    public string Speak() { return "Woof"; }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        IAnimal cat = new Cat();\n        IAnimal dog = new Dog();\n        Console.WriteLine(cat.Speak());\n        Console.WriteLine(dog.Speak());\n    }\n}\n',
     },
     {
       title: "One loop, the whole pen",
@@ -68,7 +68,7 @@
       context:
         "Because every animal keeps the same promise, you can put different ones in a single `List<IAnimal>` and walk them with one loop. Write the `Main`: build a list with a `Cat` and a `Dog`, then loop it and print what each one says. The loop never asks which animal it is holding.",
       example:
-        'var nums = new List<int> { 1, 2 };\nforeach (var n in nums)\n{\n    Console.WriteLine(n);\n}',
+        'var nums = new List<int> { 1, 2 };\nforeach (var number in nums)\n{\n    Console.WriteLine(number);\n}',
       goal: [
         "In Main, build a `List<IAnimal>` holding a `Cat` then a `Dog`, and loop it printing each `Speak()`.",
         "So the output is two lines: Meow then Woof.",
@@ -81,7 +81,7 @@
       starter:
         'using System;\nusing System.Collections.Generic;\n\npublic interface IAnimal { string Speak(); }\npublic class Cat : IAnimal { public string Speak() { return "Meow"; } }\npublic class Dog : IAnimal { public string Speak() { return "Woof"; } }\n\nclass Program\n{\n    static void Main()\n    {\n        // TODO: put a Cat and a Dog into one List<IAnimal>,\n        //       then loop the list and print what each one says.\n    }\n}\n',
       solution:
-        'using System;\nusing System.Collections.Generic;\n\npublic interface IAnimal { string Speak(); }\npublic class Cat : IAnimal { public string Speak() { return "Meow"; } }\npublic class Dog : IAnimal { public string Speak() { return "Woof"; } }\n\nclass Program\n{\n    static void Main()\n    {\n        var pen = new List<IAnimal> { new Cat(), new Dog() };\n        foreach (var a in pen)\n        {\n            Console.WriteLine(a.Speak());\n        }\n    }\n}\n',
+        'using System;\nusing System.Collections.Generic;\n\npublic interface IAnimal { string Speak(); }\npublic class Cat : IAnimal { public string Speak() { return "Meow"; } }\npublic class Dog : IAnimal { public string Speak() { return "Woof"; } }\n\nclass Program\n{\n    static void Main()\n    {\n        var pen = new List<IAnimal> { new Cat(), new Dog() };\n        foreach (var animal in pen)\n        {\n            Console.WriteLine(animal.Speak());\n        }\n    }\n}\n',
     },
     {
       title: "Pick the animal at runtime",
@@ -89,7 +89,7 @@
       context:
         "Which animal you get can be decided while the program runs. Write a `Shelter` with a method `Adopt(string kind)` that returns a new `Dog` when `kind` is `\"dog\"`, otherwise a new `Cat`. The caller then makes one plain `Speak` call and never needs to know which it got.",
       example:
-        'public IShape Pick(string k)\n{\n    if (k == "box") return new Box();\n    return new Circle();\n}',
+        'public IShape Pick(string kind)\n{\n    if (kind == "box") return new Box();\n    return new Circle();\n}',
       goal: [
         "Write a `Shelter` with `IAnimal Adopt(string kind)` - a Dog for \"dog\", otherwise a Cat.",
         "Main adopts a dog and it speaks, so the output is Woof.",
@@ -101,14 +101,14 @@
       ],
       verify: {
         main:
-          'class Program\n{\n    static void Main()\n    {\n        var shelter = new Shelter();\n        IAnimal a = shelter.Adopt("cat");\n        Console.WriteLine(a.Speak());\n    }\n}\n',
+          'class Program\n{\n    static void Main()\n    {\n        var shelter = new Shelter();\n        IAnimal animal = shelter.Adopt("cat");\n        Console.WriteLine(animal.Speak());\n    }\n}\n',
         expected: "Meow",
         message: "Woof is right for adopting a dog only. Return the animal that matches the kind asked for.",
       },
       starter:
-        'using System;\n\npublic interface IAnimal { string Speak(); }\npublic class Cat : IAnimal { public string Speak() { return "Meow"; } }\npublic class Dog : IAnimal { public string Speak() { return "Woof"; } }\n\n// TODO: write a Shelter class with a method  IAnimal Adopt(string kind)\n//       that returns a new Dog for "dog", otherwise a new Cat.\n\nclass Program\n{\n    static void Main()\n    {\n        var shelter = new Shelter();\n        IAnimal a = shelter.Adopt("dog");\n        Console.WriteLine(a.Speak());\n    }\n}\n',
+        'using System;\n\npublic interface IAnimal { string Speak(); }\npublic class Cat : IAnimal { public string Speak() { return "Meow"; } }\npublic class Dog : IAnimal { public string Speak() { return "Woof"; } }\n\n// TODO: write a Shelter class with a method  IAnimal Adopt(string kind)\n//       that returns a new Dog for "dog", otherwise a new Cat.\n\nclass Program\n{\n    static void Main()\n    {\n        var shelter = new Shelter();\n        IAnimal animal = shelter.Adopt("dog");\n        Console.WriteLine(animal.Speak());\n    }\n}\n',
       solution:
-        'using System;\n\npublic interface IAnimal { string Speak(); }\npublic class Cat : IAnimal { public string Speak() { return "Meow"; } }\npublic class Dog : IAnimal { public string Speak() { return "Woof"; } }\n\npublic class Shelter\n{\n    public IAnimal Adopt(string kind)\n    {\n        if (kind == "dog") return new Dog();\n        return new Cat();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var shelter = new Shelter();\n        IAnimal a = shelter.Adopt("dog");\n        Console.WriteLine(a.Speak());\n    }\n}\n',
+        'using System;\n\npublic interface IAnimal { string Speak(); }\npublic class Cat : IAnimal { public string Speak() { return "Meow"; } }\npublic class Dog : IAnimal { public string Speak() { return "Woof"; } }\n\npublic class Shelter\n{\n    public IAnimal Adopt(string kind)\n    {\n        if (kind == "dog") return new Dog();\n        return new Cat();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var shelter = new Shelter();\n        IAnimal animal = shelter.Adopt("dog");\n        Console.WriteLine(animal.Speak());\n    }\n}\n',
     },
     {
       title: "Add an animal, leave the loop alone",
@@ -126,9 +126,9 @@
         { pattern: /class\s+Owl\s*:\s*IAnimal/, message: "Make `Owl` keep the promise: `: IAnimal`." },
       ],
       starter:
-        'using System;\nusing System.Collections.Generic;\n\npublic interface IAnimal { string Speak(); }\npublic class Cat : IAnimal { public string Speak() { return "Meow"; } }\npublic class Dog : IAnimal { public string Speak() { return "Woof"; } }\n\n// TODO: write an Owl class that implements IAnimal and says "Hoot".\n//       The list and loop below already include an Owl - leave them as they are.\n\nclass Program\n{\n    static void Main()\n    {\n        var pen = new List<IAnimal> { new Cat(), new Dog(), new Owl() };\n        foreach (var a in pen)\n        {\n            Console.WriteLine(a.Speak());\n        }\n    }\n}\n',
+        'using System;\nusing System.Collections.Generic;\n\npublic interface IAnimal { string Speak(); }\npublic class Cat : IAnimal { public string Speak() { return "Meow"; } }\npublic class Dog : IAnimal { public string Speak() { return "Woof"; } }\n\n// TODO: write an Owl class that implements IAnimal and says "Hoot".\n//       The list and loop below already include an Owl - leave them as they are.\n\nclass Program\n{\n    static void Main()\n    {\n        var pen = new List<IAnimal> { new Cat(), new Dog(), new Owl() };\n        foreach (var animal in pen)\n        {\n            Console.WriteLine(animal.Speak());\n        }\n    }\n}\n',
       solution:
-        'using System;\nusing System.Collections.Generic;\n\npublic interface IAnimal { string Speak(); }\npublic class Cat : IAnimal { public string Speak() { return "Meow"; } }\npublic class Dog : IAnimal { public string Speak() { return "Woof"; } }\n\npublic class Owl : IAnimal\n{\n    public string Speak()\n    {\n        return "Hoot";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var pen = new List<IAnimal> { new Cat(), new Dog(), new Owl() };\n        foreach (var a in pen)\n        {\n            Console.WriteLine(a.Speak());\n        }\n    }\n}\n',
+        'using System;\nusing System.Collections.Generic;\n\npublic interface IAnimal { string Speak(); }\npublic class Cat : IAnimal { public string Speak() { return "Meow"; } }\npublic class Dog : IAnimal { public string Speak() { return "Woof"; } }\n\npublic class Owl : IAnimal\n{\n    public string Speak()\n    {\n        return "Hoot";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var pen = new List<IAnimal> { new Cat(), new Dog(), new Owl() };\n        foreach (var animal in pen)\n        {\n            Console.WriteLine(animal.Speak());\n        }\n    }\n}\n',
     },
     {
       summary: true,

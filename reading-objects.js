@@ -21,8 +21,8 @@ public class Greeter
 {
     public string Greet(Clock clock)
     {
-        int h = clock.{{1}}();
-        return h < 12 ? "Good morning" : "Good afternoon";
+        int hour = clock.{{1}}();
+        return hour < 12 ? "Good morning" : "Good afternoon";
     }
 }
 
@@ -43,7 +43,7 @@ public static void Main()
         hints: ["The method on Clock that returns the hour."],
         explain: [
           { text: "`Clock` has one method, `Hour`, that returns the current hour as a number.", highlight: "public int Hour() => 9" },
-          { text: "`Greeter` calls `clock.Hour()` to find out the time. It relies on `Clock` for that fact.", highlight: "int h = clock.{{1}}()" },
+          { text: "`Greeter` calls `clock.Hour()` to find out the time. It relies on `Clock` for that fact.", highlight: "int hour = clock.{{1}}()" },
         ],
       },
       {
@@ -124,8 +124,8 @@ public static void Main()
 
 public static void Main()
 {
-    var r = new Rectangle();
-    Console.WriteLine(r.Area(4, 5));
+    var rectangle = new Rectangle();
+    Console.WriteLine(rectangle.Area(4, 5));
 }`,
     points: [
       "`Area` does exactly one thing: `width` times `height`.",
@@ -478,8 +478,8 @@ public class Greeter
 {
     public string Greet(Clock clock)
     {
-        int h = clock.Hour();
-        return h < 12 ? "Good morning" : "Good afternoon";
+        int hour = clock.Hour();
+        return hour < 12 ? "Good morning" : "Good afternoon";
     }
 }
 
@@ -533,8 +533,8 @@ class Program
 {
     static void Main()
     {
-        var r = new Rectangle();
-        Console.WriteLine(r.Area(4, 5));
+        var rectangle = new Rectangle();
+        Console.WriteLine(rectangle.Area(4, 5));
     }
 }`,
   // 3 - Spot The Second Job

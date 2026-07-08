@@ -26,9 +26,9 @@
         answerWhy: "`Where` filters - it returns every item the lambda said true for. Counting and picking one are other operators.",
       },
       snippet: `// keep only the four-legged animals
-var fourLegged = animals.{{1}}(a => a.Legs == 4);
-foreach (var a in fourLegged)
-    Console.WriteLine(a.Name);`,
+var fourLegged = animals.{{1}}(animal => animal.Legs == 4);
+foreach (var animal in fourLegged)
+    Console.WriteLine(animal.Name);`,
       points: [
         "`Where` returns a filtered sequence, not a single value.",
         "The lambda runs once per item and decides true (keep) or false (drop).",
@@ -40,8 +40,8 @@ foreach (var a in fourLegged)
           answer: "Where",
           hints: ["The operator that filters a sequence."],
           explain: [
-            { text: "`Where` tests each animal with the lambda and keeps the ones that return true.", highlight: "var fourLegged = animals.{{1}}(a => a.Legs == 4)" },
-            { text: "Here it keeps every animal whose `Legs` equals 4.", highlight: "var fourLegged = animals.{{1}}(a => a.Legs == 4)" },
+            { text: "`Where` tests each animal with the lambda and keeps the ones that return true.", highlight: "var fourLegged = animals.{{1}}(animal => animal.Legs == 4)" },
+            { text: "Here it keeps every animal whose `Legs` equals 4.", highlight: "var fourLegged = animals.{{1}}(animal => animal.Legs == 4)" },
           ],
         },
       ],
@@ -52,7 +52,7 @@ foreach (var a in fourLegged)
       context:
         "`Count` does the loop-and-tally for you. Give it a lambda and it returns how many items match - the one-line version of the `foreach` plus counter you wrote in Collections.",
       quiz: {
-        question: "`animals.Count(a => a.Legs == 4)` returns...",
+        question: "`animals.Count(animal => animal.Legs == 4)` returns...",
         options: [
           { text: "How many animals have 4 legs", correct: true },
           { text: "A list of the 4-legged animals", correct: false },
@@ -60,7 +60,7 @@ foreach (var a in fourLegged)
         ],
         answerWhy: "`Count` returns a number - the tally of items that matched. A list is `Where`; a yes/no is `Any`.",
       },
-      snippet: `int dogs = animals.{{1}}(a => a.Legs == 4);
+      snippet: `int dogs = animals.{{1}}(animal => animal.Legs == 4);
 Console.WriteLine(dogs);`,
       points: [
         "`Count` returns an `int` - how many items matched.",
@@ -73,8 +73,8 @@ Console.WriteLine(dogs);`,
           answer: "Count",
           hints: ["The operator that returns a number."],
           explain: [
-            { text: "`Count` runs the lambda over every animal and returns how many were true.", highlight: "int dogs = animals.{{1}}(a => a.Legs == 4)" },
-            { text: "This is the whole manual tally from Collections, in one line.", highlight: "int dogs = animals.{{1}}(a => a.Legs == 4)" },
+            { text: "`Count` runs the lambda over every animal and returns how many were true.", highlight: "int dogs = animals.{{1}}(animal => animal.Legs == 4)" },
+            { text: "This is the whole manual tally from Collections, in one line.", highlight: "int dogs = animals.{{1}}(animal => animal.Legs == 4)" },
           ],
         },
       ],
@@ -93,7 +93,7 @@ Console.WriteLine(dogs);`,
         ],
         answerWhy: "`Any` is a yes/no check, so it returns a `bool` - true if at least one item matched.",
       },
-      snippet: `bool hasBird = animals.{{1}}(a => a.Legs == 2);
+      snippet: `bool hasBird = animals.{{1}}(animal => animal.Legs == 2);
 Console.WriteLine(hasBird);`,
       points: [
         "`Any` returns true the moment one item matches.",
@@ -106,8 +106,8 @@ Console.WriteLine(hasBird);`,
           answer: "Any",
           hints: ["The operator that returns a bool for 'at least one'."],
           explain: [
-            { text: "`Any` returns true if at least one animal makes the lambda true.", highlight: "bool hasBird = animals.{{1}}(a => a.Legs == 2)" },
-            { text: "If no animal has 2 legs, it returns false.", highlight: "bool hasBird = animals.{{1}}(a => a.Legs == 2)" },
+            { text: "`Any` returns true if at least one animal makes the lambda true.", highlight: "bool hasBird = animals.{{1}}(animal => animal.Legs == 2)" },
+            { text: "If no animal has 2 legs, it returns false.", highlight: "bool hasBird = animals.{{1}}(animal => animal.Legs == 2)" },
           ],
         },
       ],
@@ -126,7 +126,7 @@ Console.WriteLine(hasBird);`,
         ],
         answerWhy: "`All` needs the condition to be true for every item; 'at least one' is `Any`.",
       },
-      snippet: `bool everyoneHasLegs = animals.{{1}}(a => a.Legs > 0);
+      snippet: `bool everyoneHasLegs = animals.{{1}}(animal => animal.Legs > 0);
 Console.WriteLine(everyoneHasLegs);`,
       points: [
         "`All` returns true only if no item fails the condition.",
@@ -139,8 +139,8 @@ Console.WriteLine(everyoneHasLegs);`,
           answer: "All",
           hints: ["The operator that needs every item to pass."],
           explain: [
-            { text: "`All` returns true only if every animal has `Legs > 0`.", highlight: "bool everyoneHasLegs = animals.{{1}}(a => a.Legs > 0)" },
-            { text: "A single legless animal would make it false.", highlight: "bool everyoneHasLegs = animals.{{1}}(a => a.Legs > 0)" },
+            { text: "`All` returns true only if every animal has `Legs > 0`.", highlight: "bool everyoneHasLegs = animals.{{1}}(animal => animal.Legs > 0)" },
+            { text: "A single legless animal would make it false.", highlight: "bool everyoneHasLegs = animals.{{1}}(animal => animal.Legs > 0)" },
           ],
         },
       ],
@@ -151,7 +151,7 @@ Console.WriteLine(everyoneHasLegs);`,
       context:
         "`Select` turns each item into something else - often pulling out one field. From a list of animals you can get a sequence of just their names.",
       quiz: {
-        question: "`animals.Select(a => a.Name)` gives you...",
+        question: "`animals.Select(animal => animal.Name)` gives you...",
         options: [
           { text: "A sequence of the animals' names", correct: true },
           { text: "The first animal's name", correct: false },
@@ -159,9 +159,9 @@ Console.WriteLine(everyoneHasLegs);`,
         ],
         answerWhy: "`Select` projects each item through the lambda, so a list of animals becomes a list of names.",
       },
-      snippet: `var names = animals.{{1}}(a => a.{{2}});
-foreach (var n in names)
-    Console.WriteLine(n);`,
+      snippet: `var names = animals.{{1}}(animal => animal.{{2}});
+foreach (var name in names)
+    Console.WriteLine(name);`,
       points: [
         "`Select` returns one new item per input item.",
         "It reshapes a sequence; it does not filter or count.",
@@ -173,7 +173,7 @@ foreach (var n in names)
           answer: "Select",
           hints: ["The operator that projects each item."],
           explain: [
-            { text: "`Select` runs the lambda on every animal and collects the results.", highlight: "var names = animals.{{1}}(a => a.{{2}})" },
+            { text: "`Select` runs the lambda on every animal and collects the results.", highlight: "var names = animals.{{1}}(animal => animal.{{2}})" },
           ],
         },
         {
@@ -182,7 +182,7 @@ foreach (var n in names)
           answer: "Name",
           hints: ["The field on Animal that holds the name."],
           explain: [
-            { text: "`a.Name` is what each animal becomes, so you end up with a sequence of names.", highlight: "var names = animals.{{1}}(a => a.{{2}})" },
+            { text: "`animal.Name` is what each animal becomes, so you end up with a sequence of names.", highlight: "var names = animals.{{1}}(animal => animal.{{2}})" },
           ],
         },
       ],
@@ -202,7 +202,7 @@ foreach (var n in names)
         answerWhy: "`FirstOrDefault` returns the type's default (null for objects) when there is no match; plain `First` throws.",
       },
       snippet: `// there may be no bird in the list - use the safe variant
-var bird = animals.{{1}}(a => a.Legs == 2);`,
+var bird = animals.{{1}}(animal => animal.Legs == 2);`,
       points: [
         "`First` throws on no match; `FirstOrDefault` returns a default.",
         "Reach for the safe variant when a missing match is possible.",
@@ -214,8 +214,8 @@ var bird = animals.{{1}}(a => a.Legs == 2);`,
           answer: "FirstOrDefault",
           hints: ["The safe variant that returns a default instead of throwing."],
           explain: [
-            { text: "`FirstOrDefault` returns the first two-legged animal, or `null` if there is none.", highlight: "var bird = animals.{{1}}(a => a.Legs == 2)" },
-            { text: "Plain `First` would throw an exception when nothing matches.", highlight: "var bird = animals.{{1}}(a => a.Legs == 2)" },
+            { text: "`FirstOrDefault` returns the first two-legged animal, or `null` if there is none.", highlight: "var bird = animals.{{1}}(animal => animal.Legs == 2)" },
+            { text: "Plain `First` would throw an exception when nothing matches.", highlight: "var bird = animals.{{1}}(animal => animal.Legs == 2)" },
           ],
         },
       ],
@@ -224,9 +224,9 @@ var bird = animals.{{1}}(a => a.Legs == 2);`,
       title: "Sort with OrderBy",
       concept: "OrderBy",
       context:
-        "`OrderBy` sorts the items by whatever the lambda picks out. `OrderBy(a => a.Name)` sorts alphabetically by name; `OrderBy(a => a.Legs)` sorts by leg count, smallest first.",
+        "`OrderBy` sorts the items by whatever the lambda picks out. `OrderBy(animal => animal.Name)` sorts alphabetically by name; `OrderBy(animal => animal.Legs)` sorts by leg count, smallest first.",
       quiz: {
-        question: "`animals.OrderBy(a => a.Legs)` sorts the animals by...",
+        question: "`animals.OrderBy(animal => animal.Legs)` sorts the animals by...",
         options: [
           { text: "Their number of legs, smallest first", correct: true },
           { text: "Their name, alphabetically", correct: false },
@@ -234,9 +234,9 @@ var bird = animals.{{1}}(a => a.Legs == 2);`,
         ],
         answerWhy: "`OrderBy` sorts ascending by the value the lambda returns - here, `Legs`.",
       },
-      snippet: `var sorted = animals.{{1}}(a => a.Name);
-foreach (var a in sorted)
-    Console.WriteLine(a.Name);`,
+      snippet: `var sorted = animals.{{1}}(animal => animal.Name);
+foreach (var animal in sorted)
+    Console.WriteLine(animal.Name);`,
       points: [
         "`OrderBy` returns the same items in a new order.",
         "The lambda picks the value to sort on.",
@@ -248,8 +248,8 @@ foreach (var a in sorted)
           answer: "OrderBy",
           hints: ["The operator that sorts a sequence."],
           explain: [
-            { text: "`OrderBy` arranges the animals by the value the lambda returns.", highlight: "var sorted = animals.{{1}}(a => a.Name)" },
-            { text: "Here that value is `a.Name`, so they come out in alphabetical order.", highlight: "var sorted = animals.{{1}}(a => a.Name)" },
+            { text: "`OrderBy` arranges the animals by the value the lambda returns.", highlight: "var sorted = animals.{{1}}(animal => animal.Name)" },
+            { text: "Here that value is `animal.Name`, so they come out in alphabetical order.", highlight: "var sorted = animals.{{1}}(animal => animal.Name)" },
           ],
         },
       ],

@@ -241,8 +241,8 @@ public class Duck  : Animal { public override string Sound() => "Quack"; }
 public class Sheep : Animal { public override string Sound() => "Baa"; }
 
 Animal[] pen = { new Sheep(), new Duck(), new Sheep() };
-foreach (var a in pen)
-    Console.Write(a.Sound() + " ");`,
+foreach (var animal in pen)
+    Console.Write(animal.Sound() + " ");`,
     runCode: `using System;
 
 public abstract class Animal { public abstract string Sound(); }
@@ -254,8 +254,8 @@ public class Program
     public static void Main()
     {
         Animal[] pen = { new Sheep(), new Duck(), new Sheep() };
-        foreach (var a in pen)
-            Console.Write(a.Sound() + " ");
+        foreach (var animal in pen)
+            Console.Write(animal.Sound() + " ");
     }
 }`,
     explain:
@@ -623,8 +623,8 @@ public class Program
     concept: "Tie-back to the capstone",
     context: "The SOLID capstone you finished was composition plus polymorphism the whole time.",
     code: `public interface IReporter { void Send(string msg); }
-public class ConsoleReporter : IReporter { public void Send(string m) => Console.WriteLine(m); }
-public class SilentReporter  : IReporter { public void Send(string m) { } }
+public class ConsoleReporter : IReporter { public void Send(string message) => Console.WriteLine(message); }
+public class SilentReporter  : IReporter { public void Send(string message) { } }
 
 public class TestRunner
 {
@@ -635,8 +635,8 @@ public class TestRunner
     runCode: `using System;
 
 public interface IReporter { void Send(string msg); }
-public class ConsoleReporter : IReporter { public void Send(string m) => Console.WriteLine(m); }
-public class SilentReporter  : IReporter { public void Send(string m) { } }
+public class ConsoleReporter : IReporter { public void Send(string message) => Console.WriteLine(message); }
+public class SilentReporter  : IReporter { public void Send(string message) { } }
 
 public class TestRunner
 {

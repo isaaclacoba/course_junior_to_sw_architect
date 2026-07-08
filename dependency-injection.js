@@ -76,7 +76,7 @@
       context:
         "Finish the job: write a `Keeper` that takes an `IAnimal` rather than a specific animal. Now any animal that keeps the promise can be handed in, and the keeper is closed for editing for good. `Cat` and `Dog` are given.",
       example:
-        'public class Player\n{\n    private readonly IInstrument _i;\n    public Player(IInstrument i)\n    {\n        _i = i;\n    }\n}',
+        'public class Player\n{\n    private readonly IInstrument _i;\n    public Player(IInstrument instrument)\n    {\n        _i = instrument;\n    }\n}',
       goal: [
         "Write a `Keeper` that takes an `IAnimal` in its constructor and has `Greet()` return its `Speak()`.",
         "Main hands in a `Cat` and greets, so the output is Meow.",
@@ -137,7 +137,7 @@
         { title: "Depend on an interface - ", text: "inject `IAnimal`, so any animal that keeps the promise fits." },
         { title: "Swap in a stand-in - ", text: "hand in a toy double to rehearse with no real dependency." },
       ],
-      summaryClose: "Next: Part five - Design for change (the SOLID principles).",
+      summaryClose: "Next: Part five - Prove it works. You made a stand-in; now use it to actually test.",
     },
   ];
 

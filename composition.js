@@ -23,9 +23,9 @@
         { pattern: /class\s+Dog\s*:\s*Animal/, message: "Make the is-a claim: `class Dog : Animal`." },
       ],
       starter:
-        'using System;\n\npublic class Animal\n{\n    public string Breathe() { return "breathing"; }\n}\n\n// TODO: write a Dog that inherits Animal (: Animal)\n//       and adds its own Fetch() returning "fetching".\n\nclass Program\n{\n    static void Main()\n    {\n        var d = new Dog();\n        Console.WriteLine(d.Breathe());\n        Console.WriteLine(d.Fetch());\n    }\n}\n',
+        'using System;\n\npublic class Animal\n{\n    public string Breathe() { return "breathing"; }\n}\n\n// TODO: write a Dog that inherits Animal (: Animal)\n//       and adds its own Fetch() returning "fetching".\n\nclass Program\n{\n    static void Main()\n    {\n        var dog = new Dog();\n        Console.WriteLine(dog.Breathe());\n        Console.WriteLine(dog.Fetch());\n    }\n}\n',
       solution:
-        'using System;\n\npublic class Animal\n{\n    public string Breathe() { return "breathing"; }\n}\n\npublic class Dog : Animal\n{\n    public string Fetch()\n    {\n        return "fetching";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var d = new Dog();\n        Console.WriteLine(d.Breathe());\n        Console.WriteLine(d.Fetch());\n    }\n}\n',
+        'using System;\n\npublic class Animal\n{\n    public string Breathe() { return "breathing"; }\n}\n\npublic class Dog : Animal\n{\n    public string Fetch()\n    {\n        return "fetching";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var dog = new Dog();\n        Console.WriteLine(dog.Breathe());\n        Console.WriteLine(dog.Fetch());\n    }\n}\n',
     },
     {
       title: "The is-a lie",
@@ -45,14 +45,14 @@
       ],
       verify: {
         main:
-          'class Program\n{\n    static void Main()\n    {\n        var p = new Parrot("bye");\n        Console.WriteLine(p.Talk());\n    }\n}\n',
+          'class Program\n{\n    static void Main()\n    {\n        var parrot = new Parrot("bye");\n        Console.WriteLine(parrot.Talk());\n    }\n}\n',
         expected: "BYE",
         message: "HELLO is right for that one word only. Talk must pass the real word to the megaphone.",
       },
       starter:
-        'using System;\n\npublic class Megaphone\n{\n    public string Boost(string s) { return s.ToUpper(); }\n}\n\n// TODO: write a Parrot that:\n//   - is given a word in its constructor (keep it in a private field)\n//   - holds a Megaphone part of its own\n//   - Talk(): returns the megaphone boosting that word\n\nclass Program\n{\n    static void Main()\n    {\n        var p = new Parrot("hello");\n        Console.WriteLine(p.Talk());\n    }\n}\n',
+        'using System;\n\npublic class Megaphone\n{\n    public string Boost(string text) { return text.ToUpper(); }\n}\n\n// TODO: write a Parrot that:\n//   - is given a word in its constructor (keep it in a private field)\n//   - holds a Megaphone part of its own\n//   - Talk(): returns the megaphone boosting that word\n\nclass Program\n{\n    static void Main()\n    {\n        var parrot = new Parrot("hello");\n        Console.WriteLine(parrot.Talk());\n    }\n}\n',
       solution:
-        'using System;\n\npublic class Megaphone\n{\n    public string Boost(string s) { return s.ToUpper(); }\n}\n\npublic class Parrot\n{\n    private readonly string _word;\n    private Megaphone _mega = new Megaphone();\n\n    public Parrot(string word)\n    {\n        _word = word;\n    }\n\n    public string Talk()\n    {\n        return _mega.Boost(_word);\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var p = new Parrot("hello");\n        Console.WriteLine(p.Talk());\n    }\n}\n',
+        'using System;\n\npublic class Megaphone\n{\n    public string Boost(string text) { return text.ToUpper(); }\n}\n\npublic class Parrot\n{\n    private readonly string _word;\n    private Megaphone _mega = new Megaphone();\n\n    public Parrot(string word)\n    {\n        _word = word;\n    }\n\n    public string Talk()\n    {\n        return _mega.Boost(_word);\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var parrot = new Parrot("hello");\n        Console.WriteLine(parrot.Talk());\n    }\n}\n',
     },
     {
       title: "You cannot inherit three",
@@ -116,14 +116,14 @@
       ],
       verify: {
         main:
-          'class Program\n{\n    static void Main()\n    {\n        var c = new Chimera(new DogLegs());\n        Console.WriteLine(c.Move());\n    }\n}\n',
+          'class Program\n{\n    static void Main()\n    {\n        var creature = new Chimera(new DogLegs());\n        Console.WriteLine(creature.Move());\n    }\n}\n',
         expected: "running",
         message: "The creature must use whatever legs it is handed. With DogLegs, Move should say running.",
       },
       starter:
-        'using System;\n\npublic interface ILegs\n{\n    string Run();\n}\n\npublic class DogLegs : ILegs\n{\n    public string Run() { return "running"; }\n}\n\npublic class Chimera\n{\n    private readonly ILegs _legs;\n    public Chimera(ILegs legs) { _legs = legs; }\n    public string Move() { return _legs.Run(); }\n}\n\n// TODO: write a CheetahLegs that keeps the ILegs promise\n//       and whose Run() returns "sprinting".\n\nclass Program\n{\n    static void Main()\n    {\n        var c = new Chimera(new CheetahLegs());\n        Console.WriteLine(c.Move());\n    }\n}\n',
+        'using System;\n\npublic interface ILegs\n{\n    string Run();\n}\n\npublic class DogLegs : ILegs\n{\n    public string Run() { return "running"; }\n}\n\npublic class Chimera\n{\n    private readonly ILegs _legs;\n    public Chimera(ILegs legs) { _legs = legs; }\n    public string Move() { return _legs.Run(); }\n}\n\n// TODO: write a CheetahLegs that keeps the ILegs promise\n//       and whose Run() returns "sprinting".\n\nclass Program\n{\n    static void Main()\n    {\n        var creature = new Chimera(new CheetahLegs());\n        Console.WriteLine(creature.Move());\n    }\n}\n',
       solution:
-        'using System;\n\npublic interface ILegs\n{\n    string Run();\n}\n\npublic class DogLegs : ILegs\n{\n    public string Run() { return "running"; }\n}\n\npublic class Chimera\n{\n    private readonly ILegs _legs;\n    public Chimera(ILegs legs) { _legs = legs; }\n    public string Move() { return _legs.Run(); }\n}\n\npublic class CheetahLegs : ILegs\n{\n    public string Run()\n    {\n        return "sprinting";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var c = new Chimera(new CheetahLegs());\n        Console.WriteLine(c.Move());\n    }\n}\n',
+        'using System;\n\npublic interface ILegs\n{\n    string Run();\n}\n\npublic class DogLegs : ILegs\n{\n    public string Run() { return "running"; }\n}\n\npublic class Chimera\n{\n    private readonly ILegs _legs;\n    public Chimera(ILegs legs) { _legs = legs; }\n    public string Move() { return _legs.Run(); }\n}\n\npublic class CheetahLegs : ILegs\n{\n    public string Run()\n    {\n        return "sprinting";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var creature = new Chimera(new CheetahLegs());\n        Console.WriteLine(creature.Move());\n    }\n}\n',
     },
     {
       summary: true,

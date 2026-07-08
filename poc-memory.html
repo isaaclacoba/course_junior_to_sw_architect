@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PoC - How memory works (animated)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #fbfbf8;
+        --ink: #1b1d22;
+        --muted: #6b7280;
+        --line: #e6e4dc;
+        --accent: #1f6f5f;
+        --stack: #2563eb;
+        --stack-bg: #eff4ff;
+        --heap: #1f6f5f;
+        --heap-bg: #e7f1ee;
+        --cpu: #9a3412;
+        --cpu-bg: #fdf1ea;
+        --store: #57534e;
+        --store-bg: #f3f1ec;
+        --code-bg: #1b1d22;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Space Grotesk", system-ui, sans-serif;
+        line-height: 1.5;
+      }
+      .wrap { max-width: 1040px; margin: 0 auto; padding: 32px 20px 80px; }
+      .eyebrow {
+        font-family: "IBM Plex Mono", monospace;
+        text-transform: uppercase; letter-spacing: 0.18em;
+        font-size: 0.72rem; color: var(--accent); margin: 0 0 6px;
+      }
+      h1 { font-size: 1.7rem; margin: 0 0 6px; letter-spacing: -0.02em; }
+      .lede { color: var(--muted); margin: 0 0 22px; max-width: 70ch; }
+
+      .stage {
+        border: 1px solid var(--line); border-radius: 16px; background: #fff;
+        padding: 18px; position: relative;
+      }
+      .top { display: grid; grid-template-columns: 1fr 1.3fr; gap: 14px; margin-bottom: 14px; }
+      .box { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; background: #fff; }
+      .box h3 {
+        margin: 0 0 8px; font-size: 0.72rem; font-family: "IBM Plex Mono", monospace;
+        text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted);
+        display: flex; align-items: center; gap: 8px;
+      }
+      .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; display: inline-block; }
+
+      .storage { background: var(--store-bg); border-color: #e2ded4; }
+      .storage.active { box-shadow: 0 0 0 3px rgba(87,83,78,0.18); }
+      .storage .disk { font-family: "IBM Plex Mono", monospace; font-size: 0.82rem; color: var(--store); }
+
+      .cpu { background: var(--cpu-bg); border-color: #f1d9cb; }
+      .cpu h3 { color: var(--cpu); }
+      .cpu .reg { display: flex; justify-content: space-between; font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; }
+      .cpu .instr {
+        margin-top: 8px; padding: 8px 10px; border-radius: 8px; background: #fff;
+        border: 1px solid #f1d9cb; font-family: "IBM Plex Mono", monospace; font-size: 0.9rem;
+        color: var(--cpu); transition: background 0.25s;
+      }
+      .cpu .instr.tick { background: #fbe0d0; }
+
+      .ram-wrap { position: relative; }
+      .ram-title {
+        font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.14em;
+        font-size: 0.72rem; color: var(--muted); margin: 4px 2px 8px;
+      }
+      .ram { display: grid; grid-template-columns: 1.15fr 1fr 1.1fr; gap: 12px; position: relative; min-height: 280px; }
+      .region { border: 1px dashed var(--line); border-radius: 12px; padding: 10px; background: #fdfdfb; }
+      .region > .label {
+        font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; text-transform: uppercase;
+        letter-spacing: 0.12em; color: var(--muted); margin-bottom: 8px; display: block;
+      }
+      .region.dimmed { opacity: 0.45; }
+
+      /* Code region */
+      .code { background: var(--code-bg); border: none; }
+      .code > .label { color: #9aa4b2; }
+      .code ol { margin: 0; padding: 0; list-style: none; counter-reset: ln; }
+      .code li {
+        font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; color: #c7cdd6;
+        padding: 2px 6px; border-radius: 5px; white-space: pre; transition: background 0.2s, color 0.2s;
+        counter-increment: ln;
+      }
+      .code li::before { content: counter(ln) "  "; color: #5b6472; }
+      .code li.pc { background: #2b6a5b; color: #fff; }
+      .code li.pc::before { color: #bfe6db; }
+
+      /* Stack */
+      .stack .frames { display: flex; flex-direction: column-reverse; gap: 8px; min-height: 40px; }
+      .frame {
+        border: 1px solid #cdddff; background: var(--stack-bg); border-radius: 9px; padding: 8px 9px;
+      }
+      .frame .fname {
+        font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; color: var(--stack); font-weight: 600;
+        margin-bottom: 6px;
+      }
+      .slot {
+        display: flex; align-items: center; gap: 8px; font-family: "IBM Plex Mono", monospace;
+        font-size: 0.8rem; background: #fff; border: 1px solid #d7e3ff; border-radius: 6px;
+        padding: 3px 8px; margin-top: 4px;
+      }
+      .slot .k { color: #475569; }
+      .slot .v { color: var(--ink); font-weight: 500; }
+      .slot .refdot {
+        width: 11px; height: 11px; border-radius: 50%; background: var(--heap);
+        margin-left: auto; box-shadow: 0 0 0 3px var(--heap-bg);
+      }
+
+      /* Heap */
+      .heap .objs { display: flex; flex-direction: column; gap: 10px; }
+      .obj {
+        border: 1px solid #bfe0d6; background: var(--heap-bg); border-radius: 10px; padding: 9px 10px;
+      }
+      .obj .oname { font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; color: var(--heap); font-weight: 600; }
+      .obj .field { font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; color: #334155; margin-top: 4px; }
+      .obj.glow { box-shadow: 0 0 0 3px rgba(31,111,95,0.28); }
+      .obj.dim { opacity: 0.4; filter: grayscale(0.4); }
+
+      @keyframes enter { from { opacity: 0; transform: translateY(10px) scale(0.96); } to { opacity: 1; transform: none; } }
+      .enter { animation: enter 0.32s ease; }
+      .leaving { animation: enter 0.28s ease reverse forwards; pointer-events: none; }
+
+      /* Arrow overlay */
+      #arrows { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+      #arrows path { fill: none; stroke: var(--heap); stroke-width: 2.2; opacity: 0; transition: opacity 0.3s; }
+      #arrows path.show { opacity: 0.9; }
+
+      /* Controls + narration */
+      .narr {
+        margin-top: 16px; background: #f7f7f2; border: 1px solid var(--line); border-radius: 12px;
+        padding: 14px 16px; min-height: 62px; font-size: 1.02rem;
+      }
+      .narr .step-no { font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; color: var(--accent); letter-spacing: 0.1em; }
+      .controls { display: flex; align-items: center; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+      button {
+        font: inherit; font-weight: 600; font-size: 0.92rem; cursor: pointer;
+        border: 1px solid var(--line); background: #fff; color: var(--ink);
+        padding: 9px 16px; border-radius: 10px; transition: background 0.15s, border-color 0.15s;
+      }
+      button:hover:not(:disabled) { border-color: #cfccc1; background: #fbfbf8; }
+      button:disabled { opacity: 0.4; cursor: default; }
+      button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+      button.primary:hover:not(:disabled) { background: #174f44; }
+      .track { flex: 1; min-width: 120px; height: 6px; background: #eceae3; border-radius: 99px; overflow: hidden; }
+      .track > i { display: block; height: 100%; background: var(--accent); width: 0; transition: width 0.3s; }
+      .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 14px; font-size: 0.8rem; color: var(--muted); }
+      .legend span { display: inline-flex; align-items: center; gap: 6px; }
+      .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+      .note { margin-top: 18px; font-size: 0.85rem; color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <p class="eyebrow">Theory PoC · Visualizer</p>
+      <h1>How memory works</h1>
+      <p class="lede">
+        A tiny program, executed one step at a time. Watch it load from storage into RAM, the CPU
+        run each instruction, stack frames appear and vanish with each call, and an object live on
+        the heap - reached through a reference. Use Next / Play to step through it.
+      </p>
+
+      <section class="stage">
+        <div class="top">
+          <div class="box storage" id="storage">
+            <h3 style="color: var(--store)"><span class="dot"></span>Storage (disk)</h3>
+            <div class="disk" id="diskState">Program.dll &nbsp;·&nbsp; saved, power-safe</div>
+          </div>
+          <div class="box cpu" id="cpu">
+            <h3><span class="dot"></span>CPU</h3>
+            <div class="reg"><span>program counter</span><span id="pcReg">-</span></div>
+            <div class="instr" id="cpuInstr">idle</div>
+          </div>
+        </div>
+
+        <div class="ram-wrap">
+          <div class="ram-title">RAM · working memory</div>
+          <div class="ram" id="ram">
+            <div class="region code" id="codeRegion">
+              <span class="label">Code (loaded program)</span>
+              <ol id="codeList"></ol>
+            </div>
+            <div class="region stack">
+              <span class="label">Stack · calls</span>
+              <div class="frames" id="stack"></div>
+            </div>
+            <div class="region heap">
+              <span class="label">Heap · objects</span>
+              <div class="objs" id="heap"></div>
+            </div>
+            <svg id="arrows">
+              <defs>
+                <marker id="ah" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                  <path d="M0,0 L9,4.5 L0,9 z" fill="#1f6f5f" stroke="none" />
+                </marker>
+              </defs>
+            </svg>
+          </div>
+        </div>
+
+        <div class="narr">
+          <div class="step-no" id="stepNo"></div>
+          <div id="narr"></div>
+        </div>
+
+        <div class="controls">
+          <button id="prev">◀ Prev</button>
+          <button id="play" class="primary">▶ Play</button>
+          <button id="next" class="primary">Next ▶</button>
+          <button id="reset">Reset</button>
+          <div class="track"><i id="track"></i></div>
+        </div>
+
+        <div class="legend">
+          <span><i class="sw" style="background: var(--stack)"></i>Stack frame (a call)</span>
+          <span><i class="sw" style="background: var(--heap)"></i>Heap object</span>
+          <span><i class="sw" style="background: var(--heap); border-radius: 50%"></i>reference (arrow to the object)</span>
+        </div>
+      </section>
+
+      <p class="note">
+        PoC only - standalone, no libraries, no build step. If the approach works, the next step is a
+        reusable <code>&lt;memory-viz&gt;</code>-style widget the theory lessons drop in with their own
+        step scripts (memory regions, stack/heap, references, GC).
+      </p>
+    </main>
+
+    <script>
+      const CODE = [
+        "Main() {",
+        "  int n = 3",
+        '  dog = new Dog("Rex")',
+        "  Greet(dog)",
+        "    print pet.Name",
+        "  return",
+        "}",
+      ];
+
+      // Each step is a full snapshot of machine state + narration.
+      const STEPS = [
+        {
+          narr: "A program lives in storage - the disk. It stays there even with the power off, but the CPU cannot run it from here.",
+          store: true, ramLoaded: false, pc: -1, instr: "idle", stack: [], heap: [], refs: [],
+        },
+        {
+          narr: "To run, the program is copied from storage into RAM - the fast working memory the CPU can actually reach.",
+          store: true, ramLoaded: true, pc: -1, instr: "loaded", stack: [], heap: [], refs: [],
+        },
+        {
+          narr: "The CPU starts at Main. It pushes a stack frame - the private workspace for that call.",
+          ramLoaded: true, pc: 0, instr: "call Main", tick: true,
+          stack: [{ id: "Main", name: "Main()", vars: [] }], heap: [], refs: [],
+        },
+        {
+          narr: "int n = 3 is small, so its value sits directly in Main's frame, on the stack.",
+          ramLoaded: true, pc: 1, instr: "n = 3", tick: true,
+          stack: [{ id: "Main", name: "Main()", vars: [{ id: "Main.n", k: "n", v: "3" }] }],
+          heap: [], refs: [],
+        },
+        {
+          narr: "new Dog() builds an object on the heap. It is too big for a slot, so the variable dog only holds a reference - an arrow pointing to it.",
+          ramLoaded: true, pc: 2, instr: "new Dog", tick: true,
+          stack: [{ id: "Main", name: "Main()", vars: [{ id: "Main.n", k: "n", v: "3" }, { id: "Main.dog", k: "dog", ref: "d1" }] }],
+          heap: [{ id: "d1", type: "Dog", fields: [["Name", '"Rex"']] }],
+          refs: [{ from: "Main.dog", to: "d1" }],
+        },
+        {
+          narr: "Greet(dog) pushes a new frame. Its parameter points at the SAME Dog - two references, one object. This is the sharing that surprises beginners.",
+          ramLoaded: true, pc: 3, instr: "call Greet", tick: true,
+          stack: [
+            { id: "Main", name: "Main()", vars: [{ id: "Main.n", k: "n", v: "3" }, { id: "Main.dog", k: "dog", ref: "d1" }] },
+            { id: "Greet", name: "Greet(pet)", vars: [{ id: "Greet.pet", k: "pet", ref: "d1" }] },
+          ],
+          heap: [{ id: "d1", type: "Dog", fields: [["Name", '"Rex"']] }],
+          refs: [{ from: "Main.dog", to: "d1" }, { from: "Greet.pet", to: "d1" }],
+        },
+        {
+          narr: "Reading pet.Name follows the reference across to the heap to find the real Dog and read its data.",
+          ramLoaded: true, pc: 4, instr: "read pet.Name", tick: true, glow: "d1",
+          stack: [
+            { id: "Main", name: "Main()", vars: [{ id: "Main.n", k: "n", v: "3" }, { id: "Main.dog", k: "dog", ref: "d1" }] },
+            { id: "Greet", name: "Greet(pet)", vars: [{ id: "Greet.pet", k: "pet", ref: "d1" }] },
+          ],
+          heap: [{ id: "d1", type: "Dog", fields: [["Name", '"Rex"']] }],
+          refs: [{ from: "Main.dog", to: "d1" }, { from: "Greet.pet", to: "d1" }],
+        },
+        {
+          narr: "Greet returns. Its whole frame pops off the stack and is gone at once. The Dog stays on the heap - Main still references it.",
+          ramLoaded: true, pc: 5, instr: "return", tick: true,
+          stack: [{ id: "Main", name: "Main()", vars: [{ id: "Main.n", k: "n", v: "3" }, { id: "Main.dog", k: "dog", ref: "d1" }] }],
+          heap: [{ id: "d1", type: "Dog", fields: [["Name", '"Rex"']] }],
+          refs: [{ from: "Main.dog", to: "d1" }],
+        },
+        {
+          narr: "Main ends and its frame pops too. Now nothing references the Dog - later, garbage collection frees that heap space automatically.",
+          ramLoaded: true, pc: 6, instr: "done", stack: [], refs: [],
+          heap: [{ id: "d1", type: "Dog", fields: [["Name", '"Rex"']], dim: true }],
+        },
+      ];
+
+      const $ = (id) => document.getElementById(id);
+      const arrows = $("arrows");
+      let idx = 0, playing = false, timer = null;
+
+      // Build the code listing once.
+      (function buildCode() {
+        const ol = $("codeList");
+        CODE.forEach((line) => {
+          const li = document.createElement("li");
+          li.textContent = line;
+          ol.appendChild(li);
+        });
+      })();
+
+      // Keyed reconcile: reuse nodes by id so persistent ones animate, new ones
+      // enter, and removed ones fade out.
+      function reconcile(container, items, makeNode) {
+        const want = new Map(items.map((it) => [it.id, it]));
+        // remove gone
+        Array.from(container.children).forEach((node) => {
+          if (!want.has(node.dataset.id) && !node.classList.contains("leaving")) {
+            node.classList.add("leaving");
+            setTimeout(() => node.remove(), 280);
+          }
+        });
+        // add / update
+        items.forEach((it) => {
+          let node = container.querySelector(`[data-id="${CSS.escape(it.id)}"]:not(.leaving)`);
+          if (!node) {
+            node = makeNode(it);
+            node.dataset.id = it.id;
+            node.classList.add("enter");
+            container.appendChild(node);
+          } else {
+            makeNode(it, node); // update in place
+          }
+        });
+      }
+
+      function frameNode(f, existing) {
+        const el = existing || document.createElement("div");
+        el.className = "frame" + (existing ? " " + (el.className.includes("enter") ? "enter" : "") : "");
+        el.classList.add("frame");
+        el.innerHTML =
+          `<div class="fname">${f.name}</div>` +
+          f.vars
+            .map(
+              (v) =>
+                `<div class="slot">` +
+                `<span class="k">${v.k}</span>` +
+                (v.ref
+                  ? `<span class="v">→</span><span class="refdot" id="dot-${v.id}"></span>`
+                  : `<span class="v">${v.v}</span>`) +
+                `</div>`
+            )
+            .join("");
+        return el;
+      }
+
+      function objNode(o, existing) {
+        const el = existing || document.createElement("div");
+        el.className = "obj";
+        if (o.dim) el.classList.add("dim");
+        el.id = "obj-" + o.id;
+        el.innerHTML =
+          `<div class="oname">${o.type} <span style="color:#94a3b8">@heap</span></div>` +
+          o.fields.map((f) => `<div class="field">${f[0]} = ${f[1]}</div>`).join("");
+        return el;
+      }
+
+      function drawArrows(refs, glow) {
+        // clear existing paths (keep defs)
+        Array.from(arrows.querySelectorAll("path.ref")).forEach((p) => p.remove());
+        const box = arrows.getBoundingClientRect();
+        refs.forEach((r) => {
+          const from = document.getElementById("dot-" + r.from);
+          const to = document.getElementById("obj-" + r.to);
+          if (!from || !to) return;
+          const a = from.getBoundingClientRect();
+          const b = to.getBoundingClientRect();
+          const x1 = a.left + a.width / 2 - box.left;
+          const y1 = a.top + a.height / 2 - box.top;
+          const x2 = b.left - box.left - 2;
+          const y2 = b.top + Math.min(b.height / 2, 18) - box.top;
+          const dx = Math.max(40, (x2 - x1) * 0.5);
+          const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          path.setAttribute("class", "ref");
+          path.setAttribute("d", `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`);
+          path.setAttribute("marker-end", "url(#ah)");
+          arrows.appendChild(path);
+          requestAnimationFrame(() => path.classList.add("show"));
+        });
+      }
+
+      function render() {
+        const s = STEPS[idx];
+
+        $("storage").classList.toggle("active", !!s.store);
+        $("diskState").textContent = s.ramLoaded ? "Program.dll · copied to RAM →" : "Program.dll · saved, power-safe";
+
+        $("pcReg").textContent = s.pc < 0 ? "-" : s.pc + 1;
+        const ci = $("cpuInstr");
+        ci.textContent = s.instr;
+        ci.classList.toggle("tick", !!s.tick);
+
+        $("codeRegion").classList.toggle("dimmed", !s.ramLoaded);
+        Array.from($("codeList").children).forEach((li, i) => li.classList.toggle("pc", i === s.pc));
+
+        reconcile($("stack"), s.stack || [], frameNode);
+        reconcile($("heap"), (s.heap || []).map((o) => ({ ...o })), objNode);
+
+        // glow the object being read
+        requestAnimationFrame(() => {
+          (s.heap || []).forEach((o) => {
+            const el = document.getElementById("obj-" + o.id);
+            if (el) el.classList.toggle("glow", s.glow === o.id);
+          });
+          drawArrows(s.refs || [], s.glow);
+        });
+
+        $("stepNo").textContent = `STEP ${idx + 1} / ${STEPS.length}`;
+        $("narr").textContent = s.narr;
+        $("track").style.width = ((idx + 1) / STEPS.length) * 100 + "%";
+        $("prev").disabled = idx === 0;
+        $("next").disabled = idx === STEPS.length - 1;
+      }
+
+      function go(n) { idx = Math.max(0, Math.min(STEPS.length - 1, n)); render(); if (idx === STEPS.length - 1) stop(); }
+      function stop() { playing = false; clearInterval(timer); $("play").textContent = "▶ Play"; }
+      function play() {
+        if (idx === STEPS.length - 1) idx = -1;
+        playing = true; $("play").textContent = "⏸ Pause";
+        timer = setInterval(() => { if (idx >= STEPS.length - 1) return stop(); go(idx + 1); }, 2100);
+        go(idx + 1);
+      }
+
+      $("next").onclick = () => go(idx + 1);
+      $("prev").onclick = () => go(idx - 1);
+      $("reset").onclick = () => { stop(); go(0); };
+      $("play").onclick = () => (playing ? stop() : play());
+      window.addEventListener("resize", () => drawArrows(STEPS[idx].refs || [], STEPS[idx].glow));
+
+      render();
+    </script>
+  </body>
+</html>

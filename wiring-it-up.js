@@ -13,7 +13,7 @@
       context:
         "An `if` / `else if` / `else` chain picks exactly one branch, top to bottom. The pattern below sorts a temperature into bands; do the same to turn an error count into a level.",
       example:
-        'int temp = 30;\nif (temp >= 40)\n{\n    Console.WriteLine("hot");\n}\nelse if (temp >= 20)\n{\n    Console.WriteLine("warm");\n}\nelse\n{\n    Console.WriteLine("cold");\n}',
+        'int temperature = 30;\nif (temperature >= 40)\n{\n    Console.WriteLine("hot");\n}\nelse if (temperature >= 20)\n{\n    Console.WriteLine("warm");\n}\nelse\n{\n    Console.WriteLine("cold");\n}',
       goal: [
         "Return `\"critical\"` when errors is 10 or more, `\"warn\"` when it is 1 or more, otherwise `\"clean\"`.",
         "errors is 3 here, so the output should be warn.",
@@ -66,9 +66,9 @@
       context:
         "A `while` loop repeats while its condition holds. Step the counter with `n--` each pass or it never ends. The pattern below counts down; do the same, then print `liftoff`.",
       example:
-        'int n = 3;\nwhile (n > 0)\n{\n    Console.WriteLine(n);\n    n--;\n}',
+        'int count = 3;\nwhile (count > 0)\n{\n    Console.WriteLine(count);\n    count--;\n}',
       goal: [
-        "Print `n`, then `n - 1`, down to 1, then print `\"liftoff\"`.",
+        "Print `count`, then `count - 1`, down to 1, then print `\"liftoff\"`.",
         "From 3 the output is four lines: 3, 2, 1, liftoff.",
       ],
       expected: ["3", "2", "1", "liftoff"],
@@ -82,9 +82,9 @@
         message: "Those lines are right for this example only. Loop from whatever number you are given.",
       },
       starter:
-        'using System;\n\npublic class Countdown\n{\n    public void From(int n)\n    {\n        // TODO: print n, then n - 1, ... down to 1, then "liftoff"\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        new Countdown().From(3);\n    }\n}\n',
+        'using System;\n\npublic class Countdown\n{\n    public void From(int count)\n    {\n        // TODO: print count, then count - 1, ... down to 1, then "liftoff"\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        new Countdown().From(3);\n    }\n}\n',
       solution:
-        'using System;\n\npublic class Countdown\n{\n    public void From(int n)\n    {\n        while (n >= 1)\n        {\n            Console.WriteLine(n);\n            n--;\n        }\n        Console.WriteLine("liftoff");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        new Countdown().From(3);\n    }\n}\n',
+        'using System;\n\npublic class Countdown\n{\n    public void From(int count)\n    {\n        while (count >= 1)\n        {\n            Console.WriteLine(count);\n            count--;\n        }\n        Console.WriteLine("liftoff");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        new Countdown().From(3);\n    }\n}\n',
     },
     {
       title: "Count with for",

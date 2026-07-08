@@ -41,7 +41,7 @@
       context:
         "A method can be generic too: put the `<T>` after its name, and it works on any type. Write `First<T>` that takes an array of `T` and returns its first item. The caller's type is worked out automatically from the array passed in.",
       example:
-        "// A generic method names its placeholder after the method:\n// public T Pick<T>(T[] items) => items[0];\nvar n = new Picker().Pick(new int[] { 9, 8 });  // n is 9",
+        "// A generic method names its placeholder after the method:\n// public T Pick<T>(T[] items) => items[0];\nvar first = new Picker().Pick(new int[] { 9, 8 });  // first is 9",
       goal: [
         "Give `Picker` a method `public T First<T>(T[] items)` that returns `items[0]`.",
         "Main calls `First` on the int array `{ 3, 4, 5 }`, so the output is 3.",
@@ -78,14 +78,14 @@
       ],
       verify: {
         main:
-          'class Program\n{\n    static void Main()\n    {\n        var p = new Pair<int, string>(1, "x");\n        Console.WriteLine(p.First + ": " + p.Second);\n    }\n}\n',
+          'class Program\n{\n    static void Main()\n    {\n        var pair = new Pair<int, string>(1, "x");\n        Console.WriteLine(pair.First + ": " + pair.Second);\n    }\n}\n',
         expected: "1: x",
         message: "age: 3 works for Pair<string, int> only. Pair<A, B> must hold whatever types A and B are.",
       },
       starter:
-        'using System;\n\n// TODO: define a generic class Pair<A, B> with First (A) and Second (B), set in the constructor\n\nclass Program\n{\n    static void Main()\n    {\n        var p = new Pair<string, int>("age", 3);\n        Console.WriteLine(p.First + ": " + p.Second);\n    }\n}\n',
+        'using System;\n\n// TODO: define a generic class Pair<A, B> with First (A) and Second (B), set in the constructor\n\nclass Program\n{\n    static void Main()\n    {\n        var pair = new Pair<string, int>("age", 3);\n        Console.WriteLine(pair.First + ": " + pair.Second);\n    }\n}\n',
       solution:
-        'using System;\n\npublic class Pair<A, B>\n{\n    public A First { get; }\n    public B Second { get; }\n    public Pair(A first, B second) { First = first; Second = second; }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var p = new Pair<string, int>("age", 3);\n        Console.WriteLine(p.First + ": " + p.Second);\n    }\n}\n',
+        'using System;\n\npublic class Pair<A, B>\n{\n    public A First { get; }\n    public B Second { get; }\n    public Pair(A first, B second) { First = first; Second = second; }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var pair = new Pair<string, int>("age", 3);\n        Console.WriteLine(pair.First + ": " + pair.Second);\n    }\n}\n',
     },
     {
       title: "Put them together",

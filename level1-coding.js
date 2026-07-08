@@ -25,7 +25,7 @@ Console.WriteLine(doorOpen);`,
     concept: "Variables and Functions",
     context: "The method name says the goal: return exactly twice the input value.",
     snippet: `// Double means: duplicate the numeric value.
-int Double(int x)
+int Double(int value)
 {
     return {{1}};
 }`,
@@ -37,12 +37,12 @@ int Double(int x)
       {
         id: 1,
         label: "Return transformed value",
-        answer: "x * 2",
+        answer: "value * 2",
         hints: ["Multiply by 2."],
         explain: [
-          { text: "This is the function header. It says: I take a whole number called `x` as input, and I give back a whole number.", highlight: "int Double(int x)" },
+          { text: "This is the function header. It says: I take a whole number called `value` as input, and I give back a whole number.", highlight: "int Double(int value)" },
           { text: "`return` sends a value back to whoever called this function. The function stops after `return`.", highlight: "return {{1}}" },
-          { text: "The name `Double` means the output must be exactly `2` times the input. If `x` is `5`, the answer is `10`.", highlight: "// Double means" },
+          { text: "The name `Double` means the output must be exactly `2` times the input. If `value` is `5`, the answer is `10`.", highlight: "// Double means" },
           { text: "The `*` symbol means multiply.", highlight: "return {{1}}" },
         ],
       },
@@ -98,19 +98,19 @@ Console.WriteLine(counter.Value);`,
     title: "Reference Assignment",
     concept: "Memory Model",
     context: "Represent that two variables reference the same object.",
-    snippet: `var a = new User();
-var b = {{1}};`,
+    snippet: `var user = new User();
+var sameUser = {{1}};`,
     points: ["Assignment copies the reference for reference types.", "No automatic clone occurs."],
     blanks: [
       {
         id: 1,
         label: "Assign existing reference",
-        answer: "a",
+        answer: "user",
         hints: ["Use the variable already holding the object reference."],
         explain: [
-          { text: "`new User()` creates an object in memory. The variable `a` holds the address of where that object lives — not the object itself.", highlight: "var a = new User()" },
-          { text: "This line does not create a second object. It copies the address stored in `a` and puts it into `b`.", highlight: "var b = {{1}}" },
-          { text: "After this, both `a` and `b` hold the same address — they point to the exact same object.", highlight: "var b = {{1}}" },
+          { text: "`new User()` creates an object in memory. The variable `user` holds the address of where that object lives — not the object itself.", highlight: "var user = new User()" },
+          { text: "This line does not create a second object. It copies the address stored in `user` and puts it into `sameUser`.", highlight: "var sameUser = {{1}}" },
+          { text: "After this, both `user` and `sameUser` hold the same address — they point to the exact same object.", highlight: "var sameUser = {{1}}" },
         ],
       },
     ],
@@ -514,9 +514,9 @@ class Program
 
 class Program
 {
-    static int Double(int x)
+    static int Double(int value)
     {
-        return x * 2;
+        return value * 2;
     }
 
     static void Main()
@@ -555,9 +555,9 @@ class Program
 {
     static void Main()
     {
-        var a = new User();
-        var b = a;
-        Console.WriteLine(Object.ReferenceEquals(a, b));
+        var user = new User();
+        var sameUser = user;
+        Console.WriteLine(Object.ReferenceEquals(user, sameUser));
     }
 }`,
   // 4 - Encapsulation Accessor

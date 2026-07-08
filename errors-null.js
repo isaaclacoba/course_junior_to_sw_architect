@@ -121,11 +121,11 @@ catch (Exception {{1}})
     concept: "throw",
     context:
       "When your own code spots something invalid, it can raise an exception with `throw`. Here a method refuses a negative number of treats, and the caller catches it.",
-    snippet: `int Treats(int n)
+    snippet: `int Treats(int count)
 {
-    if (n < 0)
+    if (count < 0)
         {{1}} new ArgumentException("treats cannot be negative");
-    return n;
+    return count;
 }
 
 try { Treats(-1); }
@@ -301,11 +301,11 @@ class Program
 
 class Program
 {
-    static int Treats(int n)
+    static int Treats(int count)
     {
-        if (n < 0)
+        if (count < 0)
             throw new ArgumentException("treats cannot be negative");
-        return n;
+        return count;
     }
 
     static void Main()
