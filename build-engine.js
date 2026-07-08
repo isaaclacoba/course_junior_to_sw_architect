@@ -170,12 +170,34 @@
 
   function renderInline(text) {
     return (text || "")
-      .split(/(`[^`]+`)/)
-      .map((seg) =>
-        seg.length > 1 && seg.startsWith("`") && seg.endsWith("`")
-          ? `<code>${escapeHtml(seg.slice(1, -1))}</code>`
-          : escapeHtml(seg)
-      )
+      .split(/(`[^`]+`|\*\*[^*]+\*\*)/)
+      .map((seg) => {
+        if (seg.length > 1 && seg.startsWith("`") && seg.endsWith("`"))
+          return `<code>${escapeHtml(seg.slice(1, -1))}</code>`;
+        if (seg.length > 3 && seg.startsWith("**") && seg.endsWith("**"))
+          return `<strong>${escapeHtml(seg.slice(2, -2))}</strong>`;
+        return escapeHtml(seg);
+      })
+      .join("");
+  }
+
+  // Prose can carry structure: a blank line starts a new paragraph, a run of
+  // lines beginning with "- " becomes a bullet list, a single newline is a soft
+  // break. Backticks and **bold** render inline.
+  function renderProse(text) {
+    return (text || "")
+      .split(/\n{2,}/)
+      .map((block) => {
+        const lines = block.split("\n");
+        const isList = lines.length > 0 && lines.every((l) => /^\s*-\s+/.test(l));
+        if (isList) {
+          const items = lines
+            .map((l) => `<li>${renderInline(l.replace(/^\s*-\s+/, ""))}</li>`)
+            .join("");
+          return `<ul class="context-list">${items}</ul>`;
+        }
+        return `<span class="para">${renderInline(block).replace(/\n/g, "<br>")}</span>`;
+      })
       .join("");
   }
 
@@ -223,7 +245,7 @@
     try { history.replaceState(null, "", "#" + (idx + 1)); } catch (e) {}
     if (meta) meta.textContent = metaLabel;
     title.textContent = task.title;
-    context.innerHTML = renderInline(task.context);
+    context.innerHTML = renderProse(task.context);
     if (concept) concept.textContent = task.concept;
     progress.textContent = task.summary
       ? "Recap"

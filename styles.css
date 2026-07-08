@@ -147,6 +147,24 @@ h1 {
   margin: 0.25rem 0;
 }
 
+.context .para {
+  display: block;
+}
+
+.context .para + .para {
+  margin-top: 0.6rem;
+}
+
+.context-list {
+  margin: 0.6rem 0 0;
+  padding-left: 1.15rem;
+  color: var(--ink-soft);
+}
+
+.context-list li {
+  margin: 0.25rem 0;
+}
+
 .context code,
 .coach-list code,
 .quiz-feedback code,

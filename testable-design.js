@@ -31,7 +31,7 @@
       title: "One job, one easy test",
       concept: "Single responsibility",
       context:
-        "A class that computes *and* formats *and* prints is hard to test - you cannot get at the answer without the rest. Give the calculation its own home. Write a `Scorer` with a `Score(int hits, int misses)` that just returns `hits - misses` - one job, so a test can check it directly.",
+        "A class that computes, formats, and prints is hard to test - you cannot reach the answer without the rest running too. Give the calculation its own home. Write a `Scorer` with a `Score(int hits, int misses)` that returns `hits - misses` - one job, so a test can check it directly.",
       example:
         'public class Tally\n{\n    public int Net(int gains, int losses) { return gains - losses; }\n}',
       goal: [

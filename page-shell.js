@@ -136,7 +136,7 @@
           <div>
             <p id="${p}Meta" class="meta"></p>
             <h2 id="${p}Title"></h2>
-            <p id="${p}Context" class="context"></p>
+            <div id="${p}Context" class="context"></div>
           </div>
           <div class="badge-group">
             <span id="${p}Concept" class="badge"></span>

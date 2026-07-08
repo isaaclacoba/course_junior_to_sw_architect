@@ -32,7 +32,7 @@
       title: "Check the exact result",
       concept: "A real assertion",
       context:
-        "A test that only checks the code *ran* proves little - it would pass even with a wrong answer. A good assertion checks the *exact* result. The `Adder` is given. Write a test that acts by calling `Add(2, 3)` and asserts the result is exactly `5`.",
+        "A test that only checks the code ran would pass even when the answer is wrong. A useful assertion checks the exact result. The `Adder` is given. Write a test that calls `Add(2, 3)` and asserts the result is exactly `5`.",
       example:
         'int total = cart.Total();\nConsole.WriteLine(total == 42 ? "PASS" : "FAIL");',
       goal: [
@@ -73,7 +73,7 @@
       title: "Expect it to fail",
       concept: "Testing errors",
       context:
-        "Some behaviour is a *failure on purpose* - and you test that too. The `Gate` throws when you pass a negative count. Write a test that calls `Enter(-1)` inside a `try`; print `PASS` from the `catch` because the throw was expected, or `FAIL` if no throw happened.",
+        "Sometimes the correct behaviour is to throw, and you test that too. The `Gate` throws when you pass a negative count. Write a test that calls `Enter(-1)` inside a `try`; print `PASS` from the `catch` because the throw was expected, or `FAIL` if no throw happened.",
       example:
         'try\n{\n    account.Withdraw(-5);\n    Console.WriteLine("FAIL");\n}\ncatch (Exception)\n{\n    Console.WriteLine("PASS");\n}',
       goal: [

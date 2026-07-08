@@ -9,9 +9,9 @@
   const tasks = [
     {
       title: "Fake a shaky dependency",
-      concept: "A stand-in you control",
+      concept: "A fake",
       context:
-        "The `Greeter` asks an `IClock` for the hour. A real clock gives a different answer every run, so a test could pass at 9am and fail at 9pm - useless. Write a `FixedClock` that keeps the `IClock` promise and whose `Hour()` always returns `9`. Injected, it makes the test repeatable.",
+        "When `Greeter` calls the real clock directly, your test is stuck with whatever time it actually is - it can pass this morning and fail tonight. Code that reaches for real things is hard to test.\n\n**A fake** is a small class you write and inject in place of the real clock, so the test decides what it returns.\n\n- Real clock: the hour changes, so the test passes in the morning and fails at night.\n- Fake clock: `Hour()` always returns `9`, so the test gives the same result every run.",
       example:
         'public class FakeRandom : IRandom\n{\n    public int Next() { return 4; }   // always the same\n}',
       goal: [
@@ -32,7 +32,7 @@
       title: "Feed it canned data",
       concept: "A stub",
       context:
-        "A double can also hand back a value you choose, so you set up the exact case you want to check. The `Cart` asks an `IPriceFeed` for the price. Write a `StubFeed : IPriceFeed` whose `Price()` returns `10`, so `Total(3)` is a value you can predict.",
+        "To check `Total`, you need to know the price going in - but a real `IPriceFeed` reads a live price that moves, so you can't say what `Total(3)` should be.\n\n**A stub** is a double that returns a value you choose, so you can set up one exact case.\n\n- Real feed: an unpredictable live price, nothing you can check against.\n- Stub feed: `Price()` returns `10`, so `Total(3)` is `30` - a number you can check.",
       example:
         'public class StubFeed : IFeed\n{\n    public int Value() { return 42; }   // the case under test\n}',
       goal: [
@@ -53,7 +53,7 @@
       title: "Spy on the call",
       concept: "A spy",
       context:
-        "Sometimes the thing you want to check is not a return value but *that a call happened*. A spy is a double that remembers. The `Signup` should tell an `IMailer` to send a welcome. Write a `SpyMailer : IMailer` with a public `bool WasCalled` that `Send()` sets to `true`, so the test can confirm the mail went out.",
+        "`Signup.Register` tells the mailer to send a welcome email, then returns nothing. A test can't check a return value, and you don't want real mail going out - what you care about is whether it called the mailer at all.\n\n**A spy** is a double that records how it was used, so you can confirm a call happened.\n\n- Real mailer: sends actual mail and hands back nothing to inspect.\n- Spy mailer: sets `WasCalled = true` on `Send()`, so the test can confirm the call.",
       example:
         'public class SpyLog : ILog\n{\n    public bool WasCalled = false;\n    public void Write(string message) { WasCalled = true; }\n}',
       goal: [
@@ -76,11 +76,11 @@
       concept: "Recap",
       context: "A double stands in for a real dependency so a test is fast, repeatable and under your control.",
       summaryIntro:
-        "Injection let you hand a class its dependencies - a double is a stand-in you hand in during a test.",
+        "Real dependencies - a clock, a live feed, a mailer - give a different answer each run or reach outside your program. A double is a stand-in you pass in during a test. You can pass one in because the class receives its dependencies through injection, against an interface rather than a concrete type - the payoff of that earlier work.",
       summaryItems: [
-        { title: "Fake a shaky dependency - ", text: "swap a real clock/random/network for one that always answers the same." },
-        { title: "Stub - ", text: "a double that returns a value you chose, so you set up the exact case." },
-        { title: "Spy - ", text: "a double that remembers it was called, so you can confirm an interaction." },
+        { title: "Fake - ", text: "a plain working stand-in with fixed behaviour: a clock that is always `9`, so the test repeats." },
+        { title: "Stub - ", text: "returns a value you chose, so you arrange one exact case and can predict the result." },
+        { title: "Spy - ", text: "remembers how it was used, so you can confirm a call happened when there is no return value to check." },
       ],
       summaryClose: "Next: testable by design - the habits that make code easy to test are the habits behind SOLID.",
     },
