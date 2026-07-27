@@ -1,5 +1,11 @@
 # Errors and null (`errors-null.js`)
 
+> Updated 2026-07-27: retitled to **Exception handling**, the `null` card was
+> removed (null is now taught in Foundations), and the whole lesson was converted
+> from a fill-in-the-blank drill to a code-lab write-and-run **build** lesson
+> (Monaco + Roslyn). Six tasks: try/catch, the message, finally, throw, `??`,
+> `?.` (data-total 7 -> 6). The notes below predate that change.
+
 - **Track / Part:** Practical - Part 3 Know the language
 - **Engine / format:** drill-engine (runnable fill-in-the-blank)
 - **Difficulty pill:** Steady  **XP cards (data-total):** 7

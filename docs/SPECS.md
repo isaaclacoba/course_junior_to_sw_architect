@@ -72,10 +72,12 @@ drafts plain and factual; do not ship model-register warmth or hype.
 Reuse-first is non-negotiable: never write a new engine, runner, editor, or page
 controller. If a new archetype seems needed, it almost certainly is not.
 
-Direction: the course started as click-quiz + fill-the-gaps and has moved toward
-real programming exercises. For a practical lesson, prefer `build` (write real
-code, Run it) over `drill`; reach for `drill`/quiz only for pure recall or where
-writing code adds no understanding. Theory stays concept-only via the visual.
+Direction (MANDATORY): every practical lesson that shows or runs code MUST use the
+code-lab Monaco editor via `build-engine` (write real code, Run it). The
+fill-in-the-blank `drill-engine` is **not acceptable** for practical lessons - do
+not create or leave one. Reach for `drill`/quiz only for pure recall with no code.
+Theory stays concept-only via the visual (`MemoryViz`). This rule is
+non-negotiable; see `.github/instructions/code-editor.instructions.md`.
 
 ## 2. Config shapes (the exact surface)
 

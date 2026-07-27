@@ -52,7 +52,7 @@ not an endorsement.
 | 10 | data-shapes | 3 | ways to package data: property, computed value, a fixed set, value-copy, value-equality | `{ get; set; }` `[inversion]`, `=>` `(C#)`, enum, struct, record `(C#)` | 1,9 |
 | 11 | lambdas | 3 | a function passed as a value; capturing surrounding locals | `=>` lambda `(C#)`, Func/Predicate | 4,9 |
 | 12 | linq | 3 | query a collection without loops: filter, count, exists, all, map, first, order | Where/Count/Any/All/Select/FirstOrDefault/OrderBy `(C#)` | 9,11 |
-| 13 | errors-null | 3 | handle things going wrong; represent "missing" | try/catch/finally, throw, `??` `?.` `(C#)` (null itself is taught in Foundations, row 1) | 4 |
+| 13 | errors-null (Exception handling) | 3 | handle things going wrong; keep a program standing when it fails | try/catch/finally, throw, `??` `?.` `(C#)` (null itself is taught in Foundations, row 1) | 4 |
 | 14 | generics | 3 | write a type or method that works for any type | `Box<T>`, `First<T>`, `Pair<A,B>` | 9 |
 | 15 | encapsulation (why objects?) | 4 | group data, put behaviour beside it, hide internals, guard a rule, keep it in one place - **S** | private, class | 1,4 |
 | 16 | interfaces (why abstract?) | 4 | name a shared promise; depend on the promise not the concrete; add a type without touching callers - **D/O** | interface | 6,15 |
