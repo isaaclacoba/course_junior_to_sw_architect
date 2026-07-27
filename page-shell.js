@@ -206,6 +206,9 @@
     "theory-11.html", "theory-12.html", "theory-13.html", "theory-14.html", "theory-check-2.html",
     "theory-15.html", "theory-16.html", "theory-17.html", "theory-18.html", "theory-19.html", "theory-check-3.html",
     "theory-21.html", "theory-20.html", "theory-check-4.html",
+    "ai-1.html", "ai-2.html", "ai-3.html", "ai-9.html", "ai-10.html",
+    "ai-4.html", "ai-5.html",
+    "ai-6.html", "ai-7.html", "ai-8.html",
   ];
   if (!page.nextHref) {
     const current = (location.pathname.split("/").pop() || "").toLowerCase();

@@ -302,7 +302,8 @@
         <p class="c-lead">
           Two ways to learn. The <strong>practical</strong> track teaches C# by building and running
           real code in your browser. The <strong>theory</strong> track starts from zero and explains
-          how software and computers actually work. Pick one - you can switch any time.
+          how software and computers actually work - and now includes a first look at how large
+          language models and AI agents work under the hood. Pick one - you can switch any time.
         </p>
 
         <div id="trackActive" hidden>
@@ -336,7 +337,7 @@
             <span class="c-track-name">Theory</span>
             <span class="c-track-blurb">
               No background needed. Understand what software is and how a computer actually runs it,
-              from the ground up.
+              from the ground up - now with a first look at how AI models and agents work.
             </span>
           </button>
         </div>
@@ -1293,11 +1294,201 @@
               </div>
               <p class="c-card-blurb">
                 The final checkpoint: libraries, the standard library, packages, dependencies and
-                version control. Pass it to finish the theory track.
+                version control. Pass it to wrap up the software foundations.
               </p>
               <div class="c-card-meta">
                 <span class="c-pill c-pill--steady">Checkpoint</span>
                 <span class="c-meta-time">10 min</span>
+              </div>
+            </a>
+          </li>
+
+          <li class="c-stage-head">
+            <p class="c-stage-kicker">Theory · Part five</p>
+            <h2 class="c-stage-title">The building blocks of AI</h2>
+          </li>
+
+          <li class="c-step">
+            <a class="c-card" href="ai-1.html" data-key="ai_1_awarded" data-total="1">
+              <span class="c-node" aria-hidden="true"></span>
+              <div class="c-card-top">
+                <h3 class="c-card-title">What is an LLM?</h3>
+                <span class="c-status">Not started</span>
+              </div>
+              <p class="c-card-blurb">
+                The one move at the heart of it all: a model that reads some text and predicts the
+                next token, over and over. Watch it pick from the candidates and continue.
+              </p>
+              <div class="c-card-meta">
+                <span class="c-pill c-pill--gentle">Gentle</span>
+                <span class="c-meta-time">15 min</span>
+              </div>
+            </a>
+          </li>
+
+          <li class="c-step">
+            <a class="c-card" href="ai-2.html" data-key="ai_2_awarded" data-total="1">
+              <span class="c-node" aria-hidden="true"></span>
+              <div class="c-card-top">
+                <h3 class="c-card-title">Tokens</h3>
+                <span class="c-status">Not started</span>
+              </div>
+              <p class="c-card-blurb">
+                Not letters, not quite words. See how text breaks into the chunks the model actually
+                reads and counts - and why the model's limits and cost are measured in them.
+              </p>
+              <div class="c-card-meta">
+                <span class="c-pill c-pill--gentle">Gentle</span>
+                <span class="c-meta-time">15 min</span>
+              </div>
+            </a>
+          </li>
+
+          <li class="c-step">
+            <a class="c-card" href="ai-3.html" data-key="ai_3_awarded" data-total="1">
+              <span class="c-node" aria-hidden="true"></span>
+              <div class="c-card-top">
+                <h3 class="c-card-title">The prompt</h3>
+                <span class="c-status">Not started</span>
+              </div>
+              <p class="c-card-blurb">
+                The text you hand the model to start from. It simply continues it - so changing the
+                prompt changes everything that follows.
+              </p>
+              <div class="c-card-meta">
+                <span class="c-pill c-pill--gentle">Gentle</span>
+                <span class="c-meta-time">15 min</span>
+              </div>
+            </a>
+          </li>
+
+          <li class="c-step">
+            <a class="c-card" href="ai-9.html" data-key="ai_9_awarded" data-total="1">
+              <span class="c-node" aria-hidden="true"></span>
+              <div class="c-card-top">
+                <h3 class="c-card-title">System and user messages</h3>
+                <span class="c-status">Not started</span>
+              </div>
+              <p class="c-card-blurb">
+                Every prompt really has two parts: your message, and a hidden system message that sets
+                the model's role and rules. Change the system message and the tone changes.
+              </p>
+              <div class="c-card-meta">
+                <span class="c-pill c-pill--gentle">Gentle</span>
+                <span class="c-meta-time">15 min</span>
+              </div>
+            </a>
+          </li>
+
+          <li class="c-step">
+            <a class="c-card" href="ai-10.html" data-key="ai_10_awarded" data-total="1">
+              <span class="c-node" aria-hidden="true"></span>
+              <div class="c-card-top">
+                <h3 class="c-card-title">Sampling and temperature</h3>
+                <span class="c-status">Not started</span>
+              </div>
+              <p class="c-card-blurb">
+                Why the same prompt gives different answers. The model samples its next word from a
+                spread, and temperature decides how boldly - low is steady, high is varied.
+              </p>
+              <div class="c-card-meta">
+                <span class="c-pill c-pill--gentle">Gentle</span>
+                <span class="c-meta-time">15 min</span>
+              </div>
+            </a>
+          </li>
+
+          <li class="c-step">
+            <a class="c-card" href="ai-4.html" data-key="ai_4_awarded" data-total="1">
+              <span class="c-node" aria-hidden="true"></span>
+              <div class="c-card-top">
+                <h3 class="c-card-title">Context</h3>
+                <span class="c-status">Not started</span>
+              </div>
+              <p class="c-card-blurb">
+                Everything the model can see right now - the prompt, the conversation, any facts you
+                add. Watch a flat guess become a confident answer once the context is there.
+              </p>
+              <div class="c-card-meta">
+                <span class="c-pill c-pill--gentle">Gentle</span>
+                <span class="c-meta-time">15 min</span>
+              </div>
+            </a>
+          </li>
+
+          <li class="c-step">
+            <a class="c-card" href="ai-5.html" data-key="ai_5_awarded" data-total="1">
+              <span class="c-node" aria-hidden="true"></span>
+              <div class="c-card-top">
+                <h3 class="c-card-title">The context window</h3>
+                <span class="c-status">Not started</span>
+              </div>
+              <p class="c-card-blurb">
+                That context is finite, measured in tokens. When it fills, the oldest tokens fall off
+                the start - which is why a long chat seems to forget how it began.
+              </p>
+              <div class="c-card-meta">
+                <span class="c-pill c-pill--gentle">Gentle</span>
+                <span class="c-meta-time">15 min</span>
+              </div>
+            </a>
+          </li>
+
+          <li class="c-stage-head">
+            <p class="c-stage-kicker">Theory · Part six</p>
+            <h2 class="c-stage-title">From model to agent</h2>
+          </li>
+
+          <li class="c-step">
+            <a class="c-card" href="ai-6.html" data-key="ai_6_awarded" data-total="1">
+              <span class="c-node" aria-hidden="true"></span>
+              <div class="c-card-top">
+                <h3 class="c-card-title">Memory</h3>
+                <span class="c-status">Not started</span>
+              </div>
+              <p class="c-card-blurb">
+                The window forgets, so how does an assistant remember? It saves what matters to a store
+                outside the window and recalls it into the context when it is needed.
+              </p>
+              <div class="c-card-meta">
+                <span class="c-pill c-pill--gentle">Gentle</span>
+                <span class="c-meta-time">15 min</span>
+              </div>
+            </a>
+          </li>
+
+          <li class="c-step">
+            <a class="c-card" href="ai-7.html" data-key="ai_7_awarded" data-total="1">
+              <span class="c-node" aria-hidden="true"></span>
+              <div class="c-card-top">
+                <h3 class="c-card-title">Tools</h3>
+                <span class="c-status">Not started</span>
+              </div>
+              <p class="c-card-blurb">
+                A model can only produce text. Tools let it ask to run a function - check the weather,
+                do a calculation - and read the result back into its context. The first step from talker to doer.
+              </p>
+              <div class="c-card-meta">
+                <span class="c-pill c-pill--gentle">Gentle</span>
+                <span class="c-meta-time">15 min</span>
+              </div>
+            </a>
+          </li>
+
+          <li class="c-step">
+            <a class="c-card" href="ai-8.html" data-key="ai_8_awarded" data-total="1">
+              <span class="c-node" aria-hidden="true"></span>
+              <div class="c-card-top">
+                <h3 class="c-card-title">From LLM to agent</h3>
+                <span class="c-status">Not started</span>
+              </div>
+              <p class="c-card-blurb">
+                Put the pieces together - model, context, memory, tools - and run them in a loop with a
+                goal, and you get an agent. The capstone, and the bridge to the harder material ahead.
+              </p>
+              <div class="c-card-meta">
+                <span class="c-pill c-pill--steady">Steady</span>
+                <span class="c-meta-time">15 min</span>
               </div>
             </a>
           </li>
