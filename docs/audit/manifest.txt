@@ -1,0 +1,58 @@
+# Course audit manifest - one line per lesson report that MUST exist.
+# Format: track/report-file <TAB> lesson-source(s) <TAB> title
+# The tracker script (check-progress.sh) checks each report file exists and is non-trivial.
+# Order = the live path order in index.html.
+
+# --- PRACTICAL TRACK ---
+practical/level1.md	level1.js,level1.html	P1 Foundations
+practical/level1-coding.md	level1-coding.js,level1-coding.html	P1 Practice the Basics
+practical/control-flow.md	control-flow.js,control-flow.html	P1 Control Flow
+practical/writing-methods.md	writing-methods.js,writing-methods.html	P1 Methods
+practical/reading-objects.md	reading-objects.js,reading-objects.html	P1 Reading Objects
+practical/level4.md	level4.js,level4.html	P1 Reuse Without Regret
+practical/first-builds.md	first-builds.js,first-builds.html	P2 First Builds
+practical/wiring-it-up.md	wiring-it-up.js,wiring-it-up.html	P2 Wiring It Up
+practical/collections.md	collections.js,collections.html	P3 Collections
+practical/data-shapes.md	data-shapes.js,data-shapes.html	P3 Data shapes
+practical/lambdas.md	lambdas.js,lambdas.html	P3 Lambdas
+practical/linq.md	linq.js,linq.html	P3 LINQ
+practical/errors-null.md	errors-null.js,errors-null.html	P3 Errors and null
+practical/generics.md	generics.js,generics.html	P3 Generics
+practical/encapsulation.md	encapsulation.js,encapsulation.html	P4 Why objects?
+practical/interfaces.md	interfaces.js,interfaces.html	P4 Why abstract?
+practical/polymorphism.md	polymorphism.js,polymorphism.html	P4 Why many versions?
+practical/composition.md	composition.js,composition.html	P4 Inherit or compose?
+practical/dependency-injection.md	dependency-injection.js,dependency-injection.html	P4 Why inject?
+practical/testing-basics.md	testing-basics.js,testing-basics.html	P5 What a test is
+practical/test-doubles.md	test-doubles.js,test-doubles.html	P5 Test doubles
+practical/testable-design.md	testable-design.js,testable-design.html	P5 Testable by design
+practical/refactor-moves.md	refactor-moves.js,refactor-moves.html	P6 Refactor moves
+practical/level2.md	level2.js,level2.html	P6 The SOLID Principles
+practical/capstone.md	level3-exercise/	P6 Capstone: SOLID in Practice
+
+# --- THEORY TRACK ---
+theory/theory-1.md	theory-1.js,theory-1.html	P1 What a program is
+theory/theory-2.md	theory-2.js,theory-2.html	P1 How a program runs
+theory/theory-3.md	theory-3.js,theory-3.html	P1 What starts a program
+theory/theory-4.md	theory-4.js,theory-4.html	P1 Running many programs at once
+theory/theory-5.md	theory-5.js,theory-5.viz.js,theory-5.html	P1 How computers store everything as numbers
+theory/theory-6.md	theory-6.js,theory-6.viz.js,theory-6.html	P1 Text, images, and sound as numbers
+theory/theory-7.md	theory-7.js,theory-7.viz.js,theory-7.html	P1 The operating system's bigger job
+theory/theory-check-1.md	theory-check-1.js,theory-check-1.html	P1 Part one checkpoint
+theory/theory-8.md	theory-8.js,theory-8.viz.js,theory-8.html	P2 What a programming language is
+theory/theory-9.md	theory-9.js,theory-9.html	P2 Variables
+theory/theory-10.md	theory-10.js,theory-10.viz.js,theory-10.html	P2 Types
+theory/theory-11.md	theory-11.js,theory-11.viz.js,theory-11.html	P2 Statements and expressions
+theory/theory-12.md	theory-12.js,theory-12.viz.js,theory-12.html	P2 Decisions and repetition
+theory/theory-13.md	theory-13.js,theory-13.viz.js,theory-13.html	P2 Functions
+theory/theory-14.md	theory-14.js,theory-14.viz.js,theory-14.html	P2 Bugs: why programs go wrong
+theory/theory-check-2.md	theory-check-2.js,theory-check-2.html	P2 Part two checkpoint
+theory/theory-15.md	theory-15.js,theory-15.viz.js,theory-15.html	P3 Where data lives
+theory/theory-16.md	theory-16.js,theory-16.viz.js,theory-16.html	P3 References vs values
+theory/theory-17.md	theory-17.js,theory-17.viz.js,theory-17.html	P3 The build-and-run cycle
+theory/theory-18.md	theory-18.js,theory-18.viz.js,theory-18.html	P3 Saving data
+theory/theory-19.md	theory-19.js,theory-19.viz.js,theory-19.html	P3 Programs that talk
+theory/theory-check-3.md	theory-check-3.js,theory-check-3.html	P3 Part three checkpoint
+theory/theory-21.md	theory-21.js,theory-21.viz.js,theory-21.html	P4 Standing on other code
+theory/theory-20.md	theory-20.js,theory-20.viz.js,theory-20.html	P4 How code is shared
+theory/theory-check-4.md	theory-check-4.js,theory-check-4.html	P4 Part four checkpoint
