@@ -144,6 +144,14 @@ drill file for the same lesson - that is the dead-file trap the audit found.)
    flavour, but do not switch families mid-Part.
 8. **Difficulty rises one rung at a time.** No card jumps to several new classes
    at once; insert an intermediate card instead.
+9. **Format the prose.** `context`, `summaryIntro`/`summaryItems`, `goal` and the
+   theory `narr` are rendered with light markup - use it, never a run-on:
+   - a **blank line** starts a new paragraph;
+   - a run of lines beginning with `- ` becomes a **bullet list** - use it for any
+     list of operators, types, options or steps (never comma-pack a list into one
+     sentence);
+   - `**bold**` marks the term being introduced; backtick `` `code` `` for code;
+   - the build `example` is real code (Monaco highlights it) - keep it valid C#.
 
 ## 4. XP and wiring conventions
 

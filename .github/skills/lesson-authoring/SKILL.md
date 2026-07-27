@@ -69,6 +69,8 @@ runner, editor, or page controller. If you think you need one, re-read
 - [ ] Every concept and token used is at or above this lesson's ledger row.
 - [ ] No C#-only sugar used before its ledger row (`=>`, `var`, `$"..."`, records).
 - [ ] One idea per card; a recap closes a multi-card lesson.
+- [ ] Prose is formatted: lists use `- ` bullets (never comma-packed), distinct
+      points use blank-line paragraphs, `**bold**` for the new term, `code` in backticks.
 - [ ] Runnable if it produces visible output.
 - [ ] Build tasks have a technique gate AND a hidden `verify` probe.
 - [ ] SOLID letter stated if this is a design/testing/refactor lesson.

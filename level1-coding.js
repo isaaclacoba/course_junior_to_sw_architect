@@ -12,7 +12,7 @@
       title: "Do math with variables",
       concept: "Arithmetic",
       context:
-        "You can compute with values. The arithmetic operators are `+` (add), `-` (subtract), `*` (multiply), `/` (divide). Combine variables and you get a new value back.",
+        "You can compute with values using the arithmetic operators:\n\n- `+` - add\n- `-` - subtract\n- `*` - multiply\n- `/` - divide\n\nCombine variables and you get a new value back.",
       example:
         "int a = 6;\nint b = 4;\nConsole.WriteLine(a + b);   // 10\nConsole.WriteLine(a * b);   // 24",
       goal: [
@@ -55,7 +55,7 @@
       title: "Ask a yes/no question",
       concept: "Comparisons",
       context:
-        "A **comparison** asks a yes/no question and gives back a `bool`. The operators: `==` (equal), `!=` (not equal), `>`, `<`, `>=`, `<=`. `age >= 18` is `true` when age is 18 or more. Watch the difference: `==` compares, a single `=` stores.",
+        "A **comparison** asks a yes/no question and gives back a `bool`:\n\n- `==` - equal\n- `!=` - not equal\n- `>` `<` `>=` `<=` - greater / less than (or equal to)\n\nSo `age >= 18` is `true` when age is 18 or more. Watch the difference: `==` compares, a single `=` stores.",
       example:
         "int score = 70;\nbool passed = score >= 50;\nConsole.WriteLine(passed);   // True",
       goal: [
