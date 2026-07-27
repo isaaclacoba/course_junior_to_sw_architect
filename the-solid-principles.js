@@ -11,179 +11,179 @@
 
   const tasks = [
     {
-      title: "S - Single Responsibility: split the jobs",
+      title: "S - Single Responsibility: one animal, one job",
       concept: "Single Responsibility",
       context:
-        "This is the **S** in SOLID: Single Responsibility. A class should have one job, so it has one reason to change.\n\nThe trap: `LoginTest` does two jobs in one method - it runs the check and it builds the report text. When someone reworded the report last month, the login check broke too, because both lived in the same place. Two unrelated things sharing a method means touching one bruises the other.\n\nThe fix: leave `LoginTest` with only the check, and move the report text into its own class.",
+        "This is the **S** in SOLID: Single Responsibility. A class should have one job, so it has one reason to change.\n\nWhy bother - isn't this overengineering? When two unrelated jobs share a method, a change to one quietly risks the other. Here `Cat` both checks if it is hungry and builds the sign text the keeper reads. Reword the sign and you are editing the very method that decides feeding - one careless change breaks both. Keep them apart and a sign change can never touch the hunger check.\n\nThe fix: leave `Cat` with only the check, and move the sign text into its own `FeedingSign` class.",
       example:
         "public class Door\n{\n    public bool IsOpen()\n    {\n        return true;\n    }\n}\n\npublic class DoorSign\n{\n    public string Show(bool open)\n    {\n        return open ? \"OPEN\" : \"SHUT\";\n    }\n}",
       goal: [
-        "Leave `LoginTest` with only the check: a `bool Run()` that returns `true`.",
-        "Write a `ReportFormatter` with `string Format(bool passed)` returning `\"PASS\"` or `\"FAIL\"`.",
-        "`Main` runs the test, then formats the result. The output stays `PASS`.",
+        "Leave `Cat` with only the check: a `bool IsHungry()` that returns `true`.",
+        "Write a `FeedingSign` with `string Format(bool hungry)` returning `\"FEED\"` or `\"FULL\"`.",
+        "`Main` asks the cat, then formats the sign. The output stays `FEED`.",
       ],
-      expected: "PASS",
+      expected: "FEED",
       requireSource: [
-        { pattern: /class\s+ReportFormatter/, message: "Move the report text into its own `ReportFormatter` class." },
-        { pattern: /string\s+Format\s*\(\s*bool/, message: "Give `ReportFormatter` a `Format(bool passed)` method that returns the text." },
-        { pattern: /bool\s+Run\s*\(\s*\)/, message: "Leave `LoginTest` with only the check: a `bool Run()`." },
-        { pattern: /^(?![\s\S]*RunAndReport)[\s\S]*$/, message: "Split the two jobs - `LoginTest` should no longer both run the check and build the report." },
+        { pattern: /class\s+FeedingSign/, message: "Move the sign text into its own `FeedingSign` class." },
+        { pattern: /string\s+Format\s*\(\s*bool/, message: "Give `FeedingSign` a `Format(bool hungry)` method that returns the text." },
+        { pattern: /bool\s+IsHungry\s*\(\s*\)/, message: "Leave `Cat` with only the check: a `bool IsHungry()`." },
+        { pattern: /^(?![\s\S]*CheckAndSign)[\s\S]*$/, message: "Split the two jobs - `Cat` should no longer both check hunger and build the sign." },
       ],
       verify: {
         main:
-          'class Program\n{\n    static void Main()\n    {\n        var formatter = new ReportFormatter();\n        System.Console.WriteLine(formatter.Format(false));\n    }\n}\n',
-        expected: "FAIL",
+          'class Program\n{\n    static void Main()\n    {\n        var sign = new FeedingSign();\n        System.Console.WriteLine(sign.Format(false));\n    }\n}\n',
+        expected: "FULL",
         message:
-          "`ReportFormatter` should turn any result into text on its own - a failing result should read FAIL, with no help from `LoginTest`.",
+          "`FeedingSign` should turn any answer into text on its own - a cat that is not hungry should read FULL, with no help from `Cat`.",
       },
       starter:
-        'using System;\n\npublic class LoginTest\n{\n    // one method: runs the check AND builds the report text\n    public string RunAndReport()\n    {\n        bool passed = true;                        // the check\n        return passed ? "PASS" : "FAIL";           // the formatting\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var test = new LoginTest();\n        Console.WriteLine(test.RunAndReport());\n    }\n}\n',
+        'using System;\n\npublic class Cat\n{\n    // one method: checks hunger AND builds the sign text\n    public string CheckAndSign()\n    {\n        bool hungry = true;                        // the check\n        return hungry ? "FEED" : "FULL";           // the formatting\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var cat = new Cat();\n        Console.WriteLine(cat.CheckAndSign());\n    }\n}\n',
       solution:
-        'using System;\n\npublic class LoginTest\n{\n    public bool Run()\n    {\n        return true;\n    }\n}\n\npublic class ReportFormatter\n{\n    public string Format(bool passed)\n    {\n        return passed ? "PASS" : "FAIL";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var test = new LoginTest();\n        bool passed = test.Run();\n\n        var formatter = new ReportFormatter();\n        Console.WriteLine(formatter.Format(passed));\n    }\n}\n',
+        'using System;\n\npublic class Cat\n{\n    public bool IsHungry()\n    {\n        return true;\n    }\n}\n\npublic class FeedingSign\n{\n    public string Format(bool hungry)\n    {\n        return hungry ? "FEED" : "FULL";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var cat = new Cat();\n        bool hungry = cat.IsHungry();\n\n        var sign = new FeedingSign();\n        Console.WriteLine(sign.Format(hungry));\n    }\n}\n',
     },
     {
-      title: "O - Open/Closed: add a style without editing",
+      title: "O - Open/Closed: add an animal without editing",
       concept: "Open/Closed",
       context:
-        "This is the **O** in SOLID: Open/Closed. Code should be open to new behaviour but closed to edits - you add a case without reopening what already works.\n\nThe trap: `ReportFormatter.Build` decides the style with a chain of `if` checks. Every new style means editing this one method, and each edit risks breaking the styles that already passed.\n\nThe fix: make each style its own class behind a shared `IReport` interface. A new style becomes a new class, and the old ones are never touched.",
+        "This is the **O** in SOLID: Open/Closed. Code should be open to new behaviour but closed to edits - you add a case without reopening what already works.\n\nWhy bother - isn't this overengineering? Every time you edit a working method to bolt on a case, you risk the cases that already passed, and you have to retest all of them. Here `AnimalVoice.Speak` grows another `if` for every animal. Add a cow and you reopen the same method cats and dogs already depend on. If each animal is its own class behind `IAnimal`, a new animal is a new class and the old ones are never touched - so they cannot break.\n\nThe fix: give each animal its own class behind a shared `IAnimal` interface.",
       example:
         "public interface IGreeting\n{\n    string Say();\n}\n\npublic class Hello : IGreeting\n{\n    public string Say()\n    {\n        return \"hi\";\n    }\n}\n\npublic class Bye : IGreeting\n{\n    public string Say()\n    {\n        return \"later\";\n    }\n}",
       goal: [
-        "Declare `interface IReport` with `string Build(bool passed)`.",
-        "Write a `PlainReport` (`\"PASS\"`/`\"FAIL\"`) and an `EmojiReport` (`\"OK\"`/`\"X\"`), each implementing `IReport`.",
-        "`Main` uses a `PlainReport` through an `IReport` variable. The output stays `PASS`.",
+        "Declare `interface IAnimal` with `string Speak()`.",
+        "Write a `Cat` (`\"Meow\"`) and a `Dog` (`\"Woof\"`), each implementing `IAnimal`.",
+        "`Main` uses a `Cat` through an `IAnimal` variable. The output stays `Meow`.",
       ],
-      expected: "PASS",
+      expected: "Meow",
       requireSource: [
-        { pattern: /interface\s+IReport/, message: "Declare an `IReport` interface with `string Build(bool passed)`." },
-        { pattern: /class\s+PlainReport\s*:\s*IReport/, message: "Write a `PlainReport` that implements `IReport`." },
-        { pattern: /class\s+EmojiReport\s*:\s*IReport/, message: "Write an `EmojiReport` that implements `IReport`." },
-        { pattern: /^(?![\s\S]*style\s*==)[\s\S]*$/, message: "Drop the `style ==` checks - each style is now its own class, chosen by type." },
-        { pattern: /^(?![\s\S]*\bswitch\b)[\s\S]*$/, message: "No `switch` on the style either - the type picks the behaviour now." },
+        { pattern: /interface\s+IAnimal/, message: "Declare an `IAnimal` interface with `string Speak()`." },
+        { pattern: /class\s+Cat\s*:\s*IAnimal/, message: "Write a `Cat` that implements `IAnimal`." },
+        { pattern: /class\s+Dog\s*:\s*IAnimal/, message: "Write a `Dog` that implements `IAnimal`." },
+        { pattern: /^(?![\s\S]*kind\s*==)[\s\S]*$/, message: "Drop the `kind ==` checks - each animal is now its own class, chosen by type." },
+        { pattern: /^(?![\s\S]*\bswitch\b)[\s\S]*$/, message: "No `switch` on the kind either - the type picks the behaviour now." },
       ],
       verify: {
         main:
-          'class Program\n{\n    static void Main()\n    {\n        IReport report = new EmojiReport();\n        System.Console.WriteLine(report.Build(true));\n    }\n}\n',
-        expected: "OK",
+          'class Program\n{\n    static void Main()\n    {\n        IAnimal animal = new Dog();\n        System.Console.WriteLine(animal.Speak());\n    }\n}\n',
+        expected: "Woof",
         message:
-          "Adding a style must not touch the others. An `EmojiReport` should build its own text - OK when passed - through the same `IReport`.",
+          "Adding an animal must not touch the others. A `Dog` should speak its own sound - Woof - through the same `IAnimal`.",
       },
       starter:
-        'using System;\n\npublic class ReportFormatter\n{\n    // every new style forces another edit to this method\n    public string Build(string style, bool passed)\n    {\n        if (style == "plain")\n            return passed ? "PASS" : "FAIL";\n        if (style == "emoji")\n            return passed ? "OK" : "X";\n        return "unknown";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var formatter = new ReportFormatter();\n        Console.WriteLine(formatter.Build("plain", true));\n    }\n}\n',
+        'using System;\n\npublic class AnimalVoice\n{\n    // every new animal forces another edit to this method\n    public string Speak(string kind)\n    {\n        if (kind == "cat")\n            return "Meow";\n        if (kind == "dog")\n            return "Woof";\n        return "unknown";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var voice = new AnimalVoice();\n        Console.WriteLine(voice.Speak("cat"));\n    }\n}\n',
       solution:
-        'using System;\n\npublic interface IReport\n{\n    string Build(bool passed);\n}\n\npublic class PlainReport : IReport\n{\n    public string Build(bool passed)\n    {\n        return passed ? "PASS" : "FAIL";\n    }\n}\n\npublic class EmojiReport : IReport\n{\n    public string Build(bool passed)\n    {\n        return passed ? "OK" : "X";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        IReport report = new PlainReport();\n        Console.WriteLine(report.Build(true));\n    }\n}\n',
+        'using System;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak()\n    {\n        return "Meow";\n    }\n}\n\npublic class Dog : IAnimal\n{\n    public string Speak()\n    {\n        return "Woof";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        IAnimal animal = new Cat();\n        Console.WriteLine(animal.Speak());\n    }\n}\n',
     },
     {
-      title: "L - Liskov Substitution: stop the subtype lying",
+      title: "L - Liskov Substitution: the penguin that can't fly",
       concept: "Liskov Substitution",
       context:
-        "This is the **L** in SOLID: Liskov Substitution. Any subtype must be usable anywhere its parent is, with no surprises.\n\nThe trap: `SkippedTest` inherits `Test` to reuse its code, but a skipped test has no real result, so its `Run()` throws. Now any code holding a `Test` blows up the moment it happens to be a `SkippedTest`. The child broke a promise the parent made - and this starter throws when you run it.\n\nThe fix: drop the false is-a relationship. Have both types implement a small shared `IRunnable` and return a real outcome for every case, so none of them throws.",
+        "This is the **L** in SOLID: Liskov Substitution. Any subtype must be usable anywhere its parent is, with no surprises.\n\nWhy bother - isn't this overengineering? Inheritance looks like free reuse, but if the child cannot keep the parent's promise it becomes a landmine. A `Penguin` that inherits `Bird` still has a `Fly()` - so it throws, and any code holding a `Bird` crashes the moment it meets a penguin. The bug stays hidden until the wrong animal shows up. This starter throws when you run it.\n\nThe fix: drop the false is-a. Have both types share a small `IMover` and return a real move for every case, so none of them throws.",
       example:
         "public interface IReadable\n{\n    string Read();\n}\n\npublic class Book : IReadable\n{\n    public string Read()\n    {\n        return \"Words\";\n    }\n}\n\npublic class BlankPage : IReadable\n{\n    public string Read()\n    {\n        return \"Empty\";\n    }\n}",
       goal: [
-        "Declare `interface IRunnable` with `string Run()`.",
-        "Make `LoginTest` implement it (`Run` returns `\"Pass\"`) and `SkippedTest` implement it (`Run` returns `\"Skipped\"` - never throw).",
-        "`Main` runs a `SkippedTest` through an `IRunnable`. The output should be `Skipped`.",
+        "Declare `interface IMover` with `string Move()`.",
+        "Make `Sparrow` implement it (`Move` returns `\"Fly\"`) and `Penguin` implement it (`Move` returns `\"Swim\"` - never throw).",
+        "`Main` moves a `Penguin` through an `IMover`. The output should be `Swim`.",
       ],
-      expected: "Skipped",
+      expected: "Swim",
       requireSource: [
-        { pattern: /interface\s+IRunnable/, message: "Declare an `IRunnable` interface with `string Run()` that every test can honour." },
-        { pattern: /class\s+LoginTest\s*:\s*IRunnable/, message: "Make `LoginTest` implement `IRunnable`." },
-        { pattern: /class\s+SkippedTest\s*:\s*IRunnable/, message: "Make `SkippedTest` implement `IRunnable` instead of inheriting `Test`." },
-        { pattern: /^(?![\s\S]*throw\s+new)[\s\S]*$/, message: "No `throw` - every `Run()` must return a real outcome, even a skipped one." },
-        { pattern: /^(?![\s\S]*:\s*Test\b)[\s\S]*$/, message: "Drop the inheritance from `Test` - a skipped test is not a runnable test." },
+        { pattern: /interface\s+IMover/, message: "Declare an `IMover` interface with `string Move()` that every animal can honour." },
+        { pattern: /class\s+Sparrow\s*:\s*IMover/, message: "Make `Sparrow` implement `IMover`." },
+        { pattern: /class\s+Penguin\s*:\s*IMover/, message: "Make `Penguin` implement `IMover` instead of inheriting `Bird`." },
+        { pattern: /^(?![\s\S]*throw\s+new)[\s\S]*$/, message: "No `throw` - every `Move()` must return a real move, even for a penguin." },
+        { pattern: /^(?![\s\S]*:\s*Bird\b)[\s\S]*$/, message: "Drop the inheritance from `Bird` - a penguin is not a flying bird." },
       ],
       verify: {
         main:
-          'class Program\n{\n    static void Main()\n    {\n        IRunnable a = new LoginTest();\n        IRunnable b = new SkippedTest();\n        System.Console.WriteLine(a.Run());\n        System.Console.WriteLine(b.Run());\n    }\n}\n',
-        expected: ["Pass", "Skipped"],
+          'class Program\n{\n    static void Main()\n    {\n        IMover a = new Sparrow();\n        IMover b = new Penguin();\n        System.Console.WriteLine(a.Move());\n        System.Console.WriteLine(b.Move());\n    }\n}\n',
+        expected: ["Fly", "Swim"],
         message:
-          "Any `IRunnable` must be safe to run. A `LoginTest` should read Pass and a `SkippedTest` should read Skipped - neither may throw.",
+          "Any `IMover` must be safe to move. A `Sparrow` should read Fly and a `Penguin` should read Swim - neither may throw.",
       },
       starter:
-        'using System;\n\npublic class Test\n{\n    public virtual string Run()\n    {\n        return "Pass";\n    }\n}\n\npublic class SkippedTest : Test\n{\n    // a skipped test has no real result, so it breaks the promise\n    public override string Run()\n    {\n        throw new InvalidOperationException("skipped");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Test test = new SkippedTest();\n        Console.WriteLine(test.Run());\n    }\n}\n',
+        'using System;\n\npublic class Bird\n{\n    public virtual string Fly()\n    {\n        return "Flap flap";\n    }\n}\n\npublic class Penguin : Bird\n{\n    // a penguin cannot fly, so it breaks the promise\n    public override string Fly()\n    {\n        throw new InvalidOperationException("penguins do not fly");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Bird bird = new Penguin();\n        Console.WriteLine(bird.Fly());\n    }\n}\n',
       solution:
-        'using System;\n\npublic interface IRunnable\n{\n    string Run();\n}\n\npublic class LoginTest : IRunnable\n{\n    public string Run()\n    {\n        return "Pass";\n    }\n}\n\npublic class SkippedTest : IRunnable\n{\n    public string Run()\n    {\n        return "Skipped";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        IRunnable test = new SkippedTest();\n        Console.WriteLine(test.Run());\n    }\n}\n',
+        'using System;\n\npublic interface IMover\n{\n    string Move();\n}\n\npublic class Sparrow : IMover\n{\n    public string Move()\n    {\n        return "Fly";\n    }\n}\n\npublic class Penguin : IMover\n{\n    public string Move()\n    {\n        return "Swim";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        IMover bird = new Penguin();\n        Console.WriteLine(bird.Move());\n    }\n}\n',
     },
     {
-      title: "I - Interface Segregation: split the fat interface",
+      title: "I - Interface Segregation: don't make a fish walk",
       concept: "Interface Segregation",
       context:
-        "This is the **I** in SOLID: Interface Segregation. A class should only depend on the methods it actually uses.\n\nThe trap: one fat `ITestPlugin` interface demands `Run`, `Report`, and `Retry`. A plugin that only formats reports is still forced to implement all three, so `Run` and `Retry` become fake bodies that throw. Those fakes are noise, and other code can call them by mistake.\n\nThe fix: split the fat interface into small focused ones - `IRunnable` and `IReportable` - so the report plugin implements only the one it needs.",
+        "This is the **I** in SOLID: Interface Segregation. A class should only depend on the methods it actually uses.\n\nWhy bother - isn't this overengineering? A fat interface forces a class to implement things it will never do, and those fake bodies are traps - other code can call them and blow up. Here one `IAnimalActions` demands `Walk`, `Swim` and `Fly`, so a `Fish` has to fake walking and flying with methods that throw. Split the interface and the fish implements only swimming - there is nothing fake left to call by mistake.\n\nThe fix: split the fat interface into small focused ones - `IWalker`, `ISwimmer`, `IFlyer` - so the fish implements only the one it needs.",
       example:
         "public interface IWasher\n{\n    string Wash();\n}\n\npublic interface IDryer\n{\n    string Dry();\n}\n\npublic class HandTowel : IDryer\n{\n    public string Dry()\n    {\n        return \"dry\";\n    }\n}",
       goal: [
-        "Declare two small interfaces: `IRunnable` with `string Run()`, and `IReportable` with `string Report()`.",
-        "Make `ReportPlugin` implement only `IReportable`, with `Report()` returning `\"report ready\"`.",
-        "`Main` uses the plugin through an `IReportable`. The output stays `report ready`.",
+        "Declare three small interfaces: `IWalker` with `string Walk()`, `ISwimmer` with `string Swim()`, and `IFlyer` with `string Fly()`.",
+        "Make `Fish` implement only `ISwimmer`, with `Swim()` returning `\"swim\"`.",
+        "`Main` uses the fish through an `ISwimmer`. The output stays `swim`.",
       ],
-      expected: "report ready",
+      expected: "swim",
       requireSource: [
-        { pattern: /interface\s+IRunnable/, message: "Split the fat interface: declare an `IRunnable` with `string Run()`." },
-        { pattern: /interface\s+IReportable/, message: "Declare an `IReportable` with `string Report()`." },
-        { pattern: /class\s+ReportPlugin\s*:\s*IReportable/, message: "`ReportPlugin` should implement only `IReportable` - the interface it actually needs." },
-        { pattern: /^(?![\s\S]*interface\s+ITestPlugin)[\s\S]*$/, message: "Drop the fat `ITestPlugin` - a plugin should not depend on methods it never uses." },
-        { pattern: /^(?![\s\S]*NotImplementedException)[\s\S]*$/, message: "No fake `Run`/`Retry` bodies - if `ReportPlugin` only reports, it should not have them at all." },
+        { pattern: /interface\s+ISwimmer/, message: "Split the fat interface: declare an `ISwimmer` with `string Swim()`." },
+        { pattern: /interface\s+IWalker/, message: "Declare an `IWalker` with `string Walk()` as its own interface." },
+        { pattern: /class\s+Fish\s*:\s*ISwimmer/, message: "`Fish` should implement only `ISwimmer` - the interface it actually needs." },
+        { pattern: /^(?![\s\S]*interface\s+IAnimalActions)[\s\S]*$/, message: "Drop the fat `IAnimalActions` - an animal should not depend on moves it never makes." },
+        { pattern: /^(?![\s\S]*NotImplementedException)[\s\S]*$/, message: "No fake `Walk`/`Fly` bodies - if `Fish` only swims, it should not have them at all." },
       ],
       verify: {
         main:
-          'class Program\n{\n    class SummaryPlugin : IReportable\n    {\n        public string Report()\n        {\n            return "summary ready";\n        }\n    }\n    static void Main()\n    {\n        IReportable plugin = new SummaryPlugin();\n        System.Console.WriteLine(plugin.Report());\n    }\n}\n',
-        expected: "summary ready",
+          'class Program\n{\n    class Dolphin : ISwimmer\n    {\n        public string Swim()\n        {\n            return "glide";\n        }\n    }\n    static void Main()\n    {\n        ISwimmer swimmer = new Dolphin();\n        System.Console.WriteLine(swimmer.Swim());\n    }\n}\n',
+        expected: "glide",
         message:
-          "`IReportable` should stand on its own, so any reporter can implement just it without a `Run` or `Retry` in sight.",
+          "`ISwimmer` should stand on its own, so any swimmer can implement just it without a `Walk` or `Fly` in sight.",
       },
       starter:
-        'using System;\n\npublic interface ITestPlugin\n{\n    string Run();\n    string Report();\n    string Retry();\n}\n\n// only formats reports, but the fat interface forces all three\npublic class ReportPlugin : ITestPlugin\n{\n    public string Run()\n    {\n        throw new NotImplementedException();\n    }\n\n    public string Report()\n    {\n        return "report ready";\n    }\n\n    public string Retry()\n    {\n        throw new NotImplementedException();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        ITestPlugin plugin = new ReportPlugin();\n        Console.WriteLine(plugin.Report());\n    }\n}\n',
+        'using System;\n\npublic interface IAnimalActions\n{\n    string Walk();\n    string Swim();\n    string Fly();\n}\n\n// a fish only swims, but the fat interface forces all three\npublic class Fish : IAnimalActions\n{\n    public string Walk()\n    {\n        throw new NotImplementedException();\n    }\n\n    public string Swim()\n    {\n        return "swim";\n    }\n\n    public string Fly()\n    {\n        throw new NotImplementedException();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        IAnimalActions fish = new Fish();\n        Console.WriteLine(fish.Swim());\n    }\n}\n',
       solution:
-        'using System;\n\npublic interface IRunnable\n{\n    string Run();\n}\n\npublic interface IReportable\n{\n    string Report();\n}\n\n// the report plugin implements only the interface it needs\npublic class ReportPlugin : IReportable\n{\n    public string Report()\n    {\n        return "report ready";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        IReportable plugin = new ReportPlugin();\n        Console.WriteLine(plugin.Report());\n    }\n}\n',
+        'using System;\n\npublic interface IWalker\n{\n    string Walk();\n}\n\npublic interface ISwimmer\n{\n    string Swim();\n}\n\npublic interface IFlyer\n{\n    string Fly();\n}\n\n// the fish implements only the interface it needs\npublic class Fish : ISwimmer\n{\n    public string Swim()\n    {\n        return "swim";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        ISwimmer fish = new Fish();\n        Console.WriteLine(fish.Swim());\n    }\n}\n',
     },
     {
-      title: "D - Dependency Inversion: inject the reporter",
+      title: "D - Dependency Inversion: hand the keeper a log",
       concept: "Dependency Inversion",
       context:
-        "This is the **D** in SOLID: Dependency Inversion. High-level code should depend on an interface, not reach out and build a concrete class itself.\n\nThe trap: `TestRunner` builds its own `ConsoleReporter` with `new`, inside itself. The runner is welded to the console - you cannot point it at a file, and in a test you cannot check what it reported without it printing for real.\n\nThe fix: have `TestRunner` receive an `IReporter` through its constructor instead of building one. Now a test can hand it a fake reporter that just records the message - which is the payoff you will lean on for testing.",
+        "This is the **D** in SOLID: Dependency Inversion. High-level code should depend on an interface, not reach out and build a concrete class itself.\n\nWhy bother - isn't this overengineering? When a class news up its own collaborator, it is welded to that one choice. Here `Keeper` builds its own `ConsoleLog` inside itself, so it can only ever log to the console - and in a test you cannot check what it logged without it printing for real. Have the keeper receive the log from outside and a test can hand it a fake that just records the message. That single move is what makes the class testable at all.\n\nThe fix: have `Keeper` receive an `ILog` through its constructor instead of building one. A test can then pass a fake log that records the message - the payoff you will lean on for testing.",
       example:
         "public interface IClock\n{\n    int Hour();\n}\n\npublic class Alarm\n{\n    private readonly IClock _clock;\n\n    public Alarm(IClock clock)\n    {\n        _clock = clock;\n    }\n}",
       goal: [
-        "Declare `interface IReporter` with `void Send(string message)`, and make `ConsoleReporter` implement it.",
-        "Change `TestRunner` to receive an `IReporter` through its constructor and store it in a `private readonly` field - no `new` inside.",
-        "`Main` hands in a `ConsoleReporter`. The output stays `test passed`.",
+        "Declare `interface ILog` with `void Write(string message)`, and make `ConsoleLog` implement it.",
+        "Change `Keeper` to receive an `ILog` through its constructor and store it in a `private readonly` field - no `new` inside.",
+        "`Main` hands in a `ConsoleLog`. The output stays `cat fed`.",
       ],
-      expected: "test passed",
+      expected: "cat fed",
       requireSource: [
-        { pattern: /interface\s+IReporter/, message: "Declare an `IReporter` interface with `void Send(string message)`." },
-        { pattern: /class\s+ConsoleReporter\s*:\s*IReporter/, message: "Make `ConsoleReporter` implement `IReporter`." },
-        { pattern: /TestRunner\s*\(\s*IReporter/, message: "Have `TestRunner` receive an `IReporter` through its constructor." },
-        { pattern: /^(?![\s\S]*=\s*new\s+ConsoleReporter\s*\(\s*\)\s*;)[\s\S]*$/, message: "Don't build the reporter inside `TestRunner` - the field must be assigned from the constructor parameter, not `new`ed." },
+        { pattern: /interface\s+ILog/, message: "Declare an `ILog` interface with `void Write(string message)`." },
+        { pattern: /class\s+ConsoleLog\s*:\s*ILog/, message: "Make `ConsoleLog` implement `ILog`." },
+        { pattern: /Keeper\s*\(\s*ILog/, message: "Have `Keeper` receive an `ILog` through its constructor." },
+        { pattern: /^(?![\s\S]*=\s*new\s+ConsoleLog\s*\(\s*\)\s*;)[\s\S]*$/, message: "Don't build the log inside `Keeper` - the field must be assigned from the constructor parameter, not `new`ed." },
       ],
       verify: {
         main:
-          'class Program\n{\n    class FakeReporter : IReporter\n    {\n        public string Last = "";\n        public void Send(string message)\n        {\n            Last = message;\n        }\n    }\n    static void Main()\n    {\n        var fake = new FakeReporter();\n        var runner = new TestRunner(fake);\n        runner.Run();\n        System.Console.WriteLine(fake.Last);\n    }\n}\n',
-        expected: "test passed",
+          'class Program\n{\n    class FakeLog : ILog\n    {\n        public string Last = "";\n        public void Write(string message)\n        {\n            Last = message;\n        }\n    }\n    static void Main()\n    {\n        var fake = new FakeLog();\n        var keeper = new Keeper(fake);\n        keeper.Feed();\n        System.Console.WriteLine(fake.Last);\n    }\n}\n',
+        expected: "cat fed",
         message:
-          "The point of injecting is that a test can pass a fake. Store the injected `IReporter` and call it, so a `FakeReporter` records the message instead of printing.",
+          "The point of injecting is that a test can pass a fake. Store the injected `ILog` and call it, so a `FakeLog` records the message instead of printing.",
       },
       starter:
-        'using System;\n\npublic class ConsoleReporter\n{\n    public void Send(string message)\n    {\n        Console.WriteLine(message);\n    }\n}\n\npublic class TestRunner\n{\n    // the runner builds its own reporter - welded to the console\n    private readonly ConsoleReporter _reporter = new ConsoleReporter();\n\n    public void Run()\n    {\n        _reporter.Send("test passed");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var runner = new TestRunner();\n        runner.Run();\n    }\n}\n',
+        'using System;\n\npublic class ConsoleLog\n{\n    public void Write(string message)\n    {\n        Console.WriteLine(message);\n    }\n}\n\npublic class Keeper\n{\n    // the keeper builds its own log - welded to the console\n    private readonly ConsoleLog _log = new ConsoleLog();\n\n    public void Feed()\n    {\n        _log.Write("cat fed");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var keeper = new Keeper();\n        keeper.Feed();\n    }\n}\n',
       solution:
-        'using System;\n\npublic interface IReporter\n{\n    void Send(string message);\n}\n\npublic class ConsoleReporter : IReporter\n{\n    public void Send(string message)\n    {\n        Console.WriteLine(message);\n    }\n}\n\npublic class TestRunner\n{\n    private readonly IReporter _reporter;\n\n    public TestRunner(IReporter reporter)\n    {\n        _reporter = reporter;\n    }\n\n    public void Run()\n    {\n        _reporter.Send("test passed");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var runner = new TestRunner(new ConsoleReporter());\n        runner.Run();\n    }\n}\n',
+        'using System;\n\npublic interface ILog\n{\n    void Write(string message);\n}\n\npublic class ConsoleLog : ILog\n{\n    public void Write(string message)\n    {\n        Console.WriteLine(message);\n    }\n}\n\npublic class Keeper\n{\n    private readonly ILog _log;\n\n    public Keeper(ILog log)\n    {\n        _log = log;\n    }\n\n    public void Feed()\n    {\n        _log.Write("cat fed");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var keeper = new Keeper(new ConsoleLog());\n        keeper.Feed();\n    }\n}\n',
     },
     {
       summary: true,
       title: "What you learned",
       concept: "SOLID recap",
-      context: "Five habits, each one a small fix to a real problem you just wrote your way out of.",
+      context: "Five habits, each one a small fix to a real problem you just wrote your way out of - with the animals from the rest of the course.",
       summaryIntro:
-        "SOLID is five habits for writing classes that are easy to change without breaking other code. You met each one as a trap first, then wrote the fix:",
+        "SOLID is not extra ceremony or overengineering. Each rule removes one specific, repeatable pain that shows up when code has to change. You met each one as a trap first, then wrote the fix:",
       summaryItems: [
-        { title: "S - Single Responsibility - ", text: "one class, one job. When checking and formatting shared a method, changing one broke the other. Split the jobs into separate classes." },
-        { title: "O - Open/Closed - ", text: "add new behaviour without editing old code. Instead of growing an `if`-chain, add a new class behind a shared interface. Old code stays untouched." },
-        { title: "L - Liskov Substitution - ", text: "a subtype must work anywhere its parent does. `SkippedTest` inheriting `Test` broke that by throwing. A small shared interface every type can honour fixes it." },
-        { title: "I - Interface Segregation - ", text: "don't force a class to implement methods it never uses. Split one fat interface into small focused ones, so each class implements only what it does." },
-        { title: "D - Dependency Inversion - ", text: "depend on an interface and receive it from outside, instead of building a concrete class inside. That is dependency injection, and it lets you pass a fake in tests." },
+        { title: "S - Single Responsibility - ", text: "one class, one job. When checking hunger and building the sign shared a method, changing one risked the other. Split the jobs so a change stays put." },
+        { title: "O - Open/Closed - ", text: "add a new animal without editing old code. Instead of growing an `if`-chain, add a class behind `IAnimal`. What already works is never reopened, so it cannot break." },
+        { title: "L - Liskov Substitution - ", text: "a subtype must work anywhere its parent does. A `Penguin` inheriting `Bird` broke that by throwing on `Fly()`. A small shared `IMover` every animal can honour fixes it." },
+        { title: "I - Interface Segregation - ", text: "don't force a class to implement moves it never makes. Splitting one fat interface into `IWalker`/`ISwimmer`/`IFlyer` let the fish implement only swimming." },
+        { title: "D - Dependency Inversion - ", text: "depend on an interface and receive it from outside, instead of building a concrete class inside. Injecting the `ILog` is what lets a test pass a fake." },
       ],
       summaryClose:
-        "The thread that ties them together: polymorphism, composition, and encapsulation are the tools, and SOLID is how you aim them. The D fix - injecting a fake reporter - is also why automated testing becomes possible, which is where the capstone puts it all to work.",
+        "So when a colleague asks why bother: each principle earns its keep the first time the code has to change. You do not sprinkle interfaces everywhere up front - you reach for the matching fix when a real reason to change shows up. That judgement, and the injecting habit that makes testing possible, is what the capstone puts to work.",
     },
   ];
 
