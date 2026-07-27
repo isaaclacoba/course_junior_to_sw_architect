@@ -9,10 +9,55 @@ proposal. Authoritative companions, do not duplicate them here:
   `.github/copilot-instructions.md`.
 - Editor rule (Monaco only, reuse first): `.github/instructions/code-editor.instructions.md`.
 - Current content map, gaps, and the cycle plan: `docs/audit/README.md`.
+- The portable syllabus (concept order + language-surface policy): `docs/concept-ledger.md`.
 
 This file is the *shape* contract: which archetype, which config, what a good
 card looks like, and the invariants that keep the course consistent as it grows
 to hundreds of lessons.
+
+## 0. Principles that outrank everything below
+
+These four are why the invariants exist. When a detail conflicts, these win.
+
+1. **Teach the portable concept, not the language.** The transferable idea (a
+   function that returns a value, a list you can add to, handling an error) is
+   the lesson. C#-specific sugar (`=>`, `var`, `$"..."`, records, `??`/`?.`) is
+   disposable skin - prefer the form that maps to Java/Python/TS, and where you
+   must use sugar, introduce it deliberately and mark it `(C#)` in the ledger.
+   The course must stay portable.
+2. **Nothing is used before it is taught - enforced by the ledger.**
+   `docs/concept-ledger.md` is the ordered, language-independent syllabus. A
+   lesson may use any concept at or above its own row and none below it. Do not
+   reach forward for a concept (or a token) just because it is convenient. Update
+   the ledger in the same change that adds or reorders a lesson.
+3. **Runnable by default.** The reason this course ships an in-browser Roslyn
+   compiler is that a beginner runs real code and sees it work. If a lesson's
+   idea produces visible output, it MUST be runnable (a `build` task or a drill
+   with `runnablePrograms`). Concept-only theory and pure recall are the only
+   exceptions.
+4. **The learner earns success through understanding.** Grading (below) must
+   make the target technique unavoidable and block a hardcoded pass.
+
+### Grading - how a build submission is judged
+
+`build-engine` evaluates the student's source in three layers. Use all three:
+
+- **Output match** (`expected`) - necessary but weak on its own; a constant can
+  satisfy it.
+- **Technique gate** (`requireSource[]`) - regex that forces the shape (e.g.
+  "contains an `interface`", "no `switch`").
+- **Hidden probe** (`verify`) - re-runs the learner's code from `class Program`
+  onward with different inputs, so a value hardcoded to the visible case fails.
+
+A build task graded on output alone is the recurring hole the audits keep
+finding. `data-shapes` and `generics` are the reference implementations.
+
+### Voice is owned by the human and iterated in `AGENTS.md`
+
+The author (human) owns the learner-facing voice. When agent-written prose misses
+it, the fix is to sharpen `AGENTS.md` with a concrete before/after, then
+regenerate - so the voice steadily converges on what the author wants. Keep
+drafts plain and factual; do not ship model-register warmth or hype.
 
 ## 1. Pick the archetype
 
@@ -26,6 +71,11 @@ to hundreds of lessons.
 
 Reuse-first is non-negotiable: never write a new engine, runner, editor, or page
 controller. If a new archetype seems needed, it almost certainly is not.
+
+Direction: the course started as click-quiz + fill-the-gaps and has moved toward
+real programming exercises. For a practical lesson, prefer `build` (write real
+code, Run it) over `drill`; reach for `drill`/quiz only for pure recall or where
+writing code adds no understanding. Theory stays concept-only via the visual.
 
 ## 2. Config shapes (the exact surface)
 
@@ -75,17 +125,17 @@ drill file for the same lesson - that is the dead-file trap the audit found.)
    the word "and" to describe its concept, split it.
 2. **Recap to close.** Every multi-card lesson ends with a `summary` (drill) or a
    final recap step (visual). Checkpoints do not need one.
-3. **Nothing used before it is taught.** No syntax token (`=>`, `?:`, `$"..."`,
-   `var`, `static`, `string?`) appears before a lesson that introduces it. When
-   an earlier lesson gives a taster of a later idea, the later "real" lesson
-   acknowledges the earlier exposure.
-4. **Grade the concept, not the output.** For build tasks, choose `expected`,
+3. **Nothing used before it is taught.** Check `docs/concept-ledger.md`: a lesson
+   may use only concepts at or above its own row. Prefer the portable form and
+   avoid C#-only sugar (`=>`, `var`, `$"..."`, records) until its ledger row -
+   see principles 1 and 2 above.
+4. **Grade the concept, not the output.** For build tasks, set `expected`,
    `requireSource`, and a hidden `verify` probe so the target technique is
-   unavoidable and a hardcoded constant cannot pass. `data-shapes` and
-   `generics` are the reference implementations.
-5. **Make it runnable when it executes cleanly.** If the concept has visible
-   output, ship `runnablePrograms` (drill) or a Run task (build). Do not leave a
-   naturally-runnable lesson button-less.
+   unavoidable and a hardcoded constant cannot pass (see the grading section
+   above). `data-shapes` and `generics` are the reference implementations.
+5. **Make it runnable when it executes cleanly** (principle 3). If the concept
+   has visible output, ship `runnablePrograms` (drill) or a Run task (build). Do
+   not leave a naturally-runnable lesson button-less.
 6. **State the SOLID letter** a design/testing/refactor lesson embodies, so the
    capstone's principle names have a back-reference.
 7. **One example family per Part.** Keep the light animal / test-automation

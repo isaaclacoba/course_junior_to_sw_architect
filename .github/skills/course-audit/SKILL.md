@@ -23,7 +23,9 @@ modify a lesson file, never compile or run anything.
    `docs/audit/practical/first-builds.md` (build) and
    `docs/audit/practical/control-flow.md` (drill).
 4. `docs/SPECS.md` - so you judge each lesson against the intended structure.
-5. `AGENTS.md` - the voice the reports themselves are written in.
+5. `docs/concept-ledger.md` - the portable syllabus; diff each lesson against it
+   to catch "used before taught" and language-sugar leaks.
+6. `AGENTS.md` - the voice the reports themselves are written in.
 
 ## The tracking mechanism
 
@@ -43,13 +45,22 @@ modify a lesson file, never compile or run anything.
    difficulty pill + `data-total`, runnable + theme, concept(s) taught, a
    card-by-card table, prerequisites, complexity rung, what is covered well,
    gaps/issues, verification status.
-3. In "Gaps / issues" list only genuinely-present problems. The recurring ones to
-   check for (from cycle 1): syntax used before taught (`=>`, `?:`, `$"..."`,
-   `var`, `static`, `string?`); missing recap; missing hidden `verify` probe;
-   not runnable when it could be; SOLID letter left implicit; difficulty spike;
-   theme switch mid-Part; dead sibling file; ordering inversion.
-4. Voice: plain, factual, code terms in `backticks`, spaced hyphen ` - `, no
-   emojis, no hype.
+3. In "Gaps / issues" run the **recurring-defect scan** and list only
+   genuinely-present problems. These are the patterns every audit keeps finding:
+   - **Used before taught** - a concept or token used before its
+     `docs/concept-ledger.md` row. Diff the lesson against the ledger.
+   - **Language sugar leaking in** - C#-only surface (`=>`, `var`, `$"..."`,
+     records, `??`/`?.`) where the portable form would do, especially early.
+   - **Weak grading** - a build task graded on output only, no hidden `verify`.
+   - **Not runnable when it could be** - visible output but no Run button.
+   - **Implicit spine** - the SOLID letter or the "builds on the last rung" link
+     left unstated.
+   - **Missing recap**; **difficulty spike at a seam**; **theme switch mid-Part**;
+     **dead sibling file**; **ordering inversion** (file numbers vs path order).
+   - **Voice drift** toward AI-register (hype, tricolon-plus-dash, jargon before
+     it is taught) - measured against `AGENTS.md`.
+4. Voice of the report itself: plain, factual, code terms in `backticks`, spaced
+   hyphen ` - `, no emojis, no hype.
 
 ## Scaling with subagents
 

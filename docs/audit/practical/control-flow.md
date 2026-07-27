@@ -35,9 +35,9 @@ Practice the Basics and Methods - vocabulary the later build lessons rely on.
 - Plain voice, accurate explanations, good `answerWhy` framing.
 
 ## Gaps / issues
-- **Not runnable.** Control flow is a natural fit for a Run button, but this is
-  pure theory. Collections/errors-null are runnable; this is not - an
-  inconsistency where executing the branch/loop would land harder.
+- **Now runnable (2026-07-27).** Each card gained a Run button backed by an
+  index-aligned `runnablePrograms` set, so the learner can watch the branch or
+  loop execute. The write-from-scratch counterpart remains `wiring-it-up`.
 - No recap/summary card noted in the sampled data (confirm at end of file).
 - `Console.WriteLine` used in snippets before methods/output are formally taught
   (acceptable as display, but worth noting).

@@ -274,3 +274,37 @@ End: 2026-07-04 09:44:19 | Result: Deployed the Build-with-objects redesign + UR
   infrastructure.md, practical/index.md, theory/index.md, README.md; docs/SPECS.md;
   .github/skills/{lesson-authoring,course-audit}/SKILL.md. Read-only audit, no
   lesson content changed, nothing compiled.
+
+## 2026-07-27 09:08 - Distil audit learnings into ledger + SPECS + skills
+- Start: turn recurring audit findings into durable guidance.
+- End (2026-07-27 09:10): added docs/concept-ledger.md (portable syllabus, both
+  tracks + language-surface policy); SPECS.md principles (portability,
+  ledger-enforced ordering, runnable-by-default, grading definition, voice loop)
+  and prefer-build direction; lesson-authoring skill (ledger step + preflight
+  checklist); course-audit skill (recurring-defect scan). Docs only.
+
+## 2026-07-27 09:40 - Give LINQ and Control Flow code-lab exercises
+- Start: LINQ had no runnable code-lab exercise; Control Flow was a non-runnable drill.
+- Decisions: LINQ -> converted to a write-from-scratch build lesson (7 query
+  tasks, each with a requireSource gate + hidden verify probe). Control Flow ->
+  kept as the Part 1 theory drill (its build partner is wiring-it-up) and made
+  runnable by adding index-aligned runnablePrograms + a Run button per card.
+- Verified with real dotnet: all 7 LINQ solutions compile warning-free and match,
+  hidden probes catch hardcoding, starters do not pre-pass, gates hold; all 7
+  Control Flow programs compile warning-free with correct output. Headless render
+  confirmed: LINQ "Query 1/7" build card, Control Flow "Topic 1/7" with Run button.
+- Updated linq.html (build archetype), index.html cards, and the two audit reports.
+- End: LINQ and Control Flow both runnable through code-lab.
+
+## 2026-07-27 10:05 - Review fixes: lambda clarity + snippet consistency
+- LINQ: made the lambda link explicit for a beginner - intro now frames "each
+  operator takes a lambda (x => ...) from the Lambdas lesson", task 1 context
+  names `animal => animal.Legs == 4` as a lambda, and every example comment
+  labels the lambda. Only context/example display strings changed; solution,
+  starter and verify code untouched (dotnet verification still valid).
+- Control Flow: boolean card snippet now prints `resting` too, so the displayed
+  snippet matches the runnable program (was the one review nit); warning-free.
+- Refreshed the stale linq.md audit report (concept, card-by-card table,
+  complexity, covered-well, verification status) to the build form.
+- Verified: node --check both; headless render confirms the bridge text, example
+  label, intro framing, and the two WriteLines in the control-flow snippet; 0 undefined.

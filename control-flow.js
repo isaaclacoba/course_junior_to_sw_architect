@@ -1,8 +1,10 @@
 // Control Flow - theory lesson between Practice the Basics and Methods.
 // It teaches if/else, boolean logic, while, for, foreach, break/continue and
 // switch. Each card combines the two ways of working: a multiple-choice
-// knowledge check first, then a fill-in-the-blank for the same idea. Pure
-// theory - no compiler Run. Data only: drill-engine.js reads window.DRILL_CONFIG.
+// knowledge check first, then a fill-in-the-blank for the same idea. Each card
+// also runs: a Run button compiles the solved version through the shared
+// code-lab Roslyn/WASM host so the learner sees the branch or loop execute.
+// Data only: drill-engine.js reads window.DRILL_CONFIG.
 (function () {
   "use strict";
 
@@ -74,7 +76,8 @@ if (score {{1}} 50)
 bool working = true;
 bool adult = age >= 18 {{1}} age < 65;
 bool resting = {{2}}working;
-Console.WriteLine(adult);`,
+Console.WriteLine(adult);
+Console.WriteLine(resting);`,
       points: [
         "`&&` is true only when both sides are true.",
         "`!` turns true into false and false into true.",
@@ -353,6 +356,124 @@ switch ({{1}})
     },
   ];
 
+  // Complete, runnable C# for each drill, index-aligned with `drills` (the recap
+  // card has no program). The Run button compiles and runs these through the
+  // shared code-lab Roslyn/WASM host, showing the solved snippet execute.
+  const runnablePrograms = [
+    // 0 - Branch with if / else
+    `using System;
+
+class Program
+{
+    static void Main()
+    {
+        int score = 40;
+        if (score >= 50)
+        {
+            Console.WriteLine("Pass");
+        }
+        else
+        {
+            Console.WriteLine("Fail");
+        }
+    }
+}`,
+    // 1 - Combine conditions
+    `using System;
+
+class Program
+{
+    static void Main()
+    {
+        int age = 25;
+        bool working = true;
+        bool adult = age >= 18 && age < 65;
+        bool resting = !working;
+        Console.WriteLine(adult);
+        Console.WriteLine(resting);
+    }
+}`,
+    // 2 - Repeat with while
+    `using System;
+
+class Program
+{
+    static void Main()
+    {
+        int n = 3;
+        while (n > 0)
+        {
+            Console.WriteLine(n);
+            n--;
+        }
+    }
+}`,
+    // 3 - Count with for
+    `using System;
+
+class Program
+{
+    static void Main()
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            Console.WriteLine(i);
+        }
+    }
+}`,
+    // 4 - Walk a collection with foreach
+    `using System;
+
+class Program
+{
+    static void Main()
+    {
+        string[] names = { "Ann", "Bo" };
+        foreach (var name in names)
+        {
+            Console.WriteLine(name);
+        }
+    }
+}`,
+    // 5 - Skip and stop: continue / break
+    `using System;
+
+class Program
+{
+    static void Main()
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            if (i == 2) continue;
+            if (i == 4) break;
+            Console.WriteLine(i);
+        }
+    }
+}`,
+    // 6 - Pick a case with switch
+    `using System;
+
+class Program
+{
+    static void Main()
+    {
+        int day = 2;
+        switch (day)
+        {
+            case 1:
+                Console.WriteLine("Mon");
+                break;
+            case 2:
+                Console.WriteLine("Tue");
+                break;
+            default:
+                Console.WriteLine("Other");
+                break;
+        }
+    }
+}`,
+  ];
+
   window.DRILL_CONFIG = {
     prefix: "cf",
     metaLabel: "Foundations \u00b7 Control Flow",
@@ -360,5 +481,8 @@ switch ({{1}})
     awardedKey: "control_flow_awarded",
     awardAmount: 20,
     drills,
+    runnablePrograms,
+    runnerUrl: "level3-app/index.html?runner=1",
+    xpKey: "course_global_xp",
   };
 })();

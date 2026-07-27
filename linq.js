@@ -1,266 +1,639 @@
-// Part three - "LINQ". Theory lesson in the same shape as Control Flow: each
-// card is a multiple-choice knowledge check first, then a fill-in-the-blank for
-// the same idea. Pure theory - no compiler Run. It teaches the everyday LINQ
-// operators as the loop-free way to query the collections from earlier lessons:
-// Where, Count, Any, All, Select, FirstOrDefault and OrderBy. The learner has
-// already met lambdas, so the blanks focus on which operator to reach for.
+// Part three - "LINQ". Write-from-scratch lesson: the learner writes each query
+// themselves, runs it through the shared Roslyn host, and matches the output.
+// It teaches the everyday LINQ operators as the loop-free way to query the
+// collections from earlier lessons: Where, Count, Any, All, Select,
+// FirstOrDefault and OrderBy. Lambdas were taught in the previous lesson, so the
+// work here is choosing and writing the right operator.
 //
-// Data only: drill-engine.js reads window.DRILL_CONFIG. Animal theme throughout;
-// every example queries a `List<Animal>` where each animal has Name and Legs.
+// The portable idea is "query a collection without writing a loop"; the operator
+// names are the C# surface for it. Data only: build-engine.js reads
+// window.BUILD_CONFIG. Animal theme throughout; every query runs over a
+// `List<Animal>` where each animal has Name and Legs.
 (function () {
   "use strict";
 
-  const drills = [
+  const ANIMAL = `using System;
+using System.Collections.Generic;
+using System.Linq;
+
+public class Animal
+{
+    public string Name = "";
+    public int Legs;
+}
+`;
+
+  const tasks = [
     {
-      title: "Filter with Where",
+      title: "Keep only what matches: Where",
       concept: "Where",
       context:
-        "`Where` keeps only the items that match a condition. You hand it a lambda that returns true or false for each item, and you get back a new sequence of the ones that passed - no loop to write.",
-      quiz: {
-        question: "What does `Where` give you back?",
-        options: [
-          { text: "A new sequence of the items that matched", correct: true },
-          { text: "The number of items that matched", correct: false },
-          { text: "The first item that matched", correct: false },
-        ],
-        answerWhy: "`Where` filters - it returns every item the lambda said true for. Counting and picking one are other operators.",
-      },
-      snippet: `// keep only the four-legged animals
-var fourLegged = animals.{{1}}(animal => animal.Legs == 4);
-foreach (var animal in fourLegged)
-    Console.WriteLine(animal.Name);`,
-      points: [
-        "`Where` returns a filtered sequence, not a single value.",
-        "The lambda runs once per item and decides true (keep) or false (drop).",
+        "Filtering means keeping only the items that pass a test. `Where` takes a lambda - the short inline rule you wrote in the Lambdas lesson. Here `animal => animal.Legs == 4` reads \"for each animal, is its Legs equal to 4?\". `Where` runs that lambda on every animal and hands back a new sequence of the ones it said true for - no loop to write.",
+      example:
+        "List<int> scores = new List<int> { 40, 75, 90, 20 };\n// score => score >= 50 is a lambda - Where runs it on each score\nIEnumerable<int> passing = scores.Where(score => score >= 50); // 75, 90",
+      goal: [
+        "In `FourLegged`, return only the animals whose `Legs` equals 4.",
+        "`Main` prints each survivor's name, so the output should be Dog then Cat.",
       ],
-      blanks: [
+      expected: ["Dog", "Cat"],
+      requireSource: [
+        { pattern: /\.Where\s*\(/, message: "Use `Where` to keep only the four-legged animals." },
+      ],
+      verify: {
+        main: `class Program
+{
+    static void Main()
+    {
+        List<Animal> animals = new List<Animal>
         {
-          id: 1,
-          label: "Keep only the animals the lambda likes",
-          answer: "Where",
-          hints: ["The operator that filters a sequence."],
-          explain: [
-            { text: "`Where` tests each animal with the lambda and keeps the ones that return true.", highlight: "var fourLegged = animals.{{1}}(animal => animal.Legs == 4)" },
-            { text: "Here it keeps every animal whose `Legs` equals 4.", highlight: "var fourLegged = animals.{{1}}(animal => animal.Legs == 4)" },
-          ],
-        },
-      ],
+            new Animal { Name = "Bee", Legs = 6 },
+            new Animal { Name = "Horse", Legs = 4 },
+            new Animal { Name = "Cow", Legs = 4 },
+        };
+        Safari safari = new Safari();
+        foreach (Animal animal in safari.FourLegged(animals))
+            Console.WriteLine(animal.Name);
+    }
+}
+`,
+        expected: ["Horse", "Cow"],
+        message: "Filter by the real leg count, not a fixed list of names.",
+      },
+      starter: ANIMAL + `
+public class Safari
+{
+    // Return only the animals that have exactly 4 legs.
+    public IEnumerable<Animal> FourLegged(List<Animal> animals)
+    {
+        // TODO: use Where to keep the animals whose Legs equals 4
+        return animals;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        List<Animal> animals = new List<Animal>
+        {
+            new Animal { Name = "Dog", Legs = 4 },
+            new Animal { Name = "Duck", Legs = 2 },
+            new Animal { Name = "Cat", Legs = 4 },
+        };
+        Safari safari = new Safari();
+        foreach (Animal animal in safari.FourLegged(animals))
+            Console.WriteLine(animal.Name);
+    }
+}
+`,
+      solution: ANIMAL + `
+public class Safari
+{
+    public IEnumerable<Animal> FourLegged(List<Animal> animals)
+    {
+        return animals.Where(animal => animal.Legs == 4);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        List<Animal> animals = new List<Animal>
+        {
+            new Animal { Name = "Dog", Legs = 4 },
+            new Animal { Name = "Duck", Legs = 2 },
+            new Animal { Name = "Cat", Legs = 4 },
+        };
+        Safari safari = new Safari();
+        foreach (Animal animal in safari.FourLegged(animals))
+            Console.WriteLine(animal.Name);
+    }
+}
+`,
     },
     {
-      title: "Count what matches",
+      title: "How many match: Count",
       concept: "Count",
       context:
-        "`Count` does the loop-and-tally for you. Give it a lambda and it returns how many items match - the one-line version of the `foreach` plus counter you wrote in Collections.",
-      quiz: {
-        question: "`animals.Count(animal => animal.Legs == 4)` returns...",
-        options: [
-          { text: "How many animals have 4 legs", correct: true },
-          { text: "A list of the 4-legged animals", correct: false },
-          { text: "true if any animal has 4 legs", correct: false },
-        ],
-        answerWhy: "`Count` returns a number - the tally of items that matched. A list is `Where`; a yes/no is `Any`.",
-      },
-      snippet: `int dogs = animals.{{1}}(animal => animal.Legs == 4);
-Console.WriteLine(dogs);`,
-      points: [
-        "`Count` returns an `int` - how many items matched.",
-        "It replaces the start-at-zero, loop, `if`, increment pattern.",
+        "`Count` does the start-at-zero, loop, check, add-one tally for you. Give it a lambda and it returns how many items passed - a plain number.",
+      example:
+        "List<int> scores = new List<int> { 40, 75, 90, 20 };\n// Count runs the same kind of lambda and tallies the trues\nint passing = scores.Count(score => score >= 50); // 2",
+      goal: [
+        "In `FourLeggedCount`, return how many animals have exactly 4 legs.",
+        "`Main` prints the number, so the output should be 2.",
       ],
-      blanks: [
+      expected: "2",
+      requireSource: [
+        { pattern: /\.Count\s*\(/, message: "Use `Count` with a rule; do not loop by hand." },
+      ],
+      verify: {
+        main: `class Program
+{
+    static void Main()
+    {
+        List<Animal> animals = new List<Animal>
         {
-          id: 1,
-          label: "Tally the matching animals in one call",
-          answer: "Count",
-          hints: ["The operator that returns a number."],
-          explain: [
-            { text: "`Count` runs the lambda over every animal and returns how many were true.", highlight: "int dogs = animals.{{1}}(animal => animal.Legs == 4)" },
-            { text: "This is the whole manual tally from Collections, in one line.", highlight: "int dogs = animals.{{1}}(animal => animal.Legs == 4)" },
-          ],
-        },
-      ],
+            new Animal { Name = "Horse", Legs = 4 },
+            new Animal { Name = "Cow", Legs = 4 },
+            new Animal { Name = "Dog", Legs = 4 },
+            new Animal { Name = "Bee", Legs = 6 },
+        };
+        Census census = new Census();
+        Console.WriteLine(census.FourLeggedCount(animals));
+    }
+}
+`,
+        expected: "3",
+        message: "Count from the real list, not a fixed number.",
+      },
+      starter: ANIMAL + `
+public class Census
+{
+    // Return how many animals have exactly 4 legs.
+    public int FourLeggedCount(List<Animal> animals)
+    {
+        // TODO: use Count with a rule that matches Legs == 4
+        return 0;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        List<Animal> animals = new List<Animal>
+        {
+            new Animal { Name = "Dog", Legs = 4 },
+            new Animal { Name = "Duck", Legs = 2 },
+            new Animal { Name = "Cat", Legs = 4 },
+        };
+        Census census = new Census();
+        Console.WriteLine(census.FourLeggedCount(animals));
+    }
+}
+`,
+      solution: ANIMAL + `
+public class Census
+{
+    public int FourLeggedCount(List<Animal> animals)
+    {
+        return animals.Count(animal => animal.Legs == 4);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        List<Animal> animals = new List<Animal>
+        {
+            new Animal { Name = "Dog", Legs = 4 },
+            new Animal { Name = "Duck", Legs = 2 },
+            new Animal { Name = "Cat", Legs = 4 },
+        };
+        Census census = new Census();
+        Console.WriteLine(census.FourLeggedCount(animals));
+    }
+}
+`,
     },
     {
-      title: "Is there at least one? Any",
+      title: "Is there at least one: Any",
       concept: "Any",
       context:
-        "`Any` answers a yes/no question: is there at least one item that matches? It stops as soon as it finds one and returns a `bool`.",
-      quiz: {
-        question: "What type does `Any` return?",
-        options: [
-          { text: "bool", correct: true },
-          { text: "int", correct: false },
-          { text: "a list", correct: false },
-        ],
-        answerWhy: "`Any` is a yes/no check, so it returns a `bool` - true if at least one item matched.",
-      },
-      snippet: `bool hasBird = animals.{{1}}(animal => animal.Legs == 2);
-Console.WriteLine(hasBird);`,
-      points: [
-        "`Any` returns true the moment one item matches.",
-        "Use it when you only care whether something exists, not how many.",
+        "Sometimes you only need a yes or no: is there at least one item that matches? You give `Any` a lambda; it returns a `bool` and stops the moment one item makes it true.",
+      example:
+        "List<int> scores = new List<int> { 40, 75, 90, 20 };\n// Any stops at the first score the lambda likes\nbool anyPerfect = scores.Any(score => score >= 100); // false - none matched",
+      goal: [
+        "In `AnyTwoLegged`, return whether any animal has exactly 2 legs.",
+        "`Main` prints True or False, so the output should be True.",
       ],
-      blanks: [
+      expected: "True",
+      requireSource: [
+        { pattern: /\.Any\s*\(/, message: "Use `Any` to ask whether at least one animal matches." },
+      ],
+      verify: {
+        main: `class Program
+{
+    static void Main()
+    {
+        List<Animal> animals = new List<Animal>
         {
-          id: 1,
-          label: "Ask whether any animal has two legs",
-          answer: "Any",
-          hints: ["The operator that returns a bool for 'at least one'."],
-          explain: [
-            { text: "`Any` returns true if at least one animal makes the lambda true.", highlight: "bool hasBird = animals.{{1}}(animal => animal.Legs == 2)" },
-            { text: "If no animal has 2 legs, it returns false.", highlight: "bool hasBird = animals.{{1}}(animal => animal.Legs == 2)" },
-          ],
-        },
-      ],
+            new Animal { Name = "Dog", Legs = 4 },
+            new Animal { Name = "Cat", Legs = 4 },
+        };
+        Watch watch = new Watch();
+        Console.WriteLine(watch.AnyTwoLegged(animals));
+    }
+}
+`,
+        expected: "False",
+        message: "Decide from the real list; here no animal has two legs.",
+      },
+      starter: ANIMAL + `
+public class Watch
+{
+    // Return whether at least one animal has exactly 2 legs.
+    public bool AnyTwoLegged(List<Animal> animals)
+    {
+        // TODO: use Any with a rule that matches Legs == 2
+        return false;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        List<Animal> animals = new List<Animal>
+        {
+            new Animal { Name = "Dog", Legs = 4 },
+            new Animal { Name = "Duck", Legs = 2 },
+            new Animal { Name = "Cat", Legs = 4 },
+        };
+        Watch watch = new Watch();
+        Console.WriteLine(watch.AnyTwoLegged(animals));
+    }
+}
+`,
+      solution: ANIMAL + `
+public class Watch
+{
+    public bool AnyTwoLegged(List<Animal> animals)
+    {
+        return animals.Any(animal => animal.Legs == 2);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        List<Animal> animals = new List<Animal>
+        {
+            new Animal { Name = "Dog", Legs = 4 },
+            new Animal { Name = "Duck", Legs = 2 },
+            new Animal { Name = "Cat", Legs = 4 },
+        };
+        Watch watch = new Watch();
+        Console.WriteLine(watch.AnyTwoLegged(animals));
+    }
+}
+`,
     },
     {
-      title: "Do they all match? All",
+      title: "Do they all match: All",
       concept: "All",
       context:
-        "`All` checks whether every item matches. It returns true only when the condition holds for all of them - one failure makes it false.",
-      quiz: {
-        question: "`All` returns true when...",
-        options: [
-          { text: "Every item matches the condition", correct: true },
-          { text: "At least one item matches", correct: false },
-          { text: "No item matches", correct: false },
-        ],
-        answerWhy: "`All` needs the condition to be true for every item; 'at least one' is `Any`.",
-      },
-      snippet: `bool everyoneHasLegs = animals.{{1}}(animal => animal.Legs > 0);
-Console.WriteLine(everyoneHasLegs);`,
-      points: [
-        "`All` returns true only if no item fails the condition.",
-        "`Any` needs one match; `All` needs every match.",
+        "`All` checks the whole sequence: it returns true only when every item passes the lambda. A single failure makes it false.",
+      example:
+        "List<int> scores = new List<int> { 40, 75, 90, 20 };\n// All needs the lambda true for every score\nbool allPassed = scores.All(score => score >= 50); // false - 40 and 20 fail",
+      goal: [
+        "In `AllHaveLegs`, return whether every animal has more than 0 legs.",
+        "`Main` prints True or False, so the output should be True.",
       ],
-      blanks: [
+      expected: "True",
+      requireSource: [
+        { pattern: /\.All\s*\(/, message: "Use `All` to check that every animal passes the rule." },
+      ],
+      verify: {
+        main: `class Program
+{
+    static void Main()
+    {
+        List<Animal> animals = new List<Animal>
         {
-          id: 1,
-          label: "Check that every animal has at least one leg",
-          answer: "All",
-          hints: ["The operator that needs every item to pass."],
-          explain: [
-            { text: "`All` returns true only if every animal has `Legs > 0`.", highlight: "bool everyoneHasLegs = animals.{{1}}(animal => animal.Legs > 0)" },
-            { text: "A single legless animal would make it false.", highlight: "bool everyoneHasLegs = animals.{{1}}(animal => animal.Legs > 0)" },
-          ],
-        },
-      ],
+            new Animal { Name = "Horse", Legs = 4 },
+            new Animal { Name = "Snake", Legs = 0 },
+        };
+        Inspection inspection = new Inspection();
+        Console.WriteLine(inspection.AllHaveLegs(animals));
+    }
+}
+`,
+        expected: "False",
+        message: "One legless animal must make the answer False.",
+      },
+      starter: ANIMAL + `
+public class Inspection
+{
+    // Return whether every animal has more than 0 legs.
+    public bool AllHaveLegs(List<Animal> animals)
+    {
+        // TODO: use All with the rule that every animal must pass: Legs > 0
+        return false;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        List<Animal> animals = new List<Animal>
+        {
+            new Animal { Name = "Dog", Legs = 4 },
+            new Animal { Name = "Duck", Legs = 2 },
+            new Animal { Name = "Cat", Legs = 4 },
+        };
+        Inspection inspection = new Inspection();
+        Console.WriteLine(inspection.AllHaveLegs(animals));
+    }
+}
+`,
+      solution: ANIMAL + `
+public class Inspection
+{
+    public bool AllHaveLegs(List<Animal> animals)
+    {
+        return animals.All(animal => animal.Legs > 0);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        List<Animal> animals = new List<Animal>
+        {
+            new Animal { Name = "Dog", Legs = 4 },
+            new Animal { Name = "Duck", Legs = 2 },
+            new Animal { Name = "Cat", Legs = 4 },
+        };
+        Inspection inspection = new Inspection();
+        Console.WriteLine(inspection.AllHaveLegs(animals));
+    }
+}
+`,
     },
     {
-      title: "Transform with Select",
+      title: "Turn each into something else: Select",
       concept: "Select",
       context:
-        "`Select` turns each item into something else - often pulling out one field. From a list of animals you can get a sequence of just their names.",
-      quiz: {
-        question: "`animals.Select(animal => animal.Name)` gives you...",
-        options: [
-          { text: "A sequence of the animals' names", correct: true },
-          { text: "The first animal's name", correct: false },
-          { text: "How many names there are", correct: false },
-        ],
-        answerWhy: "`Select` projects each item through the lambda, so a list of animals becomes a list of names.",
+        "`Select` reshapes a sequence: it runs a lambda on every item and collects the results. Often you use it to pull out one field - from a sequence of animals to a sequence of just their names.",
+      example:
+        "List<int> scores = new List<int> { 40, 75, 90 };\n// the lambda turns each score into a new value\nIEnumerable<int> doubled = scores.Select(score => score * 2); // 80, 150, 180",
+      goal: [
+        "In `Names`, return each animal's `Name` as a sequence of strings.",
+        "`Main` prints each name, so the output should be Dog, Duck, Cat.",
+      ],
+      expected: ["Dog", "Duck", "Cat"],
+      requireSource: [
+        { pattern: /\.Select\s*\(/, message: "Use `Select` to turn each animal into its name." },
+      ],
+      verify: {
+        main: `class Program
+{
+    static void Main()
+    {
+        List<Animal> animals = new List<Animal>
+        {
+            new Animal { Name = "Owl", Legs = 2 },
+            new Animal { Name = "Fox", Legs = 4 },
+        };
+        Roster roster = new Roster();
+        foreach (string name in roster.Names(animals))
+            Console.WriteLine(name);
+    }
+}
+`,
+        expected: ["Owl", "Fox"],
+        message: "Project the real names, not a fixed list.",
       },
-      snippet: `var names = animals.{{1}}(animal => animal.{{2}});
-foreach (var name in names)
-    Console.WriteLine(name);`,
-      points: [
-        "`Select` returns one new item per input item.",
-        "It reshapes a sequence; it does not filter or count.",
-      ],
-      blanks: [
+      starter: ANIMAL + `
+public class Roster
+{
+    // Return each animal's name as a sequence of strings.
+    public IEnumerable<string> Names(List<Animal> animals)
+    {
+        // TODO: use Select to turn each animal into its Name
+        return new List<string>();
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        List<Animal> animals = new List<Animal>
         {
-          id: 1,
-          label: "Transform each animal into something else",
-          answer: "Select",
-          hints: ["The operator that projects each item."],
-          explain: [
-            { text: "`Select` runs the lambda on every animal and collects the results.", highlight: "var names = animals.{{1}}(animal => animal.{{2}})" },
-          ],
-        },
+            new Animal { Name = "Dog", Legs = 4 },
+            new Animal { Name = "Duck", Legs = 2 },
+            new Animal { Name = "Cat", Legs = 4 },
+        };
+        Roster roster = new Roster();
+        foreach (string name in roster.Names(animals))
+            Console.WriteLine(name);
+    }
+}
+`,
+      solution: ANIMAL + `
+public class Roster
+{
+    public IEnumerable<string> Names(List<Animal> animals)
+    {
+        return animals.Select(animal => animal.Name);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        List<Animal> animals = new List<Animal>
         {
-          id: 2,
-          label: "Pull out just the name",
-          answer: "Name",
-          hints: ["The field on Animal that holds the name."],
-          explain: [
-            { text: "`animal.Name` is what each animal becomes, so you end up with a sequence of names.", highlight: "var names = animals.{{1}}(animal => animal.{{2}})" },
-          ],
-        },
-      ],
+            new Animal { Name = "Dog", Legs = 4 },
+            new Animal { Name = "Duck", Legs = 2 },
+            new Animal { Name = "Cat", Legs = 4 },
+        };
+        Roster roster = new Roster();
+        foreach (string name in roster.Names(animals))
+            Console.WriteLine(name);
+    }
+}
+`,
     },
     {
-      title: "Grab one safely: FirstOrDefault",
+      title: "The first match, or nothing: FirstOrDefault",
       concept: "FirstOrDefault",
       context:
-        "`First` returns the first matching item - but throws if there is none. `FirstOrDefault` returns a default instead (like `null`) when nothing matches, so it never crashes.",
-      quiz: {
-        question: "What does `FirstOrDefault` do when nothing matches?",
-        options: [
-          { text: "Returns a default value such as null", correct: true },
-          { text: "Throws an error", correct: false },
-          { text: "Returns an empty list", correct: false },
-        ],
-        answerWhy: "`FirstOrDefault` returns the type's default (null for objects) when there is no match; plain `First` throws.",
-      },
-      snippet: `// there may be no bird in the list - use the safe variant
-var bird = animals.{{1}}(animal => animal.Legs == 2);`,
-      points: [
-        "`First` throws on no match; `FirstOrDefault` returns a default.",
-        "Reach for the safe variant when a missing match is possible.",
+        "`First` gives you the first item a lambda matches - but it throws when there is none. `FirstOrDefault` returns a default instead (for an object, `null`), so a missing match never crashes. `Main` here already checks for that default.",
+      example:
+        "List<int> scores = new List<int> { 40, 75, 90 };\n// the first score the lambda likes, or 0 if none\nint firstPerfect = scores.FirstOrDefault(score => score >= 100); // 0",
+      goal: [
+        "In `FirstTwoLegged`, return the first animal with exactly 2 legs, or the default if there is none.",
+        "`Main` prints the found animal's name, so the output should be Duck.",
       ],
-      blanks: [
+      expected: "Duck",
+      requireSource: [
+        { pattern: /\.FirstOrDefault\s*\(/, message: "Use `FirstOrDefault` so a missing match returns a default instead of throwing." },
+      ],
+      verify: {
+        main: `class Program
+{
+    static void Main()
+    {
+        List<Animal> animals = new List<Animal>
         {
-          id: 1,
-          label: "Get the first match, or a default if there is none",
-          answer: "FirstOrDefault",
-          hints: ["The safe variant that returns a default instead of throwing."],
-          explain: [
-            { text: "`FirstOrDefault` returns the first two-legged animal, or `null` if there is none.", highlight: "var bird = animals.{{1}}(animal => animal.Legs == 2)" },
-            { text: "Plain `First` would throw an exception when nothing matches.", highlight: "var bird = animals.{{1}}(animal => animal.Legs == 2)" },
-          ],
-        },
-      ],
+            new Animal { Name = "Dog", Legs = 4 },
+            new Animal { Name = "Cat", Legs = 4 },
+        };
+        Finder finder = new Finder();
+        Animal? bird = finder.FirstTwoLegged(animals);
+        Console.WriteLine(bird == null ? "none" : bird.Name);
+    }
+}
+`,
+        expected: "none",
+        message: "When nothing matches, FirstOrDefault should return the default so Main prints none.",
+      },
+      starter: ANIMAL + `
+public class Finder
+{
+    // Return the first animal with exactly 2 legs, or the default if there is none.
+    public Animal? FirstTwoLegged(List<Animal> animals)
+    {
+        // TODO: use FirstOrDefault with a rule that matches Legs == 2
+        return null;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        List<Animal> animals = new List<Animal>
+        {
+            new Animal { Name = "Dog", Legs = 4 },
+            new Animal { Name = "Duck", Legs = 2 },
+            new Animal { Name = "Cat", Legs = 4 },
+        };
+        Finder finder = new Finder();
+        Animal? bird = finder.FirstTwoLegged(animals);
+        Console.WriteLine(bird == null ? "none" : bird.Name);
+    }
+}
+`,
+      solution: ANIMAL + `
+public class Finder
+{
+    public Animal? FirstTwoLegged(List<Animal> animals)
+    {
+        return animals.FirstOrDefault(animal => animal.Legs == 2);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        List<Animal> animals = new List<Animal>
+        {
+            new Animal { Name = "Dog", Legs = 4 },
+            new Animal { Name = "Duck", Legs = 2 },
+            new Animal { Name = "Cat", Legs = 4 },
+        };
+        Finder finder = new Finder();
+        Animal? bird = finder.FirstTwoLegged(animals);
+        Console.WriteLine(bird == null ? "none" : bird.Name);
+    }
+}
+`,
     },
     {
-      title: "Sort with OrderBy",
+      title: "Sort by a key: OrderBy",
       concept: "OrderBy",
       context:
-        "`OrderBy` sorts the items by whatever the lambda picks out. `OrderBy(animal => animal.Name)` sorts alphabetically by name; `OrderBy(animal => animal.Legs)` sorts by leg count, smallest first.",
-      quiz: {
-        question: "`animals.OrderBy(animal => animal.Legs)` sorts the animals by...",
-        options: [
-          { text: "Their number of legs, smallest first", correct: true },
-          { text: "Their name, alphabetically", correct: false },
-          { text: "A random order each time", correct: false },
-        ],
-        answerWhy: "`OrderBy` sorts ascending by the value the lambda returns - here, `Legs`.",
-      },
-      snippet: `var sorted = animals.{{1}}(animal => animal.Name);
-foreach (var animal in sorted)
-    Console.WriteLine(animal.Name);`,
-      points: [
-        "`OrderBy` returns the same items in a new order.",
-        "The lambda picks the value to sort on.",
+        "`OrderBy` returns the same items in a new order, sorted by whatever the lambda picks out. Pick the name and they come out alphabetically; pick the leg count and they come out smallest first.",
+      example:
+        "List<int> scores = new List<int> { 90, 20, 75 };\n// the lambda picks the value to sort on\nIEnumerable<int> sorted = scores.OrderBy(score => score); // 20, 75, 90",
+      goal: [
+        "In `ByName`, return the animals ordered alphabetically by `Name`.",
+        "`Main` prints each name, so the output should be Cat, Dog, Duck.",
       ],
-      blanks: [
+      expected: ["Cat", "Dog", "Duck"],
+      requireSource: [
+        { pattern: /\.OrderBy\s*\(/, message: "Use `OrderBy` to sort the animals by name." },
+      ],
+      verify: {
+        main: `class Program
+{
+    static void Main()
+    {
+        List<Animal> animals = new List<Animal>
         {
-          id: 1,
-          label: "Sort the animals by name",
-          answer: "OrderBy",
-          hints: ["The operator that sorts a sequence."],
-          explain: [
-            { text: "`OrderBy` arranges the animals by the value the lambda returns.", highlight: "var sorted = animals.{{1}}(animal => animal.Name)" },
-            { text: "Here that value is `animal.Name`, so they come out in alphabetical order.", highlight: "var sorted = animals.{{1}}(animal => animal.Name)" },
-          ],
-        },
-      ],
+            new Animal { Name = "Zebra", Legs = 4 },
+            new Animal { Name = "Ant", Legs = 6 },
+            new Animal { Name = "Mule", Legs = 4 },
+        };
+        Lineup lineup = new Lineup();
+        foreach (Animal animal in lineup.ByName(animals))
+            Console.WriteLine(animal.Name);
+    }
+}
+`,
+        expected: ["Ant", "Mule", "Zebra"],
+        message: "Sort by the real names, not a fixed order.",
+      },
+      starter: ANIMAL + `
+public class Lineup
+{
+    // Return the animals ordered alphabetically by Name.
+    public IEnumerable<Animal> ByName(List<Animal> animals)
+    {
+        // TODO: use OrderBy to sort the animals by Name
+        return animals;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        List<Animal> animals = new List<Animal>
+        {
+            new Animal { Name = "Dog", Legs = 4 },
+            new Animal { Name = "Duck", Legs = 2 },
+            new Animal { Name = "Cat", Legs = 4 },
+        };
+        Lineup lineup = new Lineup();
+        foreach (Animal animal in lineup.ByName(animals))
+            Console.WriteLine(animal.Name);
+    }
+}
+`,
+      solution: ANIMAL + `
+public class Lineup
+{
+    public IEnumerable<Animal> ByName(List<Animal> animals)
+    {
+        return animals.OrderBy(animal => animal.Name);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        List<Animal> animals = new List<Animal>
+        {
+            new Animal { Name = "Dog", Legs = 4 },
+            new Animal { Name = "Duck", Legs = 2 },
+            new Animal { Name = "Cat", Legs = 4 },
+        };
+        Lineup lineup = new Lineup();
+        foreach (Animal animal in lineup.ByName(animals))
+            Console.WriteLine(animal.Name);
+    }
+}
+`,
     },
     {
       title: "LINQ recap",
       concept: "Recap",
       summary: true,
-      context: "You now have the everyday tools for querying a collection without writing a loop.",
       summaryIntro:
-        "LINQ operators each take a lambda and answer one kind of question about a sequence. Reach for the one that matches what you want back.",
+        "Each LINQ operator takes a rule (a lambda) and answers one kind of question about a sequence. Reach for the one that matches what you want back.",
       summaryItems: [
         { title: "Where - ", text: "keep only the items that match; returns a filtered sequence." },
         { title: "Count - ", text: "how many items match; returns a number." },
@@ -268,19 +641,19 @@ foreach (var animal in sorted)
         { title: "All - ", text: "do all items match; returns a `bool`." },
         { title: "Select - ", text: "turn each item into something else; returns a reshaped sequence." },
         { title: "FirstOrDefault - ", text: "the first match, or a default (like `null`) if there is none." },
-        { title: "OrderBy - ", text: "sort the items by the value the lambda picks." },
+        { title: "OrderBy - ", text: "sort the items by the value the rule picks." },
       ],
-      summaryClose: "Next in this track: exceptions and null - handling the cases where things go wrong or a value is missing.",
-      blanks: [],
+      summaryClose:
+        "Next in this track: errors and null - handling the cases where things go wrong or a value is missing.",
     },
   ];
 
-  window.DRILL_CONFIG = {
+  window.BUILD_CONFIG = {
     prefix: "lq",
     metaLabel: "Know the language \u00b7 LINQ",
-    progressNoun: "Topic",
+    progressNoun: "Query",
     awardedKey: "linq_awarded",
     awardAmount: 20,
-    drills,
+    tasks,
   };
 })();
