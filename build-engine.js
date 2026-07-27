@@ -56,8 +56,7 @@
   // from the count shown and from XP.
   const buildCount = tasks.filter((t) => !t.summary).length;
   function cardFromHash() {
-    const n = parseInt((location.hash || "").replace(/[^0-9]/g, ""), 10);
-    return Number.isFinite(n) ? Math.min(Math.max(n - 1, 0), tasks.length - 1) : 0;
+    return LessonCommon.cardFromHash(tasks.length);
   }
   let idx = cardFromHash();
 
@@ -159,27 +158,10 @@
     return `Expected a line equal to "${expected}". Adjust your code and run again.`;
   }
 
-  // Render plain text but turn `backtick` spans into inline <code> so a pattern
-  // mentioned in prose reads as code, not running text.
-  function escapeHtml(s) {
-    return s
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
-  }
-
-  function renderInline(text) {
-    return (text || "")
-      .split(/(`[^`]+`|\*\*[^*]+\*\*)/)
-      .map((seg) => {
-        if (seg.length > 1 && seg.startsWith("`") && seg.endsWith("`"))
-          return `<code>${escapeHtml(seg.slice(1, -1))}</code>`;
-        if (seg.length > 3 && seg.startsWith("**") && seg.endsWith("**"))
-          return `<strong>${escapeHtml(seg.slice(2, -2))}</strong>`;
-        return escapeHtml(seg);
-      })
-      .join("");
-  }
+  // Escaping and inline `backtick`/**bold** markup are shared with the drill
+  // engine; the single source of truth is page-shell's LessonCommon.
+  const escapeHtml = LessonCommon.escapeHtml;
+  const renderInline = LessonCommon.renderInline;
 
   // Prose can carry structure: a blank line starts a new paragraph, a run of
   // lines beginning with "- " becomes a bullet list, a single newline is a soft

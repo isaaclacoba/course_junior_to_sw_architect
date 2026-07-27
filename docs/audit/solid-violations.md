@@ -1,81 +1,79 @@
 # SOLID violations audit
 
-A read-only audit of the repository's code for SOLID violations (Single
+An audit of the repository's **source code** for SOLID violations (Single
 responsibility, Open/closed, Liskov, Interface segregation, Dependency
-inversion). Four areas were reviewed; each has its own section. No code was
-changed.
+inversion). Four areas were reviewed; each has its own section. The concrete,
+low-risk violations have since been fixed (see "Fixes applied" below).
 
 - [Shared JS engines](solid/engines.md) - `build-engine.js`, `drill-engine.js`, `page-shell.js`
 - [C# capstone exercise](solid/capstone-csharp.md) - `level3-exercise/*.cs`
-- [Lesson example code](solid/lesson-examples.md) - does the course practice what it preaches?
+- [Lesson example code](solid/lesson-examples.md) - content check, not a source-code fix target
 - [code-lab component (TypeScript)](solid/code-lab.md) - `code-lab/src/`
 
 ## Summary
 
-| Area | SOLID health | Biggest issue |
+| Area | SOLID health | Biggest source-code issue |
 |---|---|---|
 | Shared JS engines | Weak | Monolithic IIFEs (SRP) + hard global/`localStorage` coupling (DIP) - untestable outside a live browser |
-| C# capstone | Good | ISP is neither enforced nor taught; a couple of lenient milestone detectors |
-| Lesson example code | Strong | One mild gap: Foundations models public fields with no later back-reference |
+| C# capstone | Good | A couple of lenient milestone detectors; fields that should be `readonly` |
 | code-lab (TS) | Strong core, some adapter leaks | Editors not injectable (OCP); a god-object `Step` shape (SRP) |
 
-The teaching content is in good shape - the course largely practices the SOLID
-it preaches. The weakest code is the two lesson **engines**, which are internal
-plumbing (not learner-facing), and the most important gap is a **content** one:
-**ISP**.
+Scope: this audit and its section files are about SOLID violations in the
+**source code**. The separate ["does the course practice what it preaches?"](solid/lesson-examples.md)
+check is a content review and is kept out of the fix list below.
 
-## Cross-cutting themes
+## Cross-cutting themes (source code)
 
-1. **ISP is the weak letter (highest-value fix).** The capstone enforces S, O,
-   L and D but not **I** (interface segregation), and the earlier content audit
-   found ISP is not taught as its own idea either. A course that teaches SOLID
-   should close the `I`: add an ISP milestone to the capstone and a short lesson
-   or card that motivates splitting a fat interface.
-2. **Duplication across the JS layer (DRY/SRP).** `escapeHtml`, `renderInline`,
-   the XP/`localStorage` block and card-from-hash logic are copied between
-   `build-engine.js` and `drill-engine.js`, and `escapeHtml` appears ~5 times in
-   `code-lab/src`. One shared helper would remove drift risk.
-3. **DIP / testability in the browser layer.** The engines hard-depend on
+1. **Duplication across the JS layer (DRY/SRP).** `escapeHtml`, `renderInline`
+   and card-from-hash logic were copied between `build-engine.js` and
+   `drill-engine.js` (and `escapeHtml` appears ~5 times in `code-lab/src`).
+2. **DIP / testability in the browser layer.** The engines hard-depend on
    `localStorage`, `window.CodeLab`, `monaco`, `Prism` and `mermaid` with no
    injection seam, so grading and XP can't be unit-tested. code-lab's `core/` is
    the counter-example - genuinely DOM-free and unit-tested - but its DOM
    adapters still reach for globals (`getElementById("courseXpLabel")`, untyped
    `window.monaco`, a hard-coded `localStorage` in the quiz).
-4. **OCP by branching, not extension.** `page-shell.js` hard-codes archetype
+3. **OCP by branching, not extension.** `page-shell.js` hard-codes archetype
    branches and the entire course order; both engines inline their grading
    strategy; `code-lab` picks editors with an `EditorKind` enum + `if/else`
    while its `runner`/`highlighter` are cleanly injectable. New archetypes,
    graders or editors mean editing closed code.
-5. **The content itself is disciplined.** The Part 4/5/6 lessons frame every
-   anti-pattern as an explicit "before" fixed by a later task and gated by a
-   `requireSource` rule plus a hidden `verify` probe. There is no over-
-   abstraction either - `refactor-moves` and capstone milestone 3 deliberately
-   keep injected plain classes and warn against reaching for an interface too
-   early.
+4. **Capstone reference solution.** `TestRunner` held its `_formatter` and
+   `_reporter` in mutable fields though both are assigned once in the
+   constructor; and `StructuralChecks`'s header comment overstated OCP ("this
+   class never changes"), while adding a milestone edits its `Rules` list.
 
-## Prioritised recommendations
+## Fixes applied
 
-Content (learner-facing, highest value):
-1. **Close ISP.** Add an interface-segregation milestone to the capstone and
-   teach the idea (a fat interface forcing empty implementations, split into
-   focused ones). This is the one SOLID letter the course under-serves.
-2. **Fix the Foundations back-reference.** Foundations models `public string
-   Name` / `public int Temp` poked from `Main`; once encapsulation is taught in
-   Part 4, add a one-line callback so the early public field is not left looking
-   like the norm. (Mild - see [lesson-examples.md](solid/lesson-examples.md).)
+- **DRY (engines).** `escapeHtml`, `renderInline` and `cardFromHash` now live
+  once in `page-shell.js` (`window.LessonCommon`); both engines delegate to it.
+  See [engines.md](solid/engines.md).
+- **Capstone `readonly`.** `TestRunner._formatter` / `_reporter` (and the hint
+  shape) are now `readonly` in the reference solution.
+  See [capstone-csharp.md](solid/capstone-csharp.md).
+- **Overstated OCP comment.** `StructuralChecks`'s header no longer claims the
+  class "never changes"; it states that adding a milestone means adding a rule
+  to the `Rules` list.
+
+## Open source-code items (not yet fixed)
+
+1. Split the two monolithic engine IIFEs by concern (SRP), or at least extract
+   the remaining duplicated `showOutput` / `showErrors` / XP blocks - deferred
+   because they are stateful (bound to different element containers) and share
+   less than the pure helpers already extracted.
+2. Introduce an injection seam for `localStorage` (and the runner URL) in the
+   engines so grading/XP become testable (DIP).
 3. Tighten the two lenient capstone detectors (milestones 1 and 6) so a
    false-positive shape cannot pass; verify milestone 6 also checks
    "closed to modification", not just that a second implementer exists.
-
-Internal code health (not learner-facing, lower urgency):
-4. Extract the duplicated `escapeHtml` / `renderInline` / XP helpers into one
-   shared module used by both engines (and align with code-lab's).
-5. Introduce an injection seam for `localStorage` (and the runner URL) in the
-   engines so grading/XP become testable.
-6. In code-lab, allow injecting a custom `EditorAdapter` (match the
+4. In code-lab, allow injecting a custom `EditorAdapter` (match the
    already-clean `runner`/`highlighter` seams) and split the `Step` shape into
-   per-scene discriminated types.
+   per-scene discriminated types. (code-lab is a submodule; a fix needs a
+   rebuild + re-vendor.)
 
 ## Verification status
-Read-only static review of the actual source. No code compiled or changed. Each
-finding in the section files is grounded in a specific file and location.
+The section files are a static review of the actual source. The fixes above were
+applied and verified: `node --check` on the three touched JS files, and a
+headless render of a build page (`control-flow.html`) and two drill pages
+(`reading-objects.html`, `theory-1.html`) - all render their first card with
+inline code/bold and zero `undefined`.

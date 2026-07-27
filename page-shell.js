@@ -20,6 +20,37 @@
 // and build archetypes the matching card scaffold is inserted right after it,
 // so drill-engine.js / build-engine.js find their prefixed element ids.
 (function () {
+  // Shared lesson helpers used by both engines (build + drill), so the escaping
+  // and inline-markup rules live in one place. Defined before any early return
+  // below so the engines can rely on it regardless of this page's config.
+  const LessonCommon = {
+    escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    },
+    // Turn `backtick` spans into inline <code> and **bold** into <strong>.
+    renderInline(text) {
+      return (text || "")
+        .split(/(`[^`]+`|\*\*[^*]+\*\*)/)
+        .map((seg) => {
+          if (seg.length > 1 && seg.startsWith("`") && seg.endsWith("`"))
+            return `<code>${LessonCommon.escapeHtml(seg.slice(1, -1))}</code>`;
+          if (seg.length > 3 && seg.startsWith("**") && seg.endsWith("**"))
+            return `<strong>${LessonCommon.escapeHtml(seg.slice(2, -2))}</strong>`;
+          return LessonCommon.escapeHtml(seg);
+        })
+        .join("");
+    },
+    // Which card index the URL hash points at, clamped to [0, count - 1].
+    cardFromHash(count) {
+      const n = parseInt((location.hash || "").replace(/[^0-9]/g, ""), 10);
+      return Number.isFinite(n) ? Math.min(Math.max(n - 1, 0), count - 1) : 0;
+    },
+  };
+  window.LessonCommon = LessonCommon;
+
   const page = window.PAGE;
   if (!page) {
     console.error("page-shell: window.PAGE is missing");

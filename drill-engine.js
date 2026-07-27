@@ -90,8 +90,7 @@
       : null;
 
   function cardFromHash() {
-    const n = parseInt((location.hash || "").replace(/[^0-9]/g, ""), 10);
-    return Number.isFinite(n) ? Math.min(Math.max(n - 1, 0), drills.length - 1) : 0;
+    return LessonCommon.cardFromHash(drills.length);
   }
   let idx = cardFromHash();
   const progress = drills.map((d) => d.blanks.map(() => ({ value: "", hint: -1 })));
@@ -126,23 +125,12 @@
     return snippet.replace(/\{\{(\d+)\}\}/g, (_, n) => `__${n}__`);
   }
   function escapeHtml(text) {
-    return String(text)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
+    return LessonCommon.escapeHtml(text);
   }
   // Render plain prose, turning `backtick` spans into inline <code> so a
-  // programming term reads as code. Plain text (no backticks) is unchanged.
-  function renderInline(text) {
-    return (text || "")
-      .split(/(`[^`]+`)/)
-      .map((seg) =>
-        seg.length > 1 && seg.startsWith("`") && seg.endsWith("`")
-          ? `<code>${escapeHtml(seg.slice(1, -1))}</code>`
-          : escapeHtml(seg)
-      )
-      .join("");
-  }
+  // programming term reads as code. Shared with the build engine via
+  // page-shell's LessonCommon (also renders **bold**, harmless here).
+  const renderInline = LessonCommon.renderInline;
 
   // Render a theory snippet as prose: escape, turn `backtick` spans into inline
   // code, replace each {{n}} with a numbered blank slot, and keep line breaks.

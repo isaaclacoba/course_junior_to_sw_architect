@@ -62,7 +62,9 @@ are minor; none block the exercise.
   (`new FormatterExtractedRule(), ...`). The rule set is closed to the `Run`
   logic but not fully closed to modification - the registration list is
   hand-maintained here. Minor: a factual overclaim in a comment, not a defect
-  in behaviour.
+  in behaviour. **FIXED.** The comment no longer claims the class "never
+  changes"; it states that adding a milestone means adding a rule to the
+  `Rules` list.
 - **(b) correctness - milestone 1 formatter detection can match the wrong
   class.** `CapstoneSyntax.FormatterClass` accepts any non-`TestRunner`,
   non-`Program` class that either `LooksLikeFormatter` (a `bool -> string`
@@ -84,7 +86,8 @@ are minor; none block the exercise.
   `private IReporter _reporter;` are assigned once in the constructor and never
   reassigned; they could be `readonly`. Idiomatic C# would mark them
   `readonly`. This is a small style miss in the model answer the learner may
-  copy from. Cosmetic.
+  copy from. Cosmetic. **FIXED.** Both fields (and the hint shape) are now
+  `readonly` in the reference solution.
 - **(b) reference solution - `TestRunner` depends on the concrete
   `ReportFormatter`, not an abstraction.** `Capstone.ReferenceSolution`, the
   `TestRunner` constructor takes `ReportFormatter formatter`. This is

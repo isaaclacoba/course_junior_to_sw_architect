@@ -53,8 +53,8 @@ public class SilentReporter : IReporter
 
 public class TestRunner
 {
-    private ReportFormatter _formatter;
-    private IReporter _reporter;
+    private readonly ReportFormatter _formatter;
+    private readonly IReporter _reporter;
 
     // Both dependencies arrive from outside. TestRunner builds neither.
     public TestRunner(ReportFormatter formatter, IReporter reporter)
@@ -133,7 +133,7 @@ public class Program
             {
                 new Hint("There's a trap here: calling new ReportFormatter() inside Run() still uses the class, but TestRunner is now welded to that exact formatter. It can never be given a different one."),
                 new Hint("Give TestRunner a constructor that accepts a ReportFormatter and stores it in a field. Use that field in Run(). Remove any \"new ReportFormatter()\" from inside TestRunner."),
-                new Hint("Here's the shape - you fill the holes:", "public class TestRunner\n{\n    private ReportFormatter _formatter;\n\n    public TestRunner(ReportFormatter formatter) => /* store it in the field */;\n\n    // in Run(): use _formatter.Format(passed)\n}"),
+                new Hint("Here's the shape - you fill the holes:", "public class TestRunner\n{\n    private readonly ReportFormatter _formatter;\n\n    public TestRunner(ReportFormatter formatter) => /* store it in the field */;\n\n    // in Run(): use _formatter.Format(passed)\n}"),
             },
             "Injection and interfaces are two separate ideas. Here we inject a plain class, no interface. The formatter is a pure function - same input, same output, no side effects - so you can test it directly. Don't reach for an interface until you actually need to swap or fake something. Receiving a dependency instead of building it is Dependency Injection.",
             @"flowchart LR

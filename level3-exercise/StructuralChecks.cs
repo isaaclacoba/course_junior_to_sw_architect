@@ -5,8 +5,8 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace CodeLab.Host;
 
 // Orchestrates the milestone rules over the student's code. Each rule owns one
-// milestone's pass condition and the code it points at, so adding a milestone
-// means adding a rule - this class never changes (open/closed).
+// milestone's pass condition and the code it points at. Adding a milestone means
+// adding a rule to the `Rules` list below; the `Run` logic stays unchanged.
 public class StructuralChecks
 {
     private static readonly IMilestoneRule[] Rules =
