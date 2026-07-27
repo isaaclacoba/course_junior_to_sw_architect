@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Control Flow - Theory Lesson</title>
+    <title>Bridge - Wiring It Up</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -11,14 +11,6 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css"
-    />
     <link rel="stylesheet" href="vendor/code-lab/code-lab.css" />
   </head>
   <body>
@@ -32,23 +24,18 @@
           eyebrow: "Part one \u00b7 Understand the ideas",
           title: "Control Flow",
           intro: [
-            "Code does not just run top to bottom - it branches and repeats. This lesson covers if/else, boolean logic, while, for, foreach, break/continue and switch. Each topic asks a quick knowledge check, then has you fill the gaps in a small example of the same idea.",
+            "How code decides and repeats. Each of these six builds takes one control-flow tool - if/else, boolean logic, while, for, foreach with break/continue, switch - and asks for a small working method. The pattern is shown above each card; you fill in the body and run it.",
           ],
-          links: [
-            { href: "index.html", label: "Back to the course" },
-          ],
+          links: [{ href: "index.html", label: "Back to the course" }],
         },
-        archetype: "drill",
+        archetype: "build",
         prefix: "cf",
       };
     </script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
     <script src="vendor/code-lab/code-lab.global.js"></script>
     <script src="page-shell.js"></script>
     <script src="control-flow.js"></script>
-    <script src="drill-engine.js"></script>
+    <script src="build-engine.js"></script>
   </body>
 </html>

@@ -1,5 +1,11 @@
 # Control Flow (`control-flow.js`)
 
+> Rebuilt 2026-07-27: the drill was replaced by the former `wiring-it-up` build
+> lesson (6 write-and-run tasks: if/else, boolean logic, while, for, foreach +
+> break/continue, switch), moved into this Part 1 slot. `$"..."` and `var` were
+> swapped for concatenation and explicit types. `wiring-it-up` is retired. The
+> notes below describe the earlier drill.
+
 - **Track / Part:** Practical - Part 1 Understand the ideas
 - **Engine / format:** drill-engine (theory mode: quiz + fill-in-the-blank)
 - **Difficulty pill:** Gentle  **XP cards (data-total):** 7

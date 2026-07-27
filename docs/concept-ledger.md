@@ -42,12 +42,11 @@ not an endorsement.
 |---|---|---|---|---|---|
 | 1 | foundations | 1 | printing output; a variable holds a value; datatypes; assignment (store, not equals); `null` (nothing yet); what an object is (state + behaviour, class vs instance) | `Console.WriteLine`, `int`/`long`/`double`/`decimal`/`bool`/`char`/`string`, `=`, `string?`+`null`, class/field/method, `new` | - |
 | 2 | practice-the-basics | 1 | compute with values (arithmetic); join text; ask a yes/no question (comparison to a `bool`); an object that answers about itself - bridges to Control Flow | `+` `-` `*` `/`, string `+`, `==` `!=` `>` `<` `>=` `<=`, class/field/method | 1 |
-| 3 | control-flow | 1 | choose a branch; combine yes/no; repeat; skip/stop; multi-way choose | if/else, `&&` `||` `!`, while, for, foreach, break/continue, switch | 1 |
+| 3 | control-flow | 1 | choose a branch; combine yes/no; repeat; skip/stop; multi-way choose (write-and-run methods) | if/else, `&&` `||` `!`, while, for, foreach, break/continue, switch, `string[]` | 1,2 |
 | 4 | writing-methods | 1 | a named step: return a value, take input, hold a rule, reuse it, call another | method, return, parameters | 3 |
 | 5 | reading-objects | 1 | objects collaborate: one asks another and acts (seeds one-job, receive-don't-build) | class, method, `=>` `(C#)` `[untaught]` | 1,4 |
 | 6 | reuse-without-regret | 1 | is-a vs has-a; favour composition; the diamond problem; polymorphism as payoff | inheritance, virtual/override, interface (named) | 1,5 |
 | 7 | first-builds | 2 | write from scratch: one class one method; one job; receive a dependency; depend on a promise; add a type freely | class, interface, constructor injection `[taster of P4]` | 1,4 |
-| 8 | wiring-it-up | 2 | the control-flow tools as small working methods | if/else, while, for, foreach, switch, `$"..."` `(C#)` `[untaught]` | 3,4 |
 | 9 | collections | 3 | an ordered many; a keyed lookup; iterate and tally | List<T>, Dictionary<K,V>, foreach | 3,4 |
 | 10 | data-shapes | 3 | ways to package data: property, computed value, a fixed set, value-copy, value-equality | `{ get; set; }` `[inversion]`, `=>` `(C#)`, enum, struct, record `(C#)` | 1,9 |
 | 11 | lambdas | 3 | a function passed as a value; capturing surrounding locals | `=>` lambda `(C#)`, Func/Predicate | 4,9 |

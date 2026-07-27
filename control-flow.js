@@ -1,488 +1,180 @@
-// Control Flow - theory lesson between Practice the Basics and Methods.
-// It teaches if/else, boolean logic, while, for, foreach, break/continue and
-// switch. Each card combines the two ways of working: a multiple-choice
-// knowledge check first, then a fill-in-the-blank for the same idea. Each card
-// also runs: a Run button compiles the solved version through the shared
-// code-lab Roslyn/WASM host so the learner sees the branch or loop execute.
-// Data only: drill-engine.js reads window.DRILL_CONFIG.
+// Control Flow - write-and-run practice with the control-flow tools: if/else,
+// boolean logic, while, for, foreach with break/continue, and switch. Each card
+// asks for a small working method. Part 1, after Practice the Basics. Data only:
+// the controller lives in build-engine.js, which reads window.BUILD_CONFIG.
 (function () {
   "use strict";
 
-  const drills = [
+  const tasks = [
     {
       title: "Branch with if / else",
       concept: "if / else",
       context:
-        "An `if` runs its block only when its condition is true. An `else` covers every other case.",
-      quiz: {
-        question: "When does the `else` block run?",
-        options: [
-          { text: "Only when the if condition is false", correct: true },
-          { text: "Always, right after the if block", correct: false },
-          { text: "Only when the if condition is true", correct: false },
-        ],
-        answerWhy: "`else` is the fallback - it runs exactly when the `if` condition was false.",
+        "An `if` / `else if` / `else` chain picks exactly one branch, top to bottom. The pattern below sorts a temperature into bands; do the same to turn an error count into a level.",
+      example:
+        'int temperature = 30;\nif (temperature >= 40)\n{\n    Console.WriteLine("hot");\n}\nelse if (temperature >= 20)\n{\n    Console.WriteLine("warm");\n}\nelse\n{\n    Console.WriteLine("cold");\n}',
+      goal: [
+        "Return `\"critical\"` when errors is 10 or more, `\"warn\"` when it is 1 or more, otherwise `\"clean\"`.",
+        "errors is 3 here, so the output should be warn.",
+      ],
+      expected: "warn",
+      requireSource: [
+        { pattern: /\bif\b/, message: "Use an `if` / `else` chain to choose the level." },
+      ],
+      verify: {
+        main:
+          'class Program\n{\n    static void Main()\n    {\n        var triage = new Triage();\n        Console.WriteLine(triage.Level(0));\n    }\n}\n',
+        expected: "clean",
+        message: "warn is right for this example only. Decide from the real error count, not a fixed word.",
       },
-      snippet: `int score = 40;
-if (score {{1}} 50)
-{
-    Console.WriteLine("Pass");
-}
-{{2}}
-{
-    Console.WriteLine("Fail");
-}`,
-      points: [
-        "`if` runs its block when the condition is true.",
-        "`else` handles every remaining case.",
-      ],
-      blanks: [
-        {
-          id: 1,
-          label: "Is the score at least 50?",
-          answer: ">=",
-          hints: ["Greater-than-or-equal is two characters."],
-          explain: [
-            { text: "The condition compares score against 50.", highlight: "if (score {{1}} 50)" },
-            { text: ">= is true when score is 50 or more.", highlight: "if (score {{1}} 50)" },
-          ],
-        },
-        {
-          id: 2,
-          label: "Keyword for the fallback block",
-          answer: "else",
-          hints: ["One word, runs when the if was false."],
-          explain: [
-            { text: "This block runs only when the if condition was false.", highlight: "{{2}}" },
-          ],
-        },
-      ],
+      starter:
+        'using System;\n\npublic class Triage\n{\n    public string Level(int errors)\n    {\n        // TODO: "critical" when errors >= 10, "warn" when errors >= 1, otherwise "clean"\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var triage = new Triage();\n        Console.WriteLine(triage.Level(3));\n    }\n}\n',
+      solution:
+        'using System;\n\npublic class Triage\n{\n    public string Level(int errors)\n    {\n        if (errors >= 10)\n        {\n            return "critical";\n        }\n        else if (errors >= 1)\n        {\n            return "warn";\n        }\n        else\n        {\n            return "clean";\n        }\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var triage = new Triage();\n        Console.WriteLine(triage.Level(3));\n    }\n}\n',
     },
     {
       title: "Combine conditions",
-      concept: "Boolean logic",
+      concept: "&& || !",
       context:
-        "Comparisons produce a bool. Join them with `&&` (and), `||` (or), and flip one with `!` (not).",
-      quiz: {
-        question: "Which operator is true only when BOTH sides are true?",
-        options: [
-          { text: "&&", correct: true },
-          { text: "||", correct: false },
-          { text: "!", correct: false },
-        ],
-        answerWhy: "`&&` needs both sides true; `||` needs just one; `!` flips a single bool.",
+        "`&&` is true only when both sides are, `||` is true when either side is, and `!` flips a bool. The pattern below mixes all three; do the same to decide access.",
+      example:
+        'bool paid = false;\nbool trial = true;\nbool locked = false;\nif ((paid || trial) && !locked)\n{\n    Console.WriteLine("access");\n}\nelse\n{\n    Console.WriteLine("blocked");\n}',
+      goal: [
+        "Return `\"allow\"` when the user is a `member` or `age` is 18+, and is not `banned`; otherwise `\"deny\"`.",
+        "Here age is 20 and not banned, so the output should be allow.",
+      ],
+      expected: "allow",
+      requireSource: [
+        { pattern: /&&/, message: "Join the checks with `&&`." },
+        { pattern: /\|\|/, message: "Accept either path with `||`." },
+      ],
+      verify: {
+        main:
+          'class Program\n{\n    static void Main()\n    {\n        var gate = new AccessControl();\n        Console.WriteLine(gate.Decide(true, 15, true));\n    }\n}\n',
+        expected: "deny",
+        message: "allow is right for this example only. A banned user must be denied - combine the real flags.",
       },
-      snippet: `int age = 25;
-bool working = true;
-bool adult = age >= 18 {{1}} age < 65;
-bool resting = {{2}}working;
-Console.WriteLine(adult);
-Console.WriteLine(resting);`,
-      points: [
-        "`&&` is true only when both sides are true.",
-        "`!` turns true into false and false into true.",
-      ],
-      blanks: [
-        {
-          id: 1,
-          label: "Both must be true",
-          answer: "&&",
-          hints: ["Two ampersands."],
-          explain: [
-            { text: "adult should be true only when age is 18 or more AND under 65.", highlight: "bool adult = age >= 18 {{1}} age < 65" },
-          ],
-        },
-        {
-          id: 2,
-          label: "Flip the value of working",
-          answer: "!",
-          hints: ["A single character that means 'not'."],
-          explain: [
-            { text: "! reads working and returns the opposite bool.", highlight: "bool resting = {{2}}working" },
-          ],
-        },
-      ],
+      starter:
+        'using System;\n\npublic class AccessControl\n{\n    public string Decide(bool member, int age, bool banned)\n    {\n        // TODO: "allow" when (member or age >= 18) and not banned, otherwise "deny"\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var gate = new AccessControl();\n        Console.WriteLine(gate.Decide(false, 20, false));\n    }\n}\n',
+      solution:
+        'using System;\n\npublic class AccessControl\n{\n    public string Decide(bool member, int age, bool banned)\n    {\n        if ((member || age >= 18) && !banned)\n        {\n            return "allow";\n        }\n        return "deny";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var gate = new AccessControl();\n        Console.WriteLine(gate.Decide(false, 20, false));\n    }\n}\n',
     },
     {
       title: "Repeat with while",
       concept: "while loop",
       context:
-        "A `while` loop checks its condition before each pass and keeps going until that condition is false. To move toward the end, use `n--`, shorthand for `n = n - 1` (decrement) that lowers `n` by one - its twin `n++` adds one.",
-      quiz: {
-        question: "What makes a `while` loop stop?",
-        options: [
-          { text: "Its condition becomes false", correct: true },
-          { text: "It always runs exactly ten times", correct: false },
-          { text: "A break keyword is always required", correct: false },
-        ],
-        answerWhy: "The condition is re-checked before every pass; the loop ends once it is false.",
+        "A `while` loop repeats while its condition holds. Step the counter with `n--` each pass or it never ends. The pattern below counts down; do the same, then print `liftoff`.",
+      example:
+        'int count = 3;\nwhile (count > 0)\n{\n    Console.WriteLine(count);\n    count--;\n}',
+      goal: [
+        "Print `count`, then `count - 1`, down to 1, then print `\"liftoff\"`.",
+        "From 3 the output is four lines: 3, 2, 1, liftoff.",
+      ],
+      expected: ["3", "2", "1", "liftoff"],
+      requireSource: [
+        { pattern: /\bwhile\b/, message: "Count down with a `while` loop." },
+      ],
+      verify: {
+        main:
+          'class Program\n{\n    static void Main()\n    {\n        new Countdown().From(2);\n    }\n}\n',
+        expected: ["2", "1", "liftoff"],
+        message: "Those lines are right for this example only. Loop from whatever number you are given.",
       },
-      snippet: `int n = 3;
-while (n {{1}} 0)
-{
-    Console.WriteLine(n);
-    n{{2}};
-}`,
-      points: [
-        "The condition is checked before each pass.",
-        "`n--` subtracts one from `n` each pass, or the loop never ends.",
-      ],
-      blanks: [
-        {
-          id: 1,
-          label: "Keep going while n is above zero",
-          answer: ">",
-          hints: ["A single greater-than sign."],
-          explain: [
-            { text: "The loop runs while n is still greater than 0.", highlight: "while (n {{1}} 0)" },
-          ],
-        },
-        {
-          id: 2,
-          label: "Move n one step toward zero",
-          answer: "--",
-          accept: ["-=1", "-= 1"],
-          hints: ["Decrement: two minus signs."],
-          explain: [
-            { text: "n-- lowers n by one each pass so the loop eventually stops.", highlight: "n{{2}}" },
-          ],
-        },
-      ],
+      starter:
+        'using System;\n\npublic class Countdown\n{\n    public void From(int count)\n    {\n        // TODO: print count, then count - 1, ... down to 1, then "liftoff"\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        new Countdown().From(3);\n    }\n}\n',
+      solution:
+        'using System;\n\npublic class Countdown\n{\n    public void From(int count)\n    {\n        while (count >= 1)\n        {\n            Console.WriteLine(count);\n            count--;\n        }\n        Console.WriteLine("liftoff");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        new Countdown().From(3);\n    }\n}\n',
     },
     {
       title: "Count with for",
       concept: "for loop",
       context:
-        "A `for` loop packs the counter setup, the condition, and the step into one header. The step `i++` is shorthand for `i = i + 1` (increment) that raises `i` by one after each pass - `i--` would lower it.",
-      quiz: {
-        question: "What is the order of the three parts in a `for` header?",
-        options: [
-          { text: "start; condition; step", correct: true },
-          { text: "condition; start; step", correct: false },
-          { text: "step; condition; start", correct: false },
-        ],
-        answerWhy: "`for (start; condition; step)` - initialise once, test before each pass, step after each pass.",
+        "A `for` loop gives you an index, so you can number items or reach positions. The header is `for (start; condition; step)` and `i++` advances the index. Do the same to number each item.",
+      example:
+        'string[] colors = { "red", "green" };\nfor (int i = 0; i < colors.Length; i++)\n{\n    Console.WriteLine((i + 1) + ": " + colors[i]);\n}',
+      goal: [
+        "Print each item with its 1-based position, like `\"1. login\"`.",
+        "For login then logout the output is: 1. login then 2. logout.",
+      ],
+      expected: ["1. login", "2. logout"],
+      requireSource: [
+        { pattern: /\bfor\s*\(/, message: "Use a `for` loop with an index counter." },
+        { pattern: /\.\s*Length/, message: "Use `items.Length` to know when to stop." },
+      ],
+      verify: {
+        main:
+          'class Program\n{\n    static void Main()\n    {\n        string[] items = { "a", "b", "c" };\n        new Numbering().List(items);\n    }\n}\n',
+        expected: ["1. a", "2. b", "3. c"],
+        message: "Right for this example only. Number whatever items you are given with the index.",
       },
-      snippet: `for (int i = {{1}}; i < 3; i{{2}})
-{
-    Console.WriteLine(i);
-}`,
-      points: [
-        "The start runs once, before the first pass.",
-        "The step `i++` runs after each pass to add one to `i`.",
-      ],
-      blanks: [
-        {
-          id: 1,
-          label: "Start the counter at...",
-          answer: "0",
-          hints: ["Counting usually starts here."],
-          explain: [
-            { text: "i begins at 0, so the first printed value is 0.", highlight: "for (int i = {{1}}; i < 3; i{{2}})" },
-          ],
-        },
-        {
-          id: 2,
-          label: "Advance i by one each pass",
-          answer: "++",
-          accept: ["+=1", "+= 1"],
-          hints: ["Increment: two plus signs."],
-          explain: [
-            { text: "i++ raises i by one after each pass until i < 3 is false.", highlight: "for (int i = {{1}}; i < 3; i{{2}})" },
-          ],
-        },
-      ],
+      starter:
+        'using System;\n\npublic class Numbering\n{\n    public void List(string[] items)\n    {\n        // TODO: print each item with its 1-based position, like "1. login"\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        string[] items = { "login", "logout" };\n        new Numbering().List(items);\n    }\n}\n',
+      solution:
+        'using System;\n\npublic class Numbering\n{\n    public void List(string[] items)\n    {\n        for (int i = 0; i < items.Length; i++)\n        {\n            Console.WriteLine((i + 1) + ". " + items[i]);\n        }\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        string[] items = { "login", "logout" };\n        new Numbering().List(items);\n    }\n}\n',
     },
     {
-      title: "Walk a collection with foreach",
-      concept: "foreach",
+      title: "Skip and stop with foreach",
+      concept: "foreach + break / continue",
       context:
-        "A `foreach` loop hands you each item in a collection in turn - no counter to manage.",
-      quiz: {
-        question: "What does `foreach` give you on each pass?",
-        options: [
-          { text: "The next item in the collection", correct: true },
-          { text: "The current index number", correct: false },
-          { text: "The collection's total length", correct: false },
-        ],
-        answerWhy: "foreach binds a variable to each item in order; you never touch an index.",
+        "Inside a `foreach`, `continue` jumps to the next item and `break` ends the loop. The pattern below prints lines, skipping blanks and stopping at `END`; do the same with skip and stop.",
+      example:
+        'foreach (var line in lines)\n{\n    if (line == "") continue;\n    if (line == "END") break;\n    Console.WriteLine(line);\n}',
+      goal: [
+        "Walk the steps: `continue` past a `\"skip\"`, `break` at a `\"stop\"`, otherwise print the step.",
+        "For a, skip, b, stop, c the output is just: a then b.",
+      ],
+      expected: ["a", "b"],
+      requireSource: [
+        { pattern: /foreach/, message: "Walk the steps with a `foreach` loop." },
+        { pattern: /\bcontinue\b/, message: "Skip a step with `continue`." },
+        { pattern: /\bbreak\b/, message: "Stop early with `break`." },
+      ],
+      verify: {
+        main:
+          'class Program\n{\n    static void Main()\n    {\n        string[] steps = { "skip", "x", "stop", "y" };\n        new Scanner().Run(steps);\n    }\n}\n',
+        expected: "x",
+        message: "Right for this example only. Skip and stop based on the real step values.",
       },
-      snippet: `string[] names = { "Ann", "Bo" };
-foreach ({{1}} name in names)
-{
-    Console.WriteLine({{2}});
-}`,
-      points: [
-        "foreach visits every item once, in order.",
-        "There is no index to track.",
-      ],
-      blanks: [
-        {
-          id: 1,
-          label: "Declare the loop variable (let the compiler infer the type)",
-          answer: "var",
-          accept: ["string"],
-          hints: ["A keyword that infers the type, or write string."],
-          explain: [
-            { text: "var name takes the type of each item - here, string.", highlight: "foreach ({{1}} name in names)" },
-          ],
-        },
-        {
-          id: 2,
-          label: "Print the current item",
-          answer: "name",
-          hints: ["Use the loop variable you just named."],
-          explain: [
-            { text: "name holds the current item on this pass.", highlight: "Console.WriteLine({{2}})" },
-          ],
-        },
-      ],
+      starter:
+        'using System;\n\npublic class Scanner\n{\n    public void Run(string[] steps)\n    {\n        // TODO: continue past "skip", break at "stop", otherwise print the step\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        string[] steps = { "a", "skip", "b", "stop", "c" };\n        new Scanner().Run(steps);\n    }\n}\n',
+      solution:
+        'using System;\n\npublic class Scanner\n{\n    public void Run(string[] steps)\n    {\n        foreach (string step in steps)\n        {\n            if (step == "skip")\n            {\n                continue;\n            }\n            if (step == "stop")\n            {\n                break;\n            }\n            Console.WriteLine(step);\n        }\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        string[] steps = { "a", "skip", "b", "stop", "c" };\n        new Scanner().Run(steps);\n    }\n}\n',
     },
     {
-      title: "Skip and stop: continue / break",
-      concept: "break / continue",
-      context:
-        "Inside a loop, `continue` jumps to the next pass and `break` leaves the loop entirely.",
-      quiz: {
-        question: "What does `continue` do inside a loop?",
-        options: [
-          { text: "Skips the rest of this pass and starts the next one", correct: true },
-          { text: "Stops the loop entirely", correct: false },
-          { text: "Restarts the whole program", correct: false },
-        ],
-        answerWhy: "`continue` skips to the next pass; `break` is the one that stops the loop.",
-      },
-      snippet: `for (int i = 0; i < 5; i++)
-{
-    if (i == 2) {{1}};
-    if (i == 4) {{2}};
-    Console.WriteLine(i);
-}`,
-      points: [
-        "`continue` skips the rest of the current pass.",
-        "`break` ends the loop right away.",
-      ],
-      blanks: [
-        {
-          id: 1,
-          label: "Skip printing when i is 2",
-          answer: "continue",
-          hints: ["Jumps to the next pass."],
-          explain: [
-            { text: "continue skips the WriteLine for this pass only.", highlight: "if (i == 2) {{1}}" },
-          ],
-        },
-        {
-          id: 2,
-          label: "Stop the loop when i is 4",
-          answer: "break",
-          hints: ["Leaves the loop now."],
-          explain: [
-            { text: "break ends the loop, so 4 is never printed.", highlight: "if (i == 4) {{2}}" },
-          ],
-        },
-      ],
-    },
-    {
-      title: "Pick a case with switch",
+      title: "Map values with switch",
       concept: "switch",
       context:
-        "A `switch` matches one value against several cases. Each `case` ends with `break` so it does not fall into the next.",
-      quiz: {
-        question: "Why does each `case` usually end with `break`?",
-        options: [
-          { text: "To stop execution falling into the next case", correct: true },
-          { text: "To repeat the same case again", correct: false },
-          { text: "It is decorative and does nothing", correct: false },
-        ],
-        answerWhy: "Without `break`, control falls through into the following case's code.",
+        "A `switch` maps one value to many cases; each `case` ends with `break` and `default` catches the rest. Here you run a switch for every item with a `foreach`. Do the same to label each code.",
+      example:
+        'switch (grade)\n{\n    case "A":\n        Console.WriteLine("great");\n        break;\n    default:\n        Console.WriteLine("retry");\n        break;\n}',
+      goal: [
+        "For each code print a word: 1 -> `\"low\"`, 2 -> `\"mid\"`, 3 -> `\"high\"`, anything else -> `\"?\"`.",
+        "For 1, 3, 9 the output is: low, high, ?.",
+      ],
+      expected: ["low", "high", "?"],
+      requireSource: [
+        { pattern: /\bswitch\b/, message: "Map each code with a `switch`." },
+        { pattern: /foreach/, message: "Apply it to every code with a `foreach`." },
+      ],
+      verify: {
+        main:
+          'class Program\n{\n    static void Main()\n    {\n        int[] codes = { 2, 2 };\n        new Labeler().Describe(codes);\n    }\n}\n',
+        expected: ["mid", "mid"],
+        message: "Right for this example only. Switch on the real code values.",
       },
-      snippet: `int day = 2;
-switch ({{1}})
-{
-    case 1:
-        Console.WriteLine("Mon");
-        break;
-    case 2:
-        Console.WriteLine("Tue");
-        {{2}};
-    default:
-        Console.WriteLine("Other");
-        break;
-}`,
-      points: [
-        "`switch` compares one value against each case.",
-        "`break` ends a case so it does not fall through.",
-      ],
-      blanks: [
-        {
-          id: 1,
-          label: "Value to match against the cases",
-          answer: "day",
-          hints: ["The variable declared just above."],
-          explain: [
-            { text: "switch tests day against each case label.", highlight: "switch ({{1}})" },
-          ],
-        },
-        {
-          id: 2,
-          label: "End the case 2 block",
-          answer: "break",
-          hints: ["Same keyword every case ends with."],
-          explain: [
-            { text: "break stops case 2 from falling into default.", highlight: "{{2}}" },
-          ],
-        },
-      ],
-    },
-    {
-      title: "Control flow recap",
-      concept: "Recap",
-      summary: true,
-      context: "You now have the building blocks every method and object will use.",
-      summaryIntro:
-        "Control flow decides which lines run and how often. These are the same tools you will use inside methods and across objects next.",
-      summaryItems: [
-        { title: "if / else - ", text: "run a block only when a condition holds, with a fallback." },
-        { title: "Boolean logic - ", text: "combine comparisons with `&&`, `||`, and `!` to form conditions." },
-        { title: "while - ", text: "repeat as long as a condition stays true." },
-        { title: "for - ", text: "count with a start, condition, and step in one header." },
-        { title: "foreach - ", text: "visit each item in a collection without an index." },
-        { title: "break / continue - ", text: "leave a loop early or skip to the next pass." },
-        { title: "switch - ", text: "branch on one value across several cases, each ended by `break`." },
-      ],
-      summaryClose: "Next up: Methods - package these steps into a rule you can name and reuse.",
-      blanks: [],
+      starter:
+        'using System;\n\npublic class Labeler\n{\n    public void Describe(int[] codes)\n    {\n        // TODO: for each code, switch to a word: 1->"low", 2->"mid", 3->"high", else "?"\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        int[] codes = { 1, 3, 9 };\n        new Labeler().Describe(codes);\n    }\n}\n',
+      solution:
+        'using System;\n\npublic class Labeler\n{\n    public void Describe(int[] codes)\n    {\n        foreach (int code in codes)\n        {\n            switch (code)\n            {\n                case 1:\n                    Console.WriteLine("low");\n                    break;\n                case 2:\n                    Console.WriteLine("mid");\n                    break;\n                case 3:\n                    Console.WriteLine("high");\n                    break;\n                default:\n                    Console.WriteLine("?");\n                    break;\n            }\n        }\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        int[] codes = { 1, 3, 9 };\n        new Labeler().Describe(codes);\n    }\n}\n',
     },
   ];
 
-  // Complete, runnable C# for each drill, index-aligned with `drills` (the recap
-  // card has no program). The Run button compiles and runs these through the
-  // shared code-lab Roslyn/WASM host, showing the solved snippet execute.
-  const runnablePrograms = [
-    // 0 - Branch with if / else
-    `using System;
-
-class Program
-{
-    static void Main()
-    {
-        int score = 40;
-        if (score >= 50)
-        {
-            Console.WriteLine("Pass");
-        }
-        else
-        {
-            Console.WriteLine("Fail");
-        }
-    }
-}`,
-    // 1 - Combine conditions
-    `using System;
-
-class Program
-{
-    static void Main()
-    {
-        int age = 25;
-        bool working = true;
-        bool adult = age >= 18 && age < 65;
-        bool resting = !working;
-        Console.WriteLine(adult);
-        Console.WriteLine(resting);
-    }
-}`,
-    // 2 - Repeat with while
-    `using System;
-
-class Program
-{
-    static void Main()
-    {
-        int n = 3;
-        while (n > 0)
-        {
-            Console.WriteLine(n);
-            n--;
-        }
-    }
-}`,
-    // 3 - Count with for
-    `using System;
-
-class Program
-{
-    static void Main()
-    {
-        for (int i = 0; i < 3; i++)
-        {
-            Console.WriteLine(i);
-        }
-    }
-}`,
-    // 4 - Walk a collection with foreach
-    `using System;
-
-class Program
-{
-    static void Main()
-    {
-        string[] names = { "Ann", "Bo" };
-        foreach (var name in names)
-        {
-            Console.WriteLine(name);
-        }
-    }
-}`,
-    // 5 - Skip and stop: continue / break
-    `using System;
-
-class Program
-{
-    static void Main()
-    {
-        for (int i = 0; i < 5; i++)
-        {
-            if (i == 2) continue;
-            if (i == 4) break;
-            Console.WriteLine(i);
-        }
-    }
-}`,
-    // 6 - Pick a case with switch
-    `using System;
-
-class Program
-{
-    static void Main()
-    {
-        int day = 2;
-        switch (day)
-        {
-            case 1:
-                Console.WriteLine("Mon");
-                break;
-            case 2:
-                Console.WriteLine("Tue");
-                break;
-            default:
-                Console.WriteLine("Other");
-                break;
-        }
-    }
-}`,
-  ];
-
-  window.DRILL_CONFIG = {
+  window.BUILD_CONFIG = {
     prefix: "cf",
-    metaLabel: "Foundations \u00b7 Control Flow",
-    progressNoun: "Topic",
+    metaLabel: "Understand the ideas \u00b7 Control Flow",
+    progressNoun: "Step",
     awardedKey: "control_flow_awarded",
     awardAmount: 20,
-    drills,
-    runnablePrograms,
-    runnerUrl: "level3-app/index.html?runner=1",
-    xpKey: "course_global_xp",
+    tasks,
   };
 })();

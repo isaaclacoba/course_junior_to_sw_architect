@@ -22,7 +22,7 @@ baseline when designing new chapters.
 |---|--------|------|--------|-------|---------|
 | 1 | Foundations | level1.html | Theory (quiz/blank) | 10 | What software is for; objects = state + behaviour |
 | 2 | Practice the Basics | level1-coding.html | Runnable fill-blank | 10 | The same core ideas as runnable C# |
-| 3 | Control Flow | control-flow.html | Quiz + blank | 7 (+recap) | if/else, boolean logic, while, for, foreach, break/continue, switch |
+| 3 | Control Flow | control-flow.html | Write-and-run build | 6 | if/else, boolean logic, while, for, foreach+break/continue, switch (write working methods) |
 | 4 | Methods | writing-methods.html | Write-from-scratch | 5 | Return values, parameters, logic, reuse, composing methods |
 | 5 | Reading Objects | reading-objects.html | Fill-blank + run | 10 | Object collaboration, delegation, one job per method/class (pre-SOLID) |
 | 6 | Reuse Without Regret | level4.html | Guided reading + tour | 12 | Inheritance vs composition vs polymorphism; diamond problem |
@@ -32,7 +32,8 @@ baseline when designing new chapters.
 | # | Lesson | Page | Format | Cards | Teaches |
 |---|--------|------|--------|-------|---------|
 | 7 | First Builds | first-builds.html | Write-from-scratch | 5 | Class, single job, inject, interface, second impl (a quick taster) |
-| 8 | Wiring It Up | wiring-it-up.html | Write-from-scratch | 6 | Control flow applied: if/else, bool logic, while, for, foreach+break/continue, switch |
+
+_(Wiring It Up was merged into Control Flow (Part 1) on 2026-07-27; Part 2 will be revisited.)_
 
 ### Part three — Know the language
 
@@ -82,7 +83,7 @@ Reuses the drill-engine in theory mode (multiple-choice check + fill-blank in pr
 - Variables / state, classes & objects, instantiation, reference vs value semantics —
   Foundations, Practice the Basics, Data shapes (`struct`/`record`).
 - Control flow: if/else, `&&` `||` `!`, while, for, foreach, break/continue, switch,
-  `++`/`--` — Control Flow (learn) + Wiring It Up (apply).
+  `++`/`--` — Control Flow.
 - Methods: return values, parameters, internal logic, reuse, calling other methods —
   Methods.
 - Collections: `List<T>`, indexing, `Dictionary`, `ContainsKey` — Collections.

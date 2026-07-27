@@ -1,5 +1,8 @@
 # Wiring It Up (`wiring-it-up.js`)
 
+> RETIRED 2026-07-27: this lesson's build content became the Part 1 **Control
+> Flow** lesson (`control-flow.js`); the file is gone. See `control-flow.md`.
+
 - **Track / Part:** Practical - Part 2 Build it for real
 - **Engine / format:** build-engine (write-from-scratch)
 - **Difficulty pill:** Steady  **XP cards (data-total):** 6

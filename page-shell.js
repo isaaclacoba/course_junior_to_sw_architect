@@ -194,7 +194,7 @@
   // setting window.PAGE.nextHref itself.
   const PRACTICAL = [
     "level1.html", "level1-coding.html", "control-flow.html", "writing-methods.html",
-    "reading-objects.html", "level4.html", "first-builds.html", "wiring-it-up.html",
+    "reading-objects.html", "level4.html", "first-builds.html",
     "collections.html", "data-shapes.html", "lambdas.html", "linq.html", "errors-null.html", "generics.html",
     "encapsulation.html", "interfaces.html", "polymorphism.html", "composition.html",
     "dependency-injection.html", "testing-basics.html", "test-doubles.html", "testable-design.html",
