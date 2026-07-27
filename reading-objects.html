@@ -11,14 +11,6 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css"
-    />
     <link rel="stylesheet" href="vendor/code-lab/code-lab.css" />
   </head>
   <body>
@@ -32,21 +24,18 @@
           eyebrow: "Part one \u00b7 Understand the ideas",
           title: "Reading Objects",
           intro: [
-            "A gentle step up from single-token drills. Read how a few objects work together, give one job to one place, and trace what the code does before you run it. No new theory - just the habits the SOLID drills will lean on.",
+            "A gentle step up from single-token drills. Write a few small objects that work together - one asks another for what it needs, one job lives in one place, and a class uses what is handed to it. No new theory - just the habits the SOLID drills will lean on.",
           ],
           links: [{ href: "index.html", label: "Back to the course" }],
         },
-        archetype: "drill",
+        archetype: "build",
         prefix: "ro",
       };
     </script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
     <script src="vendor/code-lab/code-lab.global.js"></script>
     <script src="page-shell.js"></script>
     <script src="reading-objects.js"></script>
-    <script src="drill-engine.js"></script>
+    <script src="build-engine.js"></script>
   </body>
 </html>

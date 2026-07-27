@@ -1,654 +1,200 @@
-const drills = [
-  {
-    title: "S — One class doing three jobs (the trap)",
-    concept: "Single Responsibility",
-    pain: "This `LoginTest` does three jobs in one method: run the check, decide pass or fail, and build the report text. When someone reworded the report last month, the login check broke too — because both lived in the same place.",
-    map: "This is the S in SOLID: Single Responsibility. A class should have one reason to change. This drill shows the tangled version on purpose — the fix comes next.",
-    context: "This is the problem version. Run the class whose single method does everything at once.",
-    snippet: `public class LoginTest
-{
-    // one method doing the check AND the formatting
-    public string RunAndReport()
+// Part six - "Design for change": The SOLID principles. Write-from-scratch
+// builds. One small test-automation codebase, one principle per task, each in
+// order S, O, L, I, D. Every task describes the trap in plain prose (the bad
+// shape and its concrete cost), then asks the learner to write the fix. The
+// output is fixed, the requireSource gate enforces the SOLID technique, and a
+// hidden verify probe re-runs the learner's classes against different inputs so
+// a faked answer cannot pass. Data only: window.BUILD_CONFIG (build-engine.js
+// reads it, loaded after this file).
+(function () {
+  "use strict";
+
+  const tasks = [
     {
-        bool passed = true;                         // the check
-        string report = passed ? "PASS" : "FAIL";   // the formatting
-        return report;
-    }
-}
-
-public static void Main()
-{
-    var test = new {{1}}();
-    Console.WriteLine(test.{{2}}());
-}`,
-    points: [
-      "Checking and formatting share one method.",
-      "Changing the report text risks breaking the check.",
-      "One class, two unrelated reasons to change.",
-    ],
-    mermaid: `flowchart LR
-  A[LoginTest] --> B[RunAndReport]
-  B --> C[does the check]
-  B --> D[builds the report]
-  C --> E[tangled together]
-  D --> E`,
-    blanks: [
-      {
-        id: 1,
-        label: "Create the tangled class",
-        answer: "LoginTest",
-        hints: ["The class that mixes checking and formatting."],
-        explain: [
-          { text: "`LoginTest` is the class that does everything. It has no separation inside it.", highlight: "public class LoginTest" },
-          { text: "`new` builds one. You name the class right after `new`.", highlight: "var test = new {{1}}()" },
-          { text: "`RunAndReport` is the single method that both checks and formats — that mix is the problem.", highlight: "public string RunAndReport()" },
-        ],
+      title: "S - Single Responsibility: split the jobs",
+      concept: "Single Responsibility",
+      context:
+        "This is the **S** in SOLID: Single Responsibility. A class should have one job, so it has one reason to change.\n\nThe trap: `LoginTest` does two jobs in one method - it runs the check and it builds the report text. When someone reworded the report last month, the login check broke too, because both lived in the same place. Two unrelated things sharing a method means touching one bruises the other.\n\nThe fix: leave `LoginTest` with only the check, and move the report text into its own class.",
+      example:
+        "public class Door\n{\n    public bool IsOpen()\n    {\n        return true;\n    }\n}\n\npublic class DoorSign\n{\n    public string Show(bool open)\n    {\n        return open ? \"OPEN\" : \"SHUT\";\n    }\n}",
+      goal: [
+        "Leave `LoginTest` with only the check: a `bool Run()` that returns `true`.",
+        "Write a `ReportFormatter` with `string Format(bool passed)` returning `\"PASS\"` or `\"FAIL\"`.",
+        "`Main` runs the test, then formats the result. The output stays `PASS`.",
+      ],
+      expected: "PASS",
+      requireSource: [
+        { pattern: /class\s+ReportFormatter/, message: "Move the report text into its own `ReportFormatter` class." },
+        { pattern: /string\s+Format\s*\(\s*bool/, message: "Give `ReportFormatter` a `Format(bool passed)` method that returns the text." },
+        { pattern: /bool\s+Run\s*\(\s*\)/, message: "Leave `LoginTest` with only the check: a `bool Run()`." },
+        { pattern: /^(?![\s\S]*RunAndReport)[\s\S]*$/, message: "Split the two jobs - `LoginTest` should no longer both run the check and build the report." },
+      ],
+      verify: {
+        main:
+          'class Program\n{\n    static void Main()\n    {\n        var formatter = new ReportFormatter();\n        System.Console.WriteLine(formatter.Format(false));\n    }\n}\n',
+        expected: "FAIL",
+        message:
+          "`ReportFormatter` should turn any result into text on its own - a failing result should read FAIL, with no help from `LoginTest`.",
       },
-      {
-        id: 2,
-        label: "Call the mixed method",
-        answer: "RunAndReport",
-        hints: ["The one method that both checks and formats."],
-        explain: [
-          { text: "Inside `RunAndReport`, `passed` is the check and `report` is the formatting. Two jobs, one method.", highlight: `string report = passed ? "PASS" : "FAIL"` },
-          { text: "Calling `RunAndReport` runs both jobs together. There is no way to change one without touching the other.", highlight: "Console.WriteLine(test.{{2}}())" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "S — The fix: one class, one job",
-    concept: "Single Responsibility",
-    pain: "This `LoginTest` class did three jobs at once: run the check, decide pass or fail, and build the report text. Last month someone reworded the report and the login check broke. Two unrelated things shared one class, so touching one bruised the other.",
-    map: "Still the S in SOLID, now done right. The check lives in one class and the formatting in another, so each has just one reason to change. Separate jobs, separate classes.",
-    context: "The report job has been pulled into its own class. Wire it up.",
-    snippet: `public class LoginTest
-{
-    public bool Run()
+      starter:
+        'using System;\n\npublic class LoginTest\n{\n    // one method: runs the check AND builds the report text\n    public string RunAndReport()\n    {\n        bool passed = true;                        // the check\n        return passed ? "PASS" : "FAIL";           // the formatting\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var test = new LoginTest();\n        Console.WriteLine(test.RunAndReport());\n    }\n}\n',
+      solution:
+        'using System;\n\npublic class LoginTest\n{\n    public bool Run()\n    {\n        return true;\n    }\n}\n\npublic class ReportFormatter\n{\n    public string Format(bool passed)\n    {\n        return passed ? "PASS" : "FAIL";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var test = new LoginTest();\n        bool passed = test.Run();\n\n        var formatter = new ReportFormatter();\n        Console.WriteLine(formatter.Format(passed));\n    }\n}\n',
+    },
     {
-        // only the check lives here now
-        return true;
-    }
-}
-
-public class ReportFormatter
-{
-    public string Format(bool passed)
+      title: "O - Open/Closed: add a style without editing",
+      concept: "Open/Closed",
+      context:
+        "This is the **O** in SOLID: Open/Closed. Code should be open to new behaviour but closed to edits - you add a case without reopening what already works.\n\nThe trap: `ReportFormatter.Build` decides the style with a chain of `if` checks. Every new style means editing this one method, and each edit risks breaking the styles that already passed.\n\nThe fix: make each style its own class behind a shared `IReport` interface. A new style becomes a new class, and the old ones are never touched.",
+      example:
+        "public interface IGreeting\n{\n    string Say();\n}\n\npublic class Hello : IGreeting\n{\n    public string Say()\n    {\n        return \"hi\";\n    }\n}\n\npublic class Bye : IGreeting\n{\n    public string Say()\n    {\n        return \"later\";\n    }\n}",
+      goal: [
+        "Declare `interface IReport` with `string Build(bool passed)`.",
+        "Write a `PlainReport` (`\"PASS\"`/`\"FAIL\"`) and an `EmojiReport` (`\"OK\"`/`\"X\"`), each implementing `IReport`.",
+        "`Main` uses a `PlainReport` through an `IReport` variable. The output stays `PASS`.",
+      ],
+      expected: "PASS",
+      requireSource: [
+        { pattern: /interface\s+IReport/, message: "Declare an `IReport` interface with `string Build(bool passed)`." },
+        { pattern: /class\s+PlainReport\s*:\s*IReport/, message: "Write a `PlainReport` that implements `IReport`." },
+        { pattern: /class\s+EmojiReport\s*:\s*IReport/, message: "Write an `EmojiReport` that implements `IReport`." },
+        { pattern: /^(?![\s\S]*style\s*==)[\s\S]*$/, message: "Drop the `style ==` checks - each style is now its own class, chosen by type." },
+        { pattern: /^(?![\s\S]*\bswitch\b)[\s\S]*$/, message: "No `switch` on the style either - the type picks the behaviour now." },
+      ],
+      verify: {
+        main:
+          'class Program\n{\n    static void Main()\n    {\n        IReport report = new EmojiReport();\n        System.Console.WriteLine(report.Build(true));\n    }\n}\n',
+        expected: "OK",
+        message:
+          "Adding a style must not touch the others. An `EmojiReport` should build its own text - OK when passed - through the same `IReport`.",
+      },
+      starter:
+        'using System;\n\npublic class ReportFormatter\n{\n    // every new style forces another edit to this method\n    public string Build(string style, bool passed)\n    {\n        if (style == "plain")\n            return passed ? "PASS" : "FAIL";\n        if (style == "emoji")\n            return passed ? "OK" : "X";\n        return "unknown";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var formatter = new ReportFormatter();\n        Console.WriteLine(formatter.Build("plain", true));\n    }\n}\n',
+      solution:
+        'using System;\n\npublic interface IReport\n{\n    string Build(bool passed);\n}\n\npublic class PlainReport : IReport\n{\n    public string Build(bool passed)\n    {\n        return passed ? "PASS" : "FAIL";\n    }\n}\n\npublic class EmojiReport : IReport\n{\n    public string Build(bool passed)\n    {\n        return passed ? "OK" : "X";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        IReport report = new PlainReport();\n        Console.WriteLine(report.Build(true));\n    }\n}\n',
+    },
     {
-        return passed ? "PASS" : "FAIL";
-    }
-}
-
-public static void Main()
-{
-    var test = new LoginTest();
-    bool result = test.Run();
-
-    var formatter = new {{1}}();
-    Console.WriteLine(formatter.{{2}}(result));
-}`,
-    points: [
-      "`LoginTest` now only runs the test.",
-      "`ReportFormatter` only turns a result into text.",
-      "Change the wording without ever touching the check.",
-    ],
-    mermaid: `flowchart LR
-  A[LoginTest] -->|runs check| B[true or false]
-  B --> C[ReportFormatter]
-  C --> D[PASS or FAIL text]`,
-    blanks: [
-      {
-        id: 1,
-        label: "Create the report class",
-        answer: "ReportFormatter",
-        hints: ["Use the class whose only job is formatting."],
-        explain: [
-          { text: "`ReportFormatter` is the class above. Its only job is turning a true/false result into readable text.", highlight: "public class ReportFormatter" },
-          { text: "`new` makes a real object from that class. You name which class to build right after `new`.", highlight: "var formatter = new {{1}}()" },
-          { text: "`formatter` is the variable holding that object. The next line uses it.", highlight: "var formatter = new {{1}}()" },
-        ],
+      title: "L - Liskov Substitution: stop the subtype lying",
+      concept: "Liskov Substitution",
+      context:
+        "This is the **L** in SOLID: Liskov Substitution. Any subtype must be usable anywhere its parent is, with no surprises.\n\nThe trap: `SkippedTest` inherits `Test` to reuse its code, but a skipped test has no real result, so its `Run()` throws. Now any code holding a `Test` blows up the moment it happens to be a `SkippedTest`. The child broke a promise the parent made - and this starter throws when you run it.\n\nThe fix: drop the false is-a relationship. Have both types implement a small shared `IRunnable` and return a real outcome for every case, so none of them throws.",
+      example:
+        "public interface IReadable\n{\n    string Read();\n}\n\npublic class Book : IReadable\n{\n    public string Read()\n    {\n        return \"Words\";\n    }\n}\n\npublic class BlankPage : IReadable\n{\n    public string Read()\n    {\n        return \"Empty\";\n    }\n}",
+      goal: [
+        "Declare `interface IRunnable` with `string Run()`.",
+        "Make `LoginTest` implement it (`Run` returns `\"Pass\"`) and `SkippedTest` implement it (`Run` returns `\"Skipped\"` - never throw).",
+        "`Main` runs a `SkippedTest` through an `IRunnable`. The output should be `Skipped`.",
+      ],
+      expected: "Skipped",
+      requireSource: [
+        { pattern: /interface\s+IRunnable/, message: "Declare an `IRunnable` interface with `string Run()` that every test can honour." },
+        { pattern: /class\s+LoginTest\s*:\s*IRunnable/, message: "Make `LoginTest` implement `IRunnable`." },
+        { pattern: /class\s+SkippedTest\s*:\s*IRunnable/, message: "Make `SkippedTest` implement `IRunnable` instead of inheriting `Test`." },
+        { pattern: /^(?![\s\S]*throw\s+new)[\s\S]*$/, message: "No `throw` - every `Run()` must return a real outcome, even a skipped one." },
+        { pattern: /^(?![\s\S]*:\s*Test\b)[\s\S]*$/, message: "Drop the inheritance from `Test` - a skipped test is not a runnable test." },
+      ],
+      verify: {
+        main:
+          'class Program\n{\n    static void Main()\n    {\n        IRunnable a = new LoginTest();\n        IRunnable b = new SkippedTest();\n        System.Console.WriteLine(a.Run());\n        System.Console.WriteLine(b.Run());\n    }\n}\n',
+        expected: ["Pass", "Skipped"],
+        message:
+          "Any `IRunnable` must be safe to run. A `LoginTest` should read Pass and a `SkippedTest` should read Skipped - neither may throw.",
       },
-      {
-        id: 2,
-        label: "Call the format method",
-        answer: "Format",
-        hints: ["Call the method that returns PASS or FAIL."],
-        explain: [
-          { text: "`Format` takes the pass/fail `bool` and returns the text. It lives in `ReportFormatter`, not in `LoginTest`.", highlight: "public string Format(bool passed)" },
-          { text: "`test.Run()` produced the result we want to display.", highlight: "bool result = test.Run()" },
-          { text: "The dot calls `Format` on the `formatter` object, passing in `result`. Formatting and checking now live apart.", highlight: "Console.WriteLine(formatter.{{2}}(result))" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "O — Editing old code for every new style (the trap)",
-    concept: "Open/Closed",
-    pain: "Every new report style meant opening `ReportFormatter` and adding another `if` branch. The method kept growing, and each edit risked breaking the styles that already worked.",
-    map: "This is the O in SOLID: Open/Closed. Code should be open to new behavior but closed to edits. This drill shows the version that must be edited every time — the fix comes next.",
-    context: "This is the problem version. Pick a style string to run through the growing if-chain.",
-    snippet: `public class ReportFormatter
-{
-    // every new style forces another edit to this method
-    public string Build(string style, bool passed)
+      starter:
+        'using System;\n\npublic class Test\n{\n    public virtual string Run()\n    {\n        return "Pass";\n    }\n}\n\npublic class SkippedTest : Test\n{\n    // a skipped test has no real result, so it breaks the promise\n    public override string Run()\n    {\n        throw new InvalidOperationException("skipped");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Test test = new SkippedTest();\n        Console.WriteLine(test.Run());\n    }\n}\n',
+      solution:
+        'using System;\n\npublic interface IRunnable\n{\n    string Run();\n}\n\npublic class LoginTest : IRunnable\n{\n    public string Run()\n    {\n        return "Pass";\n    }\n}\n\npublic class SkippedTest : IRunnable\n{\n    public string Run()\n    {\n        return "Skipped";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        IRunnable test = new SkippedTest();\n        Console.WriteLine(test.Run());\n    }\n}\n',
+    },
     {
-        if (style == "plain")
-            return passed ? "PASS" : "FAIL";
-        if (style == "emoji")
-            return passed ? "OK" : "X";
-        return "unknown";
-    }
-}
-
-public static void Main()
-{
-    var formatter = new {{1}}();
-    Console.WriteLine(formatter.Build("{{2}}", true));
-}`,
-    points: [
-      "One method holds every style as an `if` branch.",
-      "A new style means editing code that already worked.",
-      "Working styles get touched and can break.",
-    ],
-    mermaid: `flowchart LR
-  A[new style needed] --> B[edit Build]
-  B --> C[add another if]
-  C --> D[risk breaking old styles]`,
-    blanks: [
-      {
-        id: 1,
-        label: "Create the formatter",
-        answer: "ReportFormatter",
-        hints: ["The class with the growing if-chain."],
-        explain: [
-          { text: "`ReportFormatter` holds every report style inside one method.", highlight: "public class ReportFormatter" },
-          { text: "`new` builds one. The class name goes right after `new`.", highlight: "var formatter = new {{1}}()" },
-          { text: "`Build` decides the style with a chain of `if` checks. Each new style adds another `if` here.", highlight: "public string Build(string style, bool passed)" },
-        ],
+      title: "I - Interface Segregation: split the fat interface",
+      concept: "Interface Segregation",
+      context:
+        "This is the **I** in SOLID: Interface Segregation. A class should only depend on the methods it actually uses.\n\nThe trap: one fat `ITestPlugin` interface demands `Run`, `Report`, and `Retry`. A plugin that only formats reports is still forced to implement all three, so `Run` and `Retry` become fake bodies that throw. Those fakes are noise, and other code can call them by mistake.\n\nThe fix: split the fat interface into small focused ones - `IRunnable` and `IReportable` - so the report plugin implements only the one it needs.",
+      example:
+        "public interface IWasher\n{\n    string Wash();\n}\n\npublic interface IDryer\n{\n    string Dry();\n}\n\npublic class HandTowel : IDryer\n{\n    public string Dry()\n    {\n        return \"dry\";\n    }\n}",
+      goal: [
+        "Declare two small interfaces: `IRunnable` with `string Run()`, and `IReportable` with `string Report()`.",
+        "Make `ReportPlugin` implement only `IReportable`, with `Report()` returning `\"report ready\"`.",
+        "`Main` uses the plugin through an `IReportable`. The output stays `report ready`.",
+      ],
+      expected: "report ready",
+      requireSource: [
+        { pattern: /interface\s+IRunnable/, message: "Split the fat interface: declare an `IRunnable` with `string Run()`." },
+        { pattern: /interface\s+IReportable/, message: "Declare an `IReportable` with `string Report()`." },
+        { pattern: /class\s+ReportPlugin\s*:\s*IReportable/, message: "`ReportPlugin` should implement only `IReportable` - the interface it actually needs." },
+        { pattern: /^(?![\s\S]*interface\s+ITestPlugin)[\s\S]*$/, message: "Drop the fat `ITestPlugin` - a plugin should not depend on methods it never uses." },
+        { pattern: /^(?![\s\S]*NotImplementedException)[\s\S]*$/, message: "No fake `Run`/`Retry` bodies - if `ReportPlugin` only reports, it should not have them at all." },
+      ],
+      verify: {
+        main:
+          'class Program\n{\n    class SummaryPlugin : IReportable\n    {\n        public string Report()\n        {\n            return "summary ready";\n        }\n    }\n    static void Main()\n    {\n        IReportable plugin = new SummaryPlugin();\n        System.Console.WriteLine(plugin.Report());\n    }\n}\n',
+        expected: "summary ready",
+        message:
+          "`IReportable` should stand on its own, so any reporter can implement just it without a `Run` or `Retry` in sight.",
       },
-      {
-        id: 2,
-        label: "Pick a style string",
-        answer: "plain",
-        accept: ["emoji"],
-        hints: ["Use one of the style names in the if-chain."],
-        explain: [
-          { text: "The style string decides which branch runs. `plain` and `emoji` are the two the method knows.", highlight: `if (style == "plain")` },
-          { text: "To add a third style, you would edit this method again — that is the Open/Closed problem.", highlight: `if (style == "emoji")` },
-          { text: "`Build` runs the matching branch for the style you pass in.", highlight: `Console.WriteLine(formatter.Build("{{2}}", true))` },
-        ],
-      },
-    ],
-  },
-  {
-    title: "O — The fix: add behavior without editing",
-    concept: "Open/Closed",
-    pain: "Every time we needed a new report style, we opened `ReportFormatter` and added another `if` branch. The class grew, and each edit risked breaking the styles that already worked. Code that already passed kept getting touched.",
-    map: "Still the O in SOLID, now done right. Each style is its own class behind a shared `IReport`. A new style is a new class — old ones are never reopened. Polymorphism makes this work: many classes, one shared method name.",
-    context: "Each report style is now its own class behind a shared `IReport`. Add a new style without editing the others.",
-    snippet: `public interface IReport
-{
-    string Build(bool passed);
-}
-
-public class PlainReport : IReport
-{
-    public string Build(bool passed) => passed ? "PASS" : "FAIL";
-}
-
-public class EmojiReport : IReport
-{
-    public string Build(bool passed) => passed ? "OK" : "X";
-}
-
-public static void Main()
-{
-    IReport report = new {{1}}();
-    Console.WriteLine(report.{{2}}(true));
-}`,
-    points: [
-      "`IReport` is the shared shape every style follows.",
-      "A new style is a new class, not an edit.",
-      "Old styles are never reopened, so they cannot break.",
-    ],
-    mermaid: `flowchart LR
-  A[IReport] --> B[PlainReport]
-  A --> C[EmojiReport]
-  A --> D[new style = new class]`,
-    blanks: [
-      {
-        id: 1,
-        label: "Pick a report style",
-        answer: "EmojiReport",
-        accept: ["PlainReport"],
-        hints: ["Use one of the classes that implement IReport."],
-        explain: [
-          { text: "`IReport` is an interface — a shared shape. Any class that implements it must have a `Build` method.", highlight: "public interface IReport" },
-          { text: "`EmojiReport` is one class that follows that shape. Adding it never required touching `PlainReport`.", highlight: "public class EmojiReport : IReport" },
-          { text: "`new` builds one of those classes. Because it follows `IReport`, it fits in an `IReport` variable.", highlight: "IReport report = new {{1}}()" },
-        ],
-      },
-      {
-        id: 2,
-        label: "Call the shared method",
-        answer: "Build",
-        hints: ["Every IReport has this same method."],
-        explain: [
-          { text: "`Build` is the one method named in `IReport`, so every style has it.", highlight: "string Build(bool passed)" },
-          { text: "`report.Build(true)` calls it. The caller does not care which style it is — that is the point.", highlight: "Console.WriteLine(report.{{2}}(true))" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "L — When a subtype lies (the trap)",
-    concept: "Liskov Substitution",
-    pain: "We made `SkippedTest` inherit from `Test` to reuse its code. But a skipped test has no real result, so its `Run()` throws. Now any code holding a `Test` can blow up the moment it happens to be a `SkippedTest`. The child broke a promise the parent made.",
-    map: "This is the L in SOLID: Liskov Substitution. The rule: any subtype must be usable anywhere its parent is, without surprises. When a child cannot honor the parent's promise, inheritance is the wrong tool. This drill shows the broken version on purpose — the fix comes next.",
-    context: "This code is the problem, not the solution. Spot what makes it unsafe by completing the call that exposes the lie.",
-    snippet: `public class Test
-{
-    public virtual bool Run() => true;
-}
-
-public class SkippedTest : Test
-{
-    // a skipped test has no result to give
-    public override bool Run()
-        => throw new InvalidOperationException("skipped");
-}
-
-public static void Main()
-{
-    Test test = new {{1}}();
-    // caller assumes any Test can Run safely
-    bool result = test.{{2}}();
-    Console.WriteLine(result);
-}`,
-    points: [
-      "`SkippedTest` is a `Test` on paper but cannot keep its promise.",
-      "`Run()` throws where the parent returned a clean value.",
-      "Code trusting the parent type breaks at runtime.",
-    ],
-    mermaid: `flowchart LR
-  A[Test promises Run works] --> B[SkippedTest inherits]
-  B --> C[Run throws instead]
-  C --> D[caller breaks]`,
-    blanks: [
-      {
-        id: 1,
-        label: "Create the unsafe subtype",
-        answer: "SkippedTest",
-        hints: ["Use the child that overrides Run with a throw."],
-        explain: [
-          { text: "The word `virtual` means: this method can be replaced by a child class. It marks `Run` as open for a child to give its own version.", highlight: "public virtual bool Run() => true" },
-          { text: "`Test` promises that `Run` returns a `bool`. Every caller leans on that promise.", highlight: "public virtual bool Run() => true" },
-          { text: "The word `override` means: this child is replacing the parent's `virtual` method with its own version. Here `SkippedTest` replaces `Run`.", highlight: "public override bool Run()" },
-          { text: "`SkippedTest` is declared as a `Test` but its `Run` throws instead of returning. That is the broken promise.", highlight: "public class SkippedTest : Test" },
-          { text: "Storing it in a `Test` variable hides the danger — the caller cannot tell it apart from a normal `Test`.", highlight: "Test test = new {{1}}()" },
-        ],
-      },
-      {
-        id: 2,
-        label: "Call the inherited method",
-        answer: "Run",
-        hints: ["The method the parent promised would work."],
-        explain: [
-          { text: "`virtual` on the parent means the method is allowed to be replaced. `override` on the child is where that replacement actually happens.", highlight: "public virtual bool Run() => true" },
-          { text: "`Run` is the method the parent guaranteed. The caller trusts it.", highlight: "public virtual bool Run() => true" },
-          { text: "`test.Run()` looks safe but throws here, because the real object is a `SkippedTest`. That crash is the Liskov violation.", highlight: "bool result = test.{{2}}()" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "L — The safe fix",
-    concept: "Liskov Substitution",
-    pain: "`SkippedTest` could not honor `Run()`, so inheriting `Test` was a lie. The fix: stop forcing it to be a `Test`. A skipped test and a runnable test only share the idea of producing a `TestOutcome` — so that is all they should share.",
-    map: "Still the L in SOLID, now done right. Instead of inheriting to reuse code, both types implement a small shared interface and return a real value for every case. Composition and interfaces replace inheritance when the is-a relationship does not truly hold.",
-    context: "Both types now return a `TestOutcome` safely. Wire up the skipped case so it is fully swappable.",
-    snippet: `public enum TestOutcome { Pass, Fail, Skipped }
-
-public interface IRunnable
-{
-    TestOutcome Run();
-}
-
-public class LoginTest : IRunnable
-{
-    public TestOutcome Run() => TestOutcome.Pass;
-}
-
-public class SkippedTest : IRunnable
-{
-    public TestOutcome Run() => TestOutcome.{{1}};
-}
-
-public static void Main()
-{
-    IRunnable test = new SkippedTest();
-    Console.WriteLine(test.{{2}}());
-}`,
-    points: [
-      "No fake is-a relationship anymore.",
-      "Every type returns a real `TestOutcome` — none throw.",
-      "Any `IRunnable` can stand in for another, safely.",
-    ],
-    mermaid: `flowchart LR
-  A[IRunnable] --> B[LoginTest returns Pass]
-  A --> C[SkippedTest returns Skipped]
-  B --> D[both always safe]
-  C --> D`,
-    blanks: [
-      {
-        id: 1,
-        label: "Return the right outcome",
-        answer: "Skipped",
-        hints: ["Use the enum value that means not run."],
-        explain: [
-          { text: "`TestOutcome` lists every honest result a test can have, including `Skipped`.", highlight: "public enum TestOutcome { Pass, Fail, Skipped }" },
-          { text: "`SkippedTest` now returns a real value instead of throwing. It keeps the promise `IRunnable` makes.", highlight: "public TestOutcome Run() => TestOutcome.{{1}}" },
-          { text: "Because it returns cleanly, it is safe to use anywhere an `IRunnable` is expected.", highlight: "IRunnable test = new SkippedTest()" },
-        ],
-      },
-      {
-        id: 2,
-        label: "Call through the interface",
-        answer: "Run",
-        hints: ["The single method IRunnable defines."],
-        explain: [
-          { text: "`Run` is the one method `IRunnable` defines, so every implementation has it.", highlight: "TestOutcome Run()" },
-          { text: "`test.Run()` returns `Skipped` with no crash. Substitution is now safe — that is Liskov satisfied.", highlight: "Console.WriteLine(test.{{2}}())" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "I — One fat interface forcing empty methods (the trap)",
-    concept: "Interface Segregation",
-    pain: "We had one big `ITestPlugin` interface with `Run`, `Report`, and `Retry`. A plugin that only formats reports was still forced to implement `Run` and `Retry` — with empty fake bodies that throw. Those fakes are noise, and other code could call them by mistake.",
-    map: "This is the I in SOLID: Interface Segregation. A class should only depend on methods it actually uses. This drill shows the fat interface forcing fake methods — the fix comes next.",
-    context: "This is the problem version. The report plugin is forced to fill in methods it does not need. Complete the one method it actually uses.",
-    snippet: `public interface ITestPlugin
-{
-    bool Run();
-    string Report();
-    void Retry();
-}
-
-// only formats reports, but the fat interface forces all three
-public class ReportPlugin : ITestPlugin
-{
-    public bool Run() => throw new NotImplementedException();
-    public string {{1}}() => "report ready";
-    public void Retry() => throw new NotImplementedException();
-}
-
-public static void Main()
-{
-    ITestPlugin plugin = new ReportPlugin();
-    Console.WriteLine(plugin.{{2}}());
-}`,
-    points: [
-      "`ITestPlugin` demands `Run`, `Report`, and `Retry`.",
-      "`ReportPlugin` only needs `Report`.",
-      "`Run` and `Retry` become empty fakes that throw.",
-    ],
-    mermaid: `flowchart LR
-  A[ITestPlugin] --> B[Run]
-  A --> C[Report]
-  A --> D[Retry]
-  B --> E[empty fake]
-  D --> E
-  C --> F[the only real one]`,
-    blanks: [
-      {
-        id: 1,
-        label: "Implement the real method",
-        answer: "Report",
-        hints: ["The only method this plugin actually needs."],
-        explain: [
-          { text: "`ITestPlugin` lists three methods, so any class that implements it must provide all three.", highlight: "public interface ITestPlugin" },
-          { text: "`Report` is the only one this plugin truly does. It returns the report text.", highlight: `public string {{1}}() => "report ready"` },
-          { text: "`Run` and `Retry` are forced on the class. They just throw — empty fakes that exist only to satisfy the interface.", highlight: "public bool Run() => throw new NotImplementedException()" },
-        ],
-      },
-      {
-        id: 2,
-        label: "Call the real method",
-        answer: "Report",
-        hints: ["The method that returns the report text."],
-        explain: [
-          { text: "`plugin` is typed as `ITestPlugin`, so it exposes all three methods — even the fake ones.", highlight: "ITestPlugin plugin = new ReportPlugin()" },
-          { text: "Calling `Report` works. But nothing stops other code from calling `Run` or `Retry` and hitting the throw — that is the danger.", highlight: "Console.WriteLine(plugin.{{2}}())" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "I — The fix: small, focused interfaces",
-    concept: "Interface Segregation",
-    pain: "We had one big `ITestPlugin` interface with `Run`, `Report`, and `Retry`. A plugin that only formats reports was still forced to implement `Run` and `Retry` with empty fake bodies. Those empty methods were noise, and other code could call them by mistake.",
-    map: "Still the I in SOLID, now done right. The fat interface is split into `IRunnable` and `IReportable`, so a class implements only what it actually does. Small interfaces also make the next letter, D, much easier.",
-    context: "The fat interface is split. The formatter now implements only the small interface it needs.",
-    snippet: `public interface IRunnable
-{
-    bool Run();
-}
-
-public interface IReportable
-{
-    string Report();
-}
-
-// formatter only reports; it never runs anything
-public class ReportPlugin : {{1}}
-{
-    public string {{2}}() => "report ready";
-}
-
-public static void Main()
-{
-    IReportable plugin = new ReportPlugin();
-    Console.WriteLine(plugin.Report());
-}`,
-    points: [
-      "`IRunnable` and `IReportable` are separate, focused shapes.",
-      "`ReportPlugin` implements only what it truly does.",
-      "No empty fake methods left lying around.",
-    ],
-    mermaid: `flowchart LR
-  A[fat interface] --> B[split]
-  B --> C[IRunnable]
-  B --> D[IReportable]
-  D --> E[ReportPlugin uses only this]`,
-    blanks: [
-      {
-        id: 1,
-        label: "Implement the needed interface",
-        answer: "IReportable",
-        hints: ["Pick the small interface a formatter actually needs."],
-        explain: [
-          { text: "`IReportable` is the small interface with just one method, `Report`.", highlight: "public interface IReportable" },
-          { text: "`ReportPlugin` only formats reports, so it implements `IReportable` and nothing else. It is not forced to fake a `Run` method.", highlight: "public class ReportPlugin : {{1}}" },
-          { text: "Because it depends on only what it uses, the class stays small and honest.", highlight: "IReportable plugin = new ReportPlugin()" },
-        ],
-      },
-      {
-        id: 2,
-        label: "Implement the one method",
-        answer: "Report",
-        hints: ["The single method IReportable defines."],
-        explain: [
-          { text: "`Report` is the only method `IReportable` requires.", highlight: "string Report()" },
-          { text: "`ReportPlugin` implements exactly that one method — no empty extras.", highlight: "public string {{2}}() => \"report ready\"" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "D — When code is glued together (the trap)",
-    concept: "Dependency Inversion",
-    pain: "`TestRunner` builds its own `ConsoleReporter` inside itself with `new`. So the runner is welded to the console. We cannot point it at a file, and worse, in a unit test we cannot check what it reported without it printing to a real console.",
-    map: "This is the D in SOLID: Dependency Inversion. High-level code should depend on an interface, not reach out and build a concrete class itself. This drill shows the welded version on purpose — the next drill cuts the weld and unlocks testing.",
-    context: "This is the problem version. Complete the hard-wired construction that ties the runner to the console.",
-    snippet: `public class ConsoleReporter
-{
-    public void Send(string message) => Console.WriteLine(message);
-}
-
-public class TestRunner
-{
-    // runner builds its own reporter - welded together
-    private ConsoleReporter _reporter = new {{1}}();
-
-    public void Run()
+      starter:
+        'using System;\n\npublic interface ITestPlugin\n{\n    string Run();\n    string Report();\n    string Retry();\n}\n\n// only formats reports, but the fat interface forces all three\npublic class ReportPlugin : ITestPlugin\n{\n    public string Run()\n    {\n        throw new NotImplementedException();\n    }\n\n    public string Report()\n    {\n        return "report ready";\n    }\n\n    public string Retry()\n    {\n        throw new NotImplementedException();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        ITestPlugin plugin = new ReportPlugin();\n        Console.WriteLine(plugin.Report());\n    }\n}\n',
+      solution:
+        'using System;\n\npublic interface IRunnable\n{\n    string Run();\n}\n\npublic interface IReportable\n{\n    string Report();\n}\n\n// the report plugin implements only the interface it needs\npublic class ReportPlugin : IReportable\n{\n    public string Report()\n    {\n        return "report ready";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        IReportable plugin = new ReportPlugin();\n        Console.WriteLine(plugin.Report());\n    }\n}\n',
+    },
     {
-        _reporter.{{2}}("test passed");
-    }
-}
-
-public static void Main()
-{
-    new TestRunner().Run();
-}`,
-    points: [
-      "`TestRunner` picks the concrete reporter itself.",
-      "You cannot swap the console for a file or a fake.",
-      "That makes the runner hard to test in isolation.",
-    ],
-    mermaid: `flowchart LR
-  A[TestRunner] -->|new| B[ConsoleReporter]
-  B --> C[locked to console]
-  C --> D[cannot test or swap]`,
-    blanks: [
-      {
-        id: 1,
-        label: "Hard-wire the reporter",
-        answer: "ConsoleReporter",
-        hints: ["The concrete class the runner builds itself."],
-        explain: [
-          { text: "`ConsoleReporter` is a concrete class that writes to the console.", highlight: "public class ConsoleReporter" },
-          { text: "The runner creates it with `new`, inside itself. That line is the weld — the runner now depends on this exact class.", highlight: "private ConsoleReporter _reporter = new {{1}}()" },
-          { text: "Because the choice is baked in, there is no way to pass in something else.", highlight: "public class TestRunner" },
-        ],
+      title: "D - Dependency Inversion: inject the reporter",
+      concept: "Dependency Inversion",
+      context:
+        "This is the **D** in SOLID: Dependency Inversion. High-level code should depend on an interface, not reach out and build a concrete class itself.\n\nThe trap: `TestRunner` builds its own `ConsoleReporter` with `new`, inside itself. The runner is welded to the console - you cannot point it at a file, and in a test you cannot check what it reported without it printing for real.\n\nThe fix: have `TestRunner` receive an `IReporter` through its constructor instead of building one. Now a test can hand it a fake reporter that just records the message - which is the payoff you will lean on for testing.",
+      example:
+        "public interface IClock\n{\n    int Hour();\n}\n\npublic class Alarm\n{\n    private readonly IClock _clock;\n\n    public Alarm(IClock clock)\n    {\n        _clock = clock;\n    }\n}",
+      goal: [
+        "Declare `interface IReporter` with `void Send(string message)`, and make `ConsoleReporter` implement it.",
+        "Change `TestRunner` to receive an `IReporter` through its constructor and store it in a `private readonly` field - no `new` inside.",
+        "`Main` hands in a `ConsoleReporter`. The output stays `test passed`.",
+      ],
+      expected: "test passed",
+      requireSource: [
+        { pattern: /interface\s+IReporter/, message: "Declare an `IReporter` interface with `void Send(string message)`." },
+        { pattern: /class\s+ConsoleReporter\s*:\s*IReporter/, message: "Make `ConsoleReporter` implement `IReporter`." },
+        { pattern: /TestRunner\s*\(\s*IReporter/, message: "Have `TestRunner` receive an `IReporter` through its constructor." },
+        { pattern: /^(?![\s\S]*=\s*new\s+ConsoleReporter\s*\(\s*\)\s*;)[\s\S]*$/, message: "Don't build the reporter inside `TestRunner` - the field must be assigned from the constructor parameter, not `new`ed." },
+      ],
+      verify: {
+        main:
+          'class Program\n{\n    class FakeReporter : IReporter\n    {\n        public string Last = "";\n        public void Send(string message)\n        {\n            Last = message;\n        }\n    }\n    static void Main()\n    {\n        var fake = new FakeReporter();\n        var runner = new TestRunner(fake);\n        runner.Run();\n        System.Console.WriteLine(fake.Last);\n    }\n}\n',
+        expected: "test passed",
+        message:
+          "The point of injecting is that a test can pass a fake. Store the injected `IReporter` and call it, so a `FakeReporter` records the message instead of printing.",
       },
-      {
-        id: 2,
-        label: "Call the reporter",
-        answer: "Send",
-        hints: ["The method that emits a message."],
-        explain: [
-          { text: "`Send` is how the reporter emits a message.", highlight: "public void Send(string message) => Console.WriteLine(message)" },
-          { text: "The runner calls `_reporter.Send` directly. Fine on its own, but with the weld above, this always hits the real console.", highlight: "_reporter.{{2}}(\"test passed\")" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "D — Inject it, and unlock testing",
-    concept: "Dependency Inversion",
-    pain: "The welded runner could not be tested without printing for real. The fix: the runner asks for an `IReporter` from outside instead of building one. Now in a test we hand it a fake reporter that just records the message — no console needed.",
-    map: "Still the D in SOLID, done right. Depending on an interface and receiving it from outside is called dependency injection. Its biggest payoff is testing: you can pass a fake (a mock) in place of the real thing. This is why DI matters, and it sets up why automated testing becomes possible.",
-    context: "The runner now receives its reporter. Inject one and call it through the interface.",
-    snippet: `public interface IReporter
-{
-    void Send(string message);
-}
+      starter:
+        'using System;\n\npublic class ConsoleReporter\n{\n    public void Send(string message)\n    {\n        Console.WriteLine(message);\n    }\n}\n\npublic class TestRunner\n{\n    // the runner builds its own reporter - welded to the console\n    private readonly ConsoleReporter _reporter = new ConsoleReporter();\n\n    public void Run()\n    {\n        _reporter.Send("test passed");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var runner = new TestRunner();\n        runner.Run();\n    }\n}\n',
+      solution:
+        'using System;\n\npublic interface IReporter\n{\n    void Send(string message);\n}\n\npublic class ConsoleReporter : IReporter\n{\n    public void Send(string message)\n    {\n        Console.WriteLine(message);\n    }\n}\n\npublic class TestRunner\n{\n    private readonly IReporter _reporter;\n\n    public TestRunner(IReporter reporter)\n    {\n        _reporter = reporter;\n    }\n\n    public void Run()\n    {\n        _reporter.Send("test passed");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var runner = new TestRunner(new ConsoleReporter());\n        runner.Run();\n    }\n}\n',
+    },
+    {
+      summary: true,
+      title: "What you learned",
+      concept: "SOLID recap",
+      context: "Five habits, each one a small fix to a real problem you just wrote your way out of.",
+      summaryIntro:
+        "SOLID is five habits for writing classes that are easy to change without breaking other code. You met each one as a trap first, then wrote the fix:",
+      summaryItems: [
+        { title: "S - Single Responsibility - ", text: "one class, one job. When checking and formatting shared a method, changing one broke the other. Split the jobs into separate classes." },
+        { title: "O - Open/Closed - ", text: "add new behaviour without editing old code. Instead of growing an `if`-chain, add a new class behind a shared interface. Old code stays untouched." },
+        { title: "L - Liskov Substitution - ", text: "a subtype must work anywhere its parent does. `SkippedTest` inheriting `Test` broke that by throwing. A small shared interface every type can honour fixes it." },
+        { title: "I - Interface Segregation - ", text: "don't force a class to implement methods it never uses. Split one fat interface into small focused ones, so each class implements only what it does." },
+        { title: "D - Dependency Inversion - ", text: "depend on an interface and receive it from outside, instead of building a concrete class inside. That is dependency injection, and it lets you pass a fake in tests." },
+      ],
+      summaryClose:
+        "The thread that ties them together: polymorphism, composition, and encapsulation are the tools, and SOLID is how you aim them. The D fix - injecting a fake reporter - is also why automated testing becomes possible, which is where the capstone puts it all to work.",
+    },
+  ];
 
-public class FakeReporter : IReporter
-{
-    public string Last = "";
-    public void Send(string message) => Last = message;
-}
-
-public class TestRunner
-{
-    private readonly IReporter _reporter;
-    public TestRunner(IReporter reporter) => _reporter = reporter;
-
-    public void Run() => _reporter.Send("test passed");
-}
-
-public static void Main()
-{
-    var fake = new {{1}}();
-    var runner = new TestRunner({{2}});
-    runner.Run();
-    Console.WriteLine(fake.Last);
-}`,
-    points: [
-      "`TestRunner` depends on `IReporter`, not a concrete class.",
-      "The reporter is passed in, so a test can supply a fake.",
-      "`FakeReporter` records the message instead of printing it.",
-    ],
-    mermaid: `flowchart LR
-  A[Test] -->|injects| B[FakeReporter]
-  B --> C[TestRunner]
-  C --> D[records message]
-  D --> E[checkable, no console]`,
-    blanks: [
-      {
-        id: 1,
-        label: "Create the fake reporter",
-        answer: "FakeReporter",
-        hints: ["The stand-in that records instead of printing."],
-        explain: [
-          { text: "`FakeReporter` implements `IReporter` but just stores the message in `Last` instead of printing.", highlight: "public class FakeReporter : IReporter" },
-          { text: "Building one gives the test a reporter it can inspect afterwards.", highlight: "var fake = new {{1}}()" },
-          { text: "This is the mock idea: a cheap stand-in used in place of the real dependency.", highlight: "public void Send(string message) => Last = message" },
-        ],
-      },
-      {
-        id: 2,
-        label: "Inject it into the runner",
-        answer: "fake",
-        hints: ["Pass the fake into the constructor."],
-        explain: [
-          { text: "`TestRunner` takes an `IReporter` through its constructor instead of building one.", highlight: "public TestRunner(IReporter reporter) => _reporter = reporter" },
-          { text: "The `=>` here is not a lambda. It is shorthand for a one-line body: this constructor simply runs `_reporter = reporter`. The same thing could be written with braces `{ _reporter = reporter; }`.", highlight: "public TestRunner(IReporter reporter) => _reporter = reporter" },
-          { text: "Passing `fake` here is dependency injection. The runner uses it without knowing it is a fake.", highlight: "var runner = new TestRunner({{2}})" },
-          { text: "After `Run`, `fake.Last` holds the message — so a test can assert on it, with no real console. That is why DI enables testing.", highlight: "Console.WriteLine(fake.Last)" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "What you learned",
-    concept: "SOLID recap",
-    summary: true,
-    context: "Five habits, each one a small fix to a real problem you just saw break.",
-    summaryIntro:
-      "SOLID is five habits for writing classes that are easy to change without breaking other code. You met each one as a problem first, then its fix:",
-    summaryItems: [
-      { title: "S — Single Responsibility", text: "One class, one job. When checking and formatting shared a method, changing one broke the other. Split jobs into separate classes." },
-      { title: "O — Open/Closed", text: "Add new behavior without editing old code. Instead of growing an if-chain, add a new class behind a shared interface. Old code stays untouched." },
-      { title: "L — Liskov Substitution", text: "A subtype must work anywhere its parent does. `SkippedTest` inheriting `Test` broke that promise by throwing. Use a small shared interface that every type can honor." },
-      { title: "I — Interface Segregation", text: "Don't force a class to implement methods it never uses. Split one fat interface into small focused ones, so each class implements only what it does." },
-      { title: "D — Dependency Inversion", text: "Depend on an interface and receive it from outside, instead of building a concrete class inside. This is dependency injection, and it lets you pass a fake in tests." },
-    ],
-    summaryClose:
-      "The thread that ties them together: polymorphism, composition, and encapsulation are the tools, and SOLID is how you aim them. The D fix — injecting a fake reporter — is also why automated testing becomes possible, which is where the next level begins.",
-    points: [],
-    blanks: [],
-  },
-];
-
-function toRunnable(drill) {
-  const filled = drill.snippet.replace(/\{\{(\d+)\}\}/g, (_, n) => {
-    const blank = drill.blanks.find((b) => String(b.id) === n);
-    return blank ? blank.answer : "";
-  });
-  return `using System;\n\nclass __Lab\n{\n${filled}\n}`;
-}
-
-window.DRILL_CONFIG = {
-  prefix: "l2",
-  metaLabel: "SOLID, one step at a time",
-  progressNoun: "Drill",
-  drills,
-  runnablePrograms: drills.map((d) => (d.summary ? null : toRunnable(d))),
-  xpKey: "course_global_xp",
-  awardedKey: "level2_awarded",
-  awardAmount: 25,
-};
+  window.BUILD_CONFIG = {
+    prefix: "l2",
+    metaLabel: "Design for change \u00b7 The SOLID principles",
+    progressNoun: "Step",
+    tasks,
+    runnerUrl: "level3-app/index.html?runner=1",
+    xpKey: "course_global_xp",
+    awardedKey: "level2_awarded",
+    awardAmount: 25,
+  };
+})();

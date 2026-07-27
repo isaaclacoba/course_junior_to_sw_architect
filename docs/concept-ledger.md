@@ -44,7 +44,7 @@ not an endorsement.
 | 2 | practice-the-basics | 1 | compute with values (arithmetic); join text; ask a yes/no question (comparison to a `bool`); an object that answers about itself - bridges to Control Flow | `+` `-` `*` `/`, string `+`, `==` `!=` `>` `<` `>=` `<=`, class/field/method | 1 |
 | 3 | control-flow | 1 | choose a branch; combine yes/no; repeat; skip/stop; multi-way choose (write-and-run methods) | if/else, `&&` `||` `!`, while, for, foreach, break/continue, switch, `string[]` | 1,2 |
 | 4 | writing-methods | 1 | a named step: return a value, take input, hold a rule, reuse it, call another | method, return, parameters | 3 |
-| 5 | reading-objects | 1 | objects collaborate: one asks another and acts (seeds one-job, receive-don't-build) | class, method, `=>` `(C#)` `[untaught]` | 1,4 |
+| 5 | reading-objects | 1 | objects collaborate: one asks another and acts (seeds one-job, receive-don't-build) | class, field, constructor, method, if/else, comparison, string `+` | 1,4 |
 | 6 | reuse-without-regret | 1 | is-a vs has-a; favour composition; the diamond problem; polymorphism as payoff | inheritance, virtual/override, interface (named) | 1,5 |
 | 7 | first-builds | 2 | write from scratch: one class one method; one job; receive a dependency; depend on a promise; add a type freely | class, interface, constructor injection `[taster of P4]` | 1,4 |
 | 9 | collections | 3 | an ordered many; a keyed lookup; iterate and tally | List<T>, Dictionary<K,V>, foreach | 3,4 |
@@ -62,7 +62,7 @@ not an endorsement.
 | 21 | test-doubles | 5 | fake, stub, spy - injected stand-ins for a real dependency | interface, injection | 19,20 |
 | 22 | testable-design | 5 | the habits that make code testable are the SOLID habits: inject, one job, no hidden state | interface, injection | 15,19,20 |
 | 23 | refactor-moves | 6 | change the shape, keep the behaviour; five moves, each a SOLID action | interface, injection, polymorphism, extract/split | 15,16,17,18,19 |
-| 24 | the-solid-principles (level2) | 6 | all five principles, trap-then-fix, over one small codebase | interface, injection, polymorphism | 15,16,17,18,19,23 |
+| 24 | the-solid-principles (level2) | 6 | all five principles as write-the-fix builds; trap in prose, fix graded (requireSource + verify) | interface, injection, polymorphism | 15,16,17,18,19,23 |
 | 25 | capstone | 6 | apply all of SOLID to one program; milestones S, DI, O, DIP, L (ISP missing) | full C#, structural checks | 15-24 |
 
 ## Theory track

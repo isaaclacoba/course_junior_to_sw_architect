@@ -1,719 +1,203 @@
-// Bridge A — "Reading Objects".
+// Reading Objects - Bridge A. Write-and-run practice on how a few objects work
+// together: one asks another and acts, one job lives in one place, and a class
+// uses what is handed to it. Quietly seeds Single Responsibility and Dependency
+// Inversion without naming SOLID, so those ideas feel familiar later.
 //
-// Sits between Level 1 micro-coding (type one token) and the SOLID drills
-// (reason about a design principle). It builds object-collaboration intuition
-// and quietly seeds Single Responsibility and Dependency Inversion WITHOUT
-// naming SOLID, so those ideas feel familiar when the learner meets them later.
-//
-// Uses the shared fill-in-the-blank engine (drill-engine.js).
+// Part 1, between Writing Methods and the SOLID drills. Data only: the
+// controller lives in build-engine.js, which reads window.BUILD_CONFIG.
+(function () {
+  "use strict";
 
-const drills = [
-  {
-    title: "Two Objects Talk",
-    concept: "Objects collaborate",
-    context: "One object asks another for information, then acts on the answer. Complete the call and the object being built.",
-    snippet: `public class Clock
-{
-    public int Hour() => 9;
-}
-
-public class Greeter
-{
-    public string Greet(Clock clock)
+  const tasks = [
     {
-        int hour = clock.{{1}}();
-        return hour < 12 ? "Good morning" : "Good afternoon";
-    }
-}
-
-public static void Main()
-{
-    var greeter = new Greeter();
-    Console.WriteLine(greeter.Greet(new {{2}}()));
-}`,
-    points: [
-      "`Greeter` does not know the hour itself; it asks a `Clock`.",
-      "Objects get work done by talking to other objects.",
-    ],
-    blanks: [
-      {
-        id: 1,
-        label: "Ask the clock for the hour",
-        answer: "Hour",
-        hints: ["The method on Clock that returns the hour."],
-        explain: [
-          { text: "`Clock` has one method, `Hour`, that returns the current hour as a number.", highlight: "public int Hour() => 9" },
-          { text: "`Greeter` calls `clock.Hour()` to find out the time. It relies on `Clock` for that fact.", highlight: "int hour = clock.{{1}}()" },
-        ],
+      title: "Two objects talk",
+      concept: "Objects collaborate",
+      context:
+        "One object gets work done by asking another and acting on the answer. Here a `Greeter` does not know the time itself - it asks a `Clock`, then picks a greeting. The pattern below asks a `Sensor`; do the same with the clock.",
+      example:
+        'public class Sensor\n{\n    public int Temp()\n    {\n        return 22;\n    }\n}\n\npublic class Thermostat\n{\n    public string Read(Sensor sensor)\n    {\n        int t = sensor.Temp();\n        if (t > 20)\n        {\n            return "warm";\n        }\n        return "cool";\n    }\n}',
+      goal: [
+        "Ask the `clock` for the hour, then return `\"Good morning\"` before 12, otherwise `\"Good afternoon\"`.",
+        "This clock reads 9, so the output should be Good morning.",
+      ],
+      expected: "Good morning",
+      requireSource: [
+        { pattern: /clock\s*\.\s*Hour\s*\(\s*\)/, message: "Ask the `clock` for the hour with `clock.Hour()` instead of guessing." },
+        { pattern: /\bif\b/, message: "Pick the greeting with an `if` on the hour." },
+      ],
+      verify: {
+        main:
+          'class Program\n{\n    static void Main()\n    {\n        Greeter greeter = new Greeter();\n        Clock clock = new Clock(15);\n        Console.WriteLine(greeter.Greet(clock));\n    }\n}\n',
+        expected: "Good afternoon",
+        message: "Good morning is right for a 9 o'clock clock only. Decide from the hour the clock reports, not a fixed word.",
       },
-      {
-        id: 2,
-        label: "Build a clock to pass in",
-        answer: "Clock",
-        hints: ["Greet needs a Clock argument."],
-        explain: [
-          { text: "`Greet` expects a `Clock`. We build one with `new Clock()` and hand it over.", highlight: "public string Greet(Clock clock)" },
-          { text: "`new Clock()` creates the object `Greeter` will talk to.", highlight: "greeter.Greet(new {{2}}())" },
-        ],
+      starter:
+        'using System;\n\npublic class Clock\n{\n    private int _hour;\n\n    public Clock(int hour)\n    {\n        _hour = hour;\n    }\n\n    public int Hour()\n    {\n        return _hour;\n    }\n}\n\npublic class Greeter\n{\n    public string Greet(Clock clock)\n    {\n        // TODO: ask the clock for the hour; return "Good morning" before 12, otherwise "Good afternoon"\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Greeter greeter = new Greeter();\n        Clock clock = new Clock(9);\n        Console.WriteLine(greeter.Greet(clock));\n    }\n}\n',
+      solution:
+        'using System;\n\npublic class Clock\n{\n    private int _hour;\n\n    public Clock(int hour)\n    {\n        _hour = hour;\n    }\n\n    public int Hour()\n    {\n        return _hour;\n    }\n}\n\npublic class Greeter\n{\n    public string Greet(Clock clock)\n    {\n        int hour = clock.Hour();\n        if (hour < 12)\n        {\n            return "Good morning";\n        }\n        return "Good afternoon";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Greeter greeter = new Greeter();\n        Clock clock = new Clock(9);\n        Console.WriteLine(greeter.Greet(clock));\n    }\n}\n',
+    },
+    {
+      title: "Ask another object for data",
+      concept: "Delegation",
+      context:
+        "A `Cart` should not store prices - that is the `PriceList`'s knowledge. The cart asks for a price and multiplies by the quantity. Keep the price list that is handed to the cart, then ask it.\n\nThe pattern below asks a `Catalog`; do the same with the price list.",
+      example:
+        'public class Catalog\n{\n    public int Stock(string title)\n    {\n        if (title == "Dune")\n        {\n            return 4;\n        }\n        return 1;\n    }\n}\n\npublic class Library\n{\n    private Catalog _catalog;\n\n    public Library(Catalog catalog)\n    {\n        _catalog = catalog;\n    }\n\n    public int Copies(string title, int branches)\n    {\n        return _catalog.Stock(title) * branches;\n    }\n}',
+      goal: [
+        "Store the `prices` handed into the constructor, then return the item's price times `qty`.",
+        "A book is 10 and qty is 3, so the output should be 30.",
+      ],
+      expected: "30",
+      requireSource: [
+        { pattern: /_prices\s*=\s*prices/, message: "Keep the handed-in price list: `_prices = prices;`." },
+        { pattern: /_prices\s*\.\s*PriceOf\s*\(/, message: "Ask the price list with `_prices.PriceOf(item)` instead of hardcoding a number." },
+        { pattern: /\*\s*qty/, message: "Multiply the price by `qty`." },
+      ],
+      verify: {
+        main:
+          'class Program\n{\n    static void Main()\n    {\n        Cart cart = new Cart(new PriceList());\n        Console.WriteLine(cart.Total("pen", 2));\n    }\n}\n',
+        expected: "10",
+        message: "30 is right for 3 books only. Ask the price list for the real item and multiply by the real quantity.",
       },
-    ],
-  },
-  {
-    title: "Ask Another Object For Data",
-    concept: "Delegation",
-    context: "`Cart` does not store prices. It asks a `PriceList`. Wire up both calls.",
-    snippet: `public class PriceList
-{
-    public int PriceOf(string item) => item == "book" ? 10 : 5;
-}
-
-public class Cart
-{
-    private readonly PriceList _prices;
-    public Cart(PriceList prices) { _prices = prices; }
-
-    public int Total(string item, int qty)
+      starter:
+        'using System;\n\npublic class PriceList\n{\n    public int PriceOf(string item)\n    {\n        if (item == "book")\n        {\n            return 10;\n        }\n        return 5;\n    }\n}\n\npublic class Cart\n{\n    private PriceList _prices;\n\n    public Cart(PriceList prices)\n    {\n        // TODO: keep the price list that was handed in\n    }\n\n    public int Total(string item, int qty)\n    {\n        // TODO: ask the price list for the item\'s price, times qty\n        return 0;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Cart cart = new Cart(new PriceList());\n        Console.WriteLine(cart.Total("book", 3));\n    }\n}\n',
+      solution:
+        'using System;\n\npublic class PriceList\n{\n    public int PriceOf(string item)\n    {\n        if (item == "book")\n        {\n            return 10;\n        }\n        return 5;\n    }\n}\n\npublic class Cart\n{\n    private PriceList _prices;\n\n    public Cart(PriceList prices)\n    {\n        _prices = prices;\n    }\n\n    public int Total(string item, int qty)\n    {\n        return _prices.PriceOf(item) * qty;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Cart cart = new Cart(new PriceList());\n        Console.WriteLine(cart.Total("book", 3));\n    }\n}\n',
+    },
     {
-        return _prices.{{1}}(item) * qty;
-    }
-}
-
-public static void Main()
-{
-    var cart = new Cart(new PriceList());
-    Console.WriteLine(cart.{{2}}("book", 3));
-}`,
-    points: [
-      "`Cart` delegates the price question to `PriceList`.",
-      "Each object owns one kind of knowledge.",
-    ],
-    blanks: [
-      {
-        id: 1,
-        label: "Ask the price list",
-        answer: "PriceOf",
-        hints: ["The method that returns a price for an item."],
-        explain: [
-          { text: "`PriceList` knows prices. `PriceOf` returns the price for a given item.", highlight: "public int PriceOf(string item)" },
-          { text: "`Cart` asks `_prices.PriceOf(item)` instead of hard-coding prices itself.", highlight: "return _prices.{{1}}(item) * qty" },
-        ],
+      title: "A method that does one thing",
+      concept: "One job per method",
+      context:
+        "A clear method has a single, obvious result you can name. `Area` exists to do one calculation - the two sides multiplied - and nothing else. The pattern below is one job for a box; do the same for the rectangle.",
+      example:
+        'public class Box\n{\n    public int Volume(int side)\n    {\n        return side * side * side;\n    }\n}',
+      goal: [
+        "Return the area of the rectangle - `width` times `height`.",
+        "For 4 by 5 the output should be 20.",
+      ],
+      expected: "20",
+      requireSource: [
+        { pattern: /width\s*\*\s*height/, message: "Return `width * height` - the one job this method has." },
+      ],
+      verify: {
+        main:
+          'class Program\n{\n    static void Main()\n    {\n        Rectangle rectangle = new Rectangle();\n        Console.WriteLine(rectangle.Area(3, 7));\n    }\n}\n',
+        expected: "21",
+        message: "20 is right for 4 by 5 only. Compute from the two sides you are given.",
       },
-      {
-        id: 2,
-        label: "Get the cart total",
-        answer: "Total",
-        hints: ["The method that multiplies price by quantity."],
-        explain: [
-          { text: "`Total` combines the looked-up price with the quantity.", highlight: "public int Total(string item, int qty)" },
-          { text: "`cart.Total(\"book\", 3)` returns `10 * 3 = 30`.", highlight: "Console.WriteLine(cart.{{2}}(\"book\", 3))" },
-        ],
+      starter:
+        'using System;\n\npublic class Rectangle\n{\n    public int Area(int width, int height)\n    {\n        // TODO: return the area - width times height\n        return 0;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Rectangle rectangle = new Rectangle();\n        Console.WriteLine(rectangle.Area(4, 5));\n    }\n}\n',
+      solution:
+        'using System;\n\npublic class Rectangle\n{\n    public int Area(int width, int height)\n    {\n        return width * height;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Rectangle rectangle = new Rectangle();\n        Console.WriteLine(rectangle.Area(4, 5));\n    }\n}\n',
+    },
+    {
+      title: "Give each job its own class",
+      concept: "Separate the jobs",
+      context:
+        "`Checkout` was doing two jobs at once: the maths (price times quantity) and the wording (turning that number into text). Two jobs in one method means two reasons to change one place.\n\nMove the wording into `ReceiptFormatter`. `Checkout` keeps the maths and asks the formatter for the text. The pattern below splits a sale the same way.",
+      example:
+        'public class Tag\n{\n    public string Make(int price)\n    {\n        return "Price: " + price;\n    }\n}\n\npublic class Sale\n{\n    public string Line(int price, int qty)\n    {\n        int total = price * qty;\n        Tag tag = new Tag();\n        return tag.Make(total);\n    }\n}',
+      goal: [
+        "Give `ReceiptFormatter` a `Format(int total)` that returns `\"Total: \"` followed by the total.",
+        "In `Pay`, build a formatter and ask it for the text. For 10 by 2 the output should be Total: 20.",
+      ],
+      expected: "Total: 20",
+      requireSource: [
+        { pattern: /new\s+ReceiptFormatter\s*\(/, message: "Build the formatter with `new ReceiptFormatter()`." },
+        { pattern: /\.\s*Format\s*\(/, message: "Ask the formatter for the text with `formatter.Format(total)` instead of building it inside `Pay`." },
+        { pattern: /"Total:\s*"\s*\+/, message: "In `Format`, return `\"Total: \" + total`." },
+      ],
+      verify: {
+        main:
+          'class Program\n{\n    static void Main()\n    {\n        Checkout checkout = new Checkout();\n        Console.WriteLine(checkout.Pay(7, 3));\n    }\n}\n',
+        expected: "Total: 21",
+        message: "Total: 20 is right for 10 by 2 only. The maths must work for any price and quantity.",
       },
-    ],
-  },
-  {
-    title: "A Method That Does One Thing",
-    concept: "One job per method",
-    context: "A clear method has a single, obvious result. Return the area of the rectangle.",
-    snippet: `public class Rectangle
-{
-    public int Area(int width, int height)
+      starter:
+        'using System;\n\n// ReceiptFormatter should own the wording job - turning a number into text.\npublic class ReceiptFormatter\n{\n    // TODO: add a Format(int total) method that returns "Total: " + total\n}\n\npublic class Checkout\n{\n    public string Pay(int price, int qty)\n    {\n        int total = price * qty;\n        // TODO: build a ReceiptFormatter and ask it to format the total\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Checkout checkout = new Checkout();\n        Console.WriteLine(checkout.Pay(10, 2));\n    }\n}\n',
+      solution:
+        'using System;\n\npublic class ReceiptFormatter\n{\n    public string Format(int total)\n    {\n        return "Total: " + total;\n    }\n}\n\npublic class Checkout\n{\n    public string Pay(int price, int qty)\n    {\n        int total = price * qty;\n        ReceiptFormatter formatter = new ReceiptFormatter();\n        return formatter.Format(total);\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Checkout checkout = new Checkout();\n        Console.WriteLine(checkout.Pay(10, 2));\n    }\n}\n',
+    },
     {
-        return {{1}};
-    }
-}
-
-public static void Main()
-{
-    var rectangle = new Rectangle();
-    Console.WriteLine(rectangle.Area(4, 5));
-}`,
-    points: [
-      "`Area` does exactly one thing: `width` times `height`.",
-      "A method with one job is easy to name and trust.",
-    ],
-    blanks: [
-      {
-        id: 1,
-        label: "Return the area",
-        answer: "width * height",
-        hints: ["Multiply the two sides."],
-        explain: [
-          { text: "`Area` takes the two sides as input and returns their product.", highlight: "public int Area(int width, int height)" },
-          { text: "`width * height` is the one calculation this method exists to do.", highlight: "return {{1}}" },
-        ],
+      title: "Use what is handed in",
+      concept: "Receive, don't build",
+      context:
+        "A class does not have to build its own tools. `Mailer` is given an `Outbox` through its constructor and uses that one - it never calls `new Outbox()` itself. A collaborator handed in from outside is easy to swap later.\n\nThe pattern below hands a `Printer` its `Ink`; do the same with the mailer and its outbox.",
+      example:
+        'public class Ink\n{\n    public string Stamp(string text)\n    {\n        return "[" + text + "]";\n    }\n}\n\npublic class Printer\n{\n    private Ink _ink;\n\n    public Printer(Ink ink)\n    {\n        _ink = ink;\n    }\n\n    public string Print(string text)\n    {\n        return _ink.Stamp(text);\n    }\n}',
+      goal: [
+        "Keep the `outbox` handed into the constructor, then send `\"hello \"` followed by `who` through it.",
+        "For Sam the output should be sent: hello Sam.",
+      ],
+      expected: "sent: hello Sam",
+      requireSource: [
+        { pattern: /_outbox\s*=\s*outbox/, message: "Keep the handed-in outbox: `_outbox = outbox;`. Do not build a new one." },
+        { pattern: /_outbox\s*\.\s*Send\s*\(/, message: "Send through the outbox you were given, with `_outbox.Send(...)`." },
+      ],
+      verify: {
+        main:
+          'class Program\n{\n    static void Main()\n    {\n        Outbox outbox = new Outbox();\n        Mailer mailer = new Mailer(outbox);\n        Console.WriteLine(mailer.Notify("Mo"));\n    }\n}\n',
+        expected: "sent: hello Mo",
+        message: "sent: hello Sam is right for Sam only. Use the name you are handed, sent through the outbox.",
       },
-    ],
-  },
-  {
-    title: "Spot The Second Job",
-    concept: "One reason to change",
-    context: "This method does two unrelated jobs at once. Finish the wording job, then read why mixing them is risky.",
-    snippet: `public class Checkout
-{
-    // two jobs in one method: add up the price AND build the receipt text
-    public string Pay(int price, int qty)
+      starter:
+        'using System;\n\npublic class Outbox\n{\n    public string Send(string message)\n    {\n        return "sent: " + message;\n    }\n}\n\npublic class Mailer\n{\n    private Outbox _outbox;\n\n    public Mailer(Outbox outbox)\n    {\n        // TODO: keep the outbox that was handed in - do not build a new one\n    }\n\n    public string Notify(string who)\n    {\n        // TODO: send "hello " + who through the outbox\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Outbox outbox = new Outbox();\n        Mailer mailer = new Mailer(outbox);\n        Console.WriteLine(mailer.Notify("Sam"));\n    }\n}\n',
+      solution:
+        'using System;\n\npublic class Outbox\n{\n    public string Send(string message)\n    {\n        return "sent: " + message;\n    }\n}\n\npublic class Mailer\n{\n    private Outbox _outbox;\n\n    public Mailer(Outbox outbox)\n    {\n        _outbox = outbox;\n    }\n\n    public string Notify(string who)\n    {\n        return _outbox.Send("hello " + who);\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Outbox outbox = new Outbox();\n        Mailer mailer = new Mailer(outbox);\n        Console.WriteLine(mailer.Notify("Sam"));\n    }\n}\n',
+    },
     {
-        int total = price * qty;                // job 1: the maths
-        string receipt = "Total: " + {{1}};     // job 2: the wording
-        return receipt;
-    }
-}
-
-public static void Main()
-{
-    var checkout = new Checkout();
-    Console.WriteLine(checkout.Pay(10, 2));
-}`,
-    points: [
-      "`Pay` both calculates and formats. Two jobs, one method.",
-      "Change the wording and you risk breaking the maths beside it.",
-      "Two reasons to change living in one place is a warning sign.",
-    ],
-    blanks: [
-      {
-        id: 1,
-        label: "Finish the receipt text",
-        answer: "total",
-        hints: ["Put the calculated number into the wording."],
-        explain: [
-          { text: "`total` is the result of the maths job on the line above.", highlight: "int total = price * qty" },
-          { text: "The wording job glues that number onto some text. The two jobs are tangled in one method.", highlight: "string receipt = \"Total: \" + {{1}}" },
-        ],
+      title: "Wire two objects and run",
+      concept: "Put it together",
+      context:
+        "Everything in one place now: a `Worker` is handed a `ConsoleLog` and reports through it. Keep the log, then have `Report` write the status through the log it was given. Two small objects collaborating is the shape of most real code.\n\nThe pattern below wires a `Bell` to a `Speaker`; do the same with the worker and its log.",
+      example:
+        'public class Speaker\n{\n    public void Say(string text)\n    {\n        Console.WriteLine(text);\n    }\n}\n\npublic class Bell\n{\n    private Speaker _speaker;\n\n    public Bell(Speaker speaker)\n    {\n        _speaker = speaker;\n    }\n\n    public void Ring(string note)\n    {\n        _speaker.Say(note);\n    }\n}\n\n// in Main:\nSpeaker speaker = new Speaker();\nBell bell = new Bell(speaker);\nbell.Ring("ding");',
+      goal: [
+        "Keep the `log` handed into the constructor, then write the `status` through it in `Report`.",
+        "`Main` reports work done, so the output should be work done.",
+      ],
+      expected: "work done",
+      requireSource: [
+        { pattern: /_log\s*=\s*log/, message: "Keep the handed-in log: `_log = log;`." },
+        { pattern: /_log\s*\.\s*Write\s*\(/, message: "Report through the log you were given, with `_log.Write(status)`." },
+      ],
+      verify: {
+        main:
+          'class Program\n{\n    static void Main()\n    {\n        ConsoleLog log = new ConsoleLog();\n        Worker worker = new Worker(log);\n        worker.Report("shipped");\n    }\n}\n',
+        expected: "shipped",
+        message: "work done is right for that one call only. Write whatever status you are given through the log.",
       },
-    ],
-  },
-  {
-    title: "Extract The Job Into A Method",
-    concept: "Separate the jobs",
-    context: "The wording job has moved into its own method. Call it from `Pay`.",
-    snippet: `public class Checkout
-{
-    public string Pay(int price, int qty)
+      starter:
+        'using System;\n\npublic class ConsoleLog\n{\n    public void Write(string message)\n    {\n        Console.WriteLine(message);\n    }\n}\n\npublic class Worker\n{\n    private ConsoleLog _log;\n\n    public Worker(ConsoleLog log)\n    {\n        // TODO: keep the log that was handed in\n    }\n\n    public void Report(string status)\n    {\n        // TODO: write the status through the log\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        ConsoleLog log = new ConsoleLog();\n        Worker worker = new Worker(log);\n        worker.Report("work done");\n    }\n}\n',
+      solution:
+        'using System;\n\npublic class ConsoleLog\n{\n    public void Write(string message)\n    {\n        Console.WriteLine(message);\n    }\n}\n\npublic class Worker\n{\n    private ConsoleLog _log;\n\n    public Worker(ConsoleLog log)\n    {\n        _log = log;\n    }\n\n    public void Report(string status)\n    {\n        _log.Write(status);\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        ConsoleLog log = new ConsoleLog();\n        Worker worker = new Worker(log);\n        worker.Report("work done");\n    }\n}\n',
+    },
     {
-        int total = price * qty;
-        return {{1}}(total);          // the wording now lives in its own method
-    }
+      title: "Reading objects recap",
+      concept: "Recap",
+      summary: true,
+      summaryIntro:
+        "You read and wrote a few small objects working together. These are the habits the SOLID drills will lean on.",
+      summaryItems: [
+        { title: "Objects collaborate - ", text: "one object asks another for what it needs, then acts on the answer." },
+        { title: "One job per method - ", text: "a method that does exactly one thing is easy to name and trust." },
+        { title: "Separate the jobs - ", text: "when a method does two things, give one of them its own class or method." },
+        { title: "Receive, don't build - ", text: "let a class take its collaborator through the constructor, so it is easy to swap later." },
+        { title: "Wire and run - ", text: "build the parts, hand them in, and let them talk - the shape of most real code." },
+      ],
+      summaryClose:
+        "Next you will meet these ideas by name in the design track: single responsibility, and depending on what is handed in.",
+    },
+  ];
 
-    private string FormatReceipt(int total)
-    {
-        return "Total: " + total;
-    }
-}
-
-public static void Main()
-{
-    Console.WriteLine(new Checkout().Pay(10, 2));
-}`,
-    points: [
-      "`Pay` now does the maths and hands the wording to a helper.",
-      "Each method has one clear job again.",
-    ],
-    blanks: [
-      {
-        id: 1,
-        label: "Call the wording method",
-        answer: "FormatReceipt",
-        hints: ["The method whose only job is the text."],
-        explain: [
-          { text: "`FormatReceipt` is the new home for the wording job.", highlight: "private string FormatReceipt(int total)" },
-          { text: "`Pay` calls `FormatReceipt(total)` instead of building the text inline.", highlight: "return {{1}}(total)" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Extract The Job Into A Class",
-    concept: "Separate the jobs",
-    context: "The wording job is now a class of its own. Build it and call it.",
-    snippet: `public class ReceiptFormatter
-{
-    public string Format(int total) => "Total: " + total;
-}
-
-public class Checkout
-{
-    public string Pay(int price, int qty)
-    {
-        int total = price * qty;
-        var formatter = new {{1}}();
-        return formatter.{{2}}(total);
-    }
-}
-
-public static void Main()
-{
-    Console.WriteLine(new Checkout().Pay(10, 2));
-}`,
-    points: [
-      "`Checkout` now owns the maths; `ReceiptFormatter` owns the wording.",
-      "Change the receipt text without ever touching the price logic.",
-    ],
-    blanks: [
-      {
-        id: 1,
-        label: "Build the formatter",
-        answer: "ReceiptFormatter",
-        hints: ["The class whose only job is the receipt text."],
-        explain: [
-          { text: "`ReceiptFormatter` is a separate class holding only the wording job.", highlight: "public class ReceiptFormatter" },
-          { text: "`new ReceiptFormatter()` builds one for `Checkout` to use.", highlight: "var formatter = new {{1}}()" },
-        ],
-      },
-      {
-        id: 2,
-        label: "Call the format method",
-        answer: "Format",
-        hints: ["The method that returns the text."],
-        explain: [
-          { text: "`Format` turns the total into the receipt text.", highlight: "public string Format(int total)" },
-          { text: "`formatter.Format(total)` gives back `\"Total: 20\"`.", highlight: "return formatter.{{2}}(total)" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Same Name, Two Classes",
-    concept: "The object decides",
-    context: "Both classes have an `Area` method. The object you build decides which one runs. Build a `Circle`.",
-    snippet: `public class Square
-{
-    public int Area() => 9;
-}
-
-public class Circle
-{
-    public int Area() => 12;
-}
-
-public static void Main()
-{
-    // we build a Circle, so its Area runs
-    var shape = new {{1}}();
-    Console.WriteLine(shape.{{2}}());
-}`,
-    points: [
-      "`Square.Area` and `Circle.Area` share a name but differ in result.",
-      "Which one runs depends on the object that was built.",
-    ],
-    blanks: [
-      {
-        id: 1,
-        label: "Build the circle",
-        answer: "Circle",
-        hints: ["The comment says which shape to build."],
-        explain: [
-          { text: "`Circle` has its own `Area` returning `12`.", highlight: "public class Circle" },
-          { text: "Because we build a `Circle`, calling `Area` runs `Circle`'s version.", highlight: "var shape = new {{1}}()" },
-        ],
-      },
-      {
-        id: 2,
-        label: "Call area",
-        answer: "Area",
-        hints: ["The method both classes share."],
-        explain: [
-          { text: "Both classes define `Area`, so the call looks the same either way.", highlight: "public int Area() => 12" },
-          { text: "`shape.Area()` prints `12` here, because `shape` is a `Circle`.", highlight: "Console.WriteLine(shape.{{2}}())" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Use What Is Handed In",
-    concept: "Receive, don't build",
-    context: "`Mailer` is given its `Outbox` instead of creating one. Use the handed-in object, and build one to pass in.",
-    snippet: `public class Outbox
-{
-    public string Send(string msg) => "sent: " + msg;
-}
-
-public class Mailer
-{
-    private readonly Outbox _outbox;
-    // the outbox is handed in, not created here
-    public Mailer(Outbox outbox) { _outbox = outbox; }
-
-    public string Notify(string who)
-    {
-        return _outbox.{{1}}("hello " + who);
-    }
-}
-
-public static void Main()
-{
-    var mailer = new Mailer(new {{2}}());
-    Console.WriteLine(mailer.Notify("Sam"));
-}`,
-    points: [
-      "`Mailer` receives its `Outbox` through the constructor.",
-      "A collaborator handed in from outside is easy to swap later.",
-    ],
-    blanks: [
-      {
-        id: 1,
-        label: "Send through the outbox",
-        answer: "Send",
-        hints: ["The method on Outbox that emits a message."],
-        explain: [
-          { text: "`Outbox.Send` emits a message and returns a confirmation string.", highlight: "public string Send(string msg) => \"sent: \" + msg" },
-          { text: "`Mailer` uses the outbox it was given, without building its own.", highlight: "return _outbox.{{1}}(\"hello \" + who)" },
-        ],
-      },
-      {
-        id: 2,
-        label: "Build an outbox to inject",
-        answer: "Outbox",
-        hints: ["Mailer's constructor needs an Outbox."],
-        explain: [
-          { text: "The constructor asks for an `Outbox` from outside.", highlight: "public Mailer(Outbox outbox)" },
-          { text: "`new Outbox()` makes the one we hand in. Handing it in is the key idea.", highlight: "var mailer = new Mailer(new {{2}}())" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Trace The Output",
-    concept: "Read before you run",
-    context: "Follow the calls in your head and decide what the counter holds, then call the method that reads it.",
-    snippet: `public class Counter
-{
-    private int _count;
-    public void Add() => _count++;
-    public int Value() => _count;
-}
-
-public static void Main()
-{
-    var counter = new Counter();
-    counter.Add();
-    counter.Add();
-    counter.Add();
-    // three Adds happened - what does Value return?
-    Console.WriteLine(counter.{{1}}());
-}`,
-    points: [
-      "`_count` starts at `0` and `Add` raises it by one each time.",
-      "Reading code line by line tells you the result before running it.",
-    ],
-    blanks: [
-      {
-        id: 1,
-        label: "Read the count",
-        answer: "Value",
-        hints: ["The method that returns _count."],
-        explain: [
-          { text: "`Add` runs three times, so `_count` becomes `3`.", highlight: "public void Add() => _count++" },
-          { text: "`Value` returns `_count`. Tracing the three `Add`s tells you it prints `3`.", highlight: "public int Value() => _count" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Wire Two Objects And Run",
-    concept: "Put it together",
-    context: "Final drill: a `Worker` uses a log that is handed to it. Complete both blanks, then press Run.",
-    snippet: `public class ConsoleLog
-{
-    public void Write(string msg) => Console.WriteLine(msg);
-}
-
-public class Worker
-{
-    private readonly ConsoleLog _log;
-    public Worker(ConsoleLog log) { _log = log; }
-
-    public void Do()
-    {
-        _log.{{1}}("work done");
-    }
-}
-
-public static void Main()
-{
-    var log = new ConsoleLog();
-    var worker = new {{2}}(log);
-    worker.Do();
-}`,
-    points: [
-      "`Worker` is handed a `ConsoleLog` and uses it to report.",
-      "Two small objects collaborating is the shape of most real code.",
-    ],
-    blanks: [
-      {
-        id: 1,
-        label: "Write to the log",
-        answer: "Write",
-        hints: ["The method on ConsoleLog that prints."],
-        explain: [
-          { text: "`ConsoleLog.Write` prints a message to the screen.", highlight: "public void Write(string msg) => Console.WriteLine(msg)" },
-          { text: "`Worker` calls the log it was handed instead of printing directly.", highlight: "_log.{{1}}(\"work done\")" },
-        ],
-      },
-      {
-        id: 2,
-        label: "Build the worker",
-        answer: "Worker",
-        hints: ["The class that takes a log and does the job."],
-        explain: [
-          { text: "`Worker` needs a `ConsoleLog` handed into its constructor.", highlight: "public Worker(ConsoleLog log)" },
-          { text: "`new Worker(log)` wires the two objects together before `Do` runs.", highlight: "var worker = new {{2}}(log)" },
-        ],
-      },
-    ],
-  },
-];
-
-// Complete, runnable C# for each drill, index-aligned with `drills`. The Run
-// button compiles and runs these through the shared code-lab Roslyn/WASM host.
-const runnablePrograms = [
-  // 0 - Two Objects Talk
-  `using System;
-
-public class Clock
-{
-    public int Hour() => 9;
-}
-
-public class Greeter
-{
-    public string Greet(Clock clock)
-    {
-        int hour = clock.Hour();
-        return hour < 12 ? "Good morning" : "Good afternoon";
-    }
-}
-
-class Program
-{
-    static void Main()
-    {
-        var greeter = new Greeter();
-        Console.WriteLine(greeter.Greet(new Clock()));
-    }
-}`,
-  // 1 - Ask Another Object For Data
-  `using System;
-
-public class PriceList
-{
-    public int PriceOf(string item) => item == "book" ? 10 : 5;
-}
-
-public class Cart
-{
-    private readonly PriceList _prices;
-    public Cart(PriceList prices) { _prices = prices; }
-
-    public int Total(string item, int qty)
-    {
-        return _prices.PriceOf(item) * qty;
-    }
-}
-
-class Program
-{
-    static void Main()
-    {
-        var cart = new Cart(new PriceList());
-        Console.WriteLine(cart.Total("book", 3));
-    }
-}`,
-  // 2 - A Method That Does One Thing
-  `using System;
-
-public class Rectangle
-{
-    public int Area(int width, int height)
-    {
-        return width * height;
-    }
-}
-
-class Program
-{
-    static void Main()
-    {
-        var rectangle = new Rectangle();
-        Console.WriteLine(rectangle.Area(4, 5));
-    }
-}`,
-  // 3 - Spot The Second Job
-  `using System;
-
-public class Checkout
-{
-    public string Pay(int price, int qty)
-    {
-        int total = price * qty;
-        string receipt = "Total: " + total;
-        return receipt;
-    }
-}
-
-class Program
-{
-    static void Main()
-    {
-        var checkout = new Checkout();
-        Console.WriteLine(checkout.Pay(10, 2));
-    }
-}`,
-  // 4 - Extract The Job Into A Method
-  `using System;
-
-public class Checkout
-{
-    public string Pay(int price, int qty)
-    {
-        int total = price * qty;
-        return FormatReceipt(total);
-    }
-
-    private string FormatReceipt(int total)
-    {
-        return "Total: " + total;
-    }
-}
-
-class Program
-{
-    static void Main()
-    {
-        Console.WriteLine(new Checkout().Pay(10, 2));
-    }
-}`,
-  // 5 - Extract The Job Into A Class
-  `using System;
-
-public class ReceiptFormatter
-{
-    public string Format(int total) => "Total: " + total;
-}
-
-public class Checkout
-{
-    public string Pay(int price, int qty)
-    {
-        int total = price * qty;
-        var formatter = new ReceiptFormatter();
-        return formatter.Format(total);
-    }
-}
-
-class Program
-{
-    static void Main()
-    {
-        Console.WriteLine(new Checkout().Pay(10, 2));
-    }
-}`,
-  // 6 - Same Name, Two Classes
-  `using System;
-
-public class Square
-{
-    public int Area() => 9;
-}
-
-public class Circle
-{
-    public int Area() => 12;
-}
-
-class Program
-{
-    static void Main()
-    {
-        var shape = new Circle();
-        Console.WriteLine(shape.Area());
-    }
-}`,
-  // 7 - Use What Is Handed In
-  `using System;
-
-public class Outbox
-{
-    public string Send(string msg) => "sent: " + msg;
-}
-
-public class Mailer
-{
-    private readonly Outbox _outbox;
-    public Mailer(Outbox outbox) { _outbox = outbox; }
-
-    public string Notify(string who)
-    {
-        return _outbox.Send("hello " + who);
-    }
-}
-
-class Program
-{
-    static void Main()
-    {
-        var mailer = new Mailer(new Outbox());
-        Console.WriteLine(mailer.Notify("Sam"));
-    }
-}`,
-  // 8 - Trace The Output
-  `using System;
-
-public class Counter
-{
-    private int _count;
-    public void Add() => _count++;
-    public int Value() => _count;
-}
-
-class Program
-{
-    static void Main()
-    {
-        var counter = new Counter();
-        counter.Add();
-        counter.Add();
-        counter.Add();
-        Console.WriteLine(counter.Value());
-    }
-}`,
-  // 9 - Wire Two Objects And Run
-  `using System;
-
-public class ConsoleLog
-{
-    public void Write(string msg) => Console.WriteLine(msg);
-}
-
-public class Worker
-{
-    private readonly ConsoleLog _log;
-    public Worker(ConsoleLog log) { _log = log; }
-
-    public void Do()
-    {
-        _log.Write("work done");
-    }
-}
-
-class Program
-{
-    static void Main()
-    {
-        var log = new ConsoleLog();
-        var worker = new Worker(log);
-        worker.Do();
-    }
-}`,
-];
-
-window.DRILL_CONFIG = {
-  prefix: "ro",
-  metaLabel: "Bridge: Reading Objects",
-  progressNoun: "Drill",
-  drills,
-  runnablePrograms,
-  runnerUrl: "level3-app/index.html?runner=1",
-  xpKey: "course_global_xp",
-  awardedKey: "reading_objects_awarded",
-  awardAmount: 20,
-};
+  window.BUILD_CONFIG = {
+    prefix: "ro",
+    metaLabel: "Understand the ideas \u00b7 Reading Objects",
+    progressNoun: "Step",
+    awardedKey: "reading_objects_awarded",
+    awardAmount: 20,
+    runnerUrl: "level3-app/index.html?runner=1",
+    xpKey: "course_global_xp",
+    tasks,
+  };
+})();
