@@ -20,12 +20,12 @@ baseline when designing new chapters.
 
 | # | Lesson | Page | Format | Cards | Teaches |
 |---|--------|------|--------|-------|---------|
-| 1 | Foundations | level1.html | Theory (quiz/blank) | 10 | What software is for; objects = state + behaviour |
-| 2 | Practice the Basics | level1-coding.html | Runnable fill-blank | 10 | The same core ideas as runnable C# |
+| 1 | Foundations | foundations.html | Theory (quiz/blank) | 10 | What software is for; objects = state + behaviour |
+| 2 | Practice the Basics | practice-the-basics.html | Runnable fill-blank | 10 | The same core ideas as runnable C# |
 | 3 | Control Flow | control-flow.html | Write-and-run build | 6 | if/else, boolean logic, while, for, foreach+break/continue, switch (write working methods) |
 | 4 | Methods | writing-methods.html | Write-from-scratch | 5 | Return values, parameters, logic, reuse, composing methods |
 | 5 | Reading Objects | reading-objects.html | Fill-blank + run | 10 | Object collaboration, delegation, one job per method/class (pre-SOLID) |
-| 6 | Reuse Without Regret | level4.html | Guided reading + tour | 12 | Inheritance vs composition vs polymorphism; diamond problem |
+| 6 | Reuse Without Regret | reuse-without-regret.html | Guided reading + tour | 12 | Inheritance vs composition vs polymorphism; diamond problem |
 
 ### Part two — Build it for real
 
@@ -62,7 +62,7 @@ All write-from-scratch builds (build-engine.js), 5 tasks each.
 
 | # | Lesson | Page | Format | Cards | Teaches |
 |---|--------|------|--------|-------|---------|
-| 19 | The SOLID Principles | level2.html | Trap-then-fix drills | 10 (+recap) | S, O, L, I, D each shown broken then fixed |
+| 19 | The SOLID Principles | the-solid-principles.html | Trap-then-fix drills | 10 (+recap) | S, O, L, I, D each shown broken then fixed |
 | 20 | Capstone: SOLID in Practice | level3-app/ | Milestone refactor | 7 | Refactor a broken program; enforces S, DI, O, DIP, L |
 
 ## Theory track (zero-background, in order)

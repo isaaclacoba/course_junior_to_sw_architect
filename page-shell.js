@@ -224,12 +224,12 @@
   // instead of dead-ending. Maintained in one place; a page may override by
   // setting window.PAGE.nextHref itself.
   const PRACTICAL = [
-    "level1.html", "level1-coding.html", "control-flow.html", "writing-methods.html",
-    "reading-objects.html", "level4.html", "first-builds.html",
+    "foundations.html", "practice-the-basics.html", "control-flow.html", "writing-methods.html",
+    "reading-objects.html", "reuse-without-regret.html", "first-builds.html",
     "collections.html", "data-shapes.html", "lambdas.html", "linq.html", "errors-null.html", "generics.html",
     "encapsulation.html", "interfaces.html", "polymorphism.html", "composition.html",
     "dependency-injection.html", "testing-basics.html", "test-doubles.html", "testable-design.html",
-    "level2.html", "level3-app/",
+    "the-solid-principles.html", "level3-app/",
   ];
   const THEORY = [
     "theory-1.html", "theory-2.html", "theory-3.html", "theory-4.html", "theory-5.html",

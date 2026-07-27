@@ -36,10 +36,10 @@ dotnet serve -p 8080                          # from this folder
 Then open `http://localhost:8080`.
 
 - `index.html`: track selector
-- `level1.html`: Level 1 theory track (foundations)
-- `level1-coding.html`: Level 1 microcoding track (1 short drill per theory topic)
-- `level2.html`: core C# coding drills (short writing exercises)
-- `level4.html`: Reuse Without Regret (read-to-understand inheritance/composition/polymorphism, guided code tour, runnable examples)
+- `foundations.html`: Level 1 theory track (foundations)
+- `practice-the-basics.html`: Level 1 microcoding track (1 short drill per theory topic)
+- `the-solid-principles.html`: core C# coding drills (short writing exercises)
+- `reuse-without-regret.html`: Reuse Without Regret (read-to-understand inheritance/composition/polymorphism, guided code tour, runnable examples)
 - `level3-app/`: Capstone (live C# compile + run, published Blazor app)
 
 ## Rebuilding the Capstone
@@ -61,7 +61,7 @@ The host source already sets `<base href="./" />`, so no rewrite is needed.
 
 ## Customization
 
-Edit the lesson data arrays in each level's script (for example `level4.js`) to
+Edit the lesson data arrays in each level's script (for example `reuse-without-regret.js`) to
 add or change cards.
 
 ## Training Tip
