@@ -262,7 +262,17 @@
     setPracticeVisible(true);
     if (example && exampleWrap) {
       if (task.example) {
-        example.textContent = task.example;
+        // Highlight the "here's the pattern" example with Monaco (the same
+        // engine as the editor), so no separate highlighter is needed.
+        if (window.monaco && monaco.editor && monaco.editor.colorize) {
+          example.textContent = task.example;
+          monaco.editor
+            .colorize(task.example, "csharp", {})
+            .then((html) => { example.innerHTML = html; })
+            .catch(() => {});
+        } else {
+          example.textContent = task.example;
+        }
         exampleWrap.hidden = false;
       } else {
         example.textContent = "";
