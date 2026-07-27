@@ -23,6 +23,8 @@ var CodeLab = (() => {
   __export(src_exports, {
     ALL_REGIONS: () => ALL_REGIONS,
     CodeLab: () => CodeLab,
+    DEFAULT_LOOP_MEMORIES: () => DEFAULT_LOOP_MEMORIES,
+    DEFAULT_LOOP_TOOLS: () => DEFAULT_LOOP_TOOLS,
     FULL_REGIONS: () => FULL_REGIONS,
     MemoryViz: () => MemoryViz,
     MonacoEditor: () => MonacoEditor,
@@ -33,6 +35,8 @@ var CodeLab = (() => {
     RoslynIframeRunner: () => RoslynIframeRunner,
     TextareaEditor: () => TextareaEditor,
     Tour: () => Tour,
+    agentFanRows: () => agentFanRows,
+    agentLoopActiveSet: () => agentLoopActiveSet,
     atFirst: () => atFirst,
     atLast: () => atLast,
     computeLineFlags: () => computeLineFlags,
@@ -975,6 +979,69 @@ ${result.runtimeError}`.trim(),
     }
   };
 
+  // src/core/progress-store.ts
+  var ProgressStore = class {
+    constructor(xpKey, awardedKey, awardAmount, store = globalThis.localStorage) {
+      this.xpKey = xpKey;
+      this.awardedKey = awardedKey;
+      this.awardAmount = awardAmount;
+      this.store = store;
+      this.awarded = false;
+    }
+    /** The course XP total held in the store. */
+    xp() {
+      return parseInt(this.store.getItem(this.xpKey) || "0", 10);
+    }
+    /** Grant this lesson's XP the first time it is completed, once per store and
+     *  once per session. No-ops when there is no awardedKey; never throws when the
+     *  store is unavailable - progress simply is not saved. Returns the XP total. */
+    awardOnce() {
+      if (this.awarded || !this.awardedKey) return this.xp();
+      this.awarded = true;
+      try {
+        const done = JSON.parse(this.store.getItem(this.awardedKey) || "{}");
+        if (!done.done) {
+          this.store.setItem(this.awardedKey, JSON.stringify({ done: true }));
+          this.store.setItem(this.xpKey, String(this.xp() + this.awardAmount));
+        }
+      } catch {
+      }
+      return this.xp();
+    }
+  };
+
+  // src/core/autoplay.ts
+  var Autoplay = class {
+    constructor(hooks) {
+      this.hooks = hooks;
+      this.timer = null;
+      this.playing = false;
+    }
+    get isPlaying() {
+      return this.playing;
+    }
+    start() {
+      if (this.playing) return;
+      this.playing = true;
+      this.schedule();
+    }
+    stop() {
+      if (this.timer) clearTimeout(this.timer);
+      this.timer = null;
+      this.playing = false;
+      this.hooks.onStop();
+    }
+    schedule() {
+      this.timer = setTimeout(() => {
+        if (!this.playing) return;
+        if (this.hooks.atEnd()) return this.stop();
+        this.hooks.advance();
+        if (this.hooks.atEnd()) this.stop();
+        else this.schedule();
+      }, this.hooks.stepMs());
+    }
+  };
+
   // src/dom/svg.ts
   var SVG_NS = "http://www.w3.org/2000/svg";
   function svgEl(tag, attrs) {
@@ -1544,9 +1611,361 @@ ${result.runtimeError}`.trim(),
     }
   };
 
+  // src/core/agent-model.ts
+  function clamp01(n) {
+    if (!Number.isFinite(n)) return 0;
+    return n < 0 ? 0 : n > 1 ? 1 : n;
+  }
+  function agentFanRows(fan) {
+    if (!fan || !Array.isArray(fan.list)) return [];
+    const chosen = typeof fan.chosen === "number" ? fan.chosen : -1;
+    const hasChoice = chosen >= 0 && chosen < fan.list.length;
+    return fan.list.map((c, i) => ({
+      t: c.t,
+      pct: Math.round(clamp01(c.p) * 100),
+      chosen: hasChoice && i === chosen,
+      dim: hasChoice && i !== chosen
+    }));
+  }
+
+  // src/dom/agent-view.ts
+  var AgentView = class {
+    constructor(showFan = true) {
+      this.showFan = showFan;
+      this.el = document.createElement("div");
+      this.el.className = "cl-ag";
+      this.el.innerHTML = `
+      <div class="cl-ag-strip">
+        <span class="cl-ag-cap" data-stripcap></span>
+        <div class="cl-ag-tokens" data-tokens></div>
+      </div>
+      <div class="cl-ag-core-row">
+        <span class="cl-ag-wire"></span>
+        <div class="cl-ag-core" data-core>
+          <div class="cl-ag-core-name" data-corename>LLM</div>
+          <div class="cl-ag-core-sub" data-coresub>next-token model</div>
+          <div class="cl-ag-core-dots" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+        <span class="cl-ag-wire" data-rwire></span>
+        <div class="cl-ag-tool" data-tool hidden>
+          <div class="cl-ag-tool-name" data-toolname></div>
+          <div class="cl-ag-tool-io" data-toolcall></div>
+          <div class="cl-ag-tool-io" data-toolresult></div>
+        </div>
+      </div>
+      ${showFan ? `<div class="cl-ag-fan is-empty" data-fan></div>` : ""}`;
+    }
+    sync(ctx) {
+      const scene = ctx.model.agent ?? {};
+      this.renderStrip(scene);
+      this.renderCore(scene.core);
+      this.renderTool(scene.tool);
+      if (this.showFan) this.renderFan(scene);
+    }
+    renderStrip(scene) {
+      const cap = this.el.querySelector("[data-stripcap]");
+      cap.textContent = scene.stripCaption ?? "Text so far \u2014 everything the model reads";
+      const host = this.el.querySelector("[data-tokens]");
+      host.innerHTML = "";
+      const tokens = scene.tokens ?? [];
+      let prevDropped = false;
+      tokens.forEach((tok, i) => {
+        const dropped = tok.kind === "dropped";
+        if (prevDropped && !dropped) host.appendChild(this.windowDivider(scene.windowLabel));
+        const span = document.createElement("span");
+        span.className = "cl-ag-tok is-" + (tok.kind ?? "given") + (tok.hot ? " is-hot" : "");
+        span.textContent = tok.t;
+        host.appendChild(span);
+        prevDropped = dropped;
+        void i;
+      });
+      if (scene.caret) {
+        const caret = document.createElement("span");
+        caret.className = "cl-ag-caret";
+        host.appendChild(caret);
+      }
+    }
+    windowDivider(label) {
+      const div = document.createElement("span");
+      div.className = "cl-ag-winmark";
+      div.innerHTML = `<span class="cl-ag-winmark-line"></span><span class="cl-ag-winmark-label"></span>`;
+      div.querySelector(".cl-ag-winmark-label").textContent = label ?? "context window";
+      return div;
+    }
+    renderCore(core) {
+      this.el.querySelector("[data-corename]").textContent = core?.label ?? "LLM";
+      this.el.querySelector("[data-coresub]").textContent = core?.sub ?? "next-token model";
+      this.el.querySelector("[data-core]").classList.toggle("is-live", Boolean(core?.live));
+    }
+    renderTool(tool) {
+      const card = this.el.querySelector("[data-tool]");
+      const rwire = this.el.querySelector("[data-rwire]");
+      if (!tool) {
+        card.hidden = true;
+        rwire.className = "cl-ag-wire";
+        return;
+      }
+      card.hidden = false;
+      const state = tool.state ?? "idle";
+      rwire.className = "cl-ag-wire" + (state === "calling" ? " is-hot" : "");
+      card.className = "cl-ag-tool is-" + state;
+      this.el.querySelector("[data-toolname]").textContent = tool.name;
+      const callEl = this.el.querySelector("[data-toolcall]");
+      if (tool.call) {
+        callEl.hidden = false;
+        callEl.className = "cl-ag-tool-io cl-ag-tool-call";
+        callEl.innerHTML = `<span class="cl-ag-tool-dir">call \u2192</span><code class="cl-ag-tool-chip">${escapeHtml4(tool.call)}</code>`;
+      } else {
+        callEl.hidden = true;
+      }
+      const resEl = this.el.querySelector("[data-toolresult]");
+      if (tool.result && state === "returned") {
+        resEl.hidden = false;
+        resEl.className = "cl-ag-tool-io cl-ag-tool-result";
+        resEl.innerHTML = `<span class="cl-ag-tool-dir">\u2190 result</span><code class="cl-ag-tool-chip">${escapeHtml4(tool.result)}</code>`;
+      } else {
+        resEl.hidden = true;
+      }
+    }
+    renderFan(scene) {
+      const host = this.el.querySelector("[data-fan]");
+      const rows = agentFanRows(scene.fan);
+      const caption = scene.fan?.caption ?? "Probability of the next token";
+      if (rows.length === 0) {
+        host.className = "cl-ag-fan is-empty";
+        host.innerHTML = `<span class="cl-ag-cap">${escapeHtml4(caption)}</span>`;
+        return;
+      }
+      host.className = "cl-ag-fan";
+      let html = `<span class="cl-ag-cap">${escapeHtml4(caption)}</span>`;
+      for (const row of rows) {
+        const cls = "cl-ag-row" + (row.chosen ? " is-chosen" : "") + (row.dim ? " is-dim" : "");
+        html += `<div class="${cls}"><span class="cl-ag-tok-name">${escapeHtml4(row.t)}</span><span class="cl-ag-track"><span class="cl-ag-fill" style="width:${row.pct}%"></span></span><span class="cl-ag-val">${row.pct}%</span></div>`;
+      }
+      host.innerHTML = html;
+    }
+  };
+
+  // src/core/agent-loop-model.ts
+  var DEFAULT_LOOP_TOOLS = [
+    { id: "search", label: "search" },
+    { id: "calc", label: "calculator" },
+    { id: "code", label: "run code" }
+  ];
+  var DEFAULT_LOOP_MEMORIES = [
+    { id: "episodic", label: "episodic", sub: "what happened" },
+    { id: "semantic", label: "semantic", sub: "facts it knows" },
+    { id: "procedural", label: "procedural", sub: "how to act" }
+  ];
+  function agentLoopActiveSet(scene) {
+    if (!scene || !Array.isArray(scene.active)) return /* @__PURE__ */ new Set();
+    return new Set(scene.active);
+  }
+
+  // src/dom/agent-loop-view.ts
+  var NODES = ["env", "ctx", "llm", "tools", "mem"];
+  var SVG_NS2 = "http://www.w3.org/2000/svg";
+  var TOOL_BOX = { x: 812, y: 86, w: 150, rowX: 826, rowY: 122, rowW: 122, rowH: 24, step: 28 };
+  var MEM_BOX = { x: 812, y: 238, w: 150, rowX: 826, rowY: 274, rowW: 122, rowH: 34, step: 38 };
+  var toolsHeight = TOOL_BOX.rowY - TOOL_BOX.y + (DEFAULT_LOOP_TOOLS.length - 1) * TOOL_BOX.step + TOOL_BOX.rowH + 4;
+  var memHeight = MEM_BOX.rowY - MEM_BOX.y + (DEFAULT_LOOP_MEMORIES.length - 1) * MEM_BOX.step + MEM_BOX.rowH + 18;
+  var AgentLoopView = class {
+    constructor() {
+      this.scene = {};
+      this.el = document.createElement("div");
+      this.el.className = "cl-al";
+      this.el.innerHTML = this.markup();
+      this.svg = this.el.querySelector("svg");
+    }
+    sync(ctx) {
+      const scene = ctx.model.agentLoop ?? {};
+      this.scene = scene;
+      const hasActive = Array.isArray(scene.active);
+      const active = agentLoopActiveSet(scene);
+      NODES.forEach((id) => {
+        const el = this.node(id);
+        if (!el) return;
+        const on = active.has(id);
+        el.classList.toggle("hl", hasActive && on);
+        el.classList.toggle("dim", hasActive && !on);
+      });
+      this.svg.querySelectorAll(".stage").forEach(
+        (s) => s.classList.toggle("on", s.getAttribute("data-stage") === (scene.stage ?? null))
+      );
+      this.svg.querySelectorAll(".memrow").forEach(
+        (m) => m.classList.toggle("on", m.getAttribute("data-mem") === (scene.mem ?? null))
+      );
+      const chips = scene.chips ?? [];
+      this.svg.querySelectorAll(".chip").forEach(
+        (c) => c.classList.toggle("on", chips.includes(c.getAttribute("data-chip") ?? ""))
+      );
+      this.setCtxChips(scene.ctx ?? []);
+      this.svg.querySelector("[data-think]").textContent = scene.think ?? "";
+      this.svg.querySelector("[data-goal]").textContent = "GOAL: " + (scene.goal ?? "book a flight");
+      const hot = new Set((scene.packets ?? []).map((p) => p.path));
+      this.svg.querySelectorAll("[data-trace]").forEach(
+        (t) => t.classList.toggle("hot", hot.has(t.getAttribute("data-trace") ?? ""))
+      );
+    }
+    animate(model) {
+      const scene = model.agentLoop ?? this.scene;
+      (scene.packets ?? []).forEach((p) => this.sendPacket(p.path, p.reverse));
+      return Promise.resolve();
+    }
+    node(id) {
+      return this.svg.querySelector(`[data-node="${id}"]`);
+    }
+    setCtxChips(items) {
+      const host = this.svg.querySelector("[data-ctxchips]");
+      host.textContent = "";
+      items.forEach((t, n) => {
+        const x = 350 + n * 172;
+        const g = svgEl("g", {});
+        g.appendChild(svgEl("rect", { class: "ctxchip", x, y: 148, width: 160, height: 24, rx: 5 }));
+        const tx = svgEl("text", { class: "ctxchip-t", x: x + 9, y: 165 });
+        tx.textContent = t;
+        g.appendChild(tx);
+        host.appendChild(g);
+      });
+    }
+    sendPacket(trace, reverse) {
+      const path = this.svg.querySelector(`[data-trace="${trace}"]`);
+      if (!path || typeof path.getTotalLength !== "function") return;
+      const len = path.getTotalLength();
+      const dot = document.createElementNS(SVG_NS2, "circle");
+      dot.setAttribute("r", "6");
+      dot.setAttribute("class", "cl-al-packet");
+      this.svg.appendChild(dot);
+      const dur = 780;
+      const t0 = performance.now();
+      const frame = (t) => {
+        const p = Math.min(1, (t - t0) / dur);
+        const pt = path.getPointAtLength((reverse ? 1 - p : p) * len);
+        dot.setAttribute("cx", String(pt.x));
+        dot.setAttribute("cy", String(pt.y));
+        if (p < 1) requestAnimationFrame(frame);
+        else dot.remove();
+      };
+      requestAnimationFrame(frame);
+    }
+    toolsMarkup() {
+      const cx = TOOL_BOX.x + TOOL_BOX.w / 2;
+      return DEFAULT_LOOP_TOOLS.map((tool, i) => {
+        const y = TOOL_BOX.rowY + i * TOOL_BOX.step;
+        return `<rect class="chip" data-chip="${tool.id}" x="${TOOL_BOX.rowX}" y="${y}" width="${TOOL_BOX.rowW}" height="${TOOL_BOX.rowH}" rx="5" /><text x="${cx}" y="${y + 17}" text-anchor="middle" class="chip-t" font-size="11">${tool.label}</text>`;
+      }).join("");
+    }
+    memoriesMarkup() {
+      const tx = MEM_BOX.rowX + 10;
+      return DEFAULT_LOOP_MEMORIES.map((row, i) => {
+        const y = MEM_BOX.rowY + i * MEM_BOX.step;
+        return `<g class="memrow" data-mem="${row.id}"><rect x="${MEM_BOX.rowX}" y="${y}" width="${MEM_BOX.rowW}" height="${MEM_BOX.rowH}" rx="6" /><text x="${tx}" y="${y + 16}" class="mem-t" font-size="10" font-weight="700">${row.label}</text><text x="${tx}" y="${y + 29}" class="mem-s" font-size="9">${row.sub}</text></g>`;
+      }).join("");
+    }
+    markup() {
+      return `
+      <svg class="cl-al-svg" viewBox="0 0 1000 470" role="img" aria-label="An agent: model, context, tools and memory in a loop">
+        <defs>
+          <linearGradient id="cl-al-pcb" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#0f3b33" /><stop offset="1" stop-color="#0a2a25" />
+          </linearGradient>
+          <filter id="cl-al-glow" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="3" result="b" />
+            <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+          <pattern id="cl-al-dots" width="26" height="26" patternUnits="userSpaceOnUse">
+            <circle cx="2" cy="2" r="1" fill="#12463c" />
+          </pattern>
+        </defs>
+
+        <rect x="6" y="6" width="988" height="458" rx="16" fill="url(#cl-al-pcb)" stroke="#123f36" stroke-width="2" />
+        <rect x="6" y="6" width="988" height="458" rx="16" fill="url(#cl-al-dots)" opacity="0.6" />
+
+        <path data-trace="trPercept" class="trace" d="M 232 210 C 280 210, 300 165, 338 165" />
+        <path data-trace="trReason"  class="trace" d="M 520 210 L 520 250" />
+        <path data-trace="trRecall"  class="trace" d="M 812 300 C 700 300, 640 300, 604 292" />
+        <path data-trace="trAct"     class="trace" d="M 604 262 C 700 250, 740 175, 812 165" />
+        <path data-trace="trObserve" class="trace" d="M 812 150 C 720 120, 640 150, 700 158" />
+
+        <g class="node" data-node="env">
+          <rect class="node-body" x="40" y="150" width="192" height="180" rx="12" />
+          <text x="136" y="180" text-anchor="middle" class="silk" font-size="15" font-weight="700">ENVIRONMENT</text>
+          <text x="136" y="200" text-anchor="middle" class="silk-dim" font-size="11">the task \xB7 the world</text>
+          <rect class="goal" x="56" y="220" width="160" height="34" rx="7" />
+          <text data-goal x="136" y="242" text-anchor="middle" class="goal-t" font-size="11">GOAL: book a flight</text>
+          <text x="136" y="286" text-anchor="middle" class="silk-dim" font-size="10">percepts out \xB7 actions in</text>
+        </g>
+
+        <rect class="agent-shell" x="300" y="70" width="430" height="320" rx="16" />
+        <text x="316" y="92" class="silk-dim" font-size="12" font-weight="700" letter-spacing="1">AGENT</text>
+
+        <g class="node" data-node="ctx">
+          <rect class="node-body" x="338" y="112" width="356" height="70" rx="10" />
+          <text x="350" y="132" class="silk-dim" font-size="11" font-weight="700">CONTEXT \xB7 WORKING MEMORY</text>
+          <g data-ctxchips></g>
+        </g>
+
+        <g class="node llm" data-node="llm">
+          <rect class="node-body" x="430" y="250" width="180" height="96" rx="12" />
+          <text x="520" y="288" text-anchor="middle" class="silk" font-size="18" font-weight="700">LLM</text>
+          <text x="520" y="310" text-anchor="middle" class="silk-dim" font-size="11">reasoning engine</text>
+          <text data-think x="520" y="330" text-anchor="middle" class="think" font-size="10"></text>
+        </g>
+
+        <g class="node" data-node="tools">
+          <rect class="node-body" x="${TOOL_BOX.x}" y="${TOOL_BOX.y}" width="${TOOL_BOX.w}" height="${toolsHeight}" rx="12" />
+          <text x="887" y="110" text-anchor="middle" class="silk" font-size="14" font-weight="700">TOOLS</text>
+          ${this.toolsMarkup()}
+        </g>
+
+        <g class="node" data-node="mem">
+          <rect class="node-body" x="${MEM_BOX.x}" y="${MEM_BOX.y}" width="${MEM_BOX.w}" height="${memHeight}" rx="12" />
+          <text x="887" y="262" text-anchor="middle" class="silk" font-size="14" font-weight="700">MEMORY</text>
+          ${this.memoriesMarkup()}
+        </g>
+
+        <g class="stage" data-stage="perceive">
+          <rect x="316" y="410" width="96" height="34" rx="8" />
+          <text x="364" y="431" text-anchor="middle" font-size="12">Perceive</text>
+        </g>
+        <text x="418" y="431" class="arrow" font-size="14">&#8594;</text>
+        <g class="stage" data-stage="reason">
+          <rect x="436" y="410" width="96" height="34" rx="8" />
+          <text x="484" y="431" text-anchor="middle" font-size="12">Reason</text>
+        </g>
+        <text x="538" y="431" class="arrow" font-size="14">&#8594;</text>
+        <g class="stage" data-stage="act">
+          <rect x="556" y="410" width="96" height="34" rx="8" />
+          <text x="604" y="431" text-anchor="middle" font-size="12">Act</text>
+        </g>
+        <text x="658" y="431" class="arrow" font-size="14">&#8594;</text>
+        <g class="stage" data-stage="observe">
+          <rect x="676" y="410" width="96" height="34" rx="8" />
+          <text x="724" y="431" text-anchor="middle" font-size="12">Observe</text>
+        </g>
+        <text x="784" y="431" class="arrow" font-size="16">&#8635;</text>
+      </svg>`;
+    }
+  };
+
   // src/dom/viz-controls.ts
+  var DEFAULT_LEGEND = [
+    { sw: "#37d3a6", label: "data in RAM" },
+    { sw: "#2b6a5b", label: "active CPU core" },
+    { sw: "#ffd479", label: "signal on the bus", round: true },
+    { sw: "#2563eb", label: "stack frame (a call)" },
+    { sw: "#1f6f5f", label: "reference to an object", round: true }
+  ];
+  function legendHtml(items) {
+    return items.map((i) => {
+      const round = i.round ? ";border-radius:50%" : "";
+      return `<span><i class="cl-mv-sw" style="background:${i.sw}${round}"></i>${i.label}</span>`;
+    }).join("");
+  }
   var VizControls = class {
-    constructor(actions, handlers, nextHref) {
+    constructor(actions, handlers, nextHref, legend) {
       this.nextHref = nextHref;
       this.el = document.createElement("div");
       this.el.innerHTML = `
@@ -1564,13 +1983,7 @@ ${result.runtimeError}`.trim(),
         </div>
       </div>
       <input type="range" class="cl-mv-scrub" data-scrub min="0" value="0" step="1" aria-label="Step" />
-      <div class="cl-mv-legend">
-        <span><i class="cl-mv-sw" style="background:#37d3a6"></i>data in RAM</span>
-        <span><i class="cl-mv-sw" style="background:#2b6a5b"></i>active CPU core</span>
-        <span><i class="cl-mv-sw" style="background:#ffd479;border-radius:50%"></i>signal on the bus</span>
-        <span><i class="cl-mv-sw" style="background:#2563eb"></i>stack frame (a call)</span>
-        <span><i class="cl-mv-sw" style="background:#1f6f5f;border-radius:50%"></i>reference to an object</span>
-      </div>`;
+      <div class="cl-mv-legend">${legendHtml(legend && legend.length ? legend : DEFAULT_LEGEND)}</div>`;
       const controls = this.el.querySelector(".cl-mv-controls");
       actions.forEach((a, i) => {
         const b = document.createElement("button");
@@ -1641,10 +2054,16 @@ ${result.runtimeError}`.trim(),
     constructor(host, config) {
       this.panels = [];
       this.controls = null;
-      this.timer = null;
-      this.playing = false;
       this.scale = 1;
-      this.awarded = false;
+      this.panelFactories = {
+        board: (_spec, ctx) => new BoardView(ctx.uid),
+        die: (spec, ctx) => new MemoryDieView(ctx.uid, ctx.code, ctx.labels, spec.regions ?? ctx.regions, ctx.zoomTab, ctx.regionTags),
+        code: (_spec, ctx) => new CodePanel(ctx.code),
+        narration: () => new NarrationView(),
+        agent: (spec) => new AgentView(spec.fan),
+        agentloop: () => new AgentLoopView(),
+        controls: (_spec, ctx) => this.controls = new VizControls(ctx.actions, ctx.handlers, ctx.nextHref, ctx.legend)
+      };
       this.onResize = () => {
         this.relayout();
       };
@@ -1655,12 +2074,20 @@ ${result.runtimeError}`.trim(),
       const zoomTab = scene.zoomTab !== false;
       this.actions = config.actions ?? [];
       this.nextHref = config.nextHref;
-      this.awardedKey = config.awardedKey;
-      this.xpKey = config.xpKey ?? "course_global_xp";
-      this.awardAmount = typeof config.awardAmount === "number" ? config.awardAmount : 20;
+      this.progress = new ProgressStore(
+        config.xpKey ?? "course_global_xp",
+        config.awardedKey,
+        typeof config.awardAmount === "number" ? config.awardAmount : 20
+      );
       this.player = new VizPlayer(config.steps ?? [], {
         deriveRefs: config.deriveRefs !== false,
         autoDim: config.autoDim !== false
+      });
+      this.autoplay = new Autoplay({
+        stepMs: () => this.stepDurationMs(),
+        atEnd: () => this.player.state.atEnd,
+        advance: () => this.step(this.player.next()),
+        onStop: () => this.controls?.setPlaying(false)
       });
       this.scale = config.fontScale ?? 1;
       const handlers = {
@@ -1676,7 +2103,7 @@ ${result.runtimeError}`.trim(),
           this.stop();
           this.step(this.player.reset(), false);
         },
-        onPlay: () => this.timer ? this.stop() : this.play(),
+        onPlay: () => this.autoplay.isPlaying ? this.stop() : this.play(),
         onAction: (i) => this.runAction(i),
         onFontSize: (s) => this.setFont(s),
         onSeek: (i) => {
@@ -1696,6 +2123,7 @@ ${result.runtimeError}`.trim(),
         actions: this.actions,
         handlers,
         regionTags: config.regionTags ?? {},
+        legend: config.legend,
         nextHref: this.nextHref
       };
       const layout = config.layout ?? {
@@ -1742,22 +2170,9 @@ ${result.runtimeError}`.trim(),
     }
     // ---- composition ------------------------------------------------------
     makePanel(spec, ctx) {
-      switch (spec.type) {
-        case "board":
-          return new BoardView(ctx.uid);
-        case "die":
-          return new MemoryDieView(ctx.uid, ctx.code, ctx.labels, spec.regions ?? ctx.regions, ctx.zoomTab, ctx.regionTags);
-        case "code":
-          return new CodePanel(ctx.code);
-        case "narration":
-          return new NarrationView();
-        case "controls": {
-          this.controls = new VizControls(ctx.actions, ctx.handlers, ctx.nextHref);
-          return this.controls;
-        }
-        default:
-          throw new Error("MemoryViz: unknown panel type " + String(spec.type));
-      }
+      const build = this.panelFactories[spec.type];
+      if (!build) throw new Error("MemoryViz: unknown panel type " + String(spec.type));
+      return build(spec, ctx);
     }
     // ---- orchestration ----------------------------------------------------
     step(state, animate = true) {
@@ -1772,24 +2187,12 @@ ${result.runtimeError}`.trim(),
     /** Refresh the course XP label in the hero, if the page has one. */
     refreshXp() {
       const label = document.getElementById("courseXpLabel");
-      if (label) label.textContent = `Course XP: ${this.storedXp()}`;
-    }
-    storedXp() {
-      return parseInt(localStorage.getItem(this.xpKey) || "0", 10);
+      if (label) label.textContent = `Course XP: ${this.progress.xp()}`;
     }
     /** Mark the lesson complete and grant XP once, when the last step is reached. */
     markComplete() {
-      if (this.awarded || !this.awardedKey) return;
-      this.awarded = true;
-      try {
-        const done = JSON.parse(localStorage.getItem(this.awardedKey) || "{}");
-        if (!done.done) {
-          localStorage.setItem(this.awardedKey, JSON.stringify({ done: true }));
-          localStorage.setItem(this.xpKey, String(this.storedXp() + this.awardAmount));
-        }
-        this.refreshXp();
-      } catch {
-      }
+      this.progress.awardOnce();
+      this.refreshXp();
     }
     runAction(index) {
       const action = this.actions[index];
@@ -1814,31 +2217,18 @@ ${result.runtimeError}`.trim(),
     }
     play() {
       if (!this.controls) return;
-      this.playing = true;
-      this.controls.setPlaying(true);
       if (this.player.state.atEnd) this.step(this.player.reset(), false);
-      this.scheduleAdvance();
+      this.controls.setPlaying(true);
+      this.autoplay.start();
     }
     /** Hold each step long enough to read its narration at ~300 words/minute. */
-    scheduleAdvance() {
-      this.timer = setTimeout(() => {
-        if (!this.playing) return;
-        if (this.player.state.atEnd) return this.stop();
-        this.step(this.player.next());
-        if (this.player.state.atEnd) this.stop();
-        else this.scheduleAdvance();
-      }, this.stepDurationMs());
-    }
     stepDurationMs() {
       const words = (this.player.state.model.narr ?? "").trim().split(/\s+/).filter(Boolean).length;
       const readMs = words / WORDS_PER_MINUTE * 6e4;
       return Math.max(MIN_STEP_MS, Math.round(readMs) + 500);
     }
     stop() {
-      this.playing = false;
-      if (this.timer) clearTimeout(this.timer);
-      this.timer = null;
-      if (this.controls) this.controls.setPlaying(false);
+      this.autoplay.stop();
     }
     setFont(scale) {
       this.scale = scale;
