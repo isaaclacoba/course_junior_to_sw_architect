@@ -41,7 +41,7 @@ not an endorsement.
 | # | Lesson (slug) | Part | Concept introduced (portable) | C# surface | Depends on |
 |---|---|---|---|---|---|
 | 1 | foundations | 1 | printing output; a variable holds a value; datatypes; assignment (store, not equals); `null` (nothing yet); what an object is (state + behaviour, class vs instance) | `Console.WriteLine`, `int`/`long`/`double`/`decimal`/`bool`/`char`/`string`, `=`, `string?`+`null`, class/field/method, `new` | - |
-| 2 | practice-the-basics | 1 | the same ideas by hand; assigning a reference | class, `new`, method | 1 |
+| 2 | practice-the-basics | 1 | compute with values (arithmetic); join text; ask a yes/no question (comparison to a `bool`); an object that answers about itself - bridges to Control Flow | `+` `-` `*` `/`, string `+`, `==` `!=` `>` `<` `>=` `<=`, class/field/method | 1 |
 | 3 | control-flow | 1 | choose a branch; combine yes/no; repeat; skip/stop; multi-way choose | if/else, `&&` `||` `!`, while, for, foreach, break/continue, switch | 1 |
 | 4 | writing-methods | 1 | a named step: return a value, take input, hold a rule, reuse it, call another | method, return, parameters | 3 |
 | 5 | reading-objects | 1 | objects collaborate: one asks another and acts (seeds one-job, receive-don't-build) | class, method, `=>` `(C#)` `[untaught]` | 1,4 |

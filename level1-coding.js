@@ -1,809 +1,129 @@
-const drills = [
-  {
-    title: "Model State With Variables",
-    concept: "Why Software Exists",
-    context: "Represent model state with a variable and output it.",
-    snippet: `var doorOpen = {{1}};
-Console.WriteLine(doorOpen);`,
-    points: ["State is represented as data.", "Use explicit values for model state."],
-    blanks: [
-      {
-        id: 1,
-        label: "Assign boolean state",
-        answer: "true",
-        hints: ["Use a boolean literal."],
-        explain: [
-          { text: "`var` creates a variable called `doorOpen` — a named place in memory to store data.", highlight: "var doorOpen" },
-          { text: "The `=` sign puts a value into it. Because it is a door, the only options are `true` (open) or `false` (closed).", highlight: "var doorOpen = {{1}}" },
-          { text: "This line reads `doorOpen` and prints what is stored there to the screen.", highlight: "Console.WriteLine(doorOpen)" },
-        ],
+// Practice the Basics - the bridge between Foundations and Control Flow.
+// A code-lab write-and-run build lesson (build-engine.js reads
+// window.BUILD_CONFIG). Foundations gave you values, variables and objects.
+// Here you compute with them, join text, and - the bridge - ask yes/no
+// questions with comparisons that produce a bool. Control Flow then acts on
+// those answers. No if/else or loops yet.
+(function () {
+  "use strict";
+
+  const tasks = [
+    {
+      title: "Do math with variables",
+      concept: "Arithmetic",
+      context:
+        "You can compute with values. The arithmetic operators are `+` (add), `-` (subtract), `*` (multiply), `/` (divide). Combine variables and you get a new value back.",
+      example:
+        "int a = 6;\nint b = 4;\nConsole.WriteLine(a + b);   // 10\nConsole.WriteLine(a * b);   // 24",
+      goal: [
+        "Make `int apples = 3` and `int baskets = 4`.",
+        "Print `apples * baskets`. The output should be 12.",
+      ],
+      expected: "12",
+      requireSource: [
+        { pattern: /int\s+apples\s*=\s*3\s*;/, message: "Declare `int apples = 3;`." },
+        { pattern: /int\s+baskets\s*=\s*4\s*;/, message: "Declare `int baskets = 4;`." },
+        { pattern: /apples\s*\*\s*baskets|baskets\s*\*\s*apples/, message: "Multiply the two variables: `apples * baskets`." },
+      ],
+      starter:
+        'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        // TODO: int apples = 3, int baskets = 4, then print apples * baskets\n    }\n}\n',
+      solution:
+        'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int apples = 3;\n        int baskets = 4;\n        Console.WriteLine(apples * baskets);\n    }\n}\n',
+    },
+    {
+      title: "Join text",
+      concept: "Concatenation",
+      context:
+        "`+` also joins strings end to end - this is called concatenation. `\"Hi, \" + name` builds one string from two pieces. You can join a number onto a string too; it becomes text.",
+      example:
+        'string first = "Ada";\nConsole.WriteLine("Hello, " + first);   // Hello, Ada',
+      goal: [
+        "Make `string name = \"Rex\"`.",
+        "Print `\"Good dog, \" + name`. The output should be Good dog, Rex.",
+      ],
+      expected: "Good dog, Rex",
+      requireSource: [
+        { pattern: /string\s+name\s*=\s*"Rex"\s*;/, message: "Declare `string name = \"Rex\";`." },
+        { pattern: /"Good dog, "\s*\+\s*name/, message: "Join the pieces: `\"Good dog, \" + name`." },
+      ],
+      starter:
+        'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        // TODO: string name = "Rex", then print "Good dog, " + name\n    }\n}\n',
+      solution:
+        'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        string name = "Rex";\n        Console.WriteLine("Good dog, " + name);\n    }\n}\n',
+    },
+    {
+      title: "Ask a yes/no question",
+      concept: "Comparisons",
+      context:
+        "A **comparison** asks a yes/no question and gives back a `bool`. The operators: `==` (equal), `!=` (not equal), `>`, `<`, `>=`, `<=`. `age >= 18` is `true` when age is 18 or more. Watch the difference: `==` compares, a single `=` stores.",
+      example:
+        "int score = 70;\nbool passed = score >= 50;\nConsole.WriteLine(passed);   // True",
+      goal: [
+        "Make `int age = 20`.",
+        "Make `bool isAdult = age >= 18`, then print `isAdult`. The output should be True.",
+      ],
+      expected: "True",
+      requireSource: [
+        { pattern: /int\s+age\s*=\s*20\s*;/, message: "Declare `int age = 20;`." },
+        { pattern: /bool\s+isAdult\s*=\s*age\s*>=\s*18/, message: "Compare and store: `bool isAdult = age >= 18;`." },
+      ],
+      starter:
+        'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        // TODO: int age = 20, then bool isAdult = age >= 18, then print isAdult\n    }\n}\n',
+      solution:
+        'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int age = 20;\n        bool isAdult = age >= 18;\n        Console.WriteLine(isAdult);\n    }\n}\n',
+    },
+    {
+      title: "An object that answers about itself",
+      concept: "State + a question",
+      context:
+        "Put state and a comparison together. A `Thermostat` knows its `Temp` (state) and can answer `IsHot()` (behaviour) by comparing that state. The method returns the `bool` a comparison produces - an object reporting something about itself.",
+      example:
+        'class Bottle\n{\n    public int Fill = 0;            // state\n    public bool IsEmpty()          // behaviour\n    {\n        return Fill == 0;\n    }\n}\n// var b = new Bottle();  b.IsEmpty() is True',
+      goal: [
+        "Give `Thermostat` its state: set `Temp` to `30`.",
+        "Make `IsHot()` return whether `Temp` is greater than `25`.",
+        "`Main` builds one and prints `IsHot()`. The output should be True.",
+      ],
+      expected: "True",
+      requireSource: [
+        { pattern: /class\s+Thermostat/, message: "Keep the `Thermostat` class." },
+        { pattern: /Temp\s*=\s*30\s*;/, message: "Set the state: `Temp = 30;`." },
+        { pattern: /return\s+Temp\s*>\s*25\s*;/, message: "Answer with a comparison: `return Temp > 25;`." },
+      ],
+      verify: {
+        main:
+          'class Program\n{\n    static void Main()\n    {\n        Thermostat cold = new Thermostat();\n        cold.Temp = 10;\n        Console.WriteLine(cold.IsHot());\n    }\n}\n',
+        expected: "False",
+        message: "IsHot must decide from Temp. A Thermostat at 10 is not hot.",
       },
-    ],
-  },
-  {
-    title: "Behavior As Transformation",
-    concept: "Variables and Functions",
-    context: "The method name says the goal: return exactly twice the input value.",
-    snippet: `// Double means: duplicate the numeric value.
-int Double(int value)
-{
-    return {{1}};
-}`,
-    points: [
-      "Function names should communicate intent clearly.",
-      "Here, '`Double`' means output is exactly `2` times input.",
-    ],
-    blanks: [
-      {
-        id: 1,
-        label: "Return transformed value",
-        answer: "value * 2",
-        hints: ["Multiply by 2."],
-        explain: [
-          { text: "This is the function header. It says: I take a whole number called `value` as input, and I give back a whole number.", highlight: "int Double(int value)" },
-          { text: "`return` sends a value back to whoever called this function. The function stops after `return`.", highlight: "return {{1}}" },
-          { text: "The name `Double` means the output must be exactly `2` times the input. If `value` is `5`, the answer is `10`.", highlight: "// Double means" },
-          { text: "The `*` symbol means multiply.", highlight: "return {{1}}" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Instantiate A Class",
-    concept: "Class and Object",
-    context: "Given the class below, instantiate it and call the method that updates its state.",
-    snippet: `public class Counter
-{
-    public int Value;
-
-    public void Increment()
+      starter:
+        'using System;\n\nclass Thermostat\n{\n    public int Temp = 0;   // TODO: set Temp to 30\n\n    public bool IsHot()\n    {\n        // TODO: return whether Temp is greater than 25\n        return false;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Thermostat t = new Thermostat();\n        Console.WriteLine(t.IsHot());\n    }\n}\n',
+      solution:
+        'using System;\n\nclass Thermostat\n{\n    public int Temp = 30;\n\n    public bool IsHot()\n    {\n        return Temp > 25;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Thermostat t = new Thermostat();\n        Console.WriteLine(t.IsHot());\n    }\n}\n',
+    },
     {
-        Value = Value + 1;
-    }
-}
+      title: "Practice the Basics recap",
+      concept: "Recap",
+      summary: true,
+      summaryIntro:
+        "You put the Foundations pieces to work and reached the doorway to Control Flow.",
+      summaryItems: [
+        { title: "Arithmetic - ", text: "`+ - * /` compute a new value from existing ones." },
+        { title: "Concatenation - ", text: "`+` joins strings (and numbers) into one string." },
+        { title: "Comparison - ", text: "`==` `!=` `>` `<` `>=` `<=` ask a yes/no question and return a `bool`." },
+        { title: "An object that answers - ", text: "state plus a method that returns a `bool` about that state." },
+      ],
+      summaryClose:
+        "Next: Control Flow - use these yes/no answers to decide what your program does.",
+    },
+  ];
 
-var counter = new {{1}}();
-counter.{{2}}();
-Console.WriteLine(counter.Value);`,
-    points: [
-      "Use the class name declared in the snippet.",
-      "Call the method that changes `Value`.",
-    ],
-    blanks: [
-      {
-        id: 1,
-        label: "Class name after new",
-        answer: "Counter",
-        hints: ["Use the class declared above."],
-        explain: [
-          { text: "`Counter` is the blueprint. It defines what data the counter holds (`Value`) and what it can do (`Increment`).", highlight: "public class Counter" },
-          { text: "`new` tells C# to build an actual object in memory using that blueprint. You have to say which blueprint to use.", highlight: "var counter = new {{1}}()" },
-          { text: "The object is stored in the variable `counter` so we can use it in the lines below.", highlight: "var counter = new {{1}}()" },
-        ],
-      },
-      {
-        id: 2,
-        label: "Method that increases Value",
-        answer: "Increment",
-        hints: ["Call the method that adds 1 to Value."],
-        explain: [
-          { text: "The dot after `counter` means: go inside this object and call something on it.", highlight: "counter.{{2}}()" },
-          { text: "`Increment` is defined inside `Counter`. When called, it runs `Value = Value + 1` — it adds one to the stored number.", highlight: "public void Increment()" },
-          { text: "This last line prints `Value` so we can see the change actually happened.", highlight: "Console.WriteLine(counter.Value)" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Reference Assignment",
-    concept: "Memory Model",
-    context: "Represent that two variables reference the same object.",
-    snippet: `var user = new User();
-var sameUser = {{1}};`,
-    points: ["Assignment copies the reference for reference types.", "No automatic clone occurs."],
-    blanks: [
-      {
-        id: 1,
-        label: "Assign existing reference",
-        answer: "user",
-        hints: ["Use the variable already holding the object reference."],
-        explain: [
-          { text: "`new User()` creates an object in memory. The variable `user` holds the address of where that object lives — not the object itself.", highlight: "var user = new User()" },
-          { text: "This line does not create a second object. It copies the address stored in `user` and puts it into `sameUser`.", highlight: "var sameUser = {{1}}" },
-          { text: "After this, both `user` and `sameUser` hold the same address — they point to the exact same object.", highlight: "var sameUser = {{1}}" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Encapsulation Accessor",
-    concept: "Encapsulation",
-    context: "Expose controlled read access to private state.",
-    snippet: `public class BankAccount
-{
-    private int _balance;
-
-    public int {{1}}()
-    {
-        return _balance;
-    }
-}`,
-
-    points: ["Private state should be accessed through methods.", "Public API should be explicit."],
-    blanks: [
-      {
-        id: 1,
-        label: "Getter method name",
-        answer: "GetBalance",
-        hints: ["Use Get + field meaning."],
-        explain: [
-          { text: "`_balance` is `private`. Nothing outside this class can read or change it directly.", highlight: "private int _balance" },
-          { text: "This is a `public` method — the only way outside code can read the balance. It returns a whole number.", highlight: "public int {{1}}()" },
-          { text: "`return _balance` sends the stored value out. The caller gets the number without touching the field.", highlight: "return _balance" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Polymorphic Call",
-    concept: "Polymorphism",
-    context: "Polymorphism means the same method call can produce different behavior depending on the runtime object.",
-    snippet: `public abstract class Animal
-{
-    public abstract string Speak();
-}
-
-public class Dog : Animal
-{
-    public override string Speak() => "Woof";
-}
-
-public class Cat : Animal
-{
-    public override string Speak() => "Meow";
-}
-
-var pets = new List<Animal> { new Dog(), new Cat() };
-foreach (var pet in pets)
-{
-    Console.WriteLine(pet.{{1}}());
-}
-
-// Output:
-// Woof
-// Meow`,
-    points: [
-      "Caller code stays the same: `pet.Speak()` for every element.",
-      "Runtime type (`Dog` or `Cat`) decides which `Speak` implementation runs.",
-    ],
-    blanks: [
-      {
-        id: 1,
-        label: "Shared contract method called on each animal",
-        answer: "Speak",
-        hints: ["Use the same method for Dog and Cat.", "This method is declared in Animal."],
-        explain: [
-          { text: "`Animal` is the shared type. Both `Dog` and `Cat` inherit from it — they are specific kinds of `Animal`.", highlight: "public abstract class Animal" },
-          { text: "`Dog` has its own `Speak` that returns `Woof`. `Cat` has its own that returns `Meow`. Same method name, different behavior.", highlight: "public override string Speak() => \"Woof\"" },
-          { text: "The loop goes through each animal one at a time. `pet` holds the current one on each pass.", highlight: "foreach (var pet in pets)" },
-          { text: "The same call runs for every animal. C# decides at runtime which `Speak` version to use — `Dog`'s or `Cat`'s.", highlight: "Console.WriteLine(pet.{{1}}())" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Inheritance Declaration",
-    concept: "Inheritance",
-    context: "Extend a base class and specialize behavior in the derived class.",
-    snippet: `public class Vehicle
-{
-    public virtual int GetWheelCount()
-    {
-        return 0;
-    }
-}
-
-public class Car : {{1}}
-{
-    public override int GetWheelCount()
-    {
-        return {{2}};
-    }
-}
-
-var car = new Car();
-Console.WriteLine(car.GetWheelCount());
-
-// Output:
-// 4`,
-    points: [
-      "Inheritance models an is-a relation: `Car` is a `Vehicle`.",
-      "Derived classes can override base behavior to provide specific results.",
-    ],
-    blanks: [
-      {
-        id: 1,
-        label: "Base class for Car",
-        answer: "Vehicle",
-        hints: ["Use the class declared above Car."],
-        explain: [
-          { text: "`Vehicle` is the base class. It has a `GetWheelCount` method that returns `0` — it does not know what kind of vehicle it is.", highlight: "public class Vehicle" },
-          { text: "The colon means `Car` inherits from `Vehicle`. `Car` gets all of `Vehicle`'s code and can replace what it needs.", highlight: "public class Car : {{1}}" },
-        ],
-      },
-      {
-        id: 2,
-        label: "Car-specific wheel count",
-        answer: "4",
-        hints: ["A standard car has four wheels in this example."],
-        explain: [
-          { text: "`override` means `Car` is replacing `Vehicle`'s version of `GetWheelCount` with its own. `Vehicle` returns `0`. `Car` returns the real number.", highlight: "public override int GetWheelCount()" },
-          { text: "A car has `4` wheels. When we call `car.GetWheelCount()`, this `Car` version runs — not the one inside `Vehicle`.", highlight: "return {{2}}" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Composition Field",
-    concept: "Composition",
-    context: "Model has-a relationship with a collaborator.",
-    snippet: `public class OrderService
-{
-    private readonly IRepository _repo;
-
-    public OrderService(IRepository repo)
-    {
-        {{1}} // field assignment goes here
-    }
-}`,
-
-    points: ["Composition uses collaborators.", "Constructor stores required dependency."],
-    blanks: [
-      {
-        id: 1,
-        label: "Store collaborator",
-        answer: "_repo = repo;",
-        hints: ["Assign constructor parameter to field."],
-        explain: [
-          { text: "`_repo` is the field that stores the repository this service will use. It is `private` — only code inside this class can reach it.", highlight: "private readonly IRepository _repo" },
-          { text: "The constructor receives `repo` from outside. Someone who creates an `OrderService` must hand it in.", highlight: "public OrderService(IRepository repo)" },
-          { text: "This line saves the incoming `repo` into `_repo` so every method in the class can use it later. Without this line, `_repo` stays empty.", highlight: "field assignment goes here" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Dependency Injection",
-    concept: "Dependency Injection",
-    context: "Use the declarations below and inject the logger from the outside.",
-    snippet: `public interface ILogger
-  {
-    void Log(string message);
-  }
-
-  public class ConsoleLogger : ILogger
-  {
-    public void Log(string message) { }
-  }
-
-  public class ReportService
-  {
-    private readonly ILogger _logger;
-
-    public ReportService(ILogger logger)
-    {
-      _logger = logger;
-    }
-  }
-
-  var logger = new ConsoleLogger();
-var service = new ReportService({{1}});`,
-    points: ["Dependencies are provided externally.", "Class should not construct its own collaborators."],
-    blanks: [
-      {
-        id: 1,
-        label: "Injected dependency argument",
-        answer: "logger",
-        hints: ["Pass the collaborator variable."],
-        explain: [
-          { text: "`ReportService` needs a logger. Its constructor asks for one — it must be provided from the outside.", highlight: "public ReportService(ILogger logger)" },
-          { text: "A few lines above, a `ConsoleLogger` was created and stored in the variable `logger`.", highlight: "var logger = new ConsoleLogger()" },
-          { text: "Here we pass that `logger` in when creating the service. `ReportService` will use it without knowing how it was built.", highlight: "var service = new ReportService({{1}})" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Closing Synthesis",
-    concept: "Level 1 Closing Check",
-    context: "Final exam: complete the missing parts of this full program to demonstrate all Level 1 concepts together.",
-    snippet: `using System;
-  using System.Collections.Generic;
-
-  public interface ILogger
-  {
-    void Log(string message);
-  }
-
-  public class ConsoleLogger : ILogger
-  {
-    public void Log(string message) => Console.WriteLine({{1}});
-  }
-
-  public abstract class Notification
-  {
-    protected readonly ILogger _logger;
-
-    protected Notification({{2}} logger)
-    {
-      _logger = logger;
-    }
-
-    public abstract string BuildMessage(string userName);
-  }
-
-  public class EmailNotification : Notification
-  {
-    public EmailNotification(ILogger logger) : base(logger) { }
-
-    public override string BuildMessage(string userName)
-    {
-      _logger.Log("Email notification selected");
-      return $"Email for {userName}";
-    }
-  }
-
-  public class SmsNotification : Notification
-  {
-    public SmsNotification(ILogger logger) : base(logger) { }
-
-    public override string BuildMessage(string userName)
-    {
-      _logger.Log("SMS notification selected");
-      return $"{{3}} for {userName}";
-    }
-  }
-
-  public class NotificationService
-  {
-    private readonly List<Notification> _notifications;
-    private int _sentCount;
-
-    public NotificationService({{4}} notifications)
-    {
-      _notifications = notifications;
-    }
-
-    public void SendAll(string userName)
-    {
-      foreach (var notification in _notifications)
-      {
-        var message = notification.BuildMessage(userName);
-        Console.WriteLine(message);
-        _sentCount = AddOne(_sentCount);
-      }
-    }
-
-    public int GetSentCount()
-    {
-      return _sentCount;
-    }
-
-    private int AddOne(int value)
-    {
-        return value + {{5}};
-    }
-  }
-
-  var logger = new ConsoleLogger();
-  var notifications = new List<Notification>
-  {
-    new EmailNotification(logger),
-    new SmsNotification(logger)
+  window.BUILD_CONFIG = {
+    prefix: "l1c",
+    metaLabel: "Understand the ideas \u00b7 Practice the Basics",
+    progressNoun: "Step",
+    awardedKey: "level1_coding_awarded",
+    awardAmount: 20,
+    tasks,
   };
-
-var sameRef = {{6}};
-  var service = new NotificationService(notifications);
-  service.SendAll("Isaac");
-
-Console.WriteLine($"Notifications sent: {service.{{7}}()}");
-  Console.WriteLine($"Same object in memory: {Object.ReferenceEquals(notifications, sameRef)}");`,
-    points: [
-      "One program combines all Level 1 ideas in a realistic flow.",
-      "Polymorphism happens in `foreach`: same call, different runtime behavior.",
-      "Dependency injection and composition appear through constructor-provided collaborators.",
-    ],
-    blanks: [
-      {
-        id: 1,
-        label: "Value passed to Console.WriteLine",
-        answer: "message",
-        hints: ["Use the Log method parameter directly."],
-        explain: [
-          { text: "`Log` is a method that receives a text value called `message` as its input.", highlight: "void Log(string message)" },
-          { text: "The `=>` symbol is a shorthand for a method body with a single action. It means: when this method runs, do exactly what follows the arrow.", highlight: "public void Log(string message) => Console.WriteLine({{1}})" },
-          { text: "`Console.WriteLine` prints to the screen. We want to print whatever was passed in as `message`.", highlight: "public void Log(string message) => Console.WriteLine({{1}})" },
-        ],
-      },
-      {
-        id: 2,
-        label: "Type of injected logger in Notification constructor",
-        answer: "ILogger",
-        hints: ["Use the interface, not a concrete logger class."],
-        explain: [
-          { text: "`ILogger` is an interface — a contract that says: any class that implements me must have a `Log` method.", highlight: "public interface ILogger" },
-          { text: "The constructor uses `ILogger` rather than `ConsoleLogger`. Any class with a `Log` method can be passed in here — keeping `Notification` flexible.", highlight: "protected Notification({{2}} logger)" },
-        ],
-      },
-      {
-        id: 3,
-        label: "Prefix text returned by SmsNotification",
-        answer: "SMS",
-        hints: ["Match the class intent in uppercase."],
-        explain: [
-          { text: "`EmailNotification` returns a message that starts with `Email`.", highlight: "return $\"Email for" },
-          { text: "`SmsNotification` does the same thing, but for `SMS`. Both classes have the same method name with different content — that is polymorphism.", highlight: "return $\"{{3}} for" },
-        ],
-      },
-      {
-        id: 4,
-        label: "Constructor parameter type for notifications collection",
-        answer: "List<Notification>",
-        hints: ["Use a list containing the base notification type."],
-        explain: [
-          { text: "This field stores all the notification objects the service will work with.", highlight: "private readonly List<Notification> _notifications" },
-          { text: "The constructor receives the list from outside. The type must match the field — a `List` containing `Notification` objects.", highlight: "public NotificationService({{4}} notifications)" },
-        ],
-      },
-      {
-        id: 5,
-        label: "Increment amount in AddOne",
-        answer: "1",
-        hints: ["Increase the counter by one each send."],
-        explain: [
-          { text: "`AddOne` is a helper method. It takes a number and gives back that number increased by some amount.", highlight: "private int AddOne(int value)" },
-          { text: "The method is called `AddOne`, so the number to add is `1`. `value` + __ is where the increase happens.", highlight: "return value + {{5}}" },
-        ],
-      },
-      {
-        id: 6,
-        label: "Reuse the existing list reference",
-        answer: "notifications",
-        hints: ["Use the variable that already stores the List<Notification>."],
-        explain: [
-          { text: "`notifications` was already created above as a list with two items in it.", highlight: "var notifications = new List<Notification>" },
-          { text: "This line does not build a new list. It copies the address stored in `notifications` into `sameRef`.", highlight: "var sameRef = {{6}}" },
-          { text: "This checks whether both variables point to the exact same object in memory.", highlight: "Object.ReferenceEquals(notifications, sameRef)" },
-        ],
-      },
-      {
-        id: 7,
-        label: "Read encapsulated sent counter",
-        answer: "GetSentCount",
-        hints: ["Use the public method that exposes private _sentCount."],
-        explain: [
-          { text: "`_sentCount` counts how many notifications were sent. It is `private` — outside code cannot read it directly.", highlight: "private int _sentCount" },
-          { text: "`GetSentCount` is the `public` method that returns its value. The name describes exactly what it gives you.", highlight: "public int GetSentCount()" },
-          { text: "We call it here to print the total after all notifications were sent.", highlight: "service.{{7}}()" },
-        ],
-      },
-    ],
-  },
-];
-
-// Complete, runnable C# for each drill, index-aligned with `drills`. The drill
-// snippets are teaching fragments (some are class-only or use top-level
-// statements after type declarations, which do not compile on their own), so
-// each one is paired here with a valid program that produces visible output.
-// These are what the Run button compiles and runs through the shared code-lab
-// Roslyn/WASM host.
-const runnablePrograms = [
-  // 0 - Model State With Variables
-  `using System;
-
-class Program
-{
-    static void Main()
-    {
-        var doorOpen = true;
-        Console.WriteLine(doorOpen);
-    }
-}`,
-  // 1 - Behavior As Transformation
-  `using System;
-
-class Program
-{
-    static int Double(int value)
-    {
-        return value * 2;
-    }
-
-    static void Main()
-    {
-        Console.WriteLine(Double(5));
-    }
-}`,
-  // 2 - Instantiate A Class
-  `using System;
-
-public class Counter
-{
-    public int Value;
-
-    public void Increment()
-    {
-        Value = Value + 1;
-    }
-}
-
-class Program
-{
-    static void Main()
-    {
-        var counter = new Counter();
-        counter.Increment();
-        Console.WriteLine(counter.Value);
-    }
-}`,
-  // 3 - Reference Assignment
-  `using System;
-
-public class User { }
-
-class Program
-{
-    static void Main()
-    {
-        var user = new User();
-        var sameUser = user;
-        Console.WriteLine(Object.ReferenceEquals(user, sameUser));
-    }
-}`,
-  // 4 - Encapsulation Accessor
-  `using System;
-
-public class BankAccount
-{
-    private int _balance;
-
-    public int GetBalance()
-    {
-        return _balance;
-    }
-}
-
-class Program
-{
-    static void Main()
-    {
-        var account = new BankAccount();
-        Console.WriteLine(account.GetBalance());
-    }
-}`,
-  // 5 - Polymorphic Call
-  `using System;
-using System.Collections.Generic;
-
-public abstract class Animal
-{
-    public abstract string Speak();
-}
-
-public class Dog : Animal
-{
-    public override string Speak() => "Woof";
-}
-
-public class Cat : Animal
-{
-    public override string Speak() => "Meow";
-}
-
-class Program
-{
-    static void Main()
-    {
-        var pets = new List<Animal> { new Dog(), new Cat() };
-        foreach (var pet in pets)
-        {
-            Console.WriteLine(pet.Speak());
-        }
-    }
-}`,
-  // 6 - Inheritance Declaration
-  `using System;
-
-public class Vehicle
-{
-    public virtual int GetWheelCount()
-    {
-        return 0;
-    }
-}
-
-public class Car : Vehicle
-{
-    public override int GetWheelCount()
-    {
-        return 4;
-    }
-}
-
-class Program
-{
-    static void Main()
-    {
-        var car = new Car();
-        Console.WriteLine(car.GetWheelCount());
-    }
-}`,
-  // 7 - Composition Field
-  `using System;
-
-public interface IRepository { }
-
-public class OrderService
-{
-    private readonly IRepository _repo;
-
-    public OrderService(IRepository repo)
-    {
-        _repo = repo;
-    }
-}
-
-public class FakeRepository : IRepository { }
-
-class Program
-{
-    static void Main()
-    {
-        var service = new OrderService(new FakeRepository());
-        Console.WriteLine("OrderService created with its repository");
-    }
-}`,
-  // 8 - Dependency Injection
-  `using System;
-
-public interface ILogger
-{
-    void Log(string message);
-}
-
-public class ConsoleLogger : ILogger
-{
-    public void Log(string message) => Console.WriteLine(message);
-}
-
-public class ReportService
-{
-    private readonly ILogger _logger;
-
-    public ReportService(ILogger logger)
-    {
-        _logger = logger;
-    }
-
-    public void Run() => _logger.Log("Report generated");
-}
-
-class Program
-{
-    static void Main()
-    {
-        var logger = new ConsoleLogger();
-        var service = new ReportService(logger);
-        service.Run();
-    }
-}`,
-  // 9 - Closing Synthesis
-  `using System;
-using System.Collections.Generic;
-
-public interface ILogger
-{
-    void Log(string message);
-}
-
-public class ConsoleLogger : ILogger
-{
-    public void Log(string message) => Console.WriteLine(message);
-}
-
-public abstract class Notification
-{
-    protected readonly ILogger _logger;
-
-    protected Notification(ILogger logger)
-    {
-        _logger = logger;
-    }
-
-    public abstract string BuildMessage(string userName);
-}
-
-public class EmailNotification : Notification
-{
-    public EmailNotification(ILogger logger) : base(logger) { }
-
-    public override string BuildMessage(string userName)
-    {
-        _logger.Log("Email notification selected");
-        return $"Email for {userName}";
-    }
-}
-
-public class SmsNotification : Notification
-{
-    public SmsNotification(ILogger logger) : base(logger) { }
-
-    public override string BuildMessage(string userName)
-    {
-        _logger.Log("SMS notification selected");
-        return $"SMS for {userName}";
-    }
-}
-
-public class NotificationService
-{
-    private readonly List<Notification> _notifications;
-    private int _sentCount;
-
-    public NotificationService(List<Notification> notifications)
-    {
-        _notifications = notifications;
-    }
-
-    public void SendAll(string userName)
-    {
-        foreach (var notification in _notifications)
-        {
-            var message = notification.BuildMessage(userName);
-            Console.WriteLine(message);
-            _sentCount = AddOne(_sentCount);
-        }
-    }
-
-    public int GetSentCount()
-    {
-        return _sentCount;
-    }
-
-    private int AddOne(int value)
-    {
-        return value + 1;
-    }
-}
-
-class Program
-{
-    static void Main()
-    {
-        var logger = new ConsoleLogger();
-        var notifications = new List<Notification>
-        {
-            new EmailNotification(logger),
-            new SmsNotification(logger)
-        };
-
-        var sameRef = notifications;
-        var service = new NotificationService(notifications);
-        service.SendAll("Isaac");
-
-        Console.WriteLine($"Notifications sent: {service.GetSentCount()}");
-        Console.WriteLine($"Same object in memory: {Object.ReferenceEquals(notifications, sameRef)}");
-    }
-}`,
-];
-
-window.DRILL_CONFIG = {
-  prefix: "l1c",
-  metaLabel: "Level 1 Microcoding",
-  progressNoun: "Drill",
-  drills,
-  runnablePrograms,
-  xpKey: "course_global_xp",
-  awardedKey: "level1_coding_awarded",
-  awardAmount: 20,
-};
+})();

@@ -1,5 +1,12 @@
 # Practice the Basics (`level1-coding.js`)
 
+> Rewritten 2026-07-27: replaced the OO-vocabulary fill-in-the-blank drills with a
+> code-lab write-and-run `build` lesson that bridges Foundations to Control Flow -
+> arithmetic, string concatenation, comparisons to a `bool`, and an object that
+> answers a yes/no question about its own state. The premature OO design content
+> (encapsulation/polymorphism/inheritance/composition/DI) is gone; those are
+> taught in Part 4. The notes below describe the earlier version.
+
 - **Track / Part:** Practical - Part 1 Understand the ideas
 - **Engine / format:** drill-engine (fill-in-the-blank) with per-drill Run button
 - **Difficulty pill:** Gentle  **XP cards (data-total):** 10
