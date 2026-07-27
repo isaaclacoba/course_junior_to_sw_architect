@@ -230,7 +230,7 @@ class Program
       title: "A fallback with ??",
       concept: "Null-coalescing",
       context:
-        "The `??` operator gives a fallback when the left side is `null`. `name ?? \"stray\"` means \"use `name`, but if it is `null`, use \\\"stray\\\" instead\" - one short line, no `if` needed. (You met `null` in Foundations.)",
+        "The `??` operator gives a fallback when the left side is `null`. `name ?? \"stray\"` means: use `name`, but if it is `null`, use `\"stray\"` instead - one short line, no `if` needed. (You met `null` in Foundations.)",
       example:
         'string? label = null;\nstring shown = label ?? "unlabelled";\nConsole.WriteLine(shown);   // unlabelled',
       goal: [
