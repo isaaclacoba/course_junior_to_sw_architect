@@ -1,5 +1,9 @@
 # Collections (`collections.js`)
 
+> Converted 2026-07-27 from a fill-in-the-blank drill to a code-lab write-and-run
+> build lesson (Monaco + Roslyn), 7 tasks. Same content (List<T>, foreach, index,
+> list of objects, Dictionary, ContainsKey, tally). The notes below predate that.
+
 - **Track / Part:** Practical - Part 3 Know the language
 - **Engine / format:** drill-engine (runnable: quiz-free fill-in-the-blank + Run)
 - **Difficulty pill:** Steady  **XP cards (data-total):** 7
