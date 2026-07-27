@@ -40,7 +40,7 @@ not an endorsement.
 
 | # | Lesson (slug) | Part | Concept introduced (portable) | C# surface | Depends on |
 |---|---|---|---|---|---|
-| 1 | foundations | 1 | object = state + behaviour; class vs instance; the OO vocabulary named | class, field, method | - |
+| 1 | foundations | 1 | printing output; a variable holds a value; datatypes; assignment (store, not equals); `null` (nothing yet); what an object is (state + behaviour, class vs instance) | `Console.WriteLine`, `int`/`long`/`double`/`decimal`/`bool`/`char`/`string`, `=`, `string?`+`null`, class/field/method, `new` | - |
 | 2 | practice-the-basics | 1 | the same ideas by hand; assigning a reference | class, `new`, method | 1 |
 | 3 | control-flow | 1 | choose a branch; combine yes/no; repeat; skip/stop; multi-way choose | if/else, `&&` `||` `!`, while, for, foreach, break/continue, switch | 1 |
 | 4 | writing-methods | 1 | a named step: return a value, take input, hold a rule, reuse it, call another | method, return, parameters | 3 |
@@ -52,7 +52,7 @@ not an endorsement.
 | 10 | data-shapes | 3 | ways to package data: property, computed value, a fixed set, value-copy, value-equality | `{ get; set; }` `[inversion]`, `=>` `(C#)`, enum, struct, record `(C#)` | 1,9 |
 | 11 | lambdas | 3 | a function passed as a value; capturing surrounding locals | `=>` lambda `(C#)`, Func/Predicate | 4,9 |
 | 12 | linq | 3 | query a collection without loops: filter, count, exists, all, map, first, order | Where/Count/Any/All/Select/FirstOrDefault/OrderBy `(C#)` | 9,11 |
-| 13 | errors-null | 3 | handle things going wrong; represent "missing" | try/catch/finally, throw, null, `??` `?.` `(C#)` | 4 |
+| 13 | errors-null | 3 | handle things going wrong; represent "missing" | try/catch/finally, throw, `??` `?.` `(C#)` (null itself is taught in Foundations, row 1) | 4 |
 | 14 | generics | 3 | write a type or method that works for any type | `Box<T>`, `First<T>`, `Pair<A,B>` | 9 |
 | 15 | encapsulation (why objects?) | 4 | group data, put behaviour beside it, hide internals, guard a rule, keep it in one place - **S** | private, class | 1,4 |
 | 16 | interfaces (why abstract?) | 4 | name a shared promise; depend on the promise not the concrete; add a type without touching callers - **D/O** | interface | 6,15 |

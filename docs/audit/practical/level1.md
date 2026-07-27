@@ -1,5 +1,11 @@
 # Foundations (`level1.js`)
 
+> Rewritten 2026-07-27: replaced the bespoke recognition-quiz + Mermaid controller
+> with a code-lab write-and-run `build` lesson. It no longer tours OO vocabulary
+> (that is taught in Part 4); it now teaches the actual language basics -
+> printing, variables, datatypes, assignment, `null`, and a grounded "what is an
+> object" (state + behaviour). The notes below describe the earlier version.
+
 - **Track / Part:** Practical - Part 1 Understand the ideas
 - **Engine / format:** custom controller (recognition quiz + Mermaid diagram per topic; not drill-engine)
 - **Difficulty pill:** Gentle  **XP cards (data-total):** 10
