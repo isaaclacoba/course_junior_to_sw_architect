@@ -211,7 +211,7 @@ Console.WriteLine(legs[{{2}}] + " legs");`,
     title: "Check before you read",
     concept: "Safe lookup",
     context:
-      "Reading a key that was never stored throws an error, so check first. Every dictionary has a built-in method for this: `ContainsKey`. You call it on the dictionary - `legs.ContainsKey(\"puppy\")` - and it hands back `true` if that key exists or `false` if it does not.",
+      "Reading a key that was never stored fails - there is no value there to hand back - so check first. Every dictionary has a built-in method for this: `ContainsKey`. You call it on the dictionary - `legs.ContainsKey(\"puppy\")` - and it hands back `true` if that key exists or `false` if it does not.",
     snippet: `var legs = new Dictionary<string, int>();
 legs["puppy"] = 4;
 

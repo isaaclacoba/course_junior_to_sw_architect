@@ -37,6 +37,12 @@
         led: true,
         heap: [file("f1", "report.txt", "4 KB")],
       },
+      {
+        narr: "Put together, the **operating system** is the manager between your programs and everything else: it turns raw storage into named **files** in **folders**, checks **permissions** before it opens or saves them, and works the hardware **devices** on a program's behalf - so every program gets what it needs without treading on the others.",
+        instr: "OS manages all",
+        highlight: ["soc", "ufs", "gpio"],
+        heap: [file("f1", "report.txt", "4 KB"), file("f2", "notes.md", "2 KB")],
+      },
     ],
   };
 })();

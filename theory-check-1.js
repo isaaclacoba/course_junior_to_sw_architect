@@ -11,11 +11,11 @@
     metaLabel: "Foundations \u00b7 Part one checkpoint",
     title: "Part one checkpoint",
     intro:
-      "Five questions drawn from Part one - the machine. Pick the best answer for each, then submit. Score four or more to pass and earn XP; a fresh set is drawn each time you retry.",
+      "Seven questions drawn from Part one - the machine. Pick the best answer for each, then submit. Score five or more to pass and earn XP; a fresh set is drawn each time you retry.",
     xpKey: "course_global_xp",
     awardedKey: "theory_check_1_awarded",
     awardAmount: 40,
-    askCount: 5,
+    askCount: 7,
     passRatio: 0.7, // ceil(5 * 0.7) = 4 needed
     nextHref: "theory-8.html",
     nextLabel: "Continue to Part two",

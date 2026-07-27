@@ -457,7 +457,7 @@ class Program
       title: "The first match, or nothing: FirstOrDefault",
       concept: "FirstOrDefault",
       context:
-        "`First` gives you the first item a lambda matches - but it throws when there is none. `FirstOrDefault` returns a default instead (for an object, `null`), so a missing match never crashes. `Main` here already checks for that default.",
+        "`FirstOrDefault` hands you the first item that matches your rule - and when nothing matches, it gives back a default instead of a match (for an object that default is `null`, a value meaning \"nothing here\"). Reach for it whenever a match might not exist; `Main` here already checks for that default.",
       example:
         "List<int> scores = new List<int> { 40, 75, 90 };\n// the first score the lambda likes, or 0 if none\nint firstPerfect = scores.FirstOrDefault(score => score >= 100); // 0",
       goal: [

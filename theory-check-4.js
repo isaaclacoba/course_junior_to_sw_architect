@@ -9,11 +9,11 @@
     metaLabel: "The development world \u00b7 Part four checkpoint",
     title: "Part four checkpoint",
     intro:
-      "Five questions drawn from Part four - the world you build in. Pick the best answer for each, then submit. Score four or more to pass and earn XP; a fresh set is drawn each time you retry.",
+      "Seven questions drawn from Part four - the world you build in. Pick the best answer for each, then submit. Score five or more to pass and earn XP; a fresh set is drawn each time you retry.",
     xpKey: "course_global_xp",
     awardedKey: "theory_check_4_awarded",
     awardAmount: 40,
-    askCount: 5,
+    askCount: 7,
     passRatio: 0.7,
     nextHref: "index.html",
     nextLabel: "Back to the course",

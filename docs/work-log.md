@@ -308,3 +308,18 @@ End: 2026-07-04 09:44:19 | Result: Deployed the Build-with-objects redesign + UR
   complexity, covered-well, verification status) to the build form.
 - Verified: node --check both; headless render confirms the bridge text, example
   label, intro framing, and the two WriteLines in the control-flow snippet; 0 undefined.
+
+## 2026-07-27 10:55 - Cycle 1 low-effort cleanup (5 theory items)
+- 1. Archived the 21 dead drill files (theory-1.js..theory-21.js) to
+  archive/theory-drills/ via git mv (no HTML referenced them).
+- 2. Reordered Part 4 cards in index.html: How code is shared (theory-20) now
+  precedes Standing on other code (theory-21), matching file numbers + ledger;
+  no file rename. Updated concept-ledger.md and theory/index.md.
+- 3. Added a closing synthesis step to theory-7.viz.js (now 5 steps) for Part 1
+  rhythm consistency.
+- 4. Fixed theory-18.html intro - dropped the "then databases" overpromise.
+- 5. Raised checkpoint coverage: askCount 5 -> 7/7/10/7 for Part 1-4, with intro
+  and pass wording updated to match.
+- Verified: node --check all changed JS; headless render clean (theory-7 shows
+  1/5, theory-18 intro fixed, checkpoint renders); card order 20->21; no HTML
+  references the archived files; 0 undefined. Updated audit README checklist.

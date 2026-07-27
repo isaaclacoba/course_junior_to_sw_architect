@@ -9,11 +9,11 @@
     metaLabel: "From idea to code \u00b7 Part two checkpoint",
     title: "Part two checkpoint",
     intro:
-      "Five questions drawn from Part two - how we write instructions. Pick the best answer for each, then submit. Score four or more to pass and earn XP; a fresh set is drawn each time you retry.",
+      "Seven questions drawn from Part two - how we write instructions. Pick the best answer for each, then submit. Score five or more to pass and earn XP; a fresh set is drawn each time you retry.",
     xpKey: "course_global_xp",
     awardedKey: "theory_check_2_awarded",
     awardAmount: 40,
-    askCount: 5,
+    askCount: 7,
     passRatio: 0.7,
     nextHref: "theory-15.html",
     nextLabel: "Continue to Part three",

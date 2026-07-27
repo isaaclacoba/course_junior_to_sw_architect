@@ -1,6 +1,7 @@
-// Visual for theory-18 "Saving data" - data-only. Plain and terse. RAM is wiped
-// when a program stops, so you save data to storage as a file. On disk a file is
-// an inode (the file itself + facts about it) plus a name in a directory that
+// Visual for theory-18 "Saving data" - data-only. Plain and terse. When a program
+// stops the OS reclaims its RAM (and RAM is volatile), so you save data to storage
+// as a file. On disk a file is an inode (the file itself + facts about it) plus a
+// name in a directory that
 // points to it. That name -> inode pointer is a hard link; a soft link is a
 // shortcut holding a path. No databases - this lesson is just the filesystem.
 (function () {
@@ -28,7 +29,7 @@
     code: [],
     steps: [
       {
-        narr: "While your program runs, its data sits in **RAM** - and RAM is wiped the moment the program stops.\nTo keep something, you save it to **storage** as a **file**.",
+        narr: "While your program runs, its data sits in **RAM**. When the program stops, the operating system takes that memory back for other programs, so your data is gone - and RAM is **volatile** anyway: lose power and it all vanishes.\nTo keep something after the program ends, you save it to **storage** as a **file**.",
         instr: "save", ram: true, highlight: ["ram", "ufs"], packets: [{ path: "trRam", reverse: true }, { path: "trUfs" }],
         stack: [], heap: [],
       },

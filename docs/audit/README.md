@@ -120,19 +120,21 @@ This is a genuinely gentle, well-sequenced foundation for an absolute beginner.
 
 ### Issues to fix before cycle 1 is "closed"
 
-1. **~21 dead sibling data files.** Every `theory-N.html` loads
-   `theory-N.viz.js`; the `theory-N.js` `DRILL_CONFIG` files are the superseded
-   drill version and are loaded by nothing. Delete or re-home them, and update
-   any overview doc that still implies the drill version. (Detailed per report;
-   summarised in [infrastructure.md](infrastructure.md).)
-2. **Part 4 ordering.** In the live path `theory-21` (Standing on other code)
-   precedes `theory-20` (How code is shared); the file numbers are reversed
-   relative to teaching order - rename to match, or accept and document.
-3. **`theory-7` has no closing synthesis** step while lessons 1-6 all end on a
-   recap - inconsistent Part 1 rhythm.
-4. **Checkpoints under-sample.** Each draws 5 of 9-10 questions, so a single pass
-   can skip several Part concepts; some distractors are too easy to eliminate.
-5. **`theory-18` intro overpromises** relative to what the lesson delivers.
+> Progress 2026-07-27: items 1, 2, 3 and 5 addressed; item 4 raised (askCount now
+> 7/7/10/7). Remaining: distractor quality in the checkpoints.
+
+1. **~21 dead sibling data files.** DONE - moved to `archive/theory-drills/`
+   (git history preserved); the shipped pages load only `theory-N.viz.js`.
+2. **Part 4 ordering.** DONE - kept the teaching order `theory-21` (Standing on
+   other code) then `theory-20` (How code is shared); the card order in the index
+   matches it. File numbers (20/21) are legacy and do not drive order; no rename.
+3. **`theory-7` has no closing synthesis** step. DONE - added a closing recap
+   step so Part 1's rhythm is consistent (now 5 steps).
+4. **Checkpoints under-sample.** Partly addressed - `askCount` raised from 5 to
+   7/7/10/7 (Parts 1-4) so each pass covers most of the Part. Distractor quality
+   (some options too easy) is still open.
+5. **`theory-18` intro overpromises.** DONE - the intro no longer promises
+   databases; it matches the file-focused lesson.
 
 ---
 
@@ -142,15 +144,18 @@ Cycle 1 is "a gap-free introductory ladder on both tracks, with a repeatable
 lesson structure and no load-bearing concept used before it is taught." To get
 there:
 
-- Remove the dead theory `.js` files and settle the single theory engine.
+- DONE - Removed the dead theory `.js` files (archived) and settled the single
+  theory engine (`theory-N.viz.js`).
 - Introduce (once, early) every syntax token currently used before it is taught,
   or remove it from early lessons.
-- Add the missing hidden `verify` probes and make `Control Flow` and `LINQ`
-  runnable.
+- DONE - `Control Flow` and `LINQ` are now runnable (LINQ is a build lesson).
+  Still to do: add the missing hidden `verify` probes to the other build lessons.
 - State the SOLID letter each Part 4 / Part 5 / Part 6 lesson embodies, and add
   the ISP milestone to the capstone.
 - Normalise one example family per Part and smooth the two difficulty spikes.
-- Add the missing recaps and fix the small ordering/rhythm items in theory.
+- DONE (theory rhythm) - fixed the `theory-20`/`theory-21` order, added the
+  `theory-7` recap, corrected the `theory-18` intro, and widened checkpoint
+  coverage. Still to do: the missing practical recaps and checkpoint distractors.
 
 None of these add new topics - they make the existing ladder airtight.
 

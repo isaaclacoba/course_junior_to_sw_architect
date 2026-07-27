@@ -92,10 +92,11 @@ not an endorsement.
 | 18 | saving-data | 3 | RAM is wiped at exit; save to a file; a file is bytes plus metadata and a separate name | 15,7 |
 | 19 | programs-that-talk | 3 | client asks, server answers; a request gets a response back into memory | 4,7 |
 | - | checkpoint-3 | 3 | (review of Part 3) | 15-19 |
-| 20 | standing-on-other-code | 4 | you don't write everything; libraries and dependencies are code others wrote | 8 |
-| 21 | how-code-is-shared | 4 | version control keeps a history so many people work on one codebase | - |
+| 21 | standing-on-other-code | 4 | you don't write everything; libraries and dependencies are code others wrote | 8 |
+| 20 | how-code-is-shared | 4 | version control keeps a history so many people work on one codebase | - |
 | - | checkpoint-4 | 4 | (review of Part 4) | 20,21 |
 
-Note: in the live path, `theory-21` (standing on other code) currently precedes
-`theory-20` (how code is shared). The ledger lists them in intended teaching
-order; the file numbers are the thing to reconcile, not this order.
+Note: Part 4 is taught Standing on other code (`theory-21`) then How code is
+shared (`theory-20`) - you reach for libraries the moment you code; version
+control comes with managing your own. The file numbers (20/21) are legacy and do
+not drive order; no rename was made.

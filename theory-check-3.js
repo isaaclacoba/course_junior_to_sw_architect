@@ -11,11 +11,11 @@
     metaLabel: "How software runs \u00b7 Part three checkpoint",
     title: "Part three checkpoint",
     intro:
-      "Five questions drawn from Part three - how software runs and connects. Pick the best answer for each, then submit. Score four or more to pass and earn XP; a fresh set is drawn each time you retry.",
+      "Ten questions drawn from Part three - how software runs and connects. Pick the best answer for each, then submit. Score seven or more to pass and earn XP; a fresh set is drawn each time you retry.",
     xpKey: "course_global_xp",
     awardedKey: "theory_check_3_awarded",
     awardAmount: 40,
-    askCount: 5,
+    askCount: 10,
     passRatio: 0.7,
     nextHref: "theory-21.html",
     nextLabel: "Continue to Part four",
