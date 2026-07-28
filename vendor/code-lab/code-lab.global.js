@@ -67,7 +67,6 @@ var CodeLab = (() => {
     resolveRackTools: () => resolveRackTools,
     resolveRetrieval: () => resolveRetrieval,
     resolveTranscript: () => resolveTranscript,
-    retrievedDocs: () => retrievedDocs,
     scoreQuiz: () => scoreQuiz,
     selectRunCode: () => selectRunCode,
     shelfStores: () => shelfStores,
@@ -2175,9 +2174,6 @@ ${result.runtimeError}`.trim(),
         scorePct: score === null ? null : Math.round(score * 100)
       };
     });
-  }
-  function retrievedDocs(scene) {
-    return resolveRetrieval(scene).filter((doc) => doc.state === "match");
   }
 
   // src/dom/retrieval-view.ts
