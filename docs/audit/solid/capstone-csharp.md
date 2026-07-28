@@ -73,14 +73,20 @@ are minor; none block the exercise.
   `"PASS"`/`"FAIL"`, could pass milestone 1 without a genuine formatter. This is
   a deliberate leniency (the `LooksLikeFormatter` comment says detection by
   shape keeps the milestone honest when wording differs), so it is an accepted
-  trade-off, but it is a real false-positive surface. Low impact.
+  trade-off, but it is a real false-positive surface. Low impact. **FIXED.** The
+  `PASS`/`FAIL` fallback is now gated by `HasStringReturningMethod`, so a
+  data-only class that merely quotes the words is no longer taken for a
+  formatter; the reference solution still passes M1 via `LooksLikeFormatter`.
 - **(b) correctness - milestone 6 counts implementers, not usable second
   behaviour.** `SecondReporterRule` passes when
   `ReporterImplementerCount() >= 2`, i.e. two classes with the interface in
   their base list. An empty second implementer still counts. Given milestone 7
   then requires two distinct injected reporter types, the gap is small, but
   milestone 6 alone does not verify the second reporter does anything. Intended
-  leniency, low impact.
+  leniency, low impact. **FIXED.** `ReporterImplementerCount` now counts only
+  classes that define the interface's method with a body, so an empty class that
+  just names the interface no longer counts; both reference reporters (including
+  the silent one, which has an empty-body `Send`) still pass M6.
 - **(b) reference solution - `TestRunner` fields are mutable.**
   `Capstone.ReferenceSolution`: `private ReportFormatter _formatter;` and
   `private IReporter _reporter;` are assigned once in the constructor and never

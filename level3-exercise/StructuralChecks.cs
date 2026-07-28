@@ -61,7 +61,8 @@ internal sealed class CapstoneSyntax
         FormatterClass = Classes.FirstOrDefault(c =>
             c.Identifier.Text != "TestRunner" &&
             c.Identifier.Text != "Program" &&
-            (LooksLikeFormatter(c) || MentionsLiterals(c, "PASS", "FAIL")));
+            (LooksLikeFormatter(c)
+                || (HasStringReturningMethod(c) && MentionsLiterals(c, "PASS", "FAIL"))));
         RunnerConstructor = Runner?.Members.OfType<ConstructorDeclarationSyntax>().FirstOrDefault();
     }
 
@@ -108,9 +109,15 @@ internal sealed class CapstoneSyntax
     }
 
     public int ReporterImplementerCount()
-        => ReporterInterface == null
-            ? 0
-            : Classes.Count(c => Implements(c, ReporterInterface.Identifier.Text));
+    {
+        if (ReporterInterface == null) return 0;
+        // A real implementer provides the interface's method, not just a class
+        // that names the interface in its base list with an empty body.
+        var method = ReporterInterface.Members.OfType<MethodDeclarationSyntax>()
+            .FirstOrDefault()?.Identifier.Text;
+        return Classes.Count(c => Implements(c, ReporterInterface.Identifier.Text)
+            && (method == null || DefinesMethod(c, method)));
+    }
 
     public int DistinctInjectedReporterTypes()
         => RunnerCreations()
@@ -156,11 +163,25 @@ internal sealed class CapstoneSyntax
             m.ParameterList.Parameters.Count == 1 &&
             m.ParameterList.Parameters[0].Type is PredefinedTypeSyntax pt && pt.Keyword.IsKind(SyntaxKind.BoolKeyword));
 
+    // A class that actually turns something into text has a method returning a
+    // string. This guards the PASS/FAIL fallback so a data-only class that
+    // merely quotes the words is not mistaken for a formatter.
+    private static bool HasStringReturningMethod(ClassDeclarationSyntax cls)
+        => cls.Members.OfType<MethodDeclarationSyntax>().Any(m =>
+            m.ReturnType is PredefinedTypeSyntax rt && rt.Keyword.IsKind(SyntaxKind.StringKeyword));
+
     private static bool HasMethodNamed(InterfaceDeclarationSyntax iface, string name)
         => iface.Members.OfType<MethodDeclarationSyntax>().Any(m => m.Identifier.Text == name);
 
     private static bool Implements(ClassDeclarationSyntax cls, string interfaceName)
         => cls.BaseList?.Types.Any(t => t.Type is IdentifierNameSyntax id && id.Identifier.Text == interfaceName) == true;
+
+    // True when the class provides a method of this name with an actual body, so
+    // an empty class that only names the interface does not count as a second
+    // reporter.
+    private static bool DefinesMethod(ClassDeclarationSyntax cls, string name)
+        => cls.Members.OfType<MethodDeclarationSyntax>().Any(m =>
+            m.Identifier.Text == name && (m.Body != null || m.ExpressionBody != null));
 }
 
 // Builds CodeAnchor lists from syntax nodes. Kept apart so rules read as intent.
