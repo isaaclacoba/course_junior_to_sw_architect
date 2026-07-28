@@ -2,6 +2,9 @@
 
 # Work Log
 
+- Start: 2026-07-28 10:24:50 | Task: Author a new BUILD lesson "Abstract types and overriding" (type-system.js/.html, prefix ts, awardedKey type_system_awarded, awardAmount 25) for Unit 2 "Everyday essentials", after Type conversion and before "Know the language". Formalise the type-system mechanics (abstract base + override, virtual/override, method overloading, custom ToString, deterministic cleanup with IDisposable/using) in a language-agnostic way. 5 build tasks + recap, each a small themed class + Main + hidden verify probe, requireSource technique gate, culture-safe output. Copy type-conversion conventions. Do not edit index.html / concept-ledger.md / page-shell.js; do not commit or push.
+- End: 2026-07-28 10:36:46 | Result: Created type-system.js (BUILD_CONFIG, prefix ts, metaLabel "Everyday essentials \u00b7 Abstract types and overriding", progressNoun Step, xpKey course_global_xp, awardedKey type_system_awarded, awardAmount 25, runnerUrl level3-app/index.html?runner=1) with 5 build tasks + recap. T1 abstract class Animal + abstract Speak, Cat override -> Meow (gate: abstract class + abstract string Speak + override; probe Dog:Animal -> Woof). T2 Pet virtual Sound default "quiet", Parrot override -> Squawk (gate: virtual + override; probe plain Pet -> quiet, proving base stays instantiable with a default). T3 Counter overloading Add(int)/Add(int,int), Main Add(2,3) -> 5 (gate: both signatures same name; probe Add(4) -> 4). T4 Cat override ToString -> "Cat: "+name, Console.WriteLine(cat) -> Cat: Whiskers (gate: override string ToString + "Cat: "; probe new Cat("Tom") -> Cat: Tom, catches hardcoding). T5 Cage : IDisposable printing "open" in ctor + "closed" in Dispose, Main using-block -> [open, closed] (gate: :IDisposable + using(; probe two using blocks -> [open,closed,open,closed]). Examples on different subjects (Shape/Circle, Greeter/Robot, Printer, Point, Door). Culture-safe: only strings/ints/bools printed. Recap card excluded from count. Created type-system.html (archetype build, eyebrow "Part two \u00b7 Everyday essentials", prefix ts, load order code-lab.global.js -> page-shell.js -> type-system.js -> build-engine.js, no Prism). Verified: node --check clean; real dotnet 8 harness replicating the engine grading -> ALL_TASKS_PASS: all 5 solutions compile warning-free with output == expected (Meow/Squawk/5/Cat: Whiskers/[open,closed]), all 5 requireSource sets match their solution, all 5 rebuilt verify probes compile and match verify.expected (Woof/quiet/4/Cat: Tom/[open,closed,open,closed]), all 5 starters compile but do NOT pass. Headless google-chrome render of http://localhost:8091/type-system.html: "Step 1 / 5", title "Abstract types and overriding", first task "A type you cannot make", id="tsEditor" present, undefined=0. Temp artifacts removed. index.html / concept-ledger.md / page-shell.js untouched. Not committed, not pushed.
+
 - Start: 2026-07-27 16:19:45 | Task: Convert lesson "The SOLID Principles" (level2.js/level2.html) from the fill-in-the-blank drill engine (10 drills + Mermaid) to a Monaco write-and-run BUILD lesson (build-engine.js). Five build tasks S/O/L/I/D (recap excluded), each describes the trap in prose then asks the learner to write the fix; each has a requireSource technique gate and a hidden verify probe. Drop Mermaid; keep prefix l2 / awardedKey level2_awarded / awardAmount 25.
 - End: 2026-07-27 16:27:21 | Result: Rewrote level2.js as window.BUILD_CONFIG (prefix l2, metaLabel "Design for change - The SOLID principles", progressNoun Build, awardedKey level2_awarded, xpKey course_global_xp, awardAmount 25, runnerUrl level3-app/index.html?runner=1). Five build tasks over a shared test-automation subject: S split LoginTest.RunAndReport into LoginTest.Run + ReportFormatter.Format (gate: ReportFormatter class + Format(bool) + bool Run() + no RunAndReport; probe Format(false)->FAIL). O convert ReportFormatter.Build if-chain into IReport + PlainReport/EmojiReport (gate: interface + both impls + no style==/switch; probe EmojiReport.Build(true)->OK). L stop SkippedTest:Test throwing; IRunnable with LoginTest/SkippedTest returning Pass/Skipped (gate: interface + both implement IRunnable + no throw + no ": Test"; probe [Pass,Skipped]; starter throws at runtime). I split fat ITestPlugin into IRunnable+IReportable, ReportPlugin implements only IReportable (gate: both interfaces + ReportPlugin:IReportable + no ITestPlugin + no NotImplementedException; probe defines SummaryPlugin:IReportable->summary ready). D inject IReporter into TestRunner instead of newing ConsoleReporter (gate: IReporter + ConsoleReporter:IReporter + TestRunner(IReporter + no field "= new ConsoleReporter();"; probe FakeReporter records->test passed). Recap card excluded from count. Dropped all Mermaid; rewrote level2.html to build archetype (load order code-lab.global.js -> page-shell.js -> level2.js -> build-engine.js, no Prism/Mermaid). Verified: node --check clean; dotnet 8 compiled all 5 solutions warning-free with output matching expected, all requireSource regexes match each solution, all 5 verify probes pass, all 5 starters compile but are blocked (requireSource/probe; L starter throws) so none pre-passes. Headless render: "Build 1 / 5", first title "S - Single Responsibility: split the jobs", id="l2Editor" present, undefined=0, mermaid=0. Temp artifacts removed. index.html and docs/concept-ledger.md left for the orchestrator (data-total 10 -> 5; ledger row 24 wording). Not committed, not pushed.
 
@@ -342,3 +345,75 @@ solutions, starters compile and do not pre-pass, all requireSource match; headle
 shows "Step 1 / 6", first title, roEditor, 0 undefined. Temp files removed.
 Pending (orchestrator): index.html card (drop nothing structural; data-total=6)
 and ledger row 5 surface update.
+
+## 2026-07-28 10:24 - Author BUILD lesson "Strings" (Unit 2 Everyday essentials)
+
+## tis 28 jul 2026 10:24:58 CEST - Author BUILD lesson "Access and properties" (Unit 2 Everyday essentials)
+Start. New build lesson access-properties (Part 2, after type-conversion). 4
+tasks + recap: hide a field expose get-only property; auto-property get/set;
+expression-bodied computed property; init-only set-once. Portable framing:
+visibility (public/private/protected) + exposing state through a property, not a
+raw field. Surface budget: class/field/constructor/method + access modifiers +
+properties. No List/Dictionary/LINQ/generics/lambda/enum/struct/record/array.
+Every task: requireSource gate + hidden verify probe; culture-safe output.
+
+## 2026-07-28 10:25 CEST - Start: BUILD lesson "static, const, and readonly" (class-members)
+New Unit 2 practical build lesson (build-engine.js), prefix "cm", awardedKey
+class_members_awarded, data-total 4 + recap. Portable framing: some
+data/behaviour belongs to the TYPE (static), some values never change (const),
+some fields are set once (readonly). Tasks: (1) static helper method, (2) const
+value used by a method, (3) readonly field set in the constructor, (4) static
+field shared across instances. Every task: requireSource keyword gate + hidden
+verify probe; culture-safe output (int/string/bool only). Not editing index,
+ledger, or page-shell per request.
+
+## 2026-07-28 10:26 CEST - Start: BUILD lesson "Null-safety" (null-safety)
+New Unit 2 practical build lesson (build-engine.js), prefix "ns", awardedKey
+null_safety_awarded, data-total 4 + recap. Portable framing: a value may be
+absent ("no value") and robust code handles that case instead of crashing.
+Tasks: (1) default when null with ??, (2) safe navigation with ?., (3) nullable
+value type int? + null check, (4) ??= assign-if-null on a field. Every task:
+requireSource technique gate + hidden verify probe run with BOTH null and
+non-null input; culture-safe output (string/int/bool only); solutions
+warning-free under nullable reference types. Not editing index, ledger, or
+page-shell per request.
+   Done 2026-07-28 10:31 - strings.js + strings.html. 4 tasks + recap (data-total 4). Verified: node --check; dotnet all 4 (solution=expected, hidden verify probe=verify.expected, requireSource regexes, starter compiles + not pre-pass); headless Step 1 / 4, first title, 0 undefined.
+End tis 28 jul 2026 10:33:08 CEST. access-properties.js + .html authored. 4 build tasks + recap
+(data-total 4). Verified with dotnet 8: every solution runs == expected
+(9 / Rex / cat:Milo / Rex), every rebuilt verify probe == verify.expected
+(7 / Bella / cat:Zoe / Sky), all requireSource patterns match each solution,
+every starter compiles and does NOT pre-pass, no compiler warnings. Headless
+render of access-properties.html shows meta, title, "Step 1 / 4", 0 undefined.
+Temp files removed. Not committed. Pending orchestrator: index.html card
+(data-key access_properties_awarded, data-total 4) + concept-ledger row.
+
+## 2026-07-28 10:38 CEST - End: BUILD lesson "static, const, and readonly" (class-members)
+Created class-members.js (BUILD_CONFIG, prefix cm, awardedKey
+class_members_awarded, awardAmount 20, 4 tasks + recap) and class-members.html
+(eyebrow "Part two - Everyday essentials", title "Static, const, and readonly",
+load order vendor/code-lab -> page-shell -> class-members -> build-engine).
+Tasks: 1 static helper method (Zoo.Double), 2 const (Herd.LegsPerCow), 3
+readonly field set in ctor (Cat name), 4 static shared counter (Sheep.Count).
+Each: requireSource keyword gate + hidden verify probe; output int/string/bool
+only. Did NOT edit index.html, docs/concept-ledger.md, or page-shell.js (per
+request; proposed ledger row reported to author).
+Verified (dotnet 8): node --check OK; all 4 solutions compile+run == expected;
+all 4 verify probes == verify.expected; requireSource matches every solution;
+starters compile and do not pre-pass. Browser render confirmed "Step 1 / 4",
+concept/meta/goal/expected all set, Monaco loaded, 0 "undefined". Temp files
+removed.
+
+## 2026-07-28 10:39 CEST - End: BUILD lesson "Null-safety" (null-safety)
+Created null-safety.js (BUILD_CONFIG, prefix "ns", 4 tasks + recap) and
+null-safety.html (copy of type-conversion.html; eyebrow "Part two - Everyday
+essentials", title "Null-safety"). Tasks: (1) default with `??`, (2) safe call
+with `?.`, (3) nullable value type `int?` + null check, (4) assign-if-null with
+`??=` on a field. Each: requireSource technique gate + hidden verify probe that
+re-runs the learner's class with BOTH a null and a non-null input; culture-safe
+output (string/int only).
+Verified (real dotnet 8, Nullable enable): every solution output == expected;
+zero nullable warnings; every probe passes ["Rex","stray"]/["Milo","nobody"]/
+["age 4","unknown"]/["Rex","guest"]; requireSource matches each solution;
+starters compile and do not pre-pass. Headless dump of /null-safety.html shows
+"Step 1 / 4", 0 "undefined", title, meta, Run button. Temp files deleted.
+Did NOT edit index.html, docs/concept-ledger.md, or page-shell.js per request.

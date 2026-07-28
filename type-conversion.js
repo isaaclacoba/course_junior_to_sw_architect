@@ -134,7 +134,7 @@
 
   window.BUILD_CONFIG = {
     prefix: "tc",
-    metaLabel: "C# up close \u00b7 Type conversion",
+    metaLabel: "Everyday essentials \u00b7 Type conversion",
     progressNoun: "Step",
     tasks,
     runnerUrl: "level3-app/index.html?runner=1",
