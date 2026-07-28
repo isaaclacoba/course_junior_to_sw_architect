@@ -742,3 +742,32 @@ hardcoded twice:
   ai-23 -> index, theory-check-4 -> index for the 3-track split,
   the-solid-principles -> level3-app/). Screenshot matched the pre-loss view.
   Temp harnesses removed. Not pushed.
+
+## 2026-07-28 15:09 +0200 - Theme system (start)
+
+Goal: extensible theme system. Tokenize all colors in styles.css + index.html
+inline into CSS custom properties (SSOT), keep default byte-identical, add a
+theme registry + switcher + localStorage persistence (early-applied, no FOUC),
+ship default (Clean) + one full "Critters" animal theme (palette + rounder font
++ SVG decorations), applied site-wide (index + all lesson pages).
+
+## 2026-07-28 15:27 +0200 - Theme system (end)
+
+Shipped an extensible, site-wide theme system.
+
+- Tokenized every raw color in styles.css (72 unique) and the index.html inline
+  styles into semantic CSS custom properties, with RGB-channel tokens
+  (--primary-rgb / --accent-rgb / --dark-rgb, plus --bg-1-rgb / --card-rgb /
+  --shade-rgb) so tints follow a recolor. :root defaults are byte-identical -
+  headless pixel diff of the default index vs master = 0 differing pixels, and a
+  lesson page matched apart from the compiler-warmup button label.
+- Added a small registry/behavior split: theme-registry.js (data - the list of
+  themes) and theme-switch.js (applies data-theme before paint to avoid a flash,
+  persists to localStorage course_theme, loads the theme font on demand, builds
+  a floating picker). Wired both into the <head> of index + all 75 lesson pages
+  after the styles.css link. Presentation lives in styles.css [data-theme] blocks.
+- Shipped default (Clean) + a full "Critters" skin: warm rounded palette, Baloo 2
+  / Nunito fonts, larger radii, a faint paw-print background, and a fox mascot in
+  the lesson hero. Adding another theme is a data entry plus one CSS block.
+- Picker sits bottom-right, stacked above the index back-to-top and clear of the
+  lesson Previous/Next nav; panel opens upward, closes on outside-click/Escape.
