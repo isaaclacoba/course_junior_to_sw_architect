@@ -25,6 +25,7 @@ var CodeLab = (() => {
     CodeLab: () => CodeLab,
     DEFAULT_LOOP_MEMORIES: () => DEFAULT_LOOP_MEMORIES,
     DEFAULT_LOOP_TOOLS: () => DEFAULT_LOOP_TOOLS,
+    DEFAULT_MEMORY_STORES: () => DEFAULT_MEMORY_STORES,
     FULL_REGIONS: () => FULL_REGIONS,
     MemoryViz: () => MemoryViz,
     MonacoEditor: () => MonacoEditor,
@@ -35,16 +36,19 @@ var CodeLab = (() => {
     RoslynIframeRunner: () => RoslynIframeRunner,
     TextareaEditor: () => TextareaEditor,
     Tour: () => Tour,
+    activeStores: () => activeStores,
     agentFanRows: () => agentFanRows,
     agentLoopActiveSet: () => agentLoopActiveSet,
     atFirst: () => atFirst,
     atLast: () => atLast,
+    authorOf: () => authorOf,
     computeLineFlags: () => computeLineFlags,
     counterLabel: () => counterLabel,
     defaultHighlighter: () => defaultHighlighter,
     deriveRefs: () => deriveRefs,
     drawQuiz: () => drawQuiz,
     firstUnanswered: () => firstUnanswered,
+    formatToolSignature: () => formatToolSignature,
     goTo: () => goTo,
     loadMonaco: () => loadMonaco,
     makeTour: () => makeTour,
@@ -58,12 +62,16 @@ var CodeLab = (() => {
     renderErrorPanel: () => renderErrorPanel,
     resolveMarks: () => resolveMarks,
     resolveModel: () => resolveModel,
+    resolveRackTools: () => resolveRackTools,
+    resolveTranscript: () => resolveTranscript,
     scoreQuiz: () => scoreQuiz,
     selectRunCode: () => selectRunCode,
+    shelfStores: () => shelfStores,
     showErrorPanel: () => showErrorPanel,
     shuffleQuiz: () => shuffle,
     spansForLine: () => spansForLine,
-    splitCodeLines: () => splitCodeLines
+    splitCodeLines: () => splitCodeLines,
+    toolRackRows: () => toolRackRows
   });
 
   // src/highlighter.ts
@@ -1565,7 +1573,7 @@ ${result.runtimeError}`.trim(),
     return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
   function inline(text) {
-    return escapeHtml4(text).replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+    return escapeHtml4(text).replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/\*([^*]+)\*/g, "<em>$1</em>");
   }
   function renderNarration(text) {
     const lines = String(text ?? "").split("\n");
@@ -1950,6 +1958,203 @@ ${result.runtimeError}`.trim(),
     }
   };
 
+  // src/core/memory-shelf-model.ts
+  var DEFAULT_MEMORY_STORES = [
+    { id: "episodic", name: "Episodic", blurb: "what happened before" },
+    { id: "semantic", name: "Semantic", blurb: "facts that stay true" },
+    { id: "procedural", name: "Procedural", blurb: "how to do things" }
+  ];
+  function activeStores(scene) {
+    if (!scene || scene.active == null) return /* @__PURE__ */ new Set();
+    const list = Array.isArray(scene.active) ? scene.active : [scene.active];
+    return new Set(list);
+  }
+  function shelfStores(scene, stores = DEFAULT_MEMORY_STORES) {
+    const active = activeStores(scene);
+    const byKind = scene?.stores ?? {};
+    return stores.map((meta) => ({
+      meta,
+      items: byKind[meta.id] ?? [],
+      active: active.has(meta.id)
+    }));
+  }
+
+  // src/dom/memory-shelf-view.ts
+  var MemoryShelfView = class {
+    constructor() {
+      this.el = document.createElement("div");
+      this.el.className = "cl-ms";
+      this.el.innerHTML = `
+      <div class="cl-ms-working" data-working>
+        <span class="cl-ms-cap" data-workingcap></span>
+        <div class="cl-ms-strip" data-workingitems></div>
+      </div>
+      <div class="cl-ms-wire" aria-hidden="true"></div>
+      <div class="cl-ms-stores" data-stores></div>`;
+    }
+    sync(ctx) {
+      const scene = ctx.model.memoryShelf ?? {};
+      this.renderWorking(scene);
+      this.renderStores(scene);
+    }
+    chip(item) {
+      return `<span class="cl-ms-item${item.hot ? " is-hot" : ""}">${escapeHtml4(item.text)}</span>`;
+    }
+    items(list) {
+      return list.length ? list.map((it) => this.chip(it)).join("") : `<span class="cl-ms-empty">empty</span>`;
+    }
+    renderWorking(scene) {
+      this.el.querySelector("[data-workingcap]").textContent = scene.workingCaption ?? "Working memory \u2014 the context read right now";
+      this.el.querySelector("[data-working]").classList.toggle(
+        "is-active",
+        Boolean(scene.workingActive)
+      );
+      this.el.querySelector("[data-workingitems]").innerHTML = this.items(scene.working ?? []);
+    }
+    renderStores(scene) {
+      const host = this.el.querySelector("[data-stores]");
+      host.innerHTML = shelfStores(scene).map(
+        (s) => `<div class="cl-ms-store is-${s.meta.id}${s.active ? " is-active" : ""}"><div class="cl-ms-store-head"><span class="cl-ms-store-name">${escapeHtml4(s.meta.name)}</span><span class="cl-ms-store-blurb">${escapeHtml4(s.meta.blurb)}</span></div><div class="cl-ms-store-items">${this.items(s.items)}</div></div>`
+      ).join("");
+    }
+  };
+
+  // src/core/tool-rack-model.ts
+  function formatToolSignature(tool) {
+    const params = tool.params ?? [];
+    const inner = params.map((p) => `${p.name}: ${p.type}`).join(", ");
+    return `${tool.name}(${inner})`;
+  }
+  function resolveRackTools(scene) {
+    const tools = scene?.tools ?? [];
+    return tools.map((tool) => ({
+      name: tool.name,
+      signature: formatToolSignature(tool),
+      desc: tool.desc,
+      state: tool.state ?? "idle"
+    }));
+  }
+  function toolRackRows(scene) {
+    const rows = [];
+    if (!scene) return rows;
+    if (scene.call) rows.push({ kind: "call", text: scene.call });
+    if (scene.error) rows.push({ kind: "error", text: scene.error });
+    else if (scene.result) rows.push({ kind: "result", text: scene.result });
+    return rows;
+  }
+
+  // src/dom/tool-rack-view.ts
+  var IO_META = {
+    call: { cls: "cl-tr-call", dir: "call \u2192" },
+    error: { cls: "cl-tr-error", dir: "\u2190 error" },
+    result: { cls: "cl-tr-result", dir: "\u2190 result" }
+  };
+  var ToolRackView = class {
+    constructor() {
+      this.el = document.createElement("div");
+      this.el.className = "cl-tr";
+      this.el.innerHTML = `
+      <span class="cl-tr-cap" data-cap></span>
+      <div class="cl-tr-rack" data-rack></div>
+      <div class="cl-tr-io" data-io hidden></div>`;
+    }
+    sync(ctx) {
+      const scene = ctx.model.toolRack ?? {};
+      this.el.querySelector("[data-cap]").textContent = scene.caption ?? "Tools the agent can call";
+      this.renderRack(scene);
+      this.renderIo(scene);
+    }
+    renderRack(scene) {
+      const host = this.el.querySelector("[data-rack]");
+      host.innerHTML = resolveRackTools(scene).map((tool) => {
+        const desc = tool.desc ? `<div class="cl-tr-tool-desc">${escapeHtml4(tool.desc)}</div>` : "";
+        return `<div class="cl-tr-tool is-${tool.state}"><code class="cl-tr-tool-sig">${escapeHtml4(tool.signature)}</code>` + desc + `</div>`;
+      }).join("");
+    }
+    renderIo(scene) {
+      const io = this.el.querySelector("[data-io]");
+      const rows = toolRackRows(scene);
+      io.hidden = rows.length === 0;
+      io.innerHTML = rows.map((row) => {
+        const meta = IO_META[row.kind];
+        return `<div class="cl-tr-line ${meta.cls}"><span class="cl-tr-dir">${meta.dir}</span><code class="cl-tr-chip">${escapeHtml4(row.text)}</code></div>`;
+      }).join("");
+    }
+  };
+
+  // src/core/transcript-model.ts
+  var ROLE_AUTHOR = {
+    system: "app",
+    developer: "app",
+    user: "you",
+    assistant: "model",
+    tool: "code"
+  };
+  function resolveTranscript(scene) {
+    const messages = scene?.messages ?? [];
+    return messages.map((m) => ({
+      role: m.role,
+      text: m.text,
+      author: m.by ?? ROLE_AUTHOR[m.role],
+      hot: Boolean(m.hot),
+      note: m.note
+    }));
+  }
+  function authorOf(message) {
+    return message.by ?? ROLE_AUTHOR[message.role];
+  }
+
+  // src/dom/transcript-view.ts
+  var ROLE_META = {
+    system: "system",
+    developer: "developer",
+    user: "user",
+    assistant: "assistant",
+    tool: "tool"
+  };
+  var AUTHOR_META = {
+    you: "you wrote this",
+    app: "your app wrote this",
+    model: "the model wrote this",
+    code: "your code wrote this"
+  };
+  var TranscriptView = class {
+    constructor() {
+      this.el = document.createElement("div");
+      this.el.className = "cl-tx";
+      this.el.innerHTML = `
+      <span class="cl-tx-cap" data-cap></span>
+      <div class="cl-tx-banner" data-banner hidden></div>
+      <div class="cl-tx-list" data-list></div>`;
+    }
+    sync(ctx) {
+      const scene = ctx.model.transcript ?? {};
+      this.el.querySelector("[data-cap]").textContent = scene.caption ?? "The conversation so far";
+      this.renderBanner(scene);
+      this.renderList(scene);
+    }
+    renderBanner(scene) {
+      const banner = this.el.querySelector("[data-banner]");
+      if (!scene.banner) {
+        banner.hidden = true;
+        banner.textContent = "";
+        banner.className = "cl-tx-banner";
+        return;
+      }
+      banner.hidden = false;
+      banner.className = "cl-tx-banner" + (scene.flow ? " is-" + scene.flow : "");
+      const arrow = scene.flow === "send" ? "\u2193" : scene.flow === "receive" ? "\u2191" : "";
+      banner.innerHTML = (arrow ? `<span class="cl-tx-arrow">${arrow}</span>` : "") + `<span class="cl-tx-banner-t">${escapeHtml4(scene.banner)}</span>`;
+    }
+    renderList(scene) {
+      const host = this.el.querySelector("[data-list]");
+      host.innerHTML = resolveTranscript(scene).map((m) => {
+        const note = m.note ? `<div class="cl-tx-note">${escapeHtml4(m.note)}</div>` : "";
+        return `<div class="cl-tx-msg is-${m.role} by-${m.author}${m.hot ? " is-hot" : ""}"><div class="cl-tx-head"><span class="cl-tx-role">${ROLE_META[m.role]}</span><span class="cl-tx-by">${AUTHOR_META[m.author]}</span></div><div class="cl-tx-text">${escapeHtml4(m.text)}</div>` + note + `</div>`;
+      }).join("");
+    }
+  };
+
   // src/dom/viz-controls.ts
   var DEFAULT_LEGEND = [
     { sw: "#37d3a6", label: "data in RAM" },
@@ -2062,6 +2267,9 @@ ${result.runtimeError}`.trim(),
         narration: () => new NarrationView(),
         agent: (spec) => new AgentView(spec.fan),
         agentloop: () => new AgentLoopView(),
+        memoryshelf: () => new MemoryShelfView(),
+        toolrack: () => new ToolRackView(),
+        transcript: () => new TranscriptView(),
         controls: (_spec, ctx) => this.controls = new VizControls(ctx.actions, ctx.handlers, ctx.nextHref, ctx.legend)
       };
       this.onResize = () => {

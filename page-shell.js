@@ -209,6 +209,7 @@
     "ai-1.html", "ai-2.html", "ai-3.html", "ai-9.html", "ai-10.html",
     "ai-4.html", "ai-5.html",
     "ai-6.html", "ai-7.html", "ai-8.html",
+    "ai-11.html", "ai-12.html", "ai-13.html",
   ];
   if (!page.nextHref) {
     const current = (location.pathname.split("/").pop() || "").toLowerCase();

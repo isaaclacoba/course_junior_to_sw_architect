@@ -266,3 +266,244 @@ End: 2026-07-04 09:44:19 | Result: Deployed the Build-with-objects redesign + UR
 ## 2026-07-07 21:09 - Audit poor identifier names in lambdas.js, linq.js, errors-null.js
 - Start: rename single-letter local/lambda vars to descriptive camelCase.
 - End (2026-07-07 21:11): renamed lambda/local params in 3 files; node --check all pass.
+
+## 2026-07-13 20:08 - Cycle 1 content audit: per-lesson reports + agentic files
+- Start: read every lesson, write one markdown report per lesson (50), plus
+  infrastructure report, track indexes, master index, SPECS, and two skills.
+- End (2026-07-13 20:09): docs/audit/ has 50/50 reports (tracker 100%),
+  infrastructure.md, practical/index.md, theory/index.md, README.md; docs/SPECS.md;
+  .github/skills/{lesson-authoring,course-audit}/SKILL.md. Read-only audit, no
+  lesson content changed, nothing compiled.
+
+## 2026-07-27 09:08 - Distil audit learnings into ledger + SPECS + skills
+- Start: turn recurring audit findings into durable guidance.
+- End (2026-07-27 09:10): added docs/concept-ledger.md (portable syllabus, both
+  tracks + language-surface policy); SPECS.md principles (portability,
+  ledger-enforced ordering, runnable-by-default, grading definition, voice loop)
+  and prefer-build direction; lesson-authoring skill (ledger step + preflight
+  checklist); course-audit skill (recurring-defect scan). Docs only.
+
+## 2026-07-27 11:42 - AI track: code-lab agent panel + Lesson 1 "What is an LLM?"
+- Start (2026-07-27 11:28): after co-designing and getting sign-off on the clean
+  look (reuse course styles, no new palette), build the real code-lab `agent`
+  panel and prove it with Lesson 1.
+- End (2026-07-27 11:42): code-lab - new src/core/agent-model.ts (pure AgentScene model +
+  agentFanRows, 6 unit tests); Step.agent field + "agent" PanelType +
+  configurable LegendItem[] in memory-model; new src/dom/agent-view.ts (token
+  strip, LLM core, next-token fan); facade branch + legend threaded through
+  VizControls; .cl-ag CSS (course palette only, amber = chosen token) in
+  code-lab.css; exports in index.ts. typecheck clean, 63/63 tests pass, built
+  and re-vendored code-lab.global.js + code-lab.css. Course - new ai-1.viz.js
+  (data-only LESSON_VIZ, 6 steps) + ai-1.html; verified end-to-end via headless
+  render (strip, live core, probability fan, amber chosen token, autoregression).
+  Not yet wired into index.html; lessons 2-10 + checkpoint still to come.
+
+- Start (2026-07-27 11:45): Build AI-track Part 1 lessons 2-5 (Tokens, The
+  prompt, Context, The context window) on the locked clean look, then wire the
+  whole AI track into index.html.
+- End (2026-07-27 12:25): Authored ai-2..ai-5 (viz + html) reusing the `agent`
+  panel: L2 Tokens (word->token split, hot spotlight, no fan), L3 The prompt
+  (user prompt tokens + amber continuation + a next-token fan), L4 Context (fan
+  goes from flat guess to peaked "tuna" 86% once context is added), L5 The
+  context window (oldest tokens struck-through as `dropped` + dashed window
+  divider). Small engine add: optional `fan` flag on the agent PanelSpec so
+  fan-free lessons (2 and 5) omit the empty probability box; AgentView takes a
+  showFan arg. typecheck clean, 63/63 tests pass, rebuilt + re-vendored
+  code-lab.global.js + code-lab.css. Wired the AI track into index.html (third
+  chooser card + switch button + trackAi container with Part-1 stage head and 5
+  cards + registered in the tracks JS) and added the AI order array to
+  page-shell.js for nextHref. Verified every lesson and the landing page via
+  headless render (correct token kinds, fan states, divider, 3-track chooser,
+  AI track active with 0/5 progress; no `undefined`). Removed temp harnesses
+  (_drv.html, _idrv.html) and the superseded approved mock (_agent-l1-clean.html).
+
+- Start (2026-07-27 12:55): Act on review feedback - fix "AI-style" voice in
+  lessons 4-5, and fold the AI track into the Theory track (not a separate track).
+- End (2026-07-27 13:05): Voice - rewrote ai-4 intro + steps 3/5/6 and ai-5
+  intro + steps 4/5/6 to strip AI tells (removed "the model looks smart", "just
+  means", "simply", the tricolon topic-lists, and the "which is next" meta
+  bridges) per AGENTS.md. Structure - merged AI into Theory: removed the third
+  chooser card, the AI switch button, and the trackAi container; moved the AI
+  stage head + 5 cards into the Theory <ol> as "Theory · Part five - The
+  building blocks of AI"; reverted the lead to "Two ways to learn" (noting
+  theory now includes AI); dropped tracks.ai; appended ai-1..ai-5 to the THEORY
+  order array in page-shell.js so the chain runs theory-check-4 -> ai-1 -> ...
+  -> ai-5; updated the 5 AI lesson eyebrows to "Theory · Part five". Verified
+  via headless render: 2 chooser cards + 2 switch tabs, no trackAi, Theory shows
+  "0 / 30 lessons" with Part five + AI cards, lesson 4 eyebrow/intro/step-5 read
+  clean, no `undefined`. No engine rebuild needed (content + wiring only).
+
+- Start (2026-07-27 13:06): Depth decision (user): keep the intro lessons at the
+  current gentle pace; raise difficulty in later parts. Continue the arc with
+  Memory, opening a new "From model to agent" part.
+- End (2026-07-27 13:12): Built ai-6 "Memory" (viz + html), gentle pace, reusing
+  the agent panel with no engine change: a fact is saved (hot), the window fills
+  and it drops out (dropped + divider), the model alone guesses (cold fan), then
+  the fact is recalled into the context (hot green) and the fan peaks on "tuna"
+  86%. Wired into the Theory track as the first card of "Theory · Part six -
+  From model to agent"; appended ai-6.html to the THEORY nextHref array. Verified
+  via headless render (save/forget/recall beats read clearly, no `undefined`).
+  NEXT (proposed): Tools, then From LLM to agent (the loop) to finish Part six.
+
+- Start (2026-07-27 13:22): Continue Part six with richer visuals per the user's
+  directive - stop forcing the token strip; build new widget visuals where the
+  concept calls for it. Targets: Tools and From LLM to agent (the loop).
+- End (2026-07-27 13:38): Extended the code-lab agent engine with two genuinely
+  new visuals, then built the two lessons on top.
+  Engine (code-lab, rebuilt + re-vendored, typecheck clean, 66/66 tests):
+  * agent-model.ts: AgentTool (name/call/result/state) + AgentScene.tool.
+  * agent-view.ts: renders a tool card beside the core - the call the model emits
+    (amber chip) and the result that returns (teal chip), with the core->tool wire
+    lighting up while calling. CSS: .cl-ag-tool block (course palette only).
+  * agent-loop-model.ts (new) + agent-loop-view.ts (new): a new "agentloop" panel
+    type - the capstone SVG diagram (environment/context/LLM/tools/memory) wired in
+    a perceive-reason-act-observe loop, ported from the agreed mockup. Per step it
+    lights nodes (amber), a loop stage, a memory row (blue) and tool chips, fills
+    the context box, shows the model's thought, and animates a packet along the
+    active wire. Omitting `active` shows the whole picture neutral (intro/recap).
+    Pure helper agentLoopActiveSet + 3 unit tests. Wired into memory-model
+    (Step.agentLoop, PanelType "agentloop"), the facade, index.ts exports, and a
+    .cl-al CSS block.
+  Lessons (Theory · Part six · From model to agent):
+  * ai-7 "Tools" (viz + html): a question the model can't know alone -> it emits a
+    getWeather("Paris") call -> the tool returns 12C, rain -> the result lands in
+    the context as a hot token -> it answers. Uses the tool card, fan off.
+  * ai-8 "From LLM to agent" (viz + html): assembles model + context + memory +
+    tools in the loop; one turn (perceive -> reason -> recall -> act -> observe)
+    then a recap. Uses the agentloop panel. The bridge to the harder material.
+  Wired both cards into index.html (Theory now 33 lessons) and appended ai-7.html,
+  ai-8.html to the THEORY nextHref chain. Verified through the real vendored engine
+  via headless render: tool card call/result + context landing, loop stages and
+  node/tool/memory lighting, both pages mount with no `undefined`.
+
+## 2026-07-27 13:59 CEST - AI track: steering & sampling (the two optional building-block lessons)
+Task: build the two optional lessons the user approved (system-vs-user messages,
+sampling/temperature) and place them in Part five right after "The prompt", so the
+window -> memory hook stays intact. Both reuse existing agent-panel visuals (no
+engine change, no rebuild).
+Done:
+  * ai-9 "System and user messages" (viz + html): the same question ("Explain
+    gravity.") with two different system messages - a terse expert vs a playful
+    teacher for kids - produces two different replies. Reuses the token strip's
+    system (blue) / user (teal) / gen (amber) token kinds; fan off. prefix ai9.
+  * ai-10 "Sampling and temperature" (viz + html): the same prompt lands on
+    different words. The probability fan goes from a peaked spread at low
+    temperature (orange 88%, almost always picked) to a flat spread at high
+    temperature (orange 30 / pink 26 / red 22 ...) where a lower-ranked word can
+    win. prefix ai10, reuses the fan.
+Wiring: inserted both cards into index.html between "The prompt" (ai-3) and
+"Context" (ai-4); reordered the THEORY nextHref chain to ai-1,2,3,9,10,4,5,6,7,8
+so Prompt -> Steering -> Sampling -> Context flows. Theory now 35 lessons / 35 XP.
+Verified through the real vendored engine (headless): steering shows three token
+colours, sampling shows peaked vs flat fans; both pages mount with 0 undefined and
+the correct "Part five" eyebrow. No engine rebuild (visuals reused). Temp harness
+and screenshots removed.
+
+## 2026-07-27 14:38 CEST - AI-track engine: pay down SOLID debt (code review findings 2, 3, 4)
+After a SOLID review + an independent rubber-duck pass, fixed the three findings
+tied to this session's AI-track engine work (left finding 1, the Step fat
+interface, as documented debt per both reviewers).
+  * Finding 2 (OCP/DIP - panel factory): replaced the imperative switch in
+    MemoryViz.makePanel with a typed panelFactories registry
+    (Record<PanelType, builder>). TypeScript now enforces exhaustiveness, so a new
+    panel is pure addition (one record entry + import) rather than editing a
+    switch. Imports stay explicit - no self-registration side effects.
+  * Finding 3 (OCP - AgentLoopView hardcoded taxonomy): moved the tool chips and
+    memory rows out of the inline SVG into named data constants
+    (DEFAULT_LOOP_TOOLS / DEFAULT_LOOP_MEMORIES) rendered by the view in a loop,
+    and tightened AgentLoopScene.mem/chips to literal id types (AgentLoopMemoryId /
+    AgentLoopToolId) so a lesson can no longer reference an id the diagram can't
+    draw. Box heights derive from row count, so the picture is byte-identical at
+    three rows and still fits if the taxonomy grows. Exported the new types +
+    constants from index.ts.
+  * Finding 4 (SRP - MemoryViz doing too much): extracted the localStorage
+    XP/completion persistence into a testable ProgressStore (core, storage
+    injected) and the autoplay timing loop into a small Autoplay driver (core,
+    talks to the host only through hooks, so control-button state stays owned by
+    MemoryViz). MemoryViz now composes + orchestrates + reflects XP into the hero,
+    delegating persistence and timing.
+Tests: +5 progress-store + 2 autoplay (mock timers) = 73/73 pass (was 66).
+typecheck clean; npm run build; re-vendored code-lab.global.js + code-lab.css.
+Verified through the rebuilt vendored engine (headless): the agent-loop diagram
+(ai-8) renders identically from the data constants; a memory lesson (theory-1)
+still mounts board/die/narration/controls via the registry; Play advances a step
+(autoplay wired); reaching the last step awards xp=20 for both an AI and a memory
+lesson (ProgressStore wired); 0 undefined across ai-1/ai-8/ai-10/theory-1. No
+push. Temp harnesses removed.
+
+## 2026-07-27 15:20-15:31 CEST - Deeper AI lessons: Memory (4 kinds) + Tools (schemas/errors)
+Start 15:20, end 15:31. Built two "Going deeper" lessons that expand ai-6/ai-7
+with NEW engine visuals instead of reusing the token strip.
+Engine (code-lab, uncommitted): NEW memory-shelf scene (core memory-shelf-model.ts
++ dom memory-shelf-view.ts, panel type "memoryshelf": working strip + episodic/
+semantic/procedural store cards) and NEW tool-rack scene (core tool-rack-model.ts
++ dom tool-rack-view.ts, panel type "toolrack": rack of tool cards with typed
+signatures + call/error/retry/result I/O). Wired Step.memoryShelf / Step.toolRack,
+PanelType union, panelFactories, index.ts exports, .cl-ms/.cl-tr CSS. +7 unit
+tests = 80/80 pass; typecheck clean; npm run build; re-vendored global.js + css.
+Course: ai-11.viz.js/.html (Memory, four kinds; prefix ai11) and ai-12.viz.js/.html
+(Tools, deeper; prefix ai12), 7 steps each. index.html: new "Going deeper" (Part
+seven) stage + ai-11/ai-12 cards (Steady). page-shell THEORY nextHref: ai-8 ->
+ai-11 -> ai-12. Theory now 37 lessons.
+Verified (headless, real vendored engine): 12 AI cards + "Going deeper" stage,
+0 undefined; memoryshelf shows working strip + 3 stores; toolrack shows 3 tool
+cards with signatures + idle->chosen->calling->error->returned progression;
+nextHref chain ai-8->ai-11->ai-12->index. No push. Temp harnesses removed.
+
+## 2026-07-27 15:37 CEST - SOLID review of ai-11/ai-12 engine code + fix
+Reviewed the two new scenes for SOLID. Finding: the tool-rack put its domain
+logic (which I/O rows to show, error-takes-precedence-over-result, state
+defaulting) in the DOM view, untested - asymmetric with the memory-shelf, which
+resolves in a pure, tested model (shelfStores/activeStores). SRP + testability
+gap. Fix: moved it into tool-rack-model.ts as pure resolveRackTools() (signature
++ state default, in order) and toolRackRows() (call, then error XOR result);
+ToolRackView is now a thin renderer that maps resolved rows to markup (kind ->
+css/dir label kept in the view as presentation). Exported the new fns/types.
+Tests: +6 tool-rack (resolveRackTools defaults/empty; toolRackRows empty/
+call+result/error-precedence/error-without-call) +1 memory-shelf custom-taxonomy
+seam = 87/87 pass (was 80). typecheck clean; npm run build; re-vendored. ai-12
+renders identically (headless): 3 signatures, io area, 0 undefined. No push.
+
+## 2026-07-27 15:49 CEST - ai-11/ai-12 readability fixes (reported on localhost)
+Three issues found via screenshots. (1) *italic* showed literally: the narration
+engine handled **bold** and `code` but not italic. Added italic to inline() in
+narration.ts (after bold, so **x** is never misread), +3 unit tests (90/90).
+(2) ai-11 working caption was dark on the dark-green strip: the views reused the
+class cl-ag-cap, which is scoped to .cl-ag, so inside .cl-ms/.cl-tr it got no
+widget colour and fell back to the page's dark text. Gave the two scenes their
+own caption classes (cl-ms-cap light for the dark strip, cl-tr-cap muted like the
+agent scenes) and a shared caption rule. (3) ai-12 tool signatures were dark: the
+course's :not(pre) > code light pill leaked into the widget's <code>. Added a
+reset scoped to .cl-mv-visual (spares narration pills in the aside; skips <pre>
+listings); scene chips re-assert their colours at higher specificity. Bumped idle
+tool-card opacity 0.72->0.82. typecheck; 90/90 tests; build; re-vendored.
+Verified (headless screenshots): ai-11 caption readable + bold/italic render,
+ai-12 signatures readable + caption consistent, ai-1 agent captions unregressed.
+No push.
+
+## 2026-07-28 09:12 CEST - AI track: finish the "transcript" widget + lesson ai-13
+Continued the prior session's unfinished work. It had started a NEW code-lab
+"transcript" scene (an honest view of an agent run as a growing list of
+role-tagged messages) but left it half-wired, so code-lab did not typecheck.
+- Engine (code-lab): finished the transcript widget. Added Step.transcript, the
+  "transcript" PanelType, its entry in the panelFactories registry (MemoryViz),
+  and the transcript-model exports in index.ts; wrote the .cl-tx CSS block
+  (course palette only - each message's left edge + author tag coloured by WHO
+  wrote it: you=teal, app=blue, model=amber, code=rose); added
+  test/transcript-model.test.ts (5 tests for resolveTranscript/authorOf). The
+  transcript-model.ts + transcript-view.ts the prior session wrote were kept.
+  typecheck clean; 95/95 tests pass (was 90); npm run build; re-vendored
+  code-lab.global.js + code-lab.css.
+- Course: authored ai-13 "What a run really is: the transcript" (viz + html,
+  data-only LESSON_VIZ, 7 steps, prefix ai13). It makes the non-obvious truths
+  visible - the model only ever writes an assistant message; a tool result is
+  written by your code, not the model; "memory" is just the list re-sent every
+  call; instructions live as text near the top. Wired a Part-seven card into
+  index.html (Theory now 38 lessons) and appended ai-13.html to the THEORY
+  nextHref chain (ai-12 -> ai-13 -> index).
+- Verified through the rebuilt vendored engine (headless): ai-13 mounts the
+  transcript scene with correct role + author tags and 0 undefined; a probe
+  step exercising all five roles, all four authors, the send banner + arrow,
+  notes and hot all render; index shows 13 AI cards + "Going deeper" with 0
+  undefined; nextHref computes ai-12 -> ai-13 -> index. Also resolved a stale
+  stash conflict in this log. Temp harnesses removed. No push.
