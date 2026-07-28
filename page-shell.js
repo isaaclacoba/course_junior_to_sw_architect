@@ -308,39 +308,19 @@
       </section>`;
   }
 
-  // Course order, so a lesson's final "Next" advances to the next lesson
-  // instead of dead-ending. Maintained in one place; a page may override by
-  // setting window.PAGE.nextHref itself.
-  const PRACTICAL = [
-    "foundations.html", "practice-the-basics.html", "control-flow.html", "writing-methods.html",
-    "reading-objects.html", "reuse-without-regret.html",
-    "type-conversion.html", "strings.html", "arrays.html", "class-members.html",
-    "null-safety.html", "access-properties.html", "type-system.html",
-    "collections.html", "data-shapes.html", "lambdas.html", "linq.html", "errors-null.html", "generics.html",
-    "encapsulation.html", "interfaces.html", "polymorphism.html", "composition.html",
-    "dependency-injection.html", "testing-basics.html", "test-doubles.html", "testable-design.html",
-    "the-solid-principles.html", "level3-app/",
-  ];
-  const THEORY = [
-    "theory-1.html", "theory-2.html", "theory-3.html", "theory-4.html", "theory-5.html",
-    "theory-6.html", "theory-7.html", "theory-check-1.html", "theory-8.html", "theory-9.html", "theory-10.html",
-    "theory-11.html", "theory-12.html", "theory-13.html", "theory-14.html", "theory-check-2.html",
-    "theory-15.html", "theory-16.html", "theory-17.html", "theory-18.html", "theory-19.html", "theory-check-3.html",
-    "theory-21.html", "theory-20.html", "theory-check-4.html",
-    "ai-1.html", "ai-2.html", "ai-3.html", "ai-9.html", "ai-10.html",
-    "ai-4.html", "ai-5.html",
-    "ai-6.html", "ai-7.html", "ai-14.html", "ai-8.html", "ai-13.html",
-    "ai-15.html", "ai-16.html", "ai-17.html", "ai-18.html",
-    "ai-19.html", "ai-20.html", "ai-21.html", "ai-22.html", "ai-23.html",
-  ];
+  // Course order lives in the manifest (course-manifest.js), the single
+  // source of truth for the path. A lesson's final "Next" advances to the
+  // next lesson in the same track; a page may still override by setting
+  // window.PAGE.nextHref itself. If the manifest is not loaded, "Next" simply
+  // returns to the index rather than guessing an order here.
   if (!page.nextHref) {
-    const current = (location.pathname.split("/").pop() || "").toLowerCase();
-    let href = "index.html";
-    for (const list of [PRACTICAL, THEORY]) {
-      const i = list.findIndex((f) => f.toLowerCase() === current);
-      if (i >= 0) {
-        href = i < list.length - 1 ? list[i + 1] : "index.html";
-        break;
+    var href = "index.html";
+    var course = window.Course;
+    if (course && typeof course.locate === "function") {
+      var current = (location.pathname.split("/").pop() || "").toLowerCase();
+      var loc = course.locate(current);
+      if (loc && loc.order) {
+        href = loc.index < loc.order.length - 1 ? loc.order[loc.index + 1] : "index.html";
       }
     }
     page.nextHref = href;

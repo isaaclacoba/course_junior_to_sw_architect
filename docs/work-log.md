@@ -711,3 +711,34 @@ role-tagged messages) but left it half-wired, so code-lab did not typecheck.
   stage heads; ai-14 cl-rg, ai-16 & ai-19 cl-pb, ai-23 cl-tx, 0 undefined; master's
   restructured arrays/null-safety/strings build lessons still render. No push.
 - End: 2026-07-28 11:16 CEST
+
+## 2026-07-28 14:04 CEST - Rebuild the data-driven index after a hard reset lost the wiring
+A `git reset --hard HEAD` in the editor reverted every TRACKED file to HEAD.
+The four new registry files (course-manifest.js, course-progress.js,
+course-nav.js, course-index.js) survived because they were untracked; the
+wiring in index.html, page-shell.js and the lesson pages did not. Rebuilt it
+properly so the manifest is the single source of truth and nothing is
+hardcoded twice:
+- index.html is now a thin shell (462 lines, was 1907). It holds only the hero,
+  empty containers (#trackChooser/#trackCards, #trackSwitch, #trackMount), the
+  jump-bar shell, the scroll-progress line and back-to-top. course-index.js
+  builds the chooser, the track switch and one collapsible path per track from
+  window.Course; course-progress.js paints status; course-nav.js runs the jump
+  bar. No lesson cards and no progress logic live in the HTML any more. Added
+  the missing nav CSS (.c-jb-*, collapsible .c-part*, .c-scrollprog, .c-totop,
+  .c-pulse) ported from the approved nav prototype.
+- page-shell.js no longer carries its own hardcoded PRACTICAL/THEORY order
+  arrays (which had the AI lessons wrongly appended to Theory). It derives a
+  lesson's "Next" from window.Course.locate(current) - the same manifest - and
+  falls back to index.html if the manifest is absent. This removes the second
+  copy of the course order.
+- All 75 lesson pages now load course-manifest.js before page-shell.js so the
+  lookup works; the two POC pages that do not use page-shell were left alone.
+- Verified: node --check on all five JS files; headless render of the chooser
+  (3 track cards, 14 parts, 76 cards, 0 undefined) and a seeded AI-part-1-done
+  state (collapse to a summary row with no spine overlap, 7/21 in both the hero
+  and the jump bar, one done pill, 7 Completed cards); lesson next-href resolves
+  through the frozen facade (control-flow -> writing-methods, ai-5 -> ai-6,
+  ai-23 -> index, theory-check-4 -> index for the 3-track split,
+  the-solid-principles -> level3-app/). Screenshot matched the pre-loss view.
+  Temp harnesses removed. Not pushed.
