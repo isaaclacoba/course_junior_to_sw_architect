@@ -16,30 +16,31 @@
       context:
         "This is the **S** in SOLID: Single Responsibility. A class should have one job, so it has one reason to change.\n\nWhy bother - isn't this overengineering? When one class takes on two unrelated tasks, a change to one quietly risks the other. Here `Cat` both checks if it is hungry and builds the sign text the keeper reads. Reword the sign and you are editing the very method that decides feeding - one careless change breaks both. Keep them apart and a sign change can never touch the hunger check.\n\nThe fix: leave `Cat` with only the check, and move the sign text into its own `FeedingSign` class.",
       example:
-        "public class Door\n{\n    public bool IsOpen()\n    {\n        return true;\n    }\n}\n\npublic class DoorSign\n{\n    public string Show(bool open)\n    {\n        return open ? \"OPEN\" : \"SHUT\";\n    }\n}",
+        "public class Door\n{\n    private bool _open;\n\n    public Door(bool open)\n    {\n        _open = open;\n    }\n\n    public bool IsOpen()\n    {\n        return _open;\n    }\n}\n\npublic class DoorSign\n{\n    public string Show(Door door)\n    {\n        return door.IsOpen() ? \"OPEN\" : \"SHUT\";\n    }\n}",
       goal: [
-        "Leave `Cat` with only the check: a `bool IsHungry()` that returns `true`.",
+        "Give `Cat` a `bool` field for its hunger, set in a constructor - so `IsHungry()` answers from the cat's own state, not a hardcoded `true`.",
         "Write a `FeedingSign` with `string Format(bool hungry)` returning `\"FEED\"` or `\"FULL\"`.",
-        "`Main` asks the cat, then formats the sign. The output stays `FEED`.",
+        "`Main` builds a hungry cat, asks it, then formats the sign. The output stays `FEED`.",
       ],
       expected: "FEED",
       requireSource: [
         { pattern: /class\s+FeedingSign/, message: "Move the sign text into its own `FeedingSign` class." },
         { pattern: /string\s+Format\s*\(\s*bool/, message: "Give `FeedingSign` a `Format(bool hungry)` method that returns the text." },
-        { pattern: /bool\s+IsHungry\s*\(\s*\)/, message: "Leave `Cat` with only the check: a `bool IsHungry()`." },
+        { pattern: /public\s+Cat\s*\(\s*bool/, message: "Give `Cat` a constructor that takes whether it is hungry and stores it in a field." },
+        { pattern: /bool\s+IsHungry\s*\(\s*\)/, message: "Keep a `bool IsHungry()` on `Cat` that answers from its stored state." },
         { pattern: /^(?![\s\S]*CheckAndSign)[\s\S]*$/, message: "Split the two jobs - `Cat` should no longer both check hunger and build the sign." },
       ],
       verify: {
         main:
-          'class Program\n{\n    static void Main()\n    {\n        var sign = new FeedingSign();\n        System.Console.WriteLine(sign.Format(false));\n    }\n}\n',
+          'class Program\n{\n    static void Main()\n    {\n        var cat = new Cat(false);\n        var sign = new FeedingSign();\n        System.Console.WriteLine(sign.Format(cat.IsHungry()));\n    }\n}\n',
         expected: "FULL",
         message:
-          "`FeedingSign` should turn any answer into text on its own - a cat that is not hungry should read FULL, with no help from `Cat`.",
+          "`IsHungry()` must answer from the cat's own state, not a fixed `true`. Build a cat that is not hungry and the sign should read FULL.",
       },
       starter:
         'using System;\n\npublic class Cat\n{\n    // one method: checks hunger AND builds the sign text\n    public string CheckAndSign()\n    {\n        bool hungry = true;                        // the check\n        return hungry ? "FEED" : "FULL";           // the formatting\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var cat = new Cat();\n        Console.WriteLine(cat.CheckAndSign());\n    }\n}\n',
       solution:
-        'using System;\n\npublic class Cat\n{\n    public bool IsHungry()\n    {\n        return true;\n    }\n}\n\npublic class FeedingSign\n{\n    public string Format(bool hungry)\n    {\n        return hungry ? "FEED" : "FULL";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var cat = new Cat();\n        bool hungry = cat.IsHungry();\n\n        var sign = new FeedingSign();\n        Console.WriteLine(sign.Format(hungry));\n    }\n}\n',
+        'using System;\n\npublic class Cat\n{\n    private bool _hungry;\n\n    public Cat(bool hungry)\n    {\n        _hungry = hungry;\n    }\n\n    public bool IsHungry()\n    {\n        return _hungry;\n    }\n}\n\npublic class FeedingSign\n{\n    public string Format(bool hungry)\n    {\n        return hungry ? "FEED" : "FULL";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var cat = new Cat(true);\n        bool hungry = cat.IsHungry();\n\n        var sign = new FeedingSign();\n        Console.WriteLine(sign.Format(hungry));\n    }\n}\n',
     },
     {
       title: "O - Open/Closed: add an animal without editing",
