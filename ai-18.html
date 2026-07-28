@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reflection - AI Track</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="vendor/code-lab/code-lab.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <section class="hero" id="pageHero"></section>
+    </main>
+
+    <script>
+      window.PAGE = {
+        hero: {
+          eyebrow: "Theory \u00b7 Part seven \u00b7 How an agent thinks",
+          title: "Reflection",
+          intro: [
+            "The first draft is rarely the best one - for a model as much as for us. Left alone, it hands over its first attempt, mistakes and all. But you can ask it to do something surprisingly powerful: look back at its own work, find what is wrong, and try again. That loop - draft, critique, revise - catches errors the first pass missed, with no human stepping in. You'll watch a shaky first answer get checked and improved by the same model.",
+          ],
+          links: [{ href: "index.html", label: "Back to the course" }],
+        },
+        prefix: "ai18",
+      };
+    </script>
+
+    <script src="vendor/code-lab/code-lab.global.js"></script>
+    <script src="ai-18.viz.js"></script>
+    <script src="page-shell.js"></script>
+  </body>
+</html>

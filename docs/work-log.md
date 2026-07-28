@@ -530,3 +530,36 @@ role-tagged messages) but left it half-wired, so code-lab did not typecheck.
   0 undefined on every page; no stale ai-11/ai-12 references remain in any
   html/js. Engine untouched (no submodule change). No push.
 - End: 2026-07-28 10:10 CEST
+
+## 2026-07-28 10:44 CEST - Extend AI track: reasoning, planning, retrieval, reliability
+- Start: 2026-07-28 10:44 CEST
+- Grounded a gap analysis in the canonical agent authors (Anthropic "Building
+  Effective Agents", Lilian Weng "LLM-Powered Autonomous Agents", OpenAI and
+  Google agent guides) and built the ten missing introductory-to-reliable
+  lessons the AI track lacked.
+- Two new reusable code-lab scenes (data-only, pure model + thin view, both
+  unit-tested): `retrieval` (`cl-rg`) - a store of document chunks, a query
+  turned into a vector, similarity scores, the closest chunks retrieved, and an
+  answer grounded in them (RAG); and `planboard` (`cl-pb`) - a goal decomposed
+  into an ordered list of steps carrying pending/active/done/blocked state, with
+  re-planning. Wired both into Step, PanelType, the panel factory, index.ts
+  exports and code-lab.css; added retrieval-model + planboard-model tests
+  (typecheck clean, 104/104 tests, rebuilt + re-vendored the IIFE bundle + css).
+- Ten new lessons, all data-only `LESSON_VIZ` on existing engine scenes:
+  ai-14 Retrieval (retrieval), Part six. New Part seven "How an agent thinks":
+  ai-15 Reasoning/chain-of-thought (transcript), ai-16 Planning (planboard),
+  ai-17 Reason and act / ReAct (transcript), ai-18 Reflection (transcript).
+  New Part eight "Making agents reliable": ai-19 Workflow or agent? (planboard),
+  ai-20 Guardrails (transcript), ai-21 Knowing when to stop (agentloop),
+  ai-22 Hallucination and grounding (transcript), ai-23 Did it work? Reading the
+  trace (transcript).
+- Wired index.html (ai-14 card into Part six after Tools; new Part seven and
+  Part eight stage heads + nine cards) and the page-shell THEORY chain
+  (ai-7 -> ai-14 -> ai-8 -> ai-13 -> ai-15 ... -> ai-23 -> index).
+- Verified: node --check on all 10 viz files; the real resolvers run against
+  every step of every lesson (retrieval reaches 2 matches + grounded answer,
+  planboard reaches all-done, every transcript author resolves); headless render
+  of all 10 lessons + index shows correct panels (cl-rg/cl-pb/cl-tx/cl-al),
+  right step counts and titles, both new stage titles, 21 AI cards, 0 undefined.
+  Temp harnesses removed. No push.
+- End: 2026-07-28 10:44 CEST

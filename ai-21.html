@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Knowing when to stop - AI Track</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="vendor/code-lab/code-lab.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <section class="hero" id="pageHero"></section>
+    </main>
+
+    <script>
+      window.PAGE = {
+        hero: {
+          eyebrow: "Theory \u00b7 Part eight \u00b7 Making agents reliable",
+          title: "Knowing when to stop",
+          intro: [
+            "A loop that can keep going needs to know when to quit. Most of the time an agent stops because it reached the goal - but not always. It can get stuck repeating itself, chase a task that never resolves, or quietly rack up cost. So every agent runs on a leash: a budget of steps, a spend limit, a check for going in circles. You'll watch a healthy run stop at the goal, and a stuck one get cut off before it burns through the whole budget.",
+          ],
+          links: [{ href: "index.html", label: "Back to the course" }],
+        },
+        prefix: "ai21",
+      };
+    </script>
+
+    <script src="vendor/code-lab/code-lab.global.js"></script>
+    <script src="ai-21.viz.js"></script>
+    <script src="page-shell.js"></script>
+  </body>
+</html>

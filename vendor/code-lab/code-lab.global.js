@@ -56,14 +56,18 @@ var CodeLab = (() => {
     neededToPass: () => neededToPass,
     next: () => next,
     normalizeLines: () => normalizeLines,
+    planProgress: () => planProgress,
     presentRun: () => presentRun,
     prev: () => prev,
     referencedIds: () => referencedIds,
     renderErrorPanel: () => renderErrorPanel,
     resolveMarks: () => resolveMarks,
     resolveModel: () => resolveModel,
+    resolvePlan: () => resolvePlan,
     resolveRackTools: () => resolveRackTools,
+    resolveRetrieval: () => resolveRetrieval,
     resolveTranscript: () => resolveTranscript,
+    retrievedDocs: () => retrievedDocs,
     scoreQuiz: () => scoreQuiz,
     selectRunCode: () => selectRunCode,
     shelfStores: () => shelfStores,
@@ -2155,6 +2159,144 @@ ${result.runtimeError}`.trim(),
     }
   };
 
+  // src/core/retrieval-model.ts
+  function clampScore(score) {
+    if (typeof score !== "number" || Number.isNaN(score)) return null;
+    return Math.max(0, Math.min(1, score));
+  }
+  function resolveRetrieval(scene) {
+    const docs = scene?.docs ?? [];
+    return docs.map((doc) => {
+      const score = clampScore(doc.score);
+      return {
+        text: doc.text,
+        state: doc.state ?? "idle",
+        score,
+        scorePct: score === null ? null : Math.round(score * 100)
+      };
+    });
+  }
+  function retrievedDocs(scene) {
+    return resolveRetrieval(scene).filter((doc) => doc.state === "match");
+  }
+
+  // src/dom/retrieval-view.ts
+  var RetrievalView = class {
+    constructor() {
+      this.el = document.createElement("div");
+      this.el.className = "cl-rg";
+      this.el.innerHTML = `
+      <span class="cl-rg-cap" data-cap></span>
+      <div class="cl-rg-query" data-query hidden></div>
+      <div class="cl-rg-docs" data-docs></div>
+      <div class="cl-rg-answer" data-answer hidden></div>`;
+    }
+    sync(ctx) {
+      const scene = ctx.model.retrieval ?? {};
+      this.el.querySelector("[data-cap]").textContent = scene.caption ?? "The knowledge store";
+      this.renderQuery(scene);
+      this.renderDocs(scene);
+      this.renderAnswer(scene);
+    }
+    renderQuery(scene) {
+      const host = this.el.querySelector("[data-query]");
+      if (!scene.query) {
+        host.hidden = true;
+        host.innerHTML = "";
+        return;
+      }
+      host.hidden = false;
+      host.innerHTML = `<span class="cl-rg-tag">${escapeHtml4(scene.queryLabel ?? "query")}</span><code class="cl-rg-qtext">${escapeHtml4(scene.query)}</code>`;
+    }
+    renderDocs(scene) {
+      const host = this.el.querySelector("[data-docs]");
+      host.innerHTML = resolveRetrieval(scene).map((doc) => {
+        const bar = doc.scorePct === null ? "" : `<div class="cl-rg-bar"><span class="cl-rg-fill" style="width:${doc.scorePct}%"></span></div><span class="cl-rg-score">${doc.scorePct}%</span>`;
+        return `<div class="cl-rg-doc is-${doc.state}"><div class="cl-rg-doc-text">${escapeHtml4(doc.text)}</div><div class="cl-rg-doc-meter">${bar}</div></div>`;
+      }).join("");
+    }
+    renderAnswer(scene) {
+      const host = this.el.querySelector("[data-answer]");
+      if (!scene.answer) {
+        host.hidden = true;
+        host.innerHTML = "";
+        return;
+      }
+      host.hidden = false;
+      host.innerHTML = `<span class="cl-rg-tag">${escapeHtml4(scene.answerLabel ?? "grounded answer")}</span><div class="cl-rg-atext">${escapeHtml4(scene.answer)}</div>`;
+    }
+  };
+
+  // src/core/planboard-model.ts
+  function resolvePlan(scene) {
+    const steps = scene?.steps ?? [];
+    return steps.map((step, i) => ({
+      n: i + 1,
+      text: step.text,
+      state: step.state ?? "pending",
+      note: step.note
+    }));
+  }
+  function planProgress(scene) {
+    const steps = resolvePlan(scene);
+    return { done: steps.filter((s) => s.state === "done").length, total: steps.length };
+  }
+
+  // src/dom/planboard-view.ts
+  var STATE_MARK = {
+    pending: "",
+    active: "\u2192",
+    done: "\u2713",
+    blocked: "!"
+  };
+  var PlanboardView = class {
+    constructor() {
+      this.el = document.createElement("div");
+      this.el.className = "cl-pb";
+      this.el.innerHTML = `
+      <span class="cl-pb-cap" data-cap></span>
+      <div class="cl-pb-goal" data-goal hidden></div>
+      <div class="cl-pb-steps" data-steps></div>
+      <div class="cl-pb-prog" data-prog hidden></div>`;
+    }
+    sync(ctx) {
+      const scene = ctx.model.plan ?? {};
+      this.el.querySelector("[data-cap]").textContent = scene.caption ?? "The plan";
+      this.renderGoal(scene.goal);
+      this.renderSteps(scene);
+      this.renderProgress(scene);
+    }
+    renderGoal(goal) {
+      const host = this.el.querySelector("[data-goal]");
+      if (!goal) {
+        host.hidden = true;
+        host.innerHTML = "";
+        return;
+      }
+      host.hidden = false;
+      host.innerHTML = `<span class="cl-pb-tag">goal</span><span class="cl-pb-goal-t">${escapeHtml4(goal)}</span>`;
+    }
+    renderSteps(scene) {
+      const host = this.el.querySelector("[data-steps]");
+      host.innerHTML = resolvePlan(scene).map((step) => {
+        const badge = STATE_MARK[step.state] || String(step.n);
+        const note = step.note ? `<div class="cl-pb-note">${escapeHtml4(step.note)}</div>` : "";
+        return `<div class="cl-pb-step is-${step.state}"><span class="cl-pb-num">${escapeHtml4(badge)}</span><div class="cl-pb-body"><div class="cl-pb-text">${escapeHtml4(step.text)}</div>` + note + `</div></div>`;
+      }).join("");
+    }
+    renderProgress(scene) {
+      const host = this.el.querySelector("[data-prog]");
+      const { done, total } = planProgress(scene);
+      if (total === 0) {
+        host.hidden = true;
+        host.textContent = "";
+        return;
+      }
+      host.hidden = false;
+      host.textContent = `${done} / ${total} done`;
+    }
+  };
+
   // src/dom/viz-controls.ts
   var DEFAULT_LEGEND = [
     { sw: "#37d3a6", label: "data in RAM" },
@@ -2270,6 +2412,8 @@ ${result.runtimeError}`.trim(),
         memoryshelf: () => new MemoryShelfView(),
         toolrack: () => new ToolRackView(),
         transcript: () => new TranscriptView(),
+        retrieval: () => new RetrievalView(),
+        planboard: () => new PlanboardView(),
         controls: (_spec, ctx) => this.controls = new VizControls(ctx.actions, ctx.handlers, ctx.nextHref, ctx.legend)
       };
       this.onResize = () => {

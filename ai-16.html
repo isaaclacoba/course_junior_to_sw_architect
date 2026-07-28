@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Planning - AI Track</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="vendor/code-lab/code-lab.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <section class="hero" id="pageHero"></section>
+    </main>
+
+    <script>
+      window.PAGE = {
+        hero: {
+          eyebrow: "Theory \u00b7 Part seven \u00b7 How an agent thinks",
+          title: "Planning",
+          intro: [
+            "Some goals are too big to do in one move. \"Plan a weekend trip\" is not one action - it is a dozen, and some depend on others. A model that dives straight in tends to lose the thread halfway. So before acting, a good agent does what you would: break the goal into an ordered list of smaller steps, then work down it one at a time. You'll watch a goal become a plan, and the plan get carried out - including what happens when a step gets stuck.",
+          ],
+          links: [{ href: "index.html", label: "Back to the course" }],
+        },
+        prefix: "ai16",
+      };
+    </script>
+
+    <script src="vendor/code-lab/code-lab.global.js"></script>
+    <script src="ai-16.viz.js"></script>
+    <script src="page-shell.js"></script>
+  </body>
+</html>
