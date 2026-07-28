@@ -51,7 +51,7 @@
   const editor = new CodeLab.MonacoEditor();
 
   const code = tasks.map((t) => t.starter);
-  const awarded = JSON.parse(localStorage.getItem(awardedKey) || "{}");
+  const course = LessonCommon.createProgress({ xpKey, awardedKey });
   // A trailing recap card (task.summary) is content, not a build - exclude it
   // from the count shown and from XP.
   const buildCount = tasks.filter((t) => !t.summary).length;
@@ -60,19 +60,14 @@
   }
   let idx = cardFromHash();
 
-  function loadXP() {
-    return parseInt(localStorage.getItem(xpKey) || "0", 10);
-  }
-
   function renderXP() {
-    if (xpLabel) xpLabel.textContent = `Course XP: ${loadXP()}`;
+    if (xpLabel) xpLabel.textContent = `Course XP: ${course.xp()}`;
   }
 
   function award(taskIndex) {
-    if (awarded[taskIndex]) return;
-    awarded[taskIndex] = true;
-    localStorage.setItem(awardedKey, JSON.stringify(awarded));
-    localStorage.setItem(xpKey, String(loadXP() + awardAmount));
+    if (course.isAwarded(taskIndex)) return;
+    course.markAwarded(taskIndex);
+    course.addXP(awardAmount);
     renderXP();
   }
 

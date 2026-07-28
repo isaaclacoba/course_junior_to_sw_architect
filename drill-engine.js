@@ -96,22 +96,11 @@
   const progress = drills.map((d) => d.blanks.map(() => ({ value: "", hint: -1 })));
   // Per-card quiz state: which option index the learner picked (-1 = none).
   const quizState = drills.map(() => ({ chosen: -1 }));
-  const awarded = JSON.parse(localStorage.getItem(awardedKey) || "{}");
+  const course = LessonCommon.createProgress({ xpKey, awardedKey });
 
   // ---- XP -----------------------------------------------------------------
-  function loadCourseXP() {
-    return parseInt(localStorage.getItem(xpKey) || "0", 10);
-  }
   function renderCourseXP() {
-    if (courseXpLabel) courseXpLabel.textContent = `Course XP: ${loadCourseXP()}`;
-  }
-  function addCourseXP(amount) {
-    localStorage.setItem(xpKey, String(loadCourseXP() + amount));
-    renderCourseXP();
-  }
-  function markAwarded(i) {
-    awarded[i] = true;
-    localStorage.setItem(awardedKey, JSON.stringify(awarded));
+    if (courseXpLabel) courseXpLabel.textContent = `Course XP: ${course.xp()}`;
   }
 
   // ---- text helpers -------------------------------------------------------
@@ -638,9 +627,10 @@
           : "Good progress. This concept is now reinforced in code form."
         : "Blanks are correct. Now pick the right answer to the knowledge check above to finish this card.";
 
-    if (blanksDone && quizOk && !awarded[idx]) {
-      addCourseXP(awardAmount);
-      markAwarded(idx);
+    if (blanksDone && quizOk && !course.isAwarded(idx)) {
+      course.addXP(awardAmount);
+      course.markAwarded(idx);
+      renderCourseXP();
     }
 
     els.resultList.innerHTML = "";

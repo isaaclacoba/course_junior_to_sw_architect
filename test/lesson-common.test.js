@@ -82,3 +82,59 @@ test("cardFromHash clamps #0 to the first card", () => {
   location.hash = "#0";
   assert.equal(LessonCommon.cardFromHash(5), 0);
 });
+
+test("memoryStorage stores, reads, and removes", () => {
+  const { LessonCommon } = loadLessonCommon();
+  const s = LessonCommon.memoryStorage();
+  assert.equal(s.getItem("k"), null);
+  s.setItem("k", "v");
+  assert.equal(s.getItem("k"), "v");
+  s.removeItem("k");
+  assert.equal(s.getItem("k"), null);
+});
+
+test("createProgress starts XP at 0 and accumulates through the store", () => {
+  const { LessonCommon } = loadLessonCommon();
+  const store = LessonCommon.memoryStorage();
+  const p = LessonCommon.createProgress({ storage: store, xpKey: "xp", awardedKey: "aw" });
+  assert.equal(p.xp(), 0);
+  assert.equal(p.addXP(25), 25);
+  assert.equal(p.addXP(10), 35);
+  assert.equal(store.getItem("xp"), "35");
+});
+
+test("createProgress tracks awarded cards and persists them", () => {
+  const { LessonCommon } = loadLessonCommon();
+  const store = LessonCommon.memoryStorage();
+  const p = LessonCommon.createProgress({ storage: store, xpKey: "xp", awardedKey: "aw" });
+  assert.equal(p.isAwarded(0), false);
+  p.markAwarded(0);
+  assert.equal(p.isAwarded(0), true);
+  assert.equal(p.isAwarded(1), false);
+  assert.deepEqual(JSON.parse(store.getItem("aw")), { 0: true });
+});
+
+test("createProgress reads back existing state from the store", () => {
+  const { LessonCommon } = loadLessonCommon();
+  const store = LessonCommon.memoryStorage();
+  store.setItem("xp", "40");
+  store.setItem("aw", JSON.stringify({ 2: true }));
+  const p = LessonCommon.createProgress({ storage: store, xpKey: "xp", awardedKey: "aw" });
+  assert.equal(p.xp(), 40);
+  assert.equal(p.isAwarded(2), true);
+});
+
+test("createProgress uses the injected storage, leaving the default untouched", () => {
+  const { LessonCommon } = loadLessonCommon();
+  const store = LessonCommon.memoryStorage();
+  const p = LessonCommon.createProgress({ storage: store, xpKey: "xp", awardedKey: "aw" });
+  p.addXP(5);
+  assert.equal(store.getItem("xp"), "5");
+  assert.equal(LessonCommon.storage.getItem("xp"), null);
+});
+
+test("LessonCommon.storage defaults to a working store", () => {
+  const { LessonCommon } = loadLessonCommon();
+  assert.equal(typeof LessonCommon.storage.getItem, "function");
+  assert.equal(typeof LessonCommon.storage.setItem, "function");
+});

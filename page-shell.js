@@ -23,6 +23,29 @@
   // Shared lesson helpers used by both engines (build + drill), so the escaping
   // and inline-markup rules live in one place. Defined before any early return
   // below so the engines can rely on it regardless of this page's config.
+  // A tiny storage seam so course progress does not hard-depend on localStorage.
+  // Defaults to real localStorage; falls back to an in-memory store when it is
+  // unavailable (tests, private mode). A page or test can replace
+  // LessonCommon.storage before an engine runs to inject its own.
+  function memoryStorage() {
+    const map = new Map();
+    return {
+      getItem: (k) => (map.has(k) ? map.get(k) : null),
+      setItem: (k, v) => {
+        map.set(k, String(v));
+      },
+      removeItem: (k) => {
+        map.delete(k);
+      },
+    };
+  }
+  let defaultStorage;
+  try {
+    defaultStorage = (typeof localStorage !== "undefined" && localStorage) || memoryStorage();
+  } catch (e) {
+    defaultStorage = memoryStorage();
+  }
+
   const LessonCommon = {
     escapeHtml(s) {
       return String(s)
@@ -47,6 +70,34 @@
     cardFromHash(count) {
       const n = parseInt((location.hash || "").replace(/[^0-9]/g, ""), 10);
       return Number.isFinite(n) ? Math.min(Math.max(n - 1, 0), count - 1) : 0;
+    },
+    // Storage seam (default: localStorage) and the course progress built on it.
+    memoryStorage,
+    storage: defaultStorage,
+    // Course progress (shared XP counter + which cards already paid out), kept
+    // behind the storage seam so grading/XP can be unit-tested with a fake store.
+    createProgress(opts) {
+      const store = (opts && opts.storage) || LessonCommon.storage;
+      const xpKey = opts.xpKey;
+      const awardedKey = opts.awardedKey;
+      const awarded = JSON.parse(store.getItem(awardedKey) || "{}");
+      function xp() {
+        return parseInt(store.getItem(xpKey) || "0", 10);
+      }
+      return {
+        xp,
+        addXP(amount) {
+          store.setItem(xpKey, String(xp() + amount));
+          return xp();
+        },
+        isAwarded(i) {
+          return Boolean(awarded[i]);
+        },
+        markAwarded(i) {
+          awarded[i] = true;
+          store.setItem(awardedKey, JSON.stringify(awarded));
+        },
+      };
     },
   };
   window.LessonCommon = LessonCommon;
