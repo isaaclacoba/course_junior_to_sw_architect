@@ -173,18 +173,18 @@
       summary: true,
       title: "What you learned",
       concept: "SOLID recap",
-      context: "Five habits, each one a small fix to a real problem you just wrote your way out of - with the animals from the rest of the course.",
+      context: "The five habits in one place - what each one fixes.",
       summaryIntro:
-        "SOLID is not extra ceremony or overengineering. Each rule removes one specific, repeatable pain that shows up when code has to change. You met each one as a trap first, then wrote the fix:",
+        "None of these are rules for their own sake. Each one saves you a headache the day the code has to change:",
       summaryItems: [
-        { title: "S - Single Responsibility - ", text: "one class, one job. When checking hunger and building the sign shared a method, changing one risked the other. Split the jobs so a change stays put." },
-        { title: "O - Open/Closed - ", text: "add a new animal without editing old code. Instead of growing an `if`-chain, add a class behind `IAnimal`. What already works is never reopened, so it cannot break." },
-        { title: "L - Liskov Substitution - ", text: "a subtype must work anywhere its parent does. A `Penguin` inheriting `Bird` broke that by throwing on `Fly()`. A small shared `IMover` every animal can honour fixes it." },
-        { title: "I - Interface Segregation - ", text: "don't force a class to implement moves it never makes. Splitting one fat interface into `IWalker`/`ISwimmer`/`IFlyer` let the fish implement only swimming." },
-        { title: "D - Dependency Inversion - ", text: "depend on an interface and receive it from outside, instead of building a concrete class inside. Injecting the `ILog` is what lets a test pass a fake." },
+        { title: "S - Single Responsibility - ", text: "One class, one job. While the hunger check and the sign text shared a method, a change to one could break the other. Give each its own class and a change stays where you put it." },
+        { title: "O - Open/Closed - ", text: "Add a new animal without touching the old code. Instead of another branch in an `if`-chain, you write a new class behind `IAnimal`. The code that already works is left alone, so it keeps working." },
+        { title: "L - Liskov Substitution - ", text: "A subtype has to work anywhere its parent does. A `Penguin` under `Bird` broke that - it threw on `Fly()`. Drop the false claim and let both share a small `IMover` each can honestly keep." },
+        { title: "I - Interface Segregation - ", text: "Don't make a class carry methods it never uses. Split the fat interface into `IWalker`, `ISwimmer` and `IFlyer`, and the fish only has to swim." },
+        { title: "D - Dependency Inversion - ", text: "Ask for an interface and take it from outside instead of building the real thing yourself. Once the `ILog` is handed in, a test can hand in a fake." },
       ],
       summaryClose:
-        "So when a colleague asks why bother: each principle earns its keep the first time the code has to change. You do not sprinkle interfaces everywhere up front - you reach for the matching fix when a real reason to change shows up. That judgement, and the injecting habit that makes testing possible, is what the capstone puts to work.",
+        "So when someone asks why bother - each habit earns its place the first time the code has to change. You don't scatter interfaces everywhere up front; you reach for the right fix when a real reason to change turns up. That is the judgement the capstone asks for next.",
     },
   ];
 
