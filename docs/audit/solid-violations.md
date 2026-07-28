@@ -45,28 +45,33 @@ check is a content review and is kept out of the fix list below.
 
 ## Fixes applied
 
-- **DRY (engines).** `escapeHtml`, `renderInline` and `cardFromHash` now live
-  once in `page-shell.js` (`window.LessonCommon`); both engines delegate to it.
-  See [engines.md](solid/engines.md).
+- **DRY (engines).** `escapeHtml`, `renderInline`, `cardFromHash`, the XP/awarded
+  block (`createProgress`) and the run-output/error panel (`createOutputPanel`)
+  now live once in `page-shell.js` (`window.LessonCommon`); both engines delegate
+  to it, so no engine touches `localStorage` or the error panel directly. The
+  DOM-free `createProgress` / `createOutputPanel` are unit-tested
+  (`test/lesson-common.test.js`). See [engines.md](solid/engines.md).
+- **DIP (engines).** XP/award progression reads and writes through an injectable
+  `LessonCommon.storage` seam (default `localStorage`, in-memory fallback), so
+  the logic is testable with a fake store.
+- **Capstone detectors.** Milestone 1 no longer accepts a data-only class that
+  merely quotes `PASS`/`FAIL` (the fallback is gated by an actual string-returning
+  method); milestone 6 counts only reporters that define the interface's method
+  with a body. Verified with a Roslyn harness: the reference still passes all 7,
+  the two false-positive shapes now fail. See [capstone-csharp.md](solid/capstone-csharp.md).
 - **Capstone `readonly`.** `TestRunner._formatter` / `_reporter` (and the hint
   shape) are now `readonly` in the reference solution.
-  See [capstone-csharp.md](solid/capstone-csharp.md).
 - **Overstated OCP comment.** `StructuralChecks`'s header no longer claims the
   class "never changes"; it states that adding a milestone means adding a rule
   to the `Rules` list.
 
 ## Open source-code items (not yet fixed)
 
-1. Split the two monolithic engine IIFEs by concern (SRP), or at least extract
-   the remaining duplicated `showOutput` / `showErrors` / XP blocks - deferred
-   because they are stateful (bound to different element containers) and share
-   less than the pure helpers already extracted.
-2. Introduce an injection seam for `localStorage` (and the runner URL) in the
-   engines so grading/XP become testable (DIP).
-3. Tighten the two lenient capstone detectors (milestones 1 and 6) so a
-   false-positive shape cannot pass; verify milestone 6 also checks
-   "closed to modification", not just that a second implementer exists.
-4. In code-lab, allow injecting a custom `EditorAdapter` (match the
+1. Split the two monolithic engine IIFEs by concern (SRP). The shared, testable
+   pieces (prose helpers, progress, output panel) are now extracted into
+   `LessonCommon`; what remains is the per-engine render/grade/run orchestration,
+   still one closure each.
+2. In code-lab, allow injecting a custom `EditorAdapter` (match the
    already-clean `runner`/`highlighter` seams) and split the `Step` shape into
    per-scene discriminated types. (code-lab is a submodule; a fix needs a
    rebuild + re-vendor.)
