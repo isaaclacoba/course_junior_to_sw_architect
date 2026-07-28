@@ -46,7 +46,7 @@ not an endorsement.
 | 4 | writing-methods | 1 | a named step: return a value, take input, hold a rule, reuse it, call another | method, return, parameters | 3 |
 | 5 | reading-objects | 1 | objects collaborate: one asks another and acts (seeds one-job, receive-don't-build) | class, field, constructor, method, if/else, comparison, string `+` | 1,4 |
 | 6 | reuse-without-regret | 1 | is-a vs has-a; favour composition; the diamond problem; polymorphism as payoff | inheritance, virtual/override, interface (named) | 1,5 |
-| 7 | first-builds | 2 | write from scratch: one class one method; one job; receive a dependency; depend on a promise; add a type freely | class, interface, constructor injection `[taster of P4]` | 1,4 |
+| 7 | type-conversion | 2 | text to number and back; drop decimals with a cast; parse safely | `int.Parse`/`int.TryParse`, `(int)` cast, `.ToString()`, `out` | 1,4 |
 | 9 | collections | 3 | an ordered many; a keyed lookup; iterate and tally | List<T>, Dictionary<K,V>, foreach | 3,4 |
 | 10 | data-shapes | 3 | ways to package data: property, computed value, a fixed set, value-copy, value-equality | `{ get; set; }` `[inversion]`, `=>` `(C#)`, enum, struct, record `(C#)` | 1,9 |
 | 11 | lambdas | 3 | a function passed as a value; capturing surrounding locals | `=>` lambda `(C#)`, Func/Predicate | 4,9 |
