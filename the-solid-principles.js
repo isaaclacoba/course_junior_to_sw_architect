@@ -14,7 +14,7 @@
       title: "S - Single Responsibility: one animal, one job",
       concept: "Single Responsibility",
       context:
-        "This is the **S** in SOLID: Single Responsibility. A class should have one job, so it has one reason to change.\n\nWhy bother - isn't this overengineering? When two unrelated jobs share a method, a change to one quietly risks the other. Here `Cat` both checks if it is hungry and builds the sign text the keeper reads. Reword the sign and you are editing the very method that decides feeding - one careless change breaks both. Keep them apart and a sign change can never touch the hunger check.\n\nThe fix: leave `Cat` with only the check, and move the sign text into its own `FeedingSign` class.",
+        "This is the **S** in SOLID: Single Responsibility. A class should have one job, so it has one reason to change.\n\nWhy bother - isn't this overengineering? When one class takes on two unrelated tasks, a change to one quietly risks the other. Here `Cat` both checks if it is hungry and builds the sign text the keeper reads. Reword the sign and you are editing the very method that decides feeding - one careless change breaks both. Keep them apart and a sign change can never touch the hunger check.\n\nThe fix: leave `Cat` with only the check, and move the sign text into its own `FeedingSign` class.",
       example:
         "public class Door\n{\n    public bool IsOpen()\n    {\n        return true;\n    }\n}\n\npublic class DoorSign\n{\n    public string Show(bool open)\n    {\n        return open ? \"OPEN\" : \"SHUT\";\n    }\n}",
       goal: [
