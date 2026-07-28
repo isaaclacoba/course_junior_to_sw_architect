@@ -1,6 +1,6 @@
 // Visual for ai-13 "What a run really is: the transcript" - a DATA-ONLY file. It
 // uses the `transcript` panel: the growing list of role-tagged messages the model
-// re-reads on every call. After ai-6..ai-12 built up memory, tools and the loop,
+// re-reads on every call. After ai-6..ai-8 built up memory, tools and the loop,
 // this lesson pulls the curtain back - the whole thing is one list of text. The
 // crux truths it makes visible: the model only ever writes an `assistant` message
 // (even a tool call is just text it writes); a `tool` result is written by YOUR

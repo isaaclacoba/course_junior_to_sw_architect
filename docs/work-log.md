@@ -507,3 +507,26 @@ role-tagged messages) but left it half-wired, so code-lab did not typecheck.
   notes and hot all render; index shows 13 AI cards + "Going deeper" with 0
   undefined; nextHref computes ai-12 -> ai-13 -> index. Also resolved a stale
   stash conflict in this log. Temp harnesses removed. No push.
+
+## 2026-07-28 10:10 CEST - Merge AI deeper lessons into their intros
+- Start: 2026-07-28 10:10 CEST
+- Folded the two "Going deeper" lessons back into their intro lessons so each
+  topic is one lesson that starts plain and goes deep. ai-6 "Memory" now runs on
+  the richer `memoryshelf` panel (8 steps): the model forgets, working memory,
+  save to a store, the four kinds (episodic/semantic/procedural), recall the
+  right kinds, close. ai-7 "Tools" now runs on the `toolrack` panel (9 steps):
+  a single tool called on the happy path, then several tools with typed schemas,
+  choosing the right one, a call that errors on a bad argument, and recover +
+  retry. Rewrote ai-6.html / ai-7.html intros and their index cards (pill Gentle
+  -> Steady, longer time) to match the merged depth.
+- Removed ai-11.html/.viz.js (Memory, deeper) and ai-12.html/.viz.js (Tools,
+  deeper); dropped the "Theory - Part seven - Going deeper" stage head. Moved the
+  ai-13 transcript card up under Part six (after ai-8) and reset its eyebrow to
+  "Theory - Part six - From model to agent". Trimmed the THEORY nextHref chain to
+  ai-8 -> ai-13 -> index (Theory track now 36 lessons; count is data-driven).
+- Verified (headless, vendored engine): ai-6 mounts memoryshelf 1/8 with the
+  four-kinds narration; ai-7 mounts toolrack 1/9 with the tool schema signature;
+  ai-13 mounts transcript 1/7; index has no Part seven and no ai-11/ai-12 refs;
+  0 undefined on every page; no stale ai-11/ai-12 references remain in any
+  html/js. Engine untouched (no submodule change). No push.
+- End: 2026-07-28 10:10 CEST
