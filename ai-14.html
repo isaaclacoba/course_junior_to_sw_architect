@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Memory - AI Track</title>
+    <title>Retrieval - AI Track</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -22,18 +22,18 @@
       window.PAGE = {
         hero: {
           eyebrow: "Theory \u00b7 Part six \u00b7 From model to agent",
-          title: "Memory",
+          title: "Retrieval",
           intro: [
-            "Start a new chat and the model remembers nothing - each call begins fresh, reading only the context in front of it. So how does an assistant seem to remember you across a long conversation? It saves what matters to a store that outlives the turn, and recalls it when it counts. And that store is not one box: real memory splits into kinds - what happened, what stays true, and how to do things. Here you'll watch a fact get saved, sorted into the right kind, and pulled back just when it's needed.",
+            "The model only knows what it saw in training - it has never read your company's docs, and it cannot recall a page it skimmed once. So how does it answer questions about text it was never trained on? You hand it the text to read at the moment of the question - but a whole library will not fit in the context. Retrieval is the trick: turn the question into a search, pull back just the few passages that fit, and let the model answer from those. You'll watch a question become a vector, find its closest chunks, and ground an answer in real text instead of a guess.",
           ],
           links: [{ href: "index.html", label: "Back to the course" }],
         },
-        prefix: "ai6",
+        prefix: "ai14",
       };
     </script>
 
     <script src="vendor/code-lab/code-lab.global.js"></script>
-    <script src="ai-6.viz.js"></script>
+    <script src="ai-14.viz.js"></script>
     <script src="page-shell.js"></script>
   </body>
 </html>

@@ -144,6 +144,33 @@ the IIFE bundle + css into the course `vendor/code-lab/`. Keep the DOM-free logi
 in `src/core/` covered by unit tests. The 72MB WASM `_framework` output is never
 committed (git-ignored); binaries are compiled, not tracked.
 
+## Adding a MemoryViz scene (engine work)
+
+A "scene" is one visual panel (`transcript`, `agentloop`, `memoryshelf`,
+`toolrack`, `retrieval`, `planboard`, ...). Adding one is a fixed checklist
+across `code-lab/src`, then a re-vendor:
+
+1. `src/core/<name>-model.ts` - the pure, DOM-free model: a `<Name>Scene`
+   interface plus a `resolve<Name>()` that clamps/normalises the raw scene into a
+   `Resolved...` shape. Unit-test it in `test/<name>-model.test.ts`; the model is
+   the only part with tests.
+2. `src/dom/<name>-view.ts` - a thin `<Name>View` with `el` + `sync(ctx)` that
+   reads `ctx.model.<field>` and renders. Use `escapeHtml` from
+   `../core/narration.js`. Give it a unique root class (`cl-rg`, `cl-pb`, ...).
+3. `src/core/memory-model.ts` - add the scene field to `Step`, add its literal to
+   the `PanelType` union, and re-export the scene type.
+4. `src/dom/memory-viz.ts` - import the view and add a factory entry
+   (`<name>: () => new <Name>View()`).
+5. `src/index.ts` - export the model's types and its `resolve...` functions.
+6. `src/code-lab.css` - add a `.cl-xx` style block and its caption to the shared
+   caption group.
+7. `cd code-lab && npm run typecheck && npm test && npm run build`, then re-vendor:
+   `cp dist/code-lab.global.js dist/code-lab.css ../vendor/code-lab/`. Confirm the
+   new class/symbols are in the vendored bundle before authoring against it.
+
+Commit the submodule FIRST, then bump the pointer + re-vendored bundle in the
+course commit.
+
 ## Build & deploy
 
 Push to `master` → `.github/workflows/deploy.yml` checks out submodules,

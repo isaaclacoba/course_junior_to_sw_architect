@@ -1,108 +1,122 @@
-// Visual for ai-6 "Memory" - a DATA-ONLY file. It reuses the `agent` panel to
-// show how an assistant beats the context window: save an important fact to a
-// store outside the window, then recall it back into the context when it is
-// needed. Builds directly on the context (ai-4) and window (ai-5) lessons.
+// Visual for ai-6 "Memory" - a DATA-ONLY file. It uses the `memoryshelf` panel:
+// a working-memory strip (the context read right now) over three long-term
+// stores - episodic, semantic and procedural. It opens with the plain idea - a
+// model forgets between calls, so the assistant saves what matters and recalls
+// it - then shows that real memory is not one box but several kinds, each
+// answering a different question, all feeding the one working context.
 (function () {
   "use strict";
 
-  const ctx = (list) => list.map((t) => ({ t, kind: "context" }));
-  const ctxHot = (list) => list.map((t) => ({ t, kind: "context", hot: true }));
-  const dropped = (list) => list.map((t) => ({ t, kind: "dropped" }));
-  const user = (list) => list.map((t) => ({ t, kind: "user" }));
-
-  const core = (live) => ({ label: "LLM", sub: "sees only the context", live: live });
-
-  const FACT = ["Luna", "loves", "tuna", "."];
-  const FILLER = ["We", "chatted", "for", "a", "while", "."];
-  const QUESTION = ["What", "does", "Luna", "eat", "?"];
-
-  const FAN_COLD = [
-    { t: "food", p: 0.15 },
-    { t: "fish", p: 0.13 },
-    { t: "meat", p: 0.12 },
-    { t: "tuna", p: 0.1 },
-    { t: "plants", p: 0.09 },
-  ];
-  const FAN_WARM = [
-    { t: "tuna", p: 0.86 },
-    { t: "fish", p: 0.06 },
-    { t: "food", p: 0.03 },
-    { t: "meat", p: 0.03 },
-    { t: "milk", p: 0.02 },
-  ];
+  const WORKING_CAP = "Working memory \u2014 the context read right now";
 
   window.LESSON_VIZ = {
     code: [],
     legend: [
-      { sw: "#8fb7ab", label: "in the context (readable now)" },
-      { sw: "#5f7b74", label: "dropped from the window" },
-      { sw: "#37d3a6", label: "saved / recalled from memory", round: true },
+      { sw: "#cfe8df", label: "a remembered item" },
+      { sw: "#ffd479", label: "the store in focus right now" },
+      { sw: "#37d3a6", label: "just saved or recalled", round: true },
     ],
     layout: {
-      visual: [{ type: "agent" }],
+      visual: [{ type: "memoryshelf" }],
       aside: [{ type: "narration" }, { type: "controls" }],
     },
     steps: [
       {
-        narr: "Early in a chat you tell the assistant something worth keeping: Luna loves tuna.",
-        agent: {
-          stripCaption: "A fact worth remembering",
-          tokens: ctxHot(FACT),
-          caret: true,
-          core: core(false),
-          fan: null,
+        narr: "Ask a model something and it answers well - then start a new chat and it remembers nothing. Each call begins fresh. All it ever reads is its **working memory**: the context in front of it right now.",
+        memoryShelf: {
+          workingCaption: WORKING_CAP,
+          working: [{ text: "hi, plan my trip", hot: true }],
+          workingActive: true,
         },
       },
       {
-        narr: "The assistant copies that fact into **memory** - a store that lives outside the context window, so it survives no matter how long the chat runs.",
-        agent: {
-          stripCaption: "Saved to memory",
-          tokens: ctxHot(FACT),
-          caret: true,
-          core: core(false),
-          fan: null,
+        narr: "Working memory is the scratchpad for the task in hand. Now you mention something worth keeping - *you like an aisle seat*. But the scratchpad is the first thing to vanish when the chat rolls on or the window fills.",
+        memoryShelf: {
+          workingCaption: WORKING_CAP,
+          working: [{ text: "hi, plan my trip" }, { text: "I like an aisle seat", hot: true }],
+          workingActive: true,
         },
       },
       {
-        narr: "The chat rolls on. The window fills up and that early fact drops off the start - exactly what you saw in the last lesson.",
-        agent: {
-          stripCaption: "The window forgets it",
-          tokens: [...dropped(FACT), ...ctx(FILLER)],
-          windowLabel: "context window",
-          caret: true,
-          core: core(false),
-          fan: null,
+        narr: "So the assistant **saves** it - copies the fact out of working memory into a store that lives on past this turn. That is the whole trick behind remembering you: keep what matters somewhere the next call can reach.",
+        memoryShelf: {
+          workingCaption: WORKING_CAP,
+          working: [{ text: "hi, plan my trip" }],
+          active: "semantic",
+          stores: {
+            semantic: [{ text: "prefers an aisle seat", hot: true }],
+          },
         },
       },
       {
-        narr: "Now you ask: what does Luna eat? The fact is out of the window, so the model on its own is back to guessing.",
-        agent: {
-          stripCaption: "The fact is out of view",
-          tokens: [...dropped(FACT), ...ctx(FILLER), ...user(QUESTION)],
-          windowLabel: "context window",
-          caret: true,
-          core: core(true),
-          fan: { list: FAN_COLD, chosen: 0 },
+        narr: "That store is one of several. Real memory splits by the kind of question it answers. **Episodic** memory holds what happened before: past turns and events, each tied to a time. \"On 3 May you booked a window seat to Oslo.\" It is the assistant's diary.",
+        memoryShelf: {
+          workingCaption: WORKING_CAP,
+          working: [{ text: "hi, plan my trip" }],
+          active: "episodic",
+          stores: {
+            episodic: [{ text: "3 May: booked Oslo, window seat", hot: true }],
+            semantic: [{ text: "prefers an aisle seat" }],
+          },
         },
       },
       {
-        narr: "But it is still in memory. The assistant looks it up and drops it back into the context, right where the model can read it.",
-        agent: {
-          stripCaption: "Recalled from memory",
-          tokens: [...ctx(FILLER), ...ctxHot(FACT), ...user(QUESTION)],
-          caret: true,
-          core: core(true),
-          fan: { list: FAN_WARM, chosen: 0 },
+        narr: "**Semantic** memory holds what stays true, with no date attached: facts about the world, or about you. \"You prefer an aisle seat.\" It does not matter *when* you said it - it is just true. This is where the fact you saved a moment ago belongs.",
+        memoryShelf: {
+          workingCaption: WORKING_CAP,
+          working: [{ text: "hi, plan my trip" }],
+          active: "semantic",
+          stores: {
+            episodic: [{ text: "3 May: booked Oslo, window seat" }],
+            semantic: [{ text: "prefers an aisle seat", hot: true }],
+          },
         },
       },
       {
-        narr: "That is all memory is: **save** what matters, and **recall** it into the context when it is relevant. It is how an assistant seems to remember you across a long chat - well past what the window alone can hold.",
-        agent: {
-          stripCaption: "Memory: save, then recall when needed",
-          tokens: [...ctx(FILLER), ...ctxHot(FACT), ...user(QUESTION)],
-          caret: false,
-          core: core(false),
-          fan: null,
+        narr: "**Procedural** memory holds how to do things: the routines the assistant follows, like the steps of booking a trip. It is less \"a fact\" and more \"a habit\" - the way it knows to act.",
+        memoryShelf: {
+          workingCaption: WORKING_CAP,
+          working: [{ text: "hi, plan my trip" }],
+          active: "procedural",
+          stores: {
+            episodic: [{ text: "3 May: booked Oslo, window seat" }],
+            semantic: [{ text: "prefers an aisle seat" }],
+            procedural: [{ text: "to book: search \u2192 pick \u2192 confirm", hot: true }],
+          },
+        },
+      },
+      {
+        narr: "Now a task arrives: **book my usual flight**. The assistant **recalls** the right kinds - the semantic preference and the last episodic trip - and pulls them back up into working memory, where the model can read them.",
+        memoryShelf: {
+          workingCaption: WORKING_CAP,
+          working: [
+            { text: "book my usual flight" },
+            { text: "prefers an aisle seat", hot: true },
+            { text: "last trip: Oslo", hot: true },
+          ],
+          workingActive: true,
+          active: ["episodic", "semantic"],
+          stores: {
+            episodic: [{ text: "3 May: booked Oslo, window seat" }],
+            semantic: [{ text: "prefers an aisle seat" }],
+            procedural: [{ text: "to book: search \u2192 pick \u2192 confirm" }],
+          },
+        },
+      },
+      {
+        narr: "That is memory: **save** what matters, **recall** it when it counts - across four kinds of knowing. What is happening now, what happened before, what stays true, and how to act, all feeding the one working context the model reads. Save to the right store; recall the right store when it matters.",
+        memoryShelf: {
+          workingCaption: WORKING_CAP,
+          working: [
+            { text: "book my usual flight" },
+            { text: "prefers an aisle seat" },
+            { text: "last trip: Oslo" },
+          ],
+          stores: {
+            episodic: [{ text: "3 May: booked Oslo, window seat" }],
+            semantic: [{ text: "prefers an aisle seat" }],
+            procedural: [{ text: "to book: search \u2192 pick \u2192 confirm" }],
+          },
         },
       },
     ],
