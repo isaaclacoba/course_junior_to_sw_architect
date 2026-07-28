@@ -17,7 +17,24 @@ function loadLessonCommon() {
   const src = fs.readFileSync(path.join(__dirname, "..", "page-shell.js"), "utf8");
   const sandbox = { window: {}, console: { error() {} }, location: { hash: "" } };
   vm.runInNewContext(src, sandbox);
-  return { LessonCommon: sandbox.window.LessonCommon, location: sandbox.location };
+  return { LessonCommon: sandbox.window.LessonCommon, location: sandbox.location, window: sandbox.window };
+}
+
+function fakeEl() {
+  const classes = new Set();
+  return {
+    hidden: true,
+    textContent: "",
+    classList: {
+      toggle(cls, on) {
+        if (on) classes.add(cls);
+        else classes.delete(cls);
+      },
+      has(cls) {
+        return classes.has(cls);
+      },
+    },
+  };
 }
 
 test("page-shell exposes LessonCommon even without window.PAGE", () => {
@@ -137,4 +154,57 @@ test("LessonCommon.storage defaults to a working store", () => {
   const { LessonCommon } = loadLessonCommon();
   assert.equal(typeof LessonCommon.storage.getItem, "function");
   assert.equal(typeof LessonCommon.storage.setItem, "function");
+});
+
+test("createOutputPanel showOutput and hideOutput toggle the element", () => {
+  const { LessonCommon } = loadLessonCommon();
+  const output = fakeEl();
+  const panel = LessonCommon.createOutputPanel({ output, errors: null });
+  panel.showOutput("hi", false);
+  assert.equal(output.hidden, false);
+  assert.equal(output.textContent, "hi");
+  assert.equal(output.classList.has("is-error"), false);
+  panel.showOutput("boom", true);
+  assert.equal(output.classList.has("is-error"), true);
+  panel.hideOutput();
+  assert.equal(output.hidden, true);
+  assert.equal(output.textContent, "");
+});
+
+test("createOutputPanel falls back to text output when code-lab is absent", () => {
+  const { LessonCommon } = loadLessonCommon();
+  const output = fakeEl();
+  const panel = LessonCommon.createOutputPanel({ output, errors: fakeEl() });
+  const handled = panel.showErrors([{ friendly: "boom" }, { raw: "bang" }]);
+  assert.equal(output.hidden, false);
+  assert.equal(output.textContent, "boom\nbang");
+  assert.equal(output.classList.has("is-error"), true);
+  assert.equal(handled, true);
+});
+
+test("createOutputPanel uses the code-lab error panel when available", () => {
+  const { LessonCommon, window } = loadLessonCommon();
+  const seen = [];
+  window.CodeLab = {
+    showErrorPanel: (el, list) => {
+      seen.push(list);
+      return list.length > 0;
+    },
+  };
+  const output = fakeEl();
+  const panel = LessonCommon.createOutputPanel({ output, errors: fakeEl() });
+  const handled = panel.showErrors([{ friendly: "boom" }]);
+  assert.equal(output.hidden, true);
+  assert.equal(seen.length, 1);
+  assert.equal(handled, true);
+  panel.clearErrors();
+  assert.equal(seen[1].length, 0);
+});
+
+test("createOutputPanel tolerates a missing output element", () => {
+  const { LessonCommon } = loadLessonCommon();
+  const panel = LessonCommon.createOutputPanel({});
+  assert.doesNotThrow(() => panel.showOutput("x", false));
+  assert.doesNotThrow(() => panel.hideOutput());
+  assert.doesNotThrow(() => panel.clearErrors());
 });

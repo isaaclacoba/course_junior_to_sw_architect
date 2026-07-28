@@ -99,6 +99,43 @@
         },
       };
     },
+    // The run-output + compile-error surface for a lesson card. Injecting the
+    // two elements keeps the show/hide/error logic in one place instead of
+    // copied into each engine. Falls back to plain text output when the shared
+    // code-lab error panel is unavailable.
+    createOutputPanel(els) {
+      const output = (els && els.output) || null;
+      const errors = (els && els.errors) || null;
+      const panel = () =>
+        errors && typeof window !== "undefined" && window.CodeLab && window.CodeLab.showErrorPanel
+          ? window.CodeLab.showErrorPanel
+          : null;
+      function showOutput(text, isError) {
+        if (!output) return;
+        output.hidden = false;
+        output.textContent = text;
+        output.classList.toggle("is-error", Boolean(isError));
+      }
+      function hideOutput() {
+        if (!output) return;
+        output.hidden = true;
+        output.textContent = "";
+      }
+      function clearErrors() {
+        const show = panel();
+        if (show) show(errors, []);
+      }
+      function showErrors(list) {
+        const show = panel();
+        if (show) {
+          if (output) output.hidden = true;
+          return show(errors, list);
+        }
+        showOutput((list || []).map((e) => e.friendly || e.raw).join("\n"), true);
+        return Boolean(list && list.length);
+      }
+      return { showOutput, hideOutput, clearErrors, showErrors };
+    },
   };
   window.LessonCommon = LessonCommon;
 

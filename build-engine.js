@@ -71,30 +71,11 @@
     renderXP();
   }
 
-  function showOutput(text, isError) {
-    output.hidden = false;
-    output.textContent = text;
-    output.classList.toggle("is-error", Boolean(isError));
-  }
-
-  function hideOutput() {
-    output.hidden = true;
-    output.textContent = "";
-  }
-
-  // Render the shared capstone-quality compile-error panel (or clear it).
-  function showErrors(list) {
-    if (errors && CodeLab.showErrorPanel) {
-      return CodeLab.showErrorPanel(errors, list);
-    }
-    // Fallback: keep the old text output if the shared renderer is missing.
-    showOutput((list || []).map((e) => e.friendly || e.raw).join("\n"), true);
-    return Boolean(list && list.length);
-  }
-
-  function clearErrors() {
-    if (errors && CodeLab.showErrorPanel) CodeLab.showErrorPanel(errors, []);
-  }
+  const outputPanel = LessonCommon.createOutputPanel({ output, errors });
+  const showOutput = outputPanel.showOutput;
+  const hideOutput = outputPanel.hideOutput;
+  const showErrors = outputPanel.showErrors;
+  const clearErrors = outputPanel.clearErrors;
 
   function showResult(ok, body) {
     result.hidden = false;

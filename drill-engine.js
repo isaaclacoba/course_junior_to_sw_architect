@@ -679,27 +679,10 @@
     els.result.hidden = false;
   }
 
-  function showOutput(text, isError) {
-    if (!els.output) return;
-    els.output.hidden = false;
-    els.output.textContent = text;
-    els.output.classList.toggle("is-error", Boolean(isError));
-  }
-
-  function clearErrors() {
-    if (els.errors && window.CodeLab && CodeLab.showErrorPanel)
-      CodeLab.showErrorPanel(els.errors, []);
-  }
-
-  // Capstone-quality compile-error panel, shared via code-lab.
-  function showErrors(list) {
-    if (els.errors && window.CodeLab && CodeLab.showErrorPanel) {
-      if (els.output) els.output.hidden = true;
-      return CodeLab.showErrorPanel(els.errors, list);
-    }
-    showOutput((list || []).map((e) => e.friendly || e.raw).join("\n"), true);
-    return Boolean(list && list.length);
-  }
+  const outputPanel = LessonCommon.createOutputPanel({ output: els.output, errors: els.errors });
+  const showOutput = outputPanel.showOutput;
+  const clearErrors = outputPanel.clearErrors;
+  const showErrors = outputPanel.showErrors;
 
   async function runExample() {
     const code = runnablePrograms[idx];
