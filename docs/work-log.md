@@ -697,3 +697,17 @@ role-tagged messages) but left it half-wired, so code-lab did not typecheck.
   right step counts and titles, both new stage titles, 21 AI cards, 0 undefined.
   Temp harnesses removed. No push.
 - End: 2026-07-28 10:44 CEST
+
+## 2026-07-28 11:16 CEST - Merge AI agentic track into master
+- Task: merge branch agents/ai-reading-list-syllabus-creation (29 ahead / 4 behind)
+  into master. Master had diverged (practical-track restructure); our side added
+  ai-13..ai-23 plus three code-lab scenes (retrieval, planboard, transcript).
+- Submodule: fetched code-lab 4db99fd/ed6848b into master's module store so the
+  gitlink (base==master==56ba20a, ours==ed6848b) fast-forwarded cleanly.
+- Conflicts: only docs/work-log.md (append vs append) - kept both sides' entries.
+  index.html and page-shell.js auto-merged (AI region vs practical region).
+- Re-applied the viz-lessons section onto master's lesson-authoring skill.
+- Verified on merged master (headless): index 0 undefined / 21 AI cards / both new
+  stage heads; ai-14 cl-rg, ai-16 & ai-19 cl-pb, ai-23 cl-tx, 0 undefined; master's
+  restructured arrays/null-safety/strings build lessons still render. No push.
+- End: 2026-07-28 11:16 CEST
