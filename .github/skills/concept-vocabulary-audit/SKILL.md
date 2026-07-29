@@ -59,8 +59,9 @@ those instead of the `docs/concepts/*.json` drafts.
    is introduced by exactly one lesson within its track (ids are track-scoped: `pr-`,
    `th-`, `ai-`), and that lesson owns its one-sentence `def`. These drafts are the
    authoritative source while migrating; `meta.js` is seeded from them.
-2. Order, titles, blurbs: `course-manifest.js` (`Course.register(...)`, per track, in
-   registration order - not numeric).
+2. Order + structure: `course-registry.js` (`window.CourseRegistry.tracks` = the
+   track/part chrome in display order; `lessons` = every lesson in reading order).
+   (This replaced the retired `course-manifest.js`.)
 3. Lesson CONTENT to check `def`s against: a flat `<id>.js` (`BUILD_CONFIG`/`DRILL_CONFIG`
    per-card `title`/`concept`/`context`/`goal`), `<id>.viz.js` (`LESSON_VIZ` narrated
    `steps`), `<id>.html` hero - OR, if migrated, `content/<track>/<NN-part>/<NN-id>/`.

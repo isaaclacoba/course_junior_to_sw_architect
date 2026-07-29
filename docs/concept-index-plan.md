@@ -3,8 +3,9 @@
 Status: IN PROGRESS. `course-manifest.js` RETIRED (item 12 done) - `course-registry.js` is now the
 single source of the course path (chrome + order + the capstone's inlined card), and every lesson's
 display data lives in its `meta.js`. 75/76 lessons migrated (only the external capstone stays flat, by
-design). Phase 0 done (10/10); concept graph drafted (208), audited, applied. Next is CG3 (re-audit
-the vocabulary) then Phases 1-3. Owner: Isaac + agent. Last updated: 2026-07-29.
+design). Phase 0 done (10/10); concept graph drafted (208), audited, applied. CG3 re-audit done
+(fingerprint stable since CG2; P1=0, a few P2/P3 refinements pending sign-off); Phases 1-3 cleared to
+start. Owner: Isaac + agent. Last updated: 2026-07-29.
 
 Tracking: each action item is a checkbox. Flip `- [ ]` to `- [x]` when the item is
 DONE and its Verify step passes. Use `- [~]` for in-progress. Keep the Progress
@@ -16,7 +17,7 @@ table in sync.
 |---|---|---|
 | 0 - Foundation (source of truth + tooling) | 1-8 (incl. 4b, 5b) | 10 / 10 |
 | Pilot migration | 9-12 (incl. 11b, 12b) | 6 / 6 |
-| Concept graph (feeds 1-3) | CG1-CG3 | 2 / 3 |
+| Concept graph (feeds 1-3) | CG1-CG3 | 3 / 3 |
 | 1 - Glossary | 13 | 0 / 1 |
 | 2 - Agenda | 14 | 0 / 1 |
 | 3 - Concept mentions | 15 | 0 / 1 |
@@ -189,6 +190,19 @@ table in sync.
   `updateRegistry`) + the unused `vm`/`loadWindowBag` imports + `manifestPath`. `--new` (the only live
   path) is unchanged; `--from` now prints a clear retired message. node --check + `--new`/`--from`/usage
   dispatch verified; parity 7/7, validate 0 err, generated/ unchanged.
+- **2026-07-29 (CG3: standing vocabulary audit)** - Re-ran the `concept-vocabulary-audit` skill as the
+  gate before Phases 1-3 (all tracks migrated). The graph fingerprint is UNCHANGED since CG2
+  (`617584744ca3`, 76 lessons / 208 concepts) and the drafts == the migrated `meta.js`, so every
+  introduced def is identical to the CG2-resolved state. A single global reviewer (the skill's prescribed
+  method over a per-track fleet) confirmed all CG2 fixes still hold and did a fresh-eyes pass on what the
+  fingerprint does not cover (edges/placement/coverage/cross-track/voice). Verdict: good-enough-to-build-on,
+  Phases 1-3 CLEARED. New findings (NOT applied - the skill gates fixes on sign-off): P1=0; P2 x4
+  (practical leans on an untaught \"value type\" in `pr-struct`/`pr-record`/`pr-nullable-value-type`;
+  `pr-single-inheritance` overlaps `pr-favour-composition`; `pr-runtime-dispatch` vs `pr-polymorphism`;
+  `ai-1` uses \"token\" before `ai-2`); P3 x4 (top: `th-file` and `th-inode` both render the term \"File\"
+  - a collision CG2's inode-fold introduced; `ai-react` \"grounded\" before `ai-grounding`; `ai-evaluation`
+  \"can never\"; `pr-to-string`/`pr-tostring-override` near-dup ids). Report -> `vocabulary-review.md`. Also
+  fixed the audit skill's stale ground-truth (`course-manifest.js` -> `course-registry.js`).
 
 ---
 
@@ -349,7 +363,7 @@ already-migrated lessons after a draft change with `node tools/seed-concepts.mjs
   `node tools/seed-concepts.mjs`, regenerated, `validate` clean (0 err / 23 orphan warnings), parity
   6/6. Review fingerprint bumped `8b052068c017 -> 617584744ca3` (208 concepts). Cross-track overlap:
   kept track-scoped (no merge).
-- [ ] **CG3. Audit as a standing gate.** Re-run the `concept-vocabulary-audit` skill (its
+- [x] **CG3. Audit as a standing gate.** Re-run the `concept-vocabulary-audit` skill (its
   fingerprint says whether it is due) AFTER each track finishes migrating and BEFORE building any
   of Phases 1-3 - do not build a concept feature on an unaudited graph. (Drafts are the source
   until item 12 retires the manifest; then each lesson's `meta.js` is.)
