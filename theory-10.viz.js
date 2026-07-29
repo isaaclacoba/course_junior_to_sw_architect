@@ -1,25 +1,57 @@
 // Visual for theory-10 "Types" - data-only, decoupled from theory-10.js.
-// Memory scene, no board: just the Stack region, showing named slots whose
-// values carry a type, and the type staying with the slot for its whole life.
+// LEVEL-0 execution scene: just the code with a moving current line and a flat
+// Name | Value table - no memory board, no stack/heap split, no addresses.
+// We step through a tiny routine to see that every value has a type, a variable's
+// type stays fixed, and the compiler stops the wrong kind of value going in.
 (function () {
   "use strict";
 
-  const frame = (vars) => ({ id: "f", name: "your program", vars });
-  const age = (extra) => ({ id: "age", addr: "0x7000", k: "age", v: "30", ...(extra || {}) });
-  const name = (extra) => ({ id: "name", addr: "0x7008", k: "name", v: '"Rex"', ...(extra || {}) });
-  const ready = (extra) => ({ id: "ready", addr: "0x7010", k: "ready", v: "true", ...(extra || {}) });
-  const price = (extra) => ({ id: "price", addr: "0x7018", k: "price", v: "3.5", ...(extra || {}) });
+  const CODE = [
+    "int age",
+    "age = 30",
+    'string name = "Mia"',
+    "age = age + 1",
+    'age = "Mia"  // not allowed',
+  ];
+
+  // One box in the variable table. `hot` marks the box that changed THIS step
+  // (static amber highlight); omit a value to show it as "unassigned".
+  const box = (k, v, hot) => (v == null ? { id: k, k, empty: true } : { id: k, k, v: String(v), hot });
+  const frame = (vars) => ({ id: "prog", name: "your program", vars });
 
   window.LESSON_VIZ = {
-    scene: { board: false, regions: ["stack"], zoomTab: false },
-    chipName: "RAM",
-    chipAddr: "each slot has a type",
+    code: CODE,
+    layout: {
+      visual: [{ type: "code" }, { type: "vartable" }],
+      aside: [{ type: "narration" }, { type: "controls" }],
+    },
+    legend: [{ sw: "#f59e0b", label: "changed this step" }],
     steps: [
-      { narr: "Every value has a **type** - a kind.\n`age` holds `30`, a whole number (an `int`). `name` holds `\"Rex\"`, some text (a `string`). `ready` holds `true`, a yes/no answer (a `bool`).", stack: [frame([age(), name(), ready()])] },
-      { narr: "The **type** decides what you can do with a value.\nYou can add two `int`s - `age + 1` makes sense. Adding a `bool` to a word does not, so the compiler stops you before the program runs.", stack: [frame([age({ v: "31" }), name(), ready()])] },
-      { narr: "A few **types** come up constantly:\n- `int` for whole numbers\n- `double` for decimals like `3.5`\n- `string` for text\n- `bool` for `true`/`false`", stack: [frame([age(), price(), name(), ready()])] },
-      { narr: "The type **travels with the variable**.\n`age` is a number slot; it holds numbers, not text. You do not suddenly drop `\"Rex\"` into it.", stack: [frame([age(), name(), ready()])] },
-      { narr: "That type stays **fixed for the slot's whole life**.\nA number box holds numbers from start to finish - which is exactly what lets the compiler catch a misuse early.", stack: [frame([age(), name(), ready()])] },
+      {
+        narr: "Every value has a **type** - a kind.\n`int age` creates a variable meant for whole numbers. The box exists, but it does not have a value yet.",
+        pc: 0, codeLive: true,
+        stack: [frame([box("age", null)])],
+      },
+      {
+        narr: "**Assignment** writes a value into the variable.\n`age = 30` puts `30` in the `age` box. That value is a whole number, so it fits the `int` variable.",
+        pc: 1, codeLive: true,
+        stack: [frame([box("age", 30, true)])],
+      },
+      {
+        narr: "Different kinds of values have different types.\n`string name = \"Mia\"` creates a text variable and gives it text. You will also meet `double` for decimals and `bool` for `true`/`false`.",
+        pc: 2, codeLive: true,
+        stack: [frame([box("age", 30), box("name", '"Mia"', true)])],
+      },
+      {
+        narr: "The type stays with the variable for its whole life.\n`age` is still an `int` box. Its value can change from `30` to `31`, but it is still for whole numbers.",
+        pc: 3, codeLive: true,
+        stack: [frame([box("age", 31, true), box("name", '"Mia"')])],
+      },
+      {
+        narr: "The compiler uses the type to catch a misuse early.\nTrying to put `\"Mia\"` into `age` is the wrong kind of value, so the program is stopped before it runs. The `age` box stays a number box.",
+        pc: 4, codeLive: true,
+        stack: [frame([box("age", 31), box("name", '"Mia"')])],
+      },
     ],
   };
 })();
