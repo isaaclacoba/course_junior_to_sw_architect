@@ -187,12 +187,22 @@
     const d = conceptDef(id);
     return d ? d.term : id;
   }
+  // Concepts the learner has answered correctly in a checkpoint (written by
+  // CodeLab.Quiz to a shared key); used to mark agenda chips as covered.
+  function conceptProgress() {
+    try {
+      return JSON.parse(localStorage.getItem("course_concept_progress") || "{}") || {};
+    } catch (e) {
+      return {};
+    }
+  }
 
   // "In this lesson" - built from the page's own LESSON_META.concepts.
   function renderAgenda() {
     const meta = window.LESSON_META;
     const c = meta && meta.concepts;
     if (!c) return;
+    const covered = conceptProgress();
     const ids = (arr) => (arr || []).map((x) => (typeof x === "string" ? x : x.id));
     const groups = [
       { ids: ids(c.introduces), label: "New here", kind: "introduces" },
@@ -205,7 +215,7 @@
         const chips = g.ids
           .map(
             (id) =>
-              `<button type="button" class="agenda-chip agenda-chip--${g.kind}" data-concept-id="${LessonCommon.escapeHtml(id)}">${LessonCommon.escapeHtml(conceptTerm(id))}</button>`
+              `<button type="button" class="agenda-chip agenda-chip--${g.kind}${covered[id] ? " is-covered" : ""}" data-concept-id="${LessonCommon.escapeHtml(id)}">${LessonCommon.escapeHtml(conceptTerm(id))}</button>`
           )
           .join("");
         return `<div class="agenda-row"><span class="agenda-label">${g.label}</span>${chips}</div>`;

@@ -4,10 +4,9 @@ Status: IN PROGRESS. `course-manifest.js` RETIRED (item 12 done) - `course-regis
 single source of the course path (chrome + order + the capstone's inlined card), and every lesson's
 display data lives in its `meta.js`. 75/76 lessons migrated (only the external capstone stays flat, by
 design). Phase 0 done (10/10); concept graph drafted (208), audited, applied. CG3 re-audit done
-(P1=0; the clear P2/P3 fixes were applied - fp moved to `f9f9b2b89215`; two structural merges deferred).
-Phases 1-3 done (glossary + "in this lesson" agenda + in-prose concept mentions). Phase 4 in progress:
-checkpoint questions are tagged with concept ids (item 16) and the quiz persists per-concept results
-(item 17). Owner: Isaac + agent. Last updated: 2026-07-29.
+(P1=0; the clear P2/P3 fixes were applied - fp moved to `f9f9b2b89215`; the two flagged overlaps were
+kept split by decision). Phases 1-4 done (glossary + "in this lesson" agenda + in-prose concept
+mentions + per-concept evaluation). Owner: Isaac + agent. Last updated: 2026-07-29.
 
 Tracking: each action item is a checkbox. Flip `- [ ]` to `- [x]` when the item is
 DONE and its Verify step passes. Use `- [~]` for in-progress. Keep the Progress
@@ -23,7 +22,7 @@ table in sync.
 | 1 - Glossary | 13 | 1 / 1 |
 | 2 - Agenda | 14 | 1 / 1 |
 | 3 - Concept mentions | 15 | 1 / 1 |
-| 4 - Evaluation (submodule) | 16-18 | 2 / 3 |
+| 4 - Evaluation (submodule) | 16-18 | 3 / 3 |
 
 ## Progress log
 
@@ -259,6 +258,16 @@ table in sync.
   against the vendored bundle: a 3-question quiz (concept `c-alpha` in two, `c-beta` in one), answered
   correctly, persisted `{"c-beta":true,"c-alpha":true}` to `course_concept_progress`. NEXT: item 18 -
   read that key on the glossary + agenda to show per-concept "covered" state (course-side only).
+- **2026-07-29 (Phase 4 item 18: per-concept covered state)** - Read the shared `course_concept_progress`
+  key (written by item 17) on the two concept surfaces, course-side only. `glossary.html`: a `Covered`
+  pill on each concept the learner has answered correctly, plus a ` - N covered` tail on the count line
+  (self-contained CSS `.g-covered` on the styles.css tokens). `page-shell.js`: `conceptProgress()` reads
+  the key and `renderAgenda` adds `is-covered` (a leading checkmark + accent, `.agenda-chip.is-covered`
+  in styles.css) to any chip whose concept is covered. Empty/absent progress is safe (no pill, no suffix,
+  no class). VERIFIED in a real headless browser via an iframe harness that seeds the key then reads the
+  rendered DOM: seeding 4 ids showed 4 `Covered` pills + `208 concepts - 4 covered` on the glossary, and
+  2 covered chips on theory-check-1's agenda (`th-program`, `th-cpu`). Phase 4 DONE - the whole
+  concept-index plan is complete.
 ---
 
 ## The idea (hard constraints)
@@ -449,7 +458,7 @@ already-migrated lessons after a draft change with `node tools/seed-concepts.mjs
   per-question/per-concept results; rebuild + re-vendor; commit the submodule first, then
   bump the pointer. Verify: `npm run typecheck && test && build` in code-lab; headless
   checkpoint persists per-concept.
-- [ ] **18. Per-concept progress** on glossary + agenda from stored results. Verify: a
+- [x] **18. Per-concept progress** on glossary + agenda from stored results. Verify: a
   passed concept shows covered.
 
 ---

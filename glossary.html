@@ -32,6 +32,8 @@
     .g-links .g-label { font-weight: 600; color: var(--ink); }
     .g-none { color: var(--ink-soft); font-style: italic; margin-top: 1.4rem; }
     .g-hidden { display: none !important; }
+    .g-covered { font-family: "IBM Plex Mono", monospace; font-size: .66rem; text-transform: uppercase; letter-spacing: .06em; color: var(--bg-1); background: var(--primary); border-radius: 999px; padding: .12rem .5rem; font-weight: 600; }
+    .g-covered::before { content: "\2713 "; }
   </style>
 </head>
 <body>
@@ -55,6 +57,13 @@
       function esc(s) {
         return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
       }
+      // Concepts the learner has answered correctly in a checkpoint (written by
+      // CodeLab.Quiz to a shared localStorage key).
+      var COVERED = (function () {
+        try { return JSON.parse(localStorage.getItem("course_concept_progress") || "{}") || {}; }
+        catch (e) { return {}; }
+      })();
+      var coveredCount = 0;
 
       // lessonId -> { title, href } (CourseData does not expose this directly).
       var lessonMap = {};
@@ -105,8 +114,12 @@
           var art = document.createElement("article");
           art.className = "g-concept";
           art.dataset.search = (d.term + " " + d.def + " " + id).toLowerCase();
+          var isCovered = COVERED[id] === true;
+          if (isCovered) coveredCount++;
           art.innerHTML =
-            '<h3 class="g-term">' + esc(d.term) + ' <span class="g-id">' + esc(id) + '</span></h3>' +
+            '<h3 class="g-term">' + esc(d.term) + ' <span class="g-id">' + esc(id) + '</span>' +
+            (isCovered ? ' <span class="g-covered" title="You answered this correctly in a checkpoint">Covered</span>' : '') +
+            '</h3>' +
             '<p class="g-def">' + esc(d.def) + '</p>' +
             (links.length ? '<div class="g-links">' + links.join(" &middot; ") + '</div>' : '');
           section.appendChild(art);
@@ -114,7 +127,8 @@
         list.appendChild(section);
       });
 
-      document.getElementById("gCount").textContent = total + " concepts across the three tracks";
+      document.getElementById("gCount").textContent =
+        total + " concepts across the three tracks" + (coveredCount ? " \u00b7 " + coveredCount + " covered" : "");
 
       var search = document.getElementById("gSearch");
       var none = document.getElementById("gNone");

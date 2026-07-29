@@ -1665,6 +1665,8 @@ input.almost {
 .agenda-chip { font: inherit; font-size: 0.8rem; cursor: pointer; border: 1px solid var(--line); border-radius: 999px; background: #f3f3ee; color: var(--ink); padding: 0.2rem 0.6rem; }
 .agenda-chip:hover { border-color: var(--primary); color: var(--primary-2); }
 .agenda-chip--introduces { background: #e7f1ee; border-color: #cfe4dd; }
+.agenda-chip.is-covered { border-color: var(--primary); color: var(--primary-2); }
+.agenda-chip.is-covered::before { content: "\2713"; margin-right: 0.3rem; font-weight: 700; }
 .concept-mention { font: inherit; font-size: inherit; cursor: pointer; display: inline; padding: 0 0.1rem; border: 0; border-bottom: 1px dashed var(--primary); background: transparent; color: var(--primary-2); }
 .concept-mention:hover { background: #e7f1ee; }
 .concept-panel { position: fixed; bottom: 20px; right: 20px; width: min(340px, calc(100vw - 40px)); background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.14); padding: 16px 18px; z-index: 60; }
