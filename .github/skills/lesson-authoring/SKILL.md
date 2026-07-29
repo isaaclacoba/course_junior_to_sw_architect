@@ -47,7 +47,9 @@ lesson.
    `docs/audit/<track>/` so the new rung follows from the previous one and uses
    only concepts at or above its ledger row.
 3. **Pick the archetype** from the SPECS table. For a practical lesson prefer
-   `build` (real code, Run) over `drill`. Copy the closest existing lesson's data
+   `build` (real code, Run) over `drill` - `build` is the only archetype with live
+   instances under `content/`, so `drill`/`checkpoint` are scaffoldable but
+   unproven in the generated pipeline. Copy the closest existing lesson's data
    as the structural starting point.
 
 ### Target flow (generated) — for new or migrated lessons
@@ -62,11 +64,20 @@ lesson.
    `archetype`, and the `concepts` graph
    `{ introduces:[{id,term,def}], revisits:[{id}], uses:[{id}] }`. A concept's
    `def` lives ONLY in the one lesson that introduces it.
+   - `--new` does NOT seed `concepts` (only `--from` does) - fill them by hand, or
+     run `node tools/seed-concepts.mjs` to push `docs/concepts/<track>.concepts.json`
+     into every migrated `meta.js`. If this lesson is the sole introducer of a
+     concept, its `introduces` entry (with the `def`) MUST stay, or `validate.mjs`
+     fails downstream where another lesson revisits/uses it.
 6. **Fill `data.js`** with the lesson content (`window.BUILD_CONFIG` /
    `DRILL_CONFIG`, plus `viz.js` `window.LESSON_VIZ` for a viz lesson) to the
    config shape in SPECS. Honour the principles and cadence invariants (below).
    Do NOT put `nextHref`/`nextLabel` in the data file; nav derives from the
    registry.
+   - A build `starter` may intentionally NOT compile when the objective is to
+     WRITE a type/inheritance/member - the compile error is the teaching signal.
+     Keep a stub compiling only when the learner fills a body, not when they must
+     declare the shape.
 7. **Generate and validate**: `node tools/generate.mjs` writes
    `generated/course-data.js`, `generated/concept-index.js`, and the lesson's
    `content/.../index.html`; then `node tools/validate.mjs` checks alignment.

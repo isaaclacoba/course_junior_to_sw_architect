@@ -28,7 +28,7 @@
         message: "A Dog must be usable as an Animal - it is-a Animal, so it inherits Breathe() rather than redeclaring it.",
       },
       starter:
-        'using System;\n\npublic class Animal\n{\n    public void Breathe()\n    {\n        Console.WriteLine("...breathe...");\n    }\n}\n\n// TODO: make Dog inherit Animal - write "class Dog : Animal" - so it gets\n// Breathe() for free, then add a Fetch() that prints "fetches the stick".\npublic class Dog\n{\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Dog rex = new Dog();\n        rex.Breathe();\n        rex.Fetch();\n    }\n}\n',
+        'using System;\n\npublic class Animal\n{\n    public void Breathe()\n    {\n        Console.WriteLine("...breathe...");\n    }\n}\n\n// TODO: make Dog reuse Animal by inheriting from it, then give Dog its own\n// Fetch() method (the goal says what it should print).\npublic class Dog\n{\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Dog rex = new Dog();\n        rex.Breathe();\n        rex.Fetch();\n    }\n}\n',
       solution:
         'using System;\n\npublic class Animal\n{\n    public void Breathe()\n    {\n        Console.WriteLine("...breathe...");\n    }\n}\n\npublic class Dog : Animal\n{\n    public void Fetch()\n    {\n        Console.WriteLine("fetches the stick");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Dog rex = new Dog();\n        rex.Breathe();\n        rex.Fetch();\n    }\n}\n',
     },
@@ -78,7 +78,7 @@
         message: "Each type must carry its own Speak() - the words should follow the array, not a fixed order.",
       },
       starter:
-        'using System;\n\npublic class Animal\n{\n    public virtual string Speak()\n    {\n        return "...";\n    }\n}\n\npublic class Dog : Animal\n{\n    public override string Speak()\n    {\n        return "Woof";\n    }\n}\n\n// TODO: add Cat and Cow. Each is "class X : Animal" and overrides Speak()\n// to return "Meow" and "Moo".\n\nclass Program\n{\n    static void Main()\n    {\n        Animal[] pen = new Animal[] { new Dog(), new Cat(), new Cow() };\n        foreach (Animal a in pen)\n        {\n            Console.WriteLine(a.Speak());\n        }\n    }\n}\n',
+        'using System;\n\npublic class Animal\n{\n    public virtual string Speak()\n    {\n        return "...";\n    }\n}\n\npublic class Dog : Animal\n{\n    public override string Speak()\n    {\n        return "Woof";\n    }\n}\n\n// TODO: add Cat and Cow the same way Dog is written above - each a kind of\n// Animal with its own Speak() (the goal says the words).\n\nclass Program\n{\n    static void Main()\n    {\n        Animal[] pen = new Animal[] { new Dog(), new Cat(), new Cow() };\n        foreach (Animal a in pen)\n        {\n            Console.WriteLine(a.Speak());\n        }\n    }\n}\n',
       solution:
         'using System;\n\npublic class Animal\n{\n    public virtual string Speak()\n    {\n        return "...";\n    }\n}\n\npublic class Dog : Animal\n{\n    public override string Speak()\n    {\n        return "Woof";\n    }\n}\n\npublic class Cat : Animal\n{\n    public override string Speak()\n    {\n        return "Meow";\n    }\n}\n\npublic class Cow : Animal\n{\n    public override string Speak()\n    {\n        return "Moo";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Animal[] pen = new Animal[] { new Dog(), new Cat(), new Cow() };\n        foreach (Animal a in pen)\n        {\n            Console.WriteLine(a.Speak());\n        }\n    }\n}\n',
     },
@@ -98,6 +98,8 @@
         { pattern: /class\s+Duck\s*\{/, message: "Duck should HOLD its behaviours, not inherit them - `class Duck {` with no parents." },
         { pattern: /Swimming\s+\w+\s*=\s*new\s+Swimming/, message: "Give Duck a Swimming field: `Swimming _swim = new Swimming()`." },
         { pattern: /Flying\s+\w+\s*=\s*new\s+Flying/, message: "Give Duck a Flying field: `Flying _fly = new Flying()`." },
+        { pattern: /Swim\s*\(\s*\)\s*\{[^}]*\.\s*Go\s*\(/, message: "Make Swim() delegate to the held swimming part - return its `Go()`, do not hardcode." },
+        { pattern: /Fly\s*\(\s*\)\s*\{[^}]*\.\s*Go\s*\(/, message: "Make Fly() delegate to the held flying part - return its `Go()`, do not hardcode." },
       ],
       verify: {
         main:
@@ -122,7 +124,7 @@
         { title: "favour composition", text: "inheritance allows one parent and can force a bad fit; held parts never clash - that is why we lean on composition." },
       ],
       summaryClose:
-        "The keeper rule: can you honestly say A is-a B, always and everywhere? If not - or if you need to mix behaviours - hold parts instead. You already shipped this: your SOLID `TestRunner` has-a `IReporter` handed in, and one `Send` call served every reporter.",
+        "The keeper rule: can you honestly say A is-a B, always and everywhere? If not - or if you need to mix behaviours - hold parts instead. You will lean on this again when you design bigger systems: the same has-a move lets you swap one part for another without disturbing the rest.",
     },
   ];
 

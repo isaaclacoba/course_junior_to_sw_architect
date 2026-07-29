@@ -27,6 +27,12 @@ grows into a procedure, promote it to a skill and leave a pointer here.
   `PRACTICAL`/`THEORY` arrays. When you add a lesson you only add its card and its
   filename to the right `page-shell.js` array (in reading order); never bump a
   count by hand, and never set `awardedKey`/`nextHref` in a lesson data file.
+- **Scaffold a new generated lesson only after clearing any flat registry line for
+  that id.** `new-lesson.mjs --new` picks the `NN-` index from the count of
+  same-part `course-registry.js` rows, so a leftover flat line yields the wrong
+  number plus a duplicate-id row; and `--from --move` throws in `detectArchetype`
+  for a bespoke page that loads no standard engine. To rebuild a flat lesson the
+  standard way, delete its registry line (and the flat files) first, then `--new`.
 
 ## Theming
 

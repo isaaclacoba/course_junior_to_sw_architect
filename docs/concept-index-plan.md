@@ -158,6 +158,17 @@ table in sync.
   `verify` probe passes (hardcoding defeated) - 0 failures. generate + validate 0 err; page renders 0
   undefined with the `rwr` build scaffold + Monaco; root card data-driven (gentle/25 min/total 4); both
   boundary next targets reachable (200). Deleted the flat `reuse-without-regret.{html,js}`. Item 12 unblocked.
+- **2026-07-29 (11b review + skill capture)** - A read-only fleet reviewed the new lesson and the skills
+  gaps. Code review found 2 P2s, both fixed + re-verified with dotnet: (1) task 4 "Two abilities" was
+  cheatable - a learner could hold both parts unused and hardcode the returns, passing `expected` + the
+  field gates + the reorder `verify` (which only reorders the calls) - added two per-method delegation
+  gates and a negative check now confirms the cheat is blocked; (2) the recap falsely claimed the learner
+  had "already shipped" a capstone `TestRunner`/`IReporter` (rows 20-30 - untaught jargon in a Part-1
+  recap) - reworded to a plain has-a teaser. Also softened two TODOs that handed the literal
+  `class Dog : Animal` (the `context`/`example` carry the syntax). Skill capture: the flat-registry-line
+  scaffold caveat went to `learnings.instructions.md`; the build-is-the-only-live-archetype fact, the
+  `--new`-doesn't-seed-concepts / sole-introducer rule, and the intentionally non-compiling starter
+  nuance went to the `lesson-authoring` skill. All 4 tasks re-verified 0 failures; validate 0 err.
 
 ---
 
