@@ -43,6 +43,7 @@ var CodeLab = (() => {
     atLast: () => atLast,
     authorOf: () => authorOf,
     computeLineFlags: () => computeLineFlags,
+    conceptResults: () => conceptResults,
     counterLabel: () => counterLabel,
     defaultHighlighter: () => defaultHighlighter,
     deriveRefs: () => deriveRefs,
@@ -2610,6 +2611,7 @@ ${result.runtimeError}`.trim(),
     const passRatio = typeof config.passRatio === "number" ? config.passRatio : 0.7;
     const questions = shuffle(bank, rng).slice(0, askCount).map((q) => ({
       concept: q.concept ?? "",
+      conceptId: q.conceptId ?? "",
       stem: q.stem,
       why: q.why ?? "",
       chosen: -1,
@@ -2630,8 +2632,19 @@ ${result.runtimeError}`.trim(),
     }
     return { score, total: plan.questions.length, passed: score >= plan.needed };
   }
+  function conceptResults(plan) {
+    const out = {};
+    for (const q of plan.questions) {
+      const id = q.conceptId;
+      if (!id) continue;
+      const right = q.chosen >= 0 && !!q.options[q.chosen] && q.options[q.chosen].correct;
+      out[id] = (out[id] ?? false) || right;
+    }
+    return out;
+  }
 
   // src/dom/quiz-view.ts
+  var CONCEPT_PROGRESS_KEY = "course_concept_progress";
   function localStore(xpKey, awardedKey) {
     const read = () => {
       try {
@@ -2644,7 +2657,17 @@ ${result.runtimeError}`.trim(),
       hasPassed: () => Boolean(read().passed),
       markPassed: () => localStorage.setItem(awardedKey, JSON.stringify({ passed: true })),
       getXP: () => parseInt(localStorage.getItem(xpKey) || "0", 10),
-      addXP: (amount) => localStorage.setItem(xpKey, String(parseInt(localStorage.getItem(xpKey) || "0", 10) + amount))
+      addXP: (amount) => localStorage.setItem(xpKey, String(parseInt(localStorage.getItem(xpKey) || "0", 10) + amount)),
+      saveConceptResults: (results) => {
+        try {
+          const prev2 = JSON.parse(localStorage.getItem(CONCEPT_PROGRESS_KEY) || "{}");
+          for (const [id, passed] of Object.entries(results)) {
+            if (passed) prev2[id] = true;
+          }
+          localStorage.setItem(CONCEPT_PROGRESS_KEY, JSON.stringify(prev2));
+        } catch {
+        }
+      }
     };
   }
   function escapeHtml5(text) {
@@ -2774,6 +2797,7 @@ ${result.runtimeError}`.trim(),
         }
       });
       this.graded = true;
+      this.store.saveConceptResults(conceptResults(this.plan));
       this.showResult();
     }
     showResult() {
