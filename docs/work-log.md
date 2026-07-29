@@ -846,3 +846,34 @@ draft had dropped. Ten sections: problem, three pillars, what-it-shows-by-level
 Python Tutor, accessibility, build/architecture (evolve MemoryViz; derived-from-
 Step features; Roslyn tracer as a separate track; phases P1-P5), open decisions,
 and one-line evidence. Linked from docs/SPECS.md as a companion doc. No code.
+
+## 2026-07-29 12:48 +0200 - Execution visualizer P1: level-0 renderer
+
+Start+End. Built P1 of the C# execution visualizer (docs/execution-visualizer-
+spec.md): the level-0 presentation on a hand-written trace, by EVOLVING MemoryViz
+(not a new widget). Confirmed decisions: P1 first, evolve MemoryViz, prototype =
+theory-14, defer heavy motion to P3 (static change-highlight only).
+
+code-lab submodule:
+- Added "vartable" to the PanelType union (memory-model.ts).
+- New src/dom/vartable-view.ts: a Panel that renders the active (top) stack
+  frame's locals as a flat Name | Value table - no stack/heap split, no arrows,
+  no addresses. Unassigned slot -> "unassigned"; a slot the step marks hot -> a
+  STATIC amber highlight (no motion, so it is also the reduced-motion path).
+  Values are HTML-escaped (a value like List<int> would otherwise break markup).
+- Registered the factory in memory-viz.ts; added .cl-mv-vartable CSS.
+- typecheck clean, 103 tests pass, tsup build clean. Re-vendored the IIFE bundle
+  + css into vendor/code-lab/.
+
+Course repo:
+- Converted theory-14.viz.js to a level-0 exec scene: layout { visual:[code,
+  vartable], aside:[narration, controls] } over the same 6 steps, dropping the
+  board/die. Boxes fill one line at a time during the debug walkthrough, each
+  change amber-highlighted. Same narration/voice.
+- Added a [data-theme="dark"] skin for the vartable in styles.css.
+- Locked the four open decisions in the spec.
+
+Verified headless (chrome --dump-dom): step 1 shows code + 3 rows (a=10, b=5,
+total=unassigned) + narration + scrubber, no undefined; driving Next to step 4
+shows a=10 amber-highlighted with b/total still "unassigned" - the one-at-a-time
+fill and change-highlight work. CSS braces balanced; temp harness removed.

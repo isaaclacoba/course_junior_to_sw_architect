@@ -130,14 +130,14 @@ experience with zero tracer risk; (P2) the derived-features post-processor;
 (P5) the tracer, a "Visualize my code" button, then engagement and expression
 substitution as flagship polish.
 
-## 9. Open decisions
+## 9. Decisions (confirmed 2026-07-29)
 
-- First deliverable = P1 (level-0 on a hand-written trace)? Recommend yes.
-- Evolve `MemoryViz` vs a new widget? Recommend evolve.
-- Prototype lesson = `theory-14` (it already steps a tiny routine filling one
-  slot, so it converts cleanly to a flat variable table)? Recommend yes.
-- Ship animation in P1 or defer? Recommend defer heavy motion to P3; P1 uses the
-  static change-highlight, which is also the reduced-motion path.
+- First deliverable = **P1** - level-0 renderer on a hand-written trace. Confirmed.
+- Architecture = **evolve `MemoryViz`**, not a new widget. Confirmed.
+- Prototype lesson = **`theory-14`** (it already steps a tiny routine filling one
+  slot, so it converts cleanly to a flat variable table). Confirmed.
+- Motion = **defer heavy animation to P3**. P1 ships only the static
+  change-highlight, which doubles as the reduced-motion path. Confirmed.
 
 ## 10. Evidence in one line
 

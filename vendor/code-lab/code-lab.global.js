@@ -1571,6 +1571,54 @@ ${result.runtimeError}`.trim(),
     }
   };
 
+  // src/dom/vartable-view.ts
+  var VarTableView = class {
+    constructor() {
+      this.el = document.createElement("div");
+      this.el.className = "cl-mv-region cl-mv-vartable";
+      this.el.innerHTML = `<span class="cl-mv-tag">VARIABLES <span>\xB7 what each name holds now</span></span><div class="cl-mv-vt-rows" data-vtrows></div>`;
+      this.rows = this.el.querySelector("[data-vtrows]");
+    }
+    sync(ctx) {
+      this.render(activeFrame(ctx.model.stack)?.vars ?? []);
+    }
+    // Rebuild only when the set of names changes; otherwise update rows in place so
+    // a later phase can animate the changed value without re-creating the node.
+    render(vars) {
+      const names = vars.map((v) => v.k ?? v.id).join("");
+      if (this.rows.dataset.names !== names) {
+        this.rows.dataset.names = names;
+        this.rows.innerHTML = vars.length ? vars.map(rowHtml).join("") : `<div class="cl-mv-vt-empty">no variables yet</div>`;
+        return;
+      }
+      const children = Array.from(this.rows.children);
+      vars.forEach((v, i) => updateRow(children[i], v));
+    }
+  };
+  function activeFrame(stack) {
+    const frames = stack ?? [];
+    return frames[frames.length - 1];
+  }
+  function valueText(v) {
+    if (v.empty) return "unassigned";
+    if (v.ref) return "\u2192 " + v.ref;
+    return v.v ?? "";
+  }
+  function rowHtml(v) {
+    const cls = "cl-mv-vt-row" + (v.empty ? " is-empty" : "") + (v.hot ? " is-changed" : "");
+    return `<div class="${cls}"><span class="cl-mv-vt-name">${esc(v.k ?? v.id)}</span><span class="cl-mv-vt-val">${esc(valueText(v))}</span></div>`;
+  }
+  function updateRow(row, v) {
+    if (!row) return;
+    row.classList.toggle("is-empty", Boolean(v.empty));
+    row.classList.toggle("is-changed", Boolean(v.hot));
+    const val = row.querySelector(".cl-mv-vt-val");
+    if (val) val.textContent = valueText(v);
+  }
+  function esc(s) {
+    return s.replace(/[&<>]/g, (c) => c === "&" ? "&amp;" : c === "<" ? "&lt;" : "&gt;");
+  }
+
   // src/core/narration.ts
   function escapeHtml4(text) {
     return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -2402,6 +2450,7 @@ ${result.runtimeError}`.trim(),
         board: (_spec, ctx) => new BoardView(ctx.uid),
         die: (spec, ctx) => new MemoryDieView(ctx.uid, ctx.code, ctx.labels, spec.regions ?? ctx.regions, ctx.zoomTab, ctx.regionTags),
         code: (_spec, ctx) => new CodePanel(ctx.code),
+        vartable: () => new VarTableView(),
         narration: () => new NarrationView(),
         agent: (spec) => new AgentView(spec.fan),
         agentloop: () => new AgentLoopView(),
