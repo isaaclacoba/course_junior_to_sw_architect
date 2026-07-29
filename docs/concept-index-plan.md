@@ -5,7 +5,8 @@ single source of the course path (chrome + order + the capstone's inlined card),
 display data lives in its `meta.js`. 75/76 lessons migrated (only the external capstone stays flat, by
 design). Phase 0 done (10/10); concept graph drafted (208), audited, applied. CG3 re-audit done
 (P1=0; the clear P2/P3 fixes were applied - fp moved to `f9f9b2b89215`; two structural merges deferred).
-Phases 1-3 done (glossary + "in this lesson" agenda + in-prose concept mentions). Owner: Isaac + agent. Last updated: 2026-07-29.
+Phases 1-3 done (glossary + "in this lesson" agenda + in-prose concept mentions). Phase 4 started:
+checkpoint questions are tagged with concept ids (item 16). Owner: Isaac + agent. Last updated: 2026-07-29.
 
 Tracking: each action item is a checkbox. Flip `- [ ]` to `- [x]` when the item is
 DONE and its Verify step passes. Use `- [~]` for in-progress. Keep the Progress
@@ -21,7 +22,7 @@ table in sync.
 | 1 - Glossary | 13 | 1 / 1 |
 | 2 - Agenda | 14 | 1 / 1 |
 | 3 - Concept mentions | 15 | 1 / 1 |
-| 4 - Evaluation (submodule) | 16-18 | 0 / 3 |
+| 4 - Evaluation (submodule) | 16-18 | 1 / 3 |
 
 ## Progress log
 
@@ -228,8 +229,22 @@ table in sync.
   `styles.css`. Verified headless: agenda renders on build/viz/checkpoint with resolved chips (0
   undefined; viz + quiz still mount); renderInline logic-checked (mention grammar + code/bold/escape
   intact); parity 7/7, validate 0 err, generated data unchanged. NOTE: no lesson prose carries
-  `[[concept:...]]` markers yet - the capability is live for authors to use.
-
+  `[[concept:...]]` markers yet - the capability is live for authors to use.- **2026-07-29 (Phase 4 item 16: tag checkpoint questions)** - Tagged all 42 questions across the four
+  `theory-check-*` `data.js` files with a `conceptId` (a track-scoped `th-` id) next to the existing
+  display-string `concept`. The vendored `CodeLab.Quiz` maps only `concept/stem/why/options/correct`,
+  so the new field is inert until item 17 wires it in the submodule; the four checkpoint pages still
+  render (0 undefined, quiz + agenda mount). Extended `validate.mjs` with check 5
+  (`checkCheckpointConcepts` + `loadCheckpointQuizzes` + `knownConceptIds`): every question's
+  `conceptId` must resolve to an introduced concept (ERROR), an untagged question is a WARN. Most
+  questions map 1:1 to their part's revisited concept; a few topic-labels needed judgment
+  (check-2 "Type checking" -> `th-type`, "Decisions" -> `th-branch`, "Bugs" -> `th-logic-error`;
+  check-3 "Where data lives" -> `th-ram` (a Part-1 lead-in), the value/reference cluster spread over
+  `th-value-type`/`th-reference-type`/`th-reference`, both link questions -> `th-inode`). `data.js` is
+  not a generator input, so `generated/` + every `content/**/index.html` are byte-unchanged (drift
+  guard 0). Gates: validate 0 err (drift guard on), a negative unit test proves the check fires on a
+  bogus id + a missing tag, parity 7/7. NEXT: items 17-18 (surface/persist per-concept results in the
+  code-lab `Quiz` submodule, then per-concept progress on glossary + agenda) - a submodule build +
+  re-vendor. The two deferred concept merges still await an explicit decision.
 ---
 
 ## The idea (hard constraints)
@@ -414,7 +429,7 @@ already-migrated lessons after a draft change with `node tools/seed-concepts.mjs
 
 ## Phase 4 - Evaluation (touches the code-lab submodule)
 
-- [ ] **16. Tag checkpoint questions** with concept ids in `theory-check-*` data
+- [x] **16. Tag checkpoint questions** with concept ids in `theory-check-*` data
   (course-side). Verify: validator resolves every id.
 - [ ] **17. Extend `CodeLab.Quiz`** (`code-lab/src/dom/quiz-view.ts`) to surface/persist
   per-question/per-concept results; rebuild + re-vendor; commit the submodule first, then

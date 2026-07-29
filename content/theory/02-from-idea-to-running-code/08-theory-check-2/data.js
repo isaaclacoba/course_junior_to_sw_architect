@@ -18,6 +18,7 @@
     questions: [
       {
         concept: "Languages",
+        conceptId: "th-programming-language",
         stem: "Why do we write in a language like C# instead of the CPU's raw instructions?",
         options: [
           "A language is human-friendly, and a tool translates it into the CPU's instructions",
@@ -30,6 +31,7 @@
       },
       {
         concept: "High vs low level",
+        conceptId: "th-high-level",
         stem: "Roughly, one line of high-level code becomes how much machine code?",
         options: [
           "Many low-level CPU instructions",
@@ -42,6 +44,7 @@
       },
       {
         concept: "Variables",
+        conceptId: "th-variable",
         stem: "What is a variable?",
         options: [
           "A named slot in memory that holds a value",
@@ -54,6 +57,7 @@
       },
       {
         concept: "Assignment",
+        conceptId: "th-assignment",
         stem: "You run `x = 5` and then `x = 9`. What is in `x`?",
         options: [
           "9 - the new value replaces the old one",
@@ -66,6 +70,7 @@
       },
       {
         concept: "Types",
+        conceptId: "th-type",
         stem: "What does a value's type mainly decide?",
         options: [
           "What you can do with it - which operations are allowed",
@@ -78,6 +83,7 @@
       },
       {
         concept: "Type checking",
+        conceptId: "th-type",
         stem: "Adding a number to a word makes no sense. What usually catches that mistake?",
         options: [
           "The compiler, before the program runs",
@@ -90,6 +96,7 @@
       },
       {
         concept: "Statements & expressions",
+        conceptId: "th-expression",
         stem: "A statement is one complete step. What is an expression?",
         options: [
           "A piece of code that produces a value",
@@ -102,6 +109,7 @@
       },
       {
         concept: "Decisions",
+        conceptId: "th-branch",
         stem: "What does an `if`/`else` let a program do?",
         options: [
           "Choose between paths based on a yes/no condition",
@@ -114,6 +122,7 @@
       },
       {
         concept: "Functions",
+        conceptId: "th-function",
         stem: "When a function is called, what happens in memory?",
         options: [
           "A new frame is pushed on the stack holding its local variables",
@@ -126,6 +135,7 @@
       },
       {
         concept: "Bugs",
+        conceptId: "th-logic-error",
         stem: "A program builds and runs, but gives the wrong answer. What kind of bug is that?",
         options: [
           "A logic error",

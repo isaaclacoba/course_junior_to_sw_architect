@@ -20,6 +20,7 @@
     questions: [
       {
         concept: "Program",
+        conceptId: "th-program",
         stem: "You double-click an app and it starts. In computing terms, what did you just ask the CPU to begin running?",
         options: [
           "An ordered list of instructions",
@@ -32,6 +33,7 @@
       },
       {
         concept: "CPU",
+        conceptId: "th-cpu",
         stem: "A single CPU core is described as doing 'one thing at a time'. What does that actually mean?",
         options: [
           "It runs one instruction, then the next, extremely fast",
@@ -44,6 +46,7 @@
       },
       {
         concept: "Time-sharing",
+        conceptId: "th-time-sharing",
         stem: "On a single-core laptop, a browser and a music player seem to run at the same moment. How is that possible?",
         options: [
           "The operating system switches between them thousands of times a second",
@@ -56,6 +59,7 @@
       },
       {
         concept: "Cores",
+        conceptId: "th-core",
         stem: "Your machine has four cores instead of one. What does that let it do that a single core cannot?",
         options: [
           "Run several programs at the very same instant",
@@ -68,6 +72,7 @@
       },
       {
         concept: "Bits",
+        conceptId: "th-bit",
         stem: "Everything a computer stores is built from bits. What is a single bit?",
         options: [
           "A value that is either 0 or 1",
@@ -80,6 +85,7 @@
       },
       {
         concept: "Byte",
+        conceptId: "th-byte",
         stem: "One byte is a group of eight bits. How many different values can a single byte represent?",
         options: ["256", "8", "16", "1000"],
         correct: 0,
@@ -87,6 +93,7 @@
       },
       {
         concept: "Encoding",
+        conceptId: "th-encoding",
         stem: "A photo has no numbers you can see, yet the computer stores it as numbers. How does that work?",
         options: [
           "Each pixel's colour is recorded as numbers, such as red, green and blue amounts",
@@ -99,6 +106,7 @@
       },
       {
         concept: "Files",
+        conceptId: "th-file",
         stem: "When you save your work, it becomes a file. Underneath, what is a file?",
         options: [
           "A named bundle of bytes kept on storage",
@@ -111,6 +119,7 @@
       },
       {
         concept: "Operating system",
+        conceptId: "th-operating-system",
         stem: "You save a document and it lands neatly in a folder rather than as raw disk sectors. What arranges that for you?",
         options: [
           "The operating system",

@@ -20,6 +20,7 @@
     questions: [
       {
         concept: "Where data lives",
+        conceptId: "th-ram",
         stem: "Where does a running program keep the variables and objects it is actively working with?",
         options: [
           "In RAM, its working memory",
@@ -32,6 +33,7 @@
       },
       {
         concept: "The stack",
+        conceptId: "th-stack",
         stem: "During a function call, where do that call's local variables live?",
         options: [
           "On the stack, in the call's frame",
@@ -44,6 +46,7 @@
       },
       {
         concept: "The heap",
+        conceptId: "th-heap",
         stem: "An object created with `new` needs to outlive the function that made it. Where does it live?",
         options: [
           "On the heap",
@@ -56,6 +59,7 @@
       },
       {
         concept: "Value vs reference types",
+        conceptId: "th-reference-type",
         stem: "What decides whether a variable stores its data directly, or stores a reference to it kept elsewhere?",
         options: [
           "Its type - value type versus reference type",
@@ -68,6 +72,7 @@
       },
       {
         concept: "Copying a reference",
+        conceptId: "th-reference",
         stem: "Two reference-type variables point at the same object. You change the object through one of them. The other...?",
         options: [
           "Sees the change - both reference the one object",
@@ -80,6 +85,7 @@
       },
       {
         concept: "Copying a value",
+        conceptId: "th-value-type",
         stem: "A value type is copied *by value*: `b = a` copies the data itself. You then change `a`. What is in `b`?",
         options: [
           "The original value - an independent copy",
@@ -92,6 +98,7 @@
       },
       {
         concept: "Compile time",
+        conceptId: "th-compile-time",
         stem: "Translating your source into a runnable program - and checking its rules - happens at...?",
         options: [
           "Compile time, done by the compiler",
@@ -104,6 +111,7 @@
       },
       {
         concept: "Build errors",
+        conceptId: "th-build-error",
         stem: "You break one of the language's rules. When is it caught?",
         options: [
           "At compile time - the build fails until you fix it",
@@ -116,6 +124,7 @@
       },
       {
         concept: "Cross-compilation",
+        conceptId: "th-cross-compile",
         stem: "Machine code is built for a specific target (a CPU and OS). Building, on your laptop, a program meant to run on a *different* machine is called...?",
         options: [
           "Cross-compiling",
@@ -128,6 +137,7 @@
       },
       {
         concept: "Persistence",
+        conceptId: "th-persistence",
         stem: "RAM is cleared when a program stops. To keep data for next time, you...?",
         options: [
           "Write it to storage - a file on disk",
@@ -140,6 +150,7 @@
       },
       {
         concept: "Files and inodes",
+        conceptId: "th-inode",
         stem: "On disk, a file is an inode plus a name. What does the inode hold?",
         options: [
           "The file's bytes and its metadata, like size and permissions",
@@ -152,6 +163,7 @@
       },
       {
         concept: "Links",
+        conceptId: "th-inode",
         stem: "A directory entry that maps a name to an inode is a...?",
         options: [
           "Hard link",
@@ -164,6 +176,7 @@
       },
       {
         concept: "Request and response",
+        conceptId: "th-request",
         stem: "One program asks another for data over a network. The message it sends and the answer it gets back are a...?",
         options: [
           "Request and a response",
@@ -176,6 +189,7 @@
       },
       {
         concept: "APIs",
+        conceptId: "th-api",
         stem: "What is an API (application programming interface)?",
         options: [
           "The defined set of requests one program exposes for others to call",

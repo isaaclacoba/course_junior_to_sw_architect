@@ -16,7 +16,10 @@
  *      introduced-but-unused orphan (WARN), fully untagged migrated lesson (WARN).
  *   4. Migrated-lesson coherence - meta.id == dir lesson id == registry id (ERROR);
  *      meta.total is a number on a build/drill lesson (ERROR).
- *   5. Drift guard - shells `node tools/generate.mjs --out <tmp>` and diffs the
+ *   5. Checkpoint concept tags - each theory-check-* question's conceptId (in its
+ *      data.js QUIZ_CONFIG) must resolve to an introduced concept (ERROR); an
+ *      untagged question is a WARN.
+ *   6. Drift guard - shells `node tools/generate.mjs --out <tmp>` and diffs the
  *      result (course-data.js, concept-index.js AND every migrated index.html)
  *      against what is committed (ERROR). Opt-in via VALIDATE_DRIFT=1; skipped by
  *      default (a sibling agent may be editing generate.mjs).
@@ -170,6 +173,26 @@ export function checkCoherence(migrated, report) {
   }
 }
 
+// Check 5: checkpoint concept tags. Every question in a checkpoint's QUIZ_CONFIG
+// should carry a conceptId that resolves to an introduced concept, so the
+// evaluation features (Phase 4) can score per concept.
+//   quizzes: [{ lessonId, questions: [{ conceptId }] }]
+//   knownIds: Set of every concept id introduced somewhere in the graph.
+export function checkCheckpointConcepts(quizzes, knownIds, report) {
+  for (const { lessonId, questions } of quizzes) {
+    questions.forEach((q, i) => {
+      const cid = q && q.conceptId;
+      if (!cid) {
+        report.warn(`Checkpoint: "${lessonId}" question ${i + 1} has no conceptId`);
+        return;
+      }
+      if (!knownIds.has(cid)) {
+        report.error(`Checkpoint: "${lessonId}" question ${i + 1} conceptId "${cid}" is not an introduced concept`);
+      }
+    });
+  }
+}
+
 // Check 5: drift guard. Shells the generator into a temp dir and diffs against
 // the committed generated/ data files AND every migrated content/**/index.html.
 // `run` is injectable for testing.
@@ -238,6 +261,35 @@ export function loadMigrated(registry, rootDir) {
   return out;
 }
 
+// Load window.QUIZ_CONFIG.questions for every migrated checkpoint lesson.
+export function loadCheckpointQuizzes(migrated, rootDir) {
+  const out = [];
+  for (const m of migrated) {
+    if (m.meta.archetype !== "checkpoint") continue;
+    const dataPath = path.join(rootDir, m.path, "data.js");
+    if (!fs.existsSync(dataPath)) continue;
+    let cfg;
+    try {
+      cfg = loadBrowserGlobal(dataPath, "QUIZ_CONFIG");
+    } catch {
+      continue;
+    }
+    out.push({ lessonId: m.registryId, questions: (cfg && cfg.questions) || [] });
+  }
+  return out;
+}
+
+// Every concept id introduced by a migrated lesson, unioned with the draft-
+// planned ids (so a checkpoint may tag a concept whose introducer is another
+// track/part). This is the resolvable-concept set the checkpoint tags check against.
+export function knownConceptIds(migrated, plannedIds) {
+  const set = new Set(plannedIds);
+  for (const m of migrated)
+    for (const it of (m.meta.concepts && m.meta.concepts.introduces) || [])
+      set.add(it.id);
+  return set;
+}
+
 // Union of every concept id the drafts (docs/concepts/*.concepts.json) intend to
 // introduce. Used to tolerate references to not-yet-migrated introducers.
 export function loadPlannedConceptIds(rootDir) {
@@ -278,6 +330,7 @@ function main() {
   const plannedIds = loadPlannedConceptIds(root);
   checkConceptGraph(migrated.map((m) => ({ lessonId: m.registryId, meta: m.meta })), report, plannedIds);
   checkCoherence(migrated, report);
+  checkCheckpointConcepts(loadCheckpointQuizzes(migrated, root), knownConceptIds(migrated, plannedIds), report);
 
   if (process.env.VALIDATE_DRIFT === "1") {
     const outDir = fs.mkdtempSync(path.join(os.tmpdir(), "concept-drift-"));

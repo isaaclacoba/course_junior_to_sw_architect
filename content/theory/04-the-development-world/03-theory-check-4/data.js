@@ -18,6 +18,7 @@
     questions: [
       {
         concept: "Libraries",
+        conceptId: "th-library",
         stem: "Why pull in a library instead of writing everything yourself?",
         options: [
           "To reuse tested code others wrote, so you build faster and safer",
@@ -30,6 +31,7 @@
       },
       {
         concept: "Standard library",
+        conceptId: "th-standard-library",
         stem: "What is the standard library?",
         options: [
           "The useful code that ships with the language itself",
@@ -42,6 +44,7 @@
       },
       {
         concept: "Packages",
+        conceptId: "th-package",
         stem: "What is a package?",
         options: [
           "A bundle of code you can pull into your project",
@@ -54,6 +57,7 @@
       },
       {
         concept: "Package manager",
+        conceptId: "th-package-manager",
         stem: "What fetches packages - and the packages they depend on - for you?",
         options: [
           "A package manager",
@@ -66,6 +70,7 @@
       },
       {
         concept: "Dependencies",
+        conceptId: "th-dependency",
         stem: "Your project needs library X in order to build. X is called a...?",
         options: [
           "Dependency",
@@ -78,6 +83,7 @@
       },
       {
         concept: "Version control",
+        conceptId: "th-version-control",
         stem: "What does version control give you?",
         options: [
           "A tracked history of every change, so you can look back or undo",
@@ -90,6 +96,7 @@
       },
       {
         concept: "Commits",
+        conceptId: "th-commit",
         stem: "What is a commit?",
         options: [
           "A saved snapshot of the project at a point in time",
@@ -102,6 +109,7 @@
       },
       {
         concept: "History",
+        conceptId: "th-history",
         stem: "Why is a project's history useful?",
         options: [
           "You can see what changed and return to an earlier version",
@@ -114,6 +122,7 @@
       },
       {
         concept: "Collaboration",
+        conceptId: "th-collaboration",
         stem: "How do several people work on one project without overwriting each other?",
         options: [
           "Version control tracks and merges everyone's commits",
