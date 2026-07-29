@@ -1,33 +1,25 @@
 /**
- * tools/new-lesson.mjs - scaffold or migrate a lesson into the generated,
- * per-directory layout content/<track>/<PP-part>/<LL-lesson>/.
- *
- * Two modes:
- *
- *   node tools/new-lesson.mjs --from <basename> [--move]
- *     Migrate an existing FLAT lesson (<basename>.html + <basename>.js, and an
- *     optional <basename>.viz.js). Reads the manifest for structure/order and the
- *     flat page for the hero, writes meta.js + data.js (+ <basename>.viz.js) into
- *     the content dir, and sets that lesson's registry line `path`/`href`. Does
- *     NOT write index.html (generate.mjs owns that). Copies by default; --move
- *     also deletes the flat files.
+ * tools/new-lesson.mjs - scaffold a new lesson into the generated, per-directory
+ * layout content/<track>/<PP-part>/<LL-lesson>/.
  *
  *   node tools/new-lesson.mjs --new --track <t> --part <p> --id <id>
  *                             --archetype <build|drill|viz|checkpoint> --title "..."
  *     Scaffold a brand-new empty lesson dir + stub meta.js/data.js and append a
- *     registry line in order.
+ *     registry line in order. The track/part must already exist in
+ *     course-registry.js `tracks[]`.
+ *
+ * (The `--from` migration mode was retired once every flat lesson was moved into
+ * content/ and course-manifest.js was deleted.)
  *
  * Only Node built-ins.
  */
 import fs from "node:fs";
 import path from "node:path";
-import vm from "node:vm";
 import { fileURLToPath } from "node:url";
-import { loadBrowserGlobal, loadWindowBag, conceptsLiteral } from "./lib.mjs";
+import { loadBrowserGlobal, conceptsLiteral } from "./lib.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
-const manifestPath = path.join(root, "course-manifest.js");
 const registryPath = path.join(root, "course-registry.js");
 
 // ---- small helpers ----
@@ -60,92 +52,10 @@ function escRe(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-// Locate a manifest lesson by href, returning the lesson plus its 1-based part
-// index within the track and 1-based lesson index within the part.
-function locateInManifest(Course, href) {
-  const tracks = Course.tracks();
-  for (let ti = 0; ti < tracks.length; ti++) {
-    const t = tracks[ti];
-    for (let pi = 0; pi < t.parts.length; pi++) {
-      const p = t.parts[pi];
-      for (let li = 0; li < p.lessons.length; li++) {
-        if (p.lessons[li].href === href) {
-          return {
-            lesson: p.lessons[li],
-            track: t.id,
-            part: p.id,
-            partIndex: pi + 1,
-            lessonIndex: li + 1,
-          };
-        }
-      }
-    }
-  }
-  return null;
-}
-
-// Pull window.PAGE out of a flat page's inline <script> block (the one that
-// assigns window.PAGE), by running just that block in a sandbox.
-function readPageHero(htmlFile) {
-  const html = fs.readFileSync(htmlFile, "utf8");
-  const blocks = html.match(/<script>([\s\S]*?)<\/script>/gi) || [];
-  for (const block of blocks) {
-    const body = block.replace(/^<script>/i, "").replace(/<\/script>$/i, "");
-    if (!/window\.PAGE/.test(body)) continue;
-    const sandbox = { window: {} };
-    try {
-      vm.createContext(sandbox);
-      vm.runInContext(body, sandbox, { filename: htmlFile });
-    } catch (e) {
-      continue;
-    }
-    if (sandbox.window.PAGE) return sandbox.window.PAGE;
-  }
-  throw new Error("Could not read window.PAGE from " + htmlFile);
-}
-
-// Decide the archetype from what the flat page loads and what the data file sets.
-function detectArchetype(htmlFile, dataFile, basename) {
-  const html = fs.readFileSync(htmlFile, "utf8");
-  const loads = (name) => html.includes(name);
-  let archetype = null;
-  if (loads("build-engine.js")) archetype = "build";
-  else if (loads("drill-engine.js")) archetype = "drill";
-  else if (loads(basename + ".viz.js")) archetype = "viz";
-
-  // Cross-check / fill in from the data file's config global.
-  let dataGlobal = null;
-  if (fs.existsSync(dataFile)) {
-    const bag = loadWindowBag(dataFile);
-    if (bag.BUILD_CONFIG) dataGlobal = "build";
-    else if (bag.DRILL_CONFIG) dataGlobal = "drill";
-    else if (bag.QUIZ_CONFIG) dataGlobal = "checkpoint";
-  }
-  if (!archetype) archetype = dataGlobal;
-  if (!archetype) {
-    throw new Error(
-      "Cannot detect an archetype for '" + basename + "' - it loads no build/drill/viz engine and " +
-      "sets no BUILD/DRILL/QUIZ config. It is not a standard lesson; migrate it by hand."
-    );
-  }
-  return archetype;
-}
-
 function engineFor(archetype) {
   if (archetype === "build") return "build";
   if (archetype === "drill") return "drill";
   return null;
-}
-
-// Load a lesson's drafted concept graph from docs/concepts/<track>.concepts.json,
-// so a migration seeds meta.js with real concepts instead of an empty stub.
-function loadConceptDraft(track, id) {
-  try {
-    const p = path.join(root, "docs", "concepts", track + ".concepts.json");
-    if (!fs.existsSync(p)) return null;
-    const d = JSON.parse(fs.readFileSync(p, "utf8"));
-    return d[id] || null;
-  } catch (e) { return null; }
 }
 
 // Serialize the LESSON_META object as a readable classic script.
@@ -172,113 +82,6 @@ function metaFileText(meta) {
   concepts: ${conceptsLiteral(meta.concepts)},
 };
 `;
-}
-
-// Strip any literal nextHref/nextLabel property lines from a flat data file.
-function stripNav(dataText) {
-  return dataText.replace(/^[ \t]*next(?:Href|Label)\s*:[^\n]*\n/gm, "");
-}
-
-// Rewrite root-relative asset paths in a moved data file so they resolve from
-// the lesson's content/ directory (which sits `prefix` dirs below the root).
-// The only such path today is BUILD_CONFIG/DRILL_CONFIG.runnerUrl; skip ones
-// that are already relative/absolute/remote so the transform is idempotent.
-function fixAssetPaths(dataText, prefix) {
-  // The one root-relative asset a data file carries today is the runner URL;
-  // handle either quote style and skip anything already relative/absolute/remote.
-  const out = dataText.replace(
-    /(runnerUrl:\s*["'])(?!\.\.\/|\/|https?:)([^"']*)(["'])/g,
-    (_m, a, p, z) => a + prefix + p + z
-  );
-  if (/runnerUrl:\s*["'](?!\.\.\/|\/|https?:)/.test(out)) {
-    console.warn("WARN: a runnerUrl is still root-relative after path-fixing");
-  }
-  return out;
-}
-
-// Throw BEFORE writing anything if the registry has no flat line for this id
-// (missing, or already migrated) - avoids leaving a half-written content dir.
-function assertRegistryHasFlat(id) {
-  const text = fs.readFileSync(registryPath, "utf8");
-  const re = new RegExp('id: "' + escRe(id) + '", href: "[^"]*", kind: "[^"]*", path: null');
-  if (!re.test(text)) {
-    throw new Error("Registry has no flat line for '" + id + "' (missing or already migrated); nothing written.");
-  }
-}
-
-// Set the registry line for `id` to point at the migrated content dir.
-function updateRegistry(id, relPath) {
-  const href = relPath + "/";
-  const text = fs.readFileSync(registryPath, "utf8");
-  const re = new RegExp('(id: "' + escRe(id) + '", href: )"[^"]*"(, kind: "[^"]*", path: )null');
-  if (!re.test(text)) throw new Error("Registry line for id '" + id + "' not found (or already migrated)");
-  const next = text.replace(re, `$1"${href}"$2"${relPath}"`);
-  fs.writeFileSync(registryPath, next);
-}
-
-// ---- migration mode: --from <basename> ----
-
-function migrateFrom(basename, opts) {
-  if (!fs.existsSync(manifestPath)) {
-    throw new Error("--from is retired: course-manifest.js has been removed and every lesson is migrated. Author new lessons with --new.");
-  }
-  const Course = loadBrowserGlobal(manifestPath, "Course");
-  const href = basename + ".html";
-  const loc = locateInManifest(Course, href);
-  if (!loc) throw new Error("No manifest lesson with href '" + href + "'");
-  assertRegistryHasFlat(basename);
-
-  const htmlFile = path.join(root, basename + ".html");
-  const dataFile = path.join(root, basename + ".js");
-  const vizFile = path.join(root, basename + ".viz.js");
-  if (!fs.existsSync(htmlFile)) throw new Error("Missing " + htmlFile);
-
-  const page = readPageHero(htmlFile);
-  const hero = (page && page.hero) || {};
-  const archetype = detectArchetype(htmlFile, dataFile, basename);
-  const l = loc.lesson;
-
-  const relPath = ["content", loc.track, pad2(loc.partIndex) + "-" + loc.part, pad2(loc.lessonIndex) + "-" + basename].join("/");
-  const dir = path.join(root, relPath);
-  const rootPrefix = "../".repeat(relPath.split("/").length);
-
-  const meta = {
-    id: basename,
-    key: l.key,
-    total: l.total,
-    docTitle: hero.title,
-    eyebrow: hero.eyebrow,
-    title: l.title,
-    intro: hero.intro || [],
-    blurb: l.blurb,
-    pill: l.pill,
-    time: l.time,
-    archetype: archetype,
-    engine: engineFor(archetype),
-    concepts: loadConceptDraft(loc.track, basename),
-  };
-
-  fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, "meta.js"), metaFileText(meta));
-
-  // data.js exists for build/drill/checkpoint; viz lessons carry <name>.viz.js.
-  if (fs.existsSync(dataFile)) {
-    fs.writeFileSync(path.join(dir, "data.js"), fixAssetPaths(stripNav(fs.readFileSync(dataFile, "utf8")), rootPrefix));
-  }
-  if (fs.existsSync(vizFile)) {
-    fs.writeFileSync(path.join(dir, basename + ".viz.js"), stripNav(fs.readFileSync(vizFile, "utf8")));
-  }
-
-  updateRegistry(basename, relPath);
-
-  if (opts.move) {
-    [htmlFile, dataFile, vizFile].forEach(function (f) {
-      if (fs.existsSync(f)) fs.rmSync(f);
-    });
-  }
-
-  console.log("Migrated " + basename + " -> " + relPath + " (archetype: " + archetype + ", move: " + Boolean(opts.move) + ")");
-  console.log("Run: node tools/generate.mjs  (emits " + relPath + "/index.html and regenerates generated/)");
 }
 
 // ---- scaffold mode: --new ... ----
@@ -355,13 +158,13 @@ function appendRegistryLine(o) {
 
 function main() {
   const args = parseArgs(process.argv.slice(2));
-  if (args.from && typeof args.from === "string") {
-    migrateFrom(args.from, { move: Boolean(args.move) });
-  } else if (args.new) {
+  if (args.new) {
     scaffoldNew(args);
+  } else if (args.from) {
+    console.error("--from is retired: the flat lessons were all migrated and course-manifest.js is gone. Use --new.");
+    process.exit(1);
   } else {
     console.error("Usage:");
-    console.error("  node tools/new-lesson.mjs --from <basename> [--move]");
     console.error("  node tools/new-lesson.mjs --new --track <t> --part <p> --id <id> --archetype <build|drill|viz|checkpoint> --title \"...\"");
     process.exit(1);
   }

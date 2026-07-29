@@ -182,8 +182,13 @@ table in sync.
   `generated/course-data.js` + `concept-index.js` are byte-identical except the one-line header comment;
   parity 7/7 (added a kicker-derivation test); validate + drift guard 0 err; root index + a lesson page
   render 0 undefined with no manifest refs. Post-change code review (fleet) found no must-fix; fixed the
-  three stale \"source = manifest\" comments (page-shell/course-index/lib). KNOWN dead code left for a
-  separate isolated commit: `new-lesson.mjs` `--from` + its 8 migrate-only helpers are now unreachable.
+  three stale \"source = manifest\" comments (page-shell/course-index/lib).
+- **2026-07-29 (item 12 follow-up: prune dead --from)** - Removed the now-unreachable `--from` migration
+  path from `new-lesson.mjs`: dropped `migrateFrom` + its 8 helpers (`locateInManifest`, `readPageHero`,
+  `detectArchetype`, `loadConceptDraft`, `stripNav`, `fixAssetPaths`, `assertRegistryHasFlat`,
+  `updateRegistry`) + the unused `vm`/`loadWindowBag` imports + `manifestPath`. `--new` (the only live
+  path) is unchanged; `--from` now prints a clear retired message. node --check + `--new`/`--from`/usage
+  dispatch verified; parity 7/7, validate 0 err, generated/ unchanged.
 
 ---
 
