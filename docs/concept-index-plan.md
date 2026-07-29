@@ -1,8 +1,9 @@
 # Concept-index architecture - action plan
 
-Status: IN PROGRESS (all work uncommitted). Phase 0 done (10/10); pilot migration 4/6 -
-74 of 76 lessons migrated (practical + theory + ai; only `reuse-without-regret` + external capstone
-left); concept graph drafted (208), audited, applied. Owner: Isaac + agent. Last updated: 2026-07-29.
+Status: IN PROGRESS. Migration BANKED and committed - 75/76 lessons migrated (practical + theory + ai;
+only the external capstone is left) in `ad314ea` (+ fixes `3a1e3b1`); `reuse-without-regret` re-created
+the standard way as a `build` lesson. Phase 0 done (10/10); concept graph drafted (208), audited,
+applied. Item 12 (retire the manifest) is now unblocked. Owner: Isaac + agent. Last updated: 2026-07-29.
 
 Tracking: each action item is a checkbox. Flip `- [ ]` to `- [x]` when the item is
 DONE and its Verify step passes. Use `- [~]` for in-progress. Keep the Progress
@@ -13,7 +14,7 @@ table in sync.
 | Phase | Items | Done |
 |---|---|---|
 | 0 - Foundation (source of truth + tooling) | 1-8 (incl. 4b, 5b) | 10 / 10 |
-| Pilot migration | 9-12 (incl. 11b, 12b) | 4 / 6 |
+| Pilot migration | 9-12 (incl. 11b, 12b) | 5 / 6 |
 | Concept graph (feeds 1-3) | CG1-CG3 | 2 / 3 |
 | 1 - Glossary | 13 | 0 / 1 |
 | 2 - Agenda | 14 | 0 / 1 |
@@ -141,6 +142,22 @@ table in sync.
   is joined. #10 (ReDoS) was an all-clear - no code change. Gates: parity 6/6, validate 0 err, drift
   guard 0 err + non-destructive, `seed-concepts` idempotent (0 meta.js churn), two build pages render 0
   undefined. Committed the fixes.
+- **2026-07-29 (item 11b: re-create reuse-without-regret)** - Re-authored the last flat lesson as a
+  standard `build` lesson via a 3-agent read-only research fleet (content inventory / archetype +
+  tooling / concepts + neighbours) then serial authoring. Chose `build` over the plan's default `drill`
+  on the fleet's evidence: 28 live build lessons vs 0 live drill lessons in `content/`, and the
+  authoring skill prefers build for practical Part 1. Distilled the 12 read-and-choose cards into 4
+  write-from-scratch tasks - inheritance (is-a), composition (has-a), `virtual`/`override` polymorphism,
+  and the diamond dissolved by composition - plus a recap (total 4). Calibrated to ledger row 6:
+  `virtual`/`override` not `abstract`, no `=>`/`var`/`$""`, explicit types + full bodies. Scaffolding
+  caveat: a bare `--new` would have made `07-` + a duplicate id, and `--from --move` throws at the new
+  fail-loud archetype check (the bespoke page loads no engine) - so removed the flat registry line first,
+  then `--new` landed it at `06-`. Preserved all four `introduces` (sole introducer; 5 downstream OO/SOLID
+  lessons revisit them) + revisits `pr-delegation` + uses `pr-object`/`pr-method`. Verified with real
+  dotnet: all 4 solutions compile + match expected, every `requireSource` gate matches, every reordering
+  `verify` probe passes (hardcoding defeated) - 0 failures. generate + validate 0 err; page renders 0
+  undefined with the `rwr` build scaffold + Monaco; root card data-driven (gentle/25 min/total 4); both
+  boundary next targets reachable (200). Deleted the flat `reuse-without-regret.{html,js}`. Item 12 unblocked.
 
 ---
 
@@ -262,7 +279,7 @@ Key decisions:
   a viz lesson + a checkpoint. (DONE 2026-07-29: all three tracks migrated, **74/76** - practical
   (build), theory (viz + 4 checkpoints), ai (viz); parity 6/6, validate 0 errors. Two lessons are
   NOT auto-migratable and are tracked as **11b**: `reuse-without-regret` and the external capstone.)
-- [ ] **11b. Re-create `reuse-without-regret` the standard way.** It is the only lesson NOT built as
+- [x] **11b. Re-create `reuse-without-regret` the standard way.** It is the only lesson NOT built as
   data-for-a-shared-engine - a bespoke ~42KB guided walkthrough with its own page markup, custom
   controller, and its own inline `RoslynIframeRunner`. Decision (2026-07-29): do NOT port the one-off
   and do NOT add a single-use `walkthrough` archetype; instead RE-CREATE it as a standard-archetype
@@ -273,8 +290,8 @@ Key decisions:
   composition, the diamond problem) and its concepts (already in the practical draft). Blocks item 12.
 - [ ] **12. Retire `course-manifest.js`.** Delete it AND the manifest-fallback branch in
   `generate.mjs` once every lesson has a `meta.js`. Verify: no page loads it; generator green
-  with meta-only input; full headless pass per archetype. (BLOCKED on 11b: `reuse-without-regret`
-  still has no `meta.js`; the external capstone is exempt.)
+  with meta-only input; full headless pass per archetype. (UNBLOCKED as of 11b: only the external
+  capstone lacks a `meta.js`, and it is exempt - the generator must still emit its manifest-sourced card.)
 - [x] **12b. Update authoring docs.** Rewrite `.github/skills/lesson-authoring/SKILL.md`,
   `.github/copilot-instructions.md`, and `AGENTS.md` for the `new-lesson.mjs` ->
   `meta.js`/`data.js` -> generate/validate flow and the `content/` layout, so future authors

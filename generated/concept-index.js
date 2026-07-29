@@ -396,7 +396,7 @@
       ]
     },
     "pr-composition": {
-      "introducedBy": null,
+      "introducedBy": "reuse-without-regret",
       "revisitedBy": [
         "composition",
         "dependency-injection"
@@ -452,6 +452,7 @@
     "pr-delegation": {
       "introducedBy": "reading-objects",
       "revisitedBy": [
+        "reuse-without-regret",
         "composition"
       ],
       "usedBy": []
@@ -501,7 +502,7 @@
       "usedBy": []
     },
     "pr-favour-composition": {
-      "introducedBy": null,
+      "introducedBy": "reuse-without-regret",
       "revisitedBy": [
         "composition"
       ],
@@ -536,7 +537,7 @@
       "usedBy": []
     },
     "pr-inheritance": {
-      "introducedBy": null,
+      "introducedBy": "reuse-without-regret",
       "revisitedBy": [
         "type-system",
         "interfaces",
@@ -610,6 +611,7 @@
         "testing-basics"
       ],
       "usedBy": [
+        "reuse-without-regret",
         "type-conversion",
         "strings",
         "arrays",
@@ -656,6 +658,7 @@
       ],
       "usedBy": [
         "practice-the-basics",
+        "reuse-without-regret",
         "type-conversion",
         "strings",
         "class-members",
@@ -702,7 +705,7 @@
       "usedBy": []
     },
     "pr-polymorphism": {
-      "introducedBy": null,
+      "introducedBy": "reuse-without-regret",
       "revisitedBy": [
         "type-system",
         "polymorphism",
@@ -2024,6 +2027,21 @@
       ],
       "uses": []
     },
+    "reuse-without-regret": {
+      "introduces": [
+        "pr-inheritance",
+        "pr-composition",
+        "pr-polymorphism",
+        "pr-favour-composition"
+      ],
+      "revisits": [
+        "pr-delegation"
+      ],
+      "uses": [
+        "pr-object",
+        "pr-method"
+      ]
+    },
     "strings": {
       "introduces": [
         "pr-string-interpolation",
@@ -2763,6 +2781,10 @@
       "term": "Comparison",
       "def": "Asking a yes/no question with == != > < >= <= and getting back a bool."
     },
+    "pr-composition": {
+      "term": "Composition",
+      "def": "Reuse by holding parts - a class has-a smaller object as a field and asks it to do the work."
+    },
     "pr-computed-property": {
       "term": "Computed property",
       "def": "A property that works its value out each time it is read, with =>, storing nothing of its own."
@@ -2815,6 +2837,10 @@
       "term": "Expecting a failure",
       "def": "Writing a test that passes only when the code throws, to prove it fails on purpose."
     },
+    "pr-favour-composition": {
+      "term": "Favour composition",
+      "def": "Preferring has-a parts over deep inheritance, since inheritance can force a bad fit and multiple parents clash."
+    },
     "pr-field": {
       "term": "Field",
       "def": "A variable that belongs to an object and holds part of its state."
@@ -2834,6 +2860,10 @@
     "pr-idisposable": {
       "term": "Deterministic cleanup",
       "def": "Implementing IDisposable so a using block runs Dispose at a known point, even if something inside fails."
+    },
+    "pr-inheritance": {
+      "term": "Inheritance",
+      "def": "Reuse by claiming kinship - a child class is-a kind of its parent and gets the parent's members for free."
     },
     "pr-interface": {
       "term": "Interface",
@@ -2910,6 +2940,10 @@
     "pr-parse": {
       "term": "Parsing",
       "def": "Reading a value out of text - int.Parse(\"3\") turns the text into the number 3."
+    },
+    "pr-polymorphism": {
+      "term": "Polymorphism",
+      "def": "One call that adapts to the real object behind it, so the same method name gives many behaviours."
     },
     "pr-printing": {
       "term": "Printing",

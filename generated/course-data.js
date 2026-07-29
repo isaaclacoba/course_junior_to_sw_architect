@@ -84,13 +84,13 @@
               "id": "reuse-without-regret",
               "track": "practical",
               "part": "understand-the-ideas",
-              "href": "reuse-without-regret.html",
-              "key": "level4_awarded",
-              "total": 12,
-              "title": "Reuse Without Regret",
-              "blurb": "When to inherit, when to build from parts, and why one object with two parents causes trouble. Learn it by reading working code, with a guided walkthrough.",
-              "pill": "steady",
-              "time": "30 min",
+              "href": "content/practical/01-understand-the-ideas/06-reuse-without-regret/",
+              "key": "reuse_without_regret_awarded",
+              "total": 4,
+              "title": "Reuse without regret",
+              "blurb": "Build the two ways to reuse code yourself - inherit from a parent, or hold smaller parts - meet the diamond problem, and see why we lean on composition.",
+              "pill": "gentle",
+              "time": "25 min",
               "kind": "lesson"
             }
           ]
