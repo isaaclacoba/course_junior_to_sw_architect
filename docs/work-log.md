@@ -877,3 +877,10 @@ Verified headless (chrome --dump-dom): step 1 shows code + 3 rows (a=10, b=5,
 total=unassigned) + narration + scrubber, no undefined; driving Next to step 4
 shows a=10 amber-highlighted with b/total still "unassigned" - the one-at-a-time
 fill and change-highlight work. CSS braces balanced; temp harness removed.
+
+## 2026-07-29 13:15 - P1 review fix: level-0 vartable value-only
+Code review of the P1 vartable change surfaced one latent design-intent issue:
+the reusable level-0 panel rendered '-> heapId' for a ref slot, contradicting
+the spec's level-0 'no arrows, no addresses' rule. Dropped the ref branch so a
+reference slot falls through to its display value. Typecheck + 103 tests pass;
+rebuilt and re-vendored. code-lab e900057.

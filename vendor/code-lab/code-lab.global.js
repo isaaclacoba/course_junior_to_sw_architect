@@ -1601,7 +1601,6 @@ ${result.runtimeError}`.trim(),
   }
   function valueText(v) {
     if (v.empty) return "unassigned";
-    if (v.ref) return "\u2192 " + v.ref;
     return v.v ?? "";
   }
   function rowHtml(v) {
