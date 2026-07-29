@@ -23,6 +23,7 @@ import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
 import { fileURLToPath } from "node:url";
+import { loadBrowserGlobal, loadWindowBag, conceptsLiteral } from "./lib.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
@@ -57,25 +58,6 @@ function pad2(n) {
 
 function escRe(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function loadBrowserGlobal(file, name) {
-  const code = fs.readFileSync(file, "utf8");
-  const sandbox = { window: {} };
-  vm.createContext(sandbox);
-  vm.runInContext(code, sandbox, { filename: file });
-  const value = sandbox.window[name];
-  if (!value) throw new Error(`Expected window.${name} after running ${file}`);
-  return value;
-}
-
-// Run a data file (pure IIFE assigning window.*) and hand back the window bag.
-function loadWindowBag(file) {
-  const code = fs.readFileSync(file, "utf8");
-  const sandbox = { window: {} };
-  vm.createContext(sandbox);
-  vm.runInContext(code, sandbox, { filename: file });
-  return sandbox.window;
 }
 
 // Locate a manifest lesson by href, returning the lesson plus its 1-based part
@@ -164,19 +146,6 @@ function loadConceptDraft(track, id) {
     const d = JSON.parse(fs.readFileSync(p, "utf8"));
     return d[id] || null;
   } catch (e) { return null; }
-}
-
-// Serialize the concept graph as a readable literal; an empty graph stays inline.
-function conceptsLiteral(concepts) {
-  const c = concepts || {};
-  const norm = { introduces: c.introduces || [], revisits: c.revisits || [], uses: c.uses || [] };
-  if (!norm.introduces.length && !norm.revisits.length && !norm.uses.length) {
-    return "{ introduces: [], revisits: [], uses: [] }";
-  }
-  return JSON.stringify(norm, null, 2)
-    .split("\n")
-    .map((line, i) => (i === 0 ? line : "  " + line))
-    .join("\n");
 }
 
 // Serialize the LESSON_META object as a readable classic script.

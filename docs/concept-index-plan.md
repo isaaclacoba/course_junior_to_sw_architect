@@ -129,6 +129,18 @@ table in sync.
   `runnerUrl` + warns on a remaining bare one; `seed-concepts` guards its positional rewrite (unique
   marker + `};` tail). Deferred (noted, not blocking): P3 dedup of shared helpers into `tools/lib.mjs`.
   All gates green (parity 6/6, validate 0 err, deterministic). Banked the whole migration in one commit.
+- **2026-07-29 (remaining review findings, no deferrals)** - Closed every leftover finding. P2-#6:
+  the drift guard now also diffs each migrated `content/**/index.html` - `generate.mjs --out <dir>`
+  mirrors the pages into the scratch dir and `driftGuard` compares them (proven: perturbing one page
+  makes the guard ERROR on that file, and it still writes nothing to the real tree). P3-#8: extracted
+  `loadBrowserGlobal` / `loadWindowBag` / `idFromHref` / `conceptsLiteral` into `tools/lib.mjs`; the
+  four tools import them (validate re-exports for its harness), so the meta.js format can no longer
+  drift between `new-lesson` and `seed-concepts`. P3-#9: the `prefix:` line the generator injects is
+  now indented to match `archetype:` and the match is anchored to that real property line (re-indented
+  28 build pages; viz/checkpoint untouched). #11: added the trust-model note where the registry `path`
+  is joined. #10 (ReDoS) was an all-clear - no code change. Gates: parity 6/6, validate 0 err, drift
+  guard 0 err + non-destructive, `seed-concepts` idempotent (0 meta.js churn), two build pages render 0
+  undefined. Committed the fixes.
 
 ---
 

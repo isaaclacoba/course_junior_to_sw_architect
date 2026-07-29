@@ -13,32 +13,11 @@
  */
 import fs from "node:fs";
 import path from "node:path";
-import vm from "node:vm";
 import { fileURLToPath } from "node:url";
+import { loadBrowserGlobal, conceptsLiteral } from "./lib.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
-
-function loadBrowserGlobal(file, name) {
-  const code = fs.readFileSync(file, "utf8");
-  const sandbox = { window: {} };
-  vm.createContext(sandbox);
-  vm.runInContext(code, sandbox, { filename: file });
-  return sandbox.window[name];
-}
-
-// Same serialization new-lesson.mjs uses: an empty graph stays inline.
-function conceptsLiteral(concepts) {
-  const c = concepts || {};
-  const norm = { introduces: c.introduces || [], revisits: c.revisits || [], uses: c.uses || [] };
-  if (!norm.introduces.length && !norm.revisits.length && !norm.uses.length) {
-    return "{ introduces: [], revisits: [], uses: [] }";
-  }
-  return JSON.stringify(norm, null, 2)
-    .split("\n")
-    .map((line, i) => (i === 0 ? line : "  " + line))
-    .join("\n");
-}
 
 const drafts = {};
 for (const t of ["practical", "theory", "ai"]) {

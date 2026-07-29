@@ -18,8 +18,9 @@
  *   4. Migrated-lesson coherence - meta.id == dir lesson id == registry id (ERROR);
  *      meta.total is a number on a build/drill lesson (ERROR).
  *   5. Drift guard - shells `node tools/generate.mjs --out <tmp>` and diffs the
- *      result against committed generated/ (ERROR). Opt-in via VALIDATE_DRIFT=1;
- *      skipped by default (a sibling agent may be editing generate.mjs).
+ *      result (course-data.js, concept-index.js AND every migrated index.html)
+ *      against what is committed (ERROR). Opt-in via VALIDATE_DRIFT=1; skipped by
+ *      default (a sibling agent may be editing generate.mjs).
  *
  * The check functions are pure and exported so a harness can drive them on
  * synthetic fixtures without touching the live repo.
@@ -27,9 +28,9 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import vm from "node:vm";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { loadBrowserGlobal, idFromHref } from "./lib.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
@@ -39,26 +40,11 @@ const generatedDir = path.join(root, "generated");
 const generatePath = path.join(root, "tools", "generate.mjs");
 
 // ---------------------------------------------------------------------------
-// Loading helpers (mirror tools/generate.mjs)
+// Loading helpers (shared with the other tools via tools/lib.mjs)
 // ---------------------------------------------------------------------------
 
-// Run a course IIFE that assigns `window.<name>` and hand back that global.
-export function loadBrowserGlobal(file, name) {
-  const code = fs.readFileSync(file, "utf8");
-  const sandbox = { window: {} };
-  vm.createContext(sandbox);
-  vm.runInContext(code, sandbox, { filename: file });
-  const value = sandbox.window[name];
-  if (!value) throw new Error(`Expected window.${name} after running ${file}`);
-  return value;
-}
-
-// id rule: strip a trailing ".html", else a trailing "/", else use href as-is.
-export function idFromHref(href) {
-  if (href.endsWith(".html")) return href.slice(0, -".html".length);
-  if (href.endsWith("/")) return href.slice(0, -1);
-  return href;
-}
+// Re-exported so a test harness can keep importing them from validate.mjs.
+export { loadBrowserGlobal, idFromHref };
 
 // The lesson id encoded by a migrated dir: last path segment minus its "NN-"
 // ordering prefix. content/practical/02-everyday/07-type-conversion -> type-conversion.
@@ -205,13 +191,16 @@ export function checkCoherence(migrated, report) {
 }
 
 // Check 5: drift guard. Shells the generator into a temp dir and diffs against
-// the committed generated/ files. `run` is injectable for testing.
-//   deps: { genScript, committedDir, outDir, files, run(cmd,args)->{status,stderr} }
+// the committed generated/ data files AND every migrated content/**/index.html.
+// `run` is injectable for testing.
+//   deps: { genScript, committedDir, outDir, rootDir, lessonPaths[], files, run }
 export function driftGuard(deps, report) {
   const {
     genScript,
     committedDir,
     outDir,
+    rootDir,
+    lessonPaths = [],
     files = ["course-data.js", "concept-index.js"],
     run = (cmd, args) => spawnSync(cmd, args, { encoding: "utf8" }),
   } = deps;
@@ -222,18 +211,27 @@ export function driftGuard(deps, report) {
     report.error(`Drift: generator exited ${res.status}${res.stderr ? " - " + String(res.stderr).trim() : ""}`);
     return;
   }
-  for (const f of files) {
-    const committedFile = path.join(committedDir, f);
-    const freshFile = path.join(outDir, f);
+
+  // A fresh file must exist and byte-match the committed one.
+  function diff(label, committedFile, freshFile) {
     if (!fs.existsSync(freshFile)) {
-      report.error(`Drift: generator did not emit ${f}`);
-      continue;
+      report.error(`Drift: generator did not emit ${label}`);
+      return;
     }
     const committed = fs.existsSync(committedFile) ? fs.readFileSync(committedFile, "utf8") : null;
     const fresh = fs.readFileSync(freshFile, "utf8");
     if (committed !== fresh) {
-      report.error(`Drift: generated/${f} is stale - re-run tools/generate.mjs and commit`);
+      report.error(`Drift: ${label} is stale - re-run tools/generate.mjs and commit`);
     }
+  }
+
+  // The two generated data files: <outDir>/<f> vs committed generated/<f>.
+  for (const f of files) {
+    diff(`generated/${f}`, path.join(committedDir, f), path.join(outDir, f));
+  }
+  // Each migrated lesson page: <outDir>/<relPath>/index.html vs the committed one.
+  for (const rel of lessonPaths) {
+    diff(`${rel}/index.html`, path.join(rootDir, rel, "index.html"), path.join(outDir, rel, "index.html"));
   }
 }
 
@@ -326,7 +324,13 @@ function main() {
   if (process.env.VALIDATE_DRIFT === "1") {
     const outDir = fs.mkdtempSync(path.join(os.tmpdir(), "concept-drift-"));
     try {
-      driftGuard({ genScript: generatePath, committedDir: generatedDir, outDir }, report);
+      const lessonPaths = registry.lessons
+        .filter((l) => l.path && l.kind !== "external")
+        .map((l) => l.path);
+      driftGuard(
+        { genScript: generatePath, committedDir: generatedDir, outDir, rootDir: root, lessonPaths },
+        report
+      );
     } finally {
       fs.rmSync(outDir, { recursive: true, force: true });
     }
