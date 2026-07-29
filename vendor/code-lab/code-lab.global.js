@@ -36,6 +36,7 @@ var CodeLab = (() => {
     RoslynIframeRunner: () => RoslynIframeRunner,
     TextareaEditor: () => TextareaEditor,
     Tour: () => Tour,
+    VizLab: () => VizLab,
     activeStores: () => activeStores,
     agentFanRows: () => agentFanRows,
     agentLoopActiveSet: () => agentLoopActiveSet,
@@ -2831,9 +2832,12 @@ ${result.runtimeError}`.trim(),
         config.awardedKey,
         typeof config.awardAmount === "number" ? config.awardAmount : 20
       );
-      this.player = new VizPlayer(config.steps ?? [], {
-        deriveRefs: config.deriveRefs !== false,
-        autoDim: config.autoDim !== false
+      this.deriveRefs = config.deriveRefs !== false;
+      this.autoDim = config.autoDim !== false;
+      this.steps = config.steps ?? [];
+      this.player = new VizPlayer(this.steps, {
+        deriveRefs: this.deriveRefs,
+        autoDim: this.autoDim
       });
       this.autoplay = new Autoplay({
         stepMs: () => this.stepDurationMs(),
@@ -2842,7 +2846,7 @@ ${result.runtimeError}`.trim(),
         onStop: () => this.controls?.setPlaying(false)
       });
       this.scale = config.fontScale ?? 1;
-      const handlers = {
+      this.handlers = {
         onPrev: () => this.step(this.player.prev(), false),
         onNext: () => {
           if (this.player.state.atEnd && this.nextHref) {
@@ -2863,7 +2867,7 @@ ${result.runtimeError}`.trim(),
           this.step(this.player.goTo(i), false);
         }
       };
-      const buildCtx = {
+      this.buildCtx = {
         uid,
         code: config.code ?? [],
         labels: {
@@ -2873,12 +2877,12 @@ ${result.runtimeError}`.trim(),
         regions,
         zoomTab,
         actions: this.actions,
-        handlers,
+        handlers: this.handlers,
         regionTags: config.regionTags ?? {},
         legend: config.legend,
         nextHref: this.nextHref
       };
-      const layout = config.layout ?? {
+      this.layout = config.layout ?? {
         visual: [
           ...showBoard ? [{ type: "board" }] : [],
           { type: "die", regions }
@@ -2889,29 +2893,65 @@ ${result.runtimeError}`.trim(),
       this.root.className = "cl-mv";
       this.root.style.setProperty("--mv-fs", String(this.scale));
       if (config.background) this.root.style.setProperty("--mv-bg", config.background);
-      const visualCol = document.createElement("div");
-      visualCol.className = "cl-mv-visual";
-      (layout.visual ?? []).forEach((spec) => {
-        const p = this.makePanel(spec, buildCtx);
-        this.panels.push(p);
-        visualCol.appendChild(p.el);
-      });
-      const asideCol = document.createElement("div");
-      asideCol.className = "cl-mv-aside";
-      (layout.aside ?? []).forEach((spec) => {
-        const p = this.makePanel(spec, buildCtx);
-        this.panels.push(p);
-        asideCol.appendChild(p.el);
-      });
-      this.root.append(visualCol);
-      if (asideCol.childElementCount > 0) this.root.append(asideCol);
-      else this.root.classList.add("cl-mv-single");
+      this.visualCol = document.createElement("div");
+      this.visualCol.className = "cl-mv-visual";
+      this.asideCol = document.createElement("div");
+      this.asideCol.className = "cl-mv-aside";
+      this.root.append(this.visualCol);
+      this.buildPanels();
       host.appendChild(this.root);
-      if (this.controls) this.controls.setActiveSize(this.scale);
-      if (this.controls) this.controls.setDerived(deriveTrace(config.steps ?? []), handlers.onSeek);
+      this.wireControls();
       window.addEventListener("resize", this.onResize);
       this.refreshXp();
       this.step(this.player.state, false);
+    }
+    /** Replace the scene without tearing the widget down: rebuild the player and
+     *  the panels in place, and (by default) hold the current step index so a
+     *  level toggle does not send the learner back to the first step. `code` and
+     *  `layout` override the code lines and the panel arrangement when given. */
+    setSteps(steps, opts = {}) {
+      if (steps.length === 0) throw new Error("MemoryViz.setSteps needs at least one step");
+      this.stop();
+      const keepIndex = opts.preserveIndex !== false ? this.player.state.index : 0;
+      this.steps = steps;
+      if (opts.code) this.buildCtx.code = opts.code;
+      if (opts.layout) this.layout = opts.layout;
+      this.player = new VizPlayer(steps, { deriveRefs: this.deriveRefs, autoDim: this.autoDim });
+      this.buildPanels();
+      this.wireControls();
+      this.step(this.player.goTo(Math.min(keepIndex, steps.length - 1)), false);
+    }
+    /** (Re)build the visual + aside panels from the current layout into the two
+     *  columns. Clears any prior panels first, so it is safe to call repeatedly. */
+    buildPanels() {
+      this.controls = null;
+      this.panels.length = 0;
+      this.visualCol.textContent = "";
+      this.asideCol.textContent = "";
+      (this.layout.visual ?? []).forEach((spec) => {
+        const p = this.makePanel(spec, this.buildCtx);
+        this.panels.push(p);
+        this.visualCol.appendChild(p.el);
+      });
+      (this.layout.aside ?? []).forEach((spec) => {
+        const p = this.makePanel(spec, this.buildCtx);
+        this.panels.push(p);
+        this.asideCol.appendChild(p.el);
+      });
+      if (this.asideCol.childElementCount > 0) {
+        if (!this.asideCol.parentNode) this.root.append(this.asideCol);
+        this.root.classList.remove("cl-mv-single");
+      } else {
+        if (this.asideCol.parentNode) this.asideCol.remove();
+        this.root.classList.add("cl-mv-single");
+      }
+    }
+    /** Feed the freshly built controls panel the font size and the derived-trace
+     *  scrubber for the current steps. No-op when the layout has no controls. */
+    wireControls() {
+      if (!this.controls) return;
+      this.controls.setActiveSize(this.scale);
+      this.controls.setDerived(deriveTrace(this.steps), this.handlers.onSeek);
     }
     static create(host, config) {
       return new _MemoryViz(host, config);
@@ -3060,6 +3100,274 @@ ${result.runtimeError}`.trim(),
     if (!text) return "Running the program.";
     return "Running this line: `" + text + "`";
   }
+
+  // src/dom/error-panel.ts
+  var DEFAULT_LABELS2 = {
+    heading: "Let's fix this first",
+    note: "Often a single early mistake (a missing or extra { } ( ) ;) is enough to confuse the rest. Fix the top one first, then run again."
+  };
+  function locText(e) {
+    if (e.line == null) return "";
+    return e.column != null ? `Line ${e.line}, col ${e.column}` : `Line ${e.line}`;
+  }
+  function renderErrorPanel(errors, labels = {}) {
+    const l = { ...DEFAULT_LABELS2, ...labels };
+    const section = document.createElement("section");
+    section.className = "cl-errors";
+    const heading = document.createElement("h3");
+    heading.textContent = l.heading;
+    section.appendChild(heading);
+    const note = document.createElement("p");
+    note.className = "cl-errors-note";
+    note.textContent = l.note;
+    section.appendChild(note);
+    const list = document.createElement("ul");
+    for (const e of errors) {
+      const li = document.createElement("li");
+      const loc = locText(e);
+      if (loc) {
+        const locEl = document.createElement("span");
+        locEl.className = "cl-error-loc";
+        locEl.textContent = loc;
+        li.appendChild(locEl);
+      }
+      if (e.friendly) {
+        const friendly = document.createElement("span");
+        friendly.className = "cl-error-friendly";
+        friendly.textContent = e.friendly;
+        li.appendChild(friendly);
+      }
+      const raw = document.createElement("span");
+      raw.className = "cl-error-raw";
+      raw.textContent = e.raw;
+      li.appendChild(raw);
+      list.appendChild(li);
+    }
+    section.appendChild(list);
+    return section;
+  }
+  function showErrorPanel(host, errors, labels) {
+    host.textContent = "";
+    if (!errors || errors.length === 0) {
+      host.hidden = true;
+      return false;
+    }
+    host.appendChild(renderErrorPanel(errors, labels));
+    host.hidden = false;
+    return true;
+  }
+
+  // src/dom/viz-lab.ts
+  function normalizeErrors(errors) {
+    return errors.map((e) => ({
+      line: e.line ?? void 0,
+      friendly: e.friendly ?? void 0,
+      raw: e.raw
+    }));
+  }
+  var LEVELS = [
+    { id: "values", label: "Values", panel: "vartable" },
+    { id: "callstack", label: "Call stack", panel: "callstack" },
+    { id: "heap", label: "Heap", panel: "heapcards" }
+  ];
+  var DEFAULT_STARTER = [
+    "class Program",
+    "{",
+    "    static void Main()",
+    "    {",
+    "        int a = 3;",
+    "        int b = 4;",
+    "        int total = a + b;",
+    "        System.Console.WriteLine(total);",
+    "    }",
+    "}"
+  ].join("\n");
+  var VizLab = class _VizLab {
+    constructor(host, config) {
+      this.levelBtns = /* @__PURE__ */ new Map();
+      this.editor = new MonacoEditor();
+      this.lastTrace = null;
+      this.lastSteps = null;
+      this.viz = null;
+      this.ready = false;
+      this.level = config.level ?? "heap";
+      this.legend = config.legend;
+      this.runner = new RoslynIframeRunner({
+        url: config.runnerUrl,
+        readyTimeout: config.readyTimeout ?? 18e4
+      });
+      this.root = document.createElement("div");
+      this.root.className = "cl-vl";
+      const editorPane = document.createElement("div");
+      editorPane.className = "cl-vl-editor";
+      const toolbar = document.createElement("div");
+      toolbar.className = "cl-vl-toolbar";
+      this.vizBtn = document.createElement("button");
+      this.vizBtn.type = "button";
+      this.vizBtn.className = "cl-btn cl-primary cl-vl-run";
+      this.vizBtn.textContent = "Preparing compiler...";
+      this.vizBtn.disabled = true;
+      this.vizBtn.setAttribute("data-viz", "");
+      this.vizBtn.addEventListener("click", () => void this.visualize());
+      const levelGroup = document.createElement("div");
+      levelGroup.className = "cl-vl-levels";
+      levelGroup.setAttribute("role", "group");
+      levelGroup.setAttribute("aria-label", "Level of detail");
+      for (const lvl of LEVELS) {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "cl-btn cl-vl-level";
+        b.textContent = lvl.label;
+        b.setAttribute("data-level", lvl.id);
+        b.setAttribute("aria-pressed", String(lvl.id === this.level));
+        b.addEventListener("click", () => this.setLevel(lvl.id));
+        this.levelBtns.set(lvl.id, b);
+        levelGroup.appendChild(b);
+      }
+      this.statusEl = document.createElement("span");
+      this.statusEl.className = "cl-vl-status";
+      this.statusEl.setAttribute("role", "status");
+      this.statusEl.setAttribute("aria-live", "polite");
+      toolbar.append(this.vizBtn, levelGroup, this.statusEl);
+      this.editorHost = document.createElement("div");
+      this.editorHost.className = "cl-vl-monaco";
+      editorPane.append(toolbar, this.editorHost);
+      this.stage = document.createElement("div");
+      this.stage.className = "cl-vl-stage";
+      this.showHint("Write a small program, then press Visualize to watch it run.");
+      this.root.append(editorPane, this.stage);
+      host.appendChild(this.root);
+      void this.boot(config.starter ?? DEFAULT_STARTER);
+    }
+    static create(host, config) {
+      return new _VizLab(host, config);
+    }
+    async boot(starter) {
+      await loadMonaco();
+      await this.editor.mount(this.editorHost, {
+        value: starter,
+        language: "csharp",
+        readOnly: false,
+        autoHeight: { minHeight: 220, maxHeight: 640 }
+      });
+      try {
+        await this.runner.warm();
+      } catch {
+      } finally {
+        this.ready = true;
+        this.vizBtn.disabled = false;
+        this.vizBtn.textContent = "Visualize";
+      }
+    }
+    async visualize() {
+      if (!this.ready) return;
+      const code = this.editor.getValue();
+      this.vizBtn.disabled = true;
+      this.vizBtn.textContent = "Tracing...";
+      this.setStatus("");
+      try {
+        const outcome = await this.runner.trace(code);
+        if (!outcome.compiled) {
+          const errors = normalizeErrors(outcome.errors);
+          this.showErrors(errors);
+          this.setStatus("Did not compile.");
+          if (this.editor.setMarkers) this.editor.setMarkers(errors);
+          return;
+        }
+        if (this.editor.setMarkers) this.editor.setMarkers([]);
+        if (!outcome.trace || outcome.trace.steps.length === 0) {
+          this.showHint("That program produced no steps to show. Add a statement or two inside Main.");
+          this.setStatus("Nothing to trace.");
+          return;
+        }
+        this.lastTrace = outcome.trace;
+        this.lastSteps = traceToSteps(outcome.trace);
+        this.render();
+        const n = outcome.trace.steps.length;
+        let msg = `Traced ${n} step${n === 1 ? "" : "s"}.`;
+        if (outcome.trace.truncated) msg += " Stopped early - the program ran too long.";
+        if (outcome.runtimeError) msg += ` It threw: ${outcome.runtimeError}`;
+        this.setStatus(msg);
+      } catch (err) {
+        this.showHint("The tracer took too long or could not load. Try again.");
+        this.setStatus(String(err.message || err));
+      } finally {
+        this.vizBtn.disabled = false;
+        this.vizBtn.textContent = "Visualize";
+      }
+    }
+    setLevel(level) {
+      if (level === this.level) return;
+      this.level = level;
+      for (const [id, btn] of this.levelBtns) btn.setAttribute("aria-pressed", String(id === level));
+      if (!this.lastTrace || !this.lastSteps) return;
+      if (this.viz) {
+        this.viz.setSteps(this.lastSteps, {
+          code: this.lastTrace.code,
+          layout: this.layoutFor(level),
+          preserveIndex: true
+        });
+      } else {
+        this.render();
+      }
+    }
+    layoutFor(level) {
+      const panel = LEVELS.find((l) => l.id === level).panel;
+      return {
+        visual: [{ type: "code" }, { type: panel }],
+        aside: [{ type: "narration" }, { type: "controls" }]
+      };
+    }
+    render() {
+      if (!this.lastTrace || !this.lastSteps) return;
+      const layout = this.layoutFor(this.level);
+      if (this.viz) {
+        this.viz.setSteps(this.lastSteps, {
+          code: this.lastTrace.code,
+          layout,
+          preserveIndex: false
+        });
+        return;
+      }
+      this.stage.textContent = "";
+      this.viz = MemoryViz.create(this.stage, {
+        code: this.lastTrace.code,
+        steps: this.lastSteps,
+        layout,
+        legend: this.legend,
+        deriveRefs: true,
+        autoDim: true
+      });
+    }
+    showHint(text) {
+      this.teardownViz();
+      this.stage.textContent = "";
+      const hint = document.createElement("p");
+      hint.className = "cl-vl-hint";
+      hint.textContent = text;
+      this.stage.appendChild(hint);
+    }
+    showErrors(errors) {
+      this.teardownViz();
+      this.stage.textContent = "";
+      this.stage.appendChild(renderErrorPanel(errors));
+    }
+    teardownViz() {
+      this.viz?.destroy();
+      this.viz = null;
+      this.lastTrace = null;
+      this.lastSteps = null;
+    }
+    setStatus(text) {
+      this.statusEl.textContent = text;
+    }
+    destroy() {
+      this.teardownViz();
+      this.editor.destroy();
+      this.runner.destroy();
+      this.root.remove();
+    }
+  };
 
   // src/core/quiz-model.ts
   function shuffle(arr, rng = Math.random) {
@@ -3279,62 +3587,6 @@ ${result.runtimeError}`.trim(),
       if (label) label.textContent = `Course XP: ${this.store.getXP()}`;
     }
   };
-
-  // src/dom/error-panel.ts
-  var DEFAULT_LABELS2 = {
-    heading: "Let's fix this first",
-    note: "Often a single early mistake (a missing or extra { } ( ) ;) is enough to confuse the rest. Fix the top one first, then run again."
-  };
-  function locText(e) {
-    if (e.line == null) return "";
-    return e.column != null ? `Line ${e.line}, col ${e.column}` : `Line ${e.line}`;
-  }
-  function renderErrorPanel(errors, labels = {}) {
-    const l = { ...DEFAULT_LABELS2, ...labels };
-    const section = document.createElement("section");
-    section.className = "cl-errors";
-    const heading = document.createElement("h3");
-    heading.textContent = l.heading;
-    section.appendChild(heading);
-    const note = document.createElement("p");
-    note.className = "cl-errors-note";
-    note.textContent = l.note;
-    section.appendChild(note);
-    const list = document.createElement("ul");
-    for (const e of errors) {
-      const li = document.createElement("li");
-      const loc = locText(e);
-      if (loc) {
-        const locEl = document.createElement("span");
-        locEl.className = "cl-error-loc";
-        locEl.textContent = loc;
-        li.appendChild(locEl);
-      }
-      if (e.friendly) {
-        const friendly = document.createElement("span");
-        friendly.className = "cl-error-friendly";
-        friendly.textContent = e.friendly;
-        li.appendChild(friendly);
-      }
-      const raw = document.createElement("span");
-      raw.className = "cl-error-raw";
-      raw.textContent = e.raw;
-      li.appendChild(raw);
-      list.appendChild(li);
-    }
-    section.appendChild(list);
-    return section;
-  }
-  function showErrorPanel(host, errors, labels) {
-    host.textContent = "";
-    if (!errors || errors.length === 0) {
-      host.hidden = true;
-      return false;
-    }
-    host.appendChild(renderErrorPanel(errors, labels));
-    host.hidden = false;
-    return true;
-  }
   return __toCommonJS(src_exports);
 })();
 //# sourceMappingURL=code-lab.global.js.map
