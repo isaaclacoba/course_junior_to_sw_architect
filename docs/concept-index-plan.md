@@ -268,6 +268,15 @@ table in sync.
   rendered DOM: seeding 4 ids showed 4 `Covered` pills + `208 concepts - 4 covered` on the glossary, and
   2 covered chips on theory-check-1's agenda (`th-program`, `th-cpu`). Phase 4 DONE - the whole
   concept-index plan is complete.
+- **2026-07-29 (post-plan: in-prose mention pilot)** - Seeded the first real `[[concept:id|label]]`
+  markers (the Phase 3 grammar had been live but unused). 7 mentions across two Part-1 build lessons,
+  wrapping existing phrases (no rewording) in task `context` prose - `reading-objects`
+  (`pr-collaboration`/`pr-delegation`/`pr-single-responsibility`) and `reuse-without-regret`
+  (`pr-inheritance`/`pr-composition`/`pr-delegation`/`pr-polymorphism`). Only `context`/`goal` carry
+  markers (they flow through `renderInline`); `concept` is plain `textContent` and `example` is code, so
+  neither is marked. `data.js` is not a generator input - `generated/` unchanged. Verified headless: the
+  first card of `reuse-without-regret` renders a real `.concept-mention` button (`pr-inheritance`), 0 raw
+  markers leaked, agenda intact. Remaining lessons can adopt the grammar the same way.
 ---
 
 ## The idea (hard constraints)

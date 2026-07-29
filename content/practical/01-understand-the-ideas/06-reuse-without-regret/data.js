@@ -10,7 +10,7 @@
       title: "A child that is-a parent",
       concept: "Inheritance = is-a",
       context:
-        "Inheritance reuses code by kinship. Write `class Dog : Animal` and the colon reads 'is a': a `Dog` is a kind of `Animal`, so every `Animal` member comes along for free, and the child adds its own on top.\n\nThe pattern below gives a `Car` everything a `Vehicle` has, then adds one method. Do the same for the dog.",
+        "[[concept:pr-inheritance|Inheritance]] reuses code by kinship. Write `class Dog : Animal` and the colon reads 'is a': a `Dog` is a kind of `Animal`, so every `Animal` member comes along for free, and the child adds its own on top.\n\nThe pattern below gives a `Car` everything a `Vehicle` has, then adds one method. Do the same for the dog.",
       example:
         'public class Vehicle\n{\n    public void Start()\n    {\n        Console.WriteLine("engine on");\n    }\n}\n\npublic class Car : Vehicle\n{\n    public void Honk()\n    {\n        Console.WriteLine("beep");\n    }\n}',
       goal: [
@@ -36,7 +36,7 @@
       title: "An object that has-a part",
       concept: "Composition = has-a",
       context:
-        "Composition reuses code the other way: instead of being a kind of something, a class holds one and asks it to do the work. No colon, no parent - just a field it owns. Forwarding the call to that held part is called delegation.\n\nThe pattern below gives a `Printer` an `Ink` it holds and delegates to. Do the same: give `Dog` a `Voice`.",
+        "[[concept:pr-composition|Composition]] reuses code the other way: instead of being a kind of something, a class holds one and asks it to do the work. No colon, no parent - just a field it owns. Forwarding the call to that held part is called [[concept:pr-delegation|delegation]].\n\nThe pattern below gives a `Printer` an `Ink` it holds and delegates to. Do the same: give `Dog` a `Voice`.",
       example:
         'public class Ink\n{\n    public string Mark()\n    {\n        return "stamp";\n    }\n}\n\npublic class Printer\n{\n    private Ink _ink = new Ink();\n\n    public string Print()\n    {\n        return _ink.Mark();\n    }\n}',
       goal: [
@@ -58,7 +58,7 @@
       title: "One call, many answers",
       concept: "Polymorphism = the payoff",
       context:
-        "Inheritance and composition both build types; polymorphism is the payoff they unlock. A base type declares a `virtual` method with a default, and each child can `override` it. Hold children in a base-typed array and one call adapts to each real object - no `if` per type.\n\nThe base `Animal` and one child (`Dog`) are done. Add `Cat` and `Cow` the same way.",
+        "Inheritance and composition both build types; [[concept:pr-polymorphism|polymorphism]] is the payoff they unlock. A base type declares a `virtual` method with a default, and each child can `override` it. Hold children in a base-typed array and one call adapts to each real object - no `if` per type.\n\nThe base `Animal` and one child (`Dog`) are done. Add `Cat` and `Cow` the same way.",
       example:
         'public class Shape\n{\n    public virtual string Name()\n    {\n        return "shape";\n    }\n}\n\npublic class Circle : Shape\n{\n    public override string Name()\n    {\n        return "circle";\n    }\n}',
       goal: [

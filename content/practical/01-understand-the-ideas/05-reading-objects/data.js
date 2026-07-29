@@ -13,7 +13,7 @@
       title: "Two objects talk",
       concept: "Objects collaborate",
       context:
-        "One object gets work done by asking another and acting on the answer. Here a `Greeter` does not know the time itself - it asks a `Clock`, then picks a greeting. The pattern below asks a `Sensor`; do the same with the clock.",
+        "One object gets work done by [[concept:pr-collaboration|asking another and acting on the answer]]. Here a `Greeter` does not know the time itself - it asks a `Clock`, then picks a greeting. The pattern below asks a `Sensor`; do the same with the clock.",
       example:
         'public class Sensor\n{\n    public int Temp()\n    {\n        return 22;\n    }\n}\n\npublic class Thermostat\n{\n    public string Read(Sensor sensor)\n    {\n        int t = sensor.Temp();\n        if (t > 20)\n        {\n            return "warm";\n        }\n        return "cool";\n    }\n}',
       goal: [
@@ -40,7 +40,7 @@
       title: "Ask another object for data",
       concept: "Delegation",
       context:
-        "A `Cart` should not store prices - that is the `PriceList`'s knowledge. The cart asks for a price and multiplies by the quantity. Keep the price list that is handed to the cart, then ask it.\n\nThe pattern below asks a `Catalog`; do the same with the price list.",
+        "A `Cart` should not store prices - that is the `PriceList`'s knowledge. The cart [[concept:pr-delegation|asks for a price]] and multiplies by the quantity. Keep the price list that is handed to the cart, then ask it.\n\nThe pattern below asks a `Catalog`; do the same with the price list.",
       example:
         'public class Catalog\n{\n    public int Stock(string title)\n    {\n        if (title == "Dune")\n        {\n            return 4;\n        }\n        return 1;\n    }\n}\n\npublic class Library\n{\n    private Catalog _catalog;\n\n    public Library(Catalog catalog)\n    {\n        _catalog = catalog;\n    }\n\n    public int Copies(string title, int branches)\n    {\n        return _catalog.Stock(title) * branches;\n    }\n}',
       goal: [
@@ -68,7 +68,7 @@
       title: "A method that does one thing",
       concept: "One job per method",
       context:
-        "A clear method has a single, obvious result you can name. `Area` exists to do one calculation - the two sides multiplied - and nothing else. The pattern below is one job for a box; do the same for the rectangle.",
+        "A clear method has [[concept:pr-single-responsibility|a single, obvious result]] you can name. `Area` exists to do one calculation - the two sides multiplied - and nothing else. The pattern below is one job for a box; do the same for the rectangle.",
       example:
         'public class Box\n{\n    public int Volume(int side)\n    {\n        return side * side * side;\n    }\n}',
       goal: [
