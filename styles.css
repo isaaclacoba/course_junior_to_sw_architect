@@ -1701,3 +1701,25 @@ input.almost {
 [data-theme="dark"] .cl-mv .cl-mv-mark.is-return { border-color: #a3a9b5; background: #191c22; }
 [data-theme="dark"] .cl-mv .cl-mv-mark.is-new-object { border-color: #4ade80; background: #22c55e; }
 [data-theme="dark"] .cl-mv .cl-mv-mark:focus-visible { outline-color: #7ba0ee; }
+
+/* ---- Dark skin: level-2 heap cards panel (names + objects + arrows) ------ */
+[data-theme="dark"] .cl-mv .cl-mv-heapcards { background: #14171d; border-color: var(--line); }
+[data-theme="dark"] .cl-mv .cl-mv-heapcards .cl-mv-tag { color: var(--ink-soft); }
+[data-theme="dark"] .cl-mv .cl-mv-hp-frame { background: #161f2a; border-color: #2b3d5e; }
+[data-theme="dark"] .cl-mv .cl-mv-hp-frame.is-active { background: #2e2410; border-color: #5a4a1e; }
+[data-theme="dark"] .cl-mv .cl-mv-hp-frame.is-caller { background: #14171d; }
+[data-theme="dark"] .cl-mv .cl-mv-hp-frame.is-active .cl-mv-hp-fname { color: #e6a54a; }
+[data-theme="dark"] .cl-mv .cl-mv-hp-row { background: var(--card); border-color: #2b3d5e; }
+[data-theme="dark"] .cl-mv .cl-mv-hp-name { color: #8a93a3; }
+[data-theme="dark"] .cl-mv .cl-mv-hp-val { color: var(--ink); }
+[data-theme="dark"] .cl-mv .cl-mv-hp-row.is-empty .cl-mv-hp-val { color: #6b727f; }
+[data-theme="dark"] .cl-mv .cl-mv-hp-row.is-null .cl-mv-hp-val { color: #f2777a; }
+[data-theme="dark"] .cl-mv .cl-mv-hp-dot { box-shadow: 0 0 0 3px #1b2a44; }
+[data-theme="dark"] .cl-mv .cl-mv-hp-row.is-changed { background: #2e2410; border-color: #5a4a1e; box-shadow: 0 0 0 2px #5a4a1e; }
+[data-theme="dark"] .cl-mv .cl-mv-hp-row.is-changed .cl-mv-hp-val { color: #e6a54a; }
+[data-theme="dark"] .cl-mv .cl-mv-hp-card { background: #122a24; border-color: #22463c; }
+[data-theme="dark"] .cl-mv .cl-mv-hp-type { color: var(--primary-2); }
+[data-theme="dark"] .cl-mv .cl-mv-hp-field { color: #b3bccc; }
+[data-theme="dark"] .cl-mv .cl-mv-hp-field.is-hot { background: #2e2410; box-shadow: inset 0 0 0 1px #5a4a1e; color: #e6a54a; }
+[data-theme="dark"] .cl-mv .cl-mv-hp-arrows path.cl-mv-hp-ref { stroke: #7ba0ee; }
+[data-theme="dark"] .cl-mv .cl-mv-hp-arrows marker path { fill: #7ba0ee; }
