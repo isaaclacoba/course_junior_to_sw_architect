@@ -171,7 +171,7 @@
   },
   "ai-17": {
     "introduces": [
-      { "id": "ai-react", "term": "Reason and act (ReAct)", "def": "The named loop behind a tool-using agent: a thought about the next move, an action that calls a tool, an observation of the real result, repeated until the answer is grounded." }
+      { "id": "ai-react", "term": "Reason and act (ReAct)", "def": "The named loop behind a tool-using agent: a thought about the next move, an action that calls a tool, an observation of the real result, repeated until the agent has what it needs to answer." }
     ],
     "revisits": [
       { "id": "ai-agent-loop" },
@@ -247,7 +247,7 @@
     "introduces": [
       { "id": "ai-trace", "term": "Trace", "def": "The after-the-fact record of a run's messages and tool calls, read to find where it went wrong." },
       { "id": "ai-observability", "term": "Observability", "def": "Being able to point at the exact step where a run went wrong in its record, so you can see what happened, not just that it failed." },
-      { "id": "ai-evaluation", "term": "Evaluation", "def": "Turning a past failure into an automatic pass/fail check you run every time, so the same bug can never sneak back in." }
+      { "id": "ai-evaluation", "term": "Evaluation", "def": "Turning a past failure into an automatic pass/fail check you run every time, so the same bug does not sneak back in." }
     ],
     "revisits": [
       { "id": "ai-transcript" }

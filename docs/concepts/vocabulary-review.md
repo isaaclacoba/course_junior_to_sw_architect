@@ -1,4 +1,5 @@
 <!-- audit: fp=617584744ca3 lessons=76 concepts=208 date=2026-07-29 -->
+<!-- fixes applied 2026-07-29: the clear P3 (th-inode term, ai-react "grounded", ai-evaluation "can never") + the value-type P2 (pr-struct/pr-record/pr-nullable-value-type reworded) -> new fp f9f9b2b89215. The pr-single-inheritance / pr-runtime-dispatch merges were left for an explicit decision. -->
 # Concept-graph vocabulary review (CG3 - fresh-eyes re-audit)
 
 ## Status / fingerprint

@@ -4,8 +4,8 @@ Status: IN PROGRESS. `course-manifest.js` RETIRED (item 12 done) - `course-regis
 single source of the course path (chrome + order + the capstone's inlined card), and every lesson's
 display data lives in its `meta.js`. 75/76 lessons migrated (only the external capstone stays flat, by
 design). Phase 0 done (10/10); concept graph drafted (208), audited, applied. CG3 re-audit done
-(fingerprint stable since CG2; P1=0, a few P2/P3 refinements pending sign-off); Phases 1-3 cleared to
-start. Owner: Isaac + agent. Last updated: 2026-07-29.
+(P1=0; the clear P2/P3 fixes were applied - fp moved to `f9f9b2b89215`; two structural merges deferred).
+Phases 1-3 cleared and in progress. Owner: Isaac + agent. Last updated: 2026-07-29.
 
 Tracking: each action item is a checkbox. Flip `- [ ]` to `- [x]` when the item is
 DONE and its Verify step passes. Use `- [~]` for in-progress. Keep the Progress
@@ -203,7 +203,13 @@ table in sync.
   - a collision CG2's inode-fold introduced; `ai-react` \"grounded\" before `ai-grounding`; `ai-evaluation`
   \"can never\"; `pr-to-string`/`pr-tostring-override` near-dup ids). Report -> `vocabulary-review.md`. Also
   fixed the audit skill's stale ground-truth (`course-manifest.js` -> `course-registry.js`).
-
+- **2026-07-29 (CG3 fixes applied)** - Applied the clear CG3 findings to the drafts: renamed `th-inode`'s
+  colliding term "File" -> "Inode"; dropped the `ai-react` forward-ref to "grounded" and the
+  `ai-evaluation` "can never" absolute; reworded `pr-struct`/`pr-record`/`pr-nullable-value-type` off the
+  untaught term "value type" into plain language. Re-seeded 5 `meta.js`, regenerated, validate 0 err;
+  fingerprint `617584744ca3` -> `f9f9b2b89215`. Deferred (need an explicit merge decision): the
+  `pr-single-inheritance`/`pr-favour-composition` overlap and `pr-runtime-dispatch`/`pr-polymorphism`
+  overlap (merging changes the concept count).
 ---
 
 ## The idea (hard constraints)

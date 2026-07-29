@@ -28,7 +28,7 @@ window.LESSON_META = {
       },
       {
         "id": "th-inode",
-        "term": "File",
+        "term": "Inode",
         "def": "A file on disk is an inode - its bytes plus facts about them like size, time, and who can read it - reached through a name in a folder."
       }
     ],

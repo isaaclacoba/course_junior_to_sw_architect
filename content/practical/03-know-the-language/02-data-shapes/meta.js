@@ -24,12 +24,12 @@ window.LESSON_META = {
       {
         "id": "pr-struct",
         "term": "struct",
-        "def": "A value type that is copied when you assign or pass it, rather than shared by reference."
+        "def": "A small data bundle that is copied whole when you assign or pass it, so two variables never share the same one."
       },
       {
         "id": "pr-record",
         "term": "record",
-        "def": "A type meant to hold data, compared by its values rather than by identity."
+        "def": "A type meant to hold data, where two of them count as equal when their values match, not just when they are the same object."
       }
     ],
     "revisits": [

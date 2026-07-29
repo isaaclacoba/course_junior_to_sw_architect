@@ -29,7 +29,7 @@ window.LESSON_META = {
       {
         "id": "pr-nullable-value-type",
         "term": "Nullable value type",
-        "def": "A value type that opts in to being absent by adding ?, like int?, so it is either a number or null."
+        "def": "A plain value like int or bool that opts in to being absent by adding ?, like int?, so it is either the value or null."
       }
     ],
     "revisits": [

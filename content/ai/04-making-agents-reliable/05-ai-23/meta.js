@@ -29,7 +29,7 @@ window.LESSON_META = {
       {
         "id": "ai-evaluation",
         "term": "Evaluation",
-        "def": "Turning a past failure into an automatic pass/fail check you run every time, so the same bug can never sneak back in."
+        "def": "Turning a past failure into an automatic pass/fail check you run every time, so the same bug does not sneak back in."
       }
     ],
     "revisits": [

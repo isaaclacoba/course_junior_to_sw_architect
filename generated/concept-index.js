@@ -2587,7 +2587,7 @@
     },
     "ai-evaluation": {
       "term": "Evaluation",
-      "def": "Turning a past failure into an automatic pass/fail check you run every time, so the same bug can never sneak back in."
+      "def": "Turning a past failure into an automatic pass/fail check you run every time, so the same bug does not sneak back in."
     },
     "ai-grounding": {
       "term": "Grounding",
@@ -2647,7 +2647,7 @@
     },
     "ai-react": {
       "term": "Reason and act (ReAct)",
-      "def": "The named loop behind a tool-using agent: a thought about the next move, an action that calls a tool, an observation of the real result, repeated until the answer is grounded."
+      "def": "The named loop behind a tool-using agent: a thought about the next move, an action that calls a tool, an observation of the real result, repeated until the agent has what it needs to answer."
     },
     "ai-reflection": {
       "term": "Reflection",
@@ -2915,7 +2915,7 @@
     },
     "pr-nullable-value-type": {
       "term": "Nullable value type",
-      "def": "A value type that opts in to being absent by adding ?, like int?, so it is either a number or null."
+      "def": "A plain value like int or bool that opts in to being absent by adding ?, like int?, so it is either the value or null."
     },
     "pr-object": {
       "term": "Object",
@@ -2971,7 +2971,7 @@
     },
     "pr-record": {
       "term": "record",
-      "def": "A type meant to hold data, compared by its values rather than by identity."
+      "def": "A type meant to hold data, where two of them count as equal when their values match, not just when they are the same object."
     },
     "pr-refactoring": {
       "term": "Refactoring",
@@ -3015,7 +3015,7 @@
     },
     "pr-struct": {
       "term": "struct",
-      "def": "A value type that is copied when you assign or pass it, rather than shared by reference."
+      "def": "A small data bundle that is copied whole when you assign or pass it, so two variables never share the same one."
     },
     "pr-stub": {
       "term": "Stub",
@@ -3190,7 +3190,7 @@
       "def": "The timeline of all commits - how the code grew, snapshot by snapshot."
     },
     "th-inode": {
-      "term": "File",
+      "term": "Inode",
       "def": "A file on disk is an inode - its bytes plus facts about them like size, time, and who can read it - reached through a name in a folder."
     },
     "th-instruction": {

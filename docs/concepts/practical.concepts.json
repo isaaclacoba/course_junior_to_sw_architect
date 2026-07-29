@@ -99,7 +99,7 @@
     "introduces": [
       { "id": "pr-null-coalescing", "term": "Null-coalescing", "def": "Supplying a fallback for an absent value with ?? (and filling a slot only when empty with ??=)." },
       { "id": "pr-null-conditional", "term": "Null-conditional", "def": "Reaching through an object that might be missing with ?., which stops at null instead of crashing." },
-      { "id": "pr-nullable-value-type", "term": "Nullable value type", "def": "A value type that opts in to being absent by adding ?, like int?, so it is either a number or null." }
+      { "id": "pr-nullable-value-type", "term": "Nullable value type", "def": "A plain value like int or bool that opts in to being absent by adding ?, like int?, so it is either the value or null." }
     ],
     "revisits": [{ "id": "pr-null" }],
     "uses": [{ "id": "pr-method" }, { "id": "pr-object" }, { "id": "pr-conditional" }]
@@ -135,8 +135,8 @@
   "data-shapes": {
     "introduces": [
       { "id": "pr-enum", "term": "enum", "def": "A type that is one of a fixed set of named options, like a small labelled list of choices." },
-      { "id": "pr-struct", "term": "struct", "def": "A value type that is copied when you assign or pass it, rather than shared by reference." },
-      { "id": "pr-record", "term": "record", "def": "A type meant to hold data, compared by its values rather than by identity." }
+      { "id": "pr-struct", "term": "struct", "def": "A small data bundle that is copied whole when you assign or pass it, so two variables never share the same one." },
+      { "id": "pr-record", "term": "record", "def": "A type meant to hold data, where two of them count as equal when their values match, not just when they are the same object." }
     ],
     "revisits": [{ "id": "pr-property" }, { "id": "pr-computed-property" }],
     "uses": [{ "id": "pr-object" }, { "id": "pr-datatype" }]
