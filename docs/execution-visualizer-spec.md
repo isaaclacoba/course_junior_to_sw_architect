@@ -1,6 +1,11 @@
 # C# execution visualizer - canonical spec
 
-Status: design spec, no code yet (2026-07-29). Distilled from three research
+Status: P1-P4 shipped, P5 round 1 shipped (2026-07-29). The level 0/1/2 renderers
+(vartable, callstack, heapcards) and the derived-trace post-processor are live in
+code-lab and drive theory lessons; P5 round 1 added the real Roslyn tracer
+(Tracer.cs) + the traceToSteps adapter + the iframe trace() wire. Still open (P5
+round 2): the "Visualize my code" lesson UI surface, predict-then-reveal
+engagement, and expression substitution. Distilled from three research
 threads - a teardown of beginner visualizers, the learning-science evidence on how
 people model running code, and the explorable-explanation tradition (Victor,
 Ciechanowski, Red Blob). Presentation layer only; the tracer is a separate track (section 8).

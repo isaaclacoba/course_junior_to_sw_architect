@@ -74,7 +74,8 @@ var CodeLab = (() => {
     shuffleQuiz: () => shuffle,
     spansForLine: () => spansForLine,
     splitCodeLines: () => splitCodeLines,
-    toolRackRows: () => toolRackRows
+    toolRackRows: () => toolRackRows,
+    traceToSteps: () => traceToSteps
   });
 
   // src/highlighter.ts
@@ -843,7 +844,8 @@ ${result.runtimeError}`.trim(),
     handleMessage(event) {
       if (event.origin !== window.location.origin) return;
       const data = event.data || {};
-      if (data.type === "coderunner:result" && data.id != null && this.pending.has(data.id)) {
+      const isResult = data.type === "coderunner:result" || data.type === "coderunner:traceResult";
+      if (isResult && data.id != null && this.pending.has(data.id)) {
         const entry = this.pending.get(data.id);
         clearTimeout(entry.timer);
         this.pending.delete(data.id);
@@ -896,12 +898,44 @@ ${result.runtimeError}`.trim(),
           this.pending.delete(id);
           reject(new Error("The code took too long to run."));
         }, this.runTimeout);
-        this.pending.set(id, { resolve, reject, timer });
+        this.pending.set(id, { resolve: (r) => resolve(r), reject, timer });
         this.iframe.contentWindow.postMessage(
           { type: "coderunner:run", id, code },
           window.location.origin
         );
       });
+    }
+    /** Trace a program: compile an instrumented copy in the host, run it, and
+     *  return the recorded ExecTrace (or the friendly errors if it did not
+     *  compile). Mirrors run() over the same iframe wire. */
+    async trace(code) {
+      await this.ensureFrame();
+      const id = ++this.seq;
+      const response = await new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          this.pending.delete(id);
+          reject(new Error("The code took too long to trace."));
+        }, this.runTimeout);
+        this.pending.set(id, { resolve: (r) => resolve(r), reject, timer });
+        this.iframe.contentWindow.postMessage(
+          { type: "coderunner:trace", id, code },
+          window.location.origin
+        );
+      });
+      let trace;
+      if (response.compiled && response.traceJson) {
+        try {
+          trace = JSON.parse(response.traceJson);
+        } catch {
+          trace = void 0;
+        }
+      }
+      return {
+        compiled: response.compiled,
+        trace,
+        runtimeError: response.runtimeError ?? null,
+        errors: response.errors || []
+      };
     }
     destroy() {
       window.removeEventListener("message", this.onMessage);
@@ -2960,6 +2994,72 @@ ${result.runtimeError}`.trim(),
       for (const p of this.panels) if (p.onResize) p.onResize(model);
     }
   };
+
+  // src/core/exec-tracer-model.ts
+  function traceToSteps(trace) {
+    const src = trace.code ?? [];
+    const steps = trace.steps ?? [];
+    const out = [];
+    let prevValues = /* @__PURE__ */ new Map();
+    let prevFields = /* @__PURE__ */ new Map();
+    let prevStdout = "";
+    steps.forEach((ts, i) => {
+      const values = /* @__PURE__ */ new Map();
+      const stack = (ts.frames ?? []).map(
+        (f) => frameToFrame(f, values, prevValues, i === 0)
+      );
+      const fields = /* @__PURE__ */ new Map();
+      const heap = (ts.heap ?? []).map(
+        (o) => objectToObject(o, fields, prevFields, i === 0)
+      );
+      const stdout = ts.stdout ?? "";
+      const printed = stdout.startsWith(prevStdout) ? stdout.slice(prevStdout.length) : stdout;
+      const step = {
+        narr: narrationFor(ts.line, src, i, steps.length),
+        pc: typeof ts.line === "number" && ts.line > 0 ? ts.line - 1 : -1,
+        codeLive: true,
+        stack,
+        heap
+      };
+      if (printed) step.printed = printed;
+      out.push(step);
+      prevValues = values;
+      prevFields = fields;
+      prevStdout = stdout;
+    });
+    return out;
+  }
+  function frameToFrame(f, values, prevValues, firstStep) {
+    const vars = (f.vars ?? []).map((v) => {
+      const id = `${f.id}:${v.name}`;
+      const display = v.ref != null ? refDisplay(v) : v.value ?? "";
+      values.set(id, display);
+      const hot = !firstStep && prevValues.get(id) !== display;
+      const slot = { id, k: v.name, hot };
+      if (v.ref != null) slot.ref = v.ref;
+      else slot.v = v.value ?? "";
+      return slot;
+    });
+    return { id: f.id, name: f.name, vars };
+  }
+  function objectToObject(o, fields, prevFields, firstStep) {
+    const hotFields = [];
+    (o.fields ?? []).forEach(([name, value]) => {
+      const key = `${o.id}:${name}`;
+      fields.set(key, value);
+      if (!firstStep && prevFields.get(key) !== value) hotFields.push(name);
+    });
+    return { id: o.id, type: o.type, fields: o.fields ?? [], hotFields };
+  }
+  function refDisplay(v) {
+    return v.ref != null ? `\u2192${v.ref}` : v.value ?? "null";
+  }
+  function narrationFor(line, src, i, total) {
+    if (i === total - 1) return "The program has finished.";
+    const text = typeof line === "number" && line > 0 ? (src[line - 1] ?? "").trim() : "";
+    if (!text) return "Running the program.";
+    return "Running this line: `" + text + "`";
+  }
 
   // src/core/quiz-model.ts
   function shuffle(arr, rng = Math.random) {
