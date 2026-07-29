@@ -1,5 +1,5 @@
 <!-- audit: fp=617584744ca3 lessons=76 concepts=208 date=2026-07-29 -->
-<!-- fixes applied 2026-07-29: the clear P3 (th-inode term, ai-react "grounded", ai-evaluation "can never") + the value-type P2 (pr-struct/pr-record/pr-nullable-value-type reworded) -> new fp f9f9b2b89215. The pr-single-inheritance / pr-runtime-dispatch merges were left for an explicit decision. -->
+<!-- fixes applied 2026-07-29: the clear P3 (th-inode term, ai-react "grounded", ai-evaluation "can never") + the value-type P2 (pr-struct/pr-record/pr-nullable-value-type reworded) -> new fp f9f9b2b89215. The pr-single-inheritance / pr-runtime-dispatch merges were DECIDED 2026-07-29: KEEP BOTH SPLIT - pr-single-inheritance is a language fact, pr-favour-composition a design principle; pr-polymorphism is the what, pr-runtime-dispatch the how. No graph change. -->
 # Concept-graph vocabulary review (CG3 - fresh-eyes re-audit)
 
 ## Status / fingerprint
@@ -25,9 +25,9 @@ New counts (fresh findings only, CG2 fixes excluded): **P1 = 0, P2 = 4, P3 = 4.*
 
 - **`data-shapes` / `pr-struct`, `pr-record`, `null-safety` / `pr-nullable-value-type` lean on practical-untaught terms.** `pr-struct` = "A **value type** that is copied ... rather than shared **by reference**"; `pr-record` = "compared by its values rather than by **identity**"; `pr-nullable-value-type` = "A **value type** that opts in to being absent". The practical track never introduces a concept for *value type* / *reference type* / *identity* (those live only in theory: `th-value-type`, `th-reference-type`, `th-reference`). This is the same class of gap CG2 fixed for `class`/`field`, but for "value type/reference". Fix options: (a) add a light `pr-value-type` (or fold into `pr-struct`'s owning lesson as an explicit sentence) and have `data-shapes`/`null-safety` revisit it, or (b) keep the plain-English use but stop leaning on the bare term. Non-blocking.
 
-- **`composition` / `pr-single-inheritance` overlaps `reuse-without-regret` / `pr-favour-composition`.** `pr-favour-composition`'s def already carries the reasoning ("multiple parents clash"), and `pr-single-inheritance` ("C# lets a class inherit from just one parent, so you combine several parts by holding them instead") restates that same fact as its own concept. Merge candidate, or sharpen `pr-single-inheritance` to the pure language rule (one base class) and let `pr-favour-composition` own the *why*.
+- **`composition` / `pr-single-inheritance` overlaps `reuse-without-regret` / `pr-favour-composition`.** `pr-favour-composition`'s def already carries the reasoning ("multiple parents clash"), and `pr-single-inheritance` ("C# lets a class inherit from just one parent, so you combine several parts by holding them instead") restates that same fact as its own concept. Merge candidate, or sharpen `pr-single-inheritance` to the pure language rule (one base class) and let `pr-favour-composition` own the *why*. **DECIDED 2026-07-29: keep both** - a language fact (single inheritance) and a design principle (favour composition) are worth teaching as distinct concepts even though they point at the same conclusion.
 
-- **`polymorphism` / `pr-runtime-dispatch` vs `reuse-without-regret` / `pr-polymorphism`** (carried from CG2, still open by design). "The real object deciding at run time which version runs" restates polymorphism's mechanism; it earns its keep only via the "add a type, not another branch" angle. Weakest practical introduction; keep if trimming Part 4 vocabulary is undesirable, else merge.
+- **`polymorphism` / `pr-runtime-dispatch` vs `reuse-without-regret` / `pr-polymorphism`** (carried from CG2, still open by design). "The real object deciding at run time which version runs" restates polymorphism's mechanism; it earns its keep only via the "add a type, not another branch" angle. Weakest practical introduction; keep if trimming Part 4 vocabulary is undesirable, else merge. **DECIDED 2026-07-29: keep both** - `pr-polymorphism` is the *what* (one call, many behaviours), `pr-runtime-dispatch` the *how* (the runtime picks the override); distinct enough to keep.
 
 - **`ai-1` defines itself with "token" one lesson before `ai-2` introduces `ai-token`.** `ai-llm` ("predicts the next **token**") and `ai-next-token-prediction` ("scores every possible **token**") both use the word before it is taught. Analogous to CG2's theory-3 "function" note. Hard to avoid - "next-token prediction" is the whole of lesson 1 - so accept, but flag: it is the one spot the ai track names a not-yet-introduced concept in a def.
 
@@ -93,7 +93,8 @@ The first eight rows are true synonyms across practical/theory and the natural u
 
 **New findings CG2 missed (fresh eyes):**
 - P2: practical `value type`/`reference`/`identity` dependency (`pr-struct`, `pr-record`, `pr-nullable-value-type`) - the same undefined-term class CG2 only caught for class/field.
-- P2: `pr-single-inheritance` overlaps `pr-favour-composition`.
+- P2: `pr-single-inheritance` overlaps `pr-favour-composition`. **DECIDED: keep split (fact vs principle).**
+- P2: `pr-runtime-dispatch` overlaps `pr-polymorphism`. **DECIDED: keep split (what vs how).**
 - P2: `ai-1` uses "token" one lesson before `ai-2` introduces it.
 - P3: **`th-file` and `th-inode` now share the display term "File"** - a collision *introduced by CG2's own inode-fold* and not caught at the time.
 - P3: `ai-react` uses "grounded" before `ai-grounding`; `ai-evaluation` mild absolute; `pr-to-string`/`pr-tostring-override` near-duplicate ids.

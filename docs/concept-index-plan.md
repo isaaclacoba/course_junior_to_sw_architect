@@ -208,9 +208,9 @@ table in sync.
   colliding term "File" -> "Inode"; dropped the `ai-react` forward-ref to "grounded" and the
   `ai-evaluation` "can never" absolute; reworded `pr-struct`/`pr-record`/`pr-nullable-value-type` off the
   untaught term "value type" into plain language. Re-seeded 5 `meta.js`, regenerated, validate 0 err;
-  fingerprint `617584744ca3` -> `f9f9b2b89215`. Deferred (need an explicit merge decision): the
-  `pr-single-inheritance`/`pr-favour-composition` overlap and `pr-runtime-dispatch`/`pr-polymorphism`
-  overlap (merging changes the concept count).
+  fingerprint `617584744ca3` -> `f9f9b2b89215`. The two flagged overlaps were DECIDED 2026-07-29 -
+  KEEP BOTH SPLIT: `pr-single-inheritance` is a language fact and `pr-favour-composition` a design
+  principle; `pr-polymorphism` is the *what* and `pr-runtime-dispatch` the *how*. No graph change.
 - **2026-07-29 (Phase 1: glossary)** - Built `glossary.html` (root): reads `generated/concept-index.js`
   + `course-data.js`, groups all 208 concepts by track, and for each shows term + one-line def + the
   lessons that introduce/revisit/use it (each a resolved link to `content/.../`). Live substring search
@@ -244,7 +244,7 @@ table in sync.
   guard 0). Gates: validate 0 err (drift guard on), a negative unit test proves the check fires on a
   bogus id + a missing tag, parity 7/7. NEXT: items 17-18 (surface/persist per-concept results in the
   code-lab `Quiz` submodule, then per-concept progress on glossary + agenda) - a submodule build +
-  re-vendor. The two deferred concept merges still await an explicit decision.
+  re-vendor. The two flagged concept overlaps were DECIDED (keep both split - fact vs principle, what vs how).
 ---
 
 ## The idea (hard constraints)
