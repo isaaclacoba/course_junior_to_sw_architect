@@ -35,34 +35,69 @@ runner, editor, or page controller. If you think you need one, re-read
 
 ## Procedure
 
+The course is migrating to a generated, per-directory layout
+(`content/<track>/<NN-part>/<NN-lesson>/`). New and migrated lessons MUST use the
+generated flow. The old flat `<name>.js` + `<name>.html` flow is **legacy** -
+still valid for the many not-yet-migrated lessons, but do NOT author a new flat
+lesson.
+
 1. **Log start** in `docs/work-log.md` with a real `date` timestamp.
 2. **Place the lesson**: which track (Practical / Theory) and which Part. Find its
    row in `docs/concept-ledger.md`; read the neighbours' reports in
    `docs/audit/<track>/` so the new rung follows from the previous one and uses
    only concepts at or above its ledger row.
 3. **Pick the archetype** from the SPECS table. For a practical lesson prefer
-   `build` (real code, Run) over `drill`. Copy the closest existing lesson of
-   that archetype as the structural starting point (e.g. `first-builds.*` for a
-   build, `control-flow.*` for a theory drill, a `theory-N.viz.js` for a
-   visual). Do not invent a second data file for the same lesson.
-4. **Write the data file** to the config shape in SPECS. Honour the principles
-   and cadence invariants: teach the portable concept in plain surface (avoid
-   C#-only sugar until its ledger row), one idea per card, a recap to close,
-   nothing used before taught, grade the concept (set `requireSource` + a hidden
-   `verify` probe for builds), make it runnable if it executes cleanly, state the
-   SOLID letter if relevant, one example family per Part, one difficulty rung at
-   a time.
-5. **Write the HTML page** with the exact load order for the archetype (SPECS /
-   copilot-instructions). Set `window.PAGE` with a unique `prefix`.
-6. **Wire the card** into the right Part stage in `index.html`. Ensure
-   `awardedKey == data-key`, and `data-total` = XP-awarding cards excluding the
-   recap.
-7. **Update `docs/concept-ledger.md`** in this same change: add or move the
+   `build` (real code, Run) over `drill`. Copy the closest existing lesson's data
+   as the structural starting point.
+
+### Target flow (generated) — for new or migrated lessons
+
+4. **Scaffold** with `node tools/new-lesson.mjs --new --track <t> --part
+   <NN-part> --id <id> --archetype <build|drill|viz|checkpoint> --title "..."`, or
+   migrate a flat lesson with `node tools/new-lesson.mjs --from <name>.js`. This
+   creates `content/<track>/<NN-part>/<NN-lesson>/` and appends one line to
+   `course-registry.js`.
+5. **Fill `meta.js`** (`window.LESSON_META`): `id`, `key`, `total`, hero fields
+   (`docTitle`, `eyebrow`, `title`, `intro`, `blurb`), `pill`, `time`,
+   `archetype`, and the `concepts` graph
+   `{ introduces:[{id,term,def}], revisits:[{id}], uses:[{id}] }`. A concept's
+   `def` lives ONLY in the one lesson that introduces it.
+6. **Fill `data.js`** with the lesson content (`window.BUILD_CONFIG` /
+   `DRILL_CONFIG`, plus `viz.js` `window.LESSON_VIZ` for a viz lesson) to the
+   config shape in SPECS. Honour the principles and cadence invariants (below).
+   Do NOT put `nextHref`/`nextLabel` in the data file; nav derives from the
+   registry.
+7. **Generate and validate**: `node tools/generate.mjs` writes
+   `generated/course-data.js`, `generated/concept-index.js`, and the lesson's
+   `content/.../index.html`; then `node tools/validate.mjs` checks alignment.
+   - The lesson's `index.html` is GENERATED - never hand-edit it.
+   - Order comes from `course-registry.js` array order, not filenames; the `NN-`
+     dir prefixes are cosmetic.
+   - Do NOT hand-wire a card into the root `index.html`; the card data comes from
+     `meta.js` via `generated/course-data.js`.
+8. **Update `docs/concept-ledger.md`** in this same change: add or move the
    lesson's row and any concept/surface it introduces.
-8. **Verify** per the SPECS recipe: `node --check`; real-`dotnet` compile of
+9. **Verify** per the SPECS recipe: `node --check`; real-`dotnet` compile of
    every runnable program and the rebuilt `verify` probe; headless render with no
    `undefined`. Delete temp harness files.
-9. **Log end** in `docs/work-log.md` with a real `date` timestamp.
+10. **Log end** in `docs/work-log.md` with a real `date` timestamp.
+
+### Legacy flow (flat files) — only for not-yet-migrated lessons
+
+The cadence invariants are the same; only the file split and the hand-written
+page differ.
+
+- **Write the data file** `<name>.js` to the config shape in SPECS. Honour the
+  principles: teach the portable concept in plain surface, one idea per card, a
+  recap to close, nothing used before taught, grade the concept (set
+  `requireSource` + a hidden `verify` probe for builds), make it runnable if it
+  executes cleanly, state the SOLID letter if relevant.
+- **Write the HTML page** `<name>.html` with the exact load order for the
+  archetype (SPECS / copilot-instructions). Set `window.PAGE` with a unique
+  `prefix`.
+- **Wire the card** into the right Part stage in `index.html`. Ensure
+  `awardedKey == data-key`, and `data-total` = XP-awarding cards excluding the
+  recap.
 
 ## Preflight checklist (run before calling it done)
 
@@ -85,6 +120,11 @@ editor. It powers the Theory "AI track" (`ai-N.*`) and the `theory-N.viz.js`
 visuals. It is data fed to the shared **MemoryViz** engine in `code-lab`; you do
 not write rendering code. (Building a *new* scene is engine work - see
 `.github/copilot-instructions.md`, "Adding a MemoryViz scene".)
+
+Under the generated flow a viz lesson is `archetype: viz`; its scene data lives
+in the lesson dir's `viz.js` (`window.LESSON_VIZ`) and its `index.html` is
+generated. The two-file mechanics below are the **legacy** flat layout, still
+valid for not-yet-migrated `ai-N.*` / `theory-N.viz.js` lessons.
 
 Two files, same split as the other archetypes:
 

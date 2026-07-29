@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The context window</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../../../../styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+    />
+    <link rel="stylesheet" href="../../../../vendor/code-lab/code-lab.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <section class="hero" id="pageHero"></section>
+    </main>
+
+    <script>
+      window.PAGE = {
+        hero: {
+          eyebrow: "Theory · Part five · The building blocks of AI",
+          title: "The context window",
+          intro: ["The context a model can read has a hard limit, measured in tokens. When a conversation grows past that budget, the oldest tokens fall off the start and the model can no longer see them. That is why a long chat seems to forget how it began - and why memory has to be added on top."],
+          links: [{ href: "../../../../index.html", label: "Back to the course" }],
+        },
+      };
+    </script>
+
+    <!-- {{PRISM_BLOCK}} expands to the three tags below (absolute CDN URLs) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="../../../../vendor/code-lab/code-lab.global.js"></script>
+    <script src="ai-5.viz.js"></script>
+    <script src="../../../../generated/course-data.js"></script>
+    <script src="meta.js"></script>
+    <script src="../../../../page-shell.js"></script>
+  </body>
+</html>

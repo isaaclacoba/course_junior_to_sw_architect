@@ -66,6 +66,47 @@ Landing page:
 
 ## How to add a lesson
 
+The course is migrating to a generated, per-directory layout. New and migrated
+lessons MUST use the generated flow below. The flat `<name>.js` + `<name>.html`
+flow is **legacy** - still valid for the many not-yet-migrated lessons, but do
+NOT author a new flat lesson.
+
+### Target flow (generated) — for every new or migrated lesson
+
+Never hand-write the page HTML. A lesson is a directory whose `index.html` is
+generated.
+
+1. Scaffold with `node tools/new-lesson.mjs --new --track <t> --part <NN-part>
+   --id <id> --archetype <build|drill|viz|checkpoint> --title "..."`. To migrate
+   an existing flat lesson instead, use `node tools/new-lesson.mjs --from
+   <name>.js`. Either mode creates the lesson directory
+   `content/<track>/<NN-part>/<NN-lesson>/` and appends one line to
+   `course-registry.js`.
+2. Fill `meta.js` (`window.LESSON_META`): `id`, `key`, `total`, hero
+   (`docTitle`, `eyebrow`, `title`, `intro`, `blurb`), `pill`, `time`,
+   `archetype`, and the `concepts` graph
+   `{ introduces:[{id,term,def}], revisits:[{id}], uses:[{id}] }`. A concept's
+   `def` lives ONLY in the one lesson that introduces it.
+3. Fill `data.js` (the lesson content: `window.BUILD_CONFIG` / `DRILL_CONFIG`,
+   plus `viz.js` `window.LESSON_VIZ` for a viz lesson). Same config shapes as the
+   legacy engines below - only the file split and the page HTML differ. Do NOT
+   put `nextHref`/`nextLabel` in the data file; nav derives from the registry.
+4. `node tools/generate.mjs` writes `generated/course-data.js`,
+   `generated/concept-index.js`, and the lesson's `content/.../index.html`.
+5. `node tools/validate.mjs` checks alignment (registry ↔ dirs, unknown/duplicate
+   concepts, `meta.total` vs card count, stale generated output).
+
+Notes:
+- **`index.html` inside a lesson dir is generated - never edit it by hand.**
+- **Order comes from `course-registry.js` array order**, not from filenames. The
+  `NN-` directory prefixes are cosmetic only.
+- You do NOT hand-wire a card into the root `index.html` for a migrated lesson;
+  the card data (`title`, `blurb`, `key`, `total`, `pill`, `time`) comes from
+  `meta.js` via `generated/course-data.js`.
+- Generated files are committed; CI re-runs the generator and fails on drift.
+
+### Legacy flow (flat files) — only for not-yet-migrated lessons
+
 Pick the archetype that matches the pedagogy:
 
 ### Quiz + fill-in-the-blank (theory or runnable drills) — `drill-engine`

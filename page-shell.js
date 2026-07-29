@@ -315,15 +315,19 @@
   // returns to the index rather than guessing an order here.
   if (!page.nextHref) {
     var href = "index.html";
-    var course = window.Course;
+    var course = window.CourseData || window.Course;
     if (course && typeof course.locate === "function") {
       var current = (location.pathname.split("/").pop() || "").toLowerCase();
-      var loc = course.locate(current);
+      var metaId = window.LESSON_META && window.LESSON_META.id;
+      var loc = (metaId && typeof course.locateById === "function" && course.locateById(metaId)) || course.locate(current);
       if (loc && loc.order) {
         href = loc.index < loc.order.length - 1 ? loc.order[loc.index + 1] : "index.html";
       }
     }
-    page.nextHref = href;
+    // A generated lesson page lives four dirs deep (content/<track>/<part>/<lesson>/),
+    // so a root-relative next href needs the same prefix the page's assets use.
+    var rootPrefix = (window.LESSON_META && window.LESSON_META.id) ? "../../../../" : "";
+    page.nextHref = rootPrefix + href;
   }
 
   hero.innerHTML = heroHTML(page.hero);
@@ -343,12 +347,17 @@
     hero.insertAdjacentElement("afterend", vizHost);
     if (!window.LESSON_VIZ.nextHref) window.LESSON_VIZ.nextHref = page.nextHref;
     // Track progress: mark the lesson done + award XP when the last step is
-    // reached. The key is derived from the page (theory-5.html -> theory_5_awarded)
-    // so it matches the card on the index, unless the lesson sets its own.
+    // reached. A migrated lesson carries its exact key in LESSON_META; a flat
+    // page derives it from the filename (theory-5.html -> theory_5_awarded) so it
+    // matches the card on the index, unless the lesson sets its own.
     if (!window.LESSON_VIZ.awardedKey) {
-      const file = (location.pathname.split("/").pop() || "").replace(/\.html$/, "");
-      if (/^[a-z0-9]+(-[a-z0-9]+)*$/i.test(file)) {
-        window.LESSON_VIZ.awardedKey = file.replace(/-/g, "_") + "_awarded";
+      if (window.LESSON_META && window.LESSON_META.key) {
+        window.LESSON_VIZ.awardedKey = window.LESSON_META.key;
+      } else {
+        const file = (location.pathname.split("/").pop() || "").replace(/\.html$/, "");
+        if (/^[a-z0-9]+(-[a-z0-9]+)*$/i.test(file)) {
+          window.LESSON_VIZ.awardedKey = file.replace(/-/g, "_") + "_awarded";
+        }
       }
     }
     try {

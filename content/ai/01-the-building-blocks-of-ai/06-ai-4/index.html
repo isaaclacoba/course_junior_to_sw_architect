@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Context</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../../../../styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+    />
+    <link rel="stylesheet" href="../../../../vendor/code-lab/code-lab.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <section class="hero" id="pageHero"></section>
+    </main>
+
+    <script>
+      window.PAGE = {
+        hero: {
+          eyebrow: "Theory · Part five · The building blocks of AI",
+          title: "Context",
+          intro: ["A model only knows what it can read right now. Ask it about something you never told it and it just guesses. Give it a couple of facts first and the same question becomes easy. That readable text - your question plus anything you place before it - is its context. Here you'll see how adding context turns a shaky guess into a clear answer."],
+          links: [{ href: "../../../../index.html", label: "Back to the course" }],
+        },
+      };
+    </script>
+
+    <!-- {{PRISM_BLOCK}} expands to the three tags below (absolute CDN URLs) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="../../../../vendor/code-lab/code-lab.global.js"></script>
+    <script src="ai-4.viz.js"></script>
+    <script src="../../../../generated/course-data.js"></script>
+    <script src="meta.js"></script>
+    <script src="../../../../page-shell.js"></script>
+  </body>
+</html>

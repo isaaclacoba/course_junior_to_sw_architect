@@ -1,0 +1,259 @@
+{
+  "ai-1": {
+    "introduces": [
+      { "id": "ai-llm", "term": "Large language model", "def": "A model that reads the text so far and predicts the next token, over and over." },
+      { "id": "ai-next-token-prediction", "term": "Next-token prediction", "def": "For each next slot the model scores every possible token and usually picks the most likely one, then appends it and reads the whole text again." }
+    ],
+    "revisits": [],
+    "uses": []
+  },
+  "ai-2": {
+    "introduces": [
+      { "id": "ai-token", "term": "Token", "def": "A small chunk of text - roughly a word or a piece of one, punctuation included - and the unit a model actually reads, counts, and is billed by." }
+    ],
+    "revisits": [],
+    "uses": [
+      { "id": "ai-llm" }
+    ]
+  },
+  "ai-3": {
+    "introduces": [
+      { "id": "ai-prompt", "term": "Prompt", "def": "The starting text you hand the model, which it simply continues - so changing the prompt changes everything that follows." }
+    ],
+    "revisits": [],
+    "uses": [
+      { "id": "ai-llm" },
+      { "id": "ai-next-token-prediction" },
+      { "id": "ai-token" }
+    ]
+  },
+  "ai-9": {
+    "introduces": [
+      { "id": "ai-system-message", "term": "System message", "def": "A hidden message placed before your turn that sets the model's role and rules - the simplest lever for steering how it answers." },
+      { "id": "ai-user-message", "term": "User message", "def": "The message you type - your actual question or request, saying what to answer rather than how." }
+    ],
+    "revisits": [],
+    "uses": [
+      { "id": "ai-prompt" }
+    ]
+  },
+  "ai-10": {
+    "introduces": [
+      { "id": "ai-sampling", "term": "Sampling", "def": "Instead of always taking the top candidate, the model picks the next token at random according to the probabilities - which is why the same prompt can give different answers." },
+      { "id": "ai-temperature", "term": "Temperature", "def": "A dial that reshapes the spread of next-token probabilities: low sharpens it for steady, repeatable answers, high flattens it for more variety." }
+    ],
+    "revisits": [],
+    "uses": [
+      { "id": "ai-next-token-prediction" },
+      { "id": "ai-prompt" },
+      { "id": "ai-token" }
+    ]
+  },
+  "ai-4": {
+    "introduces": [
+      { "id": "ai-context", "term": "Context", "def": "Everything the model can read at this moment - the prompt, the conversation so far, and any facts you add - and the only thing it has to go on." }
+    ],
+    "revisits": [],
+    "uses": [
+      { "id": "ai-prompt" },
+      { "id": "ai-token" },
+      { "id": "ai-llm" }
+    ]
+  },
+  "ai-5": {
+    "introduces": [
+      { "id": "ai-context-window", "term": "Context window", "def": "The fixed maximum size of the context, measured in tokens - when it fills, the oldest tokens fall off the start and the model can no longer see them." }
+    ],
+    "revisits": [],
+    "uses": [
+      { "id": "ai-context" },
+      { "id": "ai-token" }
+    ]
+  },
+  "ai-6": {
+    "introduces": [
+      { "id": "ai-memory", "term": "Memory", "def": "Saving what matters to a store outside the context window and recalling it when needed, so an assistant can remember across turns even though each model call starts fresh." },
+      { "id": "ai-working-memory", "term": "Working memory", "def": "The context the model reads right now - the scratchpad for the task in hand, and the first thing to vanish as the chat rolls on." },
+      { "id": "ai-episodic-memory", "term": "Episodic memory", "def": "The store of what happened before - past turns and events, each tied to a time, like the assistant's diary." },
+      { "id": "ai-semantic-memory", "term": "Semantic memory", "def": "The store of what stays true with no date attached - facts about the world or about you." },
+      { "id": "ai-procedural-memory", "term": "Procedural memory", "def": "The store of how to do things - the routines and steps the assistant follows to act." }
+    ],
+    "revisits": [],
+    "uses": [
+      { "id": "ai-context" },
+      { "id": "ai-context-window" }
+    ]
+  },
+  "ai-7": {
+    "introduces": [
+      { "id": "ai-tool", "term": "Tool", "def": "A function the model is allowed to call so it can do something text alone cannot - like check the weather or send a message - and read the result back." },
+      { "id": "ai-tool-schema", "term": "Tool schema", "def": "The description of a tool - its name and typed parameters - that the model reads to know which tool fits and how to call it." },
+      { "id": "ai-tool-call", "term": "Tool call", "def": "The structured request the model emits to run a tool: the tool's name plus the arguments it needs, in the shape its schema asks for." }
+    ],
+    "revisits": [],
+    "uses": [
+      { "id": "ai-llm" },
+      { "id": "ai-context" }
+    ]
+  },
+  "ai-14": {
+    "introduces": [
+      { "id": "ai-retrieval", "term": "Retrieval", "def": "Turning a question into a vector and finding the closest stored chunks to it." },
+      { "id": "ai-chunk", "term": "Chunk", "def": "A small piece a document is split into so it can be stored, searched, and pulled into the context a few at a time." },
+      { "id": "ai-embedding", "term": "Embedding", "def": "Turning a piece of text into a list of numbers that captures its meaning - done ahead of time for every stored chunk, and again for each incoming question." },
+      { "id": "ai-vector", "term": "Vector", "def": "The list of numbers an embedding produces - a point in space whose closeness to another vector reflects how close their meanings are." },
+      { "id": "ai-similarity-search", "term": "Similarity search", "def": "Scoring stored chunks by how close their vectors sit to the question's vector, so matching is on meaning rather than exact words." },
+      { "id": "ai-rag", "term": "Retrieval-augmented generation (RAG)", "def": "The whole pattern of retrieving the relevant chunks, putting them into the context, and answering from them, instead of relying on the model's frozen training." }
+    ],
+    "revisits": [
+      { "id": "ai-semantic-memory" }
+    ],
+    "uses": [
+      { "id": "ai-context" },
+      { "id": "ai-token" }
+    ]
+  },
+  "ai-8": {
+    "introduces": [
+      { "id": "ai-agent", "term": "Agent", "def": "A model wrapped with its context, memory, and tools and run in a loop toward a goal, so it can decide and take its own next steps." },
+      { "id": "ai-agent-loop", "term": "Agent loop", "def": "The perceive-reason-act-observe cycle an agent runs: read the task in, reason about the next move, call a tool, observe the result, and go again." }
+    ],
+    "revisits": [
+      { "id": "ai-context" },
+      { "id": "ai-memory" },
+      { "id": "ai-tool" }
+    ],
+    "uses": [
+      { "id": "ai-llm" },
+      { "id": "ai-episodic-memory" }
+    ]
+  },
+  "ai-13": {
+    "introduces": [
+      { "id": "ai-transcript", "term": "Transcript", "def": "The running list of messages a whole run literally is - the input the model is re-sent each step." },
+      { "id": "ai-message-role", "term": "Message role", "def": "The tag on each message - system, user, assistant, or tool - that says what kind of turn it is and, with its author, who actually wrote it." }
+    ],
+    "revisits": [
+      { "id": "ai-system-message" },
+      { "id": "ai-user-message" },
+      { "id": "ai-tool" },
+      { "id": "ai-memory" }
+    ],
+    "uses": [
+      { "id": "ai-tool-call" },
+      { "id": "ai-context" }
+    ]
+  },
+  "ai-15": {
+    "introduces": [
+      { "id": "ai-chain-of-thought", "term": "Chain of thought", "def": "Asking the model to write its reasoning out step by step before answering - the working is the computation, not decoration, because each token it writes lands back in the context it reads next." }
+    ],
+    "revisits": [],
+    "uses": [
+      { "id": "ai-transcript" },
+      { "id": "ai-context" },
+      { "id": "ai-next-token-prediction" }
+    ]
+  },
+  "ai-16": {
+    "introduces": [
+      { "id": "ai-planning", "term": "Planning", "def": "Breaking a goal too big for one move into an ordered list of small steps and working them one at a time." },
+      { "id": "ai-task-decomposition", "term": "Task decomposition", "def": "Splitting a goal into smaller steps whose order captures what depends on what, so each step is small enough to actually do." },
+      { "id": "ai-replanning", "term": "Re-planning", "def": "Changing the plan mid-run when a step gets blocked, rather than pushing on with a route that no longer works." }
+    ],
+    "revisits": [
+      { "id": "ai-chain-of-thought" }
+    ],
+    "uses": [
+      { "id": "ai-agent" },
+      { "id": "ai-memory" }
+    ]
+  },
+  "ai-17": {
+    "introduces": [
+      { "id": "ai-react", "term": "Reason and act (ReAct)", "def": "The named loop behind a tool-using agent: a thought about the next move, an action that calls a tool, an observation of the real result, repeated until the answer is grounded." }
+    ],
+    "revisits": [
+      { "id": "ai-agent-loop" },
+      { "id": "ai-chain-of-thought" }
+    ],
+    "uses": [
+      { "id": "ai-tool-call" },
+      { "id": "ai-tool" }
+    ]
+  },
+  "ai-18": {
+    "introduces": [
+      { "id": "ai-reflection", "term": "Reflection", "def": "Having the model check its own draft, find the bug or edge case it missed, and revise - draft, critique, revise, because reviewing is an easier task than writing." }
+    ],
+    "revisits": [
+      { "id": "ai-chain-of-thought" }
+    ],
+    "uses": [
+      { "id": "ai-transcript" }
+    ]
+  },
+  "ai-19": {
+    "introduces": [
+      { "id": "ai-workflow", "term": "Workflow", "def": "Fixed steps run in a set order when you can write the path down ahead of time - cheaper, predictable, and easier to test than an agent." }
+    ],
+    "revisits": [
+      { "id": "ai-agent" },
+      { "id": "ai-planning" }
+    ],
+    "uses": []
+  },
+  "ai-20": {
+    "introduces": [
+      { "id": "ai-guardrail", "term": "Guardrail", "def": "A rule that lives in your code outside the model - checking what comes in and what the agent tries to do - because a model alone can be talked out of its own rules." },
+      { "id": "ai-prompt-injection", "term": "Prompt injection", "def": "Text in the input that tries to override the agent's instructions, like \"ignore your rules\", which an input check should scan for and flag." },
+      { "id": "ai-human-in-the-loop", "term": "Human in the loop", "def": "Requiring a person's approval before the agent takes a risky action, so the most consequential calls are never left to the model alone." }
+    ],
+    "revisits": [
+      { "id": "ai-agent" }
+    ],
+    "uses": [
+      { "id": "ai-tool-call" },
+      { "id": "ai-system-message" }
+    ]
+  },
+  "ai-21": {
+    "introduces": [
+      { "id": "ai-stopping-condition", "term": "Stopping condition", "def": "A reason to end the loop - the goal is reached, the budget is spent, the agent is circling, or a hard error hit - since an agent decides its own next move and will otherwise run forever." },
+      { "id": "ai-step-budget", "term": "Step budget", "def": "A cap on how many steps a task may take - the leash on a loop that costs a model call every turn." }
+    ],
+    "revisits": [
+      { "id": "ai-agent-loop" }
+    ],
+    "uses": [
+      { "id": "ai-agent" }
+    ]
+  },
+  "ai-22": {
+    "introduces": [
+      { "id": "ai-hallucination", "term": "Hallucination", "def": "A confident answer that is invented, because the model predicts plausible text rather than verified truth and fills any gap with something that reads right." },
+      { "id": "ai-grounding", "term": "Grounding", "def": "Pulling the real source into the context and answering from it - citing it, and allowing \"I don't know\" - so the answer rests on a checkable fact instead of a guess." },
+      { "id": "ai-citation", "term": "Citation", "def": "Pointing at the exact source a grounded answer came from, so the claim can be traced back and checked." }
+    ],
+    "revisits": [
+      { "id": "ai-retrieval" }
+    ],
+    "uses": [
+      { "id": "ai-context" },
+      { "id": "ai-tool" }
+    ]
+  },
+  "ai-23": {
+    "introduces": [
+      { "id": "ai-trace", "term": "Trace", "def": "The after-the-fact record of a run's messages and tool calls, read to find where it went wrong." },
+      { "id": "ai-observability", "term": "Observability", "def": "Being able to point at the exact step where a run went wrong in its record, so you can see what happened, not just that it failed." },
+      { "id": "ai-evaluation", "term": "Evaluation", "def": "Turning a past failure into an automatic pass/fail check you run every time, so the same bug can never sneak back in." }
+    ],
+    "revisits": [
+      { "id": "ai-transcript" }
+    ],
+    "uses": [
+      { "id": "ai-tool-call" }
+    ]
+  }
+}

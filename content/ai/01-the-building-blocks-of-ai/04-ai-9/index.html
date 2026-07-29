@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>System and user messages</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../../../../styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+    />
+    <link rel="stylesheet" href="../../../../vendor/code-lab/code-lab.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <section class="hero" id="pageHero"></section>
+    </main>
+
+    <script>
+      window.PAGE = {
+        hero: {
+          eyebrow: "Theory · Part five · The building blocks of AI",
+          title: "System and user messages",
+          intro: ["When you chat with an assistant, you write one message - but the model is usually handed two. There is your message, and there is a hidden one the app adds first that tells the model who to be and how to behave. Same question, different hidden message, and you get a very different answer. Here you'll see that lever in action."],
+          links: [{ href: "../../../../index.html", label: "Back to the course" }],
+        },
+      };
+    </script>
+
+    <!-- {{PRISM_BLOCK}} expands to the three tags below (absolute CDN URLs) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="../../../../vendor/code-lab/code-lab.global.js"></script>
+    <script src="ai-9.viz.js"></script>
+    <script src="../../../../generated/course-data.js"></script>
+    <script src="meta.js"></script>
+    <script src="../../../../page-shell.js"></script>
+  </body>
+</html>

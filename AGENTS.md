@@ -7,6 +7,12 @@ card blurbs in `index.html`. (For architecture, engines, and build/deploy, see
 `.github/copilot-instructions.md`; for the editor rule, see
 `.github/instructions/code-editor.instructions.md`.)
 
+For lessons on the generated, per-directory layout (`content/<track>/<part>/
+<lesson>/`), the same prose lives in that lesson's `data.js` (card prose) and
+`meta.js` (hero `intro`, `title`, `blurb`); the card `blurb`/`title` come from
+`meta.js`, not from a hand-edited `index.html`. The voice rules below are
+identical for both layouts.
+
 The audience is juniors, often non-native English speakers. Write like a calm
 colleague explaining an idea at a whiteboard.
 

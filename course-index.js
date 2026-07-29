@@ -15,7 +15,7 @@
  * them to the DOM.
  */
 (function () {
-  var C = window.Course;
+  var C = window.CourseData || window.Course;
   var P = window.CourseProgress;
   var Nav = window.CourseNav;
 

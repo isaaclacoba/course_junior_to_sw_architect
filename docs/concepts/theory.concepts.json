@@ -1,0 +1,386 @@
+{
+  "theory-1": {
+    "introduces": [
+      { "id": "th-instruction", "term": "Instruction", "def": "A single, tiny, exact action for the computer to carry out - like setting a value or adding two numbers." },
+      { "id": "th-program", "term": "Program", "def": "An ordered list of instructions; change the order and you change what it does." },
+      { "id": "th-data", "term": "Data", "def": "The values a program works on, held in memory." },
+      { "id": "th-cpu", "term": "CPU", "def": "The part of the computer that runs instructions, fetching and carrying out one at a time, billions of times a second." },
+      { "id": "th-compiler", "term": "Compiler", "def": "A tool that translates the code you write into the tiny instructions the CPU understands." }
+    ],
+    "revisits": [],
+    "uses": []
+  },
+  "theory-2": {
+    "introduces": [
+      { "id": "th-ram", "term": "RAM", "def": "The computer's fast working memory, where a program and its data must be before the CPU can run them." },
+      { "id": "th-fetch-execute", "term": "Fetch-execute loop", "def": "The loop the CPU repeats forever: fetch the next instruction from memory, carry it out, repeat." },
+      { "id": "th-program-counter", "term": "Program counter", "def": "The CPU's bookmark - it remembers which instruction comes next." },
+      { "id": "th-jump", "term": "Jump", "def": "An instruction that changes the program counter to a different line instead of the next one, which is how loops and choices work." }
+    ],
+    "revisits": [
+      { "id": "th-program" },
+      { "id": "th-cpu" }
+    ],
+    "uses": [
+      { "id": "th-data" },
+      { "id": "th-instruction" }
+    ]
+  },
+  "theory-3": {
+    "introduces": [
+      { "id": "th-operating-system", "term": "Operating system", "def": "The program in charge of the machine - it launches your program and manages it while it runs." },
+      { "id": "th-loader", "term": "Loader", "def": "The part of the operating system that copies a program from storage into memory so it can run." },
+      { "id": "th-entry-point", "term": "Entry point", "def": "The place where a program starts running - the first instruction the operating system hands to the CPU." },
+      { "id": "th-main", "term": "Main", "def": "The routine a program starts from, usually named Main." }
+    ],
+    "revisits": [
+      { "id": "th-ram" }
+    ],
+    "uses": [
+      { "id": "th-program" },
+      { "id": "th-cpu" }
+    ]
+  },
+  "theory-4": {
+    "introduces": [
+      { "id": "th-process", "term": "Process", "def": "A running program, loaded into its own separate patch of memory." },
+      { "id": "th-core", "term": "Core", "def": "One worker inside the CPU; a single core does one instruction at a time." },
+      { "id": "th-time-sharing", "term": "Time-sharing", "def": "Giving one core to several processes in turn, switching thousands of times a second so they seem to run at once." },
+      { "id": "th-scheduler", "term": "Scheduler", "def": "The part of the operating system that decides which process gets the core next." },
+      { "id": "th-parallelism", "term": "Parallelism", "def": "Running things at the very same instant on more than one core." },
+      { "id": "th-isolation", "term": "Isolation", "def": "Walling each process off in its own memory so one cannot read or wreck another's, which keeps a crash contained." }
+    ],
+    "revisits": [
+      { "id": "th-cpu" },
+      { "id": "th-operating-system" }
+    ],
+    "uses": [
+      { "id": "th-ram" },
+      { "id": "th-program" }
+    ]
+  },
+  "theory-5": {
+    "introduces": [
+      { "id": "th-bit", "term": "Bit", "def": "The smallest piece of information - a single value that is either 0 (off) or 1 (on)." },
+      { "id": "th-binary", "term": "Binary", "def": "Counting with only 0s and 1s; every number is a pattern of on and off bits." },
+      { "id": "th-byte", "term": "Byte", "def": "A group of eight bits, enough for 256 different values - the unit memory and file sizes are measured in." }
+    ],
+    "revisits": [],
+    "uses": [
+      { "id": "th-ram" },
+      { "id": "th-data" }
+    ]
+  },
+  "theory-6": {
+    "introduces": [
+      { "id": "th-encoding", "term": "Encoding", "def": "An agreed code that maps each thing to a number and back - it decides whether a number means a letter, a colour, or a sound." },
+      { "id": "th-pixel", "term": "Pixel", "def": "One tiny coloured dot of an image, its colour stored as amounts of red, green and blue." },
+      { "id": "th-sample", "term": "Sample", "def": "One measurement of a sound wave's height, taken thousands of times a second." }
+    ],
+    "revisits": [
+      { "id": "th-byte" }
+    ],
+    "uses": [
+      { "id": "th-data" }
+    ]
+  },
+  "theory-7": {
+    "introduces": [
+      { "id": "th-file", "term": "File", "def": "A named bundle of bytes on storage, which you can find again by its name." },
+      { "id": "th-folder", "term": "Folder", "def": "A named group of files, arranged in a tree you walk to reach a file." },
+      { "id": "th-permissions", "term": "Permissions", "def": "The rules the operating system checks before it lets a program open or change a file." },
+      { "id": "th-device", "term": "Device", "def": "A piece of hardware - keyboard, screen, printer, network - that programs reach only by asking the operating system." }
+    ],
+    "revisits": [
+      { "id": "th-operating-system" }
+    ],
+    "uses": [
+      { "id": "th-byte" }
+    ]
+  },
+  "theory-check-1": {
+    "introduces": [],
+    "revisits": [
+      { "id": "th-program" },
+      { "id": "th-cpu" },
+      { "id": "th-time-sharing" },
+      { "id": "th-core" },
+      { "id": "th-bit" },
+      { "id": "th-byte" },
+      { "id": "th-encoding" },
+      { "id": "th-file" },
+      { "id": "th-operating-system" }
+    ],
+    "uses": [
+      { "id": "th-instruction" },
+      { "id": "th-ram" },
+      { "id": "th-process" },
+      { "id": "th-binary" },
+      { "id": "th-folder" }
+    ]
+  },
+  "theory-8": {
+    "introduces": [
+      { "id": "th-machine-code", "term": "Machine code", "def": "The tiny numeric instructions a CPU runs directly - the only language it truly understands." },
+      { "id": "th-programming-language", "term": "Programming language", "def": "Human-friendly words and rules for writing programs, which a tool then translates for the machine." },
+      { "id": "th-high-level", "term": "High-level language", "def": "A language close to human ideas rather than raw machine instructions, so one line stands for many CPU steps." },
+      { "id": "th-syntax", "term": "Syntax", "def": "The exact rules for how code must be written in a language." }
+    ],
+    "revisits": [
+      { "id": "th-compiler" }
+    ],
+    "uses": [
+      { "id": "th-cpu" }
+    ]
+  },
+  "theory-9": {
+    "introduces": [
+      { "id": "th-variable", "term": "Variable", "def": "A named slot in memory that holds a value you can read and change." }
+    ],
+    "revisits": [
+      { "id": "th-ram" }
+    ],
+    "uses": [
+      { "id": "th-data" }
+    ]
+  },
+  "theory-10": {
+    "introduces": [
+      { "id": "th-type", "term": "Type", "def": "The kind of a value - number, text, true/false - which decides what you can do with it." }
+    ],
+    "revisits": [
+      { "id": "th-variable" }
+    ],
+    "uses": [
+      { "id": "th-compiler" }
+    ]
+  },
+  "theory-11": {
+    "introduces": [
+      { "id": "th-statement", "term": "Statement", "def": "One complete instruction - a single step the program takes." },
+      { "id": "th-expression", "term": "Expression", "def": "A piece of code that produces a value, like 2 + 3 working out to 5." },
+      { "id": "th-assignment", "term": "Assignment", "def": "Writing a computed value into a variable, done with the = operator." },
+      { "id": "th-operator", "term": "Operator", "def": "A symbol like + or = that combines or acts on values." }
+    ],
+    "revisits": [
+      { "id": "th-variable" }
+    ],
+    "uses": [
+      { "id": "th-instruction" }
+    ]
+  },
+  "theory-12": {
+    "introduces": [
+      { "id": "th-condition", "term": "Condition", "def": "A yes/no question the program asks, like temp > 10, that works out to true or false." },
+      { "id": "th-branch", "term": "Branch (if/else)", "def": "Choosing between paths - run one block when a condition is true, another when it is false." },
+      { "id": "th-loop", "term": "Loop", "def": "Repeating steps by jumping back to check a condition again, so you write them once instead of many times." }
+    ],
+    "revisits": [
+      { "id": "th-expression" }
+    ],
+    "uses": [
+      { "id": "th-variable" },
+      { "id": "th-jump" }
+    ]
+  },
+  "theory-13": {
+    "introduces": [
+      { "id": "th-function", "term": "Function", "def": "A named bundle of steps you can call and reuse, with inputs and an output." },
+      { "id": "th-parameter", "term": "Parameter", "def": "A named input a function receives, which arrives as a local variable when the function is called." },
+      { "id": "th-return-value", "term": "Return value", "def": "The result a function hands back to whatever called it." },
+      { "id": "th-local-variable", "term": "Local variable", "def": "A variable that exists only while its function is running." }
+    ],
+    "revisits": [
+      { "id": "th-variable" }
+    ],
+    "uses": [
+      { "id": "th-jump" }
+    ]
+  },
+  "theory-14": {
+    "introduces": [
+      { "id": "th-bug", "term": "Bug", "def": "A mistake in the code - the computer did what you wrote, not what you meant." },
+      { "id": "th-syntax-error", "term": "Syntax error", "def": "Code that breaks the language's rules, which the compiler catches before the program runs." },
+      { "id": "th-logic-error", "term": "Logic error", "def": "Valid code that runs but does the wrong thing, like using minus where you meant plus." },
+      { "id": "th-debugging", "term": "Debugging", "def": "Stepping through code line by line, watching the values, to find where it goes wrong." }
+    ],
+    "revisits": [
+      { "id": "th-syntax" },
+      { "id": "th-compiler" }
+    ],
+    "uses": [
+      { "id": "th-program" }
+    ]
+  },
+  "theory-check-2": {
+    "introduces": [],
+    "revisits": [
+      { "id": "th-programming-language" },
+      { "id": "th-variable" },
+      { "id": "th-type" },
+      { "id": "th-statement" },
+      { "id": "th-condition" },
+      { "id": "th-function" },
+      { "id": "th-bug" }
+    ],
+    "uses": [
+      { "id": "th-high-level" },
+      { "id": "th-machine-code" },
+      { "id": "th-assignment" },
+      { "id": "th-expression" },
+      { "id": "th-branch" },
+      { "id": "th-loop" },
+      { "id": "th-syntax-error" },
+      { "id": "th-logic-error" }
+    ]
+  },
+  "theory-15": {
+    "introduces": [
+      { "id": "th-address", "term": "Address", "def": "The number of a memory slot, which lets the program find that exact slot again." },
+      { "id": "th-stack", "term": "Stack", "def": "The memory region for the values a function is using right now, where each call adds a frame on top that is removed automatically when the call ends." },
+      { "id": "th-heap", "term": "Heap", "def": "The memory region for objects that must outlive the call that made them, kept until nothing refers to them." },
+      { "id": "th-garbage-collector", "term": "Garbage collector", "def": "The part that reclaims heap memory once nothing points to an object any more." },
+      { "id": "th-volatile", "term": "Volatile", "def": "A property of RAM: it is fast to reach but wiped the moment power drops." }
+    ],
+    "revisits": [
+      { "id": "th-ram" }
+    ],
+    "uses": [
+      { "id": "th-variable" },
+      { "id": "th-function" }
+    ]
+  },
+  "theory-16": {
+    "introduces": [
+      { "id": "th-value-type", "term": "Value type", "def": "A type whose variable holds the data itself, so copying it duplicates the value." },
+      { "id": "th-reference-type", "term": "Reference type", "def": "A type whose variable holds the address of an object on the heap, so copying it duplicates only the address." },
+      { "id": "th-reference", "term": "Reference", "def": "A value that is a memory address - follow it to reach the real object." }
+    ],
+    "revisits": [
+      { "id": "th-type" },
+      { "id": "th-heap" }
+    ],
+    "uses": [
+      { "id": "th-variable" },
+      { "id": "th-stack" },
+      { "id": "th-address" }
+    ]
+  },
+  "theory-17": {
+    "introduces": [
+      { "id": "th-compile-time", "term": "Compile time", "def": "The phase before a program runs, when the compiler translates the source and checks the rules." },
+      { "id": "th-run-time", "term": "Run time", "def": "The phase when the built program actually executes, one instruction at a time." },
+      { "id": "th-build-error", "term": "Build error", "def": "A rule-breaking mistake the compiler catches at compile time, before anything runs." },
+      { "id": "th-runtime-platform", "term": ".NET runtime", "def": "A platform that finishes and runs a portable build on each machine, like .NET." },
+      { "id": "th-cross-compile", "term": "Cross-compile", "def": "Building on one machine but aiming the compiler at a different target - another CPU or operating system." }
+    ],
+    "revisits": [
+      { "id": "th-compiler" },
+      { "id": "th-machine-code" }
+    ],
+    "uses": [
+      { "id": "th-syntax" },
+      { "id": "th-ram" }
+    ]
+  },
+  "theory-18": {
+    "introduces": [
+      { "id": "th-storage", "term": "Storage", "def": "Non-volatile hardware that keeps data after a program stops and after the power is off." },
+      { "id": "th-persistence", "term": "Persistence", "def": "Keeping data past the end of a program by saving it to storage, and loading it back later." },
+      { "id": "th-inode", "term": "File", "def": "A file on disk is an inode - its bytes plus facts about them like size, time, and who can read it - reached through a name in a folder." }
+    ],
+    "revisits": [
+      { "id": "th-ram" },
+      { "id": "th-volatile" },
+      { "id": "th-file" },
+      { "id": "th-folder" }
+    ],
+    "uses": [
+      { "id": "th-byte" }
+    ]
+  },
+  "theory-19": {
+    "introduces": [
+      { "id": "th-network", "term": "Network", "def": "The wires and wireless links that let one program talk to another, even across the world." },
+      { "id": "th-client", "term": "Client", "def": "The program that asks for something over a network." },
+      { "id": "th-server", "term": "Server", "def": "The program that answers requests over a network." },
+      { "id": "th-request", "term": "Request", "def": "A message a client sends asking for something." },
+      { "id": "th-response", "term": "Response", "def": "The answer a server sends back." },
+      { "id": "th-api", "term": "API", "def": "The set list of things a server offers and how to ask for them - like a menu." }
+    ],
+    "revisits": [],
+    "uses": [
+      { "id": "th-program" },
+      { "id": "th-data" }
+    ]
+  },
+  "theory-check-3": {
+    "introduces": [],
+    "revisits": [
+      { "id": "th-stack" },
+      { "id": "th-heap" },
+      { "id": "th-value-type" },
+      { "id": "th-reference-type" },
+      { "id": "th-reference" },
+      { "id": "th-compile-time" },
+      { "id": "th-build-error" },
+      { "id": "th-cross-compile" },
+      { "id": "th-persistence" },
+      { "id": "th-inode" },
+      { "id": "th-request" },
+      { "id": "th-response" },
+      { "id": "th-api" }
+    ],
+    "uses": [
+      { "id": "th-address" },
+      { "id": "th-garbage-collector" },
+      { "id": "th-storage" },
+      { "id": "th-file" },
+      { "id": "th-network" },
+      { "id": "th-client" },
+      { "id": "th-server" }
+    ]
+  },
+  "theory-21": {
+    "introduces": [
+      { "id": "th-library", "term": "Library", "def": "Ready-made code someone else wrote and shared, which you call instead of writing it yourself." },
+      { "id": "th-standard-library", "term": "Standard library", "def": "The big set of built-in tools every language ships with, ready the moment you start." },
+      { "id": "th-package", "term": "Package", "def": "A bundle of code someone published for others to reuse, fetched and added to your project." },
+      { "id": "th-package-manager", "term": "Package manager", "def": "A tool that fetches the packages you ask for, installs the right versions, and pulls in their dependencies." },
+      { "id": "th-dependency", "term": "Dependency", "def": "A package your program relies on, which may rely on further packages of its own." }
+    ],
+    "revisits": [],
+    "uses": [
+      { "id": "th-program" }
+    ]
+  },
+  "theory-20": {
+    "introduces": [
+      { "id": "th-version-control", "term": "Version control", "def": "A tool that tracks every change to your code, so you never lose work and can see what changed and when." },
+      { "id": "th-commit", "term": "Commit", "def": "A saved snapshot of your code at a moment worth keeping, with a short message describing the change." },
+      { "id": "th-history", "term": "History", "def": "The timeline of all commits - how the code grew, snapshot by snapshot." },
+      { "id": "th-collaboration", "term": "Collaboration", "def": "Several people working on one project, each committing their own changes without overwriting each other." }
+    ],
+    "revisits": [],
+    "uses": [
+      { "id": "th-file" }
+    ]
+  },
+  "theory-check-4": {
+    "introduces": [],
+    "revisits": [
+      { "id": "th-library" },
+      { "id": "th-standard-library" },
+      { "id": "th-package" },
+      { "id": "th-package-manager" },
+      { "id": "th-dependency" },
+      { "id": "th-version-control" },
+      { "id": "th-commit" },
+      { "id": "th-history" },
+      { "id": "th-collaboration" }
+    ],
+    "uses": [
+      { "id": "th-program" }
+    ]
+  }
+}

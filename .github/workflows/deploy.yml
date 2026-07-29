@@ -26,6 +26,16 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate concept-index outputs and check for drift
+        run: |
+          node tools/generate.mjs
+          node tools/validate.mjs
+          git diff --exit-code generated/ content/
+
       - name: Publish capstone host (code-lab submodule + course exercise)
         run: >
           dotnet publish code-lab/compiler-host -c Release
