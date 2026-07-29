@@ -929,6 +929,12 @@ ${result.runtimeError}`.trim(),
   function referencedIds(refs) {
     return new Set(refs.map((r) => r.to));
   }
+  function slotKind(slot) {
+    if (slot.empty) return "empty";
+    if (slot.ref) return "ref";
+    if (slot.v === "null") return "null";
+    return "value";
+  }
   function resolveModel(step, opts) {
     const stack = step.stack ?? [];
     const refs = opts.deriveRefs ? deriveRefs(stack) : step.refs ?? [];
@@ -1796,6 +1802,97 @@ ${result.runtimeError}`.trim(),
     if (val) val.textContent = valueText2(v);
   }
   function esc2(s) {
+    return s.replace(/[&<>]/g, (c) => c === "&" ? "&amp;" : c === "<" ? "&lt;" : "&gt;");
+  }
+
+  // src/dom/heapcards-view.ts
+  var HeapCardsView = class {
+    constructor(uid) {
+      this.markerId = `clmv-hp-ah-${uid}`;
+      this.el = document.createElement("div");
+      this.el.className = "cl-mv-region cl-mv-heapcards";
+      this.el.innerHTML = `<span class="cl-mv-tag">MEMORY <span>\xB7 names on the left, objects on the right</span></span><div class="cl-mv-hp-cols"><div class="cl-mv-hp-roots" data-hproots></div><div class="cl-mv-hp-objs" data-hpobjs></div><svg class="cl-mv-hp-arrows"><defs><marker id="${this.markerId}" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#2563eb" stroke="none" /></marker></defs></svg></div>`;
+      this.roots = this.el.querySelector("[data-hproots]");
+      this.objs = this.el.querySelector("[data-hpobjs]");
+      this.arrows = this.el.querySelector(".cl-mv-hp-arrows");
+    }
+    sync(ctx) {
+      this.render(ctx.model);
+    }
+    onResize(model) {
+      this.drawArrows(model.refs);
+    }
+    render(model) {
+      this.roots.innerHTML = framesHtml(model.stack ?? []);
+      this.objs.innerHTML = (model.heap ?? []).map((o) => objHtml(o, model.glow)).join("");
+      if (typeof window.requestAnimationFrame === "function") {
+        window.requestAnimationFrame(() => this.drawArrows(model.refs));
+      } else {
+        this.drawArrows(model.refs);
+      }
+    }
+    drawArrows(refs) {
+      this.arrows.querySelectorAll("path.cl-mv-hp-ref").forEach((p) => p.remove());
+      const box = this.arrows.getBoundingClientRect();
+      if (box.width === 0 && box.height === 0) return;
+      (refs ?? []).forEach((r) => {
+        const from = this.el.querySelector(`[data-dot="${r.from}"]`);
+        const to = this.el.querySelector(`[data-obj="${r.to}"]`);
+        if (!from || !to) return;
+        const a = from.getBoundingClientRect();
+        const b = to.getBoundingClientRect();
+        const x1 = a.left + a.width / 2 - box.left;
+        const y1 = a.top + a.height / 2 - box.top;
+        const x2 = b.left - box.left - 2;
+        const y2 = b.top + Math.min(b.height / 2, 18) - box.top;
+        const dx = Math.max(36, (x2 - x1) * 0.5);
+        const path = svgEl("path", {
+          class: "cl-mv-hp-ref",
+          d: `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`,
+          "marker-end": `url(#${this.markerId})`
+        });
+        this.arrows.appendChild(path);
+        if (typeof window.requestAnimationFrame === "function") {
+          window.requestAnimationFrame(() => path.classList.add("show"));
+        } else {
+          path.classList.add("show");
+        }
+      });
+    }
+  };
+  function framesHtml(stack) {
+    const frames = [...stack].reverse();
+    return frames.map((frame, i) => {
+      const active = i === 0;
+      const cls = "cl-mv-hp-frame" + (active ? " is-active" : " is-caller");
+      const title = frame.name ?? frame.id;
+      const rows = (frame.vars ?? []).map(rowHtml3).join("");
+      return `<div class="${cls}"><div class="cl-mv-hp-fname">${esc3(title)}</div><div class="cl-mv-hp-rows">${rows}</div></div>`;
+    }).join("");
+  }
+  function rowHtml3(v) {
+    const kind = slotKind(v);
+    const hot = v.hot ? " is-changed" : "";
+    const name = `<span class="cl-mv-hp-name">${esc3(v.k ?? v.id)}</span>`;
+    if (kind === "ref") {
+      return `<div class="cl-mv-hp-row is-ref${hot}">` + name + `<span class="cl-mv-hp-ref-cell"><span class="cl-mv-hp-arrowglyph">\u2192</span><span class="cl-mv-hp-dot" data-dot="${esc3(v.id)}"></span></span></div>`;
+    }
+    if (kind === "null") {
+      return `<div class="cl-mv-hp-row is-null${hot}">` + name + `<span class="cl-mv-hp-val">null</span></div>`;
+    }
+    const text = kind === "empty" ? "unassigned" : v.v ?? "";
+    const emptyCls = kind === "empty" ? " is-empty" : "";
+    return `<div class="cl-mv-hp-row${emptyCls}${hot}">` + name + `<span class="cl-mv-hp-val">${esc3(text)}</span></div>`;
+  }
+  function objHtml(o, glow) {
+    const cls = "cl-mv-hp-card" + (o.dim ? " is-dim" : "") + (glow === o.id ? " glow" : "");
+    const fields = (o.fields ?? []).map((field) => {
+      const isHot = (o.hotFields ?? []).includes(field[0]);
+      return `<div class="cl-mv-hp-field${isHot ? " is-hot" : ""}"><span class="cl-mv-hp-fkey">${esc3(field[0])}</span><span class="cl-mv-hp-fval">${esc3(field[1])}</span></div>`;
+    }).join("");
+    return `<div class="${cls}" data-obj="${esc3(o.id)}"><div class="cl-mv-hp-type">${esc3(o.type)}</div>` + fields + `</div>`;
+  }
+  function esc3(s) {
     return s.replace(/[&<>]/g, (c) => c === "&" ? "&amp;" : c === "<" ? "&lt;" : "&gt;");
   }
 
@@ -2674,6 +2771,7 @@ ${result.runtimeError}`.trim(),
         code: (_spec, ctx) => new CodePanel(ctx.code),
         vartable: () => new VarTableView(),
         callstack: () => new CallStackView(),
+        heapcards: (_spec, ctx) => new HeapCardsView(ctx.uid),
         narration: () => new NarrationView(),
         agent: (spec) => new AgentView(spec.fan),
         agentloop: () => new AgentLoopView(),
