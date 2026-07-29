@@ -18,7 +18,7 @@ table in sync.
 | 0 - Foundation (source of truth + tooling) | 1-8 (incl. 4b, 5b) | 10 / 10 |
 | Pilot migration | 9-12 (incl. 11b, 12b) | 6 / 6 |
 | Concept graph (feeds 1-3) | CG1-CG3 | 3 / 3 |
-| 1 - Glossary | 13 | 0 / 1 |
+| 1 - Glossary | 13 | 1 / 1 |
 | 2 - Agenda | 14 | 0 / 1 |
 | 3 - Concept mentions | 15 | 0 / 1 |
 | 4 - Evaluation (submodule) | 16-18 | 0 / 3 |
@@ -210,7 +210,13 @@ table in sync.
   fingerprint `617584744ca3` -> `f9f9b2b89215`. Deferred (need an explicit merge decision): the
   `pr-single-inheritance`/`pr-favour-composition` overlap and `pr-runtime-dispatch`/`pr-polymorphism`
   overlap (merging changes the concept count).
----
+- **2026-07-29 (Phase 1: glossary)** - Built `glossary.html` (root): reads `generated/concept-index.js`
+  + `course-data.js`, groups all 208 concepts by track, and for each shows term + one-line def + the
+  lessons that introduce/revisit/use it (each a resolved link to `content/.../`). Live substring search
+  filters cards and hides empty track sections. Self-contained CSS on the `styles.css` design tokens
+  (the `c-*` card CSS is inline-only in `index.html`, so not reused). Linked from the landing footer.
+  Verified headless: 208 concept cards, 3 track sections, 0 undefined, `th-inode` shows "Inode", a
+  lesson link resolves 200.---
 
 ## The idea (hard constraints)
 
@@ -376,7 +382,7 @@ already-migrated lessons after a draft change with `node tools/seed-concepts.mjs
 
 ## Phase 1 - Glossary (gated by CG3)
 
-- [ ] **13. `glossary.html`** - searchable, reads `generated/concept-index.js`; each concept
+- [x] **13. `glossary.html`** - searchable, reads `generated/concept-index.js`; each concept
   shows its def + links to its introduce/revisit/use lessons. Shared CSS in `styles.css`.
   Verify: headless - search filters; links resolve.
 

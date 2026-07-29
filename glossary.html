@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Concept glossary - C# course</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Glossary-specific styling, built on the styles.css design tokens. */
+    body { background: var(--bg-1); color: var(--ink); font-family: "Space Grotesk", system-ui, sans-serif; margin: 0; }
+    .g-wrap { max-width: 840px; margin: 0 auto; padding: 60px 24px 100px; }
+    .g-back { display: inline-block; margin-bottom: 1.4rem; color: var(--primary); text-decoration: none; font-weight: 600; }
+    .g-back:hover { text-decoration: underline; }
+    .g-eyebrow { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: .08em; font-size: .8rem; color: var(--primary); margin: 0 0 .4rem; }
+    .g-title { font-size: clamp(2rem, 4.5vw, 2.8rem); margin: 0 0 .5rem; line-height: 1.1; }
+    .g-lead { color: var(--ink-soft); max-width: 62ch; margin: 0 0 1.6rem; line-height: 1.5; }
+    .g-search { width: 100%; box-sizing: border-box; border: 1px solid var(--line); border-radius: 14px; background: var(--card); padding: .8rem 1rem; font-family: "Space Grotesk", sans-serif; font-size: 1rem; color: var(--ink); }
+    .g-search:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+    .g-count { font-family: "IBM Plex Mono", monospace; font-size: .8rem; color: var(--ink-soft); margin: .5rem 0 0; }
+    .g-track { margin: 2.2rem 0 0; }
+    .g-track-h { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: .08em; font-size: .82rem; color: var(--ink-soft); border-bottom: 1px solid var(--line); padding-bottom: .4rem; margin: 0 0 1rem; }
+    .g-concept { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 15px 18px; margin: 0 0 12px; }
+    .g-term { font-size: 1.1rem; margin: 0 0 .3rem; display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; }
+    .g-id { font-family: "IBM Plex Mono", monospace; font-size: .72rem; color: var(--ink-soft); font-weight: 400; }
+    .g-def { color: var(--ink-soft); margin: 0 0 .6rem; line-height: 1.5; }
+    .g-links { font-size: .85rem; color: var(--ink-soft); }
+    .g-links a { color: var(--primary); text-decoration: none; }
+    .g-links a:hover { text-decoration: underline; }
+    .g-links .g-label { font-weight: 600; color: var(--ink); }
+    .g-none { color: var(--ink-soft); font-style: italic; margin-top: 1.4rem; }
+    .g-hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <main class="g-wrap">
+    <a class="g-back" href="index.html">&larr; Back to the course</a>
+    <p class="g-eyebrow">Reference</p>
+    <h1 class="g-title">Concept glossary</h1>
+    <p class="g-lead">Every idea the course teaches, with a one-line definition and the lessons that introduce, revisit, or use it. Search to jump to a term.</p>
+    <input id="gSearch" class="g-search" type="search" placeholder="Search concepts - e.g. polymorphism, token, inode" aria-label="Search concepts" />
+    <p id="gCount" class="g-count"></p>
+    <div id="gList"></div>
+    <p id="gNone" class="g-none g-hidden">No concepts match your search.</p>
+  </main>
+
+  <script src="generated/course-data.js"></script>
+  <script src="generated/concept-index.js"></script>
+  <script>
+    (function () {
+      "use strict";
+      var CI = window.ConceptIndex, CD = window.CourseData;
+      function esc(s) {
+        return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+
+      // lessonId -> { title, href } (CourseData does not expose this directly).
+      var lessonMap = {};
+      if (CD) {
+        CD.tracks().forEach(function (t) {
+          t.parts.forEach(function (p) {
+            p.lessons.forEach(function (l) { lessonMap[l.id] = { title: l.title, href: l.href }; });
+          });
+        });
+      }
+      function lessonLink(id) {
+        var m = lessonMap[id];
+        if (!m) return esc(id);
+        return '<a href="' + esc(m.href) + '">' + esc(m.title) + '</a>';
+      }
+      function lessonLinks(ids) { return (ids || []).map(lessonLink).join(", "); }
+
+      var TRACKS = [
+        { key: "practical", prefix: "pr-", name: "Practical" },
+        { key: "theory", prefix: "th-", name: "Theory" },
+        { key: "ai", prefix: "ai-", name: "AI" }
+      ];
+      var defs = (CI && CI.defs) || {};
+      var byConcept = (CI && CI.byConcept) || {};
+      var list = document.getElementById("gList");
+      var total = 0;
+
+      TRACKS.forEach(function (tr) {
+        var ids = Object.keys(defs).filter(function (id) { return id.indexOf(tr.prefix) === 0; });
+        ids.sort(function (a, b) { return defs[a].term.toLowerCase().localeCompare(defs[b].term.toLowerCase()); });
+        if (!ids.length) return;
+
+        var section = document.createElement("section");
+        section.className = "g-track";
+        var h = document.createElement("h2");
+        h.className = "g-track-h";
+        h.textContent = tr.name + " \u00b7 " + ids.length + " concepts";
+        section.appendChild(h);
+
+        ids.forEach(function (id) {
+          total++;
+          var d = defs[id], bc = byConcept[id] || {};
+          var links = [];
+          if (bc.introducedBy) links.push('<span class="g-label">Introduced in</span> ' + lessonLink(bc.introducedBy));
+          if (bc.revisitedBy && bc.revisitedBy.length) links.push('<span class="g-label">Revisited in</span> ' + lessonLinks(bc.revisitedBy));
+          if (bc.usedBy && bc.usedBy.length) links.push('<span class="g-label">Used in</span> ' + lessonLinks(bc.usedBy));
+
+          var art = document.createElement("article");
+          art.className = "g-concept";
+          art.dataset.search = (d.term + " " + d.def + " " + id).toLowerCase();
+          art.innerHTML =
+            '<h3 class="g-term">' + esc(d.term) + ' <span class="g-id">' + esc(id) + '</span></h3>' +
+            '<p class="g-def">' + esc(d.def) + '</p>' +
+            (links.length ? '<div class="g-links">' + links.join(" &middot; ") + '</div>' : '');
+          section.appendChild(art);
+        });
+        list.appendChild(section);
+      });
+
+      document.getElementById("gCount").textContent = total + " concepts across the three tracks";
+
+      var search = document.getElementById("gSearch");
+      var none = document.getElementById("gNone");
+      search.addEventListener("input", function () {
+        var q = search.value.trim().toLowerCase();
+        var shown = 0;
+        document.querySelectorAll(".g-track").forEach(function (sec) {
+          var visible = 0;
+          sec.querySelectorAll(".g-concept").forEach(function (art) {
+            var match = !q || art.dataset.search.indexOf(q) !== -1;
+            art.classList.toggle("g-hidden", !match);
+            if (match) visible++;
+          });
+          sec.classList.toggle("g-hidden", visible === 0);
+          shown += visible;
+        });
+        none.classList.toggle("g-hidden", shown !== 0);
+      });
+    })();
+  </script>
+</body>
+</html>
