@@ -407,7 +407,12 @@
     if (course && typeof course.locate === "function") {
       var current = (location.pathname.split("/").pop() || "").toLowerCase();
       var metaId = window.LESSON_META && window.LESSON_META.id;
-      var loc = (metaId && typeof course.locateById === "function" && course.locateById(metaId)) || course.locate(current);
+      // A migrated page's filename is always "index.html", so its id is the only
+      // reliable key - never fall back to locate(current), which would match an
+      // arbitrary lesson. A flat legacy page keys on its filename.
+      var loc = metaId && typeof course.locateById === "function"
+        ? course.locateById(metaId)
+        : course.locate(current);
       if (loc && loc.order) {
         href = loc.index < loc.order.length - 1 ? loc.order[loc.index + 1] : "index.html";
       }

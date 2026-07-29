@@ -19,6 +19,9 @@
  *   5. Checkpoint concept tags - each theory-check-* question's conceptId (in its
  *      data.js QUIZ_CONFIG) must resolve to an introduced concept (ERROR); an
  *      untagged question is a WARN.
+ *   5b. In-prose mentions - a [[concept:id|label]] marker in a migrated data.js
+ *      must reference an introduced concept id (ERROR); a typo would otherwise
+ *      render as a dead "Definition not found" chip with no build signal.
  *   6. Drift guard - shells `node tools/generate.mjs --out <tmp>` and diffs the
  *      result (course-data.js, concept-index.js AND every migrated index.html)
  *      against what is committed (ERROR). Opt-in via VALIDATE_DRIFT=1; skipped by
@@ -193,6 +196,19 @@ export function checkCheckpointConcepts(quizzes, knownIds, report) {
   }
 }
 
+// Check 5b: in-prose [[concept:id|label]] mention ids must resolve to a real
+// concept, so a typo'd marker fails the build instead of rendering a dead chip.
+//   mentions: [{ lessonId, ids: [conceptId, ...] }]
+export function checkProseMentions(mentions, knownIds, report) {
+  for (const { lessonId, ids } of mentions) {
+    for (const id of ids) {
+      if (!knownIds.has(id)) {
+        report.error(`Mention: "${lessonId}" prose has [[concept:${id}|...]] but "${id}" is not an introduced concept`);
+      }
+    }
+  }
+}
+
 // Check 5: drift guard. Shells the generator into a temp dir and diffs against
 // the committed generated/ data files AND every migrated content/**/index.html.
 // `run` is injectable for testing.
@@ -279,6 +295,23 @@ export function loadCheckpointQuizzes(migrated, rootDir) {
   return out;
 }
 
+// Scan every migrated lesson's data.js text for [[concept:id|label]] markers and
+// collect their ids (a raw-text scan, so it catches markers in any prose field).
+export function loadProseMentions(migrated, rootDir) {
+  const re = /\[\[concept:([^\]|]+)\|/g;
+  const out = [];
+  for (const m of migrated) {
+    const dataPath = path.join(rootDir, m.path, "data.js");
+    if (!fs.existsSync(dataPath)) continue;
+    const text = fs.readFileSync(dataPath, "utf8");
+    const ids = [];
+    let mm;
+    while ((mm = re.exec(text))) ids.push(mm[1]);
+    if (ids.length) out.push({ lessonId: m.registryId, ids });
+  }
+  return out;
+}
+
 // Every concept id introduced by a migrated lesson, unioned with the draft-
 // planned ids (so a checkpoint may tag a concept whose introducer is another
 // track/part). This is the resolvable-concept set the checkpoint tags check against.
@@ -328,9 +361,11 @@ function main() {
 
   const migrated = loadMigrated(registry, root);
   const plannedIds = loadPlannedConceptIds(root);
+  const knownIds = knownConceptIds(migrated, plannedIds);
   checkConceptGraph(migrated.map((m) => ({ lessonId: m.registryId, meta: m.meta })), report, plannedIds);
   checkCoherence(migrated, report);
-  checkCheckpointConcepts(loadCheckpointQuizzes(migrated, root), knownConceptIds(migrated, plannedIds), report);
+  checkCheckpointConcepts(loadCheckpointQuizzes(migrated, root), knownIds, report);
+  checkProseMentions(loadProseMentions(migrated, root), knownIds, report);
 
   if (process.env.VALIDATE_DRIFT === "1") {
     const outDir = fs.mkdtempSync(path.join(os.tmpdir(), "concept-drift-"));
