@@ -771,3 +771,66 @@ Shipped an extensible, site-wide theme system.
   the lesson hero. Adding another theme is a data entry plus one CSS block.
 - Picker sits bottom-right, stacked above the index back-to-top and clear of the
   lesson Previous/Next nav; panel opens upward, closes on outside-click/Escape.
+
+## 2026-07-28 16:43 +0200 - Dark theme (start)
+
+Adding a dark theme as the next low-hanging fruit from the market investigation.
+Plan: one data entry in theme-registry.js (with a scheme:"dark" flag), one
+[data-theme="dark"] override block in styles.css (full surface/ink/hairline/tint
+inversion, plus targeted fixes for dual-role tokens), and a small FOUC-safe change
+to theme-switch.js so an unset preference follows the OS prefers-color-scheme.
+
+## 2026-07-29 08:22 +0200 - Dark theme (end)
+
+Added a Dark theme, the first cheap win from the market investigation.
+
+- theme-registry.js: one data entry (id "dark", swatch, note) plus a scheme
+  flag and a schemeDefault(scheme) query. No logic in the data file.
+- styles.css: one [data-theme="dark"] block that overrides every surface / ink /
+  hairline / tint / channel token for a dim, low-glare palette, sets
+  color-scheme: dark, and adds two targeted fixes for dual-role tokens (inline
+  code text color, and the back-to-top elevation shadow) that had assumed a
+  light surface. :root defaults untouched - the default still renders unchanged.
+- theme-switch.js: when the visitor has no saved choice, the theme now follows
+  the OS prefers-color-scheme (picking the scheme-tagged theme), and it keeps
+  following live OS changes until an explicit pick is made. An explicit choice
+  always wins. FOUC-safe: still applied in <head> before first paint.
+- Verified: node --check on both JS files; a Node DOM-stub harness covering the
+  boot decision (9 cases) and the live OS-change watcher (6 cases), all passing;
+  every dark foreground/background pair checked against WCAG AA (all >= 4.5:1);
+  headless render of index + a lesson page with dark seeded (data-theme applied,
+  0 undefined, picker lists Clean/Critters/Dark with Dark active); default index
+  with no saved choice still carries no data-theme attribute.
+
+## 2026-07-29 08:36 +0200 - Dark theme: polish theory/AI interactive widgets
+
+Start. The dark palette landed, but the theory and AI visual widgets
+(CodeLab.MemoryViz board/die scenes, the AI agent scenes, and the checkpoint
+Quiz) still carry hardcoded light panels that glare on the dark page: the
+narration panel and Prev/Reset controls, the pastel RAM region cards and
+stack/heap slots, the AI next-token probability panel, and the whole quiz card.
+Plan: add a [data-theme="dark"] widget-skin section to styles.css that
+re-points the components' own CSS variables and darkens the few hardcoded
+surfaces, deriving colours from the course dark tokens (no parallel palette).
+The vendored code-lab bundle is untouched - this is theme CSS only.
+
+## 2026-07-29 09:00 +0200 - Dark theme widgets: done
+
+End. Added a [data-theme="dark"] widget-skin section to styles.css that darkens
+the light panels the vendored code-lab visuals hardcode, deriving every colour
+from the course dark tokens (no parallel palette; code-lab bundle untouched):
+- MemoryViz shell: re-pointed its own --mv-ink/--mv-muted/--mv-line (and the
+  frame-name --mv-stack) to course tokens; dimmed the narration note and the
+  Prev/Reset/text-size controls; lifted the teal step/label text.
+- RAM die: darkened the pastel region cards (code/global/stack/heap/...) while
+  keeping each region's hue in its tag; darkened stack frames, memory slots and
+  heap objects, keeping the per-process accent colour.
+- AI agent scene: darkened the next-token probability panel and its rows.
+- Checkpoint Quiz: a full dark skin (card, question cards, options, results).
+All overrides keep the widget-root ancestor so they outweigh code-lab.css, which
+loads after styles.css.
+Verified with puppeteer-core driving the widgets to later steps: theory board/
+die/frames/slots, a filled AI probability fan, the memory-shelf and plan-board
+scenes, and a checkpoint quiz - all read cleanly on dark. Every new fg/bg pair
+clears WCAG AA (worst 4.79:1). The default light theme is unchanged (rules are
+all [data-theme="dark"]-scoped; re-checked headless). Temp harness removed.

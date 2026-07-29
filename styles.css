@@ -1415,3 +1415,245 @@ input.almost {
     opacity: 0.9;
   }
 }
+
+/* ---- Dark: a dim, low-glare palette for night reading ------------------- */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Palette channels - themes recolor these; tints follow automatically. */
+  --primary-rgb: 70, 179, 157;
+  --accent-rgb: 240, 190, 90;
+  --dark-rgb: 8, 10, 14;
+
+  /* Base surfaces + ink */
+  --bg-1: #14161b;
+  --bg-2: #191c22;
+  --bg-3: #20242c;
+  --ink: #e7e9ee;
+  --ink-soft: #a3a9b5;
+  --card: #1b1e26;
+  --line: #2b2f3a;
+  --primary: #46b39d;
+  --primary-2: #6cc9b4;
+  --danger: #e58a8a;
+  --warn: #e0b256;
+  --good: #63c47f;
+
+  /* Warm/cool neutral surfaces */
+  --panel: #1b1e26;
+  --warm: #1c1f27;
+  --warm-2: #1c1f27;
+  --cool: #191d26;
+  --surface-soft: #191d26;
+
+  /* Dark surfaces - kept dark, with lifted ink */
+  --dark: #0e1116;
+  --dark-ink: #d7e4de;
+  --ink-code: #cfd4dd;
+  --ink-code-2: #cfd4dd;
+  --hair-1: #ffffff12;
+  --hair-2: #ffffff1c;
+  --hair-3: #ffffff26;
+  --hair-blue: #9db4ff1f;
+  --hair-indigo: #9aa0ff33;
+  --hair-glass: #ffffff24;
+
+  /* Terminal-style code block */
+  --term-bg: #0b110b;
+  --term-line: #24371f;
+  --term-ink: #5fd074;
+  --term-ink-2: #a8ffb0;
+  --term-panel: #12200f;
+
+  /* Info / indigo accents */
+  --info-ink: #a9c7e6;
+  --info-ink-2: #bcd4ef;
+  --info-bg: #16202b;
+  --info-line: #2a3d52;
+  --panel-blue: #1a212b;
+  --panel-blue-line: #2a323f;
+  --indigo-bg: #1c2035;
+  --indigo-ink: #c3c7ff;
+  --indigo-fill: #2a2e50;
+  --slate-ink: #9aa2b4;
+  --slate-fill: #262b36;
+
+  /* Success / good tints */
+  --good-line: #3f8f57;
+  --good-fill: #1e3a29;
+  --good-bg: #16281d;
+  --good-bg-soft: #142419;
+  --on-good: #0e1512;
+  --good-glow: rgba(80, 220, 150, 0.28);
+
+  /* Danger tints */
+  --danger-line: #b85454;
+  --danger-line-2: #5a2a2a;
+  --danger-line-dark: #7a3a3a;
+  --danger-bg: #2a1719;
+  --danger-bg-soft: #241416;
+  --danger-bg-2: #241416;
+  --danger-ink-soft: #f0b8b8;
+  --danger-tint: rgba(229, 138, 138, 0.1);
+  --danger-glow: rgba(240, 130, 120, 0.28);
+
+  /* Warn / amber tints */
+  --warn-line: #7a5f2a;
+  --warn-bg: #241f12;
+  --warn-bg-2: #2a2314;
+  --warn-fill: #33290f;
+  --warn-ring: #5a4a1e;
+
+  /* Accent (gold) lines + fills */
+  --accent-line: #5a4f30;
+  --accent-line-2: #6a5c38;
+  --accent-fill: #2a2718;
+  --highlight-glow: rgba(255, 210, 50, 0.14);
+
+  /* Overlays + modal shadows */
+  --overlay: rgba(6, 8, 12, 0.66);
+  --overlay-2: rgba(4, 6, 10, 0.72);
+  --shadow-modal: rgba(0, 0, 0, 0.5);
+  --shadow-modal-2: rgba(0, 0, 0, 0.6);
+
+  /* Landing page: channels, muted grays, pills, switch, glass */
+  --bg-1-rgb: 20, 22, 27;
+  --card-rgb: 27, 30, 38;
+  --shade-rgb: 255, 255, 255;
+  --on-primary: #0e1512;
+  --primary-lift: #6cc9b4;
+  --muted: #9096a2;
+  --muted-2: #868c98;
+  --muted-3: #888e98;
+  --muted-warm: #a29a8c;
+  --switch-bg: #2a2f3a;
+  --switch-bg-2: #333944;
+  --card-hover-line: #3a404d;
+  --node-line: #3a404d;
+  --pill-gentle-bg: #163029;
+  --pill-steady-bg: #2f2712;
+  --pill-steady-ink: #e6c079;
+  --pill-challenging-bg: #331a1a;
+  --pill-challenging-ink: #f0a59c;
+  --shadow-soft: rgba(0, 0, 0, 0.4);
+}
+
+/* Dual-role tokens: fix foregrounds that assumed a light surface. */
+[data-theme="dark"] :not(pre) > code,
+[data-theme="dark"] .explain-step code,
+[data-theme="dark"] .feedback code {
+  color: var(--ink);
+}
+
+/* On a dark surface, elevation should read as a shadow, not a light halo. */
+[data-theme="dark"] .c-totop {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+}
+
+/* ===================================================================
+   Dark theme - interactive widgets (theory + AI)
+   The vendored code-lab visuals (MemoryViz board/die scenes, the AI
+   agent scenes, and the checkpoint Quiz) hardcode a few light panels
+   that glare on the dark page: the narration note, the step controls,
+   the pastel RAM region cards, the next-token panel and the quiz card.
+   Here we re-point each component's own CSS variables and darken those
+   surfaces, deriving every colour from the course dark tokens so the
+   widgets track the theme. The code-lab bundle is untouched - this is
+   theme CSS. Selectors keep the widget-root ancestor so they outweigh
+   code-lab.css, which loads after styles.css.
+   =================================================================== */
+
+/* ---- MemoryViz shell: its own tokens, narration, controls, legend --- */
+[data-theme="dark"] .cl-mv {
+  --mv-ink: var(--ink);
+  --mv-muted: var(--ink-soft);
+  --mv-line: var(--line);
+  --mv-stack: #7ba0ee;
+}
+/* Narration: a dim raised card instead of the pale note. */
+[data-theme="dark"] .cl-mv .cl-mv-narr {
+  background: var(--bg-2);
+}
+/* Step controls: dark buttons; the teal primary keeps its own rule. */
+[data-theme="dark"] .cl-mv .cl-mv-controls button {
+  background: var(--card);
+}
+[data-theme="dark"] .cl-mv .cl-mv-controls button:hover:not(:disabled) {
+  background: var(--bg-3);
+  border-color: var(--card-hover-line);
+}
+[data-theme="dark"] .cl-mv .cl-mv-controls button.cl-mv-action {
+  background: var(--warn-bg-2);
+  border-color: var(--warn-line);
+  color: var(--pill-steady-ink);
+}
+[data-theme="dark"] .cl-mv .cl-mv-controls button.cl-mv-action:hover:not(:disabled) {
+  background: var(--warn-fill);
+}
+[data-theme="dark"] .cl-mv .cl-mv-controls .cl-mv-textsize button:hover:not(:disabled) {
+  background: var(--bg-3);
+}
+/* Teal labels that were dark-teal text on a light note now need lift. */
+[data-theme="dark"] .cl-mv .cl-mv-stepno,
+[data-theme="dark"] .cl-mv .cl-mv-zoom-tab b,
+[data-theme="dark"] .cl-mv .cl-mv-obj .cl-mv-oname {
+  color: var(--primary-2);
+}
+
+/* ---- RAM die: darken the pastel region cards, keep the hue identity - */
+[data-theme="dark"] .cl-mv .cl-mv-global { background: #2b2414; border-color: #4a3d20; }
+[data-theme="dark"] .cl-mv .cl-mv-data   { background: #29230f; border-color: #473a1f; }
+[data-theme="dark"] .cl-mv .cl-mv-bss    { background: #26231a; border-color: #443d2b; }
+[data-theme="dark"] .cl-mv .cl-mv-rodata { background: #1b2430; border-color: #33404f; }
+[data-theme="dark"] .cl-mv .cl-mv-mmap   { background: #221e2e; border-color: #3d3350; }
+[data-theme="dark"] .cl-mv .cl-mv-stack  { background: #161f30; border-color: #2b3d5e; }
+[data-theme="dark"] .cl-mv .cl-mv-heap   { background: #122a24; border-color: #22463c; }
+[data-theme="dark"] .cl-mv .cl-mv-global .cl-mv-tag,
+[data-theme="dark"] .cl-mv .cl-mv-data .cl-mv-tag { color: var(--pill-steady-ink); }
+[data-theme="dark"] .cl-mv .cl-mv-bss .cl-mv-tag { color: #d8b06a; }
+[data-theme="dark"] .cl-mv .cl-mv-rodata .cl-mv-tag { color: var(--slate-ink); }
+[data-theme="dark"] .cl-mv .cl-mv-mmap .cl-mv-tag { color: var(--indigo-ink); }
+[data-theme="dark"] .cl-mv .cl-mv-stack .cl-mv-tag { color: #7ba0ee; }
+[data-theme="dark"] .cl-mv .cl-mv-heap .cl-mv-tag { color: var(--primary-2); }
+
+/* ---- Stack frames, slots and heap objects inside the die ------------ */
+[data-theme="dark"] .cl-mv .cl-mv-frame { background: #161f2a; border-color: #2b3d5e; }
+[data-theme="dark"] .cl-mv .cl-mv-frame.is-accent {
+  background: color-mix(in srgb, var(--frame-accent) 16%, #161f2a);
+}
+[data-theme="dark"] .cl-mv .cl-mv-slot { background: var(--card); border-color: #2b3d5e; }
+[data-theme="dark"] .cl-mv .cl-mv-slot .cl-mv-k { color: #8a93a3; }
+[data-theme="dark"] .cl-mv .cl-mv-slot.is-hot { background: #2e2410; box-shadow: 0 0 0 2px #5a4a1e; }
+[data-theme="dark"] .cl-mv .cl-mv-slot.is-hot .cl-mv-v { color: #e6a54a; }
+[data-theme="dark"] .cl-mv .cl-mv-slot .cl-mv-refdot { box-shadow: 0 0 0 3px #122a24; }
+[data-theme="dark"] .cl-mv .cl-mv-obj { background: #122a24; border-color: #22463c; }
+[data-theme="dark"] .cl-mv .cl-mv-obj .cl-mv-field { color: #b3bccc; }
+[data-theme="dark"] .cl-mv .cl-mv-obj .cl-mv-field.is-hot { background: #2e2410; box-shadow: inset 0 0 0 1px #5a4a1e; color: #e6a54a; }
+
+/* ---- AI agent scene: the next-token probability panel --------------- */
+[data-theme="dark"] .cl-ag .cl-ag-fan { background: var(--card); border-color: var(--line); }
+[data-theme="dark"] .cl-ag .cl-ag-tok-name { color: var(--ink); }
+[data-theme="dark"] .cl-ag .cl-ag-val { color: var(--ink-soft); }
+[data-theme="dark"] .cl-ag .cl-ag-track { background: rgba(255, 255, 255, 0.08); }
+[data-theme="dark"] .cl-ag .cl-ag-row.is-chosen .cl-ag-tok-name,
+[data-theme="dark"] .cl-ag .cl-ag-row.is-chosen .cl-ag-val { color: #e6a54a; }
+
+/* ---- Checkpoint Quiz: a full dark skin ------------------------------ */
+[data-theme="dark"] .cl-quiz {
+  --clq-line: var(--line);
+  background: var(--card);
+  color: var(--ink);
+}
+[data-theme="dark"] .cl-quiz .cl-quiz-intro,
+[data-theme="dark"] .cl-quiz .cl-quiz-progress { color: var(--ink-soft); }
+[data-theme="dark"] .cl-quiz .cl-quiz-q { background: var(--bg-2); }
+[data-theme="dark"] .cl-quiz .cl-quiz-opt { background: var(--bg-3); }
+[data-theme="dark"] .cl-quiz .cl-quiz-opt.is-chosen { background: var(--indigo-fill); }
+[data-theme="dark"] .cl-quiz .cl-quiz-opt.is-correct { background: var(--good-bg); color: #7fd89a; }
+[data-theme="dark"] .cl-quiz .cl-quiz-opt.is-wrong { background: var(--danger-bg); color: var(--danger-ink-soft); }
+[data-theme="dark"] .cl-quiz .cl-quiz-why.is-good { color: #7fd89a; }
+[data-theme="dark"] .cl-quiz .cl-quiz-why.is-bad { color: var(--danger); }
+[data-theme="dark"] .cl-quiz .cl-quiz-btn { background: var(--card); color: var(--ink); }
+[data-theme="dark"] .cl-quiz .cl-quiz-result { background: var(--bg-2); }
+[data-theme="dark"] .cl-quiz .cl-quiz-result.is-pass { background: var(--good-bg); }
+[data-theme="dark"] .cl-quiz .cl-quiz-result.is-fail { background: var(--warn-bg); border-color: var(--warn-line); }

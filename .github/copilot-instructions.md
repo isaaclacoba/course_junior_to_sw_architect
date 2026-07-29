@@ -42,8 +42,14 @@ Shared engines (root of repo):
 
 The compiler (do not reinvent):
 
-- `code-lab/` — git **submodule**. TypeScript component (Monaco wrapper, guided
-  tour, error panel, Roslyn iframe runner) plus the Blazor/Roslyn **compiler-host**.
+- `code-lab/` — git **submodule**. A FAMILY of `CodeLab.*` widgets, each a
+  top-level component for a different scenario - the `MonacoEditor`
+  (+ `loadMonaco`, `TextareaEditor`), the `RoslynIframeRunner` + output/error
+  panels, the `Quiz` (checkpoint assessment), the `MemoryViz` visual explainer
+  (a host that itself renders one of many *scenes*: machine board, agent, agent
+  loop, memory shelf, tool rack, transcript, retrieval, plan board), and the
+  guided `Tour` - plus the Blazor/Roslyn **compiler-host**. Do not conflate the
+  two levels: a *widget* is a component; a *scene* lives only inside MemoryViz.
   The course consumes the prebuilt IIFE bundle vendored at
   `vendor/code-lab/code-lab.global.js` + `vendor/code-lab/code-lab.css`.
 - `level3-exercise/` — the capstone exercise (content + structural checks),
@@ -145,6 +151,11 @@ in `src/core/` covered by unit tests. The 72MB WASM `_framework` output is never
 committed (git-ignored); binaries are compiled, not tracked.
 
 ## Adding a MemoryViz scene (engine work)
+
+This is ONE kind of code-lab extension - adding a scene to the `MemoryViz`
+widget. Adding a whole NEW widget (a sibling of `Quiz`/`MemoryViz`/`Tour`) is a
+broader task: a new `CodeLab.*` export, its own `.cl-*` root, and its own mount
+path from `page-shell.js`; the steps below are the scene-specific subset.
 
 A "scene" is one visual panel (`transcript`, `agentloop`, `memoryshelf`,
 `toolrack`, `retrieval`, `planboard`, ...). Adding one is a fixed checklist

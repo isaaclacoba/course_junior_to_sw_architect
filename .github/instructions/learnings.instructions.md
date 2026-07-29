@@ -27,3 +27,17 @@ grows into a procedure, promote it to a skill and leave a pointer here.
   `PRACTICAL`/`THEORY` arrays. When you add a lesson you only add its card and its
   filename to the right `page-shell.js` array (in reading order); never bump a
   count by hand, and never set `awardedKey`/`nextHref` in a lesson data file.
+
+## Theming
+
+- **Theming and dark mode is a skill - see `theme-authoring`.** A theme is one
+  `[data-theme="<id>"]` block in `styles.css` plus one entry in
+  `theme-registry.js`; keep every rule `[data-theme]`-scoped so the default stays
+  byte-for-byte unchanged. The real work is re-skinning the vendored `code-lab`
+  widgets - the `Quiz` and the `MemoryViz` scenes (`.cl-quiz`, `.cl-mv`/`.cl-ag`
+  ...): re-point their OWN CSS vars
+  (`--mv-*`, `--clq-*`) to course tokens and darken only their hardcoded-light
+  panels, ancestor-qualified (`[data-theme="x"] .cl-mv <sel>`) so they beat
+  `code-lab.css`, which loads after `styles.css`. Verify by driving the widgets to
+  later steps with puppeteer-core on the system Chrome, WCAG-checking new pairs,
+  and screenshotting the default theme to prove no regression.

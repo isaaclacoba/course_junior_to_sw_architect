@@ -33,7 +33,29 @@
     return registry.has(id) ? id : registry.defaultId;
   }
 
-  var current = resolve(read());
+  function prefersDark() {
+    try {
+      return (
+        !!window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches
+      );
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // The theme when the visitor has not chosen one: honor a valid saved choice,
+  // otherwise follow the OS color scheme (falling back to the clean default).
+  function initial() {
+    var saved = read();
+    if (saved && registry.has(saved)) return saved;
+    if (registry.schemeDefault && prefersDark()) {
+      return registry.schemeDefault("dark");
+    }
+    return registry.defaultId;
+  }
+
+  var current = initial();
 
   function ensureFont(id) {
     var theme = registry.get(id);
@@ -74,6 +96,27 @@
       return current;
     }
   });
+
+  // Follow OS light/dark changes until the visitor makes an explicit choice.
+  (function watchScheme() {
+    var mql;
+    try {
+      mql = window.matchMedia
+        ? window.matchMedia("(prefers-color-scheme: dark)")
+        : null;
+    } catch (e) {
+      mql = null;
+    }
+    if (!mql) return;
+    function onChange() {
+      if (read()) return; // an explicit choice overrides the OS preference
+      current = initial();
+      applyAttr(current);
+      render();
+    }
+    if (mql.addEventListener) mql.addEventListener("change", onChange);
+    else if (mql.addListener) mql.addListener(onChange);
+  })();
 
   // --- picker control ---------------------------------------------------
 

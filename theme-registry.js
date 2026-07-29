@@ -7,6 +7,9 @@
  *   - note   : one short line describing the mood
  *   - swatch : three colors previewed in the picker (bg, primary, ink)
  *   - font   : optional stylesheet href, loaded only while the theme is active
+ *   - scheme : optional "dark"/"light"; the runtime picks a scheme-matching
+ *              theme as the default when the visitor has no saved choice and
+ *              their OS prefers that color scheme
  *
  * "default" is the built-in clean look and carries no overrides; its rules live
  * in :root. Adding a theme is a data-only change here plus one CSS block in
@@ -29,6 +32,13 @@
       swatch: ["#fff7ef", "#e8734a", "#3a2a24"],
       font:
         "https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap"
+    },
+    {
+      id: "dark",
+      label: "Dark",
+      note: "Dim, low-glare palette for night reading.",
+      swatch: ["#14161b", "#46b39d", "#e7e9ee"],
+      scheme: "dark"
     }
   ];
 
@@ -48,6 +58,12 @@
     },
     has: function (id) {
       return Object.prototype.hasOwnProperty.call(byId, id);
+    },
+    schemeDefault: function (scheme) {
+      for (var i = 0; i < THEMES.length; i++) {
+        if (THEMES[i].scheme === scheme) return THEMES[i].id;
+      }
+      return DEFAULT_ID;
     }
   });
 })();
