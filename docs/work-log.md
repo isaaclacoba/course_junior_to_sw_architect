@@ -884,3 +884,14 @@ the reusable level-0 panel rendered '-> heapId' for a ref slot, contradicting
 the spec's level-0 'no arrows, no addresses' rule. Dropped the ref branch so a
 reference slot falls through to its display value. Typecheck + 103 tests pass;
 rebuilt and re-vendored. code-lab e900057.
+
+## 2026-07-29 13:25 - Fleet: P2 post-processor, dark widgets, two level-0 lessons
+Three parallel tracks, each scoped to disjoint files, integrated after review:
+- Track A (code-lab): derived-trace post-processor (exec-trace.ts) + 6 tests.
+  deriveTrace() -> per-step changes, value-history, line-heatmap, call-depth,
+  notable moments. DOM-free, not yet wired to a panel (P3). 109 tests pass.
+- Track B (styles.css): dark-theme overrides for widget elements that lacked a
+  skin (code line labels, slot addr, hot-slot border, quiz meta + primary).
+- Track C: converted theory-9 (Variables) and theory-11 (Statements and
+  expressions) to the level-0 execution scene, using theory-14 as the template.
+All dark rules stay [data-theme=dark]-scoped; both lessons headless-verified.
