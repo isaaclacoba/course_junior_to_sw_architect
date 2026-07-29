@@ -53,11 +53,15 @@
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
     },
-    // Turn `backtick` spans into inline <code> and **bold** into <strong>.
+    // Turn `backtick` spans into inline <code>, **bold** into <strong>, and
+    // [[concept:id|label]] into a clickable concept mention (opens a panel).
     renderInline(text) {
       return (text || "")
-        .split(/(`[^`]+`|\*\*[^*]+\*\*)/)
+        .split(/(\[\[concept:[^\]|]+\|[^\]]+\]\]|`[^`]+`|\*\*[^*]+\*\*)/)
         .map((seg) => {
+          const cm = seg.match(/^\[\[concept:([^\]|]+)\|([^\]]+)\]\]$/);
+          if (cm)
+            return `<button type="button" class="concept-mention" data-concept-id="${LessonCommon.escapeHtml(cm[1])}">${LessonCommon.escapeHtml(cm[2])}</button>`;
           if (seg.length > 1 && seg.startsWith("`") && seg.endsWith("`"))
             return `<code>${LessonCommon.escapeHtml(seg.slice(1, -1))}</code>`;
           if (seg.length > 3 && seg.startsWith("**") && seg.endsWith("**"))
@@ -169,6 +173,80 @@
       <p class="subtitle"><strong id="courseXpLabel">Course XP: 0</strong></p>
       ${links}`;
   }
+
+  // ---- Concepts: "In this lesson" agenda + click-to-define panel (Phases 2-3) ----
+  // Both the agenda chips and in-prose [[concept:...]] mentions carry a
+  // data-concept-id; one delegated click handler opens a shared panel that reads
+  // the def from window.ConceptIndex (loaded by the lesson page's script block).
+
+  function conceptDef(id) {
+    const CI = window.ConceptIndex;
+    return (CI && CI.defs && CI.defs[id]) || null;
+  }
+  function conceptTerm(id) {
+    const d = conceptDef(id);
+    return d ? d.term : id;
+  }
+
+  // "In this lesson" - built from the page's own LESSON_META.concepts.
+  function renderAgenda() {
+    const meta = window.LESSON_META;
+    const c = meta && meta.concepts;
+    if (!c) return;
+    const ids = (arr) => (arr || []).map((x) => (typeof x === "string" ? x : x.id));
+    const groups = [
+      { ids: ids(c.introduces), label: "New here", kind: "introduces" },
+      { ids: ids(c.revisits), label: "Revisited", kind: "revisits" },
+      { ids: ids(c.uses), label: "Used", kind: "uses" },
+    ].filter((g) => g.ids.length);
+    if (!groups.length) return;
+    const rows = groups
+      .map((g) => {
+        const chips = g.ids
+          .map(
+            (id) =>
+              `<button type="button" class="agenda-chip agenda-chip--${g.kind}" data-concept-id="${LessonCommon.escapeHtml(id)}">${LessonCommon.escapeHtml(conceptTerm(id))}</button>`
+          )
+          .join("");
+        return `<div class="agenda-row"><span class="agenda-label">${g.label}</span>${chips}</div>`;
+      })
+      .join("");
+    hero.insertAdjacentHTML(
+      "beforeend",
+      `<div class="lesson-agenda" aria-label="Concepts in this lesson"><p class="agenda-title">In this lesson</p>${rows}</div>`
+    );
+  }
+
+  // One shared panel, created on first use, that shows a concept's definition.
+  function conceptPanelEl() {
+    let el = document.getElementById("conceptPanel");
+    if (el) return el;
+    el = document.createElement("div");
+    el.id = "conceptPanel";
+    el.className = "concept-panel";
+    el.hidden = true;
+    el.innerHTML =
+      '<button type="button" class="concept-panel-close" aria-label="Close">\u00d7</button>' +
+      '<p class="concept-panel-term"></p><p class="concept-panel-def"></p><p class="concept-panel-link"></p>';
+    document.body.appendChild(el);
+    el.querySelector(".concept-panel-close").addEventListener("click", () => { el.hidden = true; });
+    return el;
+  }
+  function showConcept(id) {
+    const d = conceptDef(id);
+    const panel = conceptPanelEl();
+    panel.querySelector(".concept-panel-term").textContent = d ? d.term : id;
+    panel.querySelector(".concept-panel-def").textContent = d ? d.def : "Definition not found.";
+    const prefix = window.LESSON_META && window.LESSON_META.id ? "../../../../" : "";
+    panel.querySelector(".concept-panel-link").innerHTML = `<a href="${prefix}glossary.html">Open the glossary</a>`;
+    panel.hidden = false;
+  }
+  document.addEventListener("click", (e) => {
+    const btn = e.target && e.target.closest ? e.target.closest("[data-concept-id]") : null;
+    if (btn) { showConcept(btn.getAttribute("data-concept-id")); return; }
+    const panel = document.getElementById("conceptPanel");
+    if (panel && !panel.hidden && !panel.contains(e.target)) panel.hidden = true;
+  });
 
   function drillCard(p) {
     return `
@@ -331,6 +409,7 @@
   }
 
   hero.innerHTML = heroHTML(page.hero);
+  renderAgenda();
 
   if (page.archetype === "drill") {
     hero.insertAdjacentHTML("afterend", drillCard(page.prefix));

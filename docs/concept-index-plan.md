@@ -5,7 +5,7 @@ single source of the course path (chrome + order + the capstone's inlined card),
 display data lives in its `meta.js`. 75/76 lessons migrated (only the external capstone stays flat, by
 design). Phase 0 done (10/10); concept graph drafted (208), audited, applied. CG3 re-audit done
 (P1=0; the clear P2/P3 fixes were applied - fp moved to `f9f9b2b89215`; two structural merges deferred).
-Phases 1-3 cleared and in progress. Owner: Isaac + agent. Last updated: 2026-07-29.
+Phases 1-3 done (glossary + "in this lesson" agenda + in-prose concept mentions). Owner: Isaac + agent. Last updated: 2026-07-29.
 
 Tracking: each action item is a checkbox. Flip `- [ ]` to `- [x]` when the item is
 DONE and its Verify step passes. Use `- [~]` for in-progress. Keep the Progress
@@ -19,8 +19,8 @@ table in sync.
 | Pilot migration | 9-12 (incl. 11b, 12b) | 6 / 6 |
 | Concept graph (feeds 1-3) | CG1-CG3 | 3 / 3 |
 | 1 - Glossary | 13 | 1 / 1 |
-| 2 - Agenda | 14 | 0 / 1 |
-| 3 - Concept mentions | 15 | 0 / 1 |
+| 2 - Agenda | 14 | 1 / 1 |
+| 3 - Concept mentions | 15 | 1 / 1 |
 | 4 - Evaluation (submodule) | 16-18 | 0 / 3 |
 
 ## Progress log
@@ -216,7 +216,21 @@ table in sync.
   filters cards and hides empty track sections. Self-contained CSS on the `styles.css` design tokens
   (the `c-*` card CSS is inline-only in `index.html`, so not reused). Linked from the landing footer.
   Verified headless: 208 concept cards, 3 track sections, 0 undefined, `th-inode` shows "Inode", a
-  lesson link resolves 200.---
+  lesson link resolves 200.
+- **2026-07-29 (Phases 2+3: agenda + concept mentions)** - Added to `page-shell.js`: (2) an "In this
+  lesson" agenda rendered from the page's own `LESSON_META.concepts` (New here / Revisited / Used chips,
+  terms resolved via `window.ConceptIndex`), injected `beforeend` into `#pageHero`; (3) a
+  `[[concept:id|label]]` grammar in the shared `LessonCommon.renderInline` (flows into both engines'
+  prose automatically) plus one shared click-to-define panel that both the agenda chips and in-prose
+  mentions open (delegated `data-concept-id` handler, def from `window.ConceptIndex`, link to the
+  glossary). Prerequisite: added `generated/concept-index.js` to all four `templates/lesson.html.tmpl`
+  variants (regenerated -> 75 lesson pages, +1 script line each); new agenda/mention/panel CSS in
+  `styles.css`. Verified headless: agenda renders on build/viz/checkpoint with resolved chips (0
+  undefined; viz + quiz still mount); renderInline logic-checked (mention grammar + code/bold/escape
+  intact); parity 7/7, validate 0 err, generated data unchanged. NOTE: no lesson prose carries
+  `[[concept:...]]` markers yet - the capability is live for authors to use.
+
+---
 
 ## The idea (hard constraints)
 
@@ -388,12 +402,12 @@ already-migrated lessons after a draft change with `node tools/seed-concepts.mjs
 
 ## Phase 2 - Agenda (gated by CG3)
 
-- [ ] **14. "In this lesson"** in `page-shell.js` from the page's own `LESSON_META.concepts`;
+- [x] **14. "In this lesson"** in `page-shell.js` from the page's own `LESSON_META.concepts`;
   chip styles in `styles.css`. Verify: headless shows the list; empty is safe.
 
 ## Phase 3 - Concept mentions (gated by CG3)
 
-- [ ] **15. Linkify** in `LessonCommon.renderInline` using the `[[concept:id|label]]` grammar
+- [x] **15. Linkify** in `LessonCommon.renderInline` using the `[[concept:id|label]]` grammar
   from item 1 + a concept panel (styled in `styles.css`) populated from `window.ConceptIndex`
   (the many-to-many set). Verify: headless click opens the correct set; no collision with the
   existing `` `code` ``/`**bold**` rendering.
