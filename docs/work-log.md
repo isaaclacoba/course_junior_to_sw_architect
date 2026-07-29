@@ -834,3 +834,15 @@ die/frames/slots, a filled AI probability fan, the memory-shelf and plan-board
 scenes, and a checkpoint quiz - all read cleanly on dark. Every new fg/bg pair
 clears WCAG AA (worst 4.79:1). The default light theme is unchanged (rules are
 all [data-theme="dark"]-scoped; re-checked headless). Temp harness removed.
+
+## 2026-07-29 12:14 +0200 - Execution-visualizer spec: canonical doc
+
+Start+End (design-only). Wrote docs/execution-visualizer-spec.md - a 149-line
+canonical spec for the C# execution visualizer, distilled from three research
+threads (tool teardown, learning science, explorables/interaction design) after
+a final cross-correlation pass folded in every data/execution feature the earlier
+draft had dropped. Ten sections: problem, three pillars, what-it-shows-by-level
+(L0-L3 projection table), visual language, interaction, the differentiators over
+Python Tutor, accessibility, build/architecture (evolve MemoryViz; derived-from-
+Step features; Roslyn tracer as a separate track; phases P1-P5), open decisions,
+and one-line evidence. Linked from docs/SPECS.md as a companion doc. No code.

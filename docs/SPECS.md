@@ -10,6 +10,7 @@ proposal. Authoritative companions, do not duplicate them here:
 - Editor rule (Monaco only, reuse first): `.github/instructions/code-editor.instructions.md`.
 - Current content map, gaps, and the cycle plan: `docs/audit/README.md`.
 - The portable syllabus (concept order + language-surface policy): `docs/concept-ledger.md`.
+- The flagship execution-visualizer design (canonical spec): `docs/execution-visualizer-spec.md`.
 
 This file is the *shape* contract: which archetype, which config, what a good
 card looks like, and the invariants that keep the course consistent as it grows
