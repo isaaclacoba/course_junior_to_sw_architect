@@ -1,9 +1,10 @@
 # Concept-index architecture - action plan
 
-Status: IN PROGRESS. Migration BANKED and committed - 75/76 lessons migrated (practical + theory + ai;
-only the external capstone is left) in `ad314ea` (+ fixes `3a1e3b1`); `reuse-without-regret` re-created
-the standard way as a `build` lesson. Phase 0 done (10/10); concept graph drafted (208), audited,
-applied. Item 12 (retire the manifest) is now unblocked. Owner: Isaac + agent. Last updated: 2026-07-29.
+Status: IN PROGRESS. `course-manifest.js` RETIRED (item 12 done) - `course-registry.js` is now the
+single source of the course path (chrome + order + the capstone's inlined card), and every lesson's
+display data lives in its `meta.js`. 75/76 lessons migrated (only the external capstone stays flat, by
+design). Phase 0 done (10/10); concept graph drafted (208), audited, applied. Next is CG3 (re-audit
+the vocabulary) then Phases 1-3. Owner: Isaac + agent. Last updated: 2026-07-29.
 
 Tracking: each action item is a checkbox. Flip `- [ ]` to `- [x]` when the item is
 DONE and its Verify step passes. Use `- [~]` for in-progress. Keep the Progress
@@ -14,7 +15,7 @@ table in sync.
 | Phase | Items | Done |
 |---|---|---|
 | 0 - Foundation (source of truth + tooling) | 1-8 (incl. 4b, 5b) | 10 / 10 |
-| Pilot migration | 9-12 (incl. 11b, 12b) | 5 / 6 |
+| Pilot migration | 9-12 (incl. 11b, 12b) | 6 / 6 |
 | Concept graph (feeds 1-3) | CG1-CG3 | 2 / 3 |
 | 1 - Glossary | 13 | 0 / 1 |
 | 2 - Agenda | 14 | 0 / 1 |
@@ -169,6 +170,20 @@ table in sync.
   scaffold caveat went to `learnings.instructions.md`; the build-is-the-only-live-archetype fact, the
   `--new`-doesn't-seed-concepts / sole-introducer rule, and the intentionally non-compiling starter
   nuance went to the `lesson-authoring` skill. All 4 tasks re-verified 0 failures; validate 0 err.
+- **2026-07-29 (item 12: retire the manifest)** - `course-registry.js` is now the single source of the
+  course path. A 2-agent read-only fleet mapped the blast radius (build-time consumers + a definitive
+  "no runtime page loads the manifest"). Moved the track/part chrome (name/kicker/blurb/partPrefix +
+  part titles) into a `tracks[]` structure on the registry and inlined the external capstone's card
+  fields on its lessons[] line; `generate.mjs` now walks the registry and re-derives each part's kicker
+  from `partPrefix + ORDINALS[position]`. Retargeted `validate.mjs` (dropped manifestInfo + the vacuous
+  order check), rewrote `generate.test.mjs` to invariants over CourseData + registry + meta (no
+  manifest), pointed `new-lesson.mjs --new` at `registry.tracks` (and made `--from` fail loud), updated
+  the template to load `generated/course-data.js` directly, and DELETED `course-manifest.js`. PROOF:
+  `generated/course-data.js` + `concept-index.js` are byte-identical except the one-line header comment;
+  parity 7/7 (added a kicker-derivation test); validate + drift guard 0 err; root index + a lesson page
+  render 0 undefined with no manifest refs. Post-change code review (fleet) found no must-fix; fixed the
+  three stale \"source = manifest\" comments (page-shell/course-index/lib). KNOWN dead code left for a
+  separate isolated commit: `new-lesson.mjs` `--from` + its 8 migrate-only helpers are now unreachable.
 
 ---
 
@@ -299,7 +314,7 @@ Key decisions:
   `content/practical/01-understand-the-ideas/06-reuse-without-regret/` like every other lesson, then
   delete the flat `reuse-without-regret.{html,js}`. Preserve its content (is-a vs has-a, favour
   composition, the diamond problem) and its concepts (already in the practical draft). Blocks item 12.
-- [ ] **12. Retire `course-manifest.js`.** Delete it AND the manifest-fallback branch in
+- [x] **12. Retire `course-manifest.js`.** Delete it AND the manifest-fallback branch in
   `generate.mjs` once every lesson has a `meta.js`. Verify: no page loads it; generator green
   with meta-only input; full headless pass per archetype. (UNBLOCKED as of 11b: only the external
   capstone lacks a `meta.js`, and it is exempt - the generator must still emit its manifest-sourced card.)

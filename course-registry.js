@@ -1,28 +1,51 @@
-/* Thin registry: structure + order only. Order = array order. Add a lesson = one line; remove = delete one line. */
+/* Course structure + order - the single source of the course path. */
 /*
- * course-registry.js - DORMANT Phase-0 scaffolding. Not wired into the running
- * site yet; loading it only defines window.CourseRegistry and has no runtime
- * effect on any page.
+ * course-registry.js - the source of the course path. Two things live here:
  *
- * This is a deliberately thin mirror of course-manifest.js (the source of truth).
- * It records ONLY the sequence and the structural coordinates of each lesson -
- * track, part, id, current flat href, and kind - not the presentational data
- * (title, blurb, pill, time). Those stay in the manifest / per-lesson meta.
+ *   tracks[]  - the track + part CHROME (name, kicker, blurb, partPrefix, part
+ *               titles), in display order. The generator derives each part's
+ *               "Part one/two/..." kicker from partPrefix + its 1-based position.
+ *   lessons[] - every lesson in reading order. Order = array order. Add a lesson =
+ *               one line; remove = delete one line.
  *
- * `id`  - the lesson's stable identity: its href with a trailing ".html" removed,
- *         or a trailing "/" dropped ("type-conversion.html" -> "type-conversion",
- *         "level3-app/" -> "level3-app"). Stays constant across the future move
- *         into content/<track>/<NN-part>/<NN-lesson>/.
- * `href` - the CURRENT flat href, exactly as the manifest registers it today.
- * `kind` - "lesson" (a normal lesson), "final" (a graded capstone), or
- *          "external" (the capstone app, served from its own directory).
- * `path` - the FUTURE content/... directory for this lesson. null for now, which
- *          means "still flat - resolve via the manifest / generated data".
+ * Per-lesson presentational data (title, blurb, pill, time, total, key) lives in
+ * each lesson's content/.../meta.js. The one exception is the external capstone
+ * (no meta.js): its card fields are inlined on its lessons[] line.
  *
- * IIFE global pattern, same as course-manifest.js: exposes a frozen
- * window.CourseRegistry with { lessons, byId }.
+ * `id`   - stable identity: href minus a trailing ".html", or a trailing "/"
+ *          dropped ("level3-app/" -> "level3-app").
+ * `href` - the served path (content/.../ for a migrated lesson, level3-app/ for
+ *          the capstone).
+ * `kind` - "lesson", or "external" (the capstone app). The emitted card kind is
+ *          "final" when `final` is set, else "lesson".
+ * `path` - the content/... directory, or null for the external capstone.
+ *
+ * Frozen window.CourseRegistry = { tracks, lessons, byId }.
  */
 (function (global) {
+  var tracks = [
+    { id: "practical", name: "Practical", kicker: "Hands on", partPrefix: "Part ", blurb: "Learn C# by writing and running real code, one small win at a time - up to a SOLID capstone.", parts: [
+      { id: "understand-the-ideas", title: "Understand the ideas" },
+      { id: "everyday-essentials", title: "Everyday essentials" },
+      { id: "know-the-language", title: "Know the language" },
+      { id: "build-with-objects", title: "Build with objects" },
+      { id: "prove-it-works", title: "Prove it works" },
+      { id: "design-for-change", title: "Design for change" }
+    ] },
+    { id: "theory", name: "Theory", kicker: "From zero", partPrefix: "Theory · Part ", blurb: "No background needed. Understand what software is and how a computer actually runs it, from the ground up.", parts: [
+      { id: "what-a-computer-really-is", title: "What a computer really is" },
+      { id: "from-idea-to-running-code", title: "From idea to running code" },
+      { id: "how-software-runs-and-connects", title: "How software runs and connects" },
+      { id: "the-development-world", title: "The development world" }
+    ] },
+    { id: "ai", name: "AI", kicker: "Agents from scratch", partPrefix: "AI · Part ", blurb: "A first look at how large language models and AI agents really work - tokens, context, memory, tools, planning, and keeping an agent reliable.", parts: [
+      { id: "the-building-blocks-of-ai", title: "The building blocks of AI" },
+      { id: "from-model-to-agent", title: "From model to agent" },
+      { id: "how-an-agent-thinks", title: "How an agent thinks" },
+      { id: "making-agents-reliable", title: "Making agents reliable" }
+    ] }
+  ];
+
   var lessons = [
     // ---- practical / understand-the-ideas ----
     { track: "practical", part: "understand-the-ideas", id: "foundations", href: "content/practical/01-understand-the-ideas/01-foundations/", kind: "lesson", path: "content/practical/01-understand-the-ideas/01-foundations" },
@@ -64,7 +87,7 @@
     // ---- practical / design-for-change ----
     { track: "practical", part: "design-for-change", id: "refactor-moves", href: "content/practical/06-design-for-change/01-refactor-moves/", kind: "lesson", path: "content/practical/06-design-for-change/01-refactor-moves" },
     { track: "practical", part: "design-for-change", id: "the-solid-principles", href: "content/practical/06-design-for-change/02-the-solid-principles/", kind: "lesson", path: "content/practical/06-design-for-change/02-the-solid-principles" },
-    { track: "practical", part: "design-for-change", id: "level3-app", href: "level3-app/", kind: "external", path: null },
+    { track: "practical", part: "design-for-change", id: "level3-app", href: "level3-app/", kind: "external", path: null, title: "Capstone: SOLID in Practice", blurb: "Put it all together. Refactor a real, broken program one step at a time. Your C# compiles and runs, with friendly errors, optional hints, and a worked solution if you get stuck.", pill: "challenging", time: "60 min", final: true },
 
     // ---- theory / what-a-computer-really-is ----
     { track: "theory", part: "what-a-computer-really-is", id: "theory-1", href: "content/theory/01-what-a-computer-really-is/01-theory-1/", kind: "lesson", path: "content/theory/01-what-a-computer-really-is/01-theory-1" },
@@ -133,6 +156,7 @@
   lessons.forEach(function (l) { byIdIndex[l.id] = l; });
 
   global.CourseRegistry = Object.freeze({
+    tracks: Object.freeze(tracks.map(function (t) { return Object.freeze(t); })),
     lessons: Object.freeze(lessons.map(function (l) { return Object.freeze(l); })),
     byId: function (id) { return byIdIndex[id] || null; }
   });

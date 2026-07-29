@@ -308,11 +308,11 @@
       </section>`;
   }
 
-  // Course order lives in the manifest (course-manifest.js), the single
-  // source of truth for the path. A lesson's final "Next" advances to the
-  // next lesson in the same track; a page may still override by setting
-  // window.PAGE.nextHref itself. If the manifest is not loaded, "Next" simply
-  // returns to the index rather than guessing an order here.
+  // Course order lives in generated/course-data.js (window.CourseData). A
+  // lesson's final "Next" advances to the next lesson in the same track; a page
+  // may still override by setting window.PAGE.nextHref itself. If the course
+  // data is not loaded, "Next" simply returns to the index rather than guessing
+  // an order here.
   if (!page.nextHref) {
     var href = "index.html";
     var course = window.CourseData || window.Course;

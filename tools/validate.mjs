@@ -1,17 +1,16 @@
 /**
  * tools/validate.mjs - Phase-0 concept-index pipeline validator.
  *
- * Loads the browser IIFEs `course-registry.js` (window.CourseRegistry) and
- * `course-manifest.js` (window.Course) in a Node `vm` sandbox - the same
- * technique tools/generate.mjs uses - then runs a set of integrity checks and
- * exits non-zero on any ERROR. WARN lines are printed but never fail the build.
+ * Loads the browser IIFE `course-registry.js` (window.CourseRegistry) in a Node
+ * `vm` sandbox - the same technique tools/generate.mjs uses - then runs a set of
+ * integrity checks and exits non-zero on any ERROR. WARN lines are printed but
+ * never fail the build.
  *
  * Node built-ins only, no deps.
  *
  * Checks:
- *   1. Registry integrity - ids unique; every non-external line resolvable
- *      (flat -> manifest has the href; migrated -> dir + meta.js exist).
- *   2. Order - registry id sequence equals the manifest registration order (WARN).
+ *   1. Registry integrity - ids unique; every non-external line is migrated with
+ *      its dir + meta.js present.
  *   3. Concept graph - scans migrated content/**\/meta.js (window.LESSON_META):
  *      unknown revisits/uses id (ERROR), concept introduced by >1 lesson (ERROR),
  *      introduced-but-unused orphan (WARN), fully untagged migrated lesson (WARN).
@@ -35,7 +34,6 @@ import { loadBrowserGlobal, idFromHref } from "./lib.mjs";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
 const registryPath = path.join(root, "course-registry.js");
-const manifestPath = path.join(root, "course-manifest.js");
 const generatedDir = path.join(root, "generated");
 const generatePath = path.join(root, "tools", "generate.mjs");
 
@@ -73,21 +71,19 @@ export function makeReport() {
 // ---------------------------------------------------------------------------
 
 // Check 1: ids unique; each non-external line resolvable.
-//   deps: { manifestHrefs:Set, dirExists(fsPath)->bool, fileExists(fsPath)->bool, rootDir }
+//   deps: { dirExists(fsPath)->bool, fileExists(fsPath)->bool, rootDir }
 export function checkRegistry(lessons, deps, report) {
-  const { manifestHrefs, dirExists, fileExists, rootDir } = deps;
+  const { dirExists, fileExists, rootDir } = deps;
   const seen = new Set();
   for (const l of lessons) {
     if (seen.has(l.id)) report.error(`Registry: duplicate id "${l.id}"`);
     seen.add(l.id);
 
-    if (l.kind === "external") continue; // exempt from dir/meta/href checks
+    if (l.kind === "external") continue; // exempt from dir/meta checks
 
     if (l.path == null) {
-      // flat - resolve via the manifest
-      if (!manifestHrefs.has(l.href)) {
-        report.error(`Registry: flat lesson "${l.id}" href "${l.href}" has no matching manifest registration`);
-      }
+      // Post-manifest: a non-external lesson must be migrated (have a path).
+      report.error(`Registry: lesson "${l.id}" has no path and is not external`);
     } else {
       // migrated - dir + meta.js must exist
       const dir = path.join(rootDir, l.path);
@@ -98,22 +94,6 @@ export function checkRegistry(lessons, deps, report) {
         report.error(`Registry: migrated lesson "${l.id}" meta.js missing: ${l.path}/meta.js`);
       }
     }
-  }
-}
-
-// Check 2: registry id sequence equals manifest registration order (WARN on drift).
-export function checkOrder(registryIds, manifestIds, report) {
-  const n = Math.max(registryIds.length, manifestIds.length);
-  let drift = false;
-  for (let i = 0; i < n; i++) {
-    if (registryIds[i] !== manifestIds[i]) {
-      drift = true;
-      report.warn(`Order: drift at index ${i} - registry "${registryIds[i] ?? "<none>"}" vs manifest "${manifestIds[i] ?? "<none>"}"`);
-      break;
-    }
-  }
-  if (!drift && registryIds.length !== manifestIds.length) {
-    report.warn(`Order: length mismatch - registry ${registryIds.length} vs manifest ${manifestIds.length}`);
   }
 }
 
@@ -239,22 +219,6 @@ export function driftGuard(deps, report) {
 // Disk wiring
 // ---------------------------------------------------------------------------
 
-// Manifest registration order + the set of registered hrefs, walked from the
-// frozen window.Course facade (tracks -> parts -> lessons, in order).
-export function manifestInfo(Course) {
-  const hrefs = new Set();
-  const ids = [];
-  for (const t of Course.tracks()) {
-    for (const p of t.parts) {
-      for (const l of p.lessons) {
-        hrefs.add(l.href);
-        ids.push(idFromHref(l.href));
-      }
-    }
-  }
-  return { hrefs, ids };
-}
-
 // Load window.LESSON_META for every migrated (path set, non-external) line whose
 // meta.js exists. Missing dirs/metas are reported by checkRegistry, not here.
 export function loadMigrated(registry, rootDir) {
@@ -299,22 +263,16 @@ function main() {
   const report = makeReport();
 
   const registry = loadBrowserGlobal(registryPath, "CourseRegistry");
-  const Course = loadBrowserGlobal(manifestPath, "Course");
-  const { hrefs: manifestHrefs, ids: manifestIds } = manifestInfo(Course);
 
   checkRegistry(
     registry.lessons,
     {
-      manifestHrefs,
       dirExists: (p) => fs.existsSync(p) && fs.statSync(p).isDirectory(),
       fileExists: (p) => fs.existsSync(p),
       rootDir: root,
     },
     report
   );
-
-  const registryIds = registry.lessons.map((l) => l.id);
-  checkOrder(registryIds, manifestIds, report);
 
   const migrated = loadMigrated(registry, root);
   const plannedIds = loadPlannedConceptIds(root);

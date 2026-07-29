@@ -1,9 +1,10 @@
 /**
- * tools/generate.test.mjs - parity + invariants for the generated course data.
+ * tools/generate.test.mjs - invariants for the generated course data.
  *
- * Loads course-manifest.js (Course) and generated/course-data.js (CourseData)
- * in separate vm sandboxes and asserts the two agree, plus the id invariants.
- * Run: node --test tools/generate.test.mjs
+ * Loads course-registry.js (CourseRegistry - the source of the course path) and
+ * generated/course-data.js (CourseData - the built facade) in vm sandboxes and
+ * asserts the two agree on order, ids, per-lesson fields, and the capstone. No
+ * manifest. Run: node --test tools/generate.test.mjs
  */
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -15,129 +16,99 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
 
-function loadBrowserGlobal(file, name) {
-  const code = fs.readFileSync(file, "utf8");
+function loadGlobal(file, name) {
   const sandbox = { window: {} };
   vm.createContext(sandbox);
-  vm.runInContext(code, sandbox, { filename: file });
+  vm.runInContext(fs.readFileSync(file, "utf8"), sandbox, { filename: file });
   const value = sandbox.window[name];
   if (!value) throw new Error(`Expected window.${name} after running ${file}`);
   return value;
 }
-
-const Course = loadBrowserGlobal(path.join(root, "course-manifest.js"), "Course");
-const CourseData = loadBrowserGlobal(path.join(root, "generated", "course-data.js"), "CourseData");
-
-// Registry decides which lessons have migrated (path set -> served from content/).
-function idFromHref(href) {
-  if (href.endsWith(".html")) return href.slice(0, -".html".length);
-  if (href.endsWith("/")) return href.slice(0, -1);
-  return href;
-}
-const registryMap = new Map();
-try {
-  const reg = loadBrowserGlobal(path.join(root, "course-registry.js"), "CourseRegistry");
-  reg.lessons.forEach(function (l) { registryMap.set(l.id, { path: l.path || null, href: l.href }); });
-} catch (e) { /* no registry -> all flat */ }
-
-// The href CourseData should expose for a manifest lesson: the registry href
-// when migrated, else the manifest href unchanged.
-function expectedHref(manifestHref) {
-  const reg = registryMap.get(idFromHref(manifestHref));
-  return reg && reg.path ? reg.href : manifestHref;
-}
-function isMigrated(manifestHref) {
-  const reg = registryMap.get(idFromHref(manifestHref));
-  return !!(reg && reg.path);
+function loadMeta(relPath) {
+  const sandbox = { window: {} };
+  vm.createContext(sandbox);
+  vm.runInContext(fs.readFileSync(path.join(root, relPath, "meta.js"), "utf8"), sandbox);
+  return sandbox.window.LESSON_META;
 }
 
-// Fields that must always match the manifest for FLAT lessons. (Migrated lessons
-// take these from their own meta.js, so only href is asserted for them.)
-const PROJECTED = ["key", "total", "title", "blurb", "pill", "time", "kind"];
+const Registry = loadGlobal(path.join(root, "course-registry.js"), "CourseRegistry");
+const CourseData = loadGlobal(path.join(root, "generated", "course-data.js"), "CourseData");
 
-function courseLessons() {
-  const out = [];
-  Course.tracks().forEach(function (t) {
-    t.parts.forEach(function (p) {
-      p.lessons.forEach(function (l) { out.push(l); });
-    });
-  });
-  return out;
-}
-
-function courseDataLessons() {
+function dataLessons() {
   const out = [];
   CourseData.tracks().forEach(function (t) {
-    t.parts.forEach(function (p) {
-      p.lessons.forEach(function (l) { out.push(l); });
-    });
+    t.parts.forEach(function (p) { p.lessons.forEach(function (l) { out.push(l); }); });
   });
   return out;
 }
 
-test("order() matches the registry-adjusted manifest order per track", () => {
-  Course.tracks().forEach(function (t) {
-    const expected = [...Course.order(t.id)].map(expectedHref);
-    // Arrays cross vm realms, so copy into this realm before deep-comparing.
-    assert.deepEqual([...CourseData.order(t.id)], expected, `order mismatch for ${t.id}`);
+test("CourseData href order per track matches the registry order", () => {
+  Registry.tracks.forEach(function (t) {
+    const regHrefs = Registry.lessons.filter(function (l) { return l.track === t.id; }).map(function (l) { return l.href; });
+    assert.deepEqual([...CourseData.order(t.id)], [...regHrefs], `order mismatch for ${t.id}`);
   });
 });
 
-test("id order matches the manifest order per track (migration-invariant)", () => {
-  Course.tracks().forEach(function (t) {
-    const manifestIds = [...Course.order(t.id)].map(idFromHref);
-    const dataIds = CourseData.tracks()
-      .find(function (x) { return x.id === t.id; })
-      .parts.reduce(function (acc, p) {
-        return acc.concat(p.lessons.map(function (l) { return l.id; }));
-      }, []);
-    assert.deepEqual(dataIds, manifestIds, `id order mismatch for ${t.id}`);
+test("CourseData id order per track matches the registry", () => {
+  Registry.tracks.forEach(function (t) {
+    const regIds = Registry.lessons.filter(function (l) { return l.track === t.id; }).map(function (l) { return l.id; });
+    const dataIds = CourseData.tracks().find(function (x) { return x.id === t.id; })
+      .parts.reduce(function (acc, p) { return acc.concat(p.lessons.map(function (l) { return l.id; })); }, []);
+    assert.deepEqual([...dataIds], [...regIds], `id order mismatch for ${t.id}`);
   });
 });
 
-test("lesson counts agree and equal the register-entry count", () => {
-  const fromCourse = courseLessons().length;
-  const fromData = courseDataLessons().length;
-  assert.equal(fromData, fromCourse, "CourseData vs Course lesson count");
-  // register entries == number of lessons walked from Course (source of truth).
-  assert.equal(fromCourse, 76, "expected 76 register entries");
+test("lesson count equals the registry length (76)", () => {
+  assert.equal(dataLessons().length, Registry.lessons.length);
+  assert.equal(Registry.lessons.length, 76, "expected 76 registry lessons");
 });
 
-test("flat lessons keep manifest fields; migrated lessons take the registry href", () => {
-  const a = courseLessons();
-  const b = courseDataLessons();
-  assert.equal(a.length, b.length);
-  for (let i = 0; i < a.length; i++) {
-    assert.deepEqual(b[i].href, expectedHref(a[i].href), `href mismatch at lesson ${i} (${a[i].href})`);
-    if (!isMigrated(a[i].href)) {
-      PROJECTED.forEach(function (f) {
-        assert.deepEqual(b[i][f], a[i][f], `field ${f} mismatch at flat lesson ${i} (${a[i].href})`);
-      });
-    }
-  }
+test("part kickers derive from partPrefix + position", () => {
+  assert.equal(CourseData.track("practical").parts[0].kicker, "Part one");
+  assert.equal(CourseData.track("theory").parts[0].kicker, "Theory \u00b7 Part one");
+  assert.equal(CourseData.track("ai").parts[3].kicker, "AI \u00b7 Part four");
 });
 
-test("every lesson has a unique non-empty string id, and locateById agrees with locate", () => {
-  const lessons = courseDataLessons();
+test("each migrated lesson's card fields come from its meta.js", () => {
+  const byId = {};
+  dataLessons().forEach(function (l) { byId[l.id] = l; });
+  Registry.lessons.forEach(function (line) {
+    if (!line.path) return; // external capstone handled separately
+    const meta = loadMeta(line.path);
+    const card = byId[line.id];
+    ["title", "blurb", "pill", "time", "key", "total"].forEach(function (f) {
+      assert.deepEqual(card[f], meta[f], `field ${f} mismatch for ${line.id}`);
+    });
+    assert.equal(card.href, line.href, `href mismatch for ${line.id}`);
+    assert.equal(card.kind, "lesson", `kind mismatch for ${line.id}`);
+  });
+});
+
+test("the external capstone card comes from its inlined registry line", () => {
+  const cap = dataLessons().find(function (l) { return l.id === "level3-app"; });
+  const line = Registry.lessons.find(function (l) { return l.id === "level3-app"; });
+  assert.ok(cap, "capstone not found in CourseData");
+  assert.equal(cap.kind, "final");
+  assert.equal(cap.final, true);
+  ["title", "blurb", "pill", "time"].forEach(function (f) {
+    assert.equal(cap[f], line[f], `capstone ${f} mismatch`);
+  });
+  assert.equal(cap.href, "level3-app/");
+  assert.ok(!("key" in cap), "capstone should have no key");
+  assert.ok(!("total" in cap), "capstone should have no total");
+});
+
+test("every lesson id is unique + non-empty; locateById agrees with locate", () => {
   const ids = new Set();
-  lessons.forEach(function (l) {
+  dataLessons().forEach(function (l) {
     assert.equal(typeof l.id, "string", `id not a string for ${l.href}`);
     assert.ok(l.id.length > 0, `empty id for ${l.href}`);
     assert.ok(!ids.has(l.id), `duplicate id ${l.id}`);
     ids.add(l.id);
-
     const byHref = CourseData.locate(l.href);
     const byId = CourseData.locateById(l.id);
-    assert.ok(byHref, `locate returned null for ${l.href}`);
-    assert.ok(byId, `locateById returned null for ${l.id}`);
+    assert.ok(byHref && byId, `locate/locateById null for ${l.id}`);
     assert.equal(byId.track, byHref.track, `track mismatch for ${l.id}`);
     assert.equal(byId.index, byHref.index, `index mismatch for ${l.id}`);
   });
-});
-
-test("capstone has id 'level3-app' and kind 'final'", () => {
-  const cap = courseDataLessons().find(function (l) { return l.href === "level3-app/"; });
-  assert.ok(cap, "capstone lesson not found");
-  assert.equal(cap.id, "level3-app");
-  assert.equal(cap.kind, "final");
 });

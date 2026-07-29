@@ -219,6 +219,9 @@ function updateRegistry(id, relPath) {
 // ---- migration mode: --from <basename> ----
 
 function migrateFrom(basename, opts) {
+  if (!fs.existsSync(manifestPath)) {
+    throw new Error("--from is retired: course-manifest.js has been removed and every lesson is migrated. Author new lessons with --new.");
+  }
   const Course = loadBrowserGlobal(manifestPath, "Course");
   const href = basename + ".html";
   const loc = locateInManifest(Course, href);
@@ -287,14 +290,13 @@ function scaffoldNew(args) {
     throw new Error("--new requires --track --part --id --archetype --title");
   }
 
-  const Course = loadBrowserGlobal(manifestPath, "Course");
-  const t = Course.tracks().find(function (x) { return x.id === track; });
+  const registry = loadBrowserGlobal(registryPath, "CourseRegistry");
+  const t = registry.tracks.find(function (x) { return x.id === track; });
   if (!t) throw new Error("Unknown track '" + track + "'");
   const partIndex = t.parts.findIndex(function (p) { return p.id === part; }) + 1;
   if (partIndex === 0) throw new Error("Unknown part '" + part + "' in track '" + track + "'");
 
   // Lesson index = one past the last already-registered lesson for this part.
-  const registry = loadBrowserGlobal(registryPath, "CourseRegistry");
   const inPart = registry.lessons.filter(function (x) { return x.track === track && x.part === part; });
   const lessonIndex = inPart.length + 1;
 

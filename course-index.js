@@ -1,18 +1,18 @@
 /**
- * course-index.js - builds the course path from the manifest and orchestrates
- * the index page.
+ * course-index.js - builds the course path from the generated course data and
+ * orchestrates the index page.
  *
  * Its single job is structure and coordination:
- *   - turn the manifest (window.Course) into DOM: the track chooser, the track
- *     switch, and one collapsible path per track;
+ *   - turn the course data (window.CourseData) into DOM: the track chooser, the
+ *     track switch, and one collapsible path per track;
  *   - show or switch a track, painting each card's status from a progress
  *     summary (window.CourseProgress) - it does not compute status itself;
  *   - hand the active track to the navigation engine (window.CourseNav) and ask
  *     it to refresh.
  *
  * The progress maths lives in course-progress.js; the on-page navigation lives
- * in course-nav.js; the data lives in course-manifest.js. This file only wires
- * them to the DOM.
+ * in course-nav.js; the data lives in generated/course-data.js (built from
+ * course-registry.js). This file only wires them to the DOM.
  */
 (function () {
   var C = window.CourseData || window.Course;

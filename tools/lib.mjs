@@ -10,8 +10,8 @@ import fs from "node:fs";
 import vm from "node:vm";
 
 // Run a course IIFE that assigns `window.<name>` and hand back that global
-// (throws if it is absent). Used for course-manifest.js, course-registry.js,
-// and a migrated lesson's meta.js.
+// (throws if it is absent). Used for course-registry.js and a migrated lesson's
+// meta.js.
 export function loadBrowserGlobal(file, name) {
   const code = fs.readFileSync(file, "utf8");
   const sandbox = { window: {} };
