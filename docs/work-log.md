@@ -895,3 +895,9 @@ Three parallel tracks, each scoped to disjoint files, integrated after review:
 - Track C: converted theory-9 (Variables) and theory-11 (Statements and
   expressions) to the level-0 execution scene, using theory-14 as the template.
 All dark rules stay [data-theme=dark]-scoped; both lessons headless-verified.
+
+- Start: 2026-07-29 13:36:20 | Task: Reproject theory-13 Functions visual onto the level-1 execution call stack layout, preserving existing code and narration scope.
+- End: 2026-07-29 13:37:34 | Result: Reprojected theory-13.viz.js onto the level-1 execution layout (code + callstack). Preserved the existing add/main CODE array and six-step teaching arc; replaced legacy board/RAM scene fields with layout + legend; added local box/frame helpers, stable frame ids, copied hot arguments on add push, hot return value in the add frame, and hot r when the returned 8 lands back in main. Verified: node --check theory-13.viz.js passed; node load printed steps 6, callstack layout, ok max frames 2.
+
+- Start: 2026-07-29 13:45 | Task: Integrate P3 fleet (level-1 callstack panel + scrubber enrichment + level-0/level-1 lesson conversions) into the shared engine, rebuild, re-vendor, verify, and commit.
+- End: 2026-07-29 13:47 | Result: Wired the new CallStackView panel into memory-viz (PanelType "callstack", factory entry, deriveTrace + setDerived scrubber wiring); merged the callstack + scrubber-enrichment CSS into code-lab.css and added [data-theme=dark] skins for both to the course styles.css (braces 283/283, all dark-scoped). code-lab: typecheck clean, 109 tests, build ok, re-vendored. Headless-verified theory-13 (2 stacked frames, hot args, hot return, 2 notable dots) and theory-10/12/14 (no regression, zero undefined). Committing submodule then course.

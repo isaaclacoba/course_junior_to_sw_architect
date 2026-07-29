@@ -1053,6 +1053,97 @@ ${result.runtimeError}`.trim(),
     }
   };
 
+  // src/core/exec-trace.ts
+  function deriveTrace(steps) {
+    const callDepth = new Array(steps.length);
+    const lineHeatmap = /* @__PURE__ */ new Map();
+    const changes = new Array(steps.length);
+    const valueHistory = [];
+    const historiesByName = /* @__PURE__ */ new Map();
+    const notables = [];
+    let previousSlots = /* @__PURE__ */ new Map();
+    let previousDepth = 0;
+    let previousHeapIds = /* @__PURE__ */ new Set();
+    for (let i = 0; i < steps.length; i += 1) {
+      const step = steps[i];
+      const stack = step.stack ?? [];
+      const depth = stack.length;
+      const currentSlots = slotsByName(activeFrame(stack));
+      callDepth[i] = depth;
+      if (step.pc != null && step.pc >= 0) {
+        lineHeatmap.set(step.pc, (lineHeatmap.get(step.pc) ?? 0) + 1);
+      }
+      changes[i] = deriveSlotChanges(currentSlots, previousSlots, i === 0);
+      extendValueHistory(i, currentSlots, valueHistory, historiesByName);
+      const heapIds = heapObjectIds(step);
+      if (i > 0) {
+        if (depth > previousDepth) notables.push({ step: i, kind: "call" });
+        else if (depth < previousDepth) notables.push({ step: i, kind: "return" });
+        if (heapSetGrew(previousHeapIds, heapIds)) notables.push({ step: i, kind: "new-object" });
+      }
+      previousSlots = currentSlots;
+      previousDepth = depth;
+      previousHeapIds = heapIds;
+    }
+    return { callDepth, lineHeatmap, changes, valueHistory, notables };
+  }
+  function activeFrame(stack) {
+    return stack[stack.length - 1];
+  }
+  function slotsByName(frame) {
+    const slots = /* @__PURE__ */ new Map();
+    for (const slot of frame?.vars ?? []) {
+      slots.set(slotName(slot), slot);
+    }
+    return slots;
+  }
+  function slotName(slot) {
+    return slot.k ?? slot.id;
+  }
+  function slotValue(slot) {
+    if (!slot || slot.empty || slot.v == null) return null;
+    return slot.v;
+  }
+  function deriveSlotChanges(currentSlots, previousSlots, firstStep) {
+    const result = [];
+    for (const [name, slot] of currentSlots) {
+      const previousSlot = firstStep ? void 0 : previousSlots.get(name);
+      const from = firstStep ? null : slotValue(previousSlot);
+      const to = slotValue(slot);
+      result.push({ name, kind: changeKind(previousSlot, from, to, firstStep), from, to });
+    }
+    return result;
+  }
+  function changeKind(previousSlot, from, to, firstStep) {
+    if (firstStep) return to === null ? "unchanged" : "created";
+    if (!previousSlot) return "created";
+    if (from === null && to !== null) return "created";
+    if (from !== null && from !== to) return "changed";
+    return "unchanged";
+  }
+  function extendValueHistory(stepIndex, currentSlots, valueHistory, historiesByName) {
+    for (const [name] of currentSlots) {
+      if (!historiesByName.has(name)) {
+        const history = { name, values: Array(stepIndex).fill(null) };
+        historiesByName.set(name, history);
+        valueHistory.push(history);
+      }
+    }
+    for (const history of valueHistory) {
+      history.values.push(slotValue(currentSlots.get(history.name)));
+    }
+  }
+  function heapObjectIds(step) {
+    const ids = /* @__PURE__ */ new Set();
+    for (const obj of step.heap ?? []) {
+      ids.add(obj.id);
+    }
+    return ids;
+  }
+  function heapSetGrew(previousIds, currentIds) {
+    return currentIds.size > previousIds.size;
+  }
+
   // src/dom/svg.ts
   var SVG_NS = "http://www.w3.org/2000/svg";
   function svgEl(tag, attrs) {
@@ -1580,7 +1671,7 @@ ${result.runtimeError}`.trim(),
       this.rows = this.el.querySelector("[data-vtrows]");
     }
     sync(ctx) {
-      this.render(activeFrame(ctx.model.stack)?.vars ?? []);
+      this.render(activeFrame2(ctx.model.stack)?.vars ?? []);
     }
     // Rebuild only when the set of names changes; otherwise update rows in place so
     // a later phase can animate the changed value without re-creating the node.
@@ -1595,7 +1686,7 @@ ${result.runtimeError}`.trim(),
       vars.forEach((v, i) => updateRow(children[i], v));
     }
   };
-  function activeFrame(stack) {
+  function activeFrame2(stack) {
     const frames = stack ?? [];
     return frames[frames.length - 1];
   }
@@ -1615,6 +1706,96 @@ ${result.runtimeError}`.trim(),
     if (val) val.textContent = valueText(v);
   }
   function esc(s) {
+    return s.replace(/[&<>]/g, (c) => c === "&" ? "&amp;" : c === "<" ? "&lt;" : "&gt;");
+  }
+
+  // src/dom/callstack-view.ts
+  var CallStackView = class {
+    constructor() {
+      this.cardsById = /* @__PURE__ */ new Map();
+      this.newFrameIds = /* @__PURE__ */ new Set();
+      this.el = document.createElement("div");
+      this.el.className = "cl-mv-region cl-mv-callstack";
+      this.el.innerHTML = `<span class="cl-mv-tag">CALL STACK <span>\xB7 the calls in progress</span></span><div class="cl-mv-cs-frames" data-csframes></div>`;
+      this.frames = this.el.querySelector("[data-csframes]");
+    }
+    sync(ctx) {
+      const frames = [...ctx.model.stack ?? []].reverse();
+      const liveIds = new Set(frames.map((frame) => frame.id));
+      this.newFrameIds = /* @__PURE__ */ new Set();
+      for (const [id, card] of this.cardsById) {
+        if (!liveIds.has(id)) {
+          card.remove();
+          this.cardsById.delete(id);
+        }
+      }
+      frames.forEach((frame, i) => {
+        let card = this.cardsById.get(frame.id);
+        if (!card) {
+          card = cardEl();
+          this.cardsById.set(frame.id, card);
+          this.newFrameIds.add(frame.id);
+        }
+        updateCard(card, frame, i === 0);
+        this.frames.appendChild(card);
+      });
+    }
+    animate(_model) {
+      if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+        this.newFrameIds = /* @__PURE__ */ new Set();
+        return Promise.resolve();
+      }
+      const cards = Array.from(this.newFrameIds).map((id) => this.cardsById.get(id)).filter((card) => Boolean(card));
+      this.newFrameIds = /* @__PURE__ */ new Set();
+      cards.forEach((card) => card.classList.add("enter"));
+      if (cards.length) {
+        const removeEnter = () => cards.forEach((card) => card.classList.remove("enter"));
+        if (typeof window.requestAnimationFrame === "function") window.requestAnimationFrame(removeEnter);
+        else window.setTimeout(removeEnter, 60);
+      }
+      return Promise.resolve();
+    }
+  };
+  function cardEl() {
+    const card = document.createElement("div");
+    card.className = "cl-mv-cs-frame";
+    card.innerHTML = `<div class="cl-mv-cs-title"></div><div class="cl-mv-cs-locals" data-cslocals></div>`;
+    return card;
+  }
+  function updateCard(card, frame, active) {
+    card.classList.toggle("is-active", active);
+    card.classList.toggle("is-caller", !active);
+    const title = card.querySelector(".cl-mv-cs-title");
+    if (title) title.textContent = frame.name ?? frame.id;
+    const locals = card.querySelector("[data-cslocals]");
+    if (locals) renderLocals(locals, frame.vars ?? []);
+  }
+  function renderLocals(rows, vars) {
+    const names = vars.map((v) => v.k ?? v.id).join("");
+    if (rows.dataset.names !== names) {
+      rows.dataset.names = names;
+      rows.innerHTML = vars.map(rowHtml2).join("");
+      return;
+    }
+    const children = Array.from(rows.children);
+    vars.forEach((v, i) => updateRow2(children[i], v));
+  }
+  function valueText2(v) {
+    if (v.empty) return "unassigned";
+    return v.v ?? "";
+  }
+  function rowHtml2(v) {
+    const cls = "cl-mv-cs-row" + (v.empty ? " is-empty" : "") + (v.hot ? " is-changed" : "");
+    return `<div class="${cls}"><span class="cl-mv-cs-name">${esc2(v.k ?? v.id)}</span><span class="cl-mv-cs-val">${esc2(valueText2(v))}</span></div>`;
+  }
+  function updateRow2(row, v) {
+    if (!row) return;
+    row.classList.toggle("is-empty", Boolean(v.empty));
+    row.classList.toggle("is-changed", Boolean(v.hot));
+    const val = row.querySelector(".cl-mv-cs-val");
+    if (val) val.textContent = valueText2(v);
+  }
+  function esc2(s) {
     return s.replace(/[&<>]/g, (c) => c === "&" ? "&amp;" : c === "<" ? "&lt;" : "&gt;");
   }
 
@@ -2348,11 +2529,18 @@ ${result.runtimeError}`.trim(),
     { sw: "#2563eb", label: "stack frame (a call)" },
     { sw: "#1f6f5f", label: "reference to an object", round: true }
   ];
+  var SVG_NS3 = "http://www.w3.org/2000/svg";
   function legendHtml(items) {
     return items.map((i) => {
       const round = i.round ? ";border-radius:50%" : "";
       return `<span><i class="cl-mv-sw" style="background:${i.sw}${round}"></i>${i.label}</span>`;
     }).join("");
+  }
+  function stepPercent(step, total) {
+    return total <= 1 ? 0 : step / (total - 1) * 100;
+  }
+  function notableLabel(kind) {
+    return kind === "new-object" ? "new object" : kind;
   }
   var VizControls = class {
     constructor(actions, handlers, nextHref, legend) {
@@ -2372,7 +2560,11 @@ ${result.runtimeError}`.trim(),
           <button data-size="1.2" title="Large text" aria-label="Large text">L</button>
         </div>
       </div>
-      <input type="range" class="cl-mv-scrub" data-scrub min="0" value="0" step="1" aria-label="Step" />
+      <div class="cl-mv-scrubwrap">
+        <svg class="cl-mv-depth" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <input type="range" class="cl-mv-scrub" data-scrub min="0" value="0" step="1" aria-label="Step" />
+        <div class="cl-mv-marks" data-marks></div>
+      </div>
       <div class="cl-mv-legend">${legendHtml(legend && legend.length ? legend : DEFAULT_LEGEND)}</div>`;
       const controls = this.el.querySelector(".cl-mv-controls");
       actions.forEach((a, i) => {
@@ -2408,6 +2600,37 @@ ${result.runtimeError}`.trim(),
     setActiveSize(scale) {
       this.el.querySelectorAll(".cl-mv-textsize button").forEach((b) => {
         b.classList.toggle("is-active", Number(b.dataset.size) === scale);
+      });
+    }
+    setDerived(derived, onJump) {
+      const depth = this.el.querySelector(".cl-mv-depth");
+      const marks = this.el.querySelector("[data-marks]");
+      const total = derived.callDepth.length;
+      depth.textContent = "";
+      marks.textContent = "";
+      if (total > 0) {
+        const maxDepth = Math.max(1, ...derived.callDepth);
+        const points = derived.callDepth.map((d, i) => {
+          const x = stepPercent(i, total);
+          const y = 90 - Math.max(0, d) / maxDepth * 75;
+          return `${x},${y}`;
+        }).join(" ");
+        const line = document.createElementNS(SVG_NS3, "polyline");
+        line.setAttribute("points", points);
+        line.setAttribute("fill", "none");
+        line.setAttribute("vector-effect", "non-scaling-stroke");
+        depth.appendChild(line);
+      }
+      derived.notables.forEach((notable) => {
+        const label = notableLabel(notable.kind);
+        const mark = document.createElement("button");
+        mark.type = "button";
+        mark.className = `cl-mv-mark is-${notable.kind}`;
+        mark.style.left = `${stepPercent(notable.step, total)}%`;
+        mark.setAttribute("aria-label", `Jump to ${label} at step ${notable.step}`);
+        mark.title = `Jump to ${label} at step ${notable.step}`;
+        mark.addEventListener("click", () => onJump(notable.step));
+        marks.appendChild(mark);
       });
     }
     update(state) {
@@ -2450,6 +2673,7 @@ ${result.runtimeError}`.trim(),
         die: (spec, ctx) => new MemoryDieView(ctx.uid, ctx.code, ctx.labels, spec.regions ?? ctx.regions, ctx.zoomTab, ctx.regionTags),
         code: (_spec, ctx) => new CodePanel(ctx.code),
         vartable: () => new VarTableView(),
+        callstack: () => new CallStackView(),
         narration: () => new NarrationView(),
         agent: (spec) => new AgentView(spec.fan),
         agentloop: () => new AgentLoopView(),
@@ -2552,6 +2776,7 @@ ${result.runtimeError}`.trim(),
       else this.root.classList.add("cl-mv-single");
       host.appendChild(this.root);
       if (this.controls) this.controls.setActiveSize(this.scale);
+      if (this.controls) this.controls.setDerived(deriveTrace(config.steps ?? []), handlers.onSeek);
       window.addEventListener("resize", this.onResize);
       this.refreshXp();
       this.step(this.player.state, false);
