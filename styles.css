@@ -1668,3 +1668,14 @@ input.almost {
 [data-theme="dark"] .cl-quiz .cl-quiz-result { background: var(--bg-2); }
 [data-theme="dark"] .cl-quiz .cl-quiz-result.is-pass { background: var(--good-bg); }
 [data-theme="dark"] .cl-quiz .cl-quiz-result.is-fail { background: var(--warn-bg); border-color: var(--warn-line); }
+
+/* ---- Widget detail gaps: line labels, slot accents, quiz chrome --------- */
+[data-theme="dark"] .cl-mv .cl-mv-code li::before { color: #8a93a3; }
+[data-theme="dark"] .cl-mv .cl-mv-slot .cl-mv-addr { color: #8a93a3; }
+[data-theme="dark"] .cl-mv .cl-mv-slot.is-hot { border-color: #5a4a1e; }
+[data-theme="dark"] .cl-quiz .cl-quiz-meta { color: var(--ink-soft); }
+[data-theme="dark"] .cl-quiz .cl-quiz-primary {
+  background: var(--indigo-fill);
+  border-color: var(--indigo-ink);
+  color: var(--ink);
+}
