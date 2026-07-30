@@ -3217,8 +3217,10 @@ ${result.runtimeError}`.trim(),
       const rodata = globalSlots(ts.consts ?? []);
       const stdout = ts.stdout ?? "";
       const printed = stdout.startsWith(prevStdout) ? stdout.slice(prevStdout.length) : stdout;
+      const prevFrames = i > 0 ? steps[i - 1].frames ?? [] : [];
+      const prevHeapIds = new Set((i > 0 ? steps[i - 1].heap ?? [] : []).map((o) => o.id));
       const step = {
-        narr: runningNarration(ts.line, src),
+        narr: describeStep(prevFrames, ts, stack, heap, prevHeapIds, globals, printed, src),
         pc: typeof ts.line === "number" && ts.line > 0 ? ts.line - 1 : -1,
         codeLive: true,
         stack,
@@ -3246,8 +3248,9 @@ ${result.runtimeError}`.trim(),
       );
       const globals = globalSlots(lastTs.statics ?? [], /* @__PURE__ */ new Map(), prevGlobals, false);
       const rodata = globalSlots(lastTs.consts ?? []);
+      const printedLines = prevStdout ? prevStdout.replace(/\n+$/, "").split("\n").length : 0;
       const terminal = {
-        narr: trace.truncated ? "Stopped early - there were too many steps to show the rest." : "The program has finished.",
+        narr: trace.truncated ? "Stopped early - there were too many steps to show the rest." : printedLines > 0 ? `The program finished. It printed ${printedLines} line${printedLines === 1 ? "" : "s"}.` : "The program finished without printing anything.",
         pc: -1,
         codeLive: true,
         stack,
@@ -3323,6 +3326,65 @@ ${result.runtimeError}`.trim(),
   }
   function refDisplay(v) {
     return v.ref != null ? `\u2192${v.ref}` : v.value ?? "null";
+  }
+  function describeStep(prevFrames, ts, stack, heap, prevHeapIds, globals, printed, src) {
+    const curFrames = ts.frames ?? [];
+    const prevLen = prevFrames.length;
+    const curLen = curFrames.length;
+    if (curLen > prevLen) return callNarration(curFrames[curLen - 1]);
+    if (curLen < prevLen) return returnNarration(prevFrames[prevLen - 1], curFrames[curLen - 1]);
+    if (printed) return printedNarration(printed);
+    const topFrame = stack[stack.length - 1];
+    const hotSlot = topFrame ? topFrame.vars.find((v) => v.hot) : void 0;
+    const created = heap.find((o) => !prevHeapIds.has(o.id));
+    if (created && hotSlot && hotSlot.ref != null && hotSlot.ref === created.id) {
+      return "Set `" + hotSlot.k + "` to a new `" + created.type + "`";
+    }
+    if (created) {
+      const label = typeof created.no === "number" ? `${created.type} #${created.no}` : created.type;
+      return typeof created.no === "number" ? "Created a `" + created.type + "` (`" + label + "`)" : "Created a `" + created.type + "`";
+    }
+    if (hotSlot) {
+      if (hotSlot.ref != null) return "Pointed `" + hotSlot.k + "` at `" + heapLabel(hotSlot.ref, heap) + "`";
+      return "Set `" + hotSlot.k + "` to `" + (hotSlot.v ?? "") + "`";
+    }
+    const g = globals.find((s) => s.hot);
+    if (g) return "Set `" + g.k + "` to `" + g.v + "`";
+    return runningNarration(ts.line, src);
+  }
+  function callNarration(top) {
+    if (top.kind === "entry") return "Entered `" + (top.name || "Main") + "`";
+    if (top.kind === "ctor") {
+      const type = (top.name || "").replace(/^new\s+/, "") || "object";
+      return "Called the `" + type + "` constructor";
+    }
+    const m = methodLabel(top);
+    return top.recv ? "Called `" + m + "` on `" + top.recv + "`" : "Called `" + m + "`";
+  }
+  function returnNarration(left, back) {
+    const backName = back ? back.name : null;
+    if (left.kind === "ctor") {
+      const type = (left.name || "").replace(/^new\s+/, "") || "object";
+      return backName ? "The `" + type + "` constructor finished - back in `" + backName + "`" : "The `" + type + "` constructor finished";
+    }
+    const m = methodLabel(left);
+    return backName ? "`" + m + "` returned to `" + backName + "`" : "`" + m + "` returned";
+  }
+  function methodLabel(f) {
+    const name = f.name || "?";
+    return name.endsWith(")") ? name : name + "()";
+  }
+  function printedNarration(printed) {
+    const parts = printed.replace(/\n+$/, "").split("\n");
+    const first = (parts[0] ?? "").replace(/`/g, "");
+    if (first === "") return "Printed a blank line";
+    const shown = parts.length > 1 ? first + " \u2026" : first;
+    return "Printed `" + shown + "`";
+  }
+  function heapLabel(ref, heap) {
+    const o = heap.find((h) => h.id === ref);
+    if (!o) return "an object";
+    return typeof o.no === "number" ? `${o.type} #${o.no}` : o.type;
   }
   function runningNarration(line, src) {
     const text = typeof line === "number" && line > 0 ? (src[line - 1] ?? "").trim() : "";
