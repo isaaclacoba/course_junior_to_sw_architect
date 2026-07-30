@@ -14,6 +14,11 @@ window.LESSON_META = {
   time: "25 min",
   archetype: "build",
   engine: "build",
+  resources: {
+    base: "res/strings",
+    lang: "en",
+    voices: ["default", "child", "academic"],
+  },
   concepts: {
     "introduces": [
       {

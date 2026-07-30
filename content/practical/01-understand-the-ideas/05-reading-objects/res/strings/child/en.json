@@ -1,0 +1,54 @@
+{
+  "intro.0": "A small step up. You will make a few tiny objects that work together - one asks another for what it needs, each one has a single job, and a class uses the tool it is handed. Nothing new to learn - just good habits you will use again soon.",
+
+  "task.1.title": "Two objects talk to each other",
+  "task.1.concept": "Objects help each other",
+  "task.1.context": "A `Greeter` does not know what time it is. So it [[concept:pr-collaboration|asks a `Clock` and uses the answer]] to choose a hello. The example below asks a `Sensor` - do the same thing with the clock.",
+  "task.1.goal.0": "Ask the `clock` for the hour. Before 12, return `\"Good morning\"`. Otherwise return `\"Good afternoon\"`.",
+  "task.1.goal.1": "This clock says 9, so it should print Good morning.",
+
+  "task.2.title": "Ask another object for the price",
+  "task.2.concept": "Let another object do it",
+  "task.2.context": "A `Cart` should not keep prices - the `PriceList` knows those. So the cart [[concept:pr-delegation|asks the price list for a price]] and times it by how many you want. First keep the price list you are handed, then ask it.\n\nThe example below asks a `Catalog` - do the same with the price list.",
+  "task.2.goal.0": "Save the `prices` you get in the constructor, then return the item's price times `qty`.",
+  "task.2.goal.1": "A book is 10 and qty is 3, so the output should be 30.",
+
+  "task.3.title": "A method that does one thing",
+  "task.3.concept": "One job at a time",
+  "task.3.context": "A good method does [[concept:pr-single-responsibility|just one thing]] you can name. `Area` does one sum - the two sides times each other - and nothing else. The example below is one job for a box - do the same for the rectangle.",
+  "task.3.goal.0": "Return the area of the rectangle - `width` times `height`.",
+  "task.3.goal.1": "For 4 by 5 the output should be 20.",
+
+  "task.4.title": "Give each job its own class",
+  "task.4.concept": "Split the jobs up",
+  "task.4.context": "`Checkout` was doing two jobs at once: the maths (price times how many) and the words (turning that number into text). Two jobs in one place means two reasons it might need to change.\n\nMove the words into `ReceiptFormatter`. `Checkout` keeps the maths and asks the formatter for the text. The example below splits a sale the same way.",
+  "task.4.goal.0": "Give `ReceiptFormatter` a `Format(int total)` that returns `\"Total: \"` and then the total.",
+  "task.4.goal.1": "In `Pay`, make a formatter and ask it for the text. For 10 by 2 the output should be Total: 20.",
+
+  "task.5.title": "Use what is handed in",
+  "task.5.concept": "Use what you are given",
+  "task.5.context": "A class does not need to make its own tools. `Mailer` is handed an `Outbox` in its constructor and uses that one - it never does `new Outbox()` itself. A tool handed in from outside is easy to swap later.\n\nThe example below hands a `Printer` its `Ink` - do the same with the mailer and its outbox.",
+  "task.5.goal.0": "Keep the `outbox` you are handed in the constructor, then send `\"hello \"` and then `who` through it.",
+  "task.5.goal.1": "For Sam the output should be sent: hello Sam.",
+
+  "task.6.title": "Wire two objects and run",
+  "task.6.concept": "Put it together",
+  "task.6.context": "Now put it all together: a `Worker` is handed a `ConsoleLog` and reports through it. Keep the log, then let `Report` write the status through the log it was given. Two small objects helping each other is the shape of most real code.\n\nThe example below wires a `Bell` to a `Speaker` - do the same with the worker and its log.",
+  "task.6.goal.0": "Keep the `log` you are handed in the constructor, then write the `status` through it in `Report`.",
+  "task.6.goal.1": "`Main` reports work done, so the output should be work done.",
+
+  "task.7.title": "What you learned",
+  "task.7.concept": "Recap",
+  "task.7.summaryIntro": "You read and wrote a few small objects that work together. These are the habits the SOLID drills will use next.",
+  "task.7.summaryItems.0.title": "Objects help each other - ",
+  "task.7.summaryItems.0.text": "one object asks another for what it needs, then uses the answer.",
+  "task.7.summaryItems.1.title": "One job per method - ",
+  "task.7.summaryItems.1.text": "a method that does exactly one thing is easy to name and trust.",
+  "task.7.summaryItems.2.title": "Split the jobs up - ",
+  "task.7.summaryItems.2.text": "when a method does two things, give one of them its own class or method.",
+  "task.7.summaryItems.3.title": "Use what you are given - ",
+  "task.7.summaryItems.3.text": "let a class take its tool through the constructor, so it is easy to swap later.",
+  "task.7.summaryItems.4.title": "Wire it up and run - ",
+  "task.7.summaryItems.4.text": "make the parts, hand them in, and let them talk - the shape of most real code.",
+  "task.7.summaryClose": "Next you will meet these ideas by their real names in the design track: single responsibility, and using what is handed in."
+}

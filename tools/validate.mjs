@@ -295,19 +295,39 @@ export function loadCheckpointQuizzes(migrated, rootDir) {
   return out;
 }
 
-// Scan every migrated lesson's data.js text for [[concept:id|label]] markers and
-// collect their ids (a raw-text scan, so it catches markers in any prose field).
+// Scan every migrated lesson's prose for [[concept:id|label]] markers and collect
+// their ids (a raw-text scan, so it catches markers in any prose field). Prose
+// lives in the lesson's data.js and, for lessons with an extracted resource
+// layer, in its res/strings/<voice>/<lang>.json bundles - both are scanned.
 export function loadProseMentions(migrated, rootDir) {
   const re = /\[\[concept:([^\]|]+)\|/g;
   const out = [];
   for (const m of migrated) {
+    const texts = [];
     const dataPath = path.join(rootDir, m.path, "data.js");
-    if (!fs.existsSync(dataPath)) continue;
-    const text = fs.readFileSync(dataPath, "utf8");
+    if (fs.existsSync(dataPath)) texts.push(fs.readFileSync(dataPath, "utf8"));
+    for (const f of listJsonFiles(path.join(rootDir, m.path, "res", "strings"))) {
+      texts.push(fs.readFileSync(f, "utf8"));
+    }
     const ids = [];
-    let mm;
-    while ((mm = re.exec(text))) ids.push(mm[1]);
+    for (const text of texts) {
+      let mm;
+      re.lastIndex = 0;
+      while ((mm = re.exec(text))) ids.push(mm[1]);
+    }
     if (ids.length) out.push({ lessonId: m.registryId, ids });
+  }
+  return out;
+}
+
+// Recursively list *.json files under dir (a lesson's voice/lang resource bundles).
+function listJsonFiles(dir) {
+  const out = [];
+  if (!fs.existsSync(dir)) return out;
+  for (const name of fs.readdirSync(dir)) {
+    const p = path.join(dir, name);
+    if (fs.statSync(p).isDirectory()) out.push(...listJsonFiles(p));
+    else if (name.endsWith(".json")) out.push(p);
   }
   return out;
 }

@@ -303,9 +303,53 @@ function renderIndexHtml(m, variants) {
       new RegExp('(\\n([ \\t]*)archetype: "' + archetype + '",)'),
       '$1\n$2prefix: ' + JSON.stringify(prefix) + ','
     );
+
+    // Opt-in resource layer: when meta.resources is set, the lesson's teaching
+    // prose lives in res/strings/<voice>/<lang>.json instead of inline in
+    // data.js. Swap the static `page-shell + engine` tail for the resource
+    // modules + bootstrap, which apply the selected voice's strings onto the
+    // lesson globals and then inject the (unchanged) page-shell and engine.
+    if (meta.resources) {
+      html = applyResourceTail(html, meta.resources, enginePath, m.id);
+    }
   }
 
   return html;
+}
+
+// Rewrite the static `page-shell + data + engine` tail into the resource-gated
+// tail. page-shell.js and the engine are no longer loaded statically; the
+// bootstrap injects them after applying the chosen voice's strings, so both
+// engines stay byte-for-byte the files the flat pages use.
+function applyResourceTail(html, resources, enginePath, lessonId) {
+  const base = resources.base || "res/strings";
+  const lang = resources.lang || "en";
+  const voices = (resources.voices || ["default"]).join(",");
+
+  const staticTail =
+    '    <script src="../../../../page-shell.js"></script>\n' +
+    '    <script src="data.js"></script>\n' +
+    '    <script src="' + enginePath + '"></script>';
+  if (html.indexOf(staticTail) === -1) {
+    throw new Error("resource wiring: could not find the static engine tail for " + lessonId);
+  }
+
+  const modules = ["resolver", "store", "manager", "settings", "preference", "theme-section", "voice-section", "bind-build"]
+    .map((mod) => '    <script src="../../../../resource/' + mod + '.js"></script>')
+    .join("\n");
+  const resourceTail =
+    '    <script src="data.js"></script>\n' +
+    modules + "\n" +
+    '    <script\n' +
+    '      src="../../../../resource/bootstrap.js"\n' +
+    '      data-page-shell="../../../../page-shell.js"\n' +
+    '      data-engine="' + enginePath + '"\n' +
+    '      data-res-base="' + base + '"\n' +
+    '      data-res-lang="' + lang + '"\n' +
+    '      data-res-voices="' + voices + '"\n' +
+    '    ></script>';
+
+  return html.replace(staticTail, resourceTail);
 }
 
 function main() {

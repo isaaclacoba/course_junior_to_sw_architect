@@ -1,0 +1,54 @@
+{
+  "intro.0": "A measured step up from single-token drills. You will write several small objects that collaborate - one requests what it needs from another, each holds a single responsibility, and a class uses the collaborator it is given. No new theory is introduced here; these are the habits the SOLID drills build on.",
+
+  "task.1.title": "Two objects collaborate",
+  "task.1.concept": "Object collaboration",
+  "task.1.context": "An object often produces a result by [[concept:pr-collaboration|delegating to a collaborator and acting on its response]]. Here a `Greeter` holds no notion of time itself - it queries a `Clock` for the hour and selects a greeting accordingly. The example below queries a `Sensor`; apply the same structure to the clock.",
+  "task.1.goal.0": "Query the `clock` for the hour, then return `\"Good morning\"` when it is before 12 and `\"Good afternoon\"` otherwise.",
+  "task.1.goal.1": "The clock reports 9, so the expected output is Good morning.",
+
+  "task.2.title": "Request data from a collaborator",
+  "task.2.concept": "Delegation",
+  "task.2.context": "A `Cart` should not hold prices - that responsibility belongs to the `PriceList`. The cart [[concept:pr-delegation|requests a price]] and multiplies it by the quantity. Retain the price list supplied to the cart, then query it.\n\nThe example below queries a `Catalog`; apply the same approach to the price list.",
+  "task.2.goal.0": "Store the `prices` supplied to the constructor, then return the item's price multiplied by `qty`.",
+  "task.2.goal.1": "A book costs 10 and qty is 3, so the expected output is 30.",
+
+  "task.3.title": "A method with one responsibility",
+  "task.3.concept": "Single responsibility",
+  "task.3.context": "A well-formed method produces [[concept:pr-single-responsibility|a single, nameable result]]. `Area` performs exactly one calculation - the product of the two sides - and nothing more. The example below assigns one responsibility to a box; do the same for the rectangle.",
+  "task.3.goal.0": "Return the area of the rectangle - `width` multiplied by `height`.",
+  "task.3.goal.1": "For 4 by 5 the expected output is 20.",
+
+  "task.4.title": "Assign each responsibility its own class",
+  "task.4.concept": "Separation of concerns",
+  "task.4.context": "`Checkout` was performing two responsibilities at once: the arithmetic (price multiplied by quantity) and the presentation (rendering that number as text). Two responsibilities in one method give it two reasons to change.\n\nMove the presentation into `ReceiptFormatter`. `Checkout` retains the arithmetic and requests the text from the formatter. The example below separates a sale in the same way.",
+  "task.4.goal.0": "Give `ReceiptFormatter` a `Format(int total)` that returns `\"Total: \"` followed by the total.",
+  "task.4.goal.1": "In `Pay`, construct a formatter and request the text from it. For 10 by 2 the expected output is Total: 20.",
+
+  "task.5.title": "Use an injected collaborator",
+  "task.5.concept": "Dependency injection",
+  "task.5.context": "A class need not construct its own collaborators. `Mailer` receives an `Outbox` through its constructor and uses that instance - it never calls `new Outbox()` itself. A collaborator supplied from outside can be substituted later.\n\nThe example below supplies a `Printer` with its `Ink`; apply the same approach to the mailer and its outbox.",
+  "task.5.goal.0": "Retain the `outbox` supplied to the constructor, then send `\"hello \"` followed by `who` through it.",
+  "task.5.goal.1": "For Sam the expected output is sent: hello Sam.",
+
+  "task.6.title": "Compose two objects and run",
+  "task.6.concept": "Composition",
+  "task.6.context": "Now assemble the pieces: a `Worker` receives a `ConsoleLog` and reports through it. Retain the log, then have `Report` write the status through the log it was given. Two small objects collaborating is the shape of most production code.\n\nThe example below composes a `Bell` with a `Speaker`; apply the same approach to the worker and its log.",
+  "task.6.goal.0": "Retain the `log` supplied to the constructor, then write the `status` through it in `Report`.",
+  "task.6.goal.1": "`Main` reports work done, so the expected output is work done.",
+
+  "task.7.title": "Reading objects: summary",
+  "task.7.concept": "Summary",
+  "task.7.summaryIntro": "You read and wrote several small objects that collaborate. These are the habits the SOLID drills build on.",
+  "task.7.summaryItems.0.title": "Object collaboration - ",
+  "task.7.summaryItems.0.text": "one object requests what it needs from another, then acts on the response.",
+  "task.7.summaryItems.1.title": "Single responsibility - ",
+  "task.7.summaryItems.1.text": "a method that performs exactly one task is easy to name and to trust.",
+  "task.7.summaryItems.2.title": "Separation of concerns - ",
+  "task.7.summaryItems.2.text": "when a method performs two tasks, give one of them its own class or method.",
+  "task.7.summaryItems.3.title": "Dependency injection - ",
+  "task.7.summaryItems.3.text": "let a class receive its collaborator through the constructor, so it can be substituted later.",
+  "task.7.summaryItems.4.title": "Composition - ",
+  "task.7.summaryItems.4.text": "construct the parts, supply them, and let them collaborate - the shape of most production code.",
+  "task.7.summaryClose": "Next you will meet these ideas by name in the design track: the single responsibility principle, and depending on what is supplied."
+}
