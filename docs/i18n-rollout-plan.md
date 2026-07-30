@@ -165,6 +165,18 @@ until green); `docs/work-log.md` per session; commit per phase.
   `reading-objects` has the identical gap (parity), so it is a shared page-shell fix (localize
   cfMeta + title in `repaintHero`/kernel setLocale, sourced from the translated title + a chrome
   part label), done ONCE for all kernel lessons - not per lesson. Remaining build lessons: 26.
+- **2026-07-30** - T2 build-lesson rollout COMPLETE: batch kernel-ized the remaining 27 build
+  lessons (all 29 build lessons now en/es: reading-objects + control-flow + 27). Same recipe as
+  control-flow, scripted; drafts were task-only so Spanish hero+intro was authored per lesson (6
+  part eyebrows mapped once). Edge cases handled: `reuse-without-regret` keeps both intro lines;
+  `the-solid-principles` intro[1] is a `{html,class:"solid-intro"}` object - default en skips
+  intro.* to preserve the inline object (verified solid-intro class intact in en), es supplies both
+  lines as strings. validate: 0 errors. Verified headless (sample across all 6 parts + the object
+  edge): en unchanged (hero English, 0 undefined, 0 es-leak); es full Spanish (hero title + mapped
+  eyebrow + Objetivo chrome). Machine-first-pass Spanish; native review pending.
+  REMAINING for full site: T1 chrome site-wide wiring (drill/settings/agenda/landing + cfMeta/title
+  page-shell fix) and the 42 viz + 4 checkpoint lessons (binders + translations not yet drafted);
+  code-lab Quiz labels.
 - **2026-07-30** - Finding (owner-raised): chrome-i18n also involves the vendored code-lab widgets.
   code-lab ALREADY has a labels-injection API (`DEFAULT_LABELS + opts.labels`) on the main widget,
   error panel, MemoryViz chips and die view -> those are course-side config. GAP: the `Quiz` widget
