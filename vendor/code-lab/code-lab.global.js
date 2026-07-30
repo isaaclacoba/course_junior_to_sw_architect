@@ -27,6 +27,7 @@ var CodeLab = (() => {
     DEFAULT_LOOP_TOOLS: () => DEFAULT_LOOP_TOOLS,
     DEFAULT_MEMORY_STORES: () => DEFAULT_MEMORY_STORES,
     FULL_REGIONS: () => FULL_REGIONS,
+    IframeRunner: () => IframeRunner,
     MemoryViz: () => MemoryViz,
     MonacoEditor: () => MonacoEditor,
     PlainHighlighter: () => PlainHighlighter,
@@ -684,7 +685,8 @@ ${result.runtimeError}`.trim(),
   };
 
   // src/editors/load-monaco.ts
-  var DEFAULT_BASE = "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs";
+  var MONACO_VERSION = "0.52.2";
+  var DEFAULT_BASE = `https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/${MONACO_VERSION}/min/vs`;
   var pending;
   function loadMonaco(config = {}) {
     if (window.monaco) return Promise.resolve(window.monaco);
@@ -825,7 +827,7 @@ ${result.runtimeError}`.trim(),
 
   // src/runners/roslyn-iframe.ts
   var DEFAULT_WARM_PROGRAM = "public class __Warm { public static void Main() { } }";
-  var RoslynIframeRunner = class {
+  var IframeRunner = class {
     constructor(config) {
       this.iframe = null;
       this.readyPromise = null;
@@ -948,6 +950,7 @@ ${result.runtimeError}`.trim(),
       this.warmPromise = null;
     }
   };
+  var RoslynIframeRunner = IframeRunner;
 
   // src/core/memory-model.ts
   var ALL_REGIONS = ["code", "global", "stack", "heap"];
@@ -2675,8 +2678,9 @@ ${result.runtimeError}`.trim(),
     return kind === "new-object" ? "new object" : kind;
   }
   var VizControls = class {
-    constructor(actions, handlers, nextHref, legend) {
+    constructor(actions, handlers, nextHref, legend, nextLabel = "Next \u25B6") {
       this.nextHref = nextHref;
+      this.nextLabel = nextLabel;
       this.el = document.createElement("div");
       this.el.innerHTML = `
       <div class="cl-mv-controls">
@@ -2770,7 +2774,7 @@ ${result.runtimeError}`.trim(),
       const next2 = this.el.querySelector('[data-c="next"]');
       if (state.atEnd && this.nextHref) {
         next2.disabled = false;
-        next2.textContent = "Next lesson \u25B6";
+        next2.textContent = this.nextLabel;
       } else {
         next2.disabled = state.atEnd;
         next2.textContent = "Next \u25B6";
@@ -2815,7 +2819,7 @@ ${result.runtimeError}`.trim(),
         transcript: () => new TranscriptView(),
         retrieval: () => new RetrievalView(),
         planboard: () => new PlanboardView(),
-        controls: (_spec, ctx) => this.controls = new VizControls(ctx.actions, ctx.handlers, ctx.nextHref, ctx.legend)
+        controls: (_spec, ctx) => this.controls = new VizControls(ctx.actions, ctx.handlers, ctx.nextHref, ctx.legend, ctx.nextLabel)
       };
       this.onResize = () => {
         this.relayout();
@@ -2827,8 +2831,10 @@ ${result.runtimeError}`.trim(),
       const zoomTab = scene.zoomTab !== false;
       this.actions = config.actions ?? [];
       this.nextHref = config.nextHref;
+      this.nextLabel = config.nextLabel;
+      this.onXpChange = config.onXpChange;
       this.progress = new ProgressStore(
-        config.xpKey ?? "course_global_xp",
+        config.xpKey ?? "codelab_xp",
         config.awardedKey,
         typeof config.awardAmount === "number" ? config.awardAmount : 20
       );
@@ -2880,7 +2886,8 @@ ${result.runtimeError}`.trim(),
         handlers: this.handlers,
         regionTags: config.regionTags ?? {},
         legend: config.legend,
-        nextHref: this.nextHref
+        nextHref: this.nextHref,
+        nextLabel: this.nextLabel
       };
       this.layout = config.layout ?? {
         visual: [
@@ -2977,10 +2984,9 @@ ${result.runtimeError}`.trim(),
         this.markComplete();
       }
     }
-    /** Refresh the course XP label in the hero, if the page has one. */
+    /** Report the current tracked XP to the host, which owns any XP label. */
     refreshXp() {
-      const label = document.getElementById("courseXpLabel");
-      if (label) label.textContent = `Course XP: ${this.progress.xp()}`;
+      this.onXpChange?.(this.progress.xp());
     }
     /** Mark the lesson complete and grant XP once, when the last step is reached. */
     markComplete() {
@@ -3209,7 +3215,8 @@ ${result.runtimeError}`.trim(),
       this.ready = false;
       this.level = config.level ?? "heap";
       this.legend = config.legend;
-      this.runner = new RoslynIframeRunner({
+      this.language = config.language ?? "csharp";
+      this.runner = new IframeRunner({
         url: config.runnerUrl,
         readyTimeout: config.readyTimeout ?? 18e4
       });
@@ -3263,7 +3270,7 @@ ${result.runtimeError}`.trim(),
       await loadMonaco();
       await this.editor.mount(this.editorHost, {
         value: starter,
-        language: "csharp",
+        language: this.language,
         readOnly: false,
         autoHeight: { minHeight: 220, maxHeight: 640 }
       });
@@ -3428,19 +3435,20 @@ ${result.runtimeError}`.trim(),
   }
 
   // src/dom/quiz-view.ts
-  function localStore(xpKey, awardedKey) {
+  function localStore(xpKey, awardedKey, kv = globalThis.localStorage) {
     const read = () => {
       try {
-        return JSON.parse(localStorage.getItem(awardedKey) || "{}");
+        return JSON.parse(kv.getItem(awardedKey) || "{}");
       } catch {
         return {};
       }
     };
+    const xp = () => parseInt(kv.getItem(xpKey) || "0", 10);
     return {
       hasPassed: () => Boolean(read().passed),
-      markPassed: () => localStorage.setItem(awardedKey, JSON.stringify({ passed: true })),
-      getXP: () => parseInt(localStorage.getItem(xpKey) || "0", 10),
-      addXP: (amount) => localStorage.setItem(xpKey, String(parseInt(localStorage.getItem(xpKey) || "0", 10) + amount))
+      markPassed: () => kv.setItem(awardedKey, JSON.stringify({ passed: true })),
+      getXP: xp,
+      addXP: (amount) => kv.setItem(xpKey, String(xp() + amount))
     };
   }
   function escapeHtml5(text) {
@@ -3457,7 +3465,7 @@ ${result.runtimeError}`.trim(),
       this.graded = false;
       this.cfg = config;
       this.awardAmount = typeof config.awardAmount === "number" ? config.awardAmount : 40;
-      this.store = store ?? localStore(config.xpKey || "course_global_xp", config.awardedKey || `${config.prefix || "quiz"}_awarded`);
+      this.store = store ?? localStore(config.xpKey || "codelab_xp", config.awardedKey || `${config.prefix || "quiz"}_awarded`);
       this.root = document.createElement("section");
       this.root.className = "cl-quiz";
       this.root.setAttribute("aria-live", "polite");
@@ -3598,10 +3606,9 @@ ${result.runtimeError}`.trim(),
       this.els.progress.textContent = `Scored ${score}/${total}`;
       this.els.result.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
-    /** Best-effort refresh of the course's shared XP label, if the page has one. */
+    /** Report the current XP to the host, which owns any XP label. */
     refreshXpLabel() {
-      const label = document.getElementById("courseXpLabel");
-      if (label) label.textContent = `Course XP: ${this.store.getXP()}`;
+      this.cfg.onXpChange?.(this.store.getXP());
     }
   };
   return __toCommonJS(src_exports);

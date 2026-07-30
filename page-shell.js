@@ -334,6 +334,12 @@
     hero.insertAdjacentHTML("afterend", buildCard(page.prefix));
   }
 
+  // Reflect the code-lab widgets' XP callback into the course's shared hero label.
+  function setCourseXpLabel(xp) {
+    var el = document.getElementById("courseXpLabel");
+    if (el) el.textContent = "Course XP: " + xp;
+  }
+
   // Optional interactive visual for a lesson, supplied as a DECOUPLED data file
   // (window.LESSON_VIZ, e.g. theory-N.viz.js) and mounted once, right under the
   // hero. Keeps the lesson's text (drill data) and its visual (viz config) apart.
@@ -342,6 +348,11 @@
     vizHost.className = "lesson-viz";
     hero.insertAdjacentElement("afterend", vizHost);
     if (!window.LESSON_VIZ.nextHref) window.LESSON_VIZ.nextHref = page.nextHref;
+    // The widget is course-agnostic; the course owns its shared XP counter, its
+    // XP label element, and its button wording, so inject those here.
+    if (!window.LESSON_VIZ.xpKey) window.LESSON_VIZ.xpKey = "course_global_xp";
+    if (!window.LESSON_VIZ.nextLabel) window.LESSON_VIZ.nextLabel = "Next lesson \u25b6";
+    if (!window.LESSON_VIZ.onXpChange) window.LESSON_VIZ.onXpChange = setCourseXpLabel;
     // Track progress: mark the lesson done + award XP when the last step is
     // reached. The key is derived from the page (theory-5.html -> theory_5_awarded)
     // so it matches the card on the index, unless the lesson sets its own.
@@ -367,6 +378,8 @@
     quizHost.className = "lesson-quiz";
     hero.insertAdjacentElement("afterend", quizHost);
     if (!window.QUIZ_CONFIG.nextHref) window.QUIZ_CONFIG.nextHref = page.nextHref;
+    if (!window.QUIZ_CONFIG.xpKey) window.QUIZ_CONFIG.xpKey = "course_global_xp";
+    if (!window.QUIZ_CONFIG.onXpChange) window.QUIZ_CONFIG.onXpChange = setCourseXpLabel;
     try {
       window.CodeLab.Quiz.create(quizHost, window.QUIZ_CONFIG);
     } catch (err) {
