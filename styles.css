@@ -1709,3 +1709,18 @@ input.almost {
   border-color: var(--indigo-ink);
   color: var(--ink);
 }
+
+/* ---- VizLab: the "Visualize my code" surface chrome ---------------- */
+[data-theme="dark"] .cl-vl {
+  --cl-ink-soft: var(--ink-soft);
+  --cl-line: var(--line);
+}
+/* Level chips: an unselected chip sits on the dark card, so its label must
+   lift to the light ink; the selected chip is an amber fill and keeps a dark
+   label for contrast (--cl-ink is dual-role, so it is fixed per element). */
+[data-theme="dark"] .cl-vl .cl-vl-levels .cl-vl-level {
+  color: var(--ink);
+}
+[data-theme="dark"] .cl-vl .cl-vl-levels .cl-vl-level[aria-pressed="true"] {
+  color: var(--cl-code-bg);
+}

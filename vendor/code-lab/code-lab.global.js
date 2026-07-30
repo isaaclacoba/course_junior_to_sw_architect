@@ -1679,6 +1679,7 @@ ${result.runtimeError}`.trim(),
   // src/dom/code-panel.ts
   var CodePanel = class {
     constructor(code) {
+      this.lastPc = -1;
       this.code = code;
       this.el = document.createElement("div");
       this.el.className = "cl-mv-region cl-mv-code cl-mv-codepanel";
@@ -1693,6 +1694,7 @@ ${result.runtimeError}`.trim(),
     sync(ctx) {
       const lines = ctx.model.code ?? this.code;
       const pc = ctx.model.pc ?? -1;
+      const pcChanged = pc !== this.lastPc;
       this.el.classList.toggle("dimmed", !ctx.model.codeLive);
       if (this.list.children.length !== lines.length) {
         this.list.innerHTML = "";
@@ -1703,6 +1705,26 @@ ${result.runtimeError}`.trim(),
         li.innerHTML = markedLineHtml(line, spansForLine(i, line, ctx.model.codeMark, pc));
         li.classList.toggle("pc", i === pc);
       });
+      this.lastPc = pc;
+      if (pc >= 0 && pcChanged) this.scrollPcIntoView(pc);
+    }
+    scrollPcIntoView(pc) {
+      const activeLi = this.list.children.item(pc);
+      if (!activeLi || typeof activeLi.scrollIntoView !== "function") return;
+      let reducedMotion = false;
+      try {
+        reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+      } catch {
+        reducedMotion = false;
+      }
+      try {
+        activeLi.scrollIntoView({
+          block: "nearest",
+          inline: "nearest",
+          behavior: reducedMotion ? "auto" : "smooth"
+        });
+      } catch {
+      }
     }
   };
 
@@ -1849,7 +1871,8 @@ ${result.runtimeError}`.trim(),
       this.markerId = `clmv-hp-ah-${uid}`;
       this.el = document.createElement("div");
       this.el.className = "cl-mv-region cl-mv-heapcards";
-      this.el.innerHTML = `<span class="cl-mv-tag">MEMORY <span>\xB7 names on the left, objects on the right</span></span><div class="cl-mv-hp-cols"><div class="cl-mv-hp-roots" data-hproots></div><div class="cl-mv-hp-objs" data-hpobjs></div><svg class="cl-mv-hp-arrows"><defs><marker id="${this.markerId}" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#2563eb" stroke="none" /></marker></defs></svg></div>`;
+      this.el.innerHTML = `<span class="cl-mv-tag">MEMORY <span>\xB7 names on the left, objects on the right</span></span><div class="cl-mv-hp-statics" data-hpstatics></div><div class="cl-mv-hp-cols"><div class="cl-mv-hp-roots" data-hproots></div><div class="cl-mv-hp-objs" data-hpobjs></div><svg class="cl-mv-hp-arrows"><defs><marker id="${this.markerId}" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#2563eb" stroke="none" /></marker></defs></svg></div>`;
+      this.statics = this.el.querySelector("[data-hpstatics]");
       this.roots = this.el.querySelector("[data-hproots]");
       this.objs = this.el.querySelector("[data-hpobjs]");
       this.arrows = this.el.querySelector(".cl-mv-hp-arrows");
@@ -1861,6 +1884,7 @@ ${result.runtimeError}`.trim(),
       this.drawArrows(model.refs);
     }
     render(model) {
+      this.statics.innerHTML = staticsHtml(model.globals ?? [], model.rodata ?? []);
       this.roots.innerHTML = framesHtml(model.stack ?? []);
       this.objs.innerHTML = (model.heap ?? []).map((o) => objHtml(o, model.glow)).join("");
       if (typeof window.requestAnimationFrame === "function") {
@@ -1898,6 +1922,20 @@ ${result.runtimeError}`.trim(),
       });
     }
   };
+  function staticsHtml(globals, rodata) {
+    return [
+      globals.length ? staticGroupHtml("STATICS", "values shared across the program", globals, true) : "",
+      rodata.length ? staticGroupHtml("CONSTANTS", "fixed at compile time", rodata, false) : ""
+    ].join("");
+  }
+  function staticGroupHtml(title, note, slots, allowHot) {
+    const rows = slots.map((slot) => staticRowHtml(slot, allowHot)).join("");
+    return `<div class="cl-mv-hp-sgroup"><span class="cl-mv-tag">${esc3(title)} <span>&#183; ${esc3(note)}</span></span><div class="cl-mv-hp-srows">${rows}</div></div>`;
+  }
+  function staticRowHtml(slot, allowHot) {
+    const hot = allowHot && slot.hot ? " is-changed" : "";
+    return `<div class="cl-mv-hp-row${hot}"><span class="cl-mv-hp-name">${esc3(slot.k)}</span><span class="cl-mv-hp-val">${esc3(slot.v)}</span></div>`;
+  }
   function framesHtml(stack) {
     const frames = [...stack].reverse();
     return frames.map((frame, i) => {
@@ -3048,6 +3086,7 @@ ${result.runtimeError}`.trim(),
     const out = [];
     let prevValues = /* @__PURE__ */ new Map();
     let prevFields = /* @__PURE__ */ new Map();
+    let prevGlobals = /* @__PURE__ */ new Map();
     let prevStdout = "";
     steps.forEach((ts, i) => {
       const values = /* @__PURE__ */ new Map();
@@ -3058,6 +3097,9 @@ ${result.runtimeError}`.trim(),
       const heap = (ts.heap ?? []).map(
         (o) => objectToObject(o, fields, prevFields, i === 0)
       );
+      const globalValues = /* @__PURE__ */ new Map();
+      const globals = globalSlots(ts.statics ?? [], globalValues, prevGlobals, i === 0);
+      const rodata = globalSlots(ts.consts ?? []);
       const stdout = ts.stdout ?? "";
       const printed = stdout.startsWith(prevStdout) ? stdout.slice(prevStdout.length) : stdout;
       const step = {
@@ -3067,10 +3109,13 @@ ${result.runtimeError}`.trim(),
         stack,
         heap
       };
+      if (globals.length) step.globals = globals;
+      if (rodata.length) step.rodata = rodata;
       if (printed) step.printed = printed;
       out.push(step);
       prevValues = values;
       prevFields = fields;
+      prevGlobals = globalValues;
       prevStdout = stdout;
     });
     const lastTs = steps[steps.length - 1];
@@ -3083,13 +3128,18 @@ ${result.runtimeError}`.trim(),
       const heap = (lastTs.heap ?? []).map(
         (o) => objectToObject(o, fields, prevFields, false)
       );
-      out.push({
+      const globals = globalSlots(lastTs.statics ?? [], /* @__PURE__ */ new Map(), prevGlobals, false);
+      const rodata = globalSlots(lastTs.consts ?? []);
+      const terminal = {
         narr: trace.truncated ? "Stopped early - there were too many steps to show the rest." : "The program has finished.",
         pc: -1,
         codeLive: true,
         stack,
         heap
-      });
+      };
+      if (globals.length) terminal.globals = globals;
+      if (rodata.length) terminal.rodata = rodata;
+      out.push(terminal);
     }
     return out;
   }
@@ -3114,6 +3164,21 @@ ${result.runtimeError}`.trim(),
       if (!firstStep && prevFields.get(key) !== value) hotFields.push(name);
     });
     return { id: o.id, type: o.type, fields: o.fields ?? [], hotFields };
+  }
+  function globalSlots(globals, values, prevValues, firstStep = false) {
+    return (globals ?? []).map((g) => {
+      const owner = g.owner ?? "";
+      const id = `${owner}.${g.name}`;
+      const v = g.value ?? "";
+      values?.set(id, v);
+      const slot = {
+        id,
+        k: owner ? `${owner}.${g.name}` : g.name,
+        v
+      };
+      if (prevValues && !firstStep && prevValues.get(id) !== v) slot.hot = true;
+      return slot;
+    });
   }
   function refDisplay(v) {
     return v.ref != null ? `\u2192${v.ref}` : v.value ?? "null";
@@ -3189,9 +3254,8 @@ ${result.runtimeError}`.trim(),
     }));
   }
   var LEVELS = [
-    { id: "values", label: "Values", panel: "vartable" },
-    { id: "callstack", label: "Call stack", panel: "callstack" },
-    { id: "heap", label: "Heap", panel: "heapcards" }
+    { id: "memory", label: "Memory", panel: "heapcards" },
+    { id: "values", label: "Simple values", panel: "vartable" }
   ];
   var DEFAULT_STARTER = [
     "class Program",
@@ -3205,6 +3269,9 @@ ${result.runtimeError}`.trim(),
     "    }",
     "}"
   ].join("\n");
+  function normalizeLevel(level) {
+    return level === "values" ? "values" : "memory";
+  }
   var VizLab = class _VizLab {
     constructor(host, config) {
       this.levelBtns = /* @__PURE__ */ new Map();
@@ -3213,7 +3280,7 @@ ${result.runtimeError}`.trim(),
       this.lastSteps = null;
       this.viz = null;
       this.ready = false;
-      this.level = config.level ?? "heap";
+      this.level = normalizeLevel(config.level ?? "memory");
       this.legend = config.legend;
       this.language = config.language ?? "csharp";
       this.runner = new IframeRunner({
