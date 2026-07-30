@@ -6,7 +6,25 @@ display data lives in its `meta.js`. 75/76 lessons migrated (only the external c
 design). Phase 0 done (10/10); concept graph drafted (208), audited, applied. CG3 re-audit done
 (P1=0; the clear P2/P3 fixes were applied - fp moved to `f9f9b2b89215`; the two flagged overlaps were
 kept split by decision). Phases 1-4 done (glossary + "in this lesson" agenda + in-prose concept
-mentions + per-concept evaluation). Owner: Isaac + agent. Last updated: 2026-07-29.
+mentions + per-concept evaluation). Owner: Isaac + agent. Last updated: 2026-07-30.
+
+## Successor initiatives (this plan spawned them)
+
+The concept-index work seeded two follow-on initiatives, tracked so nothing is lost:
+
+1. **Resource / i18n layer (SHIPPED, local commits, not pushed).** Per-lesson
+   teaching prose extracted into per-voice x per-language bundles
+   (`res/strings/<voice>/<lang>.json`), resolved at runtime and applied before the
+   engine renders; a Settings popover (Theme + Reading voice + Language); an
+   `extract-res` migrator + a `checkResourceArity` validate guard; a Spanish draft on
+   reading-objects. Piloted on `reading-objects`. See `docs/work-log.md` and the
+   `resource-authoring` skill.
+2. **Lesson Platform Kernel re-architecture (APPROVED, Phase 1 not started).** The
+   live voice/lang swap (no reload) is the first increment of a domain-agnostic
+   platform: a lesson = a template composing widgets + text, with gamification,
+   media, and interactive widgets. Design-of-record + the phased action plan live in
+   **`docs/architecture/lesson-platform-kernel.md`** - that is the plan of record for
+   this line of work from here on.
 
 Tracking: each action item is a checkbox. Flip `- [ ]` to `- [x]` when the item is
 DONE and its Verify step passes. Use `- [~]` for in-progress. Keep the Progress
