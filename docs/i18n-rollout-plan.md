@@ -137,6 +137,34 @@ until green); `docs/work-log.md` per session; commit per phase.
   reading-objects es fully Spanish; live en->es swap flips chrome+hero+content, no reload,
   buffer+hash preserved. Deferred to T1: Settings/agenda labels, the interpolated describeExpected
   message, progressNoun (per-lesson data). NEXT: item 6 - commit T0.
+- **2026-07-30** - /fleet wave 1 (translation/authoring only; committed d8008af). Two disjoint
+  agents, shared spine kept serial (main agent): (A) T1 - added 103 shared chrome keys
+  (drill.*/agenda.*/concept.*/settings.*/landing.*) to `res/chrome/{en,es}.json` (INERT until the
+  engines are wired to read them; existing wired keys 0-diff, reading-objects unaffected) +
+  `docs/i18n/t1-landing.md` (47-string landing map). (B) T2 - Spanish drafts for all 28 build
+  lessons under `docs/i18n/drafts/*.es.json` (task.N.* schema, mirroring reading-objects; code +
+  output literals kept verbatim). Verified: only owned files changed, all JSON valid.
+  PENDING (serial): T1 = wire drill-engine/settings/agenda/landing to `t()` + load chrome/lang
+  site-wide on every page; T2 = extract each build lesson -> `res/strings` bundle + drop in its es
+  draft + `meta.runtime:"kernel"` + regenerate + verify. Owner review of the machine-translated
+  Spanish (native ES) also pending.
+- **2026-07-30** - T2 first integration: `control-flow` kernel-ized end-to-end (2nd kernel lesson
+  after `reading-objects`). Proven per-lesson recipe: (1) `node tools/extract-res.mjs <dir> --lang
+  en --write` (default en bundle = task.* only; mechanics data.js; meta.resources). (2) augment the
+  default en bundle with `hero.eyebrow`/`hero.title`/`intro.N` VERBATIM from meta (the extractor
+  omits them, but a non-default-lang bundle needs hero keys present in default or arity errors -
+  hero.* is NOT whitelisted, only intro.\d+ is). (3) write es bundle = Spanish hero+intro + the
+  draft's task.* (drafts are TASK-ONLY: hero/intro Spanish must be added per lesson). (4) meta:
+  `runtime:"kernel"` + `resources.langs:["en","es"]`. (5) regenerate + validate (0 errors) + verify
+  render. VERIFIED: en unchanged (hero/card/chrome English, 0 undefined, 0 es-leak); es fully
+  Spanish (hero "Flujo de control", card "Ramifica con if / else", chrome Objetivo/Salida
+  esperada/Tu código/Ver solución/Reiniciar/Anterior); key-align 30/30.
+- **KNOWN GAP (T1, shared, DRY once):** the hero breadcrumb `<p id="<p>Meta" class="meta">` (e.g.
+  "Understand the ideas · Control Flow") and the document `<title>` stay English on es - filled from
+  the English course registry, not repainted by `repaintHero`. Confirmed the accepted pilot
+  `reading-objects` has the identical gap (parity), so it is a shared page-shell fix (localize
+  cfMeta + title in `repaintHero`/kernel setLocale, sourced from the translated title + a chrome
+  part label), done ONCE for all kernel lessons - not per lesson. Remaining build lessons: 26.
 - **2026-07-30** - Finding (owner-raised): chrome-i18n also involves the vendored code-lab widgets.
   code-lab ALREADY has a labels-injection API (`DEFAULT_LABELS + opts.labels`) on the main widget,
   error panel, MemoryViz chips and die view -> those are course-side config. GAP: the `Quiz` widget
