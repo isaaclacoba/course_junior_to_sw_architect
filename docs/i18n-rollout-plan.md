@@ -177,6 +177,21 @@ until green); `docs/work-log.md` per session; commit per phase.
   REMAINING for full site: T1 chrome site-wide wiring (drill/settings/agenda/landing + cfMeta/title
   page-shell fix) and the 42 viz + 4 checkpoint lessons (binders + translations not yet drafted);
   code-lab Quiz labels.
+- **2026-07-30** - VOICE QUALITY PASS (owner-driven, COMPLETE for build lessons). Owner (native ES,
+  Spain) rejected the machine first pass as unnatural on two axes: (1) literal/calqued Spanish, then
+  (2) "AI-voice" - essayistic noun-label colon scaffolds ("La respuesta sincera:", "La solución:").
+  Locked a Spain-native voice guide in repo memory `/memories/repo/es-voice.md`: keep ESTABLISHED
+  English tech terms (array/string/override/mock/stub/spy/fake/test double/log/feed/mailer/...),
+  informal `tú`, Spain idioms (merece la pena, echa mano de, tocar el código, porque sí, revienta),
+  guillemets « », and a second AI-voice pass that kills noun-label scaffolds (say it straight / verb-
+  first, e.g. "The fix:" -> "Arréglalo así:"). Owner approved on the-solid-principles #4. Then
+  hand-re-translated ALL 29 build lessons against the guide (not delegated - owner chose option 1
+  for consistency), wave by wave (Parts 1-6), each: key-aligned, `[[concept:]]` markup preserved,
+  AI-voice-grep clean, `validate` 0 errors, es render spot-checked. **All 29 build-lesson es bundles
+  are now native Spain Spanish.** Commits: cc78f77..7671787 (calibration 8b74355/1cf714f, then per-
+  wave). Still machine-authored (one native speaker = owner reviewed the voice, not every string);
+  a full native proofread is the remaining QA. The es-voice guide now governs any future ES pass
+  (viz/checkpoint/chrome), so those buckets should be authored native-first, not literal-then-fixed.
 - **2026-07-30** - Finding (owner-raised): chrome-i18n also involves the vendored code-lab widgets.
   code-lab ALREADY has a labels-injection API (`DEFAULT_LABELS + opts.labels`) on the main widget,
   error panel, MemoryViz chips and die view -> those are course-side config. GAP: the `Quiz` widget
