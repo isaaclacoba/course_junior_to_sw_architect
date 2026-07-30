@@ -19,7 +19,7 @@ window.LESSON_META = {
     base: "res/strings",
     lang: "en",
     langs: ["en", "es"],
-    voices: ["default", "child", "academic"],
+    voices: ["default"],
   },
   concepts: {
     "introduces": [

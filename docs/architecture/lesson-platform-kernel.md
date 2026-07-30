@@ -1,6 +1,6 @@
 # Lesson Platform Kernel - design-of-record + action plan
 
-Status: **Phase 1 COMPLETE (local commit; not pushed).** Owner: Isaac + agent.
+Status: **Phase 1 COMPLETE (local commit; not pushed). Phases 2-6 PARKED (owner, 2026-07-30).** Owner: Isaac + agent.
 Last updated: 2026-07-30.
 
 This is the design-of-record for re-architecting the lesson runtime into a
@@ -145,6 +145,11 @@ DOM-sync. Expected first trigger: the level-0 debugger (Phase 5).
 | 4 - Media widgets | video/image + descriptor resources | 0 / 1 |
 | 5 - Level-0 debugger (drop-in proof) | zero core edits | 0 / 1 |
 | 6 - Domain #2 (finance) | same kernel, new content tree | 0 / 1 |
+
+> **Phases 2-6 are PARKED** (owner, 2026-07-30). The contracts are pinned, so each
+> resumes mechanically on its promotion-map trigger - not on a date. Current focus is
+> content/config on the shipped Phase-1 runtime (active-voices toggle, translation),
+> not new kernel modules.
 
 ## Phase 1 - action items (lean-conformant)
 
@@ -300,3 +305,9 @@ No bus, no registry, no host, no LAYOUT, no context object.
   reading-objects is the first kernel lesson (`meta.runtime:"kernel"`); everything else
   unchanged. Committed locally (not pushed). Contracts pinned for Phase 2 (bus/gamification)
   per the promotion map.
+- **2026-07-30** - Owner PARKED Phases 2-6 to focus on content/config over the shipped
+  Phase-1 runtime. (a) Active-voices toggle: `meta.resources.voices` is the switch for which
+  voices are offered; set reading-objects to `["default"]` so the Reading-voice picker hides
+  (the `child`/`academic` bundles stay authored on disk, just not offered - `voice-section`
+  shows only when >= 2 voices). (b) Full-Spanish page = separate scope decision (content is
+  already translated; the remaining English is chrome).
