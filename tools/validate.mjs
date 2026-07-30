@@ -209,6 +209,75 @@ export function checkProseMentions(mentions, knownIds, report) {
   }
 }
 
+// The keys a COMPLETE default bundle must carry for a build lesson's tasks:
+// every non-summary task needs title/concept/context + at least goal.0; the
+// recap (summary:true) task needs its summary keys (intro, one item, close).
+export function requiredDefaultKeys(tasks) {
+  const req = [];
+  (tasks || []).forEach((t, i) => {
+    const n = i + 1;
+    if (t && t.summary) {
+      req.push(
+        `task.${n}.summaryIntro`,
+        `task.${n}.summaryItems.0.title`,
+        `task.${n}.summaryItems.0.text`,
+        `task.${n}.summaryClose`
+      );
+    } else {
+      req.push(`task.${n}.title`, `task.${n}.concept`, `task.${n}.context`, `task.${n}.goal.0`);
+    }
+  });
+  return req;
+}
+
+// Check (resource arity): for each build lesson with a resource layer, the
+// default/<baseLang> bundle must be COMPLETE for the build schema, and every
+// present bundle (any voice/lang) must be a SUBSET of that default key set.
+//   lessons: [{ lessonId, tasks, baseLang,
+//               bundles: [{ voice, lang, keys: Set<string> }] }]
+// Policy:
+//   (a) missing a required default key            -> ERROR (incomplete default)
+//   (b) an unknown/orphan key in any bundle        -> ERROR (typo'd/out-of-range)
+//   (c) a non-default bundle missing some keys      -> WARN  (fallback covers it)
+// `intro.N` is a valid schema key a non-default voice may supply even though the
+// default bundle omits it, so it is never treated as an orphan.
+export function checkResourceArity(lessons, report) {
+  for (const { lessonId, tasks, baseLang, bundles } of lessons) {
+    const lang = baseLang || "en";
+    const def = (bundles || []).find((b) => b.voice === "default" && b.lang === lang);
+    if (!def) {
+      report.error(`Resource: "${lessonId}" has no default/${lang} bundle`);
+      continue;
+    }
+    const defKeys = def.keys instanceof Set ? def.keys : new Set(def.keys);
+
+    // (a) default completeness
+    for (const k of requiredDefaultKeys(tasks)) {
+      if (!defKeys.has(k)) {
+        report.error(`Resource: "${lessonId}" default/${lang} bundle is missing required key "${k}"`);
+      }
+    }
+
+    // (b) + (c) every present bundle vs the default key set
+    for (const b of bundles) {
+      const keys = b.keys instanceof Set ? b.keys : new Set(b.keys);
+      for (const k of keys) {
+        if (defKeys.has(k)) continue;
+        if (/^intro\.\d+$/.test(k)) continue; // intro is a valid non-default key
+        report.error(`Resource: "${lessonId}" bundle ${b.voice}/${b.lang} has unknown key "${k}" (not in default/${lang})`);
+      }
+      const isDefaultBase = b.voice === "default" && b.lang === lang;
+      if (!isDefaultBase) {
+        let missing = 0;
+        for (const k of defKeys) if (!keys.has(k)) missing++;
+        if (missing) {
+          report.warn(`Resource: "${lessonId}" bundle ${b.voice}/${b.lang} omits ${missing} key(s) (default fallback covers them)`);
+        }
+      }
+    }
+  }
+}
+
 // Check 5: drift guard. Shells the generator into a temp dir and diffs against
 // the committed generated/ data files AND every migrated content/**/index.html.
 // `run` is injectable for testing.
@@ -332,6 +401,50 @@ function listJsonFiles(dir) {
   return out;
 }
 
+// Load the resource-arity inputs for every migrated build lesson that has a
+// resource layer (meta.resources): BUILD_CONFIG.tasks (the schema arity) and the
+// key set of every res/strings/<voice>/<lang>.json bundle.
+export function loadResourceBundles(migrated, rootDir) {
+  const out = [];
+  for (const m of migrated) {
+    if (m.meta.archetype !== "build" || !m.meta.resources) continue;
+    const dataPath = path.join(rootDir, m.path, "data.js");
+    if (!fs.existsSync(dataPath)) continue;
+    let cfg;
+    try {
+      cfg = loadBrowserGlobal(dataPath, "BUILD_CONFIG");
+    } catch {
+      continue; // a broken data.js is reported by other checks
+    }
+    const tasks = (cfg && cfg.tasks) || [];
+    const base = m.meta.resources.base || "res/strings";
+    const baseLang = m.meta.resources.lang || "en";
+    const baseDir = path.join(rootDir, m.path, base);
+
+    const bundles = [];
+    if (fs.existsSync(baseDir)) {
+      for (const voice of fs.readdirSync(baseDir)) {
+        const voiceDir = path.join(baseDir, voice);
+        if (!fs.statSync(voiceDir).isDirectory()) continue;
+        for (const file of fs.readdirSync(voiceDir)) {
+          if (!file.endsWith(".json")) continue;
+          const lang = file.slice(0, -".json".length);
+          let obj = null;
+          try {
+            obj = JSON.parse(fs.readFileSync(path.join(voiceDir, file), "utf8"));
+          } catch {
+            obj = null; // a malformed bundle surfaces as an empty key set
+          }
+          const keys = obj && typeof obj === "object" ? new Set(Object.keys(obj)) : new Set();
+          bundles.push({ voice, lang, keys });
+        }
+      }
+    }
+    out.push({ lessonId: m.registryId, tasks, baseLang, bundles });
+  }
+  return out;
+}
+
 // Every concept id introduced by a migrated lesson, unioned with the draft-
 // planned ids (so a checkpoint may tag a concept whose introducer is another
 // track/part). This is the resolvable-concept set the checkpoint tags check against.
@@ -386,6 +499,7 @@ function main() {
   checkCoherence(migrated, report);
   checkCheckpointConcepts(loadCheckpointQuizzes(migrated, root), knownIds, report);
   checkProseMentions(loadProseMentions(migrated, root), knownIds, report);
+  checkResourceArity(loadResourceBundles(migrated, root), report);
 
   if (process.env.VALIDATE_DRIFT === "1") {
     const outDir = fs.mkdtempSync(path.join(os.tmpdir(), "concept-drift-"));
