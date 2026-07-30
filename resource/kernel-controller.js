@@ -89,9 +89,14 @@
     settings.mount();
   }
 
+  // Bind by which lesson global is present: a build page sets BUILD_CONFIG, a
+  // viz page sets LESSON_VIZ. Only one exists per page, so both guards are safe.
   function bind(R) {
-    if (global.ResourceBindBuild) {
+    if (global.ResourceBindBuild && global.BUILD_CONFIG) {
       global.ResourceBindBuild.apply(R, { page: global.PAGE, config: global.BUILD_CONFIG });
+    }
+    if (global.ResourceBindViz && global.LESSON_VIZ) {
+      global.ResourceBindViz.apply(R, { page: global.PAGE, viz: global.LESSON_VIZ });
     }
   }
 
@@ -135,14 +140,19 @@
       mountSettings();
       if (global.PageShellHero) surfaces.push(global.PageShellHero);
       if (global.PageShellChrome) surfaces.push(global.PageShellChrome);
-      return injectScript(engineSrc, { "data-manual": "" });
-    })
-    .then(function () {
-      if (global.BuildEngine && global.BUILD_CONFIG) {
-        var widget = global.BuildEngine.create(global.BUILD_CONFIG);
-        surfaces.push(widget);
-        return widget.boot();
-      }
+      // A viz page's visual is mounted by page-shell during its injection; hold
+      // it as a Localizable surface so a language swap re-renders the narrations.
+      if (global.PageShellViz) surfaces.push(global.PageShellViz);
+      // A build lesson injects its engine (manual mode) and mounts the widget; a
+      // viz lesson has no engine, so there is nothing more to inject.
+      if (!global.BUILD_CONFIG) return;
+      return injectScript(engineSrc, { "data-manual": "" }).then(function () {
+        if (global.BuildEngine) {
+          var widget = global.BuildEngine.create(global.BUILD_CONFIG);
+          surfaces.push(widget);
+          return widget.boot();
+        }
+      });
     })
     .catch(function (err) {
       // Defensive only: store.load swallows fetch errors to {}, so init does not

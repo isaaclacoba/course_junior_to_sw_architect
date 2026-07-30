@@ -540,7 +540,22 @@
       }
     }
     try {
-      window.CodeLab.MemoryViz.create(vizHost, window.LESSON_VIZ);
+      let vizController = window.CodeLab.MemoryViz.create(vizHost, window.LESSON_VIZ);
+      // Localizable surface: a language swap re-binds LESSON_VIZ's narrations
+      // (bind-viz), then this re-creates the visual so the new text paints.
+      // destroy() removes the old root; a fresh create restarts at step 1, which
+      // is acceptable on a language change.
+      window.PageShellViz = {
+        setLocale: () => {
+          try { if (vizController && vizController.destroy) vizController.destroy(); } catch (e) {}
+          vizHost.innerHTML = "";
+          try {
+            vizController = window.CodeLab.MemoryViz.create(vizHost, window.LESSON_VIZ);
+          } catch (e) {
+            console.error("lesson-viz relocalize failed", e);
+          }
+        },
+      };
     } catch (err) {
       console.error("lesson-viz mount failed", err);
       vizHost.remove();

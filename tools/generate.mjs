@@ -315,6 +315,11 @@ function renderIndexHtml(m, variants) {
       const controller = meta.runtime === "kernel" ? "kernel-controller" : "bootstrap";
       html = applyResourceTail(html, meta.resources, enginePath, m.id, controller);
     }
+  } else if (archetype === "viz" && meta.resources) {
+    // A viz lesson's teaching prose (hero + step narrations + legend labels) can
+    // live in res/strings too; the binder is bind-viz and there is no engine.
+    const controller = meta.runtime === "kernel" ? "kernel-controller" : "bootstrap";
+    html = applyResourceTailViz(html, meta.resources, m.id, controller);
   }
 
   return html;
@@ -348,6 +353,39 @@ function applyResourceTail(html, resources, enginePath, lessonId, controllerModu
     '      src="../../../../resource/' + controllerModule + '.js"\n' +
     '      data-page-shell="../../../../page-shell.js"\n' +
     '      data-engine="' + enginePath + '"\n' +
+    '      data-res-base="' + base + '"\n' +
+    '      data-res-lang="' + lang + '"\n' +
+    '      data-res-langs="' + langs + '"\n' +
+    '      data-res-voices="' + voices + '"\n' +
+    '    ></script>';
+
+  return html.replace(staticTail, resourceTail);
+}
+
+// Viz variant of the resource tail. A viz page has no data.js and no engine: its
+// visual (window.LESSON_VIZ, set by <id>.viz.js) is mounted by page-shell. So we
+// swap only the trailing static page-shell.js load for the resource modules (with
+// bind-viz, not bind-build) + the controller; the controller injects page-shell
+// after binding. No data-engine.
+function applyResourceTailViz(html, resources, lessonId, controllerModule = "bootstrap") {
+  const base = resources.base || "res/strings";
+  const lang = resources.lang || "en";
+  const langs = (resources.langs && resources.langs.length ? resources.langs : [lang]).join(",");
+  const voices = (resources.voices || ["default"]).join(",");
+
+  const staticTail = '    <script src="../../../../page-shell.js"></script>';
+  if (html.indexOf(staticTail) === -1) {
+    throw new Error("viz resource wiring: could not find the static page-shell tail for " + lessonId);
+  }
+
+  const modules = ["resolver", "store", "manager", "settings", "preference", "theme-section", "voice-section", "lang-section", "bind-viz"]
+    .map((mod) => '    <script src="../../../../resource/' + mod + '.js"></script>')
+    .join("\n");
+  const resourceTail =
+    modules + "\n" +
+    '    <script\n' +
+    '      src="../../../../resource/' + controllerModule + '.js"\n' +
+    '      data-page-shell="../../../../page-shell.js"\n' +
     '      data-res-base="' + base + '"\n' +
     '      data-res-lang="' + lang + '"\n' +
     '      data-res-langs="' + langs + '"\n' +

@@ -1,0 +1,15 @@
+{
+  "hero.eyebrow": "Teoría · Parte cinco · Los cimientos de la IA",
+  "hero.title": "¿Qué es un LLM?",
+  "intro.0": "Seguramente ya has usado uno - escribe, responde y explica en lenguaje normal. Puede dar la sensación de que te entiende. Por debajo, sin embargo, hace algo mucho más simple y más raro: leer el texto que hay hasta ahora y adivinar el siguiente trocito, una y otra vez. Fíjate en ese único movimiento aquí abajo - es la base sobre la que se construye todo lo demás de este itinerario.",
+  "legend.0": "token que lee el modelo",
+  "legend.1": "token que acaba de producir",
+  "legend.2": "probabilidad de un siguiente token",
+  "legend.3": "el modelo, puntuando",
+  "step.0.narr": "Un LLM hace solo **una cosa**: lee el texto que hay hasta ahora y predice qué token viene después.",
+  "step.1.narr": "Un **token** es un trozo de texto - más o menos una palabra o un pedazo de una. Para el siguiente hueco, el modelo puntúa **todos los tokens posibles** a la vez.",
+  "step.2.narr": "Elige uno - normalmente el más probable - y lo **añade** al texto.",
+  "step.3.narr": "Ahora `mat` es parte del texto. El modelo lo vuelve a leer entero, desde el principio.",
+  "step.4.narr": "Elegir, añadir, repetir - **un token cada vez**. Cada token nuevo se elige a partir de un conjunto nuevo de probabilidades.",
+  "step.5.narr": "Ese bucle es **todo el modelo**. Todo lo que viene después - prompts, chat, memoria, herramientas, agentes - se construye alrededor de este único movimiento: leer el texto, predecir el siguiente token."
+}
