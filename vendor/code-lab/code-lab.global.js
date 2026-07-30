@@ -2062,7 +2062,9 @@ ${result.runtimeError}`.trim(),
     return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
   function inline(text) {
-    return escapeHtml4(text).replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/\*([^*]+)\*/g, "<em>$1</em>");
+    return escapeHtml4(text).replace(/`([^`]+)`/g, "<code>$1</code>").split(/(<code>[\s\S]*?<\/code>)/).map(
+      (seg) => seg.startsWith("<code>") ? seg : seg.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/\*([^*]+)\*/g, "<em>$1</em>")
+    ).join("");
   }
   function renderNarration(text) {
     const lines = String(text ?? "").split("\n");
