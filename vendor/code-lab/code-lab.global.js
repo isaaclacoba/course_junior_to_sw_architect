@@ -1894,6 +1894,11 @@ ${result.runtimeError}`.trim(),
   // src/dom/heapcards-view.ts
   var HeapCardsView = class {
     constructor(uid) {
+      // Arrow paths reused across renders (keyed "from->to"), so a reference that
+      // stays put keeps its path and only its geometry updates - no flicker.
+      this.refPaths = /* @__PURE__ */ new Map();
+      // Bumped each render; the redraw loop stops once its generation is stale.
+      this.arrowGen = 0;
       this.markerId = `clmv-hp-ah-${uid}`;
       this.el = document.createElement("div");
       this.el.className = "cl-mv-region cl-mv-heapcards";
@@ -1915,27 +1920,44 @@ ${result.runtimeError}`.trim(),
       const frames = stack.map((f, i) => ({ ...f, active: i === stack.length - 1 }));
       reconcile(this.roots, frames, frameNode);
       reconcile(this.objs, (model.heap ?? []).map((o) => ({ ...o })), objNode);
-      const draw = () => {
-        (model.heap ?? []).forEach((o) => {
-          const card = this.el.querySelector(`[data-obj="${o.id}"]`);
-          if (card) card.classList.toggle("glow", model.glow === o.id);
-        });
-        this.drawArrows(model.refs);
+      (model.heap ?? []).forEach((o) => {
+        const card = this.el.querySelector(`[data-obj="${o.id}"]`);
+        if (card) card.classList.toggle("glow", model.glow === o.id);
+      });
+      this.animateArrows(model.refs);
+    }
+    animateArrows(refs) {
+      const gen = ++this.arrowGen;
+      const start = now();
+      const tick = () => {
+        if (gen !== this.arrowGen) return;
+        this.drawArrows(refs);
+        if (now() - start < 340) raf(tick);
       };
-      if (typeof window.requestAnimationFrame === "function") {
-        window.requestAnimationFrame(draw);
-      } else {
-        draw();
-      }
+      raf(tick);
     }
     drawArrows(refs) {
-      this.arrows.querySelectorAll("path.cl-mv-hp-ref").forEach((p) => p.remove());
       const box = this.arrows.getBoundingClientRect();
       if (box.width === 0 && box.height === 0) return;
-      (refs ?? []).forEach((r) => {
+      const wanted = /* @__PURE__ */ new Map();
+      (refs ?? []).forEach((r) => wanted.set(`${r.from}\u2192${r.to}`, r));
+      for (const [key, path] of this.refPaths) {
+        if (!wanted.has(key)) {
+          path.remove();
+          this.refPaths.delete(key);
+        }
+      }
+      wanted.forEach((r, key) => {
         const from = this.el.querySelector(`[data-dot="${r.from}"]`);
         const to = this.el.querySelector(`[data-obj="${r.to}"]`);
-        if (!from || !to) return;
+        const existing = this.refPaths.get(key);
+        if (!from || !to) {
+          if (existing) {
+            existing.remove();
+            this.refPaths.delete(key);
+          }
+          return;
+        }
         const a = from.getBoundingClientRect();
         const b = to.getBoundingClientRect();
         const x1 = a.left + a.width / 2 - box.left;
@@ -1943,20 +1965,29 @@ ${result.runtimeError}`.trim(),
         const x2 = b.left - box.left - 2;
         const y2 = b.top + Math.min(b.height / 2, 18) - box.top;
         const dx = Math.max(36, (x2 - x1) * 0.5);
-        const path = svgEl("path", {
-          class: "cl-mv-hp-ref",
-          d: `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`,
-          "marker-end": `url(#${this.markerId})`
-        });
-        this.arrows.appendChild(path);
-        if (typeof window.requestAnimationFrame === "function") {
-          window.requestAnimationFrame(() => path.classList.add("show"));
+        const d = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+        if (existing) {
+          existing.setAttribute("d", d);
         } else {
-          path.classList.add("show");
+          const path = svgEl("path", {
+            class: "cl-mv-hp-ref",
+            d,
+            "marker-end": `url(#${this.markerId})`
+          });
+          this.arrows.appendChild(path);
+          this.refPaths.set(key, path);
+          raf(() => path.classList.add("show"));
         }
       });
     }
   };
+  function raf(fn) {
+    if (typeof window.requestAnimationFrame === "function") window.requestAnimationFrame(fn);
+    else fn();
+  }
+  function now() {
+    return typeof performance !== "undefined" && typeof performance.now === "function" ? performance.now() : Date.now();
+  }
   function staticsHtml(globals, rodata) {
     return [
       globals.length ? staticGroupHtml("STATICS", "values shared across the program", globals, true) : "",
@@ -1991,8 +2022,9 @@ ${result.runtimeError}`.trim(),
     const label = kindLabel(f.kind);
     const badge = label ? `<span class="cl-mv-hp-fkind">${esc3(label)}</span>` : "";
     const recv = f.recv ? `<div class="cl-mv-hp-frecv">on ${esc3(f.recv)}</div>` : "";
+    const paused = !f.active && typeof f.line === "number" ? `<div class="cl-mv-hp-fpaused">paused at line ${f.line}</div>` : "";
     const rows = (f.vars ?? []).map(rowHtml3).join("");
-    el.innerHTML = `<div class="cl-mv-hp-fname"><span class="cl-mv-hp-fn">${esc3(f.name ?? f.id)}</span>${badge}</div>` + recv + `<div class="cl-mv-hp-rows">${rows}</div>`;
+    el.innerHTML = `<div class="cl-mv-hp-fname"><span class="cl-mv-hp-fn">${esc3(f.name ?? f.id)}</span>${badge}</div>` + recv + paused + `<div class="cl-mv-hp-rows">${rows}</div>`;
     return el;
   }
   function rowHtml3(v) {
@@ -3212,6 +3244,7 @@ ${result.runtimeError}`.trim(),
     const frame = { id: f.id, name: f.name, vars };
     if (f.kind) frame.kind = f.kind;
     if (f.recv) frame.recv = f.recv;
+    if (typeof f.line === "number") frame.line = f.line;
     return frame;
   }
   function objectToObject(o, fields, prevFields, firstStep) {
