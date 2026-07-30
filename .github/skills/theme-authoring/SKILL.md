@@ -74,44 +74,74 @@ SCENES. A theme must skin whichever widgets a lesson uses; today that is the Qui
 and the MemoryViz scenes (the editor/runner/tour inherit enough from the page, but
 check them for any theme you add).
 
-None of these use the course tokens; they carry their own colors. Within a widget,
-two kinds of surface:
+The widgets expose a bounded **token contract**: a set of CSS custom properties
+(`--mv-*` for MemoryViz, `--clq-*` for the Quiz, `--ag-*` for the AI fan) declared
+with per-site fallbacks in `code-lab.css`. The default ("Clean") theme sets NONE of
+them, so each widget falls back to its neutral light default. A theme re-skins a
+widget by **setting those tokens on the widget root** - not by repainting element by
+element. Within a widget, two kinds of surface:
 
 - **Intentionally dark "hardware" surfaces** (the green board, the agent strip,
   core, tool cards, memory stores, plan steps, transcript messages). These already
-  read fine on ANY page background - leave them alone.
-- **Hardcoded LIGHT panels** that glare on a dark page - these are the ones to fix:
-  the narration note (`.cl-mv-narr`), the step controls
-  (`.cl-mv-controls button`, `.cl-mv-action`, text-size), the pastel RAM region
-  cards (`.cl-mv-global/-data/-bss/-rodata/-mmap/-stack/-heap`) and the stack
-  frames/slots/heap objects inside the die, the AI next-token panel (`.cl-ag-fan`
-  + rows), and the whole `.cl-quiz` (light `#fff` card, question cards, options,
-  results).
+  read fine on ANY page background and are NOT tokenized - leave them alone.
+- **Neutral panels driven by the token contract** - the narration note, the step
+  controls, the RAM region cards, the stack frames/slots/rows, the heap objects,
+  the AI next-token fan and the whole Quiz. These are the surfaces a theme sets.
 
-How to fix them, correctly:
+The token contract (set these on the widget root, all optional - unset = default):
 
-1. **Re-point the widget's own CSS variables first**, don't repaint element by
-   element. `.cl-mv` defines `--mv-ink/--mv-muted/--mv-line/--mv-stack/--mv-heap`;
-   `.cl-quiz` defines `--clq-line/--clq-accent/--clq-good/--clq-bad`. Map them to
-   course tokens: `[data-theme="dark"] .cl-mv { --mv-ink: var(--ink); --mv-muted:
-   var(--ink-soft); --mv-line: var(--line); }`. Check each var's USAGE first
-   (`grep 'var(--mv-heap)' code-lab.css`) - some are backgrounds needing white text
-   (e.g. `--mv-heap` on the primary button) and must NOT move like an ink token.
-2. **Darken only the hardcoded-light surfaces**, deriving every value from existing
-   course tokens (`--card`, `--bg-2`, `--bg-3`, `--warn-*`, `--good-*`, `--danger-*`,
-   `--indigo-*`, `--slate-*`). Do not invent a parallel palette.
-3. **Keep the semantic hue identity.** A darkened region/frame/message should keep
-   its meaning color in the tag/accent (amber global, blue stack, teal heap,
-   per-process frame accent), so the visual still teaches.
-4. **Scope + ancestor-qualify every rule** as `[data-theme="<id>"] .cl-<root>
-   <selector>`. The ancestor is required: `code-lab.css` loads AFTER `styles.css`,
-   so a bare `[data-theme] .cl-mv-narr` can lose specificity ties. Keeping `.cl-mv`
-   in the selector wins.
-5. Never edit the vendored bundle. This is theme CSS only; the code-lab submodule
-   is usually not even checked out here.
+- `.cl-mv` (MemoryViz):
+  - shell: `--mv-ink --mv-muted --mv-line --mv-stack --mv-heap`
+  - panels/rows: `--mv-panel-bg --mv-panel-tag --mv-surface --mv-narr-bg`
+  - controls: `--mv-btn-bg --mv-btn-hover-bg --mv-btn-hover-line --mv-textsize-hover-bg
+    --mv-action-bg --mv-action-line --mv-action-ink --mv-action-hover-bg`
+  - ink families: `--mv-name-ink --mv-addr-ink --mv-empty-ink --mv-null-ink
+    --mv-lineno-ink --mv-accent-ink --mv-obj-field-ink`
+  - stack structure: `--mv-cool-bg --mv-cool-line --mv-caller-bg --mv-accent-mix`
+  - "changed / active" amber family (drives ~20 rules at once): `--mv-hot-bg
+    --mv-hot-line --mv-hot-ring --mv-hot-ink --mv-hot-inset`
+  - heap objects: `--mv-obj-bg --mv-obj-line --mv-refdot-ring --mv-dot-ring`
+  - scrubber dots: `--mv-mark-call-bg/-line --mv-mark-return-bg/-line
+    --mv-mark-obj-bg/-line --mv-mark-focus`
+  - RAM region cards (per region `global data bss rodata mmap stack heap`):
+    `--mv-r-<region>-bg --mv-r-<region>-line --mv-r-<region>-tag`
+- `.cl-ag` (AI next-token fan): `--ag-fan-bg --ag-fan-line --ag-tok-ink --ag-val-ink
+  --ag-track-bg --ag-chosen-ink`
+- `.cl-quiz` (checkpoint): brand `--clq-accent --clq-good --clq-bad --clq-line`, plus
+  `--clq-bg --clq-ink --clq-meta-ink --clq-intro-ink --clq-progress-ink --clq-q-bg
+  --clq-opt-bg --clq-chosen-bg --clq-correct-bg --clq-correct-ink --clq-wrong-bg
+  --clq-wrong-ink --clq-btn-bg --clq-fail-bg --clq-fail-line`
 
-Put all of this in a clearly commented "interactive widgets" section at the end of
-the theme's block in `styles.css`.
+How to skin a theme, correctly:
+
+1. **Set tokens, do not repaint.** One block per widget root:
+   `[data-theme="<id>"] .cl-mv { --mv-panel-bg: #14171d; --mv-hot-bg: #2e2410; ... }`.
+   Derive every value from the course tokens (`--card`, `--bg-2`, `--warn-*`,
+   `--good-*`, `--danger-*`, `--indigo-*`, `--slate-*`) - do not invent a parallel
+   palette. Setting one family token (e.g. `--mv-hot-bg`) recolours every surface in
+   that family at once.
+2. **Leave a token unset to keep its default.** A light/warm theme often only needs
+   the neutral surfaces (panels, narration, buttons, rows) plus the Quiz/fan; the
+   amber "changed", blue stack and green heap defaults usually still read fine.
+3. **Keep the semantic hue identity.** When you darken a region/frame, keep its
+   meaning colour in the tag/accent (amber global, blue stack, teal heap,
+   per-process frame accent) so the visual still teaches.
+4. **Scope + ancestor-qualify every rule** as `[data-theme="<id>"] .cl-<root> {...}`.
+   The ancestor is required: `code-lab.css` loads AFTER `styles.css`, so a bare
+   `[data-theme] .cl-mv-narr` can lose specificity ties. Keeping `.cl-mv` wins.
+5. **Never edit the vendored bundle** for theme CSS. Values live in the theme block
+   in `styles.css`.
+
+If you need to theme a surface that has NO token yet, that is an engine change, not
+theme CSS: in `code-lab/src/code-lab.css` wrap the hardcoded colour as
+`var(--new-token, <the-original-hex>)` (per-site fallback keeps the default
+pixel-identical), then `cd code-lab && npm run build` and re-vendor BOTH
+`code-lab.global.js` and `code-lab.css` into `vendor/code-lab/`. Then set the new
+token from the theme block. Verify the default theme is still pixel-unchanged
+(the fallback guarantees it) before shipping.
+
+Put the widget token blocks in a clearly commented "interactive widgets" section at
+the end of the theme's block in `styles.css`.
 
 ## Verify (the recipe that catches the real bugs)
 

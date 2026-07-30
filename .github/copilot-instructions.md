@@ -38,7 +38,11 @@ Shared engines (root of repo):
 - `build-engine.js` — the write-from-scratch engine (Monaco editor, run, match
   output). Reads `window.BUILD_CONFIG`. Grades by output match + optional
   `requireSource` technique gate + optional hidden `verify` probe.
-- `styles.css` — all shared styling. Put shared lesson CSS here, not per page.
+- `styles.css` — all shared styling AND the color source of truth. `:root` is the
+  default ("Clean") theme; each extra theme is one `[data-theme="<id>"]` block plus a
+  `theme-registry.js` entry (runtime swap by `theme-switch.js`). To add or maintain a
+  theme - including re-skinning the widgets - use the `theme-authoring` skill. Put
+  shared lesson CSS here, not per page.
 
 The compiler (do not reinvent):
 
@@ -51,7 +55,10 @@ The compiler (do not reinvent):
   guided `Tour` - plus the Blazor/Roslyn **compiler-host**. Do not conflate the
   two levels: a *widget* is a component; a *scene* lives only inside MemoryViz.
   The course consumes the prebuilt IIFE bundle vendored at
-  `vendor/code-lab/code-lab.global.js` + `vendor/code-lab/code-lab.css`.
+  `vendor/code-lab/code-lab.global.js` + `vendor/code-lab/code-lab.css`. The widget
+  CSS exposes a bounded **theme token contract** (`--mv-*`, `--clq-*`, `--ag-*` with
+  per-site fallbacks) so a theme re-skins the widgets by setting tokens, not by
+  repainting each element (see the `theme-authoring` skill).
 - `level3-exercise/` — the capstone exercise (content + structural checks),
   injected into the host at build time via the `ExerciseSource` MSBuild prop.
 - `level3-app/` — the **published** (git-ignored) WASM host. Every Run button and

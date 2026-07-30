@@ -1416,6 +1416,57 @@ input.almost {
   }
 }
 
+/* ---- Critters: a warm, light skin for the code-lab widgets ----------
+   Set the widget token contract to the cream palette and keep the
+   teaching hues (blue stack, green heap, amber "changed"). Selectors
+   keep the widget-root ancestor so they outweigh code-lab.css, which
+   loads after styles.css. */
+[data-theme="critters"] .cl-mv {
+  --mv-ink: var(--ink);
+  --mv-muted: var(--ink-soft);
+  --mv-line: var(--line);
+  --mv-panel-bg: var(--panel);
+  --mv-panel-tag: var(--ink-soft);
+  --mv-surface: var(--card);
+  --mv-narr-bg: var(--bg-2);
+  --mv-btn-bg: var(--card);
+  --mv-btn-hover-bg: var(--bg-2);
+  --mv-btn-hover-line: var(--card-hover-line);
+  --mv-textsize-hover-bg: var(--bg-2);
+  --mv-action-bg: var(--warn-bg);
+  --mv-action-line: var(--warn-line);
+  --mv-action-ink: var(--pill-steady-ink);
+  --mv-action-hover-bg: var(--warn-fill);
+  --mv-name-ink: var(--info-ink);
+  --mv-addr-ink: var(--muted-warm);
+  --mv-empty-ink: var(--muted-2);
+  --mv-null-ink: var(--danger-line);
+  --mv-lineno-ink: var(--muted-warm);
+  --mv-obj-field-ink: #4a3a30;
+}
+[data-theme="critters"] .cl-ag {
+  --ag-fan-bg: var(--bg-2);
+  --ag-fan-line: var(--line);
+  --ag-tok-ink: var(--ink);
+  --ag-val-ink: var(--info-ink);
+}
+[data-theme="critters"] .cl-quiz {
+  --clq-line: var(--line);
+  --clq-bg: var(--card);
+  --clq-ink: var(--ink);
+  --clq-meta-ink: var(--ink-soft);
+  --clq-intro-ink: var(--ink-soft);
+  --clq-progress-ink: var(--ink-soft);
+  --clq-q-bg: var(--bg-2);
+  --clq-opt-bg: var(--card);
+  --clq-chosen-bg: var(--indigo-fill);
+  --clq-correct-bg: var(--good-bg);
+  --clq-wrong-bg: var(--danger-bg);
+  --clq-btn-bg: var(--card);
+  --clq-fail-bg: var(--warn-bg);
+  --clq-fail-line: var(--warn-line);
+}
+
 /* ---- Dark: a dim, low-glare palette for night reading ------------------- */
 [data-theme="dark"] {
   color-scheme: dark;
@@ -1549,177 +1600,112 @@ input.almost {
 [data-theme="dark"] .c-totop {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
 }
-
 /* ===================================================================
    Dark theme - interactive widgets (theory + AI)
-   The vendored code-lab visuals (MemoryViz board/die scenes, the AI
-   agent scenes, and the checkpoint Quiz) hardcode a few light panels
-   that glare on the dark page: the narration note, the step controls,
-   the pastel RAM region cards, the next-token panel and the quiz card.
-   Here we re-point each component's own CSS variables and darken those
-   surfaces, deriving every colour from the course dark tokens so the
-   widgets track the theme. The code-lab bundle is untouched - this is
-   theme CSS. Selectors keep the widget-root ancestor so they outweigh
-   code-lab.css, which loads after styles.css.
+   The vendored code-lab widgets expose a bounded token contract (the
+   --mv-*, --clq- and --ag- variables declared in code-lab.css). A theme
+   skins them by SETTING those tokens on each widget root, not by
+   repainting element by element. Every value below derives from the
+   course dark tokens so the widgets track the theme. The code-lab bundle
+   is untouched - this is theme CSS. Selectors keep the widget-root
+   ancestor so they outweigh code-lab.css, which loads after styles.css.
    =================================================================== */
 
-/* ---- MemoryViz shell: its own tokens, narration, controls, legend --- */
+/* ---- MemoryViz: shell, RAM die, panels, frames and rows ------------- */
 [data-theme="dark"] .cl-mv {
+  /* shell */
   --mv-ink: var(--ink);
   --mv-muted: var(--ink-soft);
   --mv-line: var(--line);
   --mv-stack: #7ba0ee;
-}
-/* Narration: a dim raised card instead of the pale note. */
-[data-theme="dark"] .cl-mv .cl-mv-narr {
-  background: var(--bg-2);
-}
-/* Step controls: dark buttons; the teal primary keeps its own rule. */
-[data-theme="dark"] .cl-mv .cl-mv-controls button {
-  background: var(--card);
-}
-[data-theme="dark"] .cl-mv .cl-mv-controls button:hover:not(:disabled) {
-  background: var(--bg-3);
-  border-color: var(--card-hover-line);
-}
-[data-theme="dark"] .cl-mv .cl-mv-controls button.cl-mv-action {
-  background: var(--warn-bg-2);
-  border-color: var(--warn-line);
-  color: var(--pill-steady-ink);
-}
-[data-theme="dark"] .cl-mv .cl-mv-controls button.cl-mv-action:hover:not(:disabled) {
-  background: var(--warn-fill);
-}
-[data-theme="dark"] .cl-mv .cl-mv-controls .cl-mv-textsize button:hover:not(:disabled) {
-  background: var(--bg-3);
-}
-/* Teal labels that were dark-teal text on a light note now need lift. */
-[data-theme="dark"] .cl-mv .cl-mv-stepno,
-[data-theme="dark"] .cl-mv .cl-mv-zoom-tab b,
-[data-theme="dark"] .cl-mv .cl-mv-obj .cl-mv-oname {
-  color: var(--primary-2);
+  /* panels + surfaces */
+  --mv-panel-bg: #14171d;
+  --mv-panel-tag: var(--ink-soft);
+  --mv-surface: var(--card);
+  --mv-narr-bg: var(--bg-2);
+  /* controls */
+  --mv-btn-bg: var(--card);
+  --mv-btn-hover-bg: var(--bg-3);
+  --mv-btn-hover-line: var(--card-hover-line);
+  --mv-textsize-hover-bg: var(--bg-3);
+  --mv-action-bg: var(--warn-bg-2);
+  --mv-action-line: var(--warn-line);
+  --mv-action-ink: var(--pill-steady-ink);
+  --mv-action-hover-bg: var(--warn-fill);
+  /* ink families */
+  --mv-name-ink: #8a93a3;
+  --mv-addr-ink: #8a93a3;
+  --mv-empty-ink: #6b727f;
+  --mv-null-ink: #f2777a;
+  --mv-lineno-ink: #8a93a3;
+  --mv-accent-ink: var(--primary-2);
+  --mv-obj-field-ink: #b3bccc;
+  /* cool structure: stack frames, slots, rows */
+  --mv-cool-bg: #161f2a;
+  --mv-cool-line: #2b3d5e;
+  --mv-caller-bg: #14171d;
+  --mv-accent-mix: 16%;
+  /* hot / changed / active family (amber keeps its meaning) */
+  --mv-hot-bg: #2e2410;
+  --mv-hot-line: #5a4a1e;
+  --mv-hot-ring: #5a4a1e;
+  --mv-hot-ink: #e6a54a;
+  --mv-hot-inset: #5a4a1e;
+  /* heap objects (teal keeps its meaning) */
+  --mv-obj-bg: #122a24;
+  --mv-obj-line: #22463c;
+  --mv-refdot-ring: #122a24;
+  --mv-dot-ring: #1b2a44;
+  /* scrubber notable-moment dots */
+  --mv-mark-call-bg: #3b82f6;
+  --mv-mark-call-line: #60a5fa;
+  --mv-mark-return-bg: #191c22;
+  --mv-mark-return-line: #a3a9b5;
+  --mv-mark-obj-bg: #22c55e;
+  --mv-mark-obj-line: #4ade80;
+  --mv-mark-focus: #7ba0ee;
+  /* RAM region cards: darken the pastel, keep each hue identity in the tag */
+  --mv-r-global-bg: #2b2414; --mv-r-global-line: #4a3d20; --mv-r-global-tag: var(--pill-steady-ink);
+  --mv-r-data-bg: #29230f;   --mv-r-data-line: #473a1f;   --mv-r-data-tag: var(--pill-steady-ink);
+  --mv-r-bss-bg: #26231a;    --mv-r-bss-line: #443d2b;    --mv-r-bss-tag: #d8b06a;
+  --mv-r-rodata-bg: #1b2430; --mv-r-rodata-line: #33404f; --mv-r-rodata-tag: var(--slate-ink);
+  --mv-r-mmap-bg: #221e2e;   --mv-r-mmap-line: #3d3350;   --mv-r-mmap-tag: var(--indigo-ink);
+  --mv-r-stack-bg: #161f30;  --mv-r-stack-line: #2b3d5e;  --mv-r-stack-tag: #7ba0ee;
+  --mv-r-heap-bg: #122a24;   --mv-r-heap-line: #22463c;   --mv-r-heap-tag: var(--primary-2);
 }
 
-/* ---- RAM die: darken the pastel region cards, keep the hue identity - */
-[data-theme="dark"] .cl-mv .cl-mv-global { background: #2b2414; border-color: #4a3d20; }
-[data-theme="dark"] .cl-mv .cl-mv-data   { background: #29230f; border-color: #473a1f; }
-[data-theme="dark"] .cl-mv .cl-mv-bss    { background: #26231a; border-color: #443d2b; }
-[data-theme="dark"] .cl-mv .cl-mv-rodata { background: #1b2430; border-color: #33404f; }
-[data-theme="dark"] .cl-mv .cl-mv-mmap   { background: #221e2e; border-color: #3d3350; }
-[data-theme="dark"] .cl-mv .cl-mv-stack  { background: #161f30; border-color: #2b3d5e; }
-[data-theme="dark"] .cl-mv .cl-mv-heap   { background: #122a24; border-color: #22463c; }
-[data-theme="dark"] .cl-mv .cl-mv-global .cl-mv-tag,
-[data-theme="dark"] .cl-mv .cl-mv-data .cl-mv-tag { color: var(--pill-steady-ink); }
-[data-theme="dark"] .cl-mv .cl-mv-bss .cl-mv-tag { color: #d8b06a; }
-[data-theme="dark"] .cl-mv .cl-mv-rodata .cl-mv-tag { color: var(--slate-ink); }
-[data-theme="dark"] .cl-mv .cl-mv-mmap .cl-mv-tag { color: var(--indigo-ink); }
-[data-theme="dark"] .cl-mv .cl-mv-stack .cl-mv-tag { color: #7ba0ee; }
-[data-theme="dark"] .cl-mv .cl-mv-heap .cl-mv-tag { color: var(--primary-2); }
-
-/* ---- Stack frames, slots and heap objects inside the die ------------ */
-[data-theme="dark"] .cl-mv .cl-mv-frame { background: #161f2a; border-color: #2b3d5e; }
-[data-theme="dark"] .cl-mv .cl-mv-frame.is-accent {
-  background: color-mix(in srgb, var(--frame-accent) 16%, #161f2a);
+/* ---- AI agent scene: the next-token probability fan ----------------- */
+[data-theme="dark"] .cl-ag {
+  --ag-fan-bg: var(--card);
+  --ag-fan-line: var(--line);
+  --ag-tok-ink: var(--ink);
+  --ag-val-ink: var(--ink-soft);
+  --ag-track-bg: rgba(255, 255, 255, 0.08);
+  --ag-chosen-ink: #e6a54a;
 }
-[data-theme="dark"] .cl-mv .cl-mv-slot { background: var(--card); border-color: #2b3d5e; }
-[data-theme="dark"] .cl-mv .cl-mv-slot .cl-mv-k { color: #8a93a3; }
-[data-theme="dark"] .cl-mv .cl-mv-slot.is-hot { background: #2e2410; box-shadow: 0 0 0 2px #5a4a1e; }
-[data-theme="dark"] .cl-mv .cl-mv-slot.is-hot .cl-mv-v { color: #e6a54a; }
-[data-theme="dark"] .cl-mv .cl-mv-slot .cl-mv-refdot { box-shadow: 0 0 0 3px #122a24; }
-[data-theme="dark"] .cl-mv .cl-mv-obj { background: #122a24; border-color: #22463c; }
-[data-theme="dark"] .cl-mv .cl-mv-obj .cl-mv-field { color: #b3bccc; }
-[data-theme="dark"] .cl-mv .cl-mv-obj .cl-mv-field.is-hot { background: #2e2410; box-shadow: inset 0 0 0 1px #5a4a1e; color: #e6a54a; }
 
-/* ---- Level-0 execution: the flat variable table -------------------- */
-[data-theme="dark"] .cl-mv .cl-mv-vartable { background: #14171d; border-color: var(--line); }
-[data-theme="dark"] .cl-mv .cl-mv-vartable .cl-mv-tag { color: var(--ink-soft); }
-[data-theme="dark"] .cl-mv .cl-mv-vt-row { background: var(--card); border-color: #2b3d5e; }
-[data-theme="dark"] .cl-mv .cl-mv-vt-name { color: #8a93a3; }
-[data-theme="dark"] .cl-mv .cl-mv-vt-val { color: var(--ink); }
-[data-theme="dark"] .cl-mv .cl-mv-vt-row.is-empty .cl-mv-vt-val { color: #6b727f; }
-[data-theme="dark"] .cl-mv .cl-mv-vt-row.is-changed { background: #2e2410; border-color: #5a4a1e; box-shadow: 0 0 0 2px #5a4a1e; }
-[data-theme="dark"] .cl-mv .cl-mv-vt-row.is-changed .cl-mv-vt-val { color: #e6a54a; }
-[data-theme="dark"] .cl-mv .cl-mv-vt-empty { color: #6b727f; }
-
-/* ---- AI agent scene: the next-token probability panel --------------- */
-[data-theme="dark"] .cl-ag .cl-ag-fan { background: var(--card); border-color: var(--line); }
-[data-theme="dark"] .cl-ag .cl-ag-tok-name { color: var(--ink); }
-[data-theme="dark"] .cl-ag .cl-ag-val { color: var(--ink-soft); }
-[data-theme="dark"] .cl-ag .cl-ag-track { background: rgba(255, 255, 255, 0.08); }
-[data-theme="dark"] .cl-ag .cl-ag-row.is-chosen .cl-ag-tok-name,
-[data-theme="dark"] .cl-ag .cl-ag-row.is-chosen .cl-ag-val { color: #e6a54a; }
-
-/* ---- Checkpoint Quiz: a full dark skin ------------------------------ */
+/* ---- Checkpoint Quiz ------------------------------------------------- */
 [data-theme="dark"] .cl-quiz {
   --clq-line: var(--line);
-  background: var(--card);
-  color: var(--ink);
+  --clq-bg: var(--card);
+  --clq-ink: var(--ink);
+  --clq-meta-ink: var(--ink-soft);
+  --clq-intro-ink: var(--ink-soft);
+  --clq-progress-ink: var(--ink-soft);
+  --clq-q-bg: var(--bg-2);
+  --clq-opt-bg: var(--bg-3);
+  --clq-chosen-bg: var(--indigo-fill);
+  --clq-correct-bg: var(--good-bg);
+  --clq-correct-ink: #7fd89a;
+  --clq-wrong-bg: var(--danger-bg);
+  --clq-wrong-ink: var(--danger-ink-soft);
+  --clq-btn-bg: var(--card);
+  --clq-fail-bg: var(--warn-bg);
+  --clq-fail-line: var(--warn-line);
 }
-[data-theme="dark"] .cl-quiz .cl-quiz-intro,
-[data-theme="dark"] .cl-quiz .cl-quiz-progress { color: var(--ink-soft); }
-[data-theme="dark"] .cl-quiz .cl-quiz-q { background: var(--bg-2); }
-[data-theme="dark"] .cl-quiz .cl-quiz-opt { background: var(--bg-3); }
-[data-theme="dark"] .cl-quiz .cl-quiz-opt.is-chosen { background: var(--indigo-fill); }
-[data-theme="dark"] .cl-quiz .cl-quiz-opt.is-correct { background: var(--good-bg); color: #7fd89a; }
-[data-theme="dark"] .cl-quiz .cl-quiz-opt.is-wrong { background: var(--danger-bg); color: var(--danger-ink-soft); }
-[data-theme="dark"] .cl-quiz .cl-quiz-why.is-good { color: #7fd89a; }
-[data-theme="dark"] .cl-quiz .cl-quiz-why.is-bad { color: var(--danger); }
-[data-theme="dark"] .cl-quiz .cl-quiz-btn { background: var(--card); color: var(--ink); }
-[data-theme="dark"] .cl-quiz .cl-quiz-result { background: var(--bg-2); }
-[data-theme="dark"] .cl-quiz .cl-quiz-result.is-pass { background: var(--good-bg); }
-[data-theme="dark"] .cl-quiz .cl-quiz-result.is-fail { background: var(--warn-bg); border-color: var(--warn-line); }
-
-/* ---- Widget detail gaps: line labels, slot accents, quiz chrome --------- */
-[data-theme="dark"] .cl-mv .cl-mv-code li::before { color: #8a93a3; }
-[data-theme="dark"] .cl-mv .cl-mv-slot .cl-mv-addr { color: #8a93a3; }
-[data-theme="dark"] .cl-mv .cl-mv-slot.is-hot { border-color: #5a4a1e; }
-[data-theme="dark"] .cl-quiz .cl-quiz-meta { color: var(--ink-soft); }
+/* Primary button keeps its own indigo accent (not a fill token). */
 [data-theme="dark"] .cl-quiz .cl-quiz-primary {
   background: var(--indigo-fill);
   border-color: var(--indigo-ink);
   color: var(--ink);
 }
-
-/* ---- Dark skin: level-1 call stack panel ------------------------------- */
-[data-theme="dark"] .cl-mv .cl-mv-callstack { background: #14171d; border-color: var(--line); }
-[data-theme="dark"] .cl-mv .cl-mv-callstack .cl-mv-tag { color: var(--ink-soft); }
-[data-theme="dark"] .cl-mv .cl-mv-cs-frame { background: var(--card); border-color: #2b3d5e; }
-[data-theme="dark"] .cl-mv .cl-mv-cs-frame.is-active { background: #2e2410; border-color: #5a4a1e; box-shadow: 0 0 0 2px #5a4a1e; }
-[data-theme="dark"] .cl-mv .cl-mv-cs-frame.is-caller { background: #161a21; }
-[data-theme="dark"] .cl-mv .cl-mv-cs-title { color: var(--mv-stack); }
-[data-theme="dark"] .cl-mv .cl-mv-cs-frame.is-active .cl-mv-cs-title { color: #e6a54a; }
-[data-theme="dark"] .cl-mv .cl-mv-cs-row { background: #14171d; border-color: #2b3d5e; }
-[data-theme="dark"] .cl-mv .cl-mv-cs-name { color: #8a93a3; }
-[data-theme="dark"] .cl-mv .cl-mv-cs-val { color: var(--ink); }
-[data-theme="dark"] .cl-mv .cl-mv-cs-row.is-empty .cl-mv-cs-val { color: #6b727f; }
-[data-theme="dark"] .cl-mv .cl-mv-cs-row.is-changed { background: #2e2410; border-color: #5a4a1e; box-shadow: 0 0 0 2px #5a4a1e; }
-[data-theme="dark"] .cl-mv .cl-mv-cs-row.is-changed .cl-mv-cs-val { color: #e6a54a; }
-
-/* ---- Dark skin: scrubber depth sparkline + notable dots ----------------- */
-[data-theme="dark"] .cl-mv .cl-mv-depth polyline { stroke: var(--mv-stack); }
-[data-theme="dark"] .cl-mv .cl-mv-mark.is-call { border-color: #60a5fa; background: #3b82f6; }
-[data-theme="dark"] .cl-mv .cl-mv-mark.is-return { border-color: #a3a9b5; background: #191c22; }
-[data-theme="dark"] .cl-mv .cl-mv-mark.is-new-object { border-color: #4ade80; background: #22c55e; }
-[data-theme="dark"] .cl-mv .cl-mv-mark:focus-visible { outline-color: #7ba0ee; }
-
-/* ---- Dark skin: level-2 heap cards panel (names + objects + arrows) ------ */
-[data-theme="dark"] .cl-mv .cl-mv-heapcards { background: #14171d; border-color: var(--line); }
-[data-theme="dark"] .cl-mv .cl-mv-heapcards .cl-mv-tag { color: var(--ink-soft); }
-[data-theme="dark"] .cl-mv .cl-mv-hp-frame { background: #161f2a; border-color: #2b3d5e; }
-[data-theme="dark"] .cl-mv .cl-mv-hp-frame.is-active { background: #2e2410; border-color: #5a4a1e; }
-[data-theme="dark"] .cl-mv .cl-mv-hp-frame.is-caller { background: #14171d; }
-[data-theme="dark"] .cl-mv .cl-mv-hp-frame.is-active .cl-mv-hp-fname { color: #e6a54a; }
-[data-theme="dark"] .cl-mv .cl-mv-hp-row { background: var(--card); border-color: #2b3d5e; }
-[data-theme="dark"] .cl-mv .cl-mv-hp-name { color: #8a93a3; }
-[data-theme="dark"] .cl-mv .cl-mv-hp-val { color: var(--ink); }
-[data-theme="dark"] .cl-mv .cl-mv-hp-row.is-empty .cl-mv-hp-val { color: #6b727f; }
-[data-theme="dark"] .cl-mv .cl-mv-hp-row.is-null .cl-mv-hp-val { color: #f2777a; }
-[data-theme="dark"] .cl-mv .cl-mv-hp-dot { box-shadow: 0 0 0 3px #1b2a44; }
-[data-theme="dark"] .cl-mv .cl-mv-hp-row.is-changed { background: #2e2410; border-color: #5a4a1e; box-shadow: 0 0 0 2px #5a4a1e; }
-[data-theme="dark"] .cl-mv .cl-mv-hp-row.is-changed .cl-mv-hp-val { color: #e6a54a; }
-[data-theme="dark"] .cl-mv .cl-mv-hp-card { background: #122a24; border-color: #22463c; }
-[data-theme="dark"] .cl-mv .cl-mv-hp-type { color: var(--primary-2); }
-[data-theme="dark"] .cl-mv .cl-mv-hp-field { color: #b3bccc; }
-[data-theme="dark"] .cl-mv .cl-mv-hp-field.is-hot { background: #2e2410; box-shadow: inset 0 0 0 1px #5a4a1e; color: #e6a54a; }
-[data-theme="dark"] .cl-mv .cl-mv-hp-arrows path.cl-mv-hp-ref { stroke: #7ba0ee; }
-[data-theme="dark"] .cl-mv .cl-mv-hp-arrows marker path { fill: #7ba0ee; }
