@@ -1,0 +1,52 @@
+{
+  "task.1.title": "Dos objetos se comunican",
+  "task.1.concept": "Los objetos colaboran",
+  "task.1.context": "Un objeto logra su trabajo [[concept:pr-collaboration|pidiendo ayuda a otro y actuando según la respuesta]]. Aquí un `Greeter` no sabe la hora por sí mismo - se la pide a un `Clock` y luego elige un saludo. El patrón de abajo le pregunta a un `Sensor`; haz lo mismo con el reloj.",
+  "task.1.goal.0": "Pídele la hora al `clock`, luego devuelve `\"Good morning\"` antes de las 12, en caso contrario `\"Good afternoon\"`.",
+  "task.1.goal.1": "Este reloj marca 9, así que la salida debe ser Good morning.",
+
+  "task.2.title": "Pídele datos a otro objeto",
+  "task.2.concept": "Delegación",
+  "task.2.context": "Un `Cart` no debería guardar precios - ese es el conocimiento del `PriceList`. El carrito [[concept:pr-delegation|pide un precio]] y lo multiplica por la cantidad. Guarda la lista de precios que se le entrega al carrito y luego pregúntale.\n\nEl patrón de abajo le pregunta a un `Catalog`; haz lo mismo con la lista de precios.",
+  "task.2.goal.0": "Guarda los `prices` que se pasan al constructor, luego devuelve el precio del artículo por `qty`.",
+  "task.2.goal.1": "Un libro cuesta 10 y qty es 3, así que la salida debe ser 30.",
+
+  "task.3.title": "Un método que hace una sola cosa",
+  "task.3.concept": "Un trabajo por método",
+  "task.3.context": "Un método claro tiene [[concept:pr-single-responsibility|un único resultado evidente]] que puedes nombrar. `Area` existe para hacer un solo cálculo - los dos lados multiplicados - y nada más. El patrón de abajo es un solo trabajo para una caja; haz lo mismo para el rectángulo.",
+  "task.3.goal.0": "Devuelve el área del rectángulo - `width` por `height`.",
+  "task.3.goal.1": "Para 4 por 5 la salida debe ser 20.",
+
+  "task.4.title": "Dale a cada trabajo su propia clase",
+  "task.4.concept": "Separa los trabajos",
+  "task.4.context": "`Checkout` estaba haciendo dos trabajos a la vez: el cálculo (precio por cantidad) y la redacción (convertir ese número en texto). Dos trabajos en un método significan dos razones para cambiar un mismo lugar.\n\nMueve la redacción a `ReceiptFormatter`. `Checkout` conserva el cálculo y le pide el texto al formateador. El patrón de abajo divide una venta de la misma forma.",
+  "task.4.goal.0": "Dale a `ReceiptFormatter` un `Format(int total)` que devuelva `\"Total: \"` seguido del total.",
+  "task.4.goal.1": "En `Pay`, crea un formateador y pídele el texto. Para 10 por 2 la salida debe ser Total: 20.",
+
+  "task.5.title": "Usa lo que te entregan",
+  "task.5.concept": "Recibe, no construyas",
+  "task.5.context": "Una clase no tiene que construir sus propias herramientas. A `Mailer` se le entrega un `Outbox` a través de su constructor y usa ese - nunca llama a `new Outbox()` por sí mismo. Un colaborador que se entrega desde fuera es fácil de cambiar después.\n\nEl patrón de abajo le entrega a un `Printer` su `Ink`; haz lo mismo con el mailer y su outbox.",
+  "task.5.goal.0": "Conserva el `outbox` que se pasa al constructor, luego envía `\"hello \"` seguido de `who` a través de él.",
+  "task.5.goal.1": "Para Sam la salida debe ser sent: hello Sam.",
+
+  "task.6.title": "Conecta dos objetos y ejecuta",
+  "task.6.concept": "Ponlo todo junto",
+  "task.6.context": "Ahora todo en un solo lugar: a un `Worker` se le entrega un `ConsoleLog` e informa a través de él. Conserva el log, luego haz que `Report` escriba el estado a través del log que se le dio. Dos objetos pequeños colaborando es la forma de la mayoría del código real.\n\nEl patrón de abajo conecta un `Bell` a un `Speaker`; haz lo mismo con el worker y su log.",
+  "task.6.goal.0": "Conserva el `log` que se pasa al constructor, luego escribe el `status` a través de él en `Report`.",
+  "task.6.goal.1": "`Main` informa work done, así que la salida debe ser work done.",
+
+  "task.7.title": "Repaso de lectura de objetos",
+  "task.7.concept": "Repaso",
+  "task.7.summaryIntro": "Leíste y escribiste unos cuantos objetos pequeños trabajando juntos. Estos son los hábitos en los que se apoyarán los ejercicios de SOLID.",
+  "task.7.summaryItems.0.title": "Los objetos colaboran - ",
+  "task.7.summaryItems.0.text": "un objeto le pide a otro lo que necesita y luego actúa según la respuesta.",
+  "task.7.summaryItems.1.title": "Un trabajo por método - ",
+  "task.7.summaryItems.1.text": "un método que hace exactamente una cosa es fácil de nombrar y de confiar en él.",
+  "task.7.summaryItems.2.title": "Separa los trabajos - ",
+  "task.7.summaryItems.2.text": "cuando un método hace dos cosas, dale a una de ellas su propia clase o método.",
+  "task.7.summaryItems.3.title": "Recibe, no construyas - ",
+  "task.7.summaryItems.3.text": "deja que una clase reciba su colaborador a través del constructor, para que sea fácil de cambiar después.",
+  "task.7.summaryItems.4.title": "Conecta y ejecuta - ",
+  "task.7.summaryItems.4.text": "construye las partes, entrégalas y deja que se comuniquen - la forma de la mayoría del código real.",
+  "task.7.summaryClose": "A continuación conocerás estas ideas por su nombre en la ruta de diseño: responsabilidad única, y depender de lo que se te entrega."
+}

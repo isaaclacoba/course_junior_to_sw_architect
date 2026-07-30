@@ -24,7 +24,14 @@
   var pageShellSrc = attr("data-page-shell", "../../../../page-shell.js");
   var engineSrc = attr("data-engine", "../../../../build-engine.js");
   var base = attr("data-res-base", "res/strings");
-  var lang = attr("data-res-lang", "en");
+  // data-res-lang is the BASE/default language; data-res-langs is the list of
+  // available languages (defaulting to just the base) - the second axis of the
+  // resolver's (voice, lang) fallback chain.
+  var defaultLang = attr("data-res-lang", "en");
+  var langs = attr("data-res-langs", defaultLang)
+    .split(",")
+    .map(function (s) { return s.trim(); })
+    .filter(Boolean);
   var voices = attr("data-res-voices", "default")
     .split(",")
     .map(function (s) { return s.trim(); })
@@ -46,8 +53,18 @@
     values: voices,
     defaultValue: defaultVoice
   });
+  var langPref = global.ResourcePreference.create({
+    storageKey: "course_lesson_lang",
+    values: langs,
+    defaultValue: defaultLang
+  });
   function snapshot() {
-    return { voice: voicePref.get(), lang: lang, defaultVoice: defaultVoice, defaultLang: lang };
+    return {
+      voice: voicePref.get(),
+      lang: langPref.get(),
+      defaultVoice: defaultVoice,
+      defaultLang: defaultLang
+    };
   }
 
   var store = global.ResourceStore.create({ base: base });
@@ -66,6 +83,8 @@
     if (theme) sections.push(theme);
     var voice = global.VoiceSection && global.VoiceSection.create(voicePref);
     if (voice) sections.push(voice);
+    var language = global.LangSection && global.LangSection.create(langPref);
+    if (language) sections.push(language);
     global.SiteSettings.create({ sections: sections }).mount();
   }
 

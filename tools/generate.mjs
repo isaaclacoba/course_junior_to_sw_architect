@@ -324,6 +324,7 @@ function renderIndexHtml(m, variants) {
 function applyResourceTail(html, resources, enginePath, lessonId) {
   const base = resources.base || "res/strings";
   const lang = resources.lang || "en";
+  const langs = (resources.langs && resources.langs.length ? resources.langs : [lang]).join(",");
   const voices = (resources.voices || ["default"]).join(",");
 
   const staticTail =
@@ -334,7 +335,7 @@ function applyResourceTail(html, resources, enginePath, lessonId) {
     throw new Error("resource wiring: could not find the static engine tail for " + lessonId);
   }
 
-  const modules = ["resolver", "store", "manager", "settings", "preference", "theme-section", "voice-section", "bind-build"]
+  const modules = ["resolver", "store", "manager", "settings", "preference", "theme-section", "voice-section", "lang-section", "bind-build"]
     .map((mod) => '    <script src="../../../../resource/' + mod + '.js"></script>')
     .join("\n");
   const resourceTail =
@@ -346,6 +347,7 @@ function applyResourceTail(html, resources, enginePath, lessonId) {
     '      data-engine="' + enginePath + '"\n' +
     '      data-res-base="' + base + '"\n' +
     '      data-res-lang="' + lang + '"\n' +
+    '      data-res-langs="' + langs + '"\n' +
     '      data-res-voices="' + voices + '"\n' +
     '    ></script>';
 
