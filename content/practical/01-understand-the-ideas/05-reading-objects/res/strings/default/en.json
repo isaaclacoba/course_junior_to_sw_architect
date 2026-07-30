@@ -1,4 +1,8 @@
 {
+  "hero.eyebrow": "Part one · Understand the ideas",
+  "hero.title": "Reading Objects",
+  "intro.0": "A gentle step up from single-token drills. Write a few small objects that work together - one asks another for what it needs, one job lives in one place, and a class uses what is handed to it. No new theory - just the habits the SOLID drills will lean on.",
+
   "task.1.title": "Two objects talk",
   "task.1.concept": "Objects collaborate",
   "task.1.context": "One object gets work done by [[concept:pr-collaboration|asking another and acting on the answer]]. Here a `Greeter` does not know the time itself - it asks a `Clock`, then picks a greeting. The pattern below asks a `Sensor`; do the same with the clock.",

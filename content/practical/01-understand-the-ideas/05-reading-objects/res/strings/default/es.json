@@ -1,4 +1,8 @@
 {
+  "hero.eyebrow": "Parte uno · Entender las ideas",
+  "hero.title": "Lectura de objetos",
+  "intro.0": "Un paso suave más allá de los ejercicios de un solo hueco. Escribe unos cuantos objetos pequeños que trabajan juntos - uno le pide a otro lo que necesita, un trabajo vive en un solo lugar, y una clase usa lo que se le entrega. Nada de teoría nueva - solo los hábitos en los que se apoyarán los ejercicios de SOLID.",
+
   "task.1.title": "Dos objetos se comunican",
   "task.1.concept": "Los objetos colaboran",
   "task.1.context": "Un objeto logra su trabajo [[concept:pr-collaboration|pidiendo ayuda a otro y actuando según la respuesta]]. Aquí un `Greeter` no sabe la hora por sí mismo - se la pide a un `Clock` y luego elige un saludo. El patrón de abajo le pregunta a un `Sensor`; haz lo mismo con el reloj.",

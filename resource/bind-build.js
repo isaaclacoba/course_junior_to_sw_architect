@@ -45,6 +45,18 @@
     if (intro.length) hero.intro = intro; // only override when a voice supplies one
   }
 
+  // Hero fields the resolver may override when a voice/language supplies them.
+  // intro is apply-if-present (the default keeps its inlined intro); title/eyebrow
+  // the same, so an English page with no hero.* keys is unchanged.
+  function applyHero(hero, R) {
+    if (!hero) return;
+    applyIntro(hero, R);
+    var title = R.get("hero.title");
+    if (title !== undefined) hero.title = title;
+    var eyebrow = R.get("hero.eyebrow");
+    if (eyebrow !== undefined) hero.eyebrow = eyebrow;
+  }
+
   function applyTasks(cfg, R) {
     if (!cfg || !Array.isArray(cfg.tasks)) return;
     cfg.tasks.forEach(function (t, i) {
@@ -64,7 +76,7 @@
   // R: the resolver/manager (has get). ctx: { page, config } lesson globals.
   function apply(R, ctx) {
     if (!R || !ctx) return;
-    applyIntro(ctx.page && ctx.page.hero, R);
+    applyHero(ctx.page && ctx.page.hero, R);
     applyTasks(ctx.config, R);
   }
 

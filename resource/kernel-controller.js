@@ -32,6 +32,7 @@
   var defaultLang = attr("data-res-lang", "en");
   var langs = attr("data-res-langs", defaultLang).split(",").map(trim).filter(Boolean);
   var voices = attr("data-res-voices", "default").split(",").map(trim).filter(Boolean);
+  var chromeBase = attr("data-chrome-base", "../../../../res/chrome");
 
   function injectScript(src, attrs) {
     return new Promise(function (resolve, reject) {
@@ -94,15 +95,25 @@
     }
   }
 
+  // The chrome (shared UI) catalog is lang-only and site-wide. Load it into
+  // global.ChromeText so LessonCommon.t() (and the engines) resolve UI strings; a
+  // failed fetch degrades to {} (t() then returns its English fallbacks).
+  function loadChrome(lang) {
+    return fetch(chromeBase + "/" + lang + ".json")
+      .then(function (r) { return r.ok ? r.json() : {}; })
+      .then(function (map) { global.ChromeText = map || {}; })
+      .catch(function () { global.ChromeText = global.ChromeText || {}; });
+  }
+
   // Re-resolve for the current selection and repaint prose in place, guarded by
   // the generation token. The Settings highlight follows the (already-updated)
   // preference synchronously; the prose repaints when the bundle resolves.
   function relocalize() {
     if (settings) settings.refresh();
     var myGen = ++gen;
-    return manager.init().then(function (R) {
+    return Promise.all([manager.init(), loadChrome(langPref.get())]).then(function (arr) {
       if (myGen !== gen) return; // superseded by a newer selection
-      bind(R); // refresh PAGE.hero.intro + BUILD_CONFIG.tasks once, before the fan-out
+      bind(arr[0]); // refresh PAGE.hero.intro + BUILD_CONFIG.tasks once, before the fan-out
       surfaces.forEach(function (s) {
         if (s && typeof s.setLocale === "function") s.setLocale();
       });
@@ -115,11 +126,15 @@
   manager.init()
     .then(function (R) {
       bind(R);
+      return loadChrome(langPref.get());
+    })
+    .then(function () {
       return injectScript(pageShellSrc);
     })
     .then(function () {
       mountSettings();
       if (global.PageShellHero) surfaces.push(global.PageShellHero);
+      if (global.PageShellChrome) surfaces.push(global.PageShellChrome);
       return injectScript(engineSrc, { "data-manual": "" });
     })
     .then(function () {

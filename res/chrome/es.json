@@ -1,0 +1,29 @@
+{
+  "nav.run": "Ejecutar",
+  "nav.solution": "Ver solución",
+  "nav.reset": "Reiniciar",
+  "nav.prev": "Anterior",
+  "nav.next": "Siguiente",
+  "nav.nextLesson": "Siguiente lección",
+  "nav.xp": "XP del curso:",
+
+  "card.pattern": "Este es el patrón",
+  "card.goal": "Objetivo",
+  "card.yourcode": "Tu código",
+  "card.expected": "Salida esperada:",
+  "card.recap": "Repaso",
+
+  "result.passed": "Aprobado",
+  "result.notyet": "Todavía no",
+  "result.pass": "La salida coincide con lo que pedía la tarea. XP otorgado.",
+  "result.compileFail": "El código no compiló. Lee los errores de arriba e inténtalo de nuevo.",
+  "result.runtimeError": "Se ejecutó pero lanzó un error. Corrígelo y ejecútalo de nuevo.",
+  "result.verifyFail": "Tu código imprimió la respuesta correcta para este ejemplo, pero una comprobación oculta con otras entradas falló. Haz que la lógica funcione para cualquier entrada, no solo para esta.",
+  "result.error": "Algo salió mal al ejecutar el código.",
+
+  "run.running": "Ejecutando...",
+  "run.compiling": "Compilando y ejecutando...",
+  "run.preparing": "Preparando el compilador...",
+  "run.noOutput": "(sin salida)",
+  "run.couldNotRun": "No se pudo ejecutar el código."
+}

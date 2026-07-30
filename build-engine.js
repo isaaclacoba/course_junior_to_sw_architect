@@ -67,8 +67,11 @@
     }
     let idx = cardFromHash();
 
+    // Chrome text shorthand: LessonCommon.t(key, englishFallback).
+    const tr = LessonCommon.t;
+
     function renderXP() {
-      if (xpLabel) xpLabel.textContent = `Course XP: ${course.xp()}`;
+      if (xpLabel) xpLabel.textContent = tr("nav.xp", "Course XP:") + " " + course.xp();
     }
 
     function award(taskIndex) {
@@ -88,7 +91,7 @@
       result.hidden = false;
       result.classList.toggle("is-pass", ok);
       result.classList.toggle("is-fail", !ok);
-      resultTitle.textContent = ok ? "Passed" : "Not yet";
+      resultTitle.textContent = ok ? tr("result.passed", "Passed") : tr("result.notyet", "Not yet");
       resultBody.textContent = body;
     }
 
@@ -224,6 +227,16 @@
     // Localizable: repaint ONLY the voiced prose of the current card from the
     // already-refreshed cfg. Never touches the editor buffer, card index, run
     // output, or result, so a locale swap leaves the learner's work intact.
+    // Re-apply the dynamic chrome the engine owns (the labels page-shell does not
+    // carry a data-t for): the XP counter, the Run label, and the idx-dependent Next.
+    function applyChrome() {
+      renderXP();
+      if (runBtn) runBtn.textContent = tr("nav.run", "Run");
+      if (nextBtn) {
+        nextBtn.textContent = idx === tasks.length - 1 ? tr("nav.nextLesson", "Next lesson") : tr("nav.next", "Next");
+      }
+    }
+
     function setLocale() {
       const task = tasks[idx];
       title.textContent = task.title;
@@ -231,6 +244,7 @@
       if (concept) concept.textContent = task.concept;
       if (task.summary) paintSummaryProse(task);
       else paintGoal(task);
+      applyChrome();
     }
 
     function render() {
@@ -241,14 +255,14 @@
       context.innerHTML = renderProse(task.context);
       if (concept) concept.textContent = task.concept;
       progress.textContent = task.summary
-        ? "Recap"
+        ? tr("card.recap", "Recap")
         : `${progressNoun} ${idx + 1} / ${buildCount}`;
 
       if (task.summary) {
         renderSummary(task);
         prevBtn.disabled = idx === 0;
         nextBtn.disabled = false;
-        nextBtn.textContent = idx === tasks.length - 1 ? "Next lesson" : "Next";
+        nextBtn.textContent = idx === tasks.length - 1 ? tr("nav.nextLesson", "Next lesson") : tr("nav.next", "Next");
         return;
       }
 
@@ -286,7 +300,7 @@
       result.hidden = true;
       prevBtn.disabled = idx === 0;
       nextBtn.disabled = false;
-      nextBtn.textContent = idx === tasks.length - 1 ? "Next lesson" : "Next";
+      nextBtn.textContent = idx === tasks.length - 1 ? tr("nav.nextLesson", "Next lesson") : tr("nav.next", "Next");
     }
 
     async function run() {
@@ -294,8 +308,8 @@
       const task = tasks[idx];
 
       runBtn.disabled = true;
-      runBtn.textContent = "Running...";
-      showOutput("Compiling and running...", false);
+      runBtn.textContent = tr("run.running", "Running...");
+      showOutput(tr("run.compiling", "Compiling and running..."), false);
       clearErrors();
       result.hidden = true;
 
@@ -305,18 +319,18 @@
           hideOutput();
           showErrors(res.errors);
           if (editor.setMarkers) editor.setMarkers(res.errors);
-          showResult(false, "The code did not compile. Read the errors above and try again.");
+          showResult(false, tr("result.compileFail", "The code did not compile. Read the errors above and try again."));
           return;
         }
         if (editor.setMarkers) editor.setMarkers([]);
         clearErrors();
         if (res.runtimeError) {
           showOutput(`${res.output}\n${res.runtimeError}`.trim(), true);
-          showResult(false, "It ran but threw an error. Fix it and run again.");
+          showResult(false, tr("result.runtimeError", "It ran but threw an error. Fix it and run again."));
           return;
         }
         const out = (res.output || "").trim();
-        showOutput(out || "(no output)", false);
+        showOutput(out || tr("run.noOutput", "(no output)"), false);
         const unmet = unmetRequirement(code[idx], task.requireSource);
         if (!matches(out, task.expected)) {
           showResult(false, describeExpected(task.expected));
@@ -326,18 +340,18 @@
           showResult(
             false,
             task.verify.message ||
-              "Your code printed the right answer for this example, but a hidden check with different inputs failed. Make the logic work for any input, not just this one."
+              tr("result.verifyFail", "Your code printed the right answer for this example, but a hidden check with different inputs failed. Make the logic work for any input, not just this one.")
           );
         } else {
           award(idx);
-          showResult(true, "Output matched what the task asked for. XP awarded.");
+          showResult(true, tr("result.pass", "Output matched what the task asked for. XP awarded."));
         }
       } catch (err) {
-        showOutput(err.message || "Could not run the code.", true);
-        showResult(false, "Something went wrong running the code.");
+        showOutput(err.message || tr("run.couldNotRun", "Could not run the code."), true);
+        showResult(false, tr("result.error", "Something went wrong running the code."));
       } finally {
         runBtn.disabled = false;
-        runBtn.textContent = "Run";
+        runBtn.textContent = tr("nav.run", "Run");
       }
     }
 
@@ -345,14 +359,14 @@
     // user knows the first run is being prepared.
     async function warmUp() {
       runBtn.disabled = true;
-      runBtn.textContent = "Preparing compiler...";
+      runBtn.textContent = tr("run.preparing", "Preparing compiler...");
       try {
         await runner.warm();
       } catch (err) {
         // Warm-up is best effort; the user can still click Run, which retries.
       } finally {
         runBtn.disabled = false;
-        runBtn.textContent = "Run";
+        runBtn.textContent = tr("nav.run", "Run");
       }
     }
 

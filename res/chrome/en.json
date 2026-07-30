@@ -1,0 +1,29 @@
+{
+  "nav.run": "Run",
+  "nav.solution": "Show Solution",
+  "nav.reset": "Reset",
+  "nav.prev": "Previous",
+  "nav.next": "Next",
+  "nav.nextLesson": "Next lesson",
+  "nav.xp": "Course XP:",
+
+  "card.pattern": "Here's the pattern",
+  "card.goal": "Goal",
+  "card.yourcode": "Your Code",
+  "card.expected": "Expected output:",
+  "card.recap": "Recap",
+
+  "result.passed": "Passed",
+  "result.notyet": "Not yet",
+  "result.pass": "Output matched what the task asked for. XP awarded.",
+  "result.compileFail": "The code did not compile. Read the errors above and try again.",
+  "result.runtimeError": "It ran but threw an error. Fix it and run again.",
+  "result.verifyFail": "Your code printed the right answer for this example, but a hidden check with different inputs failed. Make the logic work for any input, not just this one.",
+  "result.error": "Something went wrong running the code.",
+
+  "run.running": "Running...",
+  "run.compiling": "Compiling and running...",
+  "run.preparing": "Preparing compiler...",
+  "run.noOutput": "(no output)",
+  "run.couldNotRun": "Could not run the code."
+}

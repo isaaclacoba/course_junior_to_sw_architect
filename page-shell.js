@@ -140,8 +140,55 @@
       }
       return { showOutput, hideOutput, clearErrors, showErrors };
     },
+    // Chrome (UI furniture) text lookup: the localized string for the current
+    // language from window.ChromeText, else the English fallback when no catalog
+    // is active (so non-i18n pages stay byte-identical). key is namespaced
+    // (nav.run, card.goal, quiz.check, ...).
+    t(key, fallback) {
+      var c = (typeof window !== "undefined" && window.ChromeText) || null;
+      if (c && Object.prototype.hasOwnProperty.call(c, key)) {
+        var v = c[key];
+        if (v != null) return v;
+      }
+      return fallback;
+    },
   };
   window.LessonCommon = LessonCommon;
+
+  // Template chrome helpers. With NO catalog (the non-i18n pages) tAttr adds
+  // nothing and tHtml/tSlot return the English literal, so the markup is
+  // byte-identical; on an i18n page tAttr emits a data-t marker so a live swap can
+  // re-localize the element in place.
+  function chromeActive() {
+    return typeof window !== "undefined" && !!window.ChromeText;
+  }
+  function tHtml(key, english) {
+    return LessonCommon.escapeHtml(LessonCommon.t(key, english));
+  }
+  function tAttr(key) {
+    return chromeActive() ? ' data-t="' + key + '"' : "";
+  }
+  // A chrome text slot that is NOT already its own element: inactive -> the plain
+  // (escaped) English literal, byte-identical; active -> wrapped in <span data-t>
+  // so it can be re-localized on a live swap.
+  function tSlot(key, english) {
+    return chromeActive()
+      ? '<span data-t="' + key + '">' + tHtml(key, english) + "</span>"
+      : LessonCommon.escapeHtml(english);
+  }
+
+  // Chrome Localizable: re-apply the current language to every element carrying a
+  // data-t marker (present only on i18n pages). Lets a live language swap
+  // re-localize the static chrome (headings, buttons, labels) in place.
+  function repaintChrome() {
+    if (typeof document === "undefined") return;
+    var nodes = document.querySelectorAll("[data-t]");
+    for (var i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      el.textContent = LessonCommon.t(el.getAttribute("data-t"), el.textContent);
+    }
+  }
+  window.PageShellChrome = { setLocale: repaintChrome };
 
   const page = window.PAGE;
   if (!page) {
@@ -177,21 +224,24 @@
       <p class="eyebrow">${h.eyebrow}</p>
       <h1>${h.title}</h1>
       ${intro}
-      <p class="subtitle"><strong id="courseXpLabel">Course XP: 0</strong></p>
+      <p class="subtitle"><strong id="courseXpLabel">${tHtml("nav.xp", "Course XP:")} 0</strong></p>
       ${links}`;
   }
 
-  // Localizable content element: repaint ONLY the hero's intro paragraphs from
-  // the (already-refreshed) window.PAGE.hero, in place. Leaves the eyebrow, title,
-  // the Course-XP label node, links and agenda untouched - so no cached reference
-  // (e.g. the engine's #courseXpLabel) is invalidated. Never runs on the initial
-  // render, so the default hero stays byte-identical.
-  function repaintHeroIntro() {
+  // Localizable content element: repaint the hero's eyebrow, title and intro
+  // paragraphs from the (already-refreshed) window.PAGE.hero, in place. Leaves the
+  // Course-XP label node, links and agenda untouched - so no cached reference (e.g.
+  // the engine's #courseXpLabel) is invalidated. Never runs on the initial render,
+  // so the default hero stays byte-identical.
+  function repaintHero() {
     const h = window.PAGE && window.PAGE.hero;
     if (!h) return;
+    const eyebrowEl = hero.querySelector(".eyebrow");
+    if (eyebrowEl && h.eyebrow != null) eyebrowEl.textContent = h.eyebrow;
+    const h1 = hero.querySelector("h1");
+    if (h1 && h.title != null) h1.textContent = h.title;
     const xpLabel = hero.querySelector("#courseXpLabel");
     const anchor = xpLabel ? xpLabel.closest("p") : null;
-    const h1 = hero.querySelector("h1");
     if (!anchor || !h1) return;
     // Drop the current intro nodes (everything between <h1> and the XP paragraph).
     let node = h1.nextSibling;
@@ -384,27 +434,27 @@
         </header>
 
         <section id="${p}ExampleWrap" class="example-box" hidden>
-          <h3>Here's the pattern</h3>
+          <h3${tAttr("card.pattern")}>${tHtml("card.pattern", "Here's the pattern")}</h3>
           <pre class="code-example"><code id="${p}Example" class="language-csharp"></code></pre>
         </section>
 
         <section class="coach">
-          <h3>Goal</h3>
+          <h3${tAttr("card.goal")}>${tHtml("card.goal", "Goal")}</h3>
           <ul id="${p}Goal" class="coach-list"></ul>
           <p class="context">
-            Expected output: <strong id="${p}Expected" class="expected-line"></strong>
+            ${tSlot("card.expected", "Expected output:")} <strong id="${p}Expected" class="expected-line"></strong>
           </p>
         </section>
 
         <section class="fill-section">
-          <h3>Your Code</h3>
+          <h3${tAttr("card.yourcode")}>${tHtml("card.yourcode", "Your Code")}</h3>
           <div id="${p}Editor" class="code-editor-host"></div>
         </section>
 
         <section class="actions">
-          <button id="${p}Run" class="btn primary" type="button">Run</button>
-          <button id="${p}Solution" class="btn danger" type="button">Show Solution</button>
-          <button id="${p}Reset" class="btn" type="button">Reset</button>
+          <button id="${p}Run" class="btn primary" type="button">${tHtml("nav.run", "Run")}</button>
+          <button id="${p}Solution" class="btn danger" type="button"${tAttr("nav.solution")}>${tHtml("nav.solution", "Show Solution")}</button>
+          <button id="${p}Reset" class="btn" type="button"${tAttr("nav.reset")}>${tHtml("nav.reset", "Reset")}</button>
         </section>
 
         <div id="${p}Errors" class="run-errors" hidden></div>
@@ -422,8 +472,8 @@
         </section>
 
         <footer class="nav-row">
-          <button id="${p}Prev" class="btn" type="button">Previous</button>
-          <button id="${p}Next" class="btn primary" type="button">Next</button>
+          <button id="${p}Prev" class="btn" type="button"${tAttr("nav.prev")}>${tHtml("nav.prev", "Previous")}</button>
+          <button id="${p}Next" class="btn primary" type="button">${tHtml("nav.next", "Next")}</button>
         </footer>
       </section>`;
   }
@@ -459,7 +509,7 @@
   renderAgenda();
   // The hero's intro is a Localizable content element (text, no logic); a kernel
   // lesson controller holds this and calls setLocale() on a voice/lang change.
-  window.PageShellHero = { setLocale: repaintHeroIntro };
+  window.PageShellHero = { setLocale: repaintHero };
 
   if (page.archetype === "drill") {
     hero.insertAdjacentHTML("afterend", drillCard(page.prefix));
