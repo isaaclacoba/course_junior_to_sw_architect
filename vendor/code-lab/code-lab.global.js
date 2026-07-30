@@ -3197,7 +3197,7 @@ ${result.runtimeError}`.trim(),
   // src/core/exec-tracer-model.ts
   function traceToSteps(trace) {
     const src = trace.code ?? [];
-    const steps = trace.steps ?? [];
+    const steps = collapseCallEntries(trace.steps ?? []);
     const out = [];
     let prevValues = /* @__PURE__ */ new Map();
     let prevFields = /* @__PURE__ */ new Map();
@@ -3259,6 +3259,24 @@ ${result.runtimeError}`.trim(),
       out.push(terminal);
     }
     return out;
+  }
+  function collapseCallEntries(steps) {
+    const drop = /* @__PURE__ */ new Set();
+    for (let i = 1; i + 1 < steps.length; i++) {
+      const prev2 = steps[i - 1];
+      const cur = steps[i];
+      const next2 = steps[i + 1];
+      const curLen = cur.frames?.length ?? 0;
+      const pushed = curLen > (prev2.frames?.length ?? 0);
+      if (!pushed) continue;
+      if (cur.line !== next2.line) continue;
+      if (curLen !== (next2.frames?.length ?? 0)) continue;
+      const curTop = cur.frames?.[curLen - 1];
+      const nextTop = next2.frames?.[curLen - 1];
+      if (!curTop || !nextTop || curTop.id !== nextTop.id) continue;
+      drop.add(i);
+    }
+    return drop.size ? steps.filter((_, i) => !drop.has(i)) : steps;
   }
   function frameToFrame(f, values, prevValues, firstStep) {
     const vars = (f.vars ?? []).map((v) => {
@@ -3473,7 +3491,7 @@ ${result.runtimeError}`.trim(),
         this.lastTrace = outcome.trace;
         this.lastSteps = traceToSteps(outcome.trace);
         this.render();
-        const n = outcome.trace.steps.length;
+        const n = Math.max(0, this.lastSteps.length - 1);
         let msg = `Traced ${n} step${n === 1 ? "" : "s"}.`;
         if (outcome.trace.truncated) msg += " Stopped early - the program ran too long.";
         if (outcome.runtimeError) msg += ` It threw: ${outcome.runtimeError}`;
