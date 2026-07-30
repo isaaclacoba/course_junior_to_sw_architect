@@ -1,0 +1,14 @@
+{
+  "hero.eyebrow": "Teoría · Parte siete · Cómo piensa un agente",
+  "hero.title": "Razonamiento",
+  "intro.0": "Hazle a un modelo una pregunta que necesita unos pasos de reflexión - un poco de aritmética, un pequeño acertijo de lógica - y si suelta lo primero que le sale, a menudo se equivoca. El arreglo tiene casi gracia: dile que piense paso a paso, y su acierto se dispara. No porque se haya vuelto más listo, sino porque escribir los pasos le da espacio para trabajar - cada token que escribe pasa a ser parte de lo que lee después. Verás la misma pregunta fallar como respuesta a bote pronto y luego acertar cuando el modelo razona en voz alta primero.",
+  "legend.0": "esto lo escribió el modelo",
+  "legend.1": "esto lo escribiste tú",
+  "legend.2": "esto lo escribió tu app",
+  "step.0.narr": "Una pregunta que necesita unos pasos de aritmética. Mira lo que pasa cuando el modelo responde de golpe.",
+  "step.1.narr": "Sin espacio para trabajar, encaja con un número plausible por parecido y lo suelta. Pero 3 por 4 por 6 es **72**, no 60. El modelo no tiene borrador - a menos que le demos uno.",
+  "step.2.narr": "Así que pedimos uno. Una línea lo cambia todo: dile que **piense paso a paso**. Ahora el modelo tiene permiso - se espera de él - de escribir sus cuentas antes de la respuesta.",
+  "step.3.narr": "Despliega los pasos. Y aquí está la clave: cada token que escribe cae de vuelta en el contexto que lee después - así que cada línea de cuentas sostiene a la siguiente. El razonamiento no es decoración; **es** el cálculo.",
+  "step.4.narr": "Con los pasos delante, la última línea es fácil: **72**. El mismo modelo, la misma pregunta - la única diferencia es que escribió su razonamiento primero.",
+  "step.5.narr": "Eso es la **cadena de pensamiento**: darle al modelo espacio para razonar antes de responder. Cuesta unos tokens más y un poco de tiempo, pero en cualquier cosa con pasos es la diferencia entre una conjetura y una respuesta trabajada. Todo agente se apoya en esto - el razonamiento es el paso de «razonar» del bucle que viste."
+}

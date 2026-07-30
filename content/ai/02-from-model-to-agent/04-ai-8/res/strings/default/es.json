@@ -1,0 +1,15 @@
+{
+  "hero.eyebrow": "Teoría · Parte seis · Del modelo al agente",
+  "hero.title": "Del LLM al agente",
+  "intro.0": "Has conocido las piezas de una en una: el modelo, su contexto, la ventana, la memoria y las herramientas. Por sí solo, un modelo solo predice el siguiente token. Dale un objetivo, déjale llamar a herramientas y recuperar memoria, y haz correr todo en un bucle - y obtienes un agente que puede trabajar hacia algo. Esta última lección junta las piezas, y señala hacia dónde va el curso a continuación.",
+  "legend.0": "la pieza que trabaja ahora mismo",
+  "legend.1": "memoria de la que tira",
+  "legend.2": "lo que una herramienta puso en el contexto",
+  "step.0.narr": "Aquí están las piezas que has conocido, de una en una: el **modelo**, su **contexto**, su **memoria**, y las **herramientas** que puede llamar. Por separado, cada una es limitada. Envuélvelas en un bucle y se convierten en algo nuevo - un **agente** con un objetivo que alcanzar.",
+  "step.1.narr": "Llega una tarea desde el mundo exterior. El agente la **percibe**: lee la tarea a su contexto - la memoria de trabajo que el modelo puede ver ahora mismo.",
+  "step.2.narr": "El **modelo** lee el contexto y **razona** sobre qué hacer a continuación. Esta es la misma predicción del siguiente token con la que empezaste - ahora apuntada a elegir una acción.",
+  "step.3.narr": "Para razonar bien, **recupera** de la memoria - un dato guardado en un chat anterior, como tus fechas de viaje - y lo trae al contexto, exactamente como viste en la lección de memoria.",
+  "step.4.narr": "Ahora **actúa**: llama a una **herramienta** - aquí una búsqueda de vuelos - para hacer algo en el mundo que no puede hacer solo con texto.",
+  "step.5.narr": "El resultado de la herramienta se **observa** de vuelta en el contexto. El agente ha aprendido algo nuevo - y el bucle empieza otra vez, razonando a partir de lo que ahora sabe.",
+  "step.6.narr": "Eso es un agente: un **modelo** en el centro, un **contexto** que lee, **memoria** y **herramientas** de las que tira, todo girando en un bucle hasta cumplir el objetivo. Ahora tienes el vocabulario que da por sabido el material más difícil - y ahí es donde va este curso a continuación."
+}

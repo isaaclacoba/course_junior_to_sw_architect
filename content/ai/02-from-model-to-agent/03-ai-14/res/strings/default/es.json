@@ -1,0 +1,13 @@
+{
+  "hero.eyebrow": "Teoría · Parte seis · Del modelo al agente",
+  "hero.title": "Recuperación",
+  "intro.0": "El modelo solo sabe lo que vio en el entrenamiento - nunca ha leído los documentos de tu empresa, y no puede recordar una página que ojeó una vez. Entonces, ¿cómo responde preguntas sobre texto para el que nunca fue entrenado? Le das el texto para que lo lea en el momento de la pregunta - pero una biblioteca entera no cabe en el contexto. La recuperación es el truco: convierte la pregunta en una búsqueda, trae de vuelta solo los pocos pasajes que encajan, y deja que el modelo responda a partir de esos. Verás cómo una pregunta se convierte en un vector, encuentra sus chunks más cercanos, y ancla una respuesta en texto real en vez de en una conjetura.",
+  "legend.0": "los chunks más cercanos - recuperados",
+  "legend.1": "la respuesta anclada",
+  "step.0.narr": "El modelo nunca fue entrenado con esto - tu política de devoluciones, partida en **chunks** pequeños. No puede meter la biblioteca entera en su contexto, y no ha memorizado nada de ella. Así que guardamos el texto en un **almacén** que el agente puede buscar.",
+  "step.1.narr": "Llega una pregunta. Antes de buscar, la convertimos en un **embedding** - una lista de números, un **vector**, que captura su significado. Cada chunk del almacén se convirtió en un vector de la misma forma, una vez, de antemano.",
+  "step.2.narr": "Ahora compara vectores. Los chunks cuyo significado está **cerca** de la pregunta puntúan alto; los que no tienen relación puntúan bajo. Esto es la **búsqueda por similitud** - emparejar por significado, no por palabras exactas, así que «batidora usada después de 40 días» encuentra los pasajes sobre «artículos usados» y la ventana de «30 días» aunque casi no compartan palabras.",
+  "step.3.narr": "Quédate con los **primeros** - los chunks más cercanos - y descarta el resto. Estos son los que se traen al contexto. Esta es la **recuperación** de la generación aumentada por recuperación: traer el puñado de pasajes que importan, no el documento entero.",
+  "step.4.narr": "El modelo lee la pregunta **con esos chunks delante** y responde a partir del texto, no de la memoria: los artículos usados no se pueden devolver, y hasta los sin abrir solo dentro de 30 días - así que 40 días está pasada la ventana. Anclado en una fuente real que hasta podría citar.",
+  "step.5.narr": "Eso es la recuperación: convierte la pregunta en un vector, encuentra los chunks más cercanos, ponlos en el contexto, y responde a partir de ellos. Es como un agente trabaja con conocimiento mucho más grande que su ventana - y mucho más fresco que su entrenamiento. La **memoria semántica** de la lección de memoria suele ser un almacén de recuperación igual que este."
+}

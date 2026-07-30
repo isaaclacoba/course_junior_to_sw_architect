@@ -1,0 +1,16 @@
+{
+  "hero.eyebrow": "Teoría · Parte seis · Del modelo al agente",
+  "hero.title": "Qué es de verdad una ejecución: la transcripción",
+  "intro.0": "La memoria, las herramientas, el bucle - a estas alturas un agente puede parecer una mente trabajando. Esta lección descorre la cortina. Por debajo de todo, una ejecución es una única lista de mensajes que va creciendo, cada uno etiquetado con un rol y con quién lo escribió de verdad. Verás esa lista crecer a lo largo de un turno real y verás tres cosas que sorprenden a casi todo el mundo: el modelo solo escribe texto, el resultado de una herramienta lo escribe tu propio código, y la «memoria» no es más que esta lista enviada otra vez. Una vez que ves la lista, los prompts, la memoria y las herramientas dejan de ser trucos separados - todos son formas de manejarla.",
+  "legend.0": "lo escribió tu app - las instrucciones",
+  "legend.1": "lo escribiste tú - el turno de usuario",
+  "legend.2": "lo escribió el modelo - un turno de assistant",
+  "legend.3": "lo escribió tu código - un resultado de herramienta",
+  "step.0.narr": "A lo largo de las últimas lecciones el agente ganó memoria, herramientas y un bucle, y empezó a parecer magia. Aquí está la verdad simple por debajo de todo: una ejecución no es más que una **lista de mensajes**. Empieza con dos - las instrucciones de tu app, y tu pregunta.",
+  "step.1.narr": "Cada mensaje lleva dos cosas. Un **rol** - `system`, `user`, `assistant`, o `tool` - dice qué tipo de turno es. Y un **autor** - quién lo escribió de verdad. Tu app escribió la línea `system` (las instrucciones); *tú* escribiste la línea `user`. Fíjate en esa etiqueta de autor: es de lo que va toda esta lección.",
+  "step.2.narr": "Ahora le toca al modelo. Lee la **lista entera** y escribe exactamente una cosa de vuelta: un mensaje `assistant`. Eso es todo lo que un modelo puede hacer - añadir texto. Aquí el texto que escribe es una **llamada** a una herramienta, pero fíjate en que sigue siendo solo texto que produjo el modelo.",
+  "step.3.narr": "El modelo no puede ejecutar nada. Así que **tu código** lee esa llamada, ejecuta `getWeather`, y añade el resultado como un mensaje `tool`. Lee la etiqueta de autor: esta línea la escribió tu código, **no** el modelo. Esa es la imagen honesta de «el agente usó una herramienta».",
+  "step.4.narr": "Para continuar, hay que llamar al modelo **otra vez** - y por su cuenta no recuerda nada. Así que la lista entera, resultado de la herramienta incluido, se envía otra vez desde el principio. Eso es todo lo que es la «memoria» aquí: reenviar esta lista que va creciendo en cada llamada. No hay ningún almacén oculto que el modelo lleve entre turnos.",
+  "step.5.narr": "Leyendo la lista más completa - ahora con el tiempo dentro - el modelo escribe su mensaje `assistant` final: la respuesta. El mismo movimiento de antes: leerlo todo, añadir una línea de texto.",
+  "step.6.narr": "Así que todo el agente es una única lista de texto que va creciendo. El modelo solo añade líneas `assistant`; tu código añade líneas `tool`; la **memoria** es reenviar la lista; y las **instrucciones**, skills y specs no son más que más texto colocado cerca del principio - la línea `system`. Prompt, memoria, herramientas: todo ello es manejar esta única lista."
+}

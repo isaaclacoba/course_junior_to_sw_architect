@@ -1,0 +1,14 @@
+{
+  "hero.eyebrow": "Teoría · Parte cinco · Los cimientos de la IA",
+  "hero.title": "Muestreo y temperatura",
+  "intro.0": "Pregúntale lo mismo dos veces a un modelo y puedes obtener dos respuestas distintas. Eso no es un fallo - el modelo elige su siguiente palabra de un abanico de opciones, y un ajuste llamado temperatura controla cómo de atrevida es esa elección. Una temperatura baja lo mantiene estable y predecible; una alta lo hace divagar. Aquí verás el mismo prompt caer en palabras distintas.",
+  "legend.0": "el prompt hasta ahora",
+  "legend.1": "la probabilidad de cada candidata",
+  "legend.2": "la palabra que muestreó esta vez",
+  "step.0.narr": "Volvamos a la conjetura del modelo de la primera lección: dado el texto que hay hasta ahora, produce un **abanico** de siguientes palabras, cada una con una probabilidad.",
+  "step.1.narr": "No siempre coge la de arriba. **Muestrea** - elige una palabra según esas probabilidades. Un dial llamado **temperatura** decide con cuánta osadía se aleja de la favorita.",
+  "step.2.narr": "Baja la temperatura y el abanico se afila: la palabra de arriba se lleva casi todo el peso, así que el modelo casi siempre la elige. Respuestas estables y predecibles.",
+  "step.3.narr": "Súbela y el abanico se aplana: las palabras peor clasificadas tienen una oportunidad de verdad. Aquí cae en `pink` - más variedad, pero menos seguro.",
+  "step.4.narr": "Ejecútalo otra vez a temperatura alta y puedes obtener una palabra totalmente distinta - `red` esta vez. Por esto el mismo prompt da respuestas distintas en intentos distintos.",
+  "step.5.narr": "Así que la temperatura cambia fiabilidad por variedad. Mantenla **baja** para trabajo factual y repetible; súbela para lluvia de ideas y escritura creativa. Las mismas probabilidades por debajo - solo cambia con cuánta osadía elige el modelo de entre ellas."
+}
