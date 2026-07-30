@@ -1911,12 +1911,21 @@ ${result.runtimeError}`.trim(),
     }
     render(model) {
       this.statics.innerHTML = staticsHtml(model.globals ?? [], model.rodata ?? []);
-      this.roots.innerHTML = framesHtml(model.stack ?? []);
-      this.objs.innerHTML = (model.heap ?? []).map((o) => objHtml(o, model.glow)).join("");
-      if (typeof window.requestAnimationFrame === "function") {
-        window.requestAnimationFrame(() => this.drawArrows(model.refs));
-      } else {
+      const stack = model.stack ?? [];
+      const frames = stack.map((f, i) => ({ ...f, active: i === stack.length - 1 }));
+      reconcile(this.roots, frames, frameNode);
+      reconcile(this.objs, (model.heap ?? []).map((o) => ({ ...o })), objNode);
+      const draw = () => {
+        (model.heap ?? []).forEach((o) => {
+          const card = this.el.querySelector(`[data-obj="${o.id}"]`);
+          if (card) card.classList.toggle("glow", model.glow === o.id);
+        });
         this.drawArrows(model.refs);
+      };
+      if (typeof window.requestAnimationFrame === "function") {
+        window.requestAnimationFrame(draw);
+      } else {
+        draw();
       }
     }
     drawArrows(refs) {
@@ -1962,15 +1971,29 @@ ${result.runtimeError}`.trim(),
     const hot = allowHot && slot.hot ? " is-changed" : "";
     return `<div class="cl-mv-hp-row${hot}"><span class="cl-mv-hp-name">${esc3(slot.k)}</span><span class="cl-mv-hp-val">${esc3(slot.v)}</span></div>`;
   }
-  function framesHtml(stack) {
-    const frames = [...stack].reverse();
-    return frames.map((frame, i) => {
-      const active = i === 0;
-      const cls = "cl-mv-hp-frame" + (active ? " is-active" : " is-caller");
-      const title = frame.name ?? frame.id;
-      const rows = (frame.vars ?? []).map(rowHtml3).join("");
-      return `<div class="${cls}"><div class="cl-mv-hp-fname">${esc3(title)}</div><div class="cl-mv-hp-rows">${rows}</div></div>`;
-    }).join("");
+  function kindLabel(kind) {
+    switch (kind) {
+      case "entry":
+        return "entry point";
+      case "static":
+        return "static method";
+      case "method":
+        return "instance method";
+      case "ctor":
+        return "constructor";
+      default:
+        return "";
+    }
+  }
+  function frameNode(f, existing) {
+    const el = existing ?? document.createElement("div");
+    el.className = "cl-mv-hp-frame" + (f.active ? " is-active" : " is-caller");
+    const label = kindLabel(f.kind);
+    const badge = label ? `<span class="cl-mv-hp-fkind">${esc3(label)}</span>` : "";
+    const recv = f.recv ? `<div class="cl-mv-hp-frecv">on ${esc3(f.recv)}</div>` : "";
+    const rows = (f.vars ?? []).map(rowHtml3).join("");
+    el.innerHTML = `<div class="cl-mv-hp-fname"><span class="cl-mv-hp-fn">${esc3(f.name ?? f.id)}</span>${badge}</div>` + recv + `<div class="cl-mv-hp-rows">${rows}</div>`;
+    return el;
   }
   function rowHtml3(v) {
     const kind = slotKind(v);
@@ -1986,13 +2009,17 @@ ${result.runtimeError}`.trim(),
     const emptyCls = kind === "empty" ? " is-empty" : "";
     return `<div class="cl-mv-hp-row${emptyCls}${hot}">` + name + `<span class="cl-mv-hp-val">${esc3(text)}</span></div>`;
   }
-  function objHtml(o, glow) {
-    const cls = "cl-mv-hp-card" + (o.dim ? " is-dim" : "") + (glow === o.id ? " glow" : "");
+  function objNode(o, existing) {
+    const el = existing ?? document.createElement("div");
+    el.className = "cl-mv-hp-card" + (o.dim ? " is-dim" : "");
+    el.setAttribute("data-obj", o.id);
+    const no = typeof o.no === "number" ? ` <span class="cl-mv-hp-no">#${o.no}</span>` : "";
     const fields = (o.fields ?? []).map((field) => {
       const isHot = (o.hotFields ?? []).includes(field[0]);
       return `<div class="cl-mv-hp-field${isHot ? " is-hot" : ""}"><span class="cl-mv-hp-fkey">${esc3(field[0])}</span><span class="cl-mv-hp-fval">${esc3(field[1])}</span></div>`;
     }).join("");
-    return `<div class="${cls}" data-obj="${esc3(o.id)}"><div class="cl-mv-hp-type">${esc3(o.type)}</div>` + fields + `</div>`;
+    el.innerHTML = `<div class="cl-mv-hp-type">${esc3(o.type)}${no}</div>` + fields;
+    return el;
   }
   function esc3(s) {
     return s.replace(/[&<>]/g, (c) => c === "&" ? "&amp;" : c === "<" ? "&lt;" : "&gt;");
@@ -3182,7 +3209,10 @@ ${result.runtimeError}`.trim(),
       else slot.v = v.value ?? "";
       return slot;
     });
-    return { id: f.id, name: f.name, vars };
+    const frame = { id: f.id, name: f.name, vars };
+    if (f.kind) frame.kind = f.kind;
+    if (f.recv) frame.recv = f.recv;
+    return frame;
   }
   function objectToObject(o, fields, prevFields, firstStep) {
     const hotFields = [];
@@ -3191,7 +3221,9 @@ ${result.runtimeError}`.trim(),
       fields.set(key, value);
       if (!firstStep && prevFields.get(key) !== value) hotFields.push(name);
     });
-    return { id: o.id, type: o.type, fields: o.fields ?? [], hotFields };
+    const obj = { id: o.id, type: o.type, fields: o.fields ?? [], hotFields };
+    if (typeof o.no === "number") obj.no = o.no;
+    return obj;
   }
   function globalSlots(globals, values, prevValues, firstStep = false) {
     return (globals ?? []).map((g) => {
