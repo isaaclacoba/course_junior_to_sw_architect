@@ -3055,7 +3055,7 @@ ${result.runtimeError}`.trim(),
       const stdout = ts.stdout ?? "";
       const printed = stdout.startsWith(prevStdout) ? stdout.slice(prevStdout.length) : stdout;
       const step = {
-        narr: narrationFor(ts.line, src, i, steps.length),
+        narr: runningNarration(ts.line, src),
         pc: typeof ts.line === "number" && ts.line > 0 ? ts.line - 1 : -1,
         codeLive: true,
         stack,
@@ -3067,6 +3067,24 @@ ${result.runtimeError}`.trim(),
       prevFields = fields;
       prevStdout = stdout;
     });
+    const lastTs = steps[steps.length - 1];
+    if (lastTs) {
+      const values = /* @__PURE__ */ new Map();
+      const stack = (lastTs.frames ?? []).map(
+        (f) => frameToFrame(f, values, prevValues, false)
+      );
+      const fields = /* @__PURE__ */ new Map();
+      const heap = (lastTs.heap ?? []).map(
+        (o) => objectToObject(o, fields, prevFields, false)
+      );
+      out.push({
+        narr: trace.truncated ? "Stopped early - there were too many steps to show the rest." : "The program has finished.",
+        pc: -1,
+        codeLive: true,
+        stack,
+        heap
+      });
+    }
     return out;
   }
   function frameToFrame(f, values, prevValues, firstStep) {
@@ -3094,8 +3112,7 @@ ${result.runtimeError}`.trim(),
   function refDisplay(v) {
     return v.ref != null ? `\u2192${v.ref}` : v.value ?? "null";
   }
-  function narrationFor(line, src, i, total) {
-    if (i === total - 1) return "The program has finished.";
+  function runningNarration(line, src) {
     const text = typeof line === "number" && line > 0 ? (src[line - 1] ?? "").trim() : "";
     if (!text) return "Running the program.";
     return "Running this line: `" + text + "`";
