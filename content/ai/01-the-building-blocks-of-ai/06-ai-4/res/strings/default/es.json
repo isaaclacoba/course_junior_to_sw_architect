@@ -1,0 +1,14 @@
+{
+  "hero.eyebrow": "Teoría · Parte cinco · Los cimientos de la IA",
+  "hero.title": "Contexto",
+  "intro.0": "Un modelo solo sabe lo que puede leer ahora mismo. Pregúntale por algo que nunca le contaste y no hará más que adivinar. Dale primero un par de datos y la misma pregunta se vuelve fácil. Ese texto que puede leer - tu pregunta más lo que pongas antes de ella - es su contexto. Aquí verás cómo añadir contexto convierte una respuesta a ciegas en una respuesta clara.",
+  "legend.0": "tu pregunta",
+  "legend.1": "contexto que añadiste",
+  "legend.2": "cómo de seguro está el modelo",
+  "step.0.narr": "Pregunta esto en frío y el modelo solo puede adivinar. Nunca ha oído hablar de Luna, así que todas las respuestas le parecen más o menos igual de probables.",
+  "step.1.narr": "Ahora añade un par de datos antes de la pregunta. Todo lo que el modelo puede ver ahora mismo - todo este texto - es su **contexto**.",
+  "step.2.narr": "Con esos datos delante, la respuesta es clara. Es el mismo modelo de antes, ahora con más que leer.",
+  "step.3.narr": "Quítale el contexto y vuelve a adivinar. El modelo no tiene otra memoria - no puede recordar a Luna en cuanto sale de la tira.",
+  "step.4.narr": "El contexto es más que tu última pregunta - es toda la conversación hasta ahora, más lo que añadas, como un documento o una regla que seguir. Acierta con eso y el modelo tiene lo que necesita.",
+  "step.5.narr": "Así que el **contexto** es el texto que el modelo puede leer en este momento - nada más. El modelo no guarda ninguna memoria más allá de él, y ese espacio no es ilimitado."
+}

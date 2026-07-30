@@ -1,0 +1,13 @@
+{
+  "hero.eyebrow": "Teoría · Parte cinco · Los cimientos de la IA",
+  "hero.title": "Tokens",
+  "intro.0": "Acabas de ver al modelo predecir el siguiente token. Pero ¿qué es un token, exactamente? No es una letra, y tampoco del todo una palabra - algo intermedio, y es la unidad que el modelo lee, cuenta y cobra de verdad. Si pillas bien esto, las siguientes ideas - el contexto, su límite y el coste - encajan solas.",
+  "legend.0": "un token",
+  "legend.1": "de qué va este paso",
+  "step.0.narr": "Para ti, esto es una frase hecha de **palabras**. Seis palabras y un punto - fácil de leer.",
+  "step.1.narr": "El modelo no lee palabras ni letras. Lee **tokens** - trozos pequeños de texto, cada uno convertido en un número con el que puede trabajar.",
+  "step.2.narr": "Una palabra común suele ser un solo token. Una palabra más larga o más rara se parte en trozos - aquí `doormat` se convierte en dos tokens, `door` y `mat`.",
+  "step.3.narr": "Los signos de puntuación y los espacios también son tokens. Nada es gratis - hasta un punto es un token que el modelo lee y cuenta.",
+  "step.4.narr": "¿Por qué importa? El límite de memoria del modelo y su precio se miden los dos en **tokens**, no en palabras. Aquí seis palabras, pero ocho tokens.",
+  "step.5.narr": "Así que quédate con esta imagen: todo lo que el modelo lee o escribe es un flujo de **tokens**. Cada lección a partir de esta se apoya en ello."
+}

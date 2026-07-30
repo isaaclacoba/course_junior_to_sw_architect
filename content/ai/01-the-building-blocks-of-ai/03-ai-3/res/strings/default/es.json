@@ -1,0 +1,14 @@
+{
+  "hero.eyebrow": "Teoría · Parte cinco · Los cimientos de la IA",
+  "hero.title": "El prompt",
+  "intro.0": "El modelo predice el siguiente token - pero ¿de dónde sale el primero? De ti. El prompt es el texto que le das al modelo para arrancar, y él simplemente lo continúa. Eso hace del prompt tu palanca principal: cambia el arranque y cambias todo lo que viene detrás.",
+  "legend.0": "tu prompt",
+  "legend.1": "la continuación del modelo",
+  "legend.2": "probabilidad del siguiente token",
+  "step.0.narr": "Por sí solo, el modelo no tiene nada de donde partir. Le das un texto de arranque - un **prompt** - y continúa desde ahí.",
+  "step.1.narr": "Aquí tienes un prompt. Estos tokens son **tuyos** - los escribiste tú y se los pasaste.",
+  "step.2.narr": "El modelo lee tu prompt y predice el siguiente token - el mismo movimiento de la primera lección.",
+  "step.3.narr": "Luego sigue, continuando tu texto un token cada vez.",
+  "step.4.narr": "Cambia el prompt y cambias lo que sale. Un arranque distinto lleva a un sitio completamente distinto.",
+  "step.5.narr": "Así que el prompt es tu texto de arranque - y para un modelo a secas, tu único volante. Todo lo que escribe sale de los tokens que le das."
+}

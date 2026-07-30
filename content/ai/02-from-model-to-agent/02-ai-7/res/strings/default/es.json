@@ -1,0 +1,17 @@
+{
+  "hero.eyebrow": "Teoría · Parte seis · Del modelo al agente",
+  "hero.title": "Herramientas",
+  "intro.0": "Un modelo puede escribir sobre el tiempo, pero no puede comprobarlo de verdad - su conocimiento se congeló cuando terminó el entrenamiento, y no tiene forma de llegar más allá de su propio texto. Las herramientas cambian eso: el modelo pide ejecutar una función, otra cosa hace el trabajo de verdad, y la respuesta vuelve a su contexto. Verás cómo una pregunta que no puede responder solo se convierte en una que sí - y luego lo que añade usar herramientas de verdad: leer el esquema de una herramienta, elegir la correcta entre varias, y recuperarse cuando una llamada vuelve mal.",
+  "legend.0": "la herramienta elegida / la llamada enviada",
+  "legend.1": "volvió un resultado",
+  "legend.2": "la llamada volvió con error",
+  "step.0.narr": "Por sí solo, un modelo solo puede producir texto - no puede comprobar el tiempo de hoy ni enviar un mensaje. Así que le damos **herramientas**: funciones que tiene permitido llamar. Aquí hay una.",
+  "step.1.narr": "Pides el tiempo en París - algo que el modelo no puede saber por su cuenta. Así que en vez de adivinar, emite una **llamada**: el nombre de la herramienta más el argumento que necesita.",
+  "step.2.narr": "La herramienta se ejecuta **fuera** del modelo - consulta un servicio del tiempo real y devuelve un dato: `12°C, rain`. Ese resultado cae en el contexto, y ahora el modelo puede responder de verdad. Pide una herramienta, lee el resultado de vuelta: ese viaje de ida y vuelta convierte a un charlatán en alguien que hace cosas.",
+  "step.3.narr": "Esa fue una herramienta por el camino feliz. Los agentes de verdad llevan **varias** - y una llamada no siempre vuelve con una respuesta. Vamos a mirar más de cerca cómo el agente elige una y qué pasa cuando una llamada sale mal.",
+  "step.4.narr": "Cada herramienta se describe con un **esquema**: un nombre, una línea que dice para qué sirve, y los **parámetros** tipados que toma. `getWeather(city: text)` dice «dame una ciudad como texto, y te devuelvo su tiempo». El modelo lee esto igual que tú lees una etiqueta.",
+  "step.5.narr": "Llega una tarea nueva: **¿qué tiempo hace en Oslo?** El agente la compara con las descripciones y **elige** `getWeather` - no la búsqueda de vuelos, no la herramienta de email. Elegir la correcta es la primera decisión de verdad.",
+  "step.6.narr": "Emite la llamada - pero hay una errata en el argumento: `Osloo` no es una ciudad, así que la herramienta devuelve un **error**, no un dato. Un modelo que solo produjera texto se quedaría atascado aquí. Un agente puede leer lo que volvió.",
+  "step.7.narr": "Así que se **recupera**: lee el error, corrige el argumento, y **reintenta** - `getWeather(city: \"Oslo\")`. Esta vez vuelve un resultado de verdad: `4°C, clear`.",
+  "step.8.narr": "Eso es lo que hace que las herramientas sean fiables dentro del bucle: **elige** la que encaja, **llámala** con la forma que pide su esquema, y **recupérate** cuando una llamada vuelve mal. Elección, esquema y reintento son lo que convierten una única llamada con suerte en un agente que saca las cosas adelante."
+}

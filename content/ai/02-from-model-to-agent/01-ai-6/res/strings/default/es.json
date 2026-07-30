@@ -1,0 +1,16 @@
+{
+  "hero.eyebrow": "Teoría · Parte seis · Del modelo al agente",
+  "hero.title": "Memoria",
+  "intro.0": "Empieza un chat nuevo y el modelo no recuerda nada - cada llamada arranca de cero, leyendo solo el contexto que tiene delante. Entonces, ¿cómo es que un asistente parece acordarse de ti a lo largo de una conversación larga? Guarda lo que importa en un almacén que sobrevive al turno, y lo recuerda cuando toca. Y ese almacén no es una sola caja: la memoria de verdad se divide en tipos - lo que pasó, lo que sigue siendo cierto, y cómo hacer las cosas. Aquí verás cómo se guarda un dato, se clasifica en el tipo correcto, y se recupera justo cuando hace falta.",
+  "legend.0": "un elemento recordado",
+  "legend.1": "el almacén en el que nos fijamos ahora",
+  "legend.2": "recién guardado o recuperado",
+  "step.0.narr": "Pregúntale algo a un modelo y responde bien - luego empieza un chat nuevo y no recuerda nada. Cada llamada arranca de cero. Lo único que lee siempre es su **memoria de trabajo**: el contexto que tiene delante ahora mismo.",
+  "step.1.narr": "La memoria de trabajo es el borrador para la tarea que tienes entre manos. Ahora mencionas algo que vale la pena guardar - *prefieres asiento de pasillo*. Pero el borrador es lo primero que se esfuma cuando el chat avanza o la ventana se llena.",
+  "step.2.narr": "Así que el asistente lo **guarda** - copia el dato fuera de la memoria de trabajo a un almacén que sigue vivo más allá de este turno. Ese es todo el truco para acordarse de ti: guardar lo que importa en un sitio al que la siguiente llamada pueda llegar.",
+  "step.3.narr": "Ese almacén es uno de varios. La memoria de verdad se divide según el tipo de pregunta que responde. La memoria **episódica** guarda lo que pasó antes: turnos y eventos pasados, cada uno atado a un momento. «El 3 de mayo reservaste un asiento de ventanilla a Oslo.» Es el diario del asistente.",
+  "step.4.narr": "La memoria **semántica** guarda lo que sigue siendo cierto, sin fecha pegada: datos sobre el mundo, o sobre ti. «Prefieres asiento de pasillo.» No importa *cuándo* lo dijiste - simplemente es cierto. Aquí es donde va el dato que guardaste hace un momento.",
+  "step.5.narr": "La memoria **procedimental** guarda cómo hacer las cosas: las rutinas que sigue el asistente, como los pasos para reservar un viaje. Es menos «un dato» y más «un hábito» - la forma en que sabe actuar.",
+  "step.6.narr": "Ahora llega una tarea: **reserva mi vuelo de siempre**. El asistente **recupera** los tipos correctos - la preferencia semántica y el último viaje episódico - y los sube de vuelta a la memoria de trabajo, donde el modelo puede leerlos.",
+  "step.7.narr": "Eso es la memoria: **guardar** lo que importa, **recuperarlo** cuando cuenta - a través de cuatro tipos de saber. Lo que pasa ahora, lo que pasó antes, lo que sigue siendo cierto, y cómo actuar, todo alimentando el único contexto de trabajo que el modelo lee. Guarda en el almacén correcto; recupera del almacén correcto cuando importa."
+}
