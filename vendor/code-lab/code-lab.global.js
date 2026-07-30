@@ -2108,6 +2108,33 @@ ${result.runtimeError}`.trim(),
     }
   };
 
+  // src/dom/console-view.ts
+  var ConsoleView = class {
+    constructor() {
+      this.el = document.createElement("div");
+      this.el.className = "cl-mv-console";
+      this.el.innerHTML = `<div class="cl-mv-console-head">Console</div><pre class="cl-mv-console-body" data-out></pre>`;
+      this.body = this.el.querySelector("[data-out]");
+    }
+    sync(ctx) {
+      const output = ctx.model.output ?? "";
+      const printed = ctx.model.printed ?? "";
+      if (output === "") {
+        this.body.innerHTML = `<span class="cl-mv-console-idle">Nothing printed yet.</span>`;
+        return;
+      }
+      if (printed && output.endsWith(printed)) {
+        const head = output.slice(0, output.length - printed.length);
+        this.body.innerHTML = esc4(head) + `<span class="cl-mv-console-new">${esc4(printed)}</span>`;
+      } else {
+        this.body.textContent = output;
+      }
+    }
+  };
+  function esc4(s) {
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
   // src/core/agent-model.ts
   function clamp01(n) {
     if (!Number.isFinite(n)) return 0;
@@ -2935,6 +2962,7 @@ ${result.runtimeError}`.trim(),
         callstack: () => new CallStackView(),
         heapcards: (_spec, ctx) => new HeapCardsView(ctx.uid),
         narration: () => new NarrationView(),
+        console: () => new ConsoleView(),
         agent: (spec) => new AgentView(spec.fan),
         agentloop: () => new AgentLoopView(),
         memoryshelf: () => new MemoryShelfView(),
@@ -3199,6 +3227,7 @@ ${result.runtimeError}`.trim(),
       if (globals.length) step.globals = globals;
       if (rodata.length) step.rodata = rodata;
       if (printed) step.printed = printed;
+      if (stdout) step.output = stdout;
       out.push(step);
       prevValues = values;
       prevFields = fields;
@@ -3226,6 +3255,7 @@ ${result.runtimeError}`.trim(),
       };
       if (globals.length) terminal.globals = globals;
       if (rodata.length) terminal.rodata = rodata;
+      if (prevStdout) terminal.output = prevStdout;
       out.push(terminal);
     }
     return out;
@@ -3457,11 +3487,13 @@ ${result.runtimeError}`.trim(),
       }
     }
     /** The one layout: the memory view (call stack + heap objects) in the wide
-     *  column, narration and controls in the reading rail. */
+     *  column, then narration, the console output, and the transport controls in
+     *  the reading rail. The console sits right under the narration so "this line
+     *  runs" and "this is what it printed" read together. */
     memoryLayout() {
       return {
         visual: [{ type: "heapcards" }],
-        aside: [{ type: "narration" }, { type: "controls" }]
+        aside: [{ type: "narration" }, { type: "console" }, { type: "controls" }]
       };
     }
     render() {
