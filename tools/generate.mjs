@@ -310,7 +310,10 @@ function renderIndexHtml(m, variants) {
     // modules + bootstrap, which apply the selected voice's strings onto the
     // lesson globals and then inject the (unchanged) page-shell and engine.
     if (meta.resources) {
-      html = applyResourceTail(html, meta.resources, enginePath, m.id);
+      // runtime:"kernel" swaps the reload-on-change bootstrap for the live-swap
+      // kernel controller; it supersedes the plain resource tail (never both).
+      const controller = meta.runtime === "kernel" ? "kernel-controller" : "bootstrap";
+      html = applyResourceTail(html, meta.resources, enginePath, m.id, controller);
     }
   }
 
@@ -321,7 +324,7 @@ function renderIndexHtml(m, variants) {
 // tail. page-shell.js and the engine are no longer loaded statically; the
 // bootstrap injects them after applying the chosen voice's strings, so both
 // engines stay byte-for-byte the files the flat pages use.
-function applyResourceTail(html, resources, enginePath, lessonId) {
+function applyResourceTail(html, resources, enginePath, lessonId, controllerModule = "bootstrap") {
   const base = resources.base || "res/strings";
   const lang = resources.lang || "en";
   const langs = (resources.langs && resources.langs.length ? resources.langs : [lang]).join(",");
@@ -342,7 +345,7 @@ function applyResourceTail(html, resources, enginePath, lessonId) {
     '    <script src="data.js"></script>\n' +
     modules + "\n" +
     '    <script\n' +
-    '      src="../../../../resource/bootstrap.js"\n' +
+    '      src="../../../../resource/' + controllerModule + '.js"\n' +
     '      data-page-shell="../../../../page-shell.js"\n' +
     '      data-engine="' + enginePath + '"\n' +
     '      data-res-base="' + base + '"\n' +

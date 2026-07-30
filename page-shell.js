@@ -155,14 +155,21 @@
     return;
   }
 
-  function heroHTML(h) {
-    const intro = (h.intro || [])
+  // The hero's intro paragraphs, built from h.intro. Shared by the initial
+  // heroHTML render and by repaintHeroIntro (the Localizable swap) so both emit
+  // identical markup.
+  function heroIntroHTML(h) {
+    return (h.intro || [])
       .map((item) => {
         const html = typeof item === "string" ? item : item.html;
         const cls = (typeof item === "object" && item.class) || "subtitle";
         return `<p class="${cls}">${html}</p>`;
       })
       .join("\n");
+  }
+
+  function heroHTML(h) {
+    const intro = heroIntroHTML(h);
     const links = (h.links || [])
       .map((l) => `<p class="subtitle"><a href="${l.href}">${l.label}</a></p>`)
       .join("\n");
@@ -172,6 +179,31 @@
       ${intro}
       <p class="subtitle"><strong id="courseXpLabel">Course XP: 0</strong></p>
       ${links}`;
+  }
+
+  // Localizable content element: repaint ONLY the hero's intro paragraphs from
+  // the (already-refreshed) window.PAGE.hero, in place. Leaves the eyebrow, title,
+  // the Course-XP label node, links and agenda untouched - so no cached reference
+  // (e.g. the engine's #courseXpLabel) is invalidated. Never runs on the initial
+  // render, so the default hero stays byte-identical.
+  function repaintHeroIntro() {
+    const h = window.PAGE && window.PAGE.hero;
+    if (!h) return;
+    const xpLabel = hero.querySelector("#courseXpLabel");
+    const anchor = xpLabel ? xpLabel.closest("p") : null;
+    const h1 = hero.querySelector("h1");
+    if (!anchor || !h1) return;
+    // Drop the current intro nodes (everything between <h1> and the XP paragraph).
+    let node = h1.nextSibling;
+    while (node && node !== anchor) {
+      const next = node.nextSibling;
+      hero.removeChild(node);
+      node = next;
+    }
+    // Insert fresh intro nodes (identical markup to heroHTML) before the XP p.
+    const frag = document.createElement("div");
+    frag.innerHTML = heroIntroHTML(h);
+    while (frag.firstChild) hero.insertBefore(frag.firstChild, anchor);
   }
 
   // ---- Concepts: "In this lesson" agenda + click-to-define panel (Phases 2-3) ----
@@ -425,6 +457,9 @@
 
   hero.innerHTML = heroHTML(page.hero);
   renderAgenda();
+  // The hero's intro is a Localizable content element (text, no logic); a kernel
+  // lesson controller holds this and calls setLocale() on a voice/lang change.
+  window.PageShellHero = { setLocale: repaintHeroIntro };
 
   if (page.archetype === "drill") {
     hero.insertAdjacentHTML("afterend", drillCard(page.prefix));
