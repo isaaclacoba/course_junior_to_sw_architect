@@ -475,8 +475,9 @@ ${result.runtimeError}`.trim(),
 
   // src/editors/monaco.ts
   var MonacoEditor = class {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     constructor(config = {}) {
+      // eslint-disable-line @typescript-eslint/no-explicit-any
+      this.pcDecorationIds = [];
       this.monaco = config.monaco;
       this.theme = config.theme ?? "vs-dark";
     }
@@ -536,6 +537,31 @@ ${result.runtimeError}`.trim(),
     }
     setReadOnly(readOnly) {
       if (this.editor) this.editor.updateOptions({ readOnly });
+    }
+    // Paint a whole-line highlight on the running source line and scroll it into
+    // view. `line` is 0-based (the trace model's pc); Monaco lines are 1-based.
+    highlightLine(line) {
+      if (!this.editor || !this.monaco) return;
+      if (line == null || line < 0) {
+        this.pcDecorationIds = this.editor.deltaDecorations(this.pcDecorationIds, []);
+        return;
+      }
+      const model = this.editor.getModel?.();
+      const maxLine = model ? model.getLineCount() : line + 1;
+      const ln = Math.min(Math.max(1, line + 1), maxLine);
+      this.pcDecorationIds = this.editor.deltaDecorations(this.pcDecorationIds, [
+        {
+          range: new this.monaco.Range(ln, 1, ln, 1),
+          options: {
+            isWholeLine: true,
+            className: "cl-vl-pcline",
+            linesDecorationsClassName: "cl-vl-pcline-gutter"
+          }
+        }
+      ]);
+      if (typeof this.editor.revealLineInCenterIfOutsideViewport === "function") {
+        this.editor.revealLineInCenterIfOutsideViewport(ln);
+      }
     }
     setMarkers(errors) {
       if (!this.editor || !this.monaco) return;
@@ -1871,7 +1897,7 @@ ${result.runtimeError}`.trim(),
       this.markerId = `clmv-hp-ah-${uid}`;
       this.el = document.createElement("div");
       this.el.className = "cl-mv-region cl-mv-heapcards";
-      this.el.innerHTML = `<span class="cl-mv-tag">MEMORY <span>\xB7 names on the left, objects on the right</span></span><div class="cl-mv-hp-statics" data-hpstatics></div><div class="cl-mv-hp-cols"><div class="cl-mv-hp-roots" data-hproots></div><div class="cl-mv-hp-objs" data-hpobjs></div><svg class="cl-mv-hp-arrows"><defs><marker id="${this.markerId}" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#2563eb" stroke="none" /></marker></defs></svg></div>`;
+      this.el.innerHTML = `<span class="cl-mv-tag">MEMORY <span>\xB7 the call stack on the left, objects on the heap on the right</span></span><div class="cl-mv-hp-statics" data-hpstatics></div><div class="cl-mv-hp-cols"><div class="cl-mv-hp-roots" data-hproots></div><div class="cl-mv-hp-objs" data-hpobjs></div><svg class="cl-mv-hp-arrows"><defs><marker id="${this.markerId}" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#2563eb" stroke="none" /></marker></defs></svg></div>`;
       this.statics = this.el.querySelector("[data-hpstatics]");
       this.roots = this.el.querySelector("[data-hproots]");
       this.objs = this.el.querySelector("[data-hpobjs]");
@@ -2871,6 +2897,7 @@ ${result.runtimeError}`.trim(),
       this.nextHref = config.nextHref;
       this.nextLabel = config.nextLabel;
       this.onXpChange = config.onXpChange;
+      this.onStep = config.onStep;
       this.progress = new ProgressStore(
         config.xpKey ?? "codelab_xp",
         config.awardedKey,
@@ -3016,6 +3043,7 @@ ${result.runtimeError}`.trim(),
     step(state, animate = true) {
       if (this.controls) this.controls.resetActions();
       this.syncAll(state);
+      this.onStep?.({ pc: state.model.pc ?? -1, index: state.index, total: state.total });
       if (animate) this.animateAll(state);
       if (state.atEnd) {
         this.stop();
@@ -3253,10 +3281,6 @@ ${result.runtimeError}`.trim(),
       raw: e.raw
     }));
   }
-  var LEVELS = [
-    { id: "memory", label: "Memory", panel: "heapcards" },
-    { id: "values", label: "Simple values", panel: "vartable" }
-  ];
   var DEFAULT_STARTER = [
     "class Program",
     "{",
@@ -3269,18 +3293,13 @@ ${result.runtimeError}`.trim(),
     "    }",
     "}"
   ].join("\n");
-  function normalizeLevel(level) {
-    return level === "values" ? "values" : "memory";
-  }
   var VizLab = class _VizLab {
     constructor(host, config) {
-      this.levelBtns = /* @__PURE__ */ new Map();
       this.editor = new MonacoEditor();
       this.lastTrace = null;
       this.lastSteps = null;
       this.viz = null;
       this.ready = false;
-      this.level = normalizeLevel(config.level ?? "memory");
       this.legend = config.legend;
       this.language = config.language ?? "csharp";
       this.runner = new IframeRunner({
@@ -3300,26 +3319,11 @@ ${result.runtimeError}`.trim(),
       this.vizBtn.disabled = true;
       this.vizBtn.setAttribute("data-viz", "");
       this.vizBtn.addEventListener("click", () => void this.visualize());
-      const levelGroup = document.createElement("div");
-      levelGroup.className = "cl-vl-levels";
-      levelGroup.setAttribute("role", "group");
-      levelGroup.setAttribute("aria-label", "Level of detail");
-      for (const lvl of LEVELS) {
-        const b = document.createElement("button");
-        b.type = "button";
-        b.className = "cl-btn cl-vl-level";
-        b.textContent = lvl.label;
-        b.setAttribute("data-level", lvl.id);
-        b.setAttribute("aria-pressed", String(lvl.id === this.level));
-        b.addEventListener("click", () => this.setLevel(lvl.id));
-        this.levelBtns.set(lvl.id, b);
-        levelGroup.appendChild(b);
-      }
       this.statusEl = document.createElement("span");
       this.statusEl.className = "cl-vl-status";
       this.statusEl.setAttribute("role", "status");
       this.statusEl.setAttribute("aria-live", "polite");
-      toolbar.append(this.vizBtn, levelGroup, this.statusEl);
+      toolbar.append(this.vizBtn, this.statusEl);
       this.editorHost = document.createElement("div");
       this.editorHost.className = "cl-vl-monaco";
       editorPane.append(toolbar, this.editorHost);
@@ -3387,31 +3391,17 @@ ${result.runtimeError}`.trim(),
         this.vizBtn.textContent = "Visualize";
       }
     }
-    setLevel(level) {
-      if (level === this.level) return;
-      this.level = level;
-      for (const [id, btn] of this.levelBtns) btn.setAttribute("aria-pressed", String(id === level));
-      if (!this.lastTrace || !this.lastSteps) return;
-      if (this.viz) {
-        this.viz.setSteps(this.lastSteps, {
-          code: this.lastTrace.code,
-          layout: this.layoutFor(level),
-          preserveIndex: true
-        });
-      } else {
-        this.render();
-      }
-    }
-    layoutFor(level) {
-      const panel = LEVELS.find((l) => l.id === level).panel;
+    /** The one layout: the memory view (call stack + heap objects) in the wide
+     *  column, narration and controls in the reading rail. */
+    memoryLayout() {
       return {
-        visual: [{ type: "code" }, { type: panel }],
+        visual: [{ type: "heapcards" }],
         aside: [{ type: "narration" }, { type: "controls" }]
       };
     }
     render() {
       if (!this.lastTrace || !this.lastSteps) return;
-      const layout = this.layoutFor(this.level);
+      const layout = this.memoryLayout();
       if (this.viz) {
         this.viz.setSteps(this.lastSteps, {
           code: this.lastTrace.code,
@@ -3427,10 +3417,12 @@ ${result.runtimeError}`.trim(),
         layout,
         legend: this.legend,
         deriveRefs: true,
-        autoDim: true
+        autoDim: true,
+        onStep: (info) => this.editor.highlightLine?.(info.pc)
       });
     }
     showHint(text) {
+      this.editor.highlightLine?.(null);
       this.teardownViz();
       this.stage.textContent = "";
       const hint = document.createElement("p");
@@ -3439,6 +3431,7 @@ ${result.runtimeError}`.trim(),
       this.stage.appendChild(hint);
     }
     showErrors(errors) {
+      this.editor.highlightLine?.(null);
       this.teardownViz();
       this.stage.textContent = "";
       this.stage.appendChild(renderErrorPanel(errors));

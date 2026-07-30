@@ -28,7 +28,7 @@
           title: "Visualize my code",
           intro: [
             "Write a small C# program, press Visualize, and step through it one line at a time. You see the variables fill in, the call stack grow and shrink, and objects appear on the heap - the same picture the lessons draw, but for your own code.",
-            "Start with a few lines inside Main. Switch between Memory, which shows the call stack and objects together, and Simple values, which lists just the variables.",
+            "Start with a few lines inside Main. As you step, the running line lights up in your code and the panel shows the call stack and the objects on the heap side by side.",
           ],
           links: [{ href: "index.html", label: "Back to the course" }],
         },
@@ -48,7 +48,6 @@
         }
         window.CodeLab.VizLab.create(host, {
           runnerUrl: "level3-app/index.html?runner=1",
-          level: "heap",
         });
       })();
     </script>
