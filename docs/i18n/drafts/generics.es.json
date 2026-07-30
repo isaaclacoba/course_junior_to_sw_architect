@@ -1,0 +1,25 @@
+{
+  "task.1.title": "Una caja para cualquier cosa",
+  "task.1.concept": "Clase genérica",
+  "task.1.context": "Un tipo genérico funciona con cualquier tipo de valor. Escribes un marcador de posición - `T` - entre corchetes angulares, y quien lo llama elige el tipo real. Ya has usado `List<T>`; ahora escribe el tuyo. Define un `Box<T>` que guarde un valor del tipo que sea `T`.",
+  "task.1.goal.0": "Define `public class Box<T>` con un `T Value` fijado a través de su constructor.",
+  "task.1.goal.1": "Main crea un `Box<int>` que guarda 7 e imprime `Value`, así que la salida es 7.",
+
+  "task.2.title": "Un método que funciona con cualquier array",
+  "task.2.concept": "Método genérico",
+  "task.2.context": "Un método también puede ser genérico: pon el `<T>` después de su nombre, y funciona con cualquier tipo. Escribe `First<T>` que tome un array de `T` y devuelva su primer elemento. El tipo de quien lo llama se deduce automáticamente del array que se le pasa.",
+  "task.2.goal.0": "Dale a `Picker` un método `public T First<T>(T[] items)` que devuelva `items[0]`.",
+  "task.2.goal.1": "Main llama a `First` sobre el array de int `{ 3, 4, 5 }`, así que la salida es 3.",
+
+  "task.3.title": "Dos tipos a la vez",
+  "task.3.concept": "Dos parámetros de tipo",
+  "task.3.context": "Un tipo puede tomar más de un marcador de posición. `Pair<A, B>` guarda dos valores cuyos tipos pueden diferir - como un nombre y una edad. Separa los marcadores con una coma.",
+  "task.3.goal.0": "Define `public class Pair<A, B>` con un `First` de tipo `A` y un `Second` de tipo `B`, ambos fijados en el constructor.",
+  "task.3.goal.1": "Main crea un `Pair<string, int>` de \"age\" y 3 e imprime `First + \": \" + Second`, así que la salida es age: 3.",
+
+  "task.4.title": "Júntalos",
+  "task.4.concept": "Método genérico que devuelve un tipo genérico",
+  "task.4.context": "Las clases genéricas y los métodos genéricos se combinan. `Box<T>` ya está escrito para ti. Añade un método genérico `Wrap<T>` que tome un `T` y devuelva un `Box<T>` que lo guarde - de modo que el `T` del método fluye directo hacia el tipo que construye.",
+  "task.4.goal.0": "Dale a `Wrapper` un método `public Box<T> Wrap<T>(T item)` que devuelva `new Box<T>(item)`.",
+  "task.4.goal.1": "Main envuelve 5 e imprime el `Value` de la caja, así que la salida es 5."
+}

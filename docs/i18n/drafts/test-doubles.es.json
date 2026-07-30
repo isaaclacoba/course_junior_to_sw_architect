@@ -1,0 +1,31 @@
+{
+  "task.1.title": "Falsea una dependencia inestable",
+  "task.1.concept": "Un fake",
+  "task.1.context": "Cuando `Greeter` llama al reloj real directamente, tu test queda atado a la hora que realmente sea - puede pasar esta mañana y fallar esta noche. El código que recurre a cosas reales es difícil de probar.\n\n**Un fake** es una clase pequeña que escribes e inyectas en lugar del reloj real, para que el test decida qué devuelve.\n\n- Reloj real: la hora cambia, así que el test pasa por la mañana y falla por la noche.\n- Reloj fake: `Hour()` siempre devuelve `9`, así que el test da el mismo resultado en cada ejecución.",
+  "task.1.goal.0": "Escribe un `FixedClock : IClock` cuyo `Hour()` devuelva siempre `9`.",
+  "task.1.goal.1": "Main lo inyecta y comprueba el saludo, así que la salida es PASS.",
+
+  "task.2.title": "Aliméntalo con datos enlatados",
+  "task.2.concept": "Un stub",
+  "task.2.context": "Para comprobar `Total`, necesitas saber el precio que entra - pero un `IPriceFeed` real lee un precio en vivo que se mueve, así que no puedes decir cuánto debería ser `Total(3)`.\n\n**Un stub** es un doble que devuelve un valor que tú eliges, para que puedas montar un caso exacto.\n\n- Feed real: un precio en vivo impredecible, nada contra lo que comprobar.\n- Feed stub: `Price()` devuelve `10`, así que `Total(3)` es `30` - un número que puedes comprobar.",
+  "task.2.goal.0": "Escribe un `StubFeed : IPriceFeed` cuyo `Price()` devuelva `10`.",
+  "task.2.goal.1": "Main comprueba que `Total(3)` es `30`, así que la salida es PASS.",
+
+  "task.3.title": "Espía la llamada",
+  "task.3.concept": "Un spy",
+  "task.3.context": "`Signup.Register` le dice al mailer que envíe un email de bienvenida, y luego no devuelve nada. Un test no puede comprobar un valor de retorno, y no quieres que salga correo de verdad - lo que te importa es si llegó a llamar al mailer o no.\n\n**Un spy** es un doble que registra cómo se usó, para que puedas confirmar que una llamada ocurrió.\n\n- Mailer real: envía correo de verdad y no devuelve nada que inspeccionar.\n- Mailer spy: pone `WasCalled = true` en `Send()`, así que el test puede confirmar la llamada.",
+  "task.3.goal.0": "Escribe un `SpyMailer : IMailer` con un `bool WasCalled` público que `Send()` ponga a `true`.",
+  "task.3.goal.1": "Main registra a un usuario y comprueba que se llamó al mailer, así que la salida es PASS.",
+
+  "task.4.title": "Dobles de prueba - repaso",
+  "task.4.concept": "Repaso",
+  "task.4.context": "Un doble hace de sustituto de una dependencia real para que un test sea rápido, repetible y bajo tu control.",
+  "task.4.summaryIntro": "Las dependencias reales - un reloj, un feed en vivo, un mailer - dan una respuesta distinta en cada ejecución o alcanzan fuera de tu programa. Un doble es un sustituto que pasas durante un test. Puedes pasarlo porque la clase recibe sus dependencias por inyección, contra una interfaz en vez de un tipo concreto - la recompensa de aquel trabajo anterior.",
+  "task.4.summaryItems.0.title": "Fake - ",
+  "task.4.summaryItems.0.text": "un sustituto simple que funciona con comportamiento fijo: un reloj que siempre es `9`, para que el test se repita.",
+  "task.4.summaryItems.1.title": "Stub - ",
+  "task.4.summaryItems.1.text": "devuelve un valor que elegiste, para que montes un caso exacto y puedas predecir el resultado.",
+  "task.4.summaryItems.2.title": "Spy - ",
+  "task.4.summaryItems.2.text": "recuerda cómo se usó, para que puedas confirmar que una llamada ocurrió cuando no hay valor de retorno que comprobar.",
+  "task.4.summaryClose": "A continuación: testeable por diseño - los hábitos que hacen el código fácil de probar son los hábitos detrás de SOLID."
+}

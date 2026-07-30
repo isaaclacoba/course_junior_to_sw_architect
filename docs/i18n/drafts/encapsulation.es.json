@@ -1,0 +1,47 @@
+{
+  "task.1.title": "Escribe una clase que guarde estado",
+  "task.1.concept": "Agrupa el estado",
+  "task.1.context": "Las variables sueltas se dispersan - es fácil imprimir el nombre de un gato junto a la travesura de otro gato. Una `class` ata datos relacionados en una sola cosa. Escribe una clase `Cat` que guarde un `Name` y si `KnockedSomethingOver`, para que siempre viajen juntos.",
+  "task.1.goal.0": "Escribe una clase `Cat` con un `Name` (string) y un `KnockedSomethingOver` (bool).",
+  "task.1.goal.1": "Main construye Mittens (culpable) e imprime el resultado, así que la salida es Mittens: True.",
+
+  "task.2.title": "Pon el comportamiento junto a los datos",
+  "task.2.concept": "Comportamiento junto al estado",
+  "task.2.context": "Un objeto mantiene el comportamiento al lado del estado que necesita. El `Cat` ya guarda sus datos; ahora dale un método `Verdict()` que convierta esos datos en una frase. Escribe el método para que el gato que sabe lo que hizo también sepa cómo reconocerlo.",
+  "task.2.goal.0": "Añade un método `Verdict()` a `Cat`. Devuelve el `Name`, y luego `\": guilty\"` si tiró algo, y si no `\": innocent\"`.",
+  "task.2.goal.1": "Main juzga a Mittens (culpable), así que la salida es Mittens: guilty.",
+
+  "task.3.title": "Oculta el interior",
+  "task.3.concept": "Estado privado",
+  "task.3.context": "Si un contador es un campo público, cualquier línea en cualquier sitio puede ponerlo a un disparate. Escribe una clase `ScoreBoard` que mantenga su contador `private`, para que solo la propia clase pueda cambiarlo. El exterior le suma a través de un método y lo lee a través de otro - nunca puede meter mano y corromperlo.",
+  "task.3.goal.0": "Escribe un `ScoreBoard` con un contador `private`, un `Give(bool goodBoy)` que suma uno solo cuando `goodBoy` es true, y un `Total()` que devuelve el contador.",
+  "task.3.goal.1": "Main da a true, true, false, así que la salida es 2.",
+
+  "task.4.title": "Protege la regla",
+  "task.4.concept": "Protege una invariante",
+  "task.4.context": "Ocultar el campo permite que la clase lo defienda. Escribe un `Bowl` cuya comida nunca pueda bajar por una cantidad absurda: `Fill` añade cucharadas solo cuando el número es positivo, así que un negativo o un cero se ignora. El cuenco se mantiene sensato sin importar quién lo llame.",
+  "task.4.goal.0": "Escribe un `Bowl` con un contador de comida `private`, un `Fill(int scoops)` que ignora cantidades de 0 o menos, y un `Amount()` que devuelve la comida.",
+  "task.4.goal.1": "Main llena 10, luego -5 (ignorado), luego 3, así que la salida es 13.",
+
+  "task.5.title": "Cámbialo en un solo sitio",
+  "task.5.concept": "Una razón para cambiar",
+  "task.5.context": "A estas alturas ocultas el estado y accedes a él a través de métodos. Un gato tiene nueve vidas. Escribe un `Cat` al que se le dice cuántas vidas ha `used` en su constructor, mantiene ese conteo en un campo `private`, y ofrece un `LivesLeft()` que devuelve `9 - used`. Main crea un par de gatos y le pregunta a cada uno cuántas vidas le quedan - la regla de las nueve vidas vive en un único sitio privado.",
+  "task.5.goal.0": "Escribe un `Cat` cuyo constructor toma cuántas vidas están `used`, guardadas en un campo `private`, con un `LivesLeft()` que devuelve `9 - used`.",
+  "task.5.goal.1": "Main crea gatos con 1 y 3 vidas usadas, así que la salida son dos líneas: 8 y luego 6.",
+
+  "task.6.title": "¿Por qué objetos? - repaso",
+  "task.6.concept": "Repaso",
+  "task.6.context": "Por eso nos molestamos con clases y métodos en vez de un solo Main largo.",
+  "task.6.summaryIntro": "Los objetos existen para que los datos relacionados y las reglas que los protegen vivan juntos, en vez de estar dispersos por un Main gigante.",
+  "task.6.summaryItems.0.title": "Agrupa el estado - ",
+  "task.6.summaryItems.0.text": "una `class` mantiene los datos relacionados juntos como una sola cosa.",
+  "task.6.summaryItems.1.title": "Comportamiento junto al estado - ",
+  "task.6.summaryItems.1.text": "pon un método al lado de los datos sobre los que trabaja.",
+  "task.6.summaryItems.2.title": "private - ",
+  "task.6.summaryItems.2.text": "oculta un campo para que solo la clase pueda cambiarlo.",
+  "task.6.summaryItems.3.title": "Protege la regla - ",
+  "task.6.summaryItems.3.text": "el único método que escribe puede rechazar disparates.",
+  "task.6.summaryItems.4.title": "Una razón para cambiar - ",
+  "task.6.summaryItems.4.text": "arregla una regla una vez dentro del objeto y todos los que llaman le siguen.",
+  "task.6.summaryClose": "A continuación: ¿Por qué abstraer? - llevar la lógica detrás de una interfaz."
+}

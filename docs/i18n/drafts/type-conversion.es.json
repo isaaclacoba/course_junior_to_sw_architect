@@ -1,0 +1,39 @@
+{
+  "task.1.title": "Texto a un número",
+  "task.1.concept": "Parsear texto a int",
+  "task.1.context": "Los datos a menudo llegan como **texto** - un campo de un formulario, una línea de un archivo. Antes de poder hacer cálculos con ellos, los conviertes en un número. `int.Parse(\"3\")` lee el texto `\"3\"` y devuelve el número `3`.\n\nEscribe un `Kitten` cuyo `AgeNextYear(string ageText)` parsee la edad y la devuelva más uno.",
+  "task.1.goal.0": "Dale a `Kitten` un `int AgeNextYear(string ageText)` que parsee `ageText` y lo devuelva más 1.",
+  "task.1.goal.1": "`Main` llama a `AgeNextYear(\"3\")`, así que la salida es `4`.",
+
+  "task.2.title": "Un número a texto",
+  "task.2.concept": "int a string con ToString",
+  "task.2.context": "La otra dirección: convierte un número en texto para poder construir una etiqueta o un código. `count.ToString()` devuelve los dígitos como un `string`, listos para unir con otro texto.\n\nEscribe un `Chip` cuyo `Code(int n)` devuelva la letra `\"C\"` seguida del número como texto - así `7` se convierte en `\"C7\"`.",
+  "task.2.goal.0": "Dale a `Chip` un `string Code(int n)` que devuelva `\"C\"` unido con `n` como texto.",
+  "task.2.goal.1": "`Main` llama a `Code(7)`, así que la salida es `C7`.",
+
+  "task.3.title": "Descarta los decimales",
+  "task.3.concept": "Convertir double a int",
+  "task.3.context": "Un `double` como `3.9` lleva una parte fraccionaria. Convertirlo con `(int)` **descarta** los decimales - trunca hacia cero, no redondea - así que `(int)3.9` es `3`, no `4`.\n\nEscribe un `Scale` cuyo `Whole(double kg)` devuelva solo la parte entera de un peso.",
+  "task.3.goal.0": "Dale a `Scale` un `int Whole(double kg)` que devuelva `kg` convertido a `int`.",
+  "task.3.goal.1": "`Main` llama a `Whole(3.9)`, así que la salida es `3`.",
+
+  "task.4.title": "Parsea sin fallar",
+  "task.4.concept": "int.TryParse",
+  "task.4.context": "`int.Parse(\"cat\")` lanza una excepción - el texto no es un número, y el programa se detiene. `int.TryParse` es la versión segura: devuelve un `bool` que dice si funcionó, y pone el número en una variable `out` cuando lo hace.\n\nEscribe un `Gate` cuyo `IsNumber(string text)` devuelva si el texto es un número entero.",
+  "task.4.goal.0": "Dale a `Gate` un `bool IsNumber(string text)` que devuelva el resultado de `int.TryParse`.",
+  "task.4.goal.1": "`Main` llama a `IsNumber(\"cat\")`, así que la salida es `False`.",
+
+  "task.5.title": "Lo que aprendiste",
+  "task.5.concept": "Convertir entre tipos",
+  "task.5.context": "Cuatro conversiones de todos los días - los movimientos a los que recurres siempre que un dato cruza una frontera.",
+  "task.5.summaryIntro": "Los valores cambian de tipo constantemente: entra texto, salen números, hay que recortar decimales. Escribiste cada conversión a mano:",
+  "task.5.summaryItems.0.title": "Texto a un número - ",
+  "task.5.summaryItems.0.text": "`int.Parse(\"3\")` lee texto y devuelve el número `3`, para que puedas hacer cálculos con él.",
+  "task.5.summaryItems.1.title": "Un número a texto - ",
+  "task.5.summaryItems.1.text": "`n.ToString()` convierte un número en sus dígitos como un `string`, listo para unir en una etiqueta o un código.",
+  "task.5.summaryItems.2.title": "Descarta los decimales - ",
+  "task.5.summaryItems.2.text": "`(int)3.9` convierte un `double` a `int` truncando - descarta la fracción, no redondea.",
+  "task.5.summaryItems.3.title": "Parsea sin fallar - ",
+  "task.5.summaryItems.3.text": "`int.TryParse` devuelve un `bool` que indica si el texto era un número, en vez de lanzar una excepción cuando no lo es.",
+  "task.5.summaryClose": "Recurre a `TryParse` antes que a `Parse` siempre que el texto pueda estar mal - las mismas conversiones entre double/string/int se aplican a todos los tipos que conocerás a continuación."
+}

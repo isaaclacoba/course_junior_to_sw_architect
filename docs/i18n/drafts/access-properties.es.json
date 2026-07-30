@@ -1,0 +1,42 @@
+{
+  "task.1.title": "Oculta un campo, muestra un valor",
+  "task.1.concept": "Campo privado, propiedad de solo lectura",
+  "task.1.context": "Un tipo decide qué partes de sí mismo puede ver el mundo exterior. Marca un campo como `private` y solo el propio tipo puede tocarlo - quien lo llama no puede meter mano y cambiarlo. Para dejar que lo **lean**, añades una propiedad con un `get` que devuelve el valor.\n\nEscribe un `Cat` que guarde sus vidas en un campo `private` y las exponga a través de una propiedad `Lives` de solo lectura.",
+  "task.1.goal.0": "Guarda el número de vidas en un campo `private int _lives`, fijado desde el constructor.",
+  "task.1.goal.1": "Añade una propiedad `public int Lives` con solo un `get` que devuelva `_lives`.",
+  "task.1.goal.2": "`Main` construye `new Cat(9)`, así que leer `Lives` imprime `9`.",
+
+  "task.2.title": "Lee y escribe a través de una propiedad",
+  "task.2.concept": "Propiedad automática (get y set)",
+  "task.2.context": "Cuando un valor se puede tanto leer como cambiar desde fuera, no necesitas un campo escrito a mano. Una **propiedad automática** - `public string Name { get; set; }` - te da un `get` para leerlo y un `set` para cambiarlo, con el almacenamiento generado automáticamente.\n\nEscribe un `Pet` con un `Name` que cualquiera pueda asignar y leer.",
+  "task.2.goal.0": "Dale a `Pet` una propiedad automática `public string Name { get; set; }`, con valor por defecto `\"\"`.",
+  "task.2.goal.1": "`Main` pone `Name` a `\"Rex\"`, luego lo imprime - la salida es `Rex`.",
+
+  "task.3.title": "Un valor calculado al momento",
+  "task.3.concept": "Propiedad con cuerpo de expresión (calculada)",
+  "task.3.context": "Una propiedad no tiene por qué guardar nada - puede **calcular su valor** cada vez que se lee. Escrita con `=>`, una propiedad con cuerpo de expresión ejecuta la expresión de la derecha y devuelve el resultado. Tiene solo un `get`; no hay nada que asignar.\n\nEscribe un `Tag` cuyo `Label` se construya a partir de su `Name`, de modo que `Label` siga a `Name` sin un campo propio.",
+  "task.3.goal.0": "Dale a `Tag` un `public string Name { get; set; }` con valor por defecto `\"\"`.",
+  "task.3.goal.1": "Añade `public string Label => \"cat:\" + Name;` - una propiedad calculada, sin campo.",
+  "task.3.goal.2": "`Main` pone `Name` a `\"Milo\"`, luego imprime `Label` - la salida es `cat:Milo`.",
+
+  "task.4.title": "Fíjalo una vez, y déjalo",
+  "task.4.concept": "Propiedad init-only",
+  "task.4.context": "Algunos valores pertenecen a un objeto de por vida - se fijan cuando se construye y nunca más. Marcar una propiedad como `{ get; init; }` deja que el constructor la fije, y luego la bloquea: cualquier asignación posterior desde fuera ni siquiera compilaría.\n\nEscribe un `Badge` cuyo `Name` se fije en el constructor y solo se pueda leer después.",
+  "task.4.goal.0": "Dale a `Badge` un `public string Name { get; init; }` con valor por defecto `\"\"`.",
+  "task.4.goal.1": "Fija `Name` desde un constructor `Badge(string name)`.",
+  "task.4.goal.2": "`Main` construye `new Badge(\"Rex\")`, así que leer `Name` imprime `Rex`.",
+
+  "task.5.title": "Lo que aprendiste",
+  "task.5.concept": "Acceso y propiedades",
+  "task.5.context": "Un tipo controla qué puede ver el exterior, y entrega su estado a través de propiedades en vez de campos pelados.",
+  "task.5.summaryIntro": "Decidiste qué muestra cada tipo y cómo se accede a su estado. Cuatro formas de exponer un valor, de la más cerrada a la más abierta:",
+  "task.5.summaryItems.0.title": "Campo oculto, vista de solo lectura - ",
+  "task.5.summaryItems.0.text": "un campo `private` que el exterior no puede tocar, expuesto a través de una propiedad con solo un `get`.",
+  "task.5.summaryItems.1.title": "Lee y escribe - ",
+  "task.5.summaryItems.1.text": "una propiedad automática `public string Name { get; set; }` da un `get` y un `set` con el almacenamiento generado automáticamente.",
+  "task.5.summaryItems.2.title": "Calculada al leer - ",
+  "task.5.summaryItems.2.text": "una propiedad con cuerpo de expresión `public string Label => \"cat:\" + Name;` calcula su valor cada vez, sin guardar nada.",
+  "task.5.summaryItems.3.title": "Fijada una vez al construir - ",
+  "task.5.summaryItems.3.text": "`{ get; init; }` deja que el constructor fije el valor, y luego lo bloquea contra cualquier cambio posterior.",
+  "task.5.summaryClose": "La idea portable se aplica a la mayoría de lenguajes OO: un tipo elige qué es `public` o `private`, y accede a su estado a través de una propiedad controlada en vez de un campo pelado y expuesto. Si conviene ocultar un valor - y por qué - es la lección de encapsulación que viene después."
+}

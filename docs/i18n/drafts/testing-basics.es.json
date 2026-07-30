@@ -1,0 +1,39 @@
+{
+  "task.1.title": "Preparar, Actuar, Afirmar",
+  "task.1.concept": "Qué es un test",
+  "task.1.context": "Un test es simplemente código que ejecuta tu código y comprueba el resultado. Tiene tres tiempos: Preparar (montar las cosas), Actuar (llamar a la cosa), Afirmar (comprobar lo que volvió). El `Dog` te lo damos. Escribe un test en `Main`: prepara un `Dog`, actúa llamando a `Speak()`, luego imprime `PASS` cuando el resultado sea `\"Woof\"` y `FAIL` cuando no lo sea.",
+  "task.1.goal.0": "Prepara un `Dog`, llama a `Speak()`, e imprime `PASS` cuando sea igual a `\"Woof\"`, y si no `FAIL`.",
+  "task.1.goal.1": "El perro sí dice Woof, así que la salida es PASS.",
+
+  "task.2.title": "Comprueba el resultado exacto",
+  "task.2.concept": "Una afirmación de verdad",
+  "task.2.context": "Un test que solo comprueba que el código se ejecutó pasaría incluso cuando la respuesta es incorrecta. Una afirmación útil comprueba el resultado exacto. El `Adder` te lo damos. Escribe un test que llame a `Add(2, 3)` y afirme que el resultado es exactamente `5`.",
+  "task.2.goal.0": "Llama a `Add(2, 3)` e imprime `PASS` solo cuando sea igual a `5`, y si no `FAIL`.",
+  "task.2.goal.1": "2 + 3 es 5, así que la salida es PASS.",
+
+  "task.3.title": "Una afirmación reutilizable",
+  "task.3.concept": "Ayudante de afirmación",
+  "task.3.context": "Las suites de verdad ejecutan la misma comprobación una y otra vez, así que vive en un solo sitio. Escribe un método `AssertEqual(int actual, int expected)` que imprima `PASS` cuando coincidan y `FAIL` cuando no, luego úsalo para comprobar que `Add(2, 3)` es `5`.",
+  "task.3.goal.0": "Escribe `AssertEqual(int actual, int expected)` que imprima PASS al coincidir, y FAIL en caso contrario.",
+  "task.3.goal.1": "Llámalo con `Add(2, 3)` y `5`, así que la salida es PASS.",
+
+  "task.4.title": "Espera que falle",
+  "task.4.concept": "Probar los errores",
+  "task.4.context": "A veces el comportamiento correcto es lanzar una excepción, y eso también lo pruebas. El `Gate` lanza cuando le pasas un conteo negativo. Escribe un test que llame a `Enter(-1)` dentro de un `try`; imprime `PASS` desde el `catch` porque la excepción se esperaba, o `FAIL` si no se lanzó ninguna.",
+  "task.4.goal.0": "Llama a `Enter(-1)` en un `try`; imprime `PASS` cuando lance, `FAIL` si no lo hace.",
+  "task.4.goal.1": "Un conteo negativo lanza, así que la salida es PASS.",
+
+  "task.5.title": "Qué es un test - repaso",
+  "task.5.concept": "Repaso",
+  "task.5.context": "Un test ejecuta tu código y comprueba el resultado - Preparar, Actuar, Afirmar.",
+  "task.5.summaryIntro": "Un test es código corriente que ejecuta tu código y comprueba lo que vuelve. Nada mágico - el mismo C# que ya escribes.",
+  "task.5.summaryItems.0.title": "Preparar, Actuar, Afirmar - ",
+  "task.5.summaryItems.0.text": "monta, llama a la cosa, luego comprueba el resultado.",
+  "task.5.summaryItems.1.title": "Comprueba el resultado exacto - ",
+  "task.5.summaryItems.1.text": "afirma el valor, no solo que se ejecutó.",
+  "task.5.summaryItems.2.title": "Un ayudante de afirmación - ",
+  "task.5.summaryItems.2.text": "mantén la comprobación en un solo sitio y reutilízala.",
+  "task.5.summaryItems.3.title": "Espera que falle - ",
+  "task.5.summaryItems.3.text": "un error lanzado puede ser el resultado que pasa.",
+  "task.5.summaryClose": "A continuación: dobles de prueba - sustitutos que controlas, para que un test sea rápido y repetible."
+}
