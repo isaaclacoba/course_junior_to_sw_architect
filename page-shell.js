@@ -284,6 +284,11 @@
   // kernel-controller. Unset (legacy / non-kernel pages) => read the English
   // graph directly, so the default render stays byte-identical.
   let conceptSource = null;
+  // The concept currently shown in the panel, kept in a variable (NOT a data-
+  // attribute on the panel) so the panel never matches the [data-concept-id] chip
+  // selector - otherwise clicking its close button re-triggers showConcept and the
+  // panel re-opens (only the outside-click path would then close it).
+  let activeConceptId = null;
   function conceptDef(id) {
     if (conceptSource) return { term: conceptSource.term(id), def: conceptSource.def(id) };
     const CI = window.ConceptIndex;
@@ -314,9 +319,9 @@
     const covered = conceptProgress();
     const ids = (arr) => (arr || []).map((x) => (typeof x === "string" ? x : x.id));
     const groups = [
-      { ids: ids(c.introduces), label: "New here", kind: "introduces" },
-      { ids: ids(c.revisits), label: "Revisited", kind: "revisits" },
-      { ids: ids(c.uses), label: "Used", kind: "uses" },
+      { ids: ids(c.introduces), label: tHtml("agenda.new", "New here"), kind: "introduces" },
+      { ids: ids(c.revisits), label: tHtml("agenda.revisited", "Revisited"), kind: "revisits" },
+      { ids: ids(c.uses), label: tHtml("agenda.used", "Used"), kind: "uses" },
     ].filter((g) => g.ids.length);
     if (!groups.length) return;
     const rows = groups
@@ -332,7 +337,7 @@
       .join("");
     hero.insertAdjacentHTML(
       "beforeend",
-      `<div class="lesson-agenda" aria-label="Concepts in this lesson"><p class="agenda-title">In this lesson</p>${rows}</div>`
+      `<div class="lesson-agenda" aria-label="Concepts in this lesson"><p class="agenda-title">${tHtml("agenda.title", "In this lesson")}</p>${rows}</div>`
     );
   }
 
@@ -354,11 +359,11 @@
   function showConcept(id) {
     const d = conceptDef(id);
     const panel = conceptPanelEl();
-    panel.dataset.conceptId = id;
+    activeConceptId = id;
     panel.querySelector(".concept-panel-term").textContent = d ? d.term : id;
     panel.querySelector(".concept-panel-def").textContent = d ? d.def : "Definition not found.";
     const prefix = window.LESSON_META && window.LESSON_META.id ? "../../../../" : "";
-    panel.querySelector(".concept-panel-link").innerHTML = `<a href="${prefix}glossary.html">Open the glossary</a>`;
+    panel.querySelector(".concept-panel-link").innerHTML = `<a href="${prefix}glossary.html">${tHtml("concept.openGlossary", "Open the glossary")}</a>`;
     panel.hidden = false;
   }
   document.addEventListener("click", (e) => {
@@ -376,7 +381,7 @@
     setLocale: function () {
       renderAgenda();
       const panel = document.getElementById("conceptPanel");
-      if (panel && !panel.hidden && panel.dataset.conceptId) showConcept(panel.dataset.conceptId);
+      if (panel && !panel.hidden && activeConceptId) showConcept(activeConceptId);
     }
   };
 
