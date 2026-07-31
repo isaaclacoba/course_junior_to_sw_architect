@@ -88,9 +88,12 @@ lesson.
      `meta.js` via `generated/course-data.js`.
 8. **Update `docs/concept-ledger.md`** in this same change: add or move the
    lesson's row and any concept/surface it introduces.
-9. **Verify** per the SPECS recipe: `node --check`; real-`dotnet` compile of
-   every runnable program and the rebuilt `verify` probe; headless render with no
-   `undefined`. Delete temp harness files.
+9. **Verify** with the one-command harness: `node tools/verify-lesson.mjs
+   <lesson-dir>`. It runs the whole SPECS recipe - `node --check`; real-`dotnet`
+   compile of every runnable program and the rebuilt `verify` probe; viz
+   scene-resolver checks on every step; headless EN+ES render with no
+   `undefined` - and exits non-zero on failure. Add `--no-dotnet` / `--en-only`
+   to iterate faster. It cleans up after itself, so there is nothing to delete.
 10. **Log end** in `docs/work-log.md` with a real `date` timestamp.
 
 ### Legacy flow (flat files) — only for not-yet-migrated lessons
@@ -173,6 +176,10 @@ flavour in the DATA; keep `narr` in the plain course voice (it renders
 `**bold**`, `*italic*`, `` `code` `` and the spaced hyphen ` - `).
 
 **Verify a viz lesson (no dotnet needed):**
+
+Fastest: `node tools/verify-lesson.mjs <lesson-dir> --no-dotnet` - it runs the
+resolver against every step and the EN+ES render in one shot. The manual steps
+below are what it automates:
 
 1. `node --check ai-N.viz.js`.
 2. Run the real resolver against **every** step - this catches bad scene data a

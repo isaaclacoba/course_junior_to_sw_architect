@@ -62,6 +62,12 @@ modify a lesson file, never compile or run anything.
 4. Voice of the report itself: plain, factual, code terms in `backticks`, spaced
    hyphen ` - `, no emojis, no hype.
 
+To fill the "verification status" heading without editing the lesson, run the
+read-only checks of the shared harness: `node tools/verify-lesson.mjs
+<lesson-dir> --no-dotnet` (the audit compiles nothing; `--no-dotnet` keeps it to
+`node --check` + viz resolvers + headless render). Report its result; never
+change lesson content from an audit.
+
 ## Scaling with subagents
 
 For a batch of lessons, dispatch parallel subagents (they write independent

@@ -166,6 +166,15 @@ Add a card to `index.html` inside the right `Part` stage:
 
 ## Verifying your work (the recipe that catches real bugs)
 
+**Run `node tools/verify-lesson.mjs <lesson-dir>` first - it does all of the
+below in one command**: `node --check`, real-dotnet compile+grade of every
+build task (output match + `requireSource` + the hidden `verify` probe), viz
+scene-resolver checks on every step, and a headless EN+ES render asserting no
+`undefined`. It exits non-zero on failure, so it doubles as a CI gate and
+cleans up after itself. Flags: `--no-dotnet` `--no-render` `--no-viz`
+`--en-only` `--quiet` `--all`. The manual recipe below is what it automates -
+reach for a single step only when you need to check it in isolation.
+
 1. `node --check <name>.js` for every JS file you touch.
 2. For runnable content, extract the programs and compile them with real dotnet:
    load the data file in a Node `vm` with `{ window: {}, console }`, read
