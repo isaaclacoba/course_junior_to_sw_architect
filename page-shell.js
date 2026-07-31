@@ -579,7 +579,21 @@
         }
       }
     }
+    // Pull the MemoryViz chrome strings from the shared catalog (viz.* keys) so a
+    // non-default language localizes the transport, font control, transcript
+    // author tags and tool-rack directions. Absent keys keep code-lab's English
+    // defaults, so the default language stays byte-identical.
+    const applyVizLabels = () => {
+      const C = window.ChromeText;
+      if (!C) return;
+      const keys = ["prev", "play", "pause", "next", "nextLesson", "reset", "step", "textSize", "textSmall", "textDefault", "textLarge", "authorYou", "authorApp", "authorModel", "authorCode", "toolCall", "toolError", "toolResult"];
+      const labels = {};
+      let any = false;
+      keys.forEach((k) => { const v = C["viz." + k]; if (v != null) { labels[k] = v; any = true; } });
+      if (any) window.LESSON_VIZ.labels = labels;
+    };
     try {
+      applyVizLabels();
       let vizController = window.CodeLab.MemoryViz.create(vizHost, window.LESSON_VIZ);
       // Localizable surface: a language swap re-binds LESSON_VIZ's narrations
       // (bind-viz), then this re-creates the visual so the new text paints.
@@ -590,6 +604,7 @@
           try { if (vizController && vizController.destroy) vizController.destroy(); } catch (e) {}
           vizHost.innerHTML = "";
           try {
+            applyVizLabels();
             vizController = window.CodeLab.MemoryViz.create(vizHost, window.LESSON_VIZ);
           } catch (e) {
             console.error("lesson-viz relocalize failed", e);

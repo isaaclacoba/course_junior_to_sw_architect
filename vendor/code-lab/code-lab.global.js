@@ -26,6 +26,7 @@ var CodeLab = (() => {
     DEFAULT_LOOP_MEMORIES: () => DEFAULT_LOOP_MEMORIES,
     DEFAULT_LOOP_TOOLS: () => DEFAULT_LOOP_TOOLS,
     DEFAULT_MEMORY_STORES: () => DEFAULT_MEMORY_STORES,
+    DEFAULT_VIZ_LABELS: () => DEFAULT_VIZ_LABELS,
     FULL_REGIONS: () => FULL_REGIONS,
     IframeRunner: () => IframeRunner,
     MemoryViz: () => MemoryViz,
@@ -982,6 +983,28 @@ ${result.runtimeError}`.trim(),
   // src/core/memory-model.ts
   var ALL_REGIONS = ["code", "global", "stack", "heap"];
   var FULL_REGIONS = ["code", "rodata", "data", "bss", "heap", "stack", "mmap"];
+  var DEFAULT_VIZ_LABELS = {
+    prev: "\u25C0 Prev",
+    play: "\u25B6 Play",
+    pause: "\u23F8 Pause",
+    next: "Next \u25B6",
+    // Byte-identical with the pre-i18n end button (was "Next"); the course catalog
+    // supplies a distinct "Next lesson" string on i18n pages via `labels`.
+    nextLesson: "Next \u25B6",
+    reset: "Reset",
+    step: "Step",
+    textSize: "Text size",
+    textSmall: "Small text",
+    textDefault: "Default text",
+    textLarge: "Large text",
+    authorYou: "you wrote this",
+    authorApp: "your app wrote this",
+    authorModel: "the model wrote this",
+    authorCode: "your code wrote this",
+    toolCall: "call \u2192",
+    toolError: "\u2190 error",
+    toolResult: "\u2190 result"
+  };
   function deriveRefs(stack = []) {
     const refs = [];
     for (const frame of stack) {
@@ -2563,13 +2586,13 @@ ${result.runtimeError}`.trim(),
   }
 
   // src/dom/tool-rack-view.ts
-  var IO_META = {
-    call: { cls: "cl-tr-call", dir: "call \u2192" },
-    error: { cls: "cl-tr-error", dir: "\u2190 error" },
-    result: { cls: "cl-tr-result", dir: "\u2190 result" }
-  };
   var ToolRackView = class {
-    constructor() {
+    constructor(labels = DEFAULT_VIZ_LABELS) {
+      this.ioMeta = {
+        call: { cls: "cl-tr-call", dir: labels.toolCall },
+        error: { cls: "cl-tr-error", dir: labels.toolError },
+        result: { cls: "cl-tr-result", dir: labels.toolResult }
+      };
       this.el = document.createElement("div");
       this.el.className = "cl-tr";
       this.el.innerHTML = `
@@ -2595,7 +2618,7 @@ ${result.runtimeError}`.trim(),
       const rows = toolRackRows(scene);
       io.hidden = rows.length === 0;
       io.innerHTML = rows.map((row) => {
-        const meta = IO_META[row.kind];
+        const meta = this.ioMeta[row.kind];
         return `<div class="cl-tr-line ${meta.cls}"><span class="cl-tr-dir">${meta.dir}</span><code class="cl-tr-chip">${escapeHtml4(row.text)}</code></div>`;
       }).join("");
     }
@@ -2631,14 +2654,14 @@ ${result.runtimeError}`.trim(),
     assistant: "assistant",
     tool: "tool"
   };
-  var AUTHOR_META = {
-    you: "you wrote this",
-    app: "your app wrote this",
-    model: "the model wrote this",
-    code: "your code wrote this"
-  };
   var TranscriptView = class {
-    constructor() {
+    constructor(labels = DEFAULT_VIZ_LABELS) {
+      this.authorMeta = {
+        you: labels.authorYou,
+        app: labels.authorApp,
+        model: labels.authorModel,
+        code: labels.authorCode
+      };
       this.el = document.createElement("div");
       this.el.className = "cl-tx";
       this.el.innerHTML = `
@@ -2669,7 +2692,7 @@ ${result.runtimeError}`.trim(),
       const host = this.el.querySelector("[data-list]");
       host.innerHTML = resolveTranscript(scene).map((m) => {
         const note = m.note ? `<div class="cl-tx-note">${escapeHtml4(m.note)}</div>` : "";
-        return `<div class="cl-tx-msg is-${m.role} by-${m.author}${m.hot ? " is-hot" : ""}"><div class="cl-tx-head"><span class="cl-tx-role">${ROLE_META[m.role]}</span><span class="cl-tx-by">${AUTHOR_META[m.author]}</span></div><div class="cl-tx-text">${escapeHtml4(m.text)}</div>` + note + `</div>`;
+        return `<div class="cl-tx-msg is-${m.role} by-${m.author}${m.hot ? " is-hot" : ""}"><div class="cl-tx-head"><span class="cl-tx-role">${ROLE_META[m.role]}</span><span class="cl-tx-by">${this.authorMeta[m.author]}</span></div><div class="cl-tx-text">${escapeHtml4(m.text)}</div>` + note + `</div>`;
       }).join("");
     }
   };
@@ -2831,27 +2854,28 @@ ${result.runtimeError}`.trim(),
     return kind === "new-object" ? "new object" : kind;
   }
   var VizControls = class {
-    constructor(actions, handlers, nextHref, legend, nextLabel = "Next \u25B6") {
+    constructor(actions, handlers, nextHref, legend, nextLabel = DEFAULT_VIZ_LABELS.nextLesson, labels = DEFAULT_VIZ_LABELS) {
       this.nextHref = nextHref;
       this.nextLabel = nextLabel;
+      this.labels = labels;
       this.el = document.createElement("div");
       this.el.innerHTML = `
       <div class="cl-mv-controls">
-        <button data-c="prev">\u25C0 Prev</button>
-        <button data-c="play" class="cl-mv-primary">\u25B6 Play</button>
-        <button data-c="next" class="cl-mv-primary">Next \u25B6</button>
-        <button data-c="reset">Reset</button>
+        <button data-c="prev">${labels.prev}</button>
+        <button data-c="play" class="cl-mv-primary">${labels.play}</button>
+        <button data-c="next" class="cl-mv-primary">${labels.next}</button>
+        <button data-c="reset">${labels.reset}</button>
         <span class="cl-mv-spacer"></span>
-        <div class="cl-mv-textsize" role="group" aria-label="Text size">
+        <div class="cl-mv-textsize" role="group" aria-label="${labels.textSize}">
           <span class="cl-mv-aa" aria-hidden="true">Aa</span>
-          <button data-size="0.9" title="Small text" aria-label="Small text">S</button>
-          <button data-size="1" title="Default text" aria-label="Default text">M</button>
-          <button data-size="1.2" title="Large text" aria-label="Large text">L</button>
+          <button data-size="0.9" title="${labels.textSmall}" aria-label="${labels.textSmall}">S</button>
+          <button data-size="1" title="${labels.textDefault}" aria-label="${labels.textDefault}">M</button>
+          <button data-size="1.2" title="${labels.textLarge}" aria-label="${labels.textLarge}">L</button>
         </div>
       </div>
       <div class="cl-mv-scrubwrap">
         <svg class="cl-mv-depth" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
-        <input type="range" class="cl-mv-scrub" data-scrub min="0" value="0" step="1" aria-label="Step" />
+        <input type="range" class="cl-mv-scrub" data-scrub min="0" value="0" step="1" aria-label="${labels.step}" />
         <div class="cl-mv-marks" data-marks></div>
       </div>
       <div class="cl-mv-legend">${legendHtml(legend && legend.length ? legend : DEFAULT_LEGEND)}</div>`;
@@ -2930,14 +2954,14 @@ ${result.runtimeError}`.trim(),
         next2.textContent = this.nextLabel;
       } else {
         next2.disabled = state.atEnd;
-        next2.textContent = "Next \u25B6";
+        next2.textContent = this.labels.next;
       }
       const scrub = this.el.querySelector("[data-scrub]");
       scrub.max = String(Math.max(0, state.total - 1));
       scrub.value = String(state.index);
     }
     setPlaying(playing) {
-      this.el.querySelector('[data-c="play"]').textContent = playing ? "\u23F8 Pause" : "\u25B6 Play";
+      this.el.querySelector('[data-c="play"]').textContent = playing ? this.labels.pause : this.labels.play;
     }
     resetActions() {
       this.el.querySelectorAll("button.cl-mv-action").forEach((b) => b.disabled = false);
@@ -2969,11 +2993,11 @@ ${result.runtimeError}`.trim(),
         agent: (spec) => new AgentView(spec.fan),
         agentloop: () => new AgentLoopView(),
         memoryshelf: () => new MemoryShelfView(),
-        toolrack: () => new ToolRackView(),
-        transcript: () => new TranscriptView(),
+        toolrack: (_spec, ctx) => new ToolRackView(ctx.vizLabels),
+        transcript: (_spec, ctx) => new TranscriptView(ctx.vizLabels),
         retrieval: () => new RetrievalView(),
         planboard: () => new PlanboardView(),
-        controls: (_spec, ctx) => this.controls = new VizControls(ctx.actions, ctx.handlers, ctx.nextHref, ctx.legend, ctx.nextLabel)
+        controls: (_spec, ctx) => this.controls = new VizControls(ctx.actions, ctx.handlers, ctx.nextHref, ctx.legend, ctx.nextLabel, ctx.vizLabels)
       };
       this.onResize = () => {
         this.relayout();
@@ -3028,6 +3052,7 @@ ${result.runtimeError}`.trim(),
           this.step(this.player.goTo(i), false);
         }
       };
+      const vizLabels = { ...DEFAULT_VIZ_LABELS, ...config.labels };
       this.buildCtx = {
         uid,
         code: config.code ?? [],
@@ -3042,7 +3067,8 @@ ${result.runtimeError}`.trim(),
         regionTags: config.regionTags ?? {},
         legend: config.legend,
         nextHref: this.nextHref,
-        nextLabel: this.nextLabel
+        nextLabel: this.nextLabel ?? vizLabels.nextLesson,
+        vizLabels
       };
       this.layout = config.layout ?? {
         visual: [
