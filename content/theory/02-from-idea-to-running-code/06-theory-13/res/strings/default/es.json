@@ -1,0 +1,11 @@
+{
+  "hero.eyebrow": "Teoría · Parte dos · De la idea al código en marcha",
+  "hero.title": "Funciones",
+  "intro.0": "Copiar y pegar las mismas líneas por todo un programa parece que va bien hasta que tienes que cambiarlas en diez sitios a la vez. Una función es la salida: escribe los pasos una vez, ponles un nombre, y llámala cuando la necesites. Recorre lo de abajo para ver cómo una llamada entrega sus entradas y devuelve un resultado.",
+  "step.0.narr": "Una **función** es un paquete de pasos con nombre, y esos pasos viven en la zona de `código` de la memoria - aquí `add`, que toma dos números.\nLa CPU puede saltar a ellos siempre que se les llama.",
+  "step.1.narr": "Escribe los pasos una vez, y luego **reutilízalos**.\nLlama a `add` donde lo necesites, tantas veces como quieras, sin reescribir el cuerpo.",
+  "step.2.narr": "Llamar a `add(3, 5)` hace que la CPU salte al código de `add` y apila un nuevo **frame** - la memoria local propia de la función.\nLos argumentos se convierten en variables locales dentro de ese frame: `a = 3` y `b = 5`.",
+  "step.3.narr": "Ahora la CPU ejecuta el cuerpo de `add`: lee `a` y `b` del frame y calcula `a + b` - `8`.\nLas variables **locales** como `a` y `b` solo existen mientras este frame está en la pila.",
+  "step.4.narr": "`add` devuelve el resultado y su frame se **desapila** de la pila - esa memoria se recupera al instante.\nEl contador de programa vuelve a `main`, y el `8` aterriza en `r`.",
+  "step.5.narr": "Los programas están hechos de **muchas funciones** que se llaman entre sí.\n`main` es simplemente aquella en la que el programa empieza - el resto se llaman desde ahí."
+}

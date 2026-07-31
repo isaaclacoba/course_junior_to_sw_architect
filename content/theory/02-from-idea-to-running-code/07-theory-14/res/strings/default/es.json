@@ -1,0 +1,11 @@
+{
+  "hero.eyebrow": "Teoría · Parte dos · De la idea al código en marcha",
+  "hero.title": "Bugs: por qué los programas fallan",
+  "intro.0": "Los programas fallan, y es normal. Esta lección cubre qué es un bug, los errores de sintaxis frente a los errores de lógica, qué significa depurar, y por qué encontrar y arreglar bugs es la mayor parte del trabajo. Cierra la Parte dos. Recorre el visual para ver cómo un error de sintaxis detiene la compilación y un error de lógica deja un valor equivocado.",
+  "step.0.narr": "Un **bug** es un error en las instrucciones.\nEl ordenador hizo exactamente lo que escribiste, no lo que querías decir - así que cuando un programa se porta mal, el fallo está casi siempre en el código.",
+  "step.1.narr": "Un tipo rompe las reglas del lenguaje - un **error de sintaxis**, como un símbolo que falta.\nEl compilador lo pilla antes de que nada se ejecute y se niega a compilar hasta que lo arreglas.",
+  "step.2.narr": "El otro tipo es más ladino. Este código compila y se ejecuta bien, pero usó `-` donde quería decir `+`, así que `total` sale `5` - cuando sumar `10` y `5` debería dar `15`.\nEso es un **error de lógica**: código válido haciendo lo que no es.",
+  "step.3.narr": "**Depurar** significa ir línea por línea, mirando cómo se llena cada casilla.\nPrimera línea: `a` recibe `10`.",
+  "step.4.narr": "Siguiente línea: `b` recibe `5`.\nHasta aquí las casillas guardan lo que esperas.",
+  "step.5.narr": "En esta línea el valor se tuerce - `total` se vuelve `5`, no `15`. Has **encontrado el bug**: el `-` debería ser un `+`.\nArregla esa línea, ejecuta otra vez, y `total` marca `15`."
+}

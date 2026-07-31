@@ -1,0 +1,10 @@
+{
+  "hero.eyebrow": "Teoría · Parte dos · De la idea al código en marcha",
+  "hero.title": "Tipos",
+  "intro.0": "Cada valor tiene un tipo - una clase. Esta lección cubre qué es un tipo, cómo decide lo que puedes hacer con un valor, los tipos comunes, y por qué los tipos pillan errores pronto. Responde una comprobación rápida sobre cada idea, y luego rellena el hueco en una frase sencilla.",
+  "step.0.narr": "Cada valor tiene un **tipo** - una clase.\n`age` guarda `30`, un número entero (un `int`). `name` guarda `\"Rex\"`, algo de texto (un `string`). `ready` guarda `true`, una respuesta de sí/no (un `bool`).",
+  "step.1.narr": "El **tipo** decide lo que puedes hacer con un valor.\nPuedes sumar dos `int` - `age + 1` tiene sentido. Sumar un `bool` a una palabra no, así que el compilador te para antes de que el programa se ejecute.",
+  "step.2.narr": "Unos pocos **tipos** aparecen constantemente:\n- `int` para números enteros\n- `double` para decimales como `3.5`\n- `string` para texto\n- `bool` para `true`/`false`",
+  "step.3.narr": "El tipo **viaja con la variable**.\n`age` es una casilla de números; guarda números, no texto. No vas a soltarle de repente `\"Rex\"` dentro.",
+  "step.4.narr": "Ese tipo se queda **fijo durante toda la vida de la casilla**.\nUna caja de números guarda números de principio a fin - que es justo lo que deja al compilador pillar un mal uso pronto."
+}

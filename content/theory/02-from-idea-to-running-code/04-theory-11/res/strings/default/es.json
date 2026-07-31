@@ -1,0 +1,11 @@
+{
+  "hero.eyebrow": "Teoría · Parte dos · De la idea al código en marcha",
+  "hero.title": "Sentencias y expresiones",
+  "intro.0": "El código puede parecer un muro de símbolos hasta que te das cuenta de que está hecho de solo dos tipos de cosa: pasos que hacen algo, y trozos pequeños que calculan un valor. Distingue esos dos y el código deja de ser un borrón. Recorre lo de abajo y mira cómo se ejecuta una línea - primero el valor, luego el paso que lo guarda.",
+  "step.0.narr": "Una **sentencia** es una instrucción completa - un único paso que da el programa.\nEsta línea entera es una sentencia.",
+  "step.1.narr": "Una **expresión** es un trozo de código que produce un valor - el tipo de valor que la máquina maneja en la memoria.\nAquí `2 + 3` es una expresión; se calcula a `5`.",
+  "step.2.narr": "Las sentencias usan expresiones para conseguir valores.\nEsta sentencia toma el valor de `2 + 3` y lo guarda.",
+  "step.3.narr": "La **asignación** es la parte de guardar.\nEl operador `=` escribe el valor calculado (`5`) en la casilla llamada `total`.",
+  "step.4.narr": "Las sentencias se ejecutan **en orden**, de arriba abajo.\nSiguiente línea: `total = total + 1` - el operador `+` suma `1` a `5`, y luego el valor se escribe de vuelta.",
+  "step.5.narr": "La última sentencia lee `total` y lo imprime - `6`.\nUn paso detrás de otro, en el **orden** en que están escritos."
+}

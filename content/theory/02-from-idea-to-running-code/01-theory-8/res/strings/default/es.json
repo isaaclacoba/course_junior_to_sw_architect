@@ -1,0 +1,10 @@
+{
+  "hero.eyebrow": "Teoría · Parte dos · De la idea al código en marcha",
+  "hero.title": "Qué es un lenguaje de programación",
+  "intro.0": "La Parte uno mostró cómo los ordenadores ejecutan instrucciones. Ahora empezamos a escribirlas. Esta lección cubre qué es un lenguaje de programación: por qué no escribimos instrucciones de CPU en crudo, qué significa 'de alto nivel', y que muchos lenguajes apuntan a una misma máquina. Recorre el visual para verlo pasar.",
+  "step.0.narr": "En el fondo, la CPU solo ejecuta instrucciones numéricas diminutas - patrones de unos y ceros.\nEse es su **código máquina**, el único lenguaje que entiende de verdad.",
+  "step.1.narr": "Escribir programas directamente en esos patrones es un suplicio y fácil de equivocar.\nNadie quiere escribir unos y ceros a mano todo el día.",
+  "step.2.narr": "Así que en su lugar escribimos en un **lenguaje de programación** - palabras y reglas cómodas para las personas con las que decir lo que queremos.\nEsta línea se lee casi como inglés normal.",
+  "step.3.narr": "Una herramienta **traduce** esa única línea cómoda a las muchas instrucciones diminutas que la CPU necesita.\nUna línea de alto nivel - toda una ráfaga de operaciones de máquina.",
+  "step.4.narr": "Hay muchos **lenguajes** - C#, Python, JavaScript - cada uno con su propio estilo.\nElijas el que elijas, el código acaba siendo instrucciones para una misma máquina."
+}

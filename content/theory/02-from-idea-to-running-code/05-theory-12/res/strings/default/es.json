@@ -1,0 +1,11 @@
+{
+  "hero.eyebrow": "Teoría · Parte dos · De la idea al código en marcha",
+  "hero.title": "Decisiones y repetición",
+  "intro.0": "Los programas hacen más que desfilar en línea recta por una lista - eligen y repiten. Esta lección cubre decisiones, condiciones, if/else, bucles, y cómo todo eso son en realidad los saltos de la Parte uno. Recorre el visual para ver cómo una variable elige un camino, y luego un bucle salta hacia atrás para volver a intentarlo.",
+  "step.0.narr": "Un programa no siempre desfila en línea recta por la lista - puede **elegir** qué hacer a continuación.\nAquí una variable, `temp`, guarda `12` y dirige la elección.",
+  "step.1.narr": "Una **condición** es una pregunta de sí/no que hace el programa.\n`temp > 10` lee `temp` (`12`) y se calcula a `true`.",
+  "step.2.narr": "Como la condición era `true`, ejecuta la **rama `if`** e imprime `\"warm\"`.\nEl `else` se salta por completo.",
+  "step.3.narr": "Si `temp` hubiera sido `5` en cambio, la misma pregunta respondería `false`.\nFíjate en la casilla: `temp` ahora guarda `5`.",
+  "step.4.narr": "Con `false`, la rama `if` se salta y en su lugar se ejecuta la **rama `else`** - `print \"cold\"`.\nUna condición, dos caminos posibles.",
+  "step.5.narr": "Un **bucle** es el otro movimiento.\nEn vez de seguir adelante, salta hacia atrás para comprobar la condición otra vez, repitiendo los pasos mientras siga siendo `true` - así los escribes una vez, no cien."
+}
