@@ -27,5 +27,11 @@
   "task.4.summaryItems.1.text": "returns a value you chose, so you arrange one exact case and can predict the result.",
   "task.4.summaryItems.2.title": "Spy - ",
   "task.4.summaryItems.2.text": "remembers how it was used, so you can confirm a call happened when there is no return value to check.",
-  "task.4.summaryClose": "Next: testable by design - the habits that make code easy to test are the habits behind SOLID."
+  "task.4.summaryClose": "Next: testable by design - the habits that make code easy to test are the habits behind SOLID.",
+  "concept.pr-test-double.term": "Test double",
+  "concept.pr-test-double.def": "A stand-in you control that takes the place of a real dependency in a test, such as a clock or the network.",
+  "concept.pr-stub.term": "Stub",
+  "concept.pr-stub.def": "A test double that returns canned data you decide, so the code under test sees a known answer.",
+  "concept.pr-spy.term": "Spy",
+  "concept.pr-spy.def": "A test double that records how it was called, so you can check the code used it correctly."
 }

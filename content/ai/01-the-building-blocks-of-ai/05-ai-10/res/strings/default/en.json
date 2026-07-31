@@ -1,0 +1,6 @@
+{
+  "concept.ai-sampling.term": "Sampling",
+  "concept.ai-sampling.def": "Instead of always taking the top candidate, the model picks the next token at random according to the probabilities - which is why the same prompt can give different answers.",
+  "concept.ai-temperature.term": "Temperature",
+  "concept.ai-temperature.def": "A dial that reshapes the spread of next-token probabilities: low sharpens it for steady, repeatable answers, high flattens it for more variety."
+}

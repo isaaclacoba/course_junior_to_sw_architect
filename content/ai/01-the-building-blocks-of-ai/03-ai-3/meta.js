@@ -24,9 +24,7 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "ai-prompt",
-        "term": "Prompt",
-        "def": "The starting text you hand the model, which it simply continues - so changing the prompt changes everything that follows."
+        "id": "ai-prompt"
       }
     ],
     "revisits": [],

@@ -24,19 +24,13 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-arithmetic",
-        "term": "Arithmetic",
-        "def": "Computing a new value from existing ones with + - * /."
+        "id": "pr-arithmetic"
       },
       {
-        "id": "pr-string-concatenation",
-        "term": "String concatenation",
-        "def": "Joining pieces of text (and numbers turned to text) end to end with +."
+        "id": "pr-string-concatenation"
       },
       {
-        "id": "pr-comparison",
-        "term": "Comparison",
-        "def": "Asking a yes/no question with == != > < >= <= and getting back a bool."
+        "id": "pr-comparison"
       }
     ],
     "revisits": [

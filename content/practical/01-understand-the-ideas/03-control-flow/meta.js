@@ -24,24 +24,16 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-conditional",
-        "term": "if / else",
-        "def": "Choosing exactly one branch to run by testing conditions, top to bottom."
+        "id": "pr-conditional"
       },
       {
-        "id": "pr-boolean-logic",
-        "term": "Boolean logic",
-        "def": "Combining yes/no answers with && (both), || (either), and ! (flip)."
+        "id": "pr-boolean-logic"
       },
       {
-        "id": "pr-loop",
-        "term": "Loop",
-        "def": "Repeating a block of code - with while, for, or foreach - and steering it with break and continue."
+        "id": "pr-loop"
       },
       {
-        "id": "pr-switch",
-        "term": "switch",
-        "def": "Mapping one value to many cases, each ending in break, with default catching the rest."
+        "id": "pr-switch"
       }
     ],
     "revisits": [

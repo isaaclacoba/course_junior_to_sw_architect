@@ -24,14 +24,10 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "ai-stopping-condition",
-        "term": "Stopping condition",
-        "def": "A reason to end the loop - the goal is reached, the budget is spent, the agent is circling, or a hard error hit - since an agent decides its own next move and will otherwise run forever."
+        "id": "ai-stopping-condition"
       },
       {
-        "id": "ai-step-budget",
-        "term": "Step budget",
-        "def": "A cap on how many steps a task may take - the leash on a loop that costs a model call every turn."
+        "id": "ai-step-budget"
       }
     ],
     "revisits": [

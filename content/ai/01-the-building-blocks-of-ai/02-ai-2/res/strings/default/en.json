@@ -1,0 +1,4 @@
+{
+  "concept.ai-token.term": "Token",
+  "concept.ai-token.def": "A small chunk of text - roughly a word or a piece of one, punctuation included - and the unit a model actually reads, counts, and is billed by."
+}

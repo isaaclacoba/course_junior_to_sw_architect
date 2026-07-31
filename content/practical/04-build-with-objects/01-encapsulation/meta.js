@@ -24,14 +24,10 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-encapsulation",
-        "term": "Encapsulation",
-        "def": "Grouping related state with the behaviour that uses it and hiding the inside, so callers go through the object."
+        "id": "pr-encapsulation"
       },
       {
-        "id": "pr-invariant",
-        "term": "Invariant",
-        "def": "A rule about an object's state that its own methods keep true, so nothing outside can break it."
+        "id": "pr-invariant"
       }
     ],
     "revisits": [

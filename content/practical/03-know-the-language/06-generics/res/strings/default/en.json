@@ -21,5 +21,9 @@
   "task.4.concept": "Generic method returning a generic type",
   "task.4.context": "Generic classes and generic methods combine. `Box<T>` is already written for you. Add a generic method `Wrap<T>` that takes a `T` and returns a `Box<T>` holding it - so the method's `T` flows straight into the type it builds.",
   "task.4.goal.0": "Give `Wrapper` a method `public Box<T> Wrap<T>(T item)` that returns `new Box<T>(item)`.",
-  "task.4.goal.1": "Main wraps 5 and prints the box's `Value`, so the output is 5."
+  "task.4.goal.1": "Main wraps 5 and prints the box's `Value`, so the output is 5.",
+  "concept.pr-generics.term": "Generics",
+  "concept.pr-generics.def": "Writing a type with a placeholder like Box<T> so it works with any kind of value, decided by the caller.",
+  "concept.pr-generic-method.term": "Generic method",
+  "concept.pr-generic-method.def": "A single method with a type parameter that works on any type it is given."
 }

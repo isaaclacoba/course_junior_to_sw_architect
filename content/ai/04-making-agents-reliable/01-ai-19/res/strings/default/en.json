@@ -1,0 +1,4 @@
+{
+  "concept.ai-workflow.term": "Workflow",
+  "concept.ai-workflow.def": "Fixed steps run in a set order when you can write the path down ahead of time - cheaper, predictable, and easier to test than an agent."
+}

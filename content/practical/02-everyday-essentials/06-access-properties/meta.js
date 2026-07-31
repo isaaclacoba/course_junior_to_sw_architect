@@ -24,19 +24,13 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-access-modifier",
-        "term": "Access modifier",
-        "def": "A type deciding which of its parts the outside can see, marking them public or private."
+        "id": "pr-access-modifier"
       },
       {
-        "id": "pr-property",
-        "term": "Property",
-        "def": "A controlled way to read and change state through a get and set, instead of exposing a raw field."
+        "id": "pr-property"
       },
       {
-        "id": "pr-computed-property",
-        "term": "Computed property",
-        "def": "A property that works its value out each time it is read, with =>, storing nothing of its own."
+        "id": "pr-computed-property"
       }
     ],
     "revisits": [

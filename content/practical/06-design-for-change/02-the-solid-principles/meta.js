@@ -28,24 +28,16 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-open-closed",
-        "term": "Open/Closed",
-        "def": "Code that is open to new behaviour by adding a type, and closed to editing what already works."
+        "id": "pr-open-closed"
       },
       {
-        "id": "pr-liskov-substitution",
-        "term": "Liskov Substitution",
-        "def": "A subtype must be usable anywhere its base is expected, without breaking the caller's assumptions."
+        "id": "pr-liskov-substitution"
       },
       {
-        "id": "pr-interface-segregation",
-        "term": "Interface Segregation",
-        "def": "Keeping interfaces small and focused, so a type is not forced to implement methods it does not need."
+        "id": "pr-interface-segregation"
       },
       {
-        "id": "pr-dependency-inversion",
-        "term": "Dependency Inversion",
-        "def": "High-level code depending on an abstraction rather than a concrete detail, so the detail can change freely."
+        "id": "pr-dependency-inversion"
       }
     ],
     "revisits": [

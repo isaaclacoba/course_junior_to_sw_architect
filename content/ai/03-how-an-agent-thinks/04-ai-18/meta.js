@@ -24,9 +24,7 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "ai-reflection",
-        "term": "Reflection",
-        "def": "Having the model check its own draft, find the bug or edge case it missed, and revise - draft, critique, revise, because reviewing is an easier task than writing."
+        "id": "ai-reflection"
       }
     ],
     "revisits": [

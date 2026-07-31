@@ -24,9 +24,7 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-dependency-injection",
-        "term": "Dependency injection",
-        "def": "Handing a class the collaborators it needs from outside, usually through its constructor, instead of building them itself."
+        "id": "pr-dependency-injection"
       }
     ],
     "revisits": [

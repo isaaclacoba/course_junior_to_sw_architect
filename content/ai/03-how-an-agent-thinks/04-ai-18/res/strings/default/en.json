@@ -1,0 +1,4 @@
+{
+  "concept.ai-reflection.term": "Reflection",
+  "concept.ai-reflection.def": "Having the model check its own draft, find the bug or edge case it missed, and revise - draft, critique, revise, because reviewing is an easier task than writing."
+}

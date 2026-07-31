@@ -40,5 +40,7 @@
   "task.6.summaryItems.3.text": "C# forbids inheriting three; compose the parts instead.",
   "task.6.summaryItems.4.title": "Swap a part - ",
   "task.6.summaryItems.4.text": "behind an interface, replace one part without touching the rest.",
-  "task.6.summaryClose": "Next: Why inject?"
+  "task.6.summaryClose": "Next: Why inject?",
+  "concept.pr-single-inheritance.term": "One base class only",
+  "concept.pr-single-inheritance.def": "C# lets a class inherit from just one parent, so you combine several parts by holding them instead."
 }

@@ -24,14 +24,10 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-lambda",
-        "term": "Lambda",
-        "def": "A tiny function with no name that you can store in a variable and call later."
+        "id": "pr-lambda"
       },
       {
-        "id": "pr-closure",
-        "term": "Capture",
-        "def": "A lambda reading the variables around it where it was written - something a plain method cannot do."
+        "id": "pr-closure"
       }
     ],
     "revisits": [

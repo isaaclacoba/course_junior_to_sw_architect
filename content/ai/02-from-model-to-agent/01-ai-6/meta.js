@@ -24,29 +24,19 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "ai-memory",
-        "term": "Memory",
-        "def": "Saving what matters to a store outside the context window and recalling it when needed, so an assistant can remember across turns even though each model call starts fresh."
+        "id": "ai-memory"
       },
       {
-        "id": "ai-working-memory",
-        "term": "Working memory",
-        "def": "The context the model reads right now - the scratchpad for the task in hand, and the first thing to vanish as the chat rolls on."
+        "id": "ai-working-memory"
       },
       {
-        "id": "ai-episodic-memory",
-        "term": "Episodic memory",
-        "def": "The store of what happened before - past turns and events, each tied to a time, like the assistant's diary."
+        "id": "ai-episodic-memory"
       },
       {
-        "id": "ai-semantic-memory",
-        "term": "Semantic memory",
-        "def": "The store of what stays true with no date attached - facts about the world or about you."
+        "id": "ai-semantic-memory"
       },
       {
-        "id": "ai-procedural-memory",
-        "term": "Procedural memory",
-        "def": "The store of how to do things - the routines and steps the assistant follows to act."
+        "id": "ai-procedural-memory"
       }
     ],
     "revisits": [],

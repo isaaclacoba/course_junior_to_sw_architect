@@ -1,0 +1,4 @@
+{
+  "concept.ai-context.term": "Context",
+  "concept.ai-context.def": "Everything the model can read at this moment - the prompt, the conversation so far, and any facts you add - and the only thing it has to go on."
+}

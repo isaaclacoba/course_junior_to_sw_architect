@@ -24,24 +24,16 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-static",
-        "term": "static",
-        "def": "Behaviour or data that belongs to the type itself rather than to any one object, so it is shared and needs no instance."
+        "id": "pr-static"
       },
       {
-        "id": "pr-const",
-        "term": "const",
-        "def": "A named value fixed where you write it and never changed, so a bare number gets a clear name."
+        "id": "pr-const"
       },
       {
-        "id": "pr-readonly",
-        "term": "readonly",
-        "def": "A field that can be set once - at its declaration or in the constructor - and never reassigned."
+        "id": "pr-readonly"
       },
       {
-        "id": "pr-field",
-        "term": "Field",
-        "def": "A variable that belongs to an object and holds part of its state."
+        "id": "pr-field"
       }
     ],
     "revisits": [

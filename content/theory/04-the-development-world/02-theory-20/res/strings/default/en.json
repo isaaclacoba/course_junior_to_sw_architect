@@ -1,0 +1,10 @@
+{
+  "concept.th-version-control.term": "Version control",
+  "concept.th-version-control.def": "A tool that tracks every change to your code, so you never lose work and can see what changed and when.",
+  "concept.th-commit.term": "Commit",
+  "concept.th-commit.def": "A saved snapshot of your code at a moment worth keeping, with a short message describing the change.",
+  "concept.th-history.term": "History",
+  "concept.th-history.def": "The timeline of all commits - how the code grew, snapshot by snapshot.",
+  "concept.th-collaboration.term": "Collaboration",
+  "concept.th-collaboration.def": "Several people working on one project, each committing their own changes without overwriting each other."
+}

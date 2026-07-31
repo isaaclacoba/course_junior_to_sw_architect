@@ -24,14 +24,10 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "ai-llm",
-        "term": "Large language model",
-        "def": "A model that reads the text so far and predicts the next token, over and over."
+        "id": "ai-llm"
       },
       {
-        "id": "ai-next-token-prediction",
-        "term": "Next-token prediction",
-        "def": "For each next slot the model scores every possible token and usually picks the most likely one, then appends it and reads the whole text again."
+        "id": "ai-next-token-prediction"
       }
     ],
     "revisits": [],

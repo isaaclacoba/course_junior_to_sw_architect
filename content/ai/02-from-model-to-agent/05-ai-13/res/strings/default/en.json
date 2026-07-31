@@ -1,0 +1,6 @@
+{
+  "concept.ai-transcript.term": "Transcript",
+  "concept.ai-transcript.def": "The running list of messages a whole run literally is - the input the model is re-sent each step.",
+  "concept.ai-message-role.term": "Message role",
+  "concept.ai-message-role.def": "The tag on each message - system, user, assistant, or tool - that says what kind of turn it is and, with its author, who actually wrote it."
+}

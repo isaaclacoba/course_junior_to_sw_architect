@@ -24,9 +24,7 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "ai-context-window",
-        "term": "Context window",
-        "def": "The fixed maximum size of the context, measured in tokens - when it fills, the oldest tokens fall off the start and the model can no longer see them."
+        "id": "ai-context-window"
       }
     ],
     "revisits": [],

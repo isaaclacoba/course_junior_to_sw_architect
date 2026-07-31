@@ -36,5 +36,11 @@
   "task.5.summaryItems.2.text": "an `int?` is either a real number or `null`; check first, then read `.Value`.",
   "task.5.summaryItems.3.title": "Default only when empty with `??=` - ",
   "task.5.summaryItems.3.text": "`occupant ??= \"guest\"` fills the slot only when it is `null`, never overwriting a real value.",
-  "task.5.summaryClose": "The portable habit outlasts the operators: wherever a value can be absent, decide what absent means here - a default, a safe skip, or a clear \"unknown\" - rather than letting it crash. Other languages spell it `null`, `nil`, `None`, or an optional; the thinking is the same."
+  "task.5.summaryClose": "The portable habit outlasts the operators: wherever a value can be absent, decide what absent means here - a default, a safe skip, or a clear \"unknown\" - rather than letting it crash. Other languages spell it `null`, `nil`, `None`, or an optional; the thinking is the same.",
+  "concept.pr-null-coalescing.term": "Null-coalescing",
+  "concept.pr-null-coalescing.def": "Supplying a fallback for an absent value with ?? (and filling a slot only when empty with ??=).",
+  "concept.pr-null-conditional.term": "Null-conditional",
+  "concept.pr-null-conditional.def": "Reaching through an object that might be missing with ?., which stops at null instead of crashing.",
+  "concept.pr-nullable-value-type.term": "Nullable value type",
+  "concept.pr-nullable-value-type.def": "A plain value like int or bool that opts in to being absent by adding ?, like int?, so it is either the value or null."
 }

@@ -1,0 +1,10 @@
+{
+  "concept.th-ram.term": "RAM",
+  "concept.th-ram.def": "The computer's fast working memory, where a program and its data must be before the CPU can run them.",
+  "concept.th-fetch-execute.term": "Fetch-execute loop",
+  "concept.th-fetch-execute.def": "The loop the CPU repeats forever: fetch the next instruction from memory, carry it out, repeat.",
+  "concept.th-program-counter.term": "Program counter",
+  "concept.th-program-counter.def": "The CPU's bookmark - it remembers which instruction comes next.",
+  "concept.th-jump.term": "Jump",
+  "concept.th-jump.def": "An instruction that changes the program counter to a different line instead of the next one, which is how loops and choices work."
+}

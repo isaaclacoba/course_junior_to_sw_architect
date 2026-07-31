@@ -24,14 +24,10 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-linq",
-        "term": "LINQ",
-        "def": "Querying a collection without writing a loop, with operators like Where, Any, All, Count and OrderBy."
+        "id": "pr-linq"
       },
       {
-        "id": "pr-projection",
-        "term": "Projection",
-        "def": "Turning each item into something else with Select, producing a new sequence of results."
+        "id": "pr-projection"
       }
     ],
     "revisits": [

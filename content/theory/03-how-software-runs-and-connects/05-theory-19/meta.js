@@ -24,34 +24,22 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "th-network",
-        "term": "Network",
-        "def": "The wires and wireless links that let one program talk to another, even across the world."
+        "id": "th-network"
       },
       {
-        "id": "th-client",
-        "term": "Client",
-        "def": "The program that asks for something over a network."
+        "id": "th-client"
       },
       {
-        "id": "th-server",
-        "term": "Server",
-        "def": "The program that answers requests over a network."
+        "id": "th-server"
       },
       {
-        "id": "th-request",
-        "term": "Request",
-        "def": "A message a client sends asking for something."
+        "id": "th-request"
       },
       {
-        "id": "th-response",
-        "term": "Response",
-        "def": "The answer a server sends back."
+        "id": "th-response"
       },
       {
-        "id": "th-api",
-        "term": "API",
-        "def": "The set list of things a server offers and how to ask for them - like a menu."
+        "id": "th-api"
       }
     ],
     "revisits": [],

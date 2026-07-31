@@ -27,5 +27,9 @@
   "task.5.concept": "Build from small parts",
   "task.5.context": "Methods can call each other, so a bigger answer is just small checks combined. This is the habit every later lesson builds on.",
   "task.5.goal.0": "`Summary(int age)` should return `\"Status: \"` followed by `Category(age)`.",
-  "task.5.goal.1": "`Main` calls `Summary(20)`, so the output should be `Status: adult`."
+  "task.5.goal.1": "`Main` calls `Summary(20)`, so the output should be `Status: adult`.",
+  "concept.pr-method.term": "Method",
+  "concept.pr-method.def": "A named piece of behaviour you call to get an answer back, so a rule is written once and reused.",
+  "concept.pr-parameter.term": "Parameter",
+  "concept.pr-parameter.def": "A value you hand a method when you call it, so the same method works for different inputs."
 }

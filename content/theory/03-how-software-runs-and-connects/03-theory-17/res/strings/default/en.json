@@ -1,0 +1,12 @@
+{
+  "concept.th-compile-time.term": "Compile time",
+  "concept.th-compile-time.def": "The phase before a program runs, when the compiler translates the source and checks the rules.",
+  "concept.th-run-time.term": "Run time",
+  "concept.th-run-time.def": "The phase when the built program actually executes, one instruction at a time.",
+  "concept.th-build-error.term": "Build error",
+  "concept.th-build-error.def": "A rule-breaking mistake the compiler catches at compile time, before anything runs.",
+  "concept.th-runtime-platform.term": ".NET runtime",
+  "concept.th-runtime-platform.def": "A platform that finishes and runs a portable build on each machine, like .NET.",
+  "concept.th-cross-compile.term": "Cross-compile",
+  "concept.th-cross-compile.def": "Building on one machine but aiming the compiler at a different target - another CPU or operating system."
+}

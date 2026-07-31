@@ -24,14 +24,10 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "ai-sampling",
-        "term": "Sampling",
-        "def": "Instead of always taking the top candidate, the model picks the next token at random according to the probabilities - which is why the same prompt can give different answers."
+        "id": "ai-sampling"
       },
       {
-        "id": "ai-temperature",
-        "term": "Temperature",
-        "def": "A dial that reshapes the spread of next-token probabilities: low sharpens it for steady, repeatable answers, high flattens it for more variety."
+        "id": "ai-temperature"
       }
     ],
     "revisits": [],

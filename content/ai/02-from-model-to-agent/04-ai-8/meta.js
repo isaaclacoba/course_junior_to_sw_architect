@@ -24,14 +24,10 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "ai-agent",
-        "term": "Agent",
-        "def": "A model wrapped with its context, memory, and tools and run in a loop toward a goal, so it can decide and take its own next steps."
+        "id": "ai-agent"
       },
       {
-        "id": "ai-agent-loop",
-        "term": "Agent loop",
-        "def": "The perceive-reason-act-observe cycle an agent runs: read the task in, reason about the next move, call a tool, observe the result, and go again."
+        "id": "ai-agent-loop"
       }
     ],
     "revisits": [

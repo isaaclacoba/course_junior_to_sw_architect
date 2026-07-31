@@ -24,19 +24,13 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "th-storage",
-        "term": "Storage",
-        "def": "Non-volatile hardware that keeps data after a program stops and after the power is off."
+        "id": "th-storage"
       },
       {
-        "id": "th-persistence",
-        "term": "Persistence",
-        "def": "Keeping data past the end of a program by saving it to storage, and loading it back later."
+        "id": "th-persistence"
       },
       {
-        "id": "th-inode",
-        "term": "Inode",
-        "def": "A file on disk is an inode - its bytes plus facts about them like size, time, and who can read it - reached through a name in a folder."
+        "id": "th-inode"
       }
     ],
     "revisits": [

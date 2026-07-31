@@ -24,9 +24,7 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "th-variable",
-        "term": "Variable",
-        "def": "A named slot in memory that holds a value you can read and change."
+        "id": "th-variable"
       }
     ],
     "revisits": [

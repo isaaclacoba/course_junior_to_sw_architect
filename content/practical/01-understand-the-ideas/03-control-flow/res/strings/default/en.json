@@ -31,5 +31,13 @@
   "task.6.concept": "switch",
   "task.6.context": "A `switch` maps one value to many cases; each `case` ends with `break` and `default` catches the rest. Here you run a switch for every item with a `foreach`. Do the same to label each code.",
   "task.6.goal.0": "For each code print a word: 1 -> `\"low\"`, 2 -> `\"mid\"`, 3 -> `\"high\"`, anything else -> `\"?\"`.",
-  "task.6.goal.1": "For 1, 3, 9 the output is: low, high, ?."
+  "task.6.goal.1": "For 1, 3, 9 the output is: low, high, ?.",
+  "concept.pr-conditional.term": "if / else",
+  "concept.pr-conditional.def": "Choosing exactly one branch to run by testing conditions, top to bottom.",
+  "concept.pr-boolean-logic.term": "Boolean logic",
+  "concept.pr-boolean-logic.def": "Combining yes/no answers with && (both), || (either), and ! (flip).",
+  "concept.pr-loop.term": "Loop",
+  "concept.pr-loop.def": "Repeating a block of code - with while, for, or foreach - and steering it with break and continue.",
+  "concept.pr-switch.term": "switch",
+  "concept.pr-switch.def": "Mapping one value to many cases, each ending in break, with default catching the rest."
 }

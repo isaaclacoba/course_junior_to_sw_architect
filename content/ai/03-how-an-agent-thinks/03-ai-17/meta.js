@@ -24,9 +24,7 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "ai-react",
-        "term": "Reason and act (ReAct)",
-        "def": "The named loop behind a tool-using agent: a thought about the next move, an action that calls a tool, an observation of the real result, repeated until the agent has what it needs to answer."
+        "id": "ai-react"
       }
     ],
     "revisits": [

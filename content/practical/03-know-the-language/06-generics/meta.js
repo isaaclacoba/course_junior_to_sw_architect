@@ -24,14 +24,10 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-generics",
-        "term": "Generics",
-        "def": "Writing a type with a placeholder like Box<T> so it works with any kind of value, decided by the caller."
+        "id": "pr-generics"
       },
       {
-        "id": "pr-generic-method",
-        "term": "Generic method",
-        "def": "A single method with a type parameter that works on any type it is given."
+        "id": "pr-generic-method"
       }
     ],
     "revisits": [

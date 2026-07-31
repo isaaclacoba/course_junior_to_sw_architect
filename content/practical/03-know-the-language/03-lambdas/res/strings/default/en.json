@@ -36,5 +36,9 @@
   "task.5.summaryItems.3.text": "a lambda can read the locals beside it; a named method only sees what you pass it.",
   "task.5.summaryItems.4.title": "Configure it - ",
   "task.5.summaryItems.4.text": "bake in a value you have now, and the same lambda does a new job.",
-  "task.5.summaryClose": "Next: LINQ - `legs.Count(...)` and `scores.Select(...)` do that same foreach for you, in one line, with a lambda exactly like these. (When a step deserves a real name, a normal method still works - a lambda just wins when it is small, inline, or needs the values around it.)"
+  "task.5.summaryClose": "Next: LINQ - `legs.Count(...)` and `scores.Select(...)` do that same foreach for you, in one line, with a lambda exactly like these. (When a step deserves a real name, a normal method still works - a lambda just wins when it is small, inline, or needs the values around it.)",
+  "concept.pr-lambda.term": "Lambda",
+  "concept.pr-lambda.def": "A tiny function with no name that you can store in a variable and call later.",
+  "concept.pr-closure.term": "Capture",
+  "concept.pr-closure.def": "A lambda reading the variables around it where it was written - something a plain method cannot do."
 }

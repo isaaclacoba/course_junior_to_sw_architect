@@ -24,29 +24,19 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "th-library",
-        "term": "Library",
-        "def": "Ready-made code someone else wrote and shared, which you call instead of writing it yourself."
+        "id": "th-library"
       },
       {
-        "id": "th-standard-library",
-        "term": "Standard library",
-        "def": "The big set of built-in tools every language ships with, ready the moment you start."
+        "id": "th-standard-library"
       },
       {
-        "id": "th-package",
-        "term": "Package",
-        "def": "A bundle of code someone published for others to reuse, fetched and added to your project."
+        "id": "th-package"
       },
       {
-        "id": "th-package-manager",
-        "term": "Package manager",
-        "def": "A tool that fetches the packages you ask for, installs the right versions, and pulls in their dependencies."
+        "id": "th-package-manager"
       },
       {
-        "id": "th-dependency",
-        "term": "Dependency",
-        "def": "A package your program relies on, which may rely on further packages of its own."
+        "id": "th-dependency"
       }
     ],
     "revisits": [],

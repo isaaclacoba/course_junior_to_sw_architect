@@ -24,14 +24,10 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "ai-transcript",
-        "term": "Transcript",
-        "def": "The running list of messages a whole run literally is - the input the model is re-sent each step."
+        "id": "ai-transcript"
       },
       {
-        "id": "ai-message-role",
-        "term": "Message role",
-        "def": "The tag on each message - system, user, assistant, or tool - that says what kind of turn it is and, with its author, who actually wrote it."
+        "id": "ai-message-role"
       }
     ],
     "revisits": [

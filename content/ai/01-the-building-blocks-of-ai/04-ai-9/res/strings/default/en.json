@@ -1,0 +1,6 @@
+{
+  "concept.ai-system-message.term": "System message",
+  "concept.ai-system-message.def": "A hidden message placed before your turn that sets the model's role and rules - the simplest lever for steering how it answers.",
+  "concept.ai-user-message.term": "User message",
+  "concept.ai-user-message.def": "The message you type - your actual question or request, saying what to answer rather than how."
+}

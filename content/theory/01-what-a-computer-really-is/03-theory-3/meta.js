@@ -24,24 +24,16 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "th-operating-system",
-        "term": "Operating system",
-        "def": "The program in charge of the machine - it launches your program and manages it while it runs."
+        "id": "th-operating-system"
       },
       {
-        "id": "th-loader",
-        "term": "Loader",
-        "def": "The part of the operating system that copies a program from storage into memory so it can run."
+        "id": "th-loader"
       },
       {
-        "id": "th-entry-point",
-        "term": "Entry point",
-        "def": "The place where a program starts running - the first instruction the operating system hands to the CPU."
+        "id": "th-entry-point"
       },
       {
-        "id": "th-main",
-        "term": "Main",
-        "def": "The routine a program starts from, usually named Main."
+        "id": "th-main"
       }
     ],
     "revisits": [

@@ -41,5 +41,9 @@
   "task.6.summaryItems.3.text": "test each item as you pass it and count the ones that pass.",
   "task.6.summaryItems.4.title": "Split text into pieces - ",
   "task.6.summaryItems.4.text": "`csv.Split(',')` turns text into a `string[]` you can measure and walk like any other array.",
-  "task.6.summaryClose": "An array's size is fixed once you make it. When you need a row that grows or shrinks, you will reach for a list next - but every move you just learned carries straight over."
+  "task.6.summaryClose": "An array's size is fixed once you make it. When you need a row that grows or shrinks, you will reach for a list next - but every move you just learned carries straight over.",
+  "concept.pr-array.term": "Array",
+  "concept.pr-array.def": "A fixed-size, ordered row of values you reach by position (counting from 0) and measure with .Length.",
+  "concept.pr-split.term": "Split",
+  "concept.pr-split.def": "Cutting text at a separator into a string array you can measure and walk, like \"a,b,c\" into three pieces."
 }

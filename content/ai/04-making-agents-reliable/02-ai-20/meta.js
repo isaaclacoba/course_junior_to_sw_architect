@@ -24,19 +24,13 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "ai-guardrail",
-        "term": "Guardrail",
-        "def": "A rule that lives in your code outside the model - checking what comes in and what the agent tries to do - because a model alone can be talked out of its own rules."
+        "id": "ai-guardrail"
       },
       {
-        "id": "ai-prompt-injection",
-        "term": "Prompt injection",
-        "def": "Text in the input that tries to override the agent's instructions, like \"ignore your rules\", which an input check should scan for and flag."
+        "id": "ai-prompt-injection"
       },
       {
-        "id": "ai-human-in-the-loop",
-        "term": "Human in the loop",
-        "def": "Requiring a person's approval before the agent takes a risky action, so the most consequential calls are never left to the model alone."
+        "id": "ai-human-in-the-loop"
       }
     ],
     "revisits": [

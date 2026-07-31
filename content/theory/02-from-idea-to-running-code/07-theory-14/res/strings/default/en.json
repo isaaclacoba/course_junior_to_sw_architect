@@ -1,0 +1,10 @@
+{
+  "concept.th-bug.term": "Bug",
+  "concept.th-bug.def": "A mistake in the code - the computer did what you wrote, not what you meant.",
+  "concept.th-syntax-error.term": "Syntax error",
+  "concept.th-syntax-error.def": "Code that breaks the language's rules, which the compiler catches before the program runs.",
+  "concept.th-logic-error.term": "Logic error",
+  "concept.th-logic-error.def": "Valid code that runs but does the wrong thing, like using minus where you meant plus.",
+  "concept.th-debugging.term": "Debugging",
+  "concept.th-debugging.def": "Stepping through code line by line, watching the values, to find where it goes wrong."
+}

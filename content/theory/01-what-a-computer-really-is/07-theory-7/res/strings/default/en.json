@@ -1,0 +1,10 @@
+{
+  "concept.th-file.term": "File",
+  "concept.th-file.def": "A named bundle of bytes on storage, which you can find again by its name.",
+  "concept.th-folder.term": "Folder",
+  "concept.th-folder.def": "A named group of files, arranged in a tree you walk to reach a file.",
+  "concept.th-permissions.term": "Permissions",
+  "concept.th-permissions.def": "The rules the operating system checks before it lets a program open or change a file.",
+  "concept.th-device.term": "Device",
+  "concept.th-device.def": "A piece of hardware - keyboard, screen, printer, network - that programs reach only by asking the operating system."
+}

@@ -24,19 +24,13 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-exception-handling",
-        "term": "try / catch",
-        "def": "Keeping a program standing when something fails by catching the error instead of letting it stop everything."
+        "id": "pr-exception-handling"
       },
       {
-        "id": "pr-finally",
-        "term": "finally",
-        "def": "A block that always runs after a try, whether it succeeded or failed, to clean up."
+        "id": "pr-finally"
       },
       {
-        "id": "pr-throw",
-        "term": "throw",
-        "def": "Raising your own error to signal that something is wrong and stop the current path."
+        "id": "pr-throw"
       }
     ],
     "revisits": [

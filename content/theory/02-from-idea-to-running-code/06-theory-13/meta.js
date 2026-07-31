@@ -24,24 +24,16 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "th-function",
-        "term": "Function",
-        "def": "A named bundle of steps you can call and reuse, with inputs and an output."
+        "id": "th-function"
       },
       {
-        "id": "th-parameter",
-        "term": "Parameter",
-        "def": "A named input a function receives, which arrives as a local variable when the function is called."
+        "id": "th-parameter"
       },
       {
-        "id": "th-return-value",
-        "term": "Return value",
-        "def": "The result a function hands back to whatever called it."
+        "id": "th-return-value"
       },
       {
-        "id": "th-local-variable",
-        "term": "Local variable",
-        "def": "A variable that exists only while its function is running."
+        "id": "th-local-variable"
       }
     ],
     "revisits": [

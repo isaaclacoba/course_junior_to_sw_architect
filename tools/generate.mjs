@@ -203,6 +203,21 @@ function buildConceptIndex(migrated) {
   const byConcept = {};
   const byLesson = {};
 
+  // Concept term/def now live in the lesson's English resource bundle
+  // (concept.<id>.term / concept.<id>.def), not meta.js. Read them back here so
+  // the index stays the single derived registry.
+  function conceptTextFor(dir) {
+    let bag;
+    try { bag = JSON.parse(fs.readFileSync(path.join(dir, "res", "strings", "default", "en.json"), "utf8")); }
+    catch (e) { return {}; }
+    const out = {};
+    Object.keys(bag).forEach(function (k) {
+      const mm = /^concept\.(.+)\.(term|def)$/.exec(k);
+      if (mm) { (out[mm[1]] = out[mm[1]] || {})[mm[2]] = bag[k]; }
+    });
+    return out;
+  }
+
   function concept(cid) {
     if (!byConcept[cid]) byConcept[cid] = { introducedBy: null, revisitedBy: [], usedBy: [] };
     return byConcept[cid];
@@ -210,13 +225,15 @@ function buildConceptIndex(migrated) {
 
   migrated.forEach(function (m) {
     const c = (m.meta && m.meta.concepts) || {};
+    const text = conceptTextFor(m.dir);
     const introduces = (c.introduces || []).map(function (x) { return x.id; });
     const revisits = (c.revisits || []).map(function (x) { return x.id; });
     const uses = (c.uses || []).map(function (x) { return x.id; });
     byLesson[m.id] = { introduces: introduces, revisits: revisits, uses: uses };
 
     (c.introduces || []).forEach(function (x) {
-      defs[x.id] = { term: x.term, def: x.def };
+      const t = text[x.id] || {};
+      defs[x.id] = { term: t.term, def: t.def };
       concept(x.id).introducedBy = m.id;
     });
     revisits.forEach(function (cid) { concept(cid).revisitedBy.push(m.id); });

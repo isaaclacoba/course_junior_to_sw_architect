@@ -1,0 +1,14 @@
+{
+  "concept.th-network.term": "Network",
+  "concept.th-network.def": "The wires and wireless links that let one program talk to another, even across the world.",
+  "concept.th-client.term": "Client",
+  "concept.th-client.def": "The program that asks for something over a network.",
+  "concept.th-server.term": "Server",
+  "concept.th-server.def": "The program that answers requests over a network.",
+  "concept.th-request.term": "Request",
+  "concept.th-request.def": "A message a client sends asking for something.",
+  "concept.th-response.term": "Response",
+  "concept.th-response.def": "The answer a server sends back.",
+  "concept.th-api.term": "API",
+  "concept.th-api.def": "The set list of things a server offers and how to ask for them - like a menu."
+}

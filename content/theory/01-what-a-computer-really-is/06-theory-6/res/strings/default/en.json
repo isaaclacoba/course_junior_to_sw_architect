@@ -1,0 +1,8 @@
+{
+  "concept.th-encoding.term": "Encoding",
+  "concept.th-encoding.def": "An agreed code that maps each thing to a number and back - it decides whether a number means a letter, a colour, or a sound.",
+  "concept.th-pixel.term": "Pixel",
+  "concept.th-pixel.def": "One tiny coloured dot of an image, its colour stored as amounts of red, green and blue.",
+  "concept.th-sample.term": "Sample",
+  "concept.th-sample.def": "One measurement of a sound wave's height, taken thousands of times a second."
+}

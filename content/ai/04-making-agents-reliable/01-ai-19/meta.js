@@ -24,9 +24,7 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "ai-workflow",
-        "term": "Workflow",
-        "def": "Fixed steps run in a set order when you can write the path down ahead of time - cheaper, predictable, and easier to test than an agent."
+        "id": "ai-workflow"
       }
     ],
     "revisits": [

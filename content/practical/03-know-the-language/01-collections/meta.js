@@ -24,14 +24,10 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-list",
-        "term": "List",
-        "def": "A row of values that grows and shrinks - add items, index into it, and walk it - unlike a fixed-size array."
+        "id": "pr-list"
       },
       {
-        "id": "pr-dictionary",
-        "term": "Dictionary",
-        "def": "A store that maps keys to values, so you look an item up by its key instead of its position."
+        "id": "pr-dictionary"
       }
     ],
     "revisits": [

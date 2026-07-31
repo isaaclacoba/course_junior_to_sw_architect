@@ -24,19 +24,13 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "ai-tool",
-        "term": "Tool",
-        "def": "A function the model is allowed to call so it can do something text alone cannot - like check the weather or send a message - and read the result back."
+        "id": "ai-tool"
       },
       {
-        "id": "ai-tool-schema",
-        "term": "Tool schema",
-        "def": "The description of a tool - its name and typed parameters - that the model reads to know which tool fits and how to call it."
+        "id": "ai-tool-schema"
       },
       {
-        "id": "ai-tool-call",
-        "term": "Tool call",
-        "def": "The structured request the model emits to run a tool: the tool's name plus the arguments it needs, in the shape its schema asks for."
+        "id": "ai-tool-call"
       }
     ],
     "revisits": [],

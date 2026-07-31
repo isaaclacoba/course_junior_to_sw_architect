@@ -24,34 +24,22 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "th-process",
-        "term": "Process",
-        "def": "A running program, loaded into its own separate patch of memory."
+        "id": "th-process"
       },
       {
-        "id": "th-core",
-        "term": "Core",
-        "def": "One worker inside the CPU; a single core does one instruction at a time."
+        "id": "th-core"
       },
       {
-        "id": "th-time-sharing",
-        "term": "Time-sharing",
-        "def": "Giving one core to several processes in turn, switching thousands of times a second so they seem to run at once."
+        "id": "th-time-sharing"
       },
       {
-        "id": "th-scheduler",
-        "term": "Scheduler",
-        "def": "The part of the operating system that decides which process gets the core next."
+        "id": "th-scheduler"
       },
       {
-        "id": "th-parallelism",
-        "term": "Parallelism",
-        "def": "Running things at the very same instant on more than one core."
+        "id": "th-parallelism"
       },
       {
-        "id": "th-isolation",
-        "term": "Isolation",
-        "def": "Walling each process off in its own memory so one cannot read or wreck another's, which keeps a crash contained."
+        "id": "th-isolation"
       }
     ],
     "revisits": [

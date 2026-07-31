@@ -33,5 +33,13 @@
   "task.5.summaryItems.2.text": "one call over a base type adapts to each real object, so there is no if per type.",
   "task.5.summaryItems.3.title": "favour composition",
   "task.5.summaryItems.3.text": "inheritance allows one parent and can force a bad fit; held parts never clash - that is why we lean on composition.",
-  "task.5.summaryClose": "The keeper rule: can you honestly say A is-a B, always and everywhere? If not - or if you need to mix behaviours - hold parts instead. You will lean on this again when you design bigger systems: the same has-a move lets you swap one part for another without disturbing the rest."
+  "task.5.summaryClose": "The keeper rule: can you honestly say A is-a B, always and everywhere? If not - or if you need to mix behaviours - hold parts instead. You will lean on this again when you design bigger systems: the same has-a move lets you swap one part for another without disturbing the rest.",
+  "concept.pr-inheritance.term": "Inheritance",
+  "concept.pr-inheritance.def": "Reuse by claiming kinship - a child class is-a kind of its parent and gets the parent's members for free.",
+  "concept.pr-composition.term": "Composition",
+  "concept.pr-composition.def": "Reuse by holding parts - a class has-a smaller object as a field and asks it to do the work.",
+  "concept.pr-polymorphism.term": "Polymorphism",
+  "concept.pr-polymorphism.def": "One call that adapts to the real object behind it, so the same method name gives many behaviours.",
+  "concept.pr-favour-composition.term": "Favour composition",
+  "concept.pr-favour-composition.def": "Preferring has-a parts over deep inheritance, since inheritance can force a bad fit and multiple parents clash."
 }

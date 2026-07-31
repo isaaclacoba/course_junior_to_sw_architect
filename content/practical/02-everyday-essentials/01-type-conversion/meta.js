@@ -24,24 +24,16 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-parse",
-        "term": "Parsing",
-        "def": "Reading a value out of text - int.Parse(\"3\") turns the text into the number 3."
+        "id": "pr-parse"
       },
       {
-        "id": "pr-to-string",
-        "term": "ToString",
-        "def": "Turning a value into its text form, so a number can be joined into a label or code."
+        "id": "pr-to-string"
       },
       {
-        "id": "pr-cast",
-        "term": "Cast and truncation",
-        "def": "Converting a value to another type with (int) - casting a double to int drops the fraction rather than rounding."
+        "id": "pr-cast"
       },
       {
-        "id": "pr-try-parse",
-        "term": "TryParse",
-        "def": "The safe parse: it returns a bool for success and writes the number through an out parameter instead of crashing on bad text."
+        "id": "pr-try-parse"
       }
     ],
     "revisits": [

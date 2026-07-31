@@ -43,5 +43,15 @@
   "task.6.summaryItems.3.text": "overriding `ToString` decides how the object prints, so `Console.WriteLine(obj)` shows something you chose.",
   "task.6.summaryItems.4.title": "Clean up at a known point - ",
   "task.6.summaryItems.4.text": "`IDisposable` plus a `using` block runs `Dispose` deterministically the moment the block ends.",
-  "task.6.summaryClose": "These are type-system essentials, not C# trivia - most object languages have an abstract type, an overridable method, a custom text form, and a cleanup hook. Next, you meet the collections and queries that store and shape many of these objects at once."
+  "task.6.summaryClose": "These are type-system essentials, not C# trivia - most object languages have an abstract type, an overridable method, a custom text form, and a cleanup hook. Next, you meet the collections and queries that store and shape many of these objects at once.",
+  "concept.pr-abstract-type.term": "Abstract type",
+  "concept.pr-abstract-type.def": "A base that describes a shape its subtypes must fill in and cannot itself be created with new.",
+  "concept.pr-override.term": "Override",
+  "concept.pr-override.def": "Replacing a base type's virtual behaviour in a subtype, while code holding the base still calls the real object's version.",
+  "concept.pr-overloading.term": "Overloading",
+  "concept.pr-overloading.def": "Giving two methods the same name but different parameters, so the compiler picks the right one from the arguments.",
+  "concept.pr-tostring-override.term": "Custom text form",
+  "concept.pr-tostring-override.def": "Overriding ToString so a type decides how it prints, instead of showing its type name.",
+  "concept.pr-idisposable.term": "Deterministic cleanup",
+  "concept.pr-idisposable.def": "Implementing IDisposable so a using block runs Dispose at a known point, even if something inside fails."
 }

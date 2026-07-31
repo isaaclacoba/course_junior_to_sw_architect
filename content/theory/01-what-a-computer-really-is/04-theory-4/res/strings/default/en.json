@@ -1,0 +1,14 @@
+{
+  "concept.th-process.term": "Process",
+  "concept.th-process.def": "A running program, loaded into its own separate patch of memory.",
+  "concept.th-core.term": "Core",
+  "concept.th-core.def": "One worker inside the CPU; a single core does one instruction at a time.",
+  "concept.th-time-sharing.term": "Time-sharing",
+  "concept.th-time-sharing.def": "Giving one core to several processes in turn, switching thousands of times a second so they seem to run at once.",
+  "concept.th-scheduler.term": "Scheduler",
+  "concept.th-scheduler.def": "The part of the operating system that decides which process gets the core next.",
+  "concept.th-parallelism.term": "Parallelism",
+  "concept.th-parallelism.def": "Running things at the very same instant on more than one core.",
+  "concept.th-isolation.term": "Isolation",
+  "concept.th-isolation.def": "Walling each process off in its own memory so one cannot read or wreck another's, which keeps a crash contained."
+}

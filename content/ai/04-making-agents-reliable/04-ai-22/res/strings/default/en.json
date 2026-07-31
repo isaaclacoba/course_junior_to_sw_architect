@@ -1,0 +1,8 @@
+{
+  "concept.ai-hallucination.term": "Hallucination",
+  "concept.ai-hallucination.def": "A confident answer that is invented, because the model predicts plausible text rather than verified truth and fills any gap with something that reads right.",
+  "concept.ai-grounding.term": "Grounding",
+  "concept.ai-grounding.def": "Pulling the real source into the context and answering from it - citing it, and allowing \"I don't know\" - so the answer rests on a checkable fact instead of a guess.",
+  "concept.ai-citation.term": "Citation",
+  "concept.ai-citation.def": "Pointing at the exact source a grounded answer came from, so the claim can be traced back and checked."
+}

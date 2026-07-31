@@ -1,0 +1,8 @@
+{
+  "concept.ai-tool.term": "Tool",
+  "concept.ai-tool.def": "A function the model is allowed to call so it can do something text alone cannot - like check the weather or send a message - and read the result back.",
+  "concept.ai-tool-schema.term": "Tool schema",
+  "concept.ai-tool-schema.def": "The description of a tool - its name and typed parameters - that the model reads to know which tool fits and how to call it.",
+  "concept.ai-tool-call.term": "Tool call",
+  "concept.ai-tool-call.def": "The structured request the model emits to run a tool: the tool's name plus the arguments it needs, in the shape its schema asks for."
+}

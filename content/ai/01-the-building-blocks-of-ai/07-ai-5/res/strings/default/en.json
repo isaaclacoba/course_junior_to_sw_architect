@@ -1,0 +1,4 @@
+{
+  "concept.ai-context-window.term": "Context window",
+  "concept.ai-context-window.def": "The fixed maximum size of the context, measured in tokens - when it fills, the oldest tokens fall off the start and the model can no longer see them."
+}

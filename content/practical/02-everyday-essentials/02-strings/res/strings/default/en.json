@@ -34,5 +34,9 @@
   "task.5.summaryItems.2.text": "`text.Contains(word)` answers a yes/no question about text with a `bool`.",
   "task.5.summaryItems.3.title": "Transform - ",
   "task.5.summaryItems.3.text": "`text.Replace(old, new)` reads one string and returns a new one with a change applied.",
-  "task.5.summaryClose": "Each of these returns a value rather than changing the original - the same build, reshape, search and transform moves show up in every language you will meet next."
+  "task.5.summaryClose": "Each of these returns a value rather than changing the original - the same build, reshape, search and transform moves show up in every language you will meet next.",
+  "concept.pr-string-interpolation.term": "String interpolation",
+  "concept.pr-string-interpolation.def": "Dropping values straight into text with $\"...\", so {name} is replaced by that value.",
+  "concept.pr-string-methods.term": "String operations",
+  "concept.pr-string-methods.def": "Reshaping, searching and transforming text - ToUpper, Contains, Replace - each returning new text and leaving the original unchanged."
 }

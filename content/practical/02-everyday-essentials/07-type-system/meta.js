@@ -24,29 +24,19 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-abstract-type",
-        "term": "Abstract type",
-        "def": "A base that describes a shape its subtypes must fill in and cannot itself be created with new."
+        "id": "pr-abstract-type"
       },
       {
-        "id": "pr-override",
-        "term": "Override",
-        "def": "Replacing a base type's virtual behaviour in a subtype, while code holding the base still calls the real object's version."
+        "id": "pr-override"
       },
       {
-        "id": "pr-overloading",
-        "term": "Overloading",
-        "def": "Giving two methods the same name but different parameters, so the compiler picks the right one from the arguments."
+        "id": "pr-overloading"
       },
       {
-        "id": "pr-tostring-override",
-        "term": "Custom text form",
-        "def": "Overriding ToString so a type decides how it prints, instead of showing its type name."
+        "id": "pr-tostring-override"
       },
       {
-        "id": "pr-idisposable",
-        "term": "Deterministic cleanup",
-        "def": "Implementing IDisposable so a using block runs Dispose at a known point, even if something inside fails."
+        "id": "pr-idisposable"
       }
     ],
     "revisits": [

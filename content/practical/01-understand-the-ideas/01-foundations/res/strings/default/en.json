@@ -48,5 +48,19 @@
   "task.7.summaryItems.4.text": "\"nothing here\" yet; a `?` type is allowed to be null.",
   "task.7.summaryItems.5.title": "Object - ",
   "task.7.summaryItems.5.text": "state + behaviour built from a `class` with `new`.",
-  "task.7.summaryClose": "Next: Practice the Basics - put these together and start deciding and repeating with control flow."
+  "task.7.summaryClose": "Next: Practice the Basics - put these together and start deciding and repeating with control flow.",
+  "concept.pr-printing.term": "Printing",
+  "concept.pr-printing.def": "Showing output a line at a time with Console.WriteLine, so you can see what your program did.",
+  "concept.pr-variable.term": "Variable",
+  "concept.pr-variable.def": "A named box that holds a value you can read back and change later.",
+  "concept.pr-datatype.term": "Datatype",
+  "concept.pr-datatype.def": "The kind of a value - int, double, bool, char, string and the like - which sets what you can do with it.",
+  "concept.pr-assignment.term": "Assignment",
+  "concept.pr-assignment.def": "Storing a value in a variable with =, read as \"store\" rather than \"equals\".",
+  "concept.pr-null.term": "null",
+  "concept.pr-null.def": "A special value meaning \"nothing here yet\" - a type written with a ? is allowed to hold it.",
+  "concept.pr-object.term": "Object",
+  "concept.pr-object.def": "One thing built from a class with new that bundles state (what it knows) with behaviour (what it does).",
+  "concept.pr-class.term": "Class",
+  "concept.pr-class.def": "The blueprint an object is made from - it names the object's data and what it can do."
 }

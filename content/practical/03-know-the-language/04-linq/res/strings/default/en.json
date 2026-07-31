@@ -54,5 +54,9 @@
   "task.8.summaryItems.5.text": "the first match, or a default (like `null`) if there is none.",
   "task.8.summaryItems.6.title": "OrderBy - ",
   "task.8.summaryItems.6.text": "sort the items by the value the rule picks.",
-  "task.8.summaryClose": "Next in this track: errors and null - handling the cases where things go wrong or a value is missing."
+  "task.8.summaryClose": "Next in this track: errors and null - handling the cases where things go wrong or a value is missing.",
+  "concept.pr-linq.term": "LINQ",
+  "concept.pr-linq.def": "Querying a collection without writing a loop, with operators like Where, Any, All, Count and OrderBy.",
+  "concept.pr-projection.term": "Projection",
+  "concept.pr-projection.def": "Turning each item into something else with Select, producing a new sequence of results."
 }

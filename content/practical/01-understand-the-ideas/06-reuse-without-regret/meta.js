@@ -25,24 +25,16 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-inheritance",
-        "term": "Inheritance",
-        "def": "Reuse by claiming kinship - a child class is-a kind of its parent and gets the parent's members for free."
+        "id": "pr-inheritance"
       },
       {
-        "id": "pr-composition",
-        "term": "Composition",
-        "def": "Reuse by holding parts - a class has-a smaller object as a field and asks it to do the work."
+        "id": "pr-composition"
       },
       {
-        "id": "pr-polymorphism",
-        "term": "Polymorphism",
-        "def": "One call that adapts to the real object behind it, so the same method name gives many behaviours."
+        "id": "pr-polymorphism"
       },
       {
-        "id": "pr-favour-composition",
-        "term": "Favour composition",
-        "def": "Preferring has-a parts over deep inheritance, since inheritance can force a bad fit and multiple parents clash."
+        "id": "pr-favour-composition"
       }
     ],
     "revisits": [

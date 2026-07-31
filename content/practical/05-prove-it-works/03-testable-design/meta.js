@@ -24,14 +24,10 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-testability",
-        "term": "Testable design",
-        "def": "Shaping code so it is easy to check - injected dependencies, one job each, and no hidden state."
+        "id": "pr-testability"
       },
       {
-        "id": "pr-pure-function",
-        "term": "Pure and predictable",
-        "def": "Code that depends only on its inputs and keeps no hidden state, so the same call always gives the same result."
+        "id": "pr-pure-function"
       }
     ],
     "revisits": [

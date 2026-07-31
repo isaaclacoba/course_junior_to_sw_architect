@@ -45,5 +45,7 @@
   "task.6.summaryItems.3.text": "let each object answer for itself, so a new case is a new class.",
   "task.6.summaryItems.4.title": "Split a fat class - ",
   "task.6.summaryItems.4.text": "one job per class means one reason to change.",
-  "task.6.summaryClose": "That is the toolkit. Next, the SOLID principles name these moves and help you judge when each one is worth making."
+  "task.6.summaryClose": "That is the toolkit. Next, the SOLID principles name these moves and help you judge when each one is worth making.",
+  "concept.pr-refactoring.term": "Refactoring",
+  "concept.pr-refactoring.def": "Changing the shape of working code without changing what it does, in small safe steps."
 }

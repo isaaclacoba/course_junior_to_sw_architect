@@ -24,19 +24,13 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-unit-test",
-        "term": "Unit test",
-        "def": "Code that runs your code and checks the result, laid out as arrange, act, assert."
+        "id": "pr-unit-test"
       },
       {
-        "id": "pr-assertion",
-        "term": "Assertion",
-        "def": "A check that a real result matches what you expected, failing the test when it does not."
+        "id": "pr-assertion"
       },
       {
-        "id": "pr-expected-exception",
-        "term": "Expecting a failure",
-        "def": "Writing a test that passes only when the code throws, to prove it fails on purpose."
+        "id": "pr-expected-exception"
       }
     ],
     "revisits": [

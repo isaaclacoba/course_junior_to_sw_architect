@@ -1,0 +1,12 @@
+{
+  "concept.th-instruction.term": "Instruction",
+  "concept.th-instruction.def": "A single, tiny, exact action for the computer to carry out - like setting a value or adding two numbers.",
+  "concept.th-program.term": "Program",
+  "concept.th-program.def": "An ordered list of instructions; change the order and you change what it does.",
+  "concept.th-data.term": "Data",
+  "concept.th-data.def": "The values a program works on, held in memory.",
+  "concept.th-cpu.term": "CPU",
+  "concept.th-cpu.def": "The part of the computer that runs instructions, fetching and carrying out one at a time, billions of times a second.",
+  "concept.th-compiler.term": "Compiler",
+  "concept.th-compiler.def": "A tool that translates the code you write into the tiny instructions the CPU understands."
+}

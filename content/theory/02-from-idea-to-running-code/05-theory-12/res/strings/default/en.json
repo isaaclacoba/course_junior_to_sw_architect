@@ -1,0 +1,8 @@
+{
+  "concept.th-condition.term": "Condition",
+  "concept.th-condition.def": "A yes/no question the program asks, like temp > 10, that works out to true or false.",
+  "concept.th-branch.term": "Branch (if/else)",
+  "concept.th-branch.def": "Choosing between paths - run one block when a condition is true, another when it is false.",
+  "concept.th-loop.term": "Loop",
+  "concept.th-loop.def": "Repeating steps by jumping back to check a condition again, so you write them once instead of many times."
+}

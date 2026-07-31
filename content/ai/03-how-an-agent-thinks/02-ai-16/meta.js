@@ -24,19 +24,13 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "ai-planning",
-        "term": "Planning",
-        "def": "Breaking a goal too big for one move into an ordered list of small steps and working them one at a time."
+        "id": "ai-planning"
       },
       {
-        "id": "ai-task-decomposition",
-        "term": "Task decomposition",
-        "def": "Splitting a goal into smaller steps whose order captures what depends on what, so each step is small enough to actually do."
+        "id": "ai-task-decomposition"
       },
       {
-        "id": "ai-replanning",
-        "term": "Re-planning",
-        "def": "Changing the plan mid-run when a step gets blocked, rather than pushing on with a route that no longer works."
+        "id": "ai-replanning"
       }
     ],
     "revisits": [

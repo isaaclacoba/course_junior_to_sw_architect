@@ -27,5 +27,9 @@
   "task.4.summaryItems.1.text": "a single-purpose class has a single, simple test.",
   "task.4.summaryItems.2.title": "No hidden state - ",
   "task.4.summaryItems.2.text": "input in, output out is the easiest thing to trust.",
-  "task.4.summaryClose": "These habits have names. Next: Design for change - the SOLID principles that make them deliberate."
+  "task.4.summaryClose": "These habits have names. Next: Design for change - the SOLID principles that make them deliberate.",
+  "concept.pr-testability.term": "Testable design",
+  "concept.pr-testability.def": "Shaping code so it is easy to check - injected dependencies, one job each, and no hidden state.",
+  "concept.pr-pure-function.term": "Pure and predictable",
+  "concept.pr-pure-function.def": "Code that depends only on its inputs and keeps no hidden state, so the same call always gives the same result."
 }

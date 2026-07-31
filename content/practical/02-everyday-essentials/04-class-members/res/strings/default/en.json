@@ -39,5 +39,13 @@
   "task.5.summaryItems.2.text": "set once in the constructor and never again; a `Cat` keeps the name it was built with for life.",
   "task.5.summaryItems.3.title": "A static field - ",
   "task.5.summaryItems.3.text": "one copy shared by every instance; a `static` counter lets each new sheep add to the same total.",
-  "task.5.summaryClose": "The idea is portable: `const` and `readonly` say a value will not change, and `static` says something belongs to the type rather than to one object. Other languages spell these differently, but the three ideas are the same everywhere."
+  "task.5.summaryClose": "The idea is portable: `const` and `readonly` say a value will not change, and `static` says something belongs to the type rather than to one object. Other languages spell these differently, but the three ideas are the same everywhere.",
+  "concept.pr-static.term": "static",
+  "concept.pr-static.def": "Behaviour or data that belongs to the type itself rather than to any one object, so it is shared and needs no instance.",
+  "concept.pr-const.term": "const",
+  "concept.pr-const.def": "A named value fixed where you write it and never changed, so a bare number gets a clear name.",
+  "concept.pr-readonly.term": "readonly",
+  "concept.pr-readonly.def": "A field that can be set once - at its declaration or in the constructor - and never reassigned.",
+  "concept.pr-field.term": "Field",
+  "concept.pr-field.def": "A variable that belongs to an object and holds part of its state."
 }

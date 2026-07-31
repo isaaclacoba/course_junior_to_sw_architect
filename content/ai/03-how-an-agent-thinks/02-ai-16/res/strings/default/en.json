@@ -1,0 +1,8 @@
+{
+  "concept.ai-planning.term": "Planning",
+  "concept.ai-planning.def": "Breaking a goal too big for one move into an ordered list of small steps and working them one at a time.",
+  "concept.ai-task-decomposition.term": "Task decomposition",
+  "concept.ai-task-decomposition.def": "Splitting a goal into smaller steps whose order captures what depends on what, so each step is small enough to actually do.",
+  "concept.ai-replanning.term": "Re-planning",
+  "concept.ai-replanning.def": "Changing the plan mid-run when a step gets blocked, rather than pushing on with a route that no longer works."
+}

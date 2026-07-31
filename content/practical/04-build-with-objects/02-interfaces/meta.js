@@ -24,14 +24,10 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-interface",
-        "term": "Interface",
-        "def": "A named promise of what methods a type offers, without saying how they work."
+        "id": "pr-interface"
       },
       {
-        "id": "pr-program-to-interface",
-        "term": "Program to an interface",
-        "def": "Depending on the promise rather than a concrete type, so any type that keeps it can be used."
+        "id": "pr-program-to-interface"
       }
     ],
     "revisits": [

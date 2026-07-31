@@ -24,19 +24,13 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "th-condition",
-        "term": "Condition",
-        "def": "A yes/no question the program asks, like temp > 10, that works out to true or false."
+        "id": "th-condition"
       },
       {
-        "id": "th-branch",
-        "term": "Branch (if/else)",
-        "def": "Choosing between paths - run one block when a condition is true, another when it is false."
+        "id": "th-branch"
       },
       {
-        "id": "th-loop",
-        "term": "Loop",
-        "def": "Repeating steps by jumping back to check a condition again, so you write them once instead of many times."
+        "id": "th-loop"
       }
     ],
     "revisits": [

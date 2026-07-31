@@ -24,29 +24,19 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "th-address",
-        "term": "Address",
-        "def": "The number of a memory slot, which lets the program find that exact slot again."
+        "id": "th-address"
       },
       {
-        "id": "th-stack",
-        "term": "Stack",
-        "def": "The memory region for the values a function is using right now, where each call adds a frame on top that is removed automatically when the call ends."
+        "id": "th-stack"
       },
       {
-        "id": "th-heap",
-        "term": "Heap",
-        "def": "The memory region for objects that must outlive the call that made them, kept until nothing refers to them."
+        "id": "th-heap"
       },
       {
-        "id": "th-garbage-collector",
-        "term": "Garbage collector",
-        "def": "The part that reclaims heap memory once nothing points to an object any more."
+        "id": "th-garbage-collector"
       },
       {
-        "id": "th-volatile",
-        "term": "Volatile",
-        "def": "A property of RAM: it is fast to reach but wiped the moment power drops."
+        "id": "th-volatile"
       }
     ],
     "revisits": [

@@ -24,9 +24,7 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "ai-context",
-        "term": "Context",
-        "def": "Everything the model can read at this moment - the prompt, the conversation so far, and any facts you add - and the only thing it has to go on."
+        "id": "ai-context"
       }
     ],
     "revisits": [],

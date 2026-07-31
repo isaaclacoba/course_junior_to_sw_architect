@@ -24,24 +24,16 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "th-version-control",
-        "term": "Version control",
-        "def": "A tool that tracks every change to your code, so you never lose work and can see what changed and when."
+        "id": "th-version-control"
       },
       {
-        "id": "th-commit",
-        "term": "Commit",
-        "def": "A saved snapshot of your code at a moment worth keeping, with a short message describing the change."
+        "id": "th-commit"
       },
       {
-        "id": "th-history",
-        "term": "History",
-        "def": "The timeline of all commits - how the code grew, snapshot by snapshot."
+        "id": "th-history"
       },
       {
-        "id": "th-collaboration",
-        "term": "Collaboration",
-        "def": "Several people working on one project, each committing their own changes without overwriting each other."
+        "id": "th-collaboration"
       }
     ],
     "revisits": [],

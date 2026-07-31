@@ -52,5 +52,9 @@
   "task.8.summaryItems.4.text": "check a key exists before reading it, to avoid a failure.",
   "task.8.summaryItems.5.title": "Tally with a loop - ",
   "task.8.summaryItems.5.text": "count matches by hand; LINQ will shorten this next.",
-  "task.8.summaryClose": "Next in this track: the data shapes that fill these collections - properties, enums, structs and records."
+  "task.8.summaryClose": "Next in this track: the data shapes that fill these collections - properties, enums, structs and records.",
+  "concept.pr-list.term": "List",
+  "concept.pr-list.def": "A row of values that grows and shrinks - add items, index into it, and walk it - unlike a fixed-size array.",
+  "concept.pr-dictionary.term": "Dictionary",
+  "concept.pr-dictionary.def": "A store that maps keys to values, so you look an item up by its key instead of its position."
 }

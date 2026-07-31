@@ -24,14 +24,10 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-array",
-        "term": "Array",
-        "def": "A fixed-size, ordered row of values you reach by position (counting from 0) and measure with .Length."
+        "id": "pr-array"
       },
       {
-        "id": "pr-split",
-        "term": "Split",
-        "def": "Cutting text at a separator into a string array you can measure and walk, like \"a,b,c\" into three pieces."
+        "id": "pr-split"
       }
     ],
     "revisits": [

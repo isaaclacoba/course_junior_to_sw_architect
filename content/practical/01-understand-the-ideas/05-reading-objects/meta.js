@@ -24,24 +24,16 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-collaboration",
-        "term": "Object collaboration",
-        "def": "One object getting work done by asking another and acting on the answer."
+        "id": "pr-collaboration"
       },
       {
-        "id": "pr-delegation",
-        "term": "Delegation",
-        "def": "Forwarding a job to a held object instead of doing it yourself."
+        "id": "pr-delegation"
       },
       {
-        "id": "pr-single-responsibility",
-        "term": "One job",
-        "def": "A method or class doing exactly one thing, so it has a single reason to change."
+        "id": "pr-single-responsibility"
       },
       {
-        "id": "pr-constructor",
-        "term": "Constructor",
-        "def": "The special method that runs when an object is created, used to set up its starting state."
+        "id": "pr-constructor"
       }
     ],
     "revisits": [

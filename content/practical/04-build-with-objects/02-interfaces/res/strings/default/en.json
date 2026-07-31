@@ -42,5 +42,9 @@
   "task.6.summaryItems.3.text": "depend on the promise, so any keeper of it fits.",
   "task.6.summaryItems.4.title": "Open to new types - ",
   "task.6.summaryItems.4.text": "a brand-new class drops in without touching the caller.",
-  "task.6.summaryClose": "Next: Why many versions? - polymorphism."
+  "task.6.summaryClose": "Next: Why many versions? - polymorphism.",
+  "concept.pr-interface.term": "Interface",
+  "concept.pr-interface.def": "A named promise of what methods a type offers, without saying how they work.",
+  "concept.pr-program-to-interface.term": "Program to an interface",
+  "concept.pr-program-to-interface.def": "Depending on the promise rather than a concrete type, so any type that keeps it can be used."
 }

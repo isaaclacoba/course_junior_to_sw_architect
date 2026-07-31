@@ -45,5 +45,11 @@
   "task.7.summaryItems.3.text": "raise your own exception when something is invalid.",
   "task.7.summaryItems.4.title": "?? and ?. - ",
   "task.7.summaryItems.4.text": "supply a fallback for null, or access a member safely without crashing.",
-  "task.7.summaryClose": "Next in this track: generics - writing your own types that work with any kind of value, like the List<T> you have already used."
+  "task.7.summaryClose": "Next in this track: generics - writing your own types that work with any kind of value, like the List<T> you have already used.",
+  "concept.pr-exception-handling.term": "try / catch",
+  "concept.pr-exception-handling.def": "Keeping a program standing when something fails by catching the error instead of letting it stop everything.",
+  "concept.pr-finally.term": "finally",
+  "concept.pr-finally.def": "A block that always runs after a try, whether it succeeded or failed, to clean up.",
+  "concept.pr-throw.term": "throw",
+  "concept.pr-throw.def": "Raising your own error to signal that something is wrong and stop the current path."
 }

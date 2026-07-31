@@ -24,24 +24,16 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "th-file",
-        "term": "File",
-        "def": "A named bundle of bytes on storage, which you can find again by its name."
+        "id": "th-file"
       },
       {
-        "id": "th-folder",
-        "term": "Folder",
-        "def": "A named group of files, arranged in a tree you walk to reach a file."
+        "id": "th-folder"
       },
       {
-        "id": "th-permissions",
-        "term": "Permissions",
-        "def": "The rules the operating system checks before it lets a program open or change a file."
+        "id": "th-permissions"
       },
       {
-        "id": "th-device",
-        "term": "Device",
-        "def": "A piece of hardware - keyboard, screen, printer, network - that programs reach only by asking the operating system."
+        "id": "th-device"
       }
     ],
     "revisits": [

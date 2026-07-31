@@ -24,19 +24,13 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "th-value-type",
-        "term": "Value type",
-        "def": "A type whose variable holds the data itself, so copying it duplicates the value."
+        "id": "th-value-type"
       },
       {
-        "id": "th-reference-type",
-        "term": "Reference type",
-        "def": "A type whose variable holds the address of an object on the heap, so copying it duplicates only the address."
+        "id": "th-reference-type"
       },
       {
-        "id": "th-reference",
-        "term": "Reference",
-        "def": "A value that is a memory address - follow it to reach the real object."
+        "id": "th-reference"
       }
     ],
     "revisits": [

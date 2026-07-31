@@ -1,0 +1,8 @@
+{
+  "concept.th-bit.term": "Bit",
+  "concept.th-bit.def": "The smallest piece of information - a single value that is either 0 (off) or 1 (on).",
+  "concept.th-binary.term": "Binary",
+  "concept.th-binary.def": "Counting with only 0s and 1s; every number is a pattern of on and off bits.",
+  "concept.th-byte.term": "Byte",
+  "concept.th-byte.def": "A group of eight bits, enough for 256 different values - the unit memory and file sizes are measured in."
+}

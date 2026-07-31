@@ -41,5 +41,7 @@
   "task.6.summaryItems.3.text": "choose the implementation while the program runs.",
   "task.6.summaryItems.4.title": "Open to new behaviour - ",
   "task.6.summaryItems.4.text": "add a class; the loop never changes.",
-  "task.6.summaryClose": "Next: Inherit or compose?"
+  "task.6.summaryClose": "Next: Inherit or compose?",
+  "concept.pr-runtime-dispatch.term": "Runtime selection",
+  "concept.pr-runtime-dispatch.def": "The real object deciding at run time which version of a method runs, so you add a new type instead of another branch."
 }

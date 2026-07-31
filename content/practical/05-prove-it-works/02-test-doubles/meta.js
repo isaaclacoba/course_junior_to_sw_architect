@@ -24,19 +24,13 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-test-double",
-        "term": "Test double",
-        "def": "A stand-in you control that takes the place of a real dependency in a test, such as a clock or the network."
+        "id": "pr-test-double"
       },
       {
-        "id": "pr-stub",
-        "term": "Stub",
-        "def": "A test double that returns canned data you decide, so the code under test sees a known answer."
+        "id": "pr-stub"
       },
       {
-        "id": "pr-spy",
-        "term": "Spy",
-        "def": "A test double that records how it was called, so you can check the code used it correctly."
+        "id": "pr-spy"
       }
     ],
     "revisits": [

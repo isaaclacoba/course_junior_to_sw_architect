@@ -24,19 +24,13 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-null-coalescing",
-        "term": "Null-coalescing",
-        "def": "Supplying a fallback for an absent value with ?? (and filling a slot only when empty with ??=)."
+        "id": "pr-null-coalescing"
       },
       {
-        "id": "pr-null-conditional",
-        "term": "Null-conditional",
-        "def": "Reaching through an object that might be missing with ?., which stops at null instead of crashing."
+        "id": "pr-null-conditional"
       },
       {
-        "id": "pr-nullable-value-type",
-        "term": "Nullable value type",
-        "def": "A plain value like int or bool that opts in to being absent by adding ?, like int?, so it is either the value or null."
+        "id": "pr-nullable-value-type"
       }
     ],
     "revisits": [

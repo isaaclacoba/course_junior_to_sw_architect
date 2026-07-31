@@ -24,9 +24,7 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "th-type",
-        "term": "Type",
-        "def": "The kind of a value - number, text, true/false - which decides what you can do with it."
+        "id": "th-type"
       }
     ],
     "revisits": [

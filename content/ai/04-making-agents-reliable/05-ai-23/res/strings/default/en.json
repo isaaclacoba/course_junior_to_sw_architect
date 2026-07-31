@@ -1,0 +1,8 @@
+{
+  "concept.ai-trace.term": "Trace",
+  "concept.ai-trace.def": "The after-the-fact record of a run's messages and tool calls, read to find where it went wrong.",
+  "concept.ai-observability.term": "Observability",
+  "concept.ai-observability.def": "Being able to point at the exact step where a run went wrong in its record, so you can see what happened, not just that it failed.",
+  "concept.ai-evaluation.term": "Evaluation",
+  "concept.ai-evaluation.def": "Turning a past failure into an automatic pass/fail check you run every time, so the same bug does not sneak back in."
+}

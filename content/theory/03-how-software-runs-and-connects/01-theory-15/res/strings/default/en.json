@@ -1,0 +1,12 @@
+{
+  "concept.th-address.term": "Address",
+  "concept.th-address.def": "The number of a memory slot, which lets the program find that exact slot again.",
+  "concept.th-stack.term": "Stack",
+  "concept.th-stack.def": "The memory region for the values a function is using right now, where each call adds a frame on top that is removed automatically when the call ends.",
+  "concept.th-heap.term": "Heap",
+  "concept.th-heap.def": "The memory region for objects that must outlive the call that made them, kept until nothing refers to them.",
+  "concept.th-garbage-collector.term": "Garbage collector",
+  "concept.th-garbage-collector.def": "The part that reclaims heap memory once nothing points to an object any more.",
+  "concept.th-volatile.term": "Volatile",
+  "concept.th-volatile.def": "A property of RAM: it is fast to reach but wiped the moment power drops."
+}

@@ -24,9 +24,7 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-single-inheritance",
-        "term": "One base class only",
-        "def": "C# lets a class inherit from just one parent, so you combine several parts by holding them instead."
+        "id": "pr-single-inheritance"
       }
     ],
     "revisits": [

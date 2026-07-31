@@ -24,24 +24,16 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "th-ram",
-        "term": "RAM",
-        "def": "The computer's fast working memory, where a program and its data must be before the CPU can run them."
+        "id": "th-ram"
       },
       {
-        "id": "th-fetch-execute",
-        "term": "Fetch-execute loop",
-        "def": "The loop the CPU repeats forever: fetch the next instruction from memory, carry it out, repeat."
+        "id": "th-fetch-execute"
       },
       {
-        "id": "th-program-counter",
-        "term": "Program counter",
-        "def": "The CPU's bookmark - it remembers which instruction comes next."
+        "id": "th-program-counter"
       },
       {
-        "id": "th-jump",
-        "term": "Jump",
-        "def": "An instruction that changes the program counter to a different line instead of the next one, which is how loops and choices work."
+        "id": "th-jump"
       }
     ],
     "revisits": [

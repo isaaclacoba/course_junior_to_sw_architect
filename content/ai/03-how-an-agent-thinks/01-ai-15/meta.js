@@ -24,9 +24,7 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "ai-chain-of-thought",
-        "term": "Chain of thought",
-        "def": "Asking the model to write its reasoning out step by step before answering - the working is the computation, not decoration, because each token it writes lands back in the context it reads next."
+        "id": "ai-chain-of-thought"
       }
     ],
     "revisits": [],

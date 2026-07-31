@@ -1,0 +1,14 @@
+{
+  "concept.ai-retrieval.term": "Retrieval",
+  "concept.ai-retrieval.def": "Turning a question into a vector and finding the closest stored chunks to it.",
+  "concept.ai-chunk.term": "Chunk",
+  "concept.ai-chunk.def": "A small piece a document is split into so it can be stored, searched, and pulled into the context a few at a time.",
+  "concept.ai-embedding.term": "Embedding",
+  "concept.ai-embedding.def": "Turning a piece of text into a list of numbers that captures its meaning - done ahead of time for every stored chunk, and again for each incoming question.",
+  "concept.ai-vector.term": "Vector",
+  "concept.ai-vector.def": "The list of numbers an embedding produces - a point in space whose closeness to another vector reflects how close their meanings are.",
+  "concept.ai-similarity-search.term": "Similarity search",
+  "concept.ai-similarity-search.def": "Scoring stored chunks by how close their vectors sit to the question's vector, so matching is on meaning rather than exact words.",
+  "concept.ai-rag.term": "Retrieval-augmented generation (RAG)",
+  "concept.ai-rag.def": "The whole pattern of retrieving the relevant chunks, putting them into the context, and answering from them, instead of relying on the model's frozen training."
+}

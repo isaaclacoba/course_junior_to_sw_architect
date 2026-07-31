@@ -24,24 +24,16 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "th-bug",
-        "term": "Bug",
-        "def": "A mistake in the code - the computer did what you wrote, not what you meant."
+        "id": "th-bug"
       },
       {
-        "id": "th-syntax-error",
-        "term": "Syntax error",
-        "def": "Code that breaks the language's rules, which the compiler catches before the program runs."
+        "id": "th-syntax-error"
       },
       {
-        "id": "th-logic-error",
-        "term": "Logic error",
-        "def": "Valid code that runs but does the wrong thing, like using minus where you meant plus."
+        "id": "th-logic-error"
       },
       {
-        "id": "th-debugging",
-        "term": "Debugging",
-        "def": "Stepping through code line by line, watching the values, to find where it goes wrong."
+        "id": "th-debugging"
       }
     ],
     "revisits": [

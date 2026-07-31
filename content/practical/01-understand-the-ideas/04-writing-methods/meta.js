@@ -24,14 +24,10 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-method",
-        "term": "Method",
-        "def": "A named piece of behaviour you call to get an answer back, so a rule is written once and reused."
+        "id": "pr-method"
       },
       {
-        "id": "pr-parameter",
-        "term": "Parameter",
-        "def": "A value you hand a method when you call it, so the same method works for different inputs."
+        "id": "pr-parameter"
       }
     ],
     "revisits": [

@@ -24,14 +24,10 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "ai-system-message",
-        "term": "System message",
-        "def": "A hidden message placed before your turn that sets the model's role and rules - the simplest lever for steering how it answers."
+        "id": "ai-system-message"
       },
       {
-        "id": "ai-user-message",
-        "term": "User message",
-        "def": "The message you type - your actual question or request, saying what to answer rather than how."
+        "id": "ai-user-message"
       }
     ],
     "revisits": [],

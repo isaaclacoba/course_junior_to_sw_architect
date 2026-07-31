@@ -24,24 +24,16 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "th-statement",
-        "term": "Statement",
-        "def": "One complete instruction - a single step the program takes."
+        "id": "th-statement"
       },
       {
-        "id": "th-expression",
-        "term": "Expression",
-        "def": "A piece of code that produces a value, like 2 + 3 working out to 5."
+        "id": "th-expression"
       },
       {
-        "id": "th-assignment",
-        "term": "Assignment",
-        "def": "Writing a computed value into a variable, done with the = operator."
+        "id": "th-assignment"
       },
       {
-        "id": "th-operator",
-        "term": "Operator",
-        "def": "A symbol like + or = that combines or acts on values."
+        "id": "th-operator"
       }
     ],
     "revisits": [

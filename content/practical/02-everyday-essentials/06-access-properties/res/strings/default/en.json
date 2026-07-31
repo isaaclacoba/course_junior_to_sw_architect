@@ -37,5 +37,11 @@
   "task.5.summaryItems.2.text": "an expression-bodied property `public string Label => \"cat:\" + Name;` computes its value each time, storing nothing.",
   "task.5.summaryItems.3.title": "Set once at build time - ",
   "task.5.summaryItems.3.text": "`{ get; init; }` lets the constructor set the value, then locks it against any later change.",
-  "task.5.summaryClose": "The portable idea carries to most OO languages: a type picks what is `public` or `private`, and reaches its state through a controlled property instead of a raw exposed field. Whether to hide a value at all - and why - is the encapsulation lesson ahead."
+  "task.5.summaryClose": "The portable idea carries to most OO languages: a type picks what is `public` or `private`, and reaches its state through a controlled property instead of a raw exposed field. Whether to hide a value at all - and why - is the encapsulation lesson ahead.",
+  "concept.pr-access-modifier.term": "Access modifier",
+  "concept.pr-access-modifier.def": "A type deciding which of its parts the outside can see, marking them public or private.",
+  "concept.pr-property.term": "Property",
+  "concept.pr-property.def": "A controlled way to read and change state through a get and set, instead of exposing a raw field.",
+  "concept.pr-computed-property.term": "Computed property",
+  "concept.pr-computed-property.def": "A property that works its value out each time it is read, with =>, storing nothing of its own."
 }

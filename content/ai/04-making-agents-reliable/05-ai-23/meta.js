@@ -24,19 +24,13 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "ai-trace",
-        "term": "Trace",
-        "def": "The after-the-fact record of a run's messages and tool calls, read to find where it went wrong."
+        "id": "ai-trace"
       },
       {
-        "id": "ai-observability",
-        "term": "Observability",
-        "def": "Being able to point at the exact step where a run went wrong in its record, so you can see what happened, not just that it failed."
+        "id": "ai-observability"
       },
       {
-        "id": "ai-evaluation",
-        "term": "Evaluation",
-        "def": "Turning a past failure into an automatic pass/fail check you run every time, so the same bug does not sneak back in."
+        "id": "ai-evaluation"
       }
     ],
     "revisits": [

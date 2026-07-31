@@ -24,34 +24,22 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "ai-retrieval",
-        "term": "Retrieval",
-        "def": "Turning a question into a vector and finding the closest stored chunks to it."
+        "id": "ai-retrieval"
       },
       {
-        "id": "ai-chunk",
-        "term": "Chunk",
-        "def": "A small piece a document is split into so it can be stored, searched, and pulled into the context a few at a time."
+        "id": "ai-chunk"
       },
       {
-        "id": "ai-embedding",
-        "term": "Embedding",
-        "def": "Turning a piece of text into a list of numbers that captures its meaning - done ahead of time for every stored chunk, and again for each incoming question."
+        "id": "ai-embedding"
       },
       {
-        "id": "ai-vector",
-        "term": "Vector",
-        "def": "The list of numbers an embedding produces - a point in space whose closeness to another vector reflects how close their meanings are."
+        "id": "ai-vector"
       },
       {
-        "id": "ai-similarity-search",
-        "term": "Similarity search",
-        "def": "Scoring stored chunks by how close their vectors sit to the question's vector, so matching is on meaning rather than exact words."
+        "id": "ai-similarity-search"
       },
       {
-        "id": "ai-rag",
-        "term": "Retrieval-augmented generation (RAG)",
-        "def": "The whole pattern of retrieving the relevant chunks, putting them into the context, and answering from them, instead of relying on the model's frozen training."
+        "id": "ai-rag"
       }
     ],
     "revisits": [

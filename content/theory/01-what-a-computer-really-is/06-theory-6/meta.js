@@ -24,19 +24,13 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "th-encoding",
-        "term": "Encoding",
-        "def": "An agreed code that maps each thing to a number and back - it decides whether a number means a letter, a colour, or a sound."
+        "id": "th-encoding"
       },
       {
-        "id": "th-pixel",
-        "term": "Pixel",
-        "def": "One tiny coloured dot of an image, its colour stored as amounts of red, green and blue."
+        "id": "th-pixel"
       },
       {
-        "id": "th-sample",
-        "term": "Sample",
-        "def": "One measurement of a sound wave's height, taken thousands of times a second."
+        "id": "th-sample"
       }
     ],
     "revisits": [

@@ -24,9 +24,7 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-refactoring",
-        "term": "Refactoring",
-        "def": "Changing the shape of working code without changing what it does, in small safe steps."
+        "id": "pr-refactoring"
       }
     ],
     "revisits": [

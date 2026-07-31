@@ -1,0 +1,10 @@
+{
+  "concept.th-statement.term": "Statement",
+  "concept.th-statement.def": "One complete instruction - a single step the program takes.",
+  "concept.th-expression.term": "Expression",
+  "concept.th-expression.def": "A piece of code that produces a value, like 2 + 3 working out to 5.",
+  "concept.th-assignment.term": "Assignment",
+  "concept.th-assignment.def": "Writing a computed value into a variable, done with the = operator.",
+  "concept.th-operator.term": "Operator",
+  "concept.th-operator.def": "A symbol like + or = that combines or acts on values."
+}

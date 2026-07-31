@@ -34,5 +34,11 @@
   "task.5.summaryItems.2.text": "`==` `!=` `>` `<` `>=` `<=` ask a yes/no question and return a `bool`.",
   "task.5.summaryItems.3.title": "An object that answers - ",
   "task.5.summaryItems.3.text": "state plus a method that returns a `bool` about that state.",
-  "task.5.summaryClose": "Next: Control Flow - use these yes/no answers to decide what your program does."
+  "task.5.summaryClose": "Next: Control Flow - use these yes/no answers to decide what your program does.",
+  "concept.pr-arithmetic.term": "Arithmetic",
+  "concept.pr-arithmetic.def": "Computing a new value from existing ones with + - * /.",
+  "concept.pr-string-concatenation.term": "String concatenation",
+  "concept.pr-string-concatenation.def": "Joining pieces of text (and numbers turned to text) end to end with +.",
+  "concept.pr-comparison.term": "Comparison",
+  "concept.pr-comparison.def": "Asking a yes/no question with == != > < >= <= and getting back a bool."
 }

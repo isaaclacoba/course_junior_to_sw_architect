@@ -1,0 +1,4 @@
+{
+  "concept.th-type.term": "Type",
+  "concept.th-type.def": "The kind of a value - number, text, true/false - which decides what you can do with it."
+}

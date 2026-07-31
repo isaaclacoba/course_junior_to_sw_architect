@@ -24,9 +24,7 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-runtime-dispatch",
-        "term": "Runtime selection",
-        "def": "The real object deciding at run time which version of a method runs, so you add a new type instead of another branch."
+        "id": "pr-runtime-dispatch"
       }
     ],
     "revisits": [

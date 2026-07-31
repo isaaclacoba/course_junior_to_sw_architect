@@ -24,9 +24,7 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "ai-token",
-        "term": "Token",
-        "def": "A small chunk of text - roughly a word or a piece of one, punctuation included - and the unit a model actually reads, counts, and is billed by."
+        "id": "ai-token"
       }
     ],
     "revisits": [],

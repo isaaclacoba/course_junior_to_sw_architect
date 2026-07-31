@@ -27,5 +27,11 @@
   "task.5.concept": "record",
   "task.5.context": "A `record` is a data type that compares by value: two records with the same contents are equal. (A `class` compares by reference, so two separate objects are never equal even with identical data.) Define an `Animal` record and check two equal ones.",
   "task.5.goal.0": "Define `record Animal(string Name, int Legs);`.",
-  "task.5.goal.1": "Main makes two animals with the same Name and Legs and prints whether they are equal - which should be True."
+  "task.5.goal.1": "Main makes two animals with the same Name and Legs and prints whether they are equal - which should be True.",
+  "concept.pr-enum.term": "enum",
+  "concept.pr-enum.def": "A type that is one of a fixed set of named options, like a small labelled list of choices.",
+  "concept.pr-struct.term": "struct",
+  "concept.pr-struct.def": "A small data bundle that is copied whole when you assign or pass it, so two variables never share the same one.",
+  "concept.pr-record.term": "record",
+  "concept.pr-record.def": "A type meant to hold data, where two of them count as equal when their values match, not just when they are the same object."
 }

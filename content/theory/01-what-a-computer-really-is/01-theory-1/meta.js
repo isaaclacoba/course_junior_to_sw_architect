@@ -24,29 +24,19 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "th-instruction",
-        "term": "Instruction",
-        "def": "A single, tiny, exact action for the computer to carry out - like setting a value or adding two numbers."
+        "id": "th-instruction"
       },
       {
-        "id": "th-program",
-        "term": "Program",
-        "def": "An ordered list of instructions; change the order and you change what it does."
+        "id": "th-program"
       },
       {
-        "id": "th-data",
-        "term": "Data",
-        "def": "The values a program works on, held in memory."
+        "id": "th-data"
       },
       {
-        "id": "th-cpu",
-        "term": "CPU",
-        "def": "The part of the computer that runs instructions, fetching and carrying out one at a time, billions of times a second."
+        "id": "th-cpu"
       },
       {
-        "id": "th-compiler",
-        "term": "Compiler",
-        "def": "A tool that translates the code you write into the tiny instructions the CPU understands."
+        "id": "th-compiler"
       }
     ],
     "revisits": [],

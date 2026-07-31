@@ -24,19 +24,13 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "th-bit",
-        "term": "Bit",
-        "def": "The smallest piece of information - a single value that is either 0 (off) or 1 (on)."
+        "id": "th-bit"
       },
       {
-        "id": "th-binary",
-        "term": "Binary",
-        "def": "Counting with only 0s and 1s; every number is a pattern of on and off bits."
+        "id": "th-binary"
       },
       {
-        "id": "th-byte",
-        "term": "Byte",
-        "def": "A group of eight bits, enough for 256 different values - the unit memory and file sizes are measured in."
+        "id": "th-byte"
       }
     ],
     "revisits": [],

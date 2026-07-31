@@ -1,0 +1,8 @@
+{
+  "concept.th-value-type.term": "Value type",
+  "concept.th-value-type.def": "A type whose variable holds the data itself, so copying it duplicates the value.",
+  "concept.th-reference-type.term": "Reference type",
+  "concept.th-reference-type.def": "A type whose variable holds the address of an object on the heap, so copying it duplicates only the address.",
+  "concept.th-reference.term": "Reference",
+  "concept.th-reference.def": "A value that is a memory address - follow it to reach the real object."
+}

@@ -1,0 +1,4 @@
+{
+  "concept.ai-prompt.term": "Prompt",
+  "concept.ai-prompt.def": "The starting text you hand the model, which it simply continues - so changing the prompt changes everything that follows."
+}

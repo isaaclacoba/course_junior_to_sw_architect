@@ -2,43 +2,36 @@
   "hero.eyebrow": "Part one · Understand the ideas",
   "hero.title": "Reading Objects",
   "intro.0": "A gentle step up from single-token drills. Write a few small objects that work together - one asks another for what it needs, one job lives in one place, and a class uses what is handed to it. No new theory - just the habits the SOLID drills will lean on.",
-
   "task.1.title": "Two objects talk",
   "task.1.concept": "Objects collaborate",
   "task.1.context": "One object gets work done by [[concept:pr-collaboration|asking another and acting on the answer]]. Here a `Greeter` does not know the time itself - it asks a `Clock`, then picks a greeting. The pattern below asks a `Sensor`; do the same with the clock.",
   "task.1.goal.0": "Ask the `clock` for the hour, then return `\"Good morning\"` before 12, otherwise `\"Good afternoon\"`.",
   "task.1.goal.1": "This clock reads 9, so the output should be Good morning.",
-
   "task.2.title": "Ask another object for data",
   "task.2.concept": "Delegation",
   "task.2.context": "A `Cart` should not store prices - that is the `PriceList`'s knowledge. The cart [[concept:pr-delegation|asks for a price]] and multiplies by the quantity. Keep the price list that is handed to the cart, then ask it.\n\nThe pattern below asks a `Catalog`; do the same with the price list.",
   "task.2.goal.0": "Store the `prices` handed into the constructor, then return the item's price times `qty`.",
   "task.2.goal.1": "A book is 10 and qty is 3, so the output should be 30.",
-
   "task.3.title": "A method that does one thing",
   "task.3.concept": "One job per method",
   "task.3.context": "A clear method has [[concept:pr-single-responsibility|a single, obvious result]] you can name. `Area` exists to do one calculation - the two sides multiplied - and nothing else. The pattern below is one job for a box; do the same for the rectangle.",
   "task.3.goal.0": "Return the area of the rectangle - `width` times `height`.",
   "task.3.goal.1": "For 4 by 5 the output should be 20.",
-
   "task.4.title": "Give each job its own class",
   "task.4.concept": "Separate the jobs",
   "task.4.context": "`Checkout` was doing two jobs at once: the maths (price times quantity) and the wording (turning that number into text). Two jobs in one method means two reasons to change one place.\n\nMove the wording into `ReceiptFormatter`. `Checkout` keeps the maths and asks the formatter for the text. The pattern below splits a sale the same way.",
   "task.4.goal.0": "Give `ReceiptFormatter` a `Format(int total)` that returns `\"Total: \"` followed by the total.",
   "task.4.goal.1": "In `Pay`, build a formatter and ask it for the text. For 10 by 2 the output should be Total: 20.",
-
   "task.5.title": "Use what is handed in",
   "task.5.concept": "Receive, don't build",
   "task.5.context": "A class does not have to build its own tools. `Mailer` is given an `Outbox` through its constructor and uses that one - it never calls `new Outbox()` itself. A collaborator handed in from outside is easy to swap later.\n\nThe pattern below hands a `Printer` its `Ink`; do the same with the mailer and its outbox.",
   "task.5.goal.0": "Keep the `outbox` handed into the constructor, then send `\"hello \"` followed by `who` through it.",
   "task.5.goal.1": "For Sam the output should be sent: hello Sam.",
-
   "task.6.title": "Wire two objects and run",
   "task.6.concept": "Put it together",
   "task.6.context": "Everything in one place now: a `Worker` is handed a `ConsoleLog` and reports through it. Keep the log, then have `Report` write the status through the log it was given. Two small objects collaborating is the shape of most real code.\n\nThe pattern below wires a `Bell` to a `Speaker`; do the same with the worker and its log.",
   "task.6.goal.0": "Keep the `log` handed into the constructor, then write the `status` through it in `Report`.",
   "task.6.goal.1": "`Main` reports work done, so the output should be work done.",
-
   "task.7.title": "Reading objects recap",
   "task.7.concept": "Recap",
   "task.7.summaryIntro": "You read and wrote a few small objects working together. These are the habits the SOLID drills will lean on.",
@@ -52,5 +45,13 @@
   "task.7.summaryItems.3.text": "let a class take its collaborator through the constructor, so it is easy to swap later.",
   "task.7.summaryItems.4.title": "Wire and run - ",
   "task.7.summaryItems.4.text": "build the parts, hand them in, and let them talk - the shape of most real code.",
-  "task.7.summaryClose": "Next you will meet these ideas by name in the design track: single responsibility, and depending on what is handed in."
+  "task.7.summaryClose": "Next you will meet these ideas by name in the design track: single responsibility, and depending on what is handed in.",
+  "concept.pr-collaboration.term": "Object collaboration",
+  "concept.pr-collaboration.def": "One object getting work done by asking another and acting on the answer.",
+  "concept.pr-delegation.term": "Delegation",
+  "concept.pr-delegation.def": "Forwarding a job to a held object instead of doing it yourself.",
+  "concept.pr-single-responsibility.term": "One job",
+  "concept.pr-single-responsibility.def": "A method or class doing exactly one thing, so it has a single reason to change.",
+  "concept.pr-constructor.term": "Constructor",
+  "concept.pr-constructor.def": "The special method that runs when an object is created, used to set up its starting state."
 }

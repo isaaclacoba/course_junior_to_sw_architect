@@ -24,19 +24,13 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "ai-hallucination",
-        "term": "Hallucination",
-        "def": "A confident answer that is invented, because the model predicts plausible text rather than verified truth and fills any gap with something that reads right."
+        "id": "ai-hallucination"
       },
       {
-        "id": "ai-grounding",
-        "term": "Grounding",
-        "def": "Pulling the real source into the context and answering from it - citing it, and allowing \"I don't know\" - so the answer rests on a checkable fact instead of a guess."
+        "id": "ai-grounding"
       },
       {
-        "id": "ai-citation",
-        "term": "Citation",
-        "def": "Pointing at the exact source a grounded answer came from, so the claim can be traced back and checked."
+        "id": "ai-citation"
       }
     ],
     "revisits": [

@@ -34,5 +34,11 @@
   "task.5.summaryItems.2.text": "keep the check in one place and reuse it.",
   "task.5.summaryItems.3.title": "Expect it to fail - ",
   "task.5.summaryItems.3.text": "a thrown error can be the passing result.",
-  "task.5.summaryClose": "Next: test doubles - stand-ins you control, so a test is fast and repeatable."
+  "task.5.summaryClose": "Next: test doubles - stand-ins you control, so a test is fast and repeatable.",
+  "concept.pr-unit-test.term": "Unit test",
+  "concept.pr-unit-test.def": "Code that runs your code and checks the result, laid out as arrange, act, assert.",
+  "concept.pr-assertion.term": "Assertion",
+  "concept.pr-assertion.def": "A check that a real result matches what you expected, failing the test when it does not.",
+  "concept.pr-expected-exception.term": "Expecting a failure",
+  "concept.pr-expected-exception.def": "Writing a test that passes only when the code throws, to prove it fails on purpose."
 }

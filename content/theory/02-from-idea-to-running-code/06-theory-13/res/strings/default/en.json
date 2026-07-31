@@ -1,0 +1,10 @@
+{
+  "concept.th-function.term": "Function",
+  "concept.th-function.def": "A named bundle of steps you can call and reuse, with inputs and an output.",
+  "concept.th-parameter.term": "Parameter",
+  "concept.th-parameter.def": "A named input a function receives, which arrives as a local variable when the function is called.",
+  "concept.th-return-value.term": "Return value",
+  "concept.th-return-value.def": "The result a function hands back to whatever called it.",
+  "concept.th-local-variable.term": "Local variable",
+  "concept.th-local-variable.def": "A variable that exists only while its function is running."
+}

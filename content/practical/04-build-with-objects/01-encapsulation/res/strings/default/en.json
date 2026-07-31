@@ -41,5 +41,9 @@
   "task.6.summaryItems.3.text": "the one method that writes can reject nonsense.",
   "task.6.summaryItems.4.title": "One reason to change - ",
   "task.6.summaryItems.4.text": "fix a rule once inside the object and every caller follows.",
-  "task.6.summaryClose": "Next: Why abstract? - pulling logic behind an interface."
+  "task.6.summaryClose": "Next: Why abstract? - pulling logic behind an interface.",
+  "concept.pr-encapsulation.term": "Encapsulation",
+  "concept.pr-encapsulation.def": "Grouping related state with the behaviour that uses it and hiding the inside, so callers go through the object.",
+  "concept.pr-invariant.term": "Invariant",
+  "concept.pr-invariant.def": "A rule about an object's state that its own methods keep true, so nothing outside can break it."
 }

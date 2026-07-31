@@ -1,0 +1,12 @@
+{
+  "concept.ai-memory.term": "Memory",
+  "concept.ai-memory.def": "Saving what matters to a store outside the context window and recalling it when needed, so an assistant can remember across turns even though each model call starts fresh.",
+  "concept.ai-working-memory.term": "Working memory",
+  "concept.ai-working-memory.def": "The context the model reads right now - the scratchpad for the task in hand, and the first thing to vanish as the chat rolls on.",
+  "concept.ai-episodic-memory.term": "Episodic memory",
+  "concept.ai-episodic-memory.def": "The store of what happened before - past turns and events, each tied to a time, like the assistant's diary.",
+  "concept.ai-semantic-memory.term": "Semantic memory",
+  "concept.ai-semantic-memory.def": "The store of what stays true with no date attached - facts about the world or about you.",
+  "concept.ai-procedural-memory.term": "Procedural memory",
+  "concept.ai-procedural-memory.def": "The store of how to do things - the routines and steps the assistant follows to act."
+}

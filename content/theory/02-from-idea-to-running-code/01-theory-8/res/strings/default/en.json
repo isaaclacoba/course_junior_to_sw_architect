@@ -1,0 +1,10 @@
+{
+  "concept.th-machine-code.term": "Machine code",
+  "concept.th-machine-code.def": "The tiny numeric instructions a CPU runs directly - the only language it truly understands.",
+  "concept.th-programming-language.term": "Programming language",
+  "concept.th-programming-language.def": "Human-friendly words and rules for writing programs, which a tool then translates for the machine.",
+  "concept.th-high-level.term": "High-level language",
+  "concept.th-high-level.def": "A language close to human ideas rather than raw machine instructions, so one line stands for many CPU steps.",
+  "concept.th-syntax.term": "Syntax",
+  "concept.th-syntax.def": "The exact rules for how code must be written in a language."
+}

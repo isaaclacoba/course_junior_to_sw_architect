@@ -24,14 +24,10 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-string-interpolation",
-        "term": "String interpolation",
-        "def": "Dropping values straight into text with $\"...\", so {name} is replaced by that value."
+        "id": "pr-string-interpolation"
       },
       {
-        "id": "pr-string-methods",
-        "term": "String operations",
-        "def": "Reshaping, searching and transforming text - ToUpper, Contains, Replace - each returning new text and leaving the original unchanged."
+        "id": "pr-string-methods"
       }
     ],
     "revisits": [

@@ -24,24 +24,16 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "th-machine-code",
-        "term": "Machine code",
-        "def": "The tiny numeric instructions a CPU runs directly - the only language it truly understands."
+        "id": "th-machine-code"
       },
       {
-        "id": "th-programming-language",
-        "term": "Programming language",
-        "def": "Human-friendly words and rules for writing programs, which a tool then translates for the machine."
+        "id": "th-programming-language"
       },
       {
-        "id": "th-high-level",
-        "term": "High-level language",
-        "def": "A language close to human ideas rather than raw machine instructions, so one line stands for many CPU steps."
+        "id": "th-high-level"
       },
       {
-        "id": "th-syntax",
-        "term": "Syntax",
-        "def": "The exact rules for how code must be written in a language."
+        "id": "th-syntax"
       }
     ],
     "revisits": [

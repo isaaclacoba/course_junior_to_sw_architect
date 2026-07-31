@@ -34,5 +34,13 @@
   "task.5.summaryItems.2.text": "`(int)3.9` casts a `double` to `int` by truncating - it drops the fraction, it does not round.",
   "task.5.summaryItems.3.title": "Parse without crashing - ",
   "task.5.summaryItems.3.text": "`int.TryParse` returns a `bool` for whether the text was a number, instead of throwing when it is not.",
-  "task.5.summaryClose": "Reach for `TryParse` over `Parse` whenever the text might be wrong - the same double/string/int conversions carry over to every type you will meet next."
+  "task.5.summaryClose": "Reach for `TryParse` over `Parse` whenever the text might be wrong - the same double/string/int conversions carry over to every type you will meet next.",
+  "concept.pr-parse.term": "Parsing",
+  "concept.pr-parse.def": "Reading a value out of text - int.Parse(\"3\") turns the text into the number 3.",
+  "concept.pr-to-string.term": "ToString",
+  "concept.pr-to-string.def": "Turning a value into its text form, so a number can be joined into a label or code.",
+  "concept.pr-cast.term": "Cast and truncation",
+  "concept.pr-cast.def": "Converting a value to another type with (int) - casting a double to int drops the fraction rather than rounding.",
+  "concept.pr-try-parse.term": "TryParse",
+  "concept.pr-try-parse.def": "The safe parse: it returns a bool for success and writes the number through an out parameter instead of crashing on bad text."
 }

@@ -1,0 +1,12 @@
+{
+  "concept.th-library.term": "Library",
+  "concept.th-library.def": "Ready-made code someone else wrote and shared, which you call instead of writing it yourself.",
+  "concept.th-standard-library.term": "Standard library",
+  "concept.th-standard-library.def": "The big set of built-in tools every language ships with, ready the moment you start.",
+  "concept.th-package.term": "Package",
+  "concept.th-package.def": "A bundle of code someone published for others to reuse, fetched and added to your project.",
+  "concept.th-package-manager.term": "Package manager",
+  "concept.th-package-manager.def": "A tool that fetches the packages you ask for, installs the right versions, and pulls in their dependencies.",
+  "concept.th-dependency.term": "Dependency",
+  "concept.th-dependency.def": "A package your program relies on, which may rely on further packages of its own."
+}

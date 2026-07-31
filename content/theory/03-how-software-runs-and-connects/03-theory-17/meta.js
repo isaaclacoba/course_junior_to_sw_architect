@@ -24,29 +24,19 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "th-compile-time",
-        "term": "Compile time",
-        "def": "The phase before a program runs, when the compiler translates the source and checks the rules."
+        "id": "th-compile-time"
       },
       {
-        "id": "th-run-time",
-        "term": "Run time",
-        "def": "The phase when the built program actually executes, one instruction at a time."
+        "id": "th-run-time"
       },
       {
-        "id": "th-build-error",
-        "term": "Build error",
-        "def": "A rule-breaking mistake the compiler catches at compile time, before anything runs."
+        "id": "th-build-error"
       },
       {
-        "id": "th-runtime-platform",
-        "term": ".NET runtime",
-        "def": "A platform that finishes and runs a portable build on each machine, like .NET."
+        "id": "th-runtime-platform"
       },
       {
-        "id": "th-cross-compile",
-        "term": "Cross-compile",
-        "def": "Building on one machine but aiming the compiler at a different target - another CPU or operating system."
+        "id": "th-cross-compile"
       }
     ],
     "revisits": [

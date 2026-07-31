@@ -24,19 +24,13 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "pr-enum",
-        "term": "enum",
-        "def": "A type that is one of a fixed set of named options, like a small labelled list of choices."
+        "id": "pr-enum"
       },
       {
-        "id": "pr-struct",
-        "term": "struct",
-        "def": "A small data bundle that is copied whole when you assign or pass it, so two variables never share the same one."
+        "id": "pr-struct"
       },
       {
-        "id": "pr-record",
-        "term": "record",
-        "def": "A type meant to hold data, where two of them count as equal when their values match, not just when they are the same object."
+        "id": "pr-record"
       }
     ],
     "revisits": [
