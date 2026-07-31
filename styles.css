@@ -1281,7 +1281,8 @@ input.almost {
 /* One floating gear button, bottom-right, opening a right-anchored panel so it
    can never overflow the viewport edge. On resource lessons the standalone theme
    button is hidden and its options move into this popover. */
-.res-lesson #themeControl {
+.res-lesson #themeControl,
+.res-lesson .c-lang {
   display: none;
 }
 .c-settings {
