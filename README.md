@@ -42,18 +42,16 @@ Then open `http://localhost:8080`.
 - `reuse-without-regret.html`: Reuse Without Regret (read-to-understand inheritance/composition/polymorphism, guided code tour, runnable examples)
 - `level3-app/`: Capstone (live C# compile + run, published Blazor app)
 
-## Rebuilding the Capstone
+## Rebuilding the runner host
 
-The capstone host is the generic code-lab engine, pulled in as the `code-lab/`
-git submodule. The exercise (content + structural checks) lives in this repo under
-`level3-exercise/` and is injected into the host at build time via the
-`ExerciseSource` MSBuild property. `level3-app/` is the published (git-ignored)
-output. After changing the host or the exercise, regenerate it with:
+The in-browser C# runner is the generic code-lab engine, pulled in as the
+`code-lab/` git submodule. `level3-app/` is the published (git-ignored) output
+that every Run button loads over HTTP. After changing the host, regenerate it
+with:
 
 ```
 git submodule update --init --recursive
-dotnet publish code-lab/compiler-host -c Release \
-  -p:ExerciseSource="$PWD/level3-exercise" -o blazor-publish
+dotnet publish code-lab/compiler-host -c Release -o blazor-publish
 rm -rf level3-app && cp -r blazor-publish/wwwroot level3-app
 ```
 

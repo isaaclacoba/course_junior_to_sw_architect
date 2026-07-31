@@ -431,18 +431,6 @@
               "pill": "challenging",
               "time": "35 min",
               "kind": "lesson"
-            },
-            {
-              "id": "level3-app",
-              "track": "practical",
-              "part": "design-for-change",
-              "href": "level3-app/",
-              "title": "Capstone: SOLID in Practice",
-              "blurb": "Put it all together. Refactor a real, broken program one step at a time. Your C# compiles and runs, with friendly errors, optional hints, and a worked solution if you get stuck.",
-              "pill": "challenging",
-              "time": "60 min",
-              "kind": "final",
-              "final": true
             }
           ]
         }

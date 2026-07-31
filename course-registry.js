@@ -9,16 +9,16 @@
  *               one line; remove = delete one line.
  *
  * Per-lesson presentational data (title, blurb, pill, time, total, key) lives in
- * each lesson's content/.../meta.js. The one exception is the external capstone
- * (no meta.js): its card fields are inlined on its lessons[] line.
+ * each lesson's content/.../meta.js. An external card (kind "external", no
+ * meta.js) may instead inline its card fields on its lessons[] line.
  *
  * `id`   - stable identity: href minus a trailing ".html", or a trailing "/"
- *          dropped ("level3-app/" -> "level3-app").
- * `href` - the served path (content/.../ for a migrated lesson, level3-app/ for
- *          the capstone).
- * `kind` - "lesson", or "external" (the capstone app). The emitted card kind is
+ *          dropped ("foo/" -> "foo").
+ * `href` - the served path (content/.../ for a migrated lesson, or an external
+ *          app path).
+ * `kind` - "lesson", or "external" (an external app). The emitted card kind is
  *          "final" when `final` is set, else "lesson".
- * `path` - the content/... directory, or null for the external capstone.
+ * `path` - the content/... directory, or null for an external card.
  *
  * Frozen window.CourseRegistry = { tracks, lessons, byId }.
  */
@@ -87,7 +87,6 @@
     // ---- practical / design-for-change ----
     { track: "practical", part: "design-for-change", id: "refactor-moves", href: "content/practical/06-design-for-change/01-refactor-moves/", kind: "lesson", path: "content/practical/06-design-for-change/01-refactor-moves" },
     { track: "practical", part: "design-for-change", id: "the-solid-principles", href: "content/practical/06-design-for-change/02-the-solid-principles/", kind: "lesson", path: "content/practical/06-design-for-change/02-the-solid-principles" },
-    { track: "practical", part: "design-for-change", id: "level3-app", href: "level3-app/", kind: "external", path: null, title: "Capstone: SOLID in Practice", blurb: "Put it all together. Refactor a real, broken program one step at a time. Your C# compiles and runs, with friendly errors, optional hints, and a worked solution if you get stuck.", pill: "challenging", time: "60 min", final: true },
 
     // ---- theory / what-a-computer-really-is ----
     { track: "theory", part: "what-a-computer-really-is", id: "theory-1", href: "content/theory/01-what-a-computer-really-is/01-theory-1/", kind: "lesson", path: "content/theory/01-what-a-computer-really-is/01-theory-1" },

@@ -36,10 +36,9 @@ jobs:
           node tools/validate.mjs
           git diff --exit-code generated/ content/
 
-      - name: Publish capstone host (code-lab submodule + course exercise)
+      - name: Publish compiler host (code-lab submodule)
         run: >
           dotnet publish code-lab/compiler-host -c Release
-          -p:ExerciseSource=${{ github.workspace }}/level3-exercise
           -o blazor-publish
 
       - name: Assemble site
@@ -49,7 +48,6 @@ jobs:
             --exclude='/.git' \
             --exclude='/.github' \
             --exclude='/code-lab' \
-            --exclude='/level3-exercise' \
             --exclude='/level3-app' \
             --exclude='/blazor-publish' \
             --exclude='/_site' \
