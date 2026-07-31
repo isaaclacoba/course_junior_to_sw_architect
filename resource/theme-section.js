@@ -15,12 +15,12 @@
   }
 
   var LABEL_KEYS = {
-    clean: "settings.themeClean",
+    default: "settings.themeClean",
     critters: "settings.themeCritters",
     dark: "settings.themeDark"
   };
   var NOTE_KEYS = {
-    clean: "settings.themeCleanNote",
+    default: "settings.themeCleanNote",
     critters: "settings.themeCrittersNote",
     dark: "settings.themeDarkNote"
   };

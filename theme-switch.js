@@ -14,6 +14,25 @@
   var registry = window.Themes;
   if (!registry) return;
 
+  // Read a localized chrome string, falling back to the English default when
+  // the catalog is not loaded yet (this file runs in <head>, before the
+  // page's loader fetches window.ChromeText).
+  function t(key, fallback) {
+    var C = window.ChromeText;
+    return (C && C[key]) || fallback;
+  }
+
+  // Maps a theme id to its catalog keys. The clean look has id "default".
+  // Ids not listed here fall back to the registry's own label/note.
+  var LABEL_KEYS = {
+    default: { label: "settings.themeClean", note: "settings.themeCleanNote" },
+    critters: {
+      label: "settings.themeCritters",
+      note: "settings.themeCrittersNote"
+    },
+    dark: { label: "settings.themeDark", note: "settings.themeDarkNote" }
+  };
+
   function read() {
     try {
       return window.localStorage.getItem(KEY);
@@ -90,11 +109,26 @@
     render();
   }
 
+  // Re-apply the button label + aria and re-render the panel from the catalog.
+  // Hoisted so it can be referenced in CourseTheme before its definition below.
+  function relabel() {
+    if (root) {
+      var btn = root.querySelector(".c-theme-btn");
+      if (btn) {
+        btn.setAttribute("aria-label", t("settings.themeAria", "Choose a theme"));
+        var label = btn.querySelector("span");
+        if (label) label.textContent = t("settings.theme", "Theme");
+      }
+    }
+    render();
+  }
+
   window.CourseTheme = Object.freeze({
     set: select,
     get: function () {
       return current;
-    }
+    },
+    relabel: relabel
   });
 
   // Follow OS light/dark changes until the visitor makes an explicit choice.
@@ -157,14 +191,17 @@
       item.setAttribute("aria-checked", active ? "true" : "false");
       if (active) item.classList.add("is-active");
       item.appendChild(swatch(theme));
+      var keys = LABEL_KEYS[theme.id];
       var text = document.createElement("span");
       text.className = "c-theme-text";
       var name = document.createElement("span");
       name.className = "c-theme-name";
-      name.textContent = theme.label;
+      name.textContent = keys ? t(keys.label, theme.label) : theme.label;
       var note = document.createElement("span");
       note.className = "c-theme-note";
-      note.textContent = theme.note || "";
+      note.textContent = keys
+        ? t(keys.note, theme.note || "")
+        : theme.note || "";
       text.appendChild(name);
       text.appendChild(note);
       item.appendChild(text);
@@ -188,11 +225,11 @@
     btn.className = "c-theme-btn";
     btn.setAttribute("aria-haspopup", "true");
     btn.setAttribute("aria-expanded", "false");
-    btn.setAttribute("aria-label", "Choose a theme");
+    btn.setAttribute("aria-label", t("settings.themeAria", "Choose a theme"));
     btn.innerHTML =
       '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">' +
       '<path fill="currentColor" d="M12 3a9 9 0 0 0 0 18 2.4 2.4 0 0 0 2.4-2.4c0-.63-.25-1.2-.64-1.63a1 1 0 0 1 .74-1.67H16a5 5 0 0 0 5-5c0-3.87-4.03-7.3-9-7.3Zm-5 9a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6Zm2.6-3.6A1.3 1.3 0 1 1 9.6 5.8a1.3 1.3 0 0 1 0 2.6Zm4.8 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6Zm2.6 3.6a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6Z"/>' +
-      "</svg><span>Theme</span>";
+      "</svg><span>" + t("settings.theme", "Theme") + "</span>";
     btn.addEventListener("click", function (e) {
       e.stopPropagation();
       setOpen(!open);
@@ -217,9 +254,19 @@
     });
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", build);
-  } else {
+  function ready() {
     build();
+    // Defensive: if the catalog was already present at build time, this is a
+    // no-op re-render; otherwise course:localechange below picks it up.
+    relabel();
   }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", ready);
+  } else {
+    ready();
+  }
+
+  // The page loader dispatches this once the chrome catalog is loaded.
+  window.addEventListener("course:localechange", relabel);
 })();

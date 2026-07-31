@@ -109,7 +109,10 @@
   function loadChrome(lang) {
     return fetch(chromeBase + "/" + lang + ".json")
       .then(function (r) { return r.ok ? r.json() : {}; })
-      .then(function (map) { global.ChromeText = map || {}; })
+      .then(function (map) {
+        global.ChromeText = map || {};
+        try { global.dispatchEvent(new Event("course:localechange")); } catch (e) {}
+      })
       .catch(function () { global.ChromeText = global.ChromeText || {}; });
   }
 

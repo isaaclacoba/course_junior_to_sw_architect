@@ -258,6 +258,7 @@
       boot();
       paintStaticChrome();
       mountLangToggle();
+      try { window.dispatchEvent(new Event("course:localechange")); } catch (e) {}
     });
   } else {
     boot();
