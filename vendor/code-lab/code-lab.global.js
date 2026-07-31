@@ -27,6 +27,7 @@ var CodeLab = (() => {
     DEFAULT_LOOP_TOOLS: () => DEFAULT_LOOP_TOOLS,
     DEFAULT_MEMORY_STORES: () => DEFAULT_MEMORY_STORES,
     FULL_REGIONS: () => FULL_REGIONS,
+    IframeRunner: () => IframeRunner,
     MemoryViz: () => MemoryViz,
     MonacoEditor: () => MonacoEditor,
     PlainHighlighter: () => PlainHighlighter,
@@ -36,6 +37,7 @@ var CodeLab = (() => {
     RoslynIframeRunner: () => RoslynIframeRunner,
     TextareaEditor: () => TextareaEditor,
     Tour: () => Tour,
+    VizLab: () => VizLab,
     activeStores: () => activeStores,
     agentFanRows: () => agentFanRows,
     agentLoopActiveSet: () => agentLoopActiveSet,
@@ -75,7 +77,8 @@ var CodeLab = (() => {
     shuffleQuiz: () => shuffle,
     spansForLine: () => spansForLine,
     splitCodeLines: () => splitCodeLines,
-    toolRackRows: () => toolRackRows
+    toolRackRows: () => toolRackRows,
+    traceToSteps: () => traceToSteps
   });
 
   // src/highlighter.ts
@@ -473,8 +476,9 @@ ${result.runtimeError}`.trim(),
 
   // src/editors/monaco.ts
   var MonacoEditor = class {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     constructor(config = {}) {
+      // eslint-disable-line @typescript-eslint/no-explicit-any
+      this.pcDecorationIds = [];
       this.monaco = config.monaco;
       this.theme = config.theme ?? "vs-dark";
     }
@@ -534,6 +538,31 @@ ${result.runtimeError}`.trim(),
     }
     setReadOnly(readOnly) {
       if (this.editor) this.editor.updateOptions({ readOnly });
+    }
+    // Paint a whole-line highlight on the running source line and scroll it into
+    // view. `line` is 0-based (the trace model's pc); Monaco lines are 1-based.
+    highlightLine(line) {
+      if (!this.editor || !this.monaco) return;
+      if (line == null || line < 0) {
+        this.pcDecorationIds = this.editor.deltaDecorations(this.pcDecorationIds, []);
+        return;
+      }
+      const model = this.editor.getModel?.();
+      const maxLine = model ? model.getLineCount() : line + 1;
+      const ln = Math.min(Math.max(1, line + 1), maxLine);
+      this.pcDecorationIds = this.editor.deltaDecorations(this.pcDecorationIds, [
+        {
+          range: new this.monaco.Range(ln, 1, ln, 1),
+          options: {
+            isWholeLine: true,
+            className: "cl-vl-pcline",
+            linesDecorationsClassName: "cl-vl-pcline-gutter"
+          }
+        }
+      ]);
+      if (typeof this.editor.revealLineInCenterIfOutsideViewport === "function") {
+        this.editor.revealLineInCenterIfOutsideViewport(ln);
+      }
     }
     setMarkers(errors) {
       if (!this.editor || !this.monaco) return;
@@ -683,7 +712,8 @@ ${result.runtimeError}`.trim(),
   };
 
   // src/editors/load-monaco.ts
-  var DEFAULT_BASE = "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs";
+  var MONACO_VERSION = "0.52.2";
+  var DEFAULT_BASE = `https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/${MONACO_VERSION}/min/vs`;
   var pending;
   function loadMonaco(config = {}) {
     if (window.monaco) return Promise.resolve(window.monaco);
@@ -824,7 +854,7 @@ ${result.runtimeError}`.trim(),
 
   // src/runners/roslyn-iframe.ts
   var DEFAULT_WARM_PROGRAM = "public class __Warm { public static void Main() { } }";
-  var RoslynIframeRunner = class {
+  var IframeRunner = class {
     constructor(config) {
       this.iframe = null;
       this.readyPromise = null;
@@ -844,7 +874,8 @@ ${result.runtimeError}`.trim(),
     handleMessage(event) {
       if (event.origin !== window.location.origin) return;
       const data = event.data || {};
-      if (data.type === "coderunner:result" && data.id != null && this.pending.has(data.id)) {
+      const isResult = data.type === "coderunner:result" || data.type === "coderunner:traceResult";
+      if (isResult && data.id != null && this.pending.has(data.id)) {
         const entry = this.pending.get(data.id);
         clearTimeout(entry.timer);
         this.pending.delete(data.id);
@@ -897,12 +928,44 @@ ${result.runtimeError}`.trim(),
           this.pending.delete(id);
           reject(new Error("The code took too long to run."));
         }, this.runTimeout);
-        this.pending.set(id, { resolve, reject, timer });
+        this.pending.set(id, { resolve: (r) => resolve(r), reject, timer });
         this.iframe.contentWindow.postMessage(
           { type: "coderunner:run", id, code },
           window.location.origin
         );
       });
+    }
+    /** Trace a program: compile an instrumented copy in the host, run it, and
+     *  return the recorded ExecTrace (or the friendly errors if it did not
+     *  compile). Mirrors run() over the same iframe wire. */
+    async trace(code) {
+      await this.ensureFrame();
+      const id = ++this.seq;
+      const response = await new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          this.pending.delete(id);
+          reject(new Error("The code took too long to trace."));
+        }, this.runTimeout);
+        this.pending.set(id, { resolve: (r) => resolve(r), reject, timer });
+        this.iframe.contentWindow.postMessage(
+          { type: "coderunner:trace", id, code },
+          window.location.origin
+        );
+      });
+      let trace;
+      if (response.compiled && response.traceJson) {
+        try {
+          trace = JSON.parse(response.traceJson);
+        } catch {
+          trace = void 0;
+        }
+      }
+      return {
+        compiled: response.compiled,
+        trace,
+        runtimeError: response.runtimeError ?? null,
+        errors: response.errors || []
+      };
     }
     destroy() {
       window.removeEventListener("message", this.onMessage);
@@ -914,6 +977,7 @@ ${result.runtimeError}`.trim(),
       this.warmPromise = null;
     }
   };
+  var RoslynIframeRunner = IframeRunner;
 
   // src/core/memory-model.ts
   var ALL_REGIONS = ["code", "global", "stack", "heap"];
@@ -929,6 +993,12 @@ ${result.runtimeError}`.trim(),
   }
   function referencedIds(refs) {
     return new Set(refs.map((r) => r.to));
+  }
+  function slotKind(slot) {
+    if (slot.empty) return "empty";
+    if (slot.ref) return "ref";
+    if (slot.v === "null") return "null";
+    return "value";
   }
   function resolveModel(step, opts) {
     const stack = step.stack ?? [];
@@ -1053,6 +1123,97 @@ ${result.runtimeError}`.trim(),
       }, this.hooks.stepMs());
     }
   };
+
+  // src/core/exec-trace.ts
+  function deriveTrace(steps) {
+    const callDepth = new Array(steps.length);
+    const lineHeatmap = /* @__PURE__ */ new Map();
+    const changes = new Array(steps.length);
+    const valueHistory = [];
+    const historiesByName = /* @__PURE__ */ new Map();
+    const notables = [];
+    let previousSlots = /* @__PURE__ */ new Map();
+    let previousDepth = 0;
+    let previousHeapIds = /* @__PURE__ */ new Set();
+    for (let i = 0; i < steps.length; i += 1) {
+      const step = steps[i];
+      const stack = step.stack ?? [];
+      const depth = stack.length;
+      const currentSlots = slotsByName(activeFrame(stack));
+      callDepth[i] = depth;
+      if (step.pc != null && step.pc >= 0) {
+        lineHeatmap.set(step.pc, (lineHeatmap.get(step.pc) ?? 0) + 1);
+      }
+      changes[i] = deriveSlotChanges(currentSlots, previousSlots, i === 0);
+      extendValueHistory(i, currentSlots, valueHistory, historiesByName);
+      const heapIds = heapObjectIds(step);
+      if (i > 0) {
+        if (depth > previousDepth) notables.push({ step: i, kind: "call" });
+        else if (depth < previousDepth) notables.push({ step: i, kind: "return" });
+        if (heapSetGrew(previousHeapIds, heapIds)) notables.push({ step: i, kind: "new-object" });
+      }
+      previousSlots = currentSlots;
+      previousDepth = depth;
+      previousHeapIds = heapIds;
+    }
+    return { callDepth, lineHeatmap, changes, valueHistory, notables };
+  }
+  function activeFrame(stack) {
+    return stack[stack.length - 1];
+  }
+  function slotsByName(frame) {
+    const slots = /* @__PURE__ */ new Map();
+    for (const slot of frame?.vars ?? []) {
+      slots.set(slotName(slot), slot);
+    }
+    return slots;
+  }
+  function slotName(slot) {
+    return slot.k ?? slot.id;
+  }
+  function slotValue(slot) {
+    if (!slot || slot.empty || slot.v == null) return null;
+    return slot.v;
+  }
+  function deriveSlotChanges(currentSlots, previousSlots, firstStep) {
+    const result = [];
+    for (const [name, slot] of currentSlots) {
+      const previousSlot = firstStep ? void 0 : previousSlots.get(name);
+      const from = firstStep ? null : slotValue(previousSlot);
+      const to = slotValue(slot);
+      result.push({ name, kind: changeKind(previousSlot, from, to, firstStep), from, to });
+    }
+    return result;
+  }
+  function changeKind(previousSlot, from, to, firstStep) {
+    if (firstStep) return to === null ? "unchanged" : "created";
+    if (!previousSlot) return "created";
+    if (from === null && to !== null) return "created";
+    if (from !== null && from !== to) return "changed";
+    return "unchanged";
+  }
+  function extendValueHistory(stepIndex, currentSlots, valueHistory, historiesByName) {
+    for (const [name] of currentSlots) {
+      if (!historiesByName.has(name)) {
+        const history = { name, values: Array(stepIndex).fill(null) };
+        historiesByName.set(name, history);
+        valueHistory.push(history);
+      }
+    }
+    for (const history of valueHistory) {
+      history.values.push(slotValue(currentSlots.get(history.name)));
+    }
+  }
+  function heapObjectIds(step) {
+    const ids = /* @__PURE__ */ new Set();
+    for (const obj of step.heap ?? []) {
+      ids.add(obj.id);
+    }
+    return ids;
+  }
+  function heapSetGrew(previousIds, currentIds) {
+    return currentIds.size > previousIds.size;
+  }
 
   // src/dom/svg.ts
   var SVG_NS = "http://www.w3.org/2000/svg";
@@ -1545,6 +1706,7 @@ ${result.runtimeError}`.trim(),
   // src/dom/code-panel.ts
   var CodePanel = class {
     constructor(code) {
+      this.lastPc = -1;
       this.code = code;
       this.el = document.createElement("div");
       this.el.className = "cl-mv-region cl-mv-code cl-mv-codepanel";
@@ -1559,6 +1721,7 @@ ${result.runtimeError}`.trim(),
     sync(ctx) {
       const lines = ctx.model.code ?? this.code;
       const pc = ctx.model.pc ?? -1;
+      const pcChanged = pc !== this.lastPc;
       this.el.classList.toggle("dimmed", !ctx.model.codeLive);
       if (this.list.children.length !== lines.length) {
         this.list.innerHTML = "";
@@ -1569,15 +1732,340 @@ ${result.runtimeError}`.trim(),
         li.innerHTML = markedLineHtml(line, spansForLine(i, line, ctx.model.codeMark, pc));
         li.classList.toggle("pc", i === pc);
       });
+      this.lastPc = pc;
+      if (pc >= 0 && pcChanged) this.scrollPcIntoView(pc);
+    }
+    scrollPcIntoView(pc) {
+      const activeLi = this.list.children.item(pc);
+      if (!activeLi || typeof activeLi.scrollIntoView !== "function") return;
+      let reducedMotion = false;
+      try {
+        reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+      } catch {
+        reducedMotion = false;
+      }
+      try {
+        activeLi.scrollIntoView({
+          block: "nearest",
+          inline: "nearest",
+          behavior: reducedMotion ? "auto" : "smooth"
+        });
+      } catch {
+      }
     }
   };
+
+  // src/dom/vartable-view.ts
+  var VarTableView = class {
+    constructor() {
+      this.el = document.createElement("div");
+      this.el.className = "cl-mv-region cl-mv-vartable";
+      this.el.innerHTML = `<span class="cl-mv-tag">VARIABLES <span>\xB7 what each name holds now</span></span><div class="cl-mv-vt-rows" data-vtrows></div>`;
+      this.rows = this.el.querySelector("[data-vtrows]");
+    }
+    sync(ctx) {
+      this.render(activeFrame2(ctx.model.stack)?.vars ?? []);
+    }
+    // Rebuild only when the set of names changes; otherwise update rows in place so
+    // a later phase can animate the changed value without re-creating the node.
+    render(vars) {
+      const names = vars.map((v) => v.k ?? v.id).join("");
+      if (this.rows.dataset.names !== names) {
+        this.rows.dataset.names = names;
+        this.rows.innerHTML = vars.length ? vars.map(rowHtml).join("") : `<div class="cl-mv-vt-empty">no variables yet</div>`;
+        return;
+      }
+      const children = Array.from(this.rows.children);
+      vars.forEach((v, i) => updateRow(children[i], v));
+    }
+  };
+  function activeFrame2(stack) {
+    const frames = stack ?? [];
+    return frames[frames.length - 1];
+  }
+  function valueText(v) {
+    if (v.empty) return "unassigned";
+    return v.v ?? "";
+  }
+  function rowHtml(v) {
+    const cls = "cl-mv-vt-row" + (v.empty ? " is-empty" : "") + (v.hot ? " is-changed" : "");
+    return `<div class="${cls}"><span class="cl-mv-vt-name">${esc(v.k ?? v.id)}</span><span class="cl-mv-vt-val">${esc(valueText(v))}</span></div>`;
+  }
+  function updateRow(row, v) {
+    if (!row) return;
+    row.classList.toggle("is-empty", Boolean(v.empty));
+    row.classList.toggle("is-changed", Boolean(v.hot));
+    const val = row.querySelector(".cl-mv-vt-val");
+    if (val) val.textContent = valueText(v);
+  }
+  function esc(s) {
+    return s.replace(/[&<>]/g, (c) => c === "&" ? "&amp;" : c === "<" ? "&lt;" : "&gt;");
+  }
+
+  // src/dom/callstack-view.ts
+  var CallStackView = class {
+    constructor() {
+      this.cardsById = /* @__PURE__ */ new Map();
+      this.newFrameIds = /* @__PURE__ */ new Set();
+      this.el = document.createElement("div");
+      this.el.className = "cl-mv-region cl-mv-callstack";
+      this.el.innerHTML = `<span class="cl-mv-tag">CALL STACK <span>\xB7 the calls in progress</span></span><div class="cl-mv-cs-frames" data-csframes></div>`;
+      this.frames = this.el.querySelector("[data-csframes]");
+    }
+    sync(ctx) {
+      const frames = [...ctx.model.stack ?? []].reverse();
+      const liveIds = new Set(frames.map((frame) => frame.id));
+      this.newFrameIds = /* @__PURE__ */ new Set();
+      for (const [id, card] of this.cardsById) {
+        if (!liveIds.has(id)) {
+          card.remove();
+          this.cardsById.delete(id);
+        }
+      }
+      frames.forEach((frame, i) => {
+        let card = this.cardsById.get(frame.id);
+        if (!card) {
+          card = cardEl();
+          this.cardsById.set(frame.id, card);
+          this.newFrameIds.add(frame.id);
+        }
+        updateCard(card, frame, i === 0);
+        this.frames.appendChild(card);
+      });
+    }
+    animate(_model) {
+      if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+        this.newFrameIds = /* @__PURE__ */ new Set();
+        return Promise.resolve();
+      }
+      const cards = Array.from(this.newFrameIds).map((id) => this.cardsById.get(id)).filter((card) => Boolean(card));
+      this.newFrameIds = /* @__PURE__ */ new Set();
+      cards.forEach((card) => card.classList.add("enter"));
+      if (cards.length) {
+        const removeEnter = () => cards.forEach((card) => card.classList.remove("enter"));
+        if (typeof window.requestAnimationFrame === "function") window.requestAnimationFrame(removeEnter);
+        else window.setTimeout(removeEnter, 60);
+      }
+      return Promise.resolve();
+    }
+  };
+  function cardEl() {
+    const card = document.createElement("div");
+    card.className = "cl-mv-cs-frame";
+    card.innerHTML = `<div class="cl-mv-cs-title"></div><div class="cl-mv-cs-locals" data-cslocals></div>`;
+    return card;
+  }
+  function updateCard(card, frame, active) {
+    card.classList.toggle("is-active", active);
+    card.classList.toggle("is-caller", !active);
+    const title = card.querySelector(".cl-mv-cs-title");
+    if (title) title.textContent = frame.name ?? frame.id;
+    const locals = card.querySelector("[data-cslocals]");
+    if (locals) renderLocals(locals, frame.vars ?? []);
+  }
+  function renderLocals(rows, vars) {
+    const names = vars.map((v) => v.k ?? v.id).join("");
+    if (rows.dataset.names !== names) {
+      rows.dataset.names = names;
+      rows.innerHTML = vars.map(rowHtml2).join("");
+      return;
+    }
+    const children = Array.from(rows.children);
+    vars.forEach((v, i) => updateRow2(children[i], v));
+  }
+  function valueText2(v) {
+    if (v.empty) return "unassigned";
+    return v.v ?? "";
+  }
+  function rowHtml2(v) {
+    const cls = "cl-mv-cs-row" + (v.empty ? " is-empty" : "") + (v.hot ? " is-changed" : "");
+    return `<div class="${cls}"><span class="cl-mv-cs-name">${esc2(v.k ?? v.id)}</span><span class="cl-mv-cs-val">${esc2(valueText2(v))}</span></div>`;
+  }
+  function updateRow2(row, v) {
+    if (!row) return;
+    row.classList.toggle("is-empty", Boolean(v.empty));
+    row.classList.toggle("is-changed", Boolean(v.hot));
+    const val = row.querySelector(".cl-mv-cs-val");
+    if (val) val.textContent = valueText2(v);
+  }
+  function esc2(s) {
+    return s.replace(/[&<>]/g, (c) => c === "&" ? "&amp;" : c === "<" ? "&lt;" : "&gt;");
+  }
+
+  // src/dom/heapcards-view.ts
+  var HeapCardsView = class {
+    constructor(uid) {
+      // Arrow paths reused across renders (keyed "from->to"), so a reference that
+      // stays put keeps its path and only its geometry updates - no flicker.
+      this.refPaths = /* @__PURE__ */ new Map();
+      // Bumped each render; the redraw loop stops once its generation is stale.
+      this.arrowGen = 0;
+      this.markerId = `clmv-hp-ah-${uid}`;
+      this.el = document.createElement("div");
+      this.el.className = "cl-mv-region cl-mv-heapcards";
+      this.el.innerHTML = `<span class="cl-mv-tag">MEMORY <span>\xB7 the call stack on the left, objects on the heap on the right</span></span><div class="cl-mv-hp-statics" data-hpstatics></div><div class="cl-mv-hp-cols"><div class="cl-mv-hp-roots" data-hproots></div><div class="cl-mv-hp-objs" data-hpobjs></div><svg class="cl-mv-hp-arrows"><defs><marker id="${this.markerId}" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#2563eb" stroke="none" /></marker></defs></svg></div>`;
+      this.statics = this.el.querySelector("[data-hpstatics]");
+      this.roots = this.el.querySelector("[data-hproots]");
+      this.objs = this.el.querySelector("[data-hpobjs]");
+      this.arrows = this.el.querySelector(".cl-mv-hp-arrows");
+    }
+    sync(ctx) {
+      this.render(ctx.model);
+    }
+    onResize(model) {
+      this.drawArrows(model.refs);
+    }
+    render(model) {
+      this.statics.innerHTML = staticsHtml(model.globals ?? [], model.rodata ?? []);
+      const stack = model.stack ?? [];
+      const frames = stack.map((f, i) => ({ ...f, active: i === stack.length - 1 }));
+      reconcile(this.roots, frames, frameNode);
+      reconcile(this.objs, (model.heap ?? []).map((o) => ({ ...o })), objNode);
+      (model.heap ?? []).forEach((o) => {
+        const card = this.el.querySelector(`[data-obj="${o.id}"]`);
+        if (card) card.classList.toggle("glow", model.glow === o.id);
+      });
+      this.animateArrows(model.refs);
+    }
+    animateArrows(refs) {
+      const gen = ++this.arrowGen;
+      const start = now();
+      const tick = () => {
+        if (gen !== this.arrowGen) return;
+        this.drawArrows(refs);
+        if (now() - start < 340) raf(tick);
+      };
+      raf(tick);
+    }
+    drawArrows(refs) {
+      const box = this.arrows.getBoundingClientRect();
+      if (box.width === 0 && box.height === 0) return;
+      const wanted = /* @__PURE__ */ new Map();
+      (refs ?? []).forEach((r) => wanted.set(`${r.from}\u2192${r.to}`, r));
+      for (const [key, path] of this.refPaths) {
+        if (!wanted.has(key)) {
+          path.remove();
+          this.refPaths.delete(key);
+        }
+      }
+      wanted.forEach((r, key) => {
+        const from = this.el.querySelector(`[data-dot="${r.from}"]`);
+        const to = this.el.querySelector(`[data-obj="${r.to}"]`);
+        const existing = this.refPaths.get(key);
+        if (!from || !to) {
+          if (existing) {
+            existing.remove();
+            this.refPaths.delete(key);
+          }
+          return;
+        }
+        const a = from.getBoundingClientRect();
+        const b = to.getBoundingClientRect();
+        const x1 = a.left + a.width / 2 - box.left;
+        const y1 = a.top + a.height / 2 - box.top;
+        const x2 = b.left - box.left - 2;
+        const y2 = b.top + Math.min(b.height / 2, 18) - box.top;
+        const dx = Math.max(36, (x2 - x1) * 0.5);
+        const d = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+        if (existing) {
+          existing.setAttribute("d", d);
+        } else {
+          const path = svgEl("path", {
+            class: "cl-mv-hp-ref",
+            d,
+            "marker-end": `url(#${this.markerId})`
+          });
+          this.arrows.appendChild(path);
+          this.refPaths.set(key, path);
+          raf(() => path.classList.add("show"));
+        }
+      });
+    }
+  };
+  function raf(fn) {
+    if (typeof window.requestAnimationFrame === "function") window.requestAnimationFrame(fn);
+    else fn();
+  }
+  function now() {
+    return typeof performance !== "undefined" && typeof performance.now === "function" ? performance.now() : Date.now();
+  }
+  function staticsHtml(globals, rodata) {
+    return [
+      globals.length ? staticGroupHtml("STATICS", "values shared across the program", globals, true) : "",
+      rodata.length ? staticGroupHtml("CONSTANTS", "fixed at compile time", rodata, false) : ""
+    ].join("");
+  }
+  function staticGroupHtml(title, note, slots, allowHot) {
+    const rows = slots.map((slot) => staticRowHtml(slot, allowHot)).join("");
+    return `<div class="cl-mv-hp-sgroup"><span class="cl-mv-tag">${esc3(title)} <span>&#183; ${esc3(note)}</span></span><div class="cl-mv-hp-srows">${rows}</div></div>`;
+  }
+  function staticRowHtml(slot, allowHot) {
+    const hot = allowHot && slot.hot ? " is-changed" : "";
+    return `<div class="cl-mv-hp-row${hot}"><span class="cl-mv-hp-name">${esc3(slot.k)}</span><span class="cl-mv-hp-val">${esc3(slot.v)}</span></div>`;
+  }
+  function kindLabel(kind) {
+    switch (kind) {
+      case "entry":
+        return "entry point";
+      case "static":
+        return "static method";
+      case "method":
+        return "instance method";
+      case "ctor":
+        return "constructor";
+      default:
+        return "";
+    }
+  }
+  function frameNode(f, existing) {
+    const el = existing ?? document.createElement("div");
+    el.className = "cl-mv-hp-frame" + (f.active ? " is-active" : " is-caller");
+    const label = kindLabel(f.kind);
+    const badge = label ? `<span class="cl-mv-hp-fkind">${esc3(label)}</span>` : "";
+    const recv = f.recv ? `<div class="cl-mv-hp-frecv">on ${esc3(f.recv)}</div>` : "";
+    const paused = !f.active && typeof f.line === "number" ? `<div class="cl-mv-hp-fpaused">paused at line ${f.line}</div>` : "";
+    const rows = (f.vars ?? []).map(rowHtml3).join("");
+    el.innerHTML = `<div class="cl-mv-hp-fname"><span class="cl-mv-hp-fn">${esc3(f.name ?? f.id)}</span>${badge}</div>` + recv + paused + `<div class="cl-mv-hp-rows">${rows}</div>`;
+    return el;
+  }
+  function rowHtml3(v) {
+    const kind = slotKind(v);
+    const hot = v.hot ? " is-changed" : "";
+    const name = `<span class="cl-mv-hp-name">${esc3(v.k ?? v.id)}</span>`;
+    if (kind === "ref") {
+      return `<div class="cl-mv-hp-row is-ref${hot}">` + name + `<span class="cl-mv-hp-ref-cell"><span class="cl-mv-hp-arrowglyph">\u2192</span><span class="cl-mv-hp-dot" data-dot="${esc3(v.id)}"></span></span></div>`;
+    }
+    if (kind === "null") {
+      return `<div class="cl-mv-hp-row is-null${hot}">` + name + `<span class="cl-mv-hp-val">null</span></div>`;
+    }
+    const text = kind === "empty" ? "unassigned" : v.v ?? "";
+    const emptyCls = kind === "empty" ? " is-empty" : "";
+    return `<div class="cl-mv-hp-row${emptyCls}${hot}">` + name + `<span class="cl-mv-hp-val">${esc3(text)}</span></div>`;
+  }
+  function objNode(o, existing) {
+    const el = existing ?? document.createElement("div");
+    el.className = "cl-mv-hp-card" + (o.dim ? " is-dim" : "");
+    el.setAttribute("data-obj", o.id);
+    const no = typeof o.no === "number" ? ` <span class="cl-mv-hp-no">#${o.no}</span>` : "";
+    const fields = (o.fields ?? []).map((field) => {
+      const isHot = (o.hotFields ?? []).includes(field[0]);
+      return `<div class="cl-mv-hp-field${isHot ? " is-hot" : ""}"><span class="cl-mv-hp-fkey">${esc3(field[0])}</span><span class="cl-mv-hp-fval">${esc3(field[1])}</span></div>`;
+    }).join("");
+    el.innerHTML = `<div class="cl-mv-hp-type">${esc3(o.type)}${no}</div>` + fields;
+    return el;
+  }
+  function esc3(s) {
+    return s.replace(/[&<>]/g, (c) => c === "&" ? "&amp;" : c === "<" ? "&lt;" : "&gt;");
+  }
 
   // src/core/narration.ts
   function escapeHtml4(text) {
     return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
   function inline(text) {
-    return escapeHtml4(text).replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/\*([^*]+)\*/g, "<em>$1</em>");
+    return escapeHtml4(text).replace(/`([^`]+)`/g, "<code>$1</code>").split(/(<code>[\s\S]*?<\/code>)/).map(
+      (seg) => seg.startsWith("<code>") ? seg : seg.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/\*([^*]+)\*/g, "<em>$1</em>")
+    ).join("");
   }
   function renderNarration(text) {
     const lines = String(text ?? "").split("\n");
@@ -1622,6 +2110,33 @@ ${result.runtimeError}`.trim(),
       this.el.querySelector("[data-stepno]").textContent = stepLabel;
     }
   };
+
+  // src/dom/console-view.ts
+  var ConsoleView = class {
+    constructor() {
+      this.el = document.createElement("div");
+      this.el.className = "cl-mv-console";
+      this.el.innerHTML = `<div class="cl-mv-console-head">Console</div><pre class="cl-mv-console-body" data-out></pre>`;
+      this.body = this.el.querySelector("[data-out]");
+    }
+    sync(ctx) {
+      const output = ctx.model.output ?? "";
+      const printed = ctx.model.printed ?? "";
+      if (output === "") {
+        this.body.innerHTML = `<span class="cl-mv-console-idle">Nothing printed yet.</span>`;
+        return;
+      }
+      if (printed && output.endsWith(printed)) {
+        const head = output.slice(0, output.length - printed.length);
+        this.body.innerHTML = esc4(head) + `<span class="cl-mv-console-new">${esc4(printed)}</span>`;
+      } else {
+        this.body.textContent = output;
+      }
+    }
+  };
+  function esc4(s) {
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
 
   // src/core/agent-model.ts
   function clamp01(n) {
@@ -2302,15 +2817,23 @@ ${result.runtimeError}`.trim(),
     { sw: "#2563eb", label: "stack frame (a call)" },
     { sw: "#1f6f5f", label: "reference to an object", round: true }
   ];
+  var SVG_NS3 = "http://www.w3.org/2000/svg";
   function legendHtml(items) {
     return items.map((i) => {
       const round = i.round ? ";border-radius:50%" : "";
       return `<span><i class="cl-mv-sw" style="background:${i.sw}${round}"></i>${i.label}</span>`;
     }).join("");
   }
+  function stepPercent(step, total) {
+    return total <= 1 ? 0 : step / (total - 1) * 100;
+  }
+  function notableLabel(kind) {
+    return kind === "new-object" ? "new object" : kind;
+  }
   var VizControls = class {
-    constructor(actions, handlers, nextHref, legend) {
+    constructor(actions, handlers, nextHref, legend, nextLabel = "Next \u25B6") {
       this.nextHref = nextHref;
+      this.nextLabel = nextLabel;
       this.el = document.createElement("div");
       this.el.innerHTML = `
       <div class="cl-mv-controls">
@@ -2326,7 +2849,11 @@ ${result.runtimeError}`.trim(),
           <button data-size="1.2" title="Large text" aria-label="Large text">L</button>
         </div>
       </div>
-      <input type="range" class="cl-mv-scrub" data-scrub min="0" value="0" step="1" aria-label="Step" />
+      <div class="cl-mv-scrubwrap">
+        <svg class="cl-mv-depth" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <input type="range" class="cl-mv-scrub" data-scrub min="0" value="0" step="1" aria-label="Step" />
+        <div class="cl-mv-marks" data-marks></div>
+      </div>
       <div class="cl-mv-legend">${legendHtml(legend && legend.length ? legend : DEFAULT_LEGEND)}</div>`;
       const controls = this.el.querySelector(".cl-mv-controls");
       actions.forEach((a, i) => {
@@ -2364,12 +2891,43 @@ ${result.runtimeError}`.trim(),
         b.classList.toggle("is-active", Number(b.dataset.size) === scale);
       });
     }
+    setDerived(derived, onJump) {
+      const depth = this.el.querySelector(".cl-mv-depth");
+      const marks = this.el.querySelector("[data-marks]");
+      const total = derived.callDepth.length;
+      depth.textContent = "";
+      marks.textContent = "";
+      if (total > 0) {
+        const maxDepth = Math.max(1, ...derived.callDepth);
+        const points = derived.callDepth.map((d, i) => {
+          const x = stepPercent(i, total);
+          const y = 90 - Math.max(0, d) / maxDepth * 75;
+          return `${x},${y}`;
+        }).join(" ");
+        const line = document.createElementNS(SVG_NS3, "polyline");
+        line.setAttribute("points", points);
+        line.setAttribute("fill", "none");
+        line.setAttribute("vector-effect", "non-scaling-stroke");
+        depth.appendChild(line);
+      }
+      derived.notables.forEach((notable) => {
+        const label = notableLabel(notable.kind);
+        const mark = document.createElement("button");
+        mark.type = "button";
+        mark.className = `cl-mv-mark is-${notable.kind}`;
+        mark.style.left = `${stepPercent(notable.step, total)}%`;
+        mark.setAttribute("aria-label", `Jump to ${label} at step ${notable.step}`);
+        mark.title = `Jump to ${label} at step ${notable.step}`;
+        mark.addEventListener("click", () => onJump(notable.step));
+        marks.appendChild(mark);
+      });
+    }
     update(state) {
       this.el.querySelector('[data-c="prev"]').disabled = state.atStart;
       const next2 = this.el.querySelector('[data-c="next"]');
       if (state.atEnd && this.nextHref) {
         next2.disabled = false;
-        next2.textContent = "Next lesson \u25B6";
+        next2.textContent = this.nextLabel;
       } else {
         next2.disabled = state.atEnd;
         next2.textContent = "Next \u25B6";
@@ -2403,7 +2961,11 @@ ${result.runtimeError}`.trim(),
         board: (_spec, ctx) => new BoardView(ctx.uid),
         die: (spec, ctx) => new MemoryDieView(ctx.uid, ctx.code, ctx.labels, spec.regions ?? ctx.regions, ctx.zoomTab, ctx.regionTags),
         code: (_spec, ctx) => new CodePanel(ctx.code),
+        vartable: () => new VarTableView(),
+        callstack: () => new CallStackView(),
+        heapcards: (_spec, ctx) => new HeapCardsView(ctx.uid),
         narration: () => new NarrationView(),
+        console: () => new ConsoleView(),
         agent: (spec) => new AgentView(spec.fan),
         agentloop: () => new AgentLoopView(),
         memoryshelf: () => new MemoryShelfView(),
@@ -2411,7 +2973,7 @@ ${result.runtimeError}`.trim(),
         transcript: () => new TranscriptView(),
         retrieval: () => new RetrievalView(),
         planboard: () => new PlanboardView(),
-        controls: (_spec, ctx) => this.controls = new VizControls(ctx.actions, ctx.handlers, ctx.nextHref, ctx.legend)
+        controls: (_spec, ctx) => this.controls = new VizControls(ctx.actions, ctx.handlers, ctx.nextHref, ctx.legend, ctx.nextLabel)
       };
       this.onResize = () => {
         this.relayout();
@@ -2423,14 +2985,20 @@ ${result.runtimeError}`.trim(),
       const zoomTab = scene.zoomTab !== false;
       this.actions = config.actions ?? [];
       this.nextHref = config.nextHref;
+      this.nextLabel = config.nextLabel;
+      this.onXpChange = config.onXpChange;
+      this.onStep = config.onStep;
       this.progress = new ProgressStore(
-        config.xpKey ?? "course_global_xp",
+        config.xpKey ?? "codelab_xp",
         config.awardedKey,
         typeof config.awardAmount === "number" ? config.awardAmount : 20
       );
-      this.player = new VizPlayer(config.steps ?? [], {
-        deriveRefs: config.deriveRefs !== false,
-        autoDim: config.autoDim !== false
+      this.deriveRefs = config.deriveRefs !== false;
+      this.autoDim = config.autoDim !== false;
+      this.steps = config.steps ?? [];
+      this.player = new VizPlayer(this.steps, {
+        deriveRefs: this.deriveRefs,
+        autoDim: this.autoDim
       });
       this.autoplay = new Autoplay({
         stepMs: () => this.stepDurationMs(),
@@ -2439,7 +3007,7 @@ ${result.runtimeError}`.trim(),
         onStop: () => this.controls?.setPlaying(false)
       });
       this.scale = config.fontScale ?? 1;
-      const handlers = {
+      this.handlers = {
         onPrev: () => this.step(this.player.prev(), false),
         onNext: () => {
           if (this.player.state.atEnd && this.nextHref) {
@@ -2460,7 +3028,7 @@ ${result.runtimeError}`.trim(),
           this.step(this.player.goTo(i), false);
         }
       };
-      const buildCtx = {
+      this.buildCtx = {
         uid,
         code: config.code ?? [],
         labels: {
@@ -2470,12 +3038,13 @@ ${result.runtimeError}`.trim(),
         regions,
         zoomTab,
         actions: this.actions,
-        handlers,
+        handlers: this.handlers,
         regionTags: config.regionTags ?? {},
         legend: config.legend,
-        nextHref: this.nextHref
+        nextHref: this.nextHref,
+        nextLabel: this.nextLabel
       };
-      const layout = config.layout ?? {
+      this.layout = config.layout ?? {
         visual: [
           ...showBoard ? [{ type: "board" }] : [],
           { type: "die", regions }
@@ -2486,28 +3055,65 @@ ${result.runtimeError}`.trim(),
       this.root.className = "cl-mv";
       this.root.style.setProperty("--mv-fs", String(this.scale));
       if (config.background) this.root.style.setProperty("--mv-bg", config.background);
-      const visualCol = document.createElement("div");
-      visualCol.className = "cl-mv-visual";
-      (layout.visual ?? []).forEach((spec) => {
-        const p = this.makePanel(spec, buildCtx);
-        this.panels.push(p);
-        visualCol.appendChild(p.el);
-      });
-      const asideCol = document.createElement("div");
-      asideCol.className = "cl-mv-aside";
-      (layout.aside ?? []).forEach((spec) => {
-        const p = this.makePanel(spec, buildCtx);
-        this.panels.push(p);
-        asideCol.appendChild(p.el);
-      });
-      this.root.append(visualCol);
-      if (asideCol.childElementCount > 0) this.root.append(asideCol);
-      else this.root.classList.add("cl-mv-single");
+      this.visualCol = document.createElement("div");
+      this.visualCol.className = "cl-mv-visual";
+      this.asideCol = document.createElement("div");
+      this.asideCol.className = "cl-mv-aside";
+      this.root.append(this.visualCol);
+      this.buildPanels();
       host.appendChild(this.root);
-      if (this.controls) this.controls.setActiveSize(this.scale);
+      this.wireControls();
       window.addEventListener("resize", this.onResize);
       this.refreshXp();
       this.step(this.player.state, false);
+    }
+    /** Replace the scene without tearing the widget down: rebuild the player and
+     *  the panels in place, and (by default) hold the current step index so a
+     *  level toggle does not send the learner back to the first step. `code` and
+     *  `layout` override the code lines and the panel arrangement when given. */
+    setSteps(steps, opts = {}) {
+      if (steps.length === 0) throw new Error("MemoryViz.setSteps needs at least one step");
+      this.stop();
+      const keepIndex = opts.preserveIndex !== false ? this.player.state.index : 0;
+      this.steps = steps;
+      if (opts.code) this.buildCtx.code = opts.code;
+      if (opts.layout) this.layout = opts.layout;
+      this.player = new VizPlayer(steps, { deriveRefs: this.deriveRefs, autoDim: this.autoDim });
+      this.buildPanels();
+      this.wireControls();
+      this.step(this.player.goTo(Math.min(keepIndex, steps.length - 1)), false);
+    }
+    /** (Re)build the visual + aside panels from the current layout into the two
+     *  columns. Clears any prior panels first, so it is safe to call repeatedly. */
+    buildPanels() {
+      this.controls = null;
+      this.panels.length = 0;
+      this.visualCol.textContent = "";
+      this.asideCol.textContent = "";
+      (this.layout.visual ?? []).forEach((spec) => {
+        const p = this.makePanel(spec, this.buildCtx);
+        this.panels.push(p);
+        this.visualCol.appendChild(p.el);
+      });
+      (this.layout.aside ?? []).forEach((spec) => {
+        const p = this.makePanel(spec, this.buildCtx);
+        this.panels.push(p);
+        this.asideCol.appendChild(p.el);
+      });
+      if (this.asideCol.childElementCount > 0) {
+        if (!this.asideCol.parentNode) this.root.append(this.asideCol);
+        this.root.classList.remove("cl-mv-single");
+      } else {
+        if (this.asideCol.parentNode) this.asideCol.remove();
+        this.root.classList.add("cl-mv-single");
+      }
+    }
+    /** Feed the freshly built controls panel the font size and the derived-trace
+     *  scrubber for the current steps. No-op when the layout has no controls. */
+    wireControls() {
+      if (!this.controls) return;
+      this.controls.setActiveSize(this.scale);
+      this.controls.setDerived(deriveTrace(this.steps), this.handlers.onSeek);
     }
     static create(host, config) {
       return new _MemoryViz(host, config);
@@ -2527,16 +3133,16 @@ ${result.runtimeError}`.trim(),
     step(state, animate = true) {
       if (this.controls) this.controls.resetActions();
       this.syncAll(state);
+      this.onStep?.({ pc: state.model.pc ?? -1, index: state.index, total: state.total });
       if (animate) this.animateAll(state);
       if (state.atEnd) {
         this.stop();
         this.markComplete();
       }
     }
-    /** Refresh the course XP label in the hero, if the page has one. */
+    /** Report the current tracked XP to the host, which owns any XP label. */
     refreshXp() {
-      const label = document.getElementById("courseXpLabel");
-      if (label) label.textContent = `Course XP: ${this.progress.xp()}`;
+      this.onXpChange?.(this.progress.xp());
     }
     /** Mark the lesson complete and grant XP once, when the last step is reached. */
     markComplete() {
@@ -2588,6 +3194,442 @@ ${result.runtimeError}`.trim(),
     relayout() {
       const model = this.player.state.model;
       for (const p of this.panels) if (p.onResize) p.onResize(model);
+    }
+  };
+
+  // src/core/exec-tracer-model.ts
+  function traceToSteps(trace) {
+    const src = trace.code ?? [];
+    const steps = collapseCallEntries(trace.steps ?? []);
+    const out = [];
+    let prevValues = /* @__PURE__ */ new Map();
+    let prevFields = /* @__PURE__ */ new Map();
+    let prevGlobals = /* @__PURE__ */ new Map();
+    let prevStdout = "";
+    steps.forEach((ts, i) => {
+      const values = /* @__PURE__ */ new Map();
+      const stack = (ts.frames ?? []).map(
+        (f) => frameToFrame(f, values, prevValues, i === 0)
+      );
+      const fields = /* @__PURE__ */ new Map();
+      const heap = (ts.heap ?? []).map(
+        (o) => objectToObject(o, fields, prevFields, i === 0)
+      );
+      const globalValues = /* @__PURE__ */ new Map();
+      const globals = globalSlots(ts.statics ?? [], globalValues, prevGlobals, i === 0);
+      const rodata = globalSlots(ts.consts ?? []);
+      const stdout = ts.stdout ?? "";
+      const printed = stdout.startsWith(prevStdout) ? stdout.slice(prevStdout.length) : stdout;
+      const prevFrames = i > 0 ? steps[i - 1].frames ?? [] : [];
+      const prevHeapIds = new Set((i > 0 ? steps[i - 1].heap ?? [] : []).map((o) => o.id));
+      const step = {
+        narr: describeStep(prevFrames, ts, stack, heap, prevHeapIds, globals, printed, src),
+        pc: typeof ts.line === "number" && ts.line > 0 ? ts.line - 1 : -1,
+        codeLive: true,
+        stack,
+        heap
+      };
+      if (globals.length) step.globals = globals;
+      if (rodata.length) step.rodata = rodata;
+      if (printed) step.printed = printed;
+      if (stdout) step.output = stdout;
+      out.push(step);
+      prevValues = values;
+      prevFields = fields;
+      prevGlobals = globalValues;
+      prevStdout = stdout;
+    });
+    const lastTs = steps[steps.length - 1];
+    if (lastTs) {
+      const values = /* @__PURE__ */ new Map();
+      const stack = (lastTs.frames ?? []).map(
+        (f) => frameToFrame(f, values, prevValues, false)
+      );
+      const fields = /* @__PURE__ */ new Map();
+      const heap = (lastTs.heap ?? []).map(
+        (o) => objectToObject(o, fields, prevFields, false)
+      );
+      const globals = globalSlots(lastTs.statics ?? [], /* @__PURE__ */ new Map(), prevGlobals, false);
+      const rodata = globalSlots(lastTs.consts ?? []);
+      const printedLines = prevStdout ? prevStdout.replace(/\n+$/, "").split("\n").length : 0;
+      const terminal = {
+        narr: trace.truncated ? "Stopped early - there were too many steps to show the rest." : printedLines > 0 ? `The program finished. It printed ${printedLines} line${printedLines === 1 ? "" : "s"}.` : "The program finished without printing anything.",
+        pc: -1,
+        codeLive: true,
+        stack,
+        heap
+      };
+      if (globals.length) terminal.globals = globals;
+      if (rodata.length) terminal.rodata = rodata;
+      if (prevStdout) terminal.output = prevStdout;
+      out.push(terminal);
+    }
+    return out;
+  }
+  function collapseCallEntries(steps) {
+    const drop = /* @__PURE__ */ new Set();
+    for (let i = 1; i + 1 < steps.length; i++) {
+      const prev2 = steps[i - 1];
+      const cur = steps[i];
+      const next2 = steps[i + 1];
+      const curLen = cur.frames?.length ?? 0;
+      const pushed = curLen > (prev2.frames?.length ?? 0);
+      if (!pushed) continue;
+      if (cur.line !== next2.line) continue;
+      if (curLen !== (next2.frames?.length ?? 0)) continue;
+      const curTop = cur.frames?.[curLen - 1];
+      const nextTop = next2.frames?.[curLen - 1];
+      if (!curTop || !nextTop || curTop.id !== nextTop.id) continue;
+      drop.add(i);
+    }
+    return drop.size ? steps.filter((_, i) => !drop.has(i)) : steps;
+  }
+  function frameToFrame(f, values, prevValues, firstStep) {
+    const vars = (f.vars ?? []).map((v) => {
+      const id = `${f.id}:${v.name}`;
+      const display = v.ref != null ? refDisplay(v) : v.value ?? "";
+      values.set(id, display);
+      const hot = !firstStep && prevValues.get(id) !== display;
+      const slot = { id, k: v.name, hot };
+      if (v.ref != null) slot.ref = v.ref;
+      else slot.v = v.value ?? "";
+      return slot;
+    });
+    const frame = { id: f.id, name: f.name, vars };
+    if (f.kind) frame.kind = f.kind;
+    if (f.recv) frame.recv = f.recv;
+    if (typeof f.line === "number") frame.line = f.line;
+    return frame;
+  }
+  function objectToObject(o, fields, prevFields, firstStep) {
+    const hotFields = [];
+    (o.fields ?? []).forEach(([name, value]) => {
+      const key = `${o.id}:${name}`;
+      fields.set(key, value);
+      if (!firstStep && prevFields.get(key) !== value) hotFields.push(name);
+    });
+    const obj = { id: o.id, type: o.type, fields: o.fields ?? [], hotFields };
+    if (typeof o.no === "number") obj.no = o.no;
+    return obj;
+  }
+  function globalSlots(globals, values, prevValues, firstStep = false) {
+    return (globals ?? []).map((g) => {
+      const owner = g.owner ?? "";
+      const id = `${owner}.${g.name}`;
+      const v = g.value ?? "";
+      values?.set(id, v);
+      const slot = {
+        id,
+        k: owner ? `${owner}.${g.name}` : g.name,
+        v
+      };
+      if (prevValues && !firstStep && prevValues.get(id) !== v) slot.hot = true;
+      return slot;
+    });
+  }
+  function refDisplay(v) {
+    return v.ref != null ? `\u2192${v.ref}` : v.value ?? "null";
+  }
+  function describeStep(prevFrames, ts, stack, heap, prevHeapIds, globals, printed, src) {
+    const curFrames = ts.frames ?? [];
+    const prevLen = prevFrames.length;
+    const curLen = curFrames.length;
+    if (curLen > prevLen) return callNarration(curFrames[curLen - 1]);
+    if (curLen < prevLen) return returnNarration(prevFrames[prevLen - 1], curFrames[curLen - 1]);
+    if (printed) return printedNarration(printed);
+    const topFrame = stack[stack.length - 1];
+    const hotSlot = topFrame ? topFrame.vars.find((v) => v.hot) : void 0;
+    const created = heap.find((o) => !prevHeapIds.has(o.id));
+    if (created && hotSlot && hotSlot.ref != null && hotSlot.ref === created.id) {
+      return "Set `" + hotSlot.k + "` to a new `" + created.type + "`";
+    }
+    if (created) {
+      const label = typeof created.no === "number" ? `${created.type} #${created.no}` : created.type;
+      return typeof created.no === "number" ? "Created a `" + created.type + "` (`" + label + "`)" : "Created a `" + created.type + "`";
+    }
+    if (hotSlot) {
+      if (hotSlot.ref != null) return "Pointed `" + hotSlot.k + "` at `" + heapLabel(hotSlot.ref, heap) + "`";
+      return "Set `" + hotSlot.k + "` to `" + (hotSlot.v ?? "") + "`";
+    }
+    const g = globals.find((s) => s.hot);
+    if (g) return "Set `" + g.k + "` to `" + g.v + "`";
+    return runningNarration(ts.line, src);
+  }
+  function callNarration(top) {
+    if (top.kind === "entry") return "Entered `" + (top.name || "Main") + "`";
+    if (top.kind === "ctor") {
+      const type = (top.name || "").replace(/^new\s+/, "") || "object";
+      return "Called the `" + type + "` constructor";
+    }
+    const m = methodLabel(top);
+    return top.recv ? "Called `" + m + "` on `" + top.recv + "`" : "Called `" + m + "`";
+  }
+  function returnNarration(left, back) {
+    const backName = back ? back.name : null;
+    if (left.kind === "ctor") {
+      const type = (left.name || "").replace(/^new\s+/, "") || "object";
+      return backName ? "The `" + type + "` constructor finished - back in `" + backName + "`" : "The `" + type + "` constructor finished";
+    }
+    const m = methodLabel(left);
+    return backName ? "`" + m + "` returned to `" + backName + "`" : "`" + m + "` returned";
+  }
+  function methodLabel(f) {
+    const name = f.name || "?";
+    return name.endsWith(")") ? name : name + "()";
+  }
+  function printedNarration(printed) {
+    const parts = printed.replace(/\n+$/, "").split("\n");
+    const first = (parts[0] ?? "").replace(/`/g, "");
+    if (first === "") return "Printed a blank line";
+    const shown = parts.length > 1 ? first + " \u2026" : first;
+    return "Printed `" + shown + "`";
+  }
+  function heapLabel(ref, heap) {
+    const o = heap.find((h) => h.id === ref);
+    if (!o) return "an object";
+    return typeof o.no === "number" ? `${o.type} #${o.no}` : o.type;
+  }
+  function runningNarration(line, src) {
+    const text = typeof line === "number" && line > 0 ? (src[line - 1] ?? "").trim() : "";
+    if (!text) return "Running the program.";
+    return "Running this line: `" + text + "`";
+  }
+
+  // src/dom/error-panel.ts
+  var DEFAULT_LABELS2 = {
+    heading: "Let's fix this first",
+    note: "Often a single early mistake (a missing or extra { } ( ) ;) is enough to confuse the rest. Fix the top one first, then run again."
+  };
+  function locText(e) {
+    if (e.line == null) return "";
+    return e.column != null ? `Line ${e.line}, col ${e.column}` : `Line ${e.line}`;
+  }
+  function renderErrorPanel(errors, labels = {}) {
+    const l = { ...DEFAULT_LABELS2, ...labels };
+    const section = document.createElement("section");
+    section.className = "cl-errors";
+    const heading = document.createElement("h3");
+    heading.textContent = l.heading;
+    section.appendChild(heading);
+    const note = document.createElement("p");
+    note.className = "cl-errors-note";
+    note.textContent = l.note;
+    section.appendChild(note);
+    const list = document.createElement("ul");
+    for (const e of errors) {
+      const li = document.createElement("li");
+      const loc = locText(e);
+      if (loc) {
+        const locEl = document.createElement("span");
+        locEl.className = "cl-error-loc";
+        locEl.textContent = loc;
+        li.appendChild(locEl);
+      }
+      if (e.friendly) {
+        const friendly = document.createElement("span");
+        friendly.className = "cl-error-friendly";
+        friendly.textContent = e.friendly;
+        li.appendChild(friendly);
+      }
+      const raw = document.createElement("span");
+      raw.className = "cl-error-raw";
+      raw.textContent = e.raw;
+      li.appendChild(raw);
+      list.appendChild(li);
+    }
+    section.appendChild(list);
+    return section;
+  }
+  function showErrorPanel(host, errors, labels) {
+    host.textContent = "";
+    if (!errors || errors.length === 0) {
+      host.hidden = true;
+      return false;
+    }
+    host.appendChild(renderErrorPanel(errors, labels));
+    host.hidden = false;
+    return true;
+  }
+
+  // src/dom/viz-lab.ts
+  function normalizeErrors(errors) {
+    return errors.map((e) => ({
+      line: e.line ?? void 0,
+      friendly: e.friendly ?? void 0,
+      raw: e.raw
+    }));
+  }
+  var DEFAULT_STARTER = [
+    "class Program",
+    "{",
+    "    static void Main()",
+    "    {",
+    "        int a = 3;",
+    "        int b = 4;",
+    "        int total = a + b;",
+    "        System.Console.WriteLine(total);",
+    "    }",
+    "}"
+  ].join("\n");
+  var VizLab = class _VizLab {
+    constructor(host, config) {
+      this.editor = new MonacoEditor();
+      this.lastTrace = null;
+      this.lastSteps = null;
+      this.viz = null;
+      this.ready = false;
+      this.legend = config.legend;
+      this.language = config.language ?? "csharp";
+      this.runner = new IframeRunner({
+        url: config.runnerUrl,
+        readyTimeout: config.readyTimeout ?? 18e4
+      });
+      this.root = document.createElement("div");
+      this.root.className = "cl-vl";
+      const editorPane = document.createElement("div");
+      editorPane.className = "cl-vl-editor";
+      const toolbar = document.createElement("div");
+      toolbar.className = "cl-vl-toolbar";
+      this.vizBtn = document.createElement("button");
+      this.vizBtn.type = "button";
+      this.vizBtn.className = "cl-btn cl-primary cl-vl-run";
+      this.vizBtn.textContent = "Preparing compiler...";
+      this.vizBtn.disabled = true;
+      this.vizBtn.setAttribute("data-viz", "");
+      this.vizBtn.addEventListener("click", () => void this.visualize());
+      this.statusEl = document.createElement("span");
+      this.statusEl.className = "cl-vl-status";
+      this.statusEl.setAttribute("role", "status");
+      this.statusEl.setAttribute("aria-live", "polite");
+      toolbar.append(this.vizBtn, this.statusEl);
+      this.editorHost = document.createElement("div");
+      this.editorHost.className = "cl-vl-monaco";
+      editorPane.append(toolbar, this.editorHost);
+      this.stage = document.createElement("div");
+      this.stage.className = "cl-vl-stage";
+      this.showHint("Write a small program, then press Visualize to watch it run.");
+      this.root.append(editorPane, this.stage);
+      host.appendChild(this.root);
+      void this.boot(config.starter ?? DEFAULT_STARTER);
+    }
+    static create(host, config) {
+      return new _VizLab(host, config);
+    }
+    async boot(starter) {
+      await loadMonaco();
+      await this.editor.mount(this.editorHost, {
+        value: starter,
+        language: this.language,
+        readOnly: false,
+        autoHeight: { minHeight: 220, maxHeight: 640 }
+      });
+      try {
+        await this.runner.warm();
+      } catch {
+      } finally {
+        this.ready = true;
+        this.vizBtn.disabled = false;
+        this.vizBtn.textContent = "Visualize";
+      }
+    }
+    async visualize() {
+      if (!this.ready) return;
+      const code = this.editor.getValue();
+      this.vizBtn.disabled = true;
+      this.vizBtn.textContent = "Tracing...";
+      this.setStatus("");
+      try {
+        const outcome = await this.runner.trace(code);
+        if (!outcome.compiled) {
+          const errors = normalizeErrors(outcome.errors);
+          this.showErrors(errors);
+          this.setStatus("Did not compile.");
+          if (this.editor.setMarkers) this.editor.setMarkers(errors);
+          return;
+        }
+        if (this.editor.setMarkers) this.editor.setMarkers([]);
+        if (!outcome.trace || outcome.trace.steps.length === 0) {
+          this.showHint("That program produced no steps to show. Add a statement or two inside Main.");
+          this.setStatus("Nothing to trace.");
+          return;
+        }
+        this.lastTrace = outcome.trace;
+        this.lastSteps = traceToSteps(outcome.trace);
+        this.render();
+        const n = Math.max(0, this.lastSteps.length - 1);
+        let msg = `Traced ${n} step${n === 1 ? "" : "s"}.`;
+        if (outcome.trace.truncated) msg += " Stopped early - the program ran too long.";
+        if (outcome.runtimeError) msg += ` It threw: ${outcome.runtimeError}`;
+        this.setStatus(msg);
+      } catch (err) {
+        this.showHint("The tracer took too long or could not load. Try again.");
+        this.setStatus(String(err.message || err));
+      } finally {
+        this.vizBtn.disabled = false;
+        this.vizBtn.textContent = "Visualize";
+      }
+    }
+    /** The one layout: the memory view (call stack + heap objects) in the wide
+     *  column, then narration, the console output, and the transport controls in
+     *  the reading rail. The console sits right under the narration so "this line
+     *  runs" and "this is what it printed" read together. */
+    memoryLayout() {
+      return {
+        visual: [{ type: "heapcards" }],
+        aside: [{ type: "narration" }, { type: "console" }, { type: "controls" }]
+      };
+    }
+    render() {
+      if (!this.lastTrace || !this.lastSteps) return;
+      const layout = this.memoryLayout();
+      if (this.viz) {
+        this.viz.setSteps(this.lastSteps, {
+          code: this.lastTrace.code,
+          layout,
+          preserveIndex: false
+        });
+        return;
+      }
+      this.stage.textContent = "";
+      this.viz = MemoryViz.create(this.stage, {
+        code: this.lastTrace.code,
+        steps: this.lastSteps,
+        layout,
+        legend: this.legend,
+        deriveRefs: true,
+        autoDim: true,
+        onStep: (info) => this.editor.highlightLine?.(info.pc)
+      });
+    }
+    showHint(text) {
+      this.editor.highlightLine?.(null);
+      this.teardownViz();
+      this.stage.textContent = "";
+      const hint = document.createElement("p");
+      hint.className = "cl-vl-hint";
+      hint.textContent = text;
+      this.stage.appendChild(hint);
+    }
+    showErrors(errors) {
+      this.editor.highlightLine?.(null);
+      this.teardownViz();
+      this.stage.textContent = "";
+      this.stage.appendChild(renderErrorPanel(errors));
+    }
+    teardownViz() {
+      this.viz?.destroy();
+      this.viz = null;
+      this.lastTrace = null;
+      this.lastSteps = null;
+    }
+    setStatus(text) {
+      this.statusEl.textContent = text;
+    }
+    destroy() {
+      this.teardownViz();
+      this.editor.destroy();
+      this.runner.destroy();
+      this.root.remove();
     }
   };
 
@@ -2668,26 +3710,27 @@ ${result.runtimeError}`.trim(),
     return tpl.replace(/\{(\w+)\}/g, (_m, k) => k in vars ? String(vars[k]) : `{${k}}`);
   }
   var CONCEPT_PROGRESS_KEY = "course_concept_progress";
-  function localStore(xpKey, awardedKey) {
+  function localStore(xpKey, awardedKey, kv = globalThis.localStorage) {
     const read = () => {
       try {
-        return JSON.parse(localStorage.getItem(awardedKey) || "{}");
+        return JSON.parse(kv.getItem(awardedKey) || "{}");
       } catch {
         return {};
       }
     };
+    const xp = () => parseInt(kv.getItem(xpKey) || "0", 10);
     return {
       hasPassed: () => Boolean(read().passed),
-      markPassed: () => localStorage.setItem(awardedKey, JSON.stringify({ passed: true })),
-      getXP: () => parseInt(localStorage.getItem(xpKey) || "0", 10),
-      addXP: (amount) => localStorage.setItem(xpKey, String(parseInt(localStorage.getItem(xpKey) || "0", 10) + amount)),
+      markPassed: () => kv.setItem(awardedKey, JSON.stringify({ passed: true })),
+      getXP: xp,
+      addXP: (amount) => kv.setItem(xpKey, String(xp() + amount)),
       saveConceptResults: (results) => {
         try {
-          const prev2 = JSON.parse(localStorage.getItem(CONCEPT_PROGRESS_KEY) || "{}");
+          const prev2 = JSON.parse(kv.getItem(CONCEPT_PROGRESS_KEY) || "{}");
           for (const [id, passed] of Object.entries(results)) {
             if (passed) prev2[id] = true;
           }
-          localStorage.setItem(CONCEPT_PROGRESS_KEY, JSON.stringify(prev2));
+          kv.setItem(CONCEPT_PROGRESS_KEY, JSON.stringify(prev2));
         } catch {
         }
       }
@@ -2850,68 +3893,13 @@ ${result.runtimeError}`.trim(),
       this.els.progress.textContent = fill(this.labels.progressScored, { score, total });
       this.els.result.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
-    /** Best-effort refresh of the course's shared XP label, if the page has one. */
+    /** Report the current XP to the host, which owns any XP label. */
     refreshXpLabel() {
+      this.cfg.onXpChange?.(this.store.getXP());
       const label = document.getElementById("courseXpLabel");
       if (label) label.textContent = fill(this.labels.courseXp, { xp: this.store.getXP() });
     }
   };
-
-  // src/dom/error-panel.ts
-  var DEFAULT_LABELS2 = {
-    heading: "Let's fix this first",
-    note: "Often a single early mistake (a missing or extra { } ( ) ;) is enough to confuse the rest. Fix the top one first, then run again."
-  };
-  function locText(e) {
-    if (e.line == null) return "";
-    return e.column != null ? `Line ${e.line}, col ${e.column}` : `Line ${e.line}`;
-  }
-  function renderErrorPanel(errors, labels = {}) {
-    const l = { ...DEFAULT_LABELS2, ...labels };
-    const section = document.createElement("section");
-    section.className = "cl-errors";
-    const heading = document.createElement("h3");
-    heading.textContent = l.heading;
-    section.appendChild(heading);
-    const note = document.createElement("p");
-    note.className = "cl-errors-note";
-    note.textContent = l.note;
-    section.appendChild(note);
-    const list = document.createElement("ul");
-    for (const e of errors) {
-      const li = document.createElement("li");
-      const loc = locText(e);
-      if (loc) {
-        const locEl = document.createElement("span");
-        locEl.className = "cl-error-loc";
-        locEl.textContent = loc;
-        li.appendChild(locEl);
-      }
-      if (e.friendly) {
-        const friendly = document.createElement("span");
-        friendly.className = "cl-error-friendly";
-        friendly.textContent = e.friendly;
-        li.appendChild(friendly);
-      }
-      const raw = document.createElement("span");
-      raw.className = "cl-error-raw";
-      raw.textContent = e.raw;
-      li.appendChild(raw);
-      list.appendChild(li);
-    }
-    section.appendChild(list);
-    return section;
-  }
-  function showErrorPanel(host, errors, labels) {
-    host.textContent = "";
-    if (!errors || errors.length === 0) {
-      host.hidden = true;
-      return false;
-    }
-    host.appendChild(renderErrorPanel(errors, labels));
-    host.hidden = false;
-    return true;
-  }
   return __toCommonJS(src_exports);
 })();
 //# sourceMappingURL=code-lab.global.js.map
