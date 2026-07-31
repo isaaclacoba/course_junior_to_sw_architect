@@ -18,6 +18,12 @@ grows into a procedure, promote it to a skill and leave a pointer here.
   a uniqueness guard (`assert s.count(old) == 1`), or a `cat > file <<'EOF'`
   full-file write with the delimiter quoted so the shell does not expand the body.
   Small, quick files are fine with the normal tools.
+- **A `str_replace`/`multi_replace` whose `oldString` spans more lines than the
+  `newString` reproduces silently deletes the surplus.** To change one token on a
+  line, keep `oldString`/`newString` line-balanced; do not drag trailing lines (a
+  `return;`, a closing brace) into `oldString` unless you reproduce them. Then
+  `node --check` and eyeball the diff right after the edit - this repaired a run()
+  block that lost its `return;` from exactly this mistake.
 
 ## Course structure
 
@@ -33,6 +39,12 @@ grows into a procedure, promote it to a skill and leave a pointer here.
   number plus a duplicate-id row; and `--from --move` throws in `detectArchetype`
   for a bespoke page that loads no standard engine. To rebuild a flat lesson the
   standard way, delete its registry line (and the flat files) first, then `--new`.
+- **A root-relative default asset URL in a shared engine 404s on a migrated lesson.**
+  Migrated lessons live four dirs deep (`content/<track>/<part>/<lesson>/`), so a
+  root-relative default like `level3-app/index.html?runner=1` resolves lesson-relative
+  and 404s - the runner never warms and Run silently does nothing. Gate the default
+  with a `LESSON_META`-based `../../../../` prefix (flat pages, no `LESSON_META`, keep
+  the bare default); explicit per-lesson `runnerUrl`s are already prefixed.
 
 ## Theming
 
@@ -47,3 +59,17 @@ grows into a procedure, promote it to a skill and leave a pointer here.
   `code-lab.css`, which loads after `styles.css`. Verify by driving the widgets to
   later steps with puppeteer-core on the system Chrome, WCAG-checking new pairs,
   and screenshotting the default theme to prove no regression.
+
+## i18n
+
+- **Re-localize every dynamically-painted surface, not just render-time prose.**
+  `kernel-controller.relocalize()` fans out to `surfaces.forEach(s => s.setLocale())`,
+  so a surface's `setLocale` must also re-paint whatever an event handler wrote - the
+  run result, run errors - or it keeps the old language after a switch. Store that
+  event-time text as a re-derivable thunk and re-paint it in `setLocale`, gated on the
+  panel being visible so a stale thunk never shows.
+- **Only build/viz/checkpoint lessons localize; runnable drills are English-only.**
+  `kernel-controller.bind()` handles `BUILD_CONFIG`/`LESSON_VIZ`/`QUIZ_CONFIG` but has
+  no `DRILL_CONFIG` branch, and legacy flat drill pages carry no `LESSON_META`, so they
+  never join the surface list. Do not chase a "drill result will not translate" bug -
+  those lessons are not in the i18n system.
