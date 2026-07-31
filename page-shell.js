@@ -570,7 +570,20 @@
     quizHost.className = "lesson-quiz";
     hero.insertAdjacentElement("afterend", quizHost);
     if (!window.QUIZ_CONFIG.nextHref) window.QUIZ_CONFIG.nextHref = page.nextHref;
+    // Pull the Quiz's chrome strings from the shared catalog (quiz.* keys) so a
+    // non-default language localizes the result/feedback text. Absent keys keep
+    // code-lab's English defaults, so the default language stays byte-identical.
+    const applyQuizLabels = () => {
+      const C = window.ChromeText;
+      if (!C) return;
+      const keys = ["knowledgeCheck", "submit", "retry", "continue", "progressPassed", "progressFresh", "progressScored", "answerAll", "stillNeeds", "correctPrefix", "notQuitePrefix", "passTitle", "failTitle", "scoredLine", "passTail", "failTail", "xpLine", "courseXp"];
+      const labels = {};
+      let any = false;
+      keys.forEach((k) => { const v = C["quiz." + k]; if (v != null) { labels[k] = v; any = true; } });
+      if (any) window.QUIZ_CONFIG.labels = labels;
+    };
     try {
+      applyQuizLabels();
       let quizController = window.CodeLab.Quiz.create(quizHost, window.QUIZ_CONFIG);
       // Localizable surface: a language swap re-binds QUIZ_CONFIG's strings
       // (bind-checkpoint), then this re-creates the Quiz so the new text paints.
@@ -581,6 +594,7 @@
           try { if (quizController && quizController.destroy) quizController.destroy(); } catch (e) {}
           quizHost.innerHTML = "";
           try {
+            applyQuizLabels();
             quizController = window.CodeLab.Quiz.create(quizHost, window.QUIZ_CONFIG);
           } catch (e) {
             console.error("lesson-quiz relocalize failed", e);

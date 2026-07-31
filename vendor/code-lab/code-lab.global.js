@@ -2644,6 +2644,29 @@ ${result.runtimeError}`.trim(),
   }
 
   // src/dom/quiz-view.ts
+  var DEFAULT_QUIZ_LABELS = {
+    knowledgeCheck: "Knowledge check",
+    submit: "Submit answers",
+    retry: "Try a fresh set",
+    continue: "Continue",
+    progressPassed: "Passed before \xB7 {n} questions",
+    progressFresh: "{n} questions \xB7 {m} to pass",
+    progressScored: "Scored {score}/{total}",
+    answerAll: "Answer every question",
+    stillNeeds: "Question {n} still needs an answer.",
+    correctPrefix: "Correct. ",
+    notQuitePrefix: "Not quite. ",
+    passTitle: "Checkpoint passed",
+    failTitle: "Not passed yet",
+    scoredLine: "You scored <strong>{score} / {total}</strong> - {needed} needed to pass.",
+    passTail: " The explanations below cover anything you missed.",
+    failTail: " Read the explanations below, then try a fresh set of questions.",
+    xpLine: " +{xp} XP.",
+    courseXp: "Course XP: {xp}"
+  };
+  function fill(tpl, vars) {
+    return tpl.replace(/\{(\w+)\}/g, (_m, k) => k in vars ? String(vars[k]) : `{${k}}`);
+  }
   var CONCEPT_PROGRESS_KEY = "course_concept_progress";
   function localStore(xpKey, awardedKey) {
     const read = () => {
@@ -2685,20 +2708,21 @@ ${result.runtimeError}`.trim(),
       this.cfg = config;
       this.awardAmount = typeof config.awardAmount === "number" ? config.awardAmount : 40;
       this.store = store ?? localStore(config.xpKey || "course_global_xp", config.awardedKey || `${config.prefix || "quiz"}_awarded`);
+      this.labels = { ...DEFAULT_QUIZ_LABELS, ...config.labels || {} };
       this.root = document.createElement("section");
       this.root.className = "cl-quiz";
       this.root.setAttribute("aria-live", "polite");
       this.root.innerHTML = `
       <header class="cl-quiz-head">
         <p class="cl-quiz-meta">${escapeHtml5(config.metaLabel || "")}</p>
-        <h2 class="cl-quiz-title">${escapeHtml5(config.title || "Knowledge check")}</h2>
+        <h2 class="cl-quiz-title">${escapeHtml5(config.title || this.labels.knowledgeCheck)}</h2>
         <p class="cl-quiz-intro">${inline2(config.intro || "")}</p>
         <span class="cl-quiz-progress" data-progress></span>
       </header>
       <div class="cl-quiz-questions" data-questions></div>
       <div class="cl-quiz-actions">
-        <button type="button" class="cl-quiz-btn cl-quiz-primary" data-submit>Submit answers</button>
-        <button type="button" class="cl-quiz-btn" data-retry hidden>Try a fresh set</button>
+        <button type="button" class="cl-quiz-btn cl-quiz-primary" data-submit>${escapeHtml5(this.labels.submit)}</button>
+        <button type="button" class="cl-quiz-btn" data-retry hidden>${escapeHtml5(this.labels.retry)}</button>
       </div>
       <section class="cl-quiz-result" data-result hidden>
         <h3 data-result-title></h3>
@@ -2737,7 +2761,7 @@ ${result.runtimeError}`.trim(),
       this.els.result.classList.remove("is-pass", "is-fail");
       this.els.submit.hidden = false;
       this.els.retry.hidden = true;
-      this.els.progress.textContent = this.store.hasPassed() ? `Passed before \xB7 ${this.plan.questions.length} questions` : `${this.plan.questions.length} questions \xB7 ${this.plan.needed} to pass`;
+      this.els.progress.textContent = this.store.hasPassed() ? fill(this.labels.progressPassed, { n: this.plan.questions.length }) : fill(this.labels.progressFresh, { n: this.plan.questions.length, m: this.plan.needed });
     }
     renderQuestions() {
       this.els.questions.innerHTML = "";
@@ -2767,8 +2791,8 @@ ${result.runtimeError}`.trim(),
       if (missing >= 0) {
         this.els.result.hidden = false;
         this.els.result.classList.remove("is-pass", "is-fail");
-        this.els.resultTitle.textContent = "Answer every question";
-        this.els.resultBody.textContent = `Question ${missing + 1} still needs an answer.`;
+        this.els.resultTitle.textContent = this.labels.answerAll;
+        this.els.resultBody.textContent = fill(this.labels.stillNeeds, { n: missing + 1 });
         this.els.continue.innerHTML = "";
         const block = this.els.questions.children[missing];
         if (block) block.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -2791,7 +2815,7 @@ ${result.runtimeError}`.trim(),
         const right = question.chosen >= 0 && question.options[question.chosen].correct;
         if (question.why) {
           why.hidden = false;
-          why.innerHTML = (right ? "Correct. " : "Not quite. ") + inline2(question.why);
+          why.innerHTML = (right ? this.labels.correctPrefix : this.labels.notQuitePrefix) + inline2(question.why);
           why.classList.toggle("is-good", right);
           why.classList.toggle("is-bad", !right);
         }
@@ -2810,26 +2834,26 @@ ${result.runtimeError}`.trim(),
       this.els.result.hidden = false;
       this.els.result.classList.toggle("is-pass", passed);
       this.els.result.classList.toggle("is-fail", !passed);
-      this.els.resultTitle.textContent = passed ? "Checkpoint passed" : "Not passed yet";
-      const xpLine = passed && this.awardAmount ? ` +${this.awardAmount} XP.` : "";
-      this.els.resultBody.innerHTML = `You scored <strong>${score} / ${total}</strong> - ${this.plan.needed} needed to pass.` + (passed ? xpLine + " The explanations below cover anything you missed." : " Read the explanations below, then try a fresh set of questions.");
+      this.els.resultTitle.textContent = passed ? this.labels.passTitle : this.labels.failTitle;
+      const xpLine = passed && this.awardAmount ? fill(this.labels.xpLine, { xp: this.awardAmount }) : "";
+      this.els.resultBody.innerHTML = fill(this.labels.scoredLine, { score, total, needed: this.plan.needed }) + (passed ? xpLine + this.labels.passTail : this.labels.failTail);
       this.els.continue.innerHTML = "";
       if (passed && this.cfg.nextHref) {
         const link = document.createElement("a");
         link.className = "cl-quiz-btn cl-quiz-primary";
         link.href = this.cfg.nextHref;
-        link.textContent = this.cfg.nextLabel || "Continue";
+        link.textContent = this.cfg.nextLabel || this.labels.continue;
         this.els.continue.appendChild(link);
       }
       this.els.submit.hidden = true;
       this.els.retry.hidden = false;
-      this.els.progress.textContent = `Scored ${score}/${total}`;
+      this.els.progress.textContent = fill(this.labels.progressScored, { score, total });
       this.els.result.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
     /** Best-effort refresh of the course's shared XP label, if the page has one. */
     refreshXpLabel() {
       const label = document.getElementById("courseXpLabel");
-      if (label) label.textContent = `Course XP: ${this.store.getXP()}`;
+      if (label) label.textContent = fill(this.labels.courseXp, { xp: this.store.getXP() });
     }
   };
 
