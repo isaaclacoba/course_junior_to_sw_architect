@@ -99,6 +99,16 @@
       resultBody.textContent = body;
     }
 
+    // Remember the last run result as a re-derivable thunk so setLocale can
+    // re-paint it in the new language (the title localizes via chrome; the body
+    // is re-derived by re-running its producer). The setLocale repaint is gated
+    // on the result being visible, so a stale thunk is never shown.
+    let lastResult = null;
+    function setResult(ok, bodyFn) {
+      lastResult = { ok: ok, bodyFn: bodyFn };
+      showResult(ok, bodyFn());
+    }
+
     // expected as a string: any output line equals it.
     // expected as an array: the non-empty output lines equal that exact sequence.
     function matches(out, expected) {
@@ -249,6 +259,7 @@
       if (task.summary) paintSummaryProse(task);
       else paintGoal(task);
       applyChrome();
+      if (lastResult && !result.hidden) showResult(lastResult.ok, lastResult.bodyFn());
     }
 
     function render() {
@@ -323,36 +334,36 @@
           hideOutput();
           showErrors(res.errors);
           if (editor.setMarkers) editor.setMarkers(res.errors);
-          showResult(false, tr("result.compileFail", "The code did not compile. Read the errors above and try again."));
+          setResult(false, () => tr("result.compileFail", "The code did not compile. Read the errors above and try again."));
           return;
         }
         if (editor.setMarkers) editor.setMarkers([]);
         clearErrors();
         if (res.runtimeError) {
           showOutput(`${res.output}\n${res.runtimeError}`.trim(), true);
-          showResult(false, tr("result.runtimeError", "It ran but threw an error. Fix it and run again."));
+          setResult(false, () => tr("result.runtimeError", "It ran but threw an error. Fix it and run again."));
           return;
         }
         const out = (res.output || "").trim();
         showOutput(out || tr("run.noOutput", "(no output)"), false);
         const unmet = unmetRequirement(code[idx], task.requireSource);
         if (!matches(out, task.expected)) {
-          showResult(false, describeExpected(task.expected));
+          setResult(false, () => describeExpected(task.expected));
         } else if (unmet) {
-          showResult(false, unmet);
+          setResult(false, () => unmet);
         } else if (task.verify && !(await passesHiddenVerify(code[idx], task.verify))) {
-          showResult(
+          setResult(
             false,
-            task.verify.message ||
+            () => task.verify.message ||
               tr("result.verifyFail", "Your code printed the right answer for this example, but a hidden check with different inputs failed. Make the logic work for any input, not just this one.")
           );
         } else {
           award(idx);
-          showResult(true, tr("result.pass", "Output matched what the task asked for. XP awarded."));
+          setResult(true, () => tr("result.pass", "Output matched what the task asked for. XP awarded."));
         }
       } catch (err) {
         showOutput(err.message || tr("run.couldNotRun", "Could not run the code."), true);
-        showResult(false, tr("result.error", "Something went wrong running the code."));
+        setResult(false, () => tr("result.error", "Something went wrong running the code."));
       } finally {
         runBtn.disabled = false;
         runBtn.textContent = tr("nav.run", "Run");
