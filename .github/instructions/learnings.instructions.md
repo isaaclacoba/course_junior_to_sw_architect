@@ -46,6 +46,41 @@ grows into a procedure, promote it to a skill and leave a pointer here.
   with a `LESSON_META`-based `../../../../` prefix (flat pages, no `LESSON_META`, keep
   the bare default); explicit per-lesson `runnerUrl`s are already prefixed.
 
+## Git & GitHub identity
+
+- **GitHub attributes contributors from commit author/committer email and
+  `Co-authored-by:` trailers only - never from an email that merely appears in a
+  commit message's prose.** To confirm a denied identity is really gone after a
+  history rewrite, check four independent backend sources, not the web UI (which
+  caches): `gh api 'repos/<o>/<r>/contributors?anon=1&per_page=100'` (a removed
+  user still shows by its numeric id), the Insights contributor-graph data, an
+  anonymous `curl` of the overview HTML grepped for the name / email / avatar id,
+  and `gh api repos/<o>/<r>/commits/<sha>` (`.author.login` / `.committer.login`).
+  A sighting that survives all four is the browser cache or GitHub's async
+  recompute (minutes to ~24h), not a git problem - hard-refresh, don't re-rewrite.
+
+- **A history rewrite is not finished until EVERY local ref is reset - checking
+  only the branch you are on gives a false "clean".** After `filter-repo` +
+  force-push, the old commits (and their author email) stay reachable through
+  stale local branches you never touched (a `master` left behind), `backup/*`
+  branches, `refs/original/*`, and the reflogs. Point or delete all of them, then
+  `git reflog expire --expire=now --all && git gc --prune=now`, and verify with
+  `git log --all --format='%ae%n%ce' | grep -c <bad-email>` returning `0`. Also
+  fix the repo's local `git config user.email` - a stale value there (e.g. a work
+  address carried into a worktree) is what re-introduces the wrong identity on the
+  next commit in the first place.
+
+- **When the default SSH remote maps to a denied identity, push over HTTPS.** If a
+  machine's SSH key is tied to the account you are trying to purge, pushes will
+  re-attribute to it; use the HTTPS remote with a token in `~/.git-credentials`
+  for the correct account instead of switching the key.
+
+- **A token-in-URL HTTPS push does not advance the local `origin/*` tracking
+  refs, and `git fetch origin` may even fail when it uses the SSH remote.** When
+  SSH maps to the wrong identity you push over HTTPS with an inline access token;
+  afterwards do not trust `git rev-parse origin/master`, read the real remote tip
+  with `git ls-remote https://github.com/<o>/<r>.git refs/heads/master`.
+
 ## Theming
 
 - **Theming and dark mode is a skill - see `theme-authoring`.** A theme is one
@@ -73,3 +108,40 @@ grows into a procedure, promote it to a skill and leave a pointer here.
   no `DRILL_CONFIG` branch, and legacy flat drill pages carry no `LESSON_META`, so they
   never join the surface list. Do not chase a "drill result will not translate" bug -
   those lessons are not in the i18n system.
+
+## Landing a large divergent branch (integration)
+
+- **A refused `git push` between two long-diverged lines is not always a history
+  problem - it is often plain divergence, landed with `-s ours` (no `-f`).** When a
+  public *deployed* branch and your local trunk share only an old merge-base (each
+  advanced independently), a normal push is rejected. If your trunk already carries
+  the public line's *content* (ported feature-by-feature), land it
+  non-destructively: fast-forward local to the integrated tree, `git merge -s ours
+  <public-branch>` (keeps your tree 100%, folds the public history in as a second
+  parent - verify with `git diff --quiet <integrated-commit> HEAD`), then a plain
+  fast-forward `git push`. Every absorbed commit stays reachable/cherry-pickable, so
+  nothing is lost even if a couple of items were never forward-ported.
+- **A clean fast-forward push is still rejected if the commit edits
+  `.github/workflows/*` and the token lacks the `workflow` scope.** The error reads
+  "refusing to allow an OAuth App to create or update workflow ... without
+  `workflow` scope" - a token-scope issue, not force/identity. Fix with
+  `gh auth refresh -h github.com -s workflow`, then push with that token
+  (`oauth_token` lives in `~/.config/gh/hosts.yml`; older `gh` has no
+  `gh auth token`).
+- **Push a bumped submodule's own commit to the submodule remote BEFORE pushing the
+  superproject.** CI checks out `--recurse-submodules` and `dotnet publish`es the
+  compiler-host; a gitlink pointing at an unpushed submodule commit dangles and the
+  deploy fails. Confirm first with `git ls-remote <submodule-remote> | grep <sha>`,
+  and stage ONLY the intended files so a locally-advanced submodule HEAD does not
+  bump the pointer by accident.
+- **An edit that only touches a generated file fails the deploy's drift gate - fix
+  the SOURCE.** CI runs `node tools/generate.mjs` then
+  `git diff --exit-code generated/ content/`; a prose/pedagogy edit pasted straight
+  into a generated `content/.../index.html` renders fine locally but the generator
+  overwrites it from `meta.js`/res strings, so the gate fails and the deploy dies.
+  Put the edit in `meta.js` `intro[]` (or the res `*.json`) and rehearse locally:
+  `node tools/generate.mjs && git diff --exit-code generated/ content/`.
+- **`git worktree remove` refuses (even `--force`) a worktree that contains a
+  submodule.** Fall back to `rm -rf <worktree-path> && git worktree prune`, then
+  `git branch -d <branch>` - safe once `git merge-base --is-ancestor <branch>
+  master` confirms the branch is fully contained.
