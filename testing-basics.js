@@ -21,6 +21,8 @@
       expected: "PASS",
       requireSource: [
         { pattern: /\.Speak\s*\(/, message: "Call the dog's `Speak()` - that is the Act." },
+        { pattern: /==\s*"Woof"|"Woof"\s*==/, message: "Assert with a real comparison to `\"Woof\"`, don't just print `PASS`." },
+        { pattern: /\?|\bif\s*\(/, message: "Choose PASS or FAIL with an `if` or `?:`, so both outcomes exist." },
         { pattern: /PASS/, message: "Print `PASS` when the result matches." },
       ],
       starter:
@@ -43,6 +45,7 @@
       requireSource: [
         { pattern: /Add\s*\(\s*2\s*,\s*3\s*\)/, message: "Act by calling `Add(2, 3)`." },
         { pattern: /==\s*5/, message: "Assert the result equals exactly `5`." },
+        { pattern: /\?|\bif\s*\(/, message: "Choose PASS or FAIL with an `if` or `?:`, so both outcomes exist." },
       ],
       starter:
         'using System;\n\npublic class Adder\n{\n    public int Add(int left, int right) { return left + right; }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        // TODO: Act by calling Add(2, 3); assert it equals exactly 5.\n        //       Print PASS or FAIL.\n    }\n}\n',
@@ -63,6 +66,7 @@
       expected: "PASS",
       requireSource: [
         { pattern: /AssertEqual\s*\(/, message: "Write an `AssertEqual` method and call it." },
+        { pattern: /actual\s*==\s*expected|expected\s*==\s*actual/, message: "`AssertEqual` must compare `actual` to `expected`, not always print `PASS`." },
       ],
       starter:
         'using System;\n\npublic class Adder\n{\n    public int Add(int left, int right) { return left + right; }\n}\n\nclass Program\n{\n    // TODO: write an assert helper named AssertEqual taking (int actual, int expected)\n    //       that prints PASS on a match and FAIL otherwise.\n\n    static void Main()\n    {\n        var adder = new Adder();\n        // TODO: then call it with Add(2, 3) and 5.\n    }\n}\n',

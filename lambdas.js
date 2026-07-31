@@ -35,9 +35,10 @@
         { pattern: /var\s+\w+\s*=/, message: "Store your lambda in a variable with `var`." },
         { pattern: /=>/, message: "Write the function as a lambda using `=>`." },
         { pattern: /\+\s*1/, message: "`addLeg` should give back `legs + 1`." },
+        { pattern: /addLeg\s*\(/, message: "Call `addLeg(...)` to get each result - don't print the numbers directly." },
       ],
       starter:
-        'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        // TODO: store a lambda `addLeg` that gives back legs + 1,\n        //       then print addLeg(3) and addLeg(4) on their own lines.\n\n    }\n}\n',
+        'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        // TODO: store a lambda `addLeg` that gives back legs + 1,\n        //       then print it for 3 and for 4 on their own lines.\n\n    }\n}\n',
       solution:
         'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        var addLeg = (int legs) => legs + 1;\n        Console.WriteLine(addLeg(3));\n        Console.WriteLine(addLeg(4));\n    }\n}\n',
     },
@@ -57,9 +58,10 @@
         { pattern: /var\s+\w+\s*=/, message: "Store your lambda in a variable with `var`." },
         { pattern: /==\s*4/, message: "Your rule should test `== 4`." },
         { pattern: /\bfor(each)?\s*\(/, message: "Walk the array with a `foreach` loop." },
+        { pattern: /isFourLegged\s*\(/, message: "Actually call `isFourLegged(...)` on each item - don't print the count directly." },
       ],
       starter:
-        'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int[] legs = { 2, 4, 8, 4 };\n        // TODO: store a lambda isFourLegged (a count == 4),\n        //       then loop over legs and print how many animals pass.\n\n    }\n}\n',
+        'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int[] legs = { 2, 4, 8, 4 };\n        // TODO: store a lambda isFourLegged that tests a count == 4,\n        //       then loop over legs and print how many animals pass.\n\n    }\n}\n',
       solution:
         'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int[] legs = { 2, 4, 8, 4 };\n        var isFourLegged = (int count) => count == 4;\n        int total = 0;\n        foreach (int count in legs)\n        {\n            if (isFourLegged(count)) total++;\n        }\n        Console.WriteLine(total);\n    }\n}\n',
     },
@@ -79,9 +81,10 @@
         { pattern: /var\s+\w+\s*=/, message: "Store your lambda in a variable with `var`." },
         { pattern: /=>[^;\n]*minLegs/, message: "Your lambda must read the local `minLegs` - that is the whole point." },
         { pattern: /\bfor(each)?\s*\(/, message: "Walk the array with a `foreach` loop." },
+        { pattern: /enough\s*\(/, message: "Actually call `enough(...)` on each item - don't print the count directly." },
       ],
       starter:
-        'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int minLegs = 4;\n        int[] legs = { 2, 4, 8, 4 };\n        // TODO: store a lambda enough (a count >= minLegs, reading minLegs),\n        //       then loop over legs and print how many reach minLegs.\n\n    }\n}\n',
+        'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int minLegs = 4;\n        int[] legs = { 2, 4, 8, 4 };\n        // TODO: store a lambda enough that checks a count >= minLegs (reading minLegs),\n        //       then loop over legs and print how many reach minLegs.\n\n    }\n}\n',
       solution:
         'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int minLegs = 4;\n        int[] legs = { 2, 4, 8, 4 };\n        var enough = (int count) => count >= minLegs;\n        int total = 0;\n        foreach (int count in legs)\n        {\n            if (enough(count)) total++;\n        }\n        Console.WriteLine(total);\n    }\n}\n',
     },
@@ -101,9 +104,10 @@
         { pattern: /var\s+\w+\s*=/, message: "Store your lambda in a variable with `var`." },
         { pattern: /=>[^;\n]*bonus/, message: "Your step must add the captured `bonus`." },
         { pattern: /\bfor(each)?\s*\(/, message: "Walk the array with a `foreach` loop." },
+        { pattern: /reward\s*\(/, message: "Call `reward(...)` on each score - don't print the totals directly." },
       ],
       starter:
-        'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int bonus = 10;\n        int[] scores = { 5, 20 };\n        // TODO: store a lambda reward (score + bonus, reading bonus),\n        //       then loop over scores and print each rewarded total.\n\n    }\n}\n',
+        'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int bonus = 10;\n        int[] scores = { 5, 20 };\n        // TODO: store a lambda reward that adds bonus to a score (reading bonus),\n        //       then loop over scores and print each rewarded total.\n\n    }\n}\n',
       solution:
         'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int bonus = 10;\n        int[] scores = { 5, 20 };\n        var reward = (int score) => score + bonus;\n        foreach (int score in scores)\n        {\n            Console.WriteLine(reward(score));\n        }\n    }\n}\n',
     },

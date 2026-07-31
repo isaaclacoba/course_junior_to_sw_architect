@@ -48,8 +48,9 @@ runner, editor, or page controller. If you think you need one, re-read
 4. **Write the data file** to the config shape in SPECS. Honour the principles
    and cadence invariants: teach the portable concept in plain surface (avoid
    C#-only sugar until its ledger row), one idea per card, a recap to close,
-   nothing used before taught, grade the concept (set `requireSource` + a hidden
-   `verify` probe for builds), make it runnable if it executes cleanly, state the
+   nothing used before taught, grade the concept (a `requireSource` technique gate
+   always, plus a hidden `verify` probe when the graded code is a class before
+   `Program`), make it runnable if it executes cleanly, state the
    SOLID letter if relevant, one example family per Part, one difficulty rung at
    a time.
 5. **Write the HTML page** with the exact load order for the archetype (SPECS /
@@ -72,7 +73,8 @@ runner, editor, or page controller. If you think you need one, re-read
 - [ ] Prose is formatted: lists use `- ` bullets (never comma-packed), distinct
       points use blank-line paragraphs, `**bold**` for the new term, `code` in backticks.
 - [ ] Runnable if it produces visible output.
-- [ ] Build tasks have a technique gate AND a hidden `verify` probe.
+- [ ] Build tasks have a `requireSource` technique gate; add a hidden `verify`
+      probe too when the graded code is a class the learner writes before `Program`.
 - [ ] SOLID letter stated if this is a design/testing/refactor lesson.
 - [ ] One example family for the Part; difficulty rises one rung.
 - [ ] `awardedKey == data-key`; `data-total` excludes the recap; unique `prefix`.
@@ -142,5 +144,17 @@ flavour in the DATA; keep `narr` in the plain course voice (it renders
 - Spaced hyphen ` - `, not em-dash. Code terms in `backticks`.
 - Keep the course portable: teach the concept, not the C# sugar.
 - Do not push or commit unless explicitly asked - pushing `master` deploys.
-- If a lesson naturally runs, it must have a Run button. If a build task grades
-  on output, it must have a `verify` probe. These are the two most common misses.
+- If a lesson naturally runs, it must have a Run button. Every build task must
+  grade the concept, not just the output - this is the most common miss. Pick the
+  gate by shape: a hidden `verify` probe works ONLY when the graded code is a class
+  the learner writes BEFORE `class Program` (the engine's `buildProbe` keeps
+  everything before `class Program` and swaps in `verify.main`, so logic inside
+  `Main`/`Program` is discarded and cannot be probed). When the work lives in
+  `Main` (a free method, a lambda, a test), grade with `requireSource` instead.
+- `requireSource` regexes are tested against the WHOLE source, comments included,
+  so a TODO that spells the answer can satisfy a guard by itself. Guard on
+  statement/operator forms the comment won't contain (`return "minor"`, `+ age`,
+  `== "Woof"`, the call `addLeg(`) rather than bare words, and reword any TODO that
+  leaks the exact tokens - which is also the rule that a TODO states intent, not
+  literal code. Validate both ways: a correct solution must pass every guard, and a
+  cheat that hardcodes the printed answer must fail at least one.

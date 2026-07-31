@@ -32,6 +32,9 @@
         "`Main` calls `Label(18)`, so the output should be `Age: 18`.",
       ],
       expected: "Age: 18",
+      requireSource: [
+        { pattern: /\+\s*age\b|\bage\s*\+|\{\s*age\s*\}/, message: "Build the label from the `age` value (for example `\"Age: \" + age`), not a fixed string." },
+      ],
       starter:
         'using System;\n\nclass Program\n{\n    static string Label(int age)\n    {\n        // TODO: return "Age: " plus the age\n        return "";\n    }\n\n    static void Main()\n    {\n        Console.WriteLine(Label(18));\n    }\n}\n',
       solution:
@@ -47,6 +50,10 @@
         "`Main` calls `Category(20)`, so the output should be `adult`.",
       ],
       expected: "adult",
+      requireSource: [
+        { pattern: /return\s+"minor"/, message: "Handle the other case too: `return \"minor\"` when the age is below the cutoff." },
+        { pattern: /if\s*\(|\?/, message: "Decide with an `if` (or a `?:`) - don't just return one fixed word." },
+      ],
       starter:
         'using System;\n\nclass Program\n{\n    static string Category(int age)\n    {\n        // TODO: "adult" when age >= 18, otherwise "minor"\n        return "";\n    }\n\n    static void Main()\n    {\n        Console.WriteLine(Category(20));\n    }\n}\n',
       solution:
@@ -63,6 +70,11 @@
         "The output must be exactly three lines: `minor`, `adult`, `adult`.",
       ],
       expected: ["minor", "adult", "adult"],
+      requireSource: [
+        { pattern: /Category\s*\(\s*16\s*\)/, message: "Call `Category(16)` rather than printing `minor` directly." },
+        { pattern: /Category\s*\(\s*18\s*\)/, message: "Call `Category(18)` rather than printing the answer directly." },
+        { pattern: /Category\s*\(\s*40\s*\)/, message: "Call `Category(40)` rather than printing the answer directly." },
+      ],
       starter:
         'using System;\n\nclass Program\n{\n    static string Category(int age)\n    {\n        if (age >= 18)\n        {\n            return "adult";\n        }\n        return "minor";\n    }\n\n    static void Main()\n    {\n        // TODO: print Category for 16, then 18, then 40\n    }\n}\n',
       solution:
@@ -78,8 +90,11 @@
         "`Main` calls `Summary(20)`, so the output should be `Status: adult`.",
       ],
       expected: "Status: adult",
+      requireSource: [
+        { pattern: /Category\s*\(\s*age\s*\)/, message: "Reuse `Category(age)` inside `Summary` instead of hardcoding the word." },
+      ],
       starter:
-        'using System;\n\nclass Program\n{\n    static string Category(int age)\n    {\n        if (age >= 18)\n        {\n            return "adult";\n        }\n        return "minor";\n    }\n\n    static string Summary(int age)\n    {\n        // TODO: return "Status: " plus the result of Category(age)\n        return "";\n    }\n\n    static void Main()\n    {\n        Console.WriteLine(Summary(20));\n    }\n}\n',
+        'using System;\n\nclass Program\n{\n    static string Category(int age)\n    {\n        if (age >= 18)\n        {\n            return "adult";\n        }\n        return "minor";\n    }\n\n    static string Summary(int age)\n    {\n        // TODO: return "Status: " plus the category for this age\n        return "";\n    }\n\n    static void Main()\n    {\n        Console.WriteLine(Summary(20));\n    }\n}\n',
       solution:
         'using System;\n\nclass Program\n{\n    static string Category(int age)\n    {\n        if (age >= 18)\n        {\n            return "adult";\n        }\n        return "minor";\n    }\n\n    static string Summary(int age)\n    {\n        return "Status: " + Category(age);\n    }\n\n    static void Main()\n    {\n        Console.WriteLine(Summary(20));\n    }\n}\n',
     },
