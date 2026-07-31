@@ -56,7 +56,10 @@ for (const l of reg.lessons) {
   };
   const txt = fs.readFileSync(metaPath, "utf8");
   const idx = txt.indexOf("\n  concepts:");
-  if (idx < 0 || idx !== txt.lastIndexOf("\n  concepts:") || !/\n\};\s*$/.test(txt)) {
+  // `concepts` must be the sole trailing top-level property (exactly one 2-space
+  // key from here on), or the positional rewrite could truncate a later property.
+  if (idx < 0 || idx !== txt.lastIndexOf("\n  concepts:") || !/\n\};\s*$/.test(txt) ||
+      (txt.slice(idx).match(/\n  [A-Za-z_$][\w$]*\s*:/g) || []).length !== 1) {
     console.log("SKIP meta rewrite (unexpected shape): " + l.id); skipped++; continue;
   }
   fs.writeFileSync(metaPath, txt.slice(0, idx) + "\n  concepts: " + conceptsLiteral(stripped) + ",\n};\n");

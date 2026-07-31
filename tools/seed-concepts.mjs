@@ -38,7 +38,8 @@ for (const l of reg.lessons) {
   if (idx < 0) { console.log("skip (no concepts block): " + l.id); skipped++; continue; }
   // Guard the positional rewrite: the marker must be unique and `concepts` must
   // be the last property (file ends with `};`), or we could corrupt a meta.js.
-  if (idx !== txt.lastIndexOf("\n  concepts:") || !/\n\};\s*$/.test(txt)) {
+  if (idx !== txt.lastIndexOf("\n  concepts:") || !/\n\};\s*$/.test(txt) ||
+      (txt.slice(idx).match(/\n  [A-Za-z_$][\w$]*\s*:/g) || []).length !== 1) {
     console.log("skip (unexpected meta.js shape, not rewriting): " + l.id); skipped++; continue;
   }
   const draft = (drafts[l.track] || {})[l.id] || null;

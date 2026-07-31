@@ -31,7 +31,8 @@ standalone glossary and the page-shell panel. English stays the base.
 - 2026-07-31 Design approved, decisions locked, design-of-record + this brief committed. Not started.
 - 2026-07-31 Phase A: fanned out steps 4 (ConceptI18n) + 8 (validate gate) - both tested + committed (b4313bd), inert until migration. Migration (1-3) next.
 - 2026-07-31 Migration done (7a82f2c): 71 lessons' term/def moved to default/en.json, meta.js graph-only, generate reads from bundles. Gate PASSED: concept-index.js + course-data.js byte-identical; validate 0 errors (coverage gate live); seed-concepts idempotent. Next: consumers (5-7) + verify (9), then architect review.
-- 2026-07-31 Phase A COMPLETE: consumers wired - glossary (a2..), page-shell + kernel (21e30e6). All gates green: generate no drift, validate 0 err, 41/41 tests, en byte-identical (glossary DOM diff 0, kernel agenda renders via source, no en fetch). Ready for architect review, then Phase B (author es + emit concept-i18n.es.js).
+- 2026-07-31 Phase A COMPLETE: consumers wired - glossary (166bc64), page-shell + kernel (21e30e6). All gates green: generate no drift, validate 0 err, 41/41 tests, en byte-identical (glossary DOM diff 0, kernel agenda renders via source, no en fetch).
+- 2026-07-31 Architect review: SHIP-WITH-FIXES, no blockers, byte-identical confirmed. Fixed all 4 findings - live-swap gen-guard on the concept source, en = null (true legacy path + panel sentinel), English-base 100% now enforced by the validator, meta.js rewrite last-property guard. NITs 5/6 (term-null invariant, en.json normalization) documented as accepted. Re-verified: validate 0 err, 41/41 tests, seed idempotent, en byte-identical. Next: Phase B (author es + emit concept-i18n.es.js).
 
 ## Open
 - None open; ready to start Phase A step 1 on the owner's go.

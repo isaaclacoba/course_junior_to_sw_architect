@@ -333,7 +333,11 @@ export function checkConceptCoverage(lessons, deps, report) {
         }
         if (mm[2] === "def") defsPresent.add(id);
       }
-      if (!hasConceptKey) continue; // untranslated bundle - gate stays inert
+      // The English base (default/en) must carry every owned def unconditionally
+      // (the locked "English base = 100%" rule); a translation bundle is gated on
+      // declaring any concept key, so an untranslated bundle stays inert.
+      const isBase = b.voice === "default" && b.lang === "en";
+      if (!hasConceptKey && !(isBase && owned.size)) continue;
       for (const id of owned) {
         if (!defsPresent.has(id)) {
           report.error(`Concept text: "${lessonId}" bundle ${b.voice}/${b.lang} declares concept text but is missing "concept.${id}.def" (100% coverage required)`);

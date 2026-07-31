@@ -122,21 +122,30 @@
   // per-language overlay lives in generated/concept-i18n.<lang>.js; English needs
   // none. A missing overlay degrades to the English graph.
   var conceptDataLoaded = {};
+  // Set the concept source for `lang`. English (default) => null, so page-shell
+  // keeps its legacy graph path (byte-identical, preserves the "not found" panel
+  // sentinel). A non-default lang gets a ConceptI18n over the loaded overlay.
   function buildConceptSource(lang) {
-    if (!global.ConceptI18n || !global.PageShellConcepts) return;
+    if (!global.PageShellConcepts) return;
+    if (lang === defaultLang || !global.ConceptI18n) {
+      global.PageShellConcepts.setConceptSource(null);
+      return;
+    }
     global.PageShellConcepts.setConceptSource(global.ConceptI18n.create({
       base: (global.ConceptIndex && global.ConceptIndex.defs) || {},
       overlays: (global.ConceptI18nData && global.ConceptI18nData[lang]) || {},
       selection: { voice: voicePref.get(), lang: lang }
     }));
   }
-  function loadConcepts(lang) {
-    if (lang === defaultLang || conceptDataLoaded[lang]) { buildConceptSource(lang); return Promise.resolve(); }
+  // Ensure the per-language overlay script is loaded (absent-safe). Does NOT set
+  // the source - callers set it AFTER any generation-token guard (last write wins).
+  function ensureConceptData(lang) {
+    if (lang === defaultLang || conceptDataLoaded[lang]) return Promise.resolve();
     return new Promise(function (resolve) {
       var s = document.createElement("script");
       s.src = conceptsBase + "/concept-i18n." + lang + ".js";
-      s.onload = function () { conceptDataLoaded[lang] = true; buildConceptSource(lang); resolve(); };
-      s.onerror = function () { buildConceptSource(lang); resolve(); }; // absent = English fallback
+      s.onload = function () { conceptDataLoaded[lang] = true; resolve(); };
+      s.onerror = function () { resolve(); }; // absent = English fallback
       global.document.head.appendChild(s);
     });
   }
@@ -147,9 +156,10 @@
   function relocalize() {
     if (settings) settings.refresh();
     var myGen = ++gen;
-    return Promise.all([manager.init(), loadChrome(langPref.get()), loadConcepts(langPref.get())]).then(function (arr) {
+    return Promise.all([manager.init(), loadChrome(langPref.get()), ensureConceptData(langPref.get())]).then(function (arr) {
       if (myGen !== gen) return; // superseded by a newer selection
       bind(arr[0]); // refresh PAGE.hero.intro + BUILD_CONFIG.tasks once, before the fan-out
+      buildConceptSource(langPref.get()); // gen-guarded: never sets a stale source
       surfaces.forEach(function (s) {
         if (s && typeof s.setLocale === "function") s.setLocale();
       });
@@ -192,9 +202,10 @@
       });
     })
     .then(function () {
-      return loadConcepts(langPref.get());
+      return ensureConceptData(langPref.get());
     })
     .then(function () {
+      buildConceptSource(langPref.get());
       // The hero, breadcrumb/title, and the concept agenda were rendered in the
       // default language (bind + the engine ran before the concept source was set).
       // On a non-default language, repaint them now from the injected source.
