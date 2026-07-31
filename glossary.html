@@ -52,13 +52,17 @@
 
   <script src="generated/course-data.js"></script>
   <script src="generated/concept-index.js"></script>
+  <script src="resource/concept-i18n.js"></script>
   <script>
     (function () {
       "use strict";
       var LANG = "en";
       try { LANG = window.localStorage.getItem("course_lesson_lang") || "en"; } catch (e) {}
+      var VOICE = "default";
+      try { VOICE = window.localStorage.getItem("course_lesson_voice") || "default"; } catch (e) {}
       function t(key, fallback) { var C = window.ChromeText; return (C && C[key]) || fallback; }
       var CI = window.ConceptIndex, CD = window.CourseData;
+      var CI18n = null; // built in build(), once the overlay (if any) has loaded
       function esc(s) {
         return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
       }
@@ -94,6 +98,11 @@
       var byConcept = (CI && CI.byConcept) || {};
 
       function build() {
+        CI18n = window.ConceptI18n.create({
+          base: (CI && CI.defs) || {},
+          overlays: (window.ConceptI18nData && window.ConceptI18nData[LANG]) || {},
+          selection: { voice: VOICE, lang: LANG }
+        });
         // Repaint the static chrome from the catalog (English fallbacks keep the
         // en path byte-identical).
         document.title = t("glossary.docTitle", "Concept glossary - C# course");
@@ -116,7 +125,7 @@
 
         TRACKS.forEach(function (tr) {
           var ids = Object.keys(defs).filter(function (id) { return id.indexOf(tr.prefix) === 0; });
-          ids.sort(function (a, b) { return defs[a].term.toLowerCase().localeCompare(defs[b].term.toLowerCase()); });
+          ids.sort(function (a, b) { return CI18n.term(a).toLowerCase().localeCompare(CI18n.term(b).toLowerCase()); });
           if (!ids.length) return;
 
           var section = document.createElement("section");
@@ -128,7 +137,7 @@
 
           ids.forEach(function (id) {
             total++;
-            var d = defs[id], bc = byConcept[id] || {};
+            var bc = byConcept[id] || {};
             var links = [];
             if (bc.introducedBy) links.push('<span class="g-label">' + esc(t("glossary.introducedIn", "Introduced in")) + '</span> ' + lessonLink(bc.introducedBy));
             if (bc.revisitedBy && bc.revisitedBy.length) links.push('<span class="g-label">' + esc(t("glossary.revisitedIn", "Revisited in")) + '</span> ' + lessonLinks(bc.revisitedBy));
@@ -136,14 +145,14 @@
 
             var art = document.createElement("article");
             art.className = "g-concept";
-            art.dataset.search = (d.term + " " + d.def + " " + id).toLowerCase();
+            art.dataset.search = CI18n.search(id);
             var isCovered = COVERED[id] === true;
             if (isCovered) coveredCount++;
             art.innerHTML =
-              '<h3 class="g-term">' + esc(d.term) + ' <span class="g-id">' + esc(id) + '</span>' +
+              '<h3 class="g-term">' + esc(CI18n.term(id)) + ' <span class="g-id">' + esc(id) + '</span>' +
               (isCovered ? ' <span class="g-covered" title="' + esc(t("glossary.coveredTitle", "You answered this correctly in a checkpoint")) + '">' + esc(t("glossary.covered", "Covered")) + '</span>' : '') +
               '</h3>' +
-              '<p class="g-def">' + esc(d.def) + '</p>' +
+              '<p class="g-def">' + esc(CI18n.def(id)) + '</p>' +
               (links.length ? '<div class="g-links">' + links.join(" &middot; ") + '</div>' : '');
             section.appendChild(art);
           });
@@ -196,11 +205,19 @@
         if (LANG !== "en") window.dispatchEvent(new Event("course:localechange"));
       }
 
+      function loadScript(src) {
+        return new Promise(function (resolve) {
+          var s = document.createElement("script");
+          s.src = src; s.onload = resolve; s.onerror = function () { resolve(); };
+          document.head.appendChild(s);
+        });
+      }
       if (LANG !== "en") {
-        fetch("res/chrome/" + LANG + ".json")
-          .then(function (r) { return r.json(); })
-          .then(function (m) { window.ChromeText = m; build(); afterBuild(); })
-          .catch(function () { build(); afterBuild(); });
+        Promise.all([
+          fetch("res/chrome/" + LANG + ".json").then(function (r) { return r.json(); })
+            .then(function (m) { window.ChromeText = m; }).catch(function () {}),
+          loadScript("generated/concept-i18n." + LANG + ".js")
+        ]).then(function () { build(); afterBuild(); });
       } else {
         build();
         afterBuild();
