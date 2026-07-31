@@ -11,11 +11,16 @@
 (function (global) {
   "use strict";
 
+  function t(key, fallback) {
+    var C = (typeof window !== "undefined") && window.LessonCommon;
+    return (C && typeof C.t === "function") ? C.t(key, fallback) : fallback;
+  }
+
   var LABELS = {
-    en: "English",
-    es: "Espa\u00f1ol"
+    en: { key: "settings.langEn", label: "English" },
+    es: { key: "settings.langEs", label: "Espa\u00f1ol" }
   };
-  function labelFor(id) { return LABELS[id] || id; }
+  function labelFor(id) { return (LABELS[id] && t(LABELS[id].key, LABELS[id].label)) || id; }
 
   // Build the section from a preference; returns null when there is nothing to
   // choose (fewer than two languages), so the caller can omit it.
@@ -24,7 +29,7 @@
 
     return {
       id: "language",
-      title: "Language",
+      title: t("settings.language", "Language"),
       options: function () {
         var active = pref.get();
         return pref.values.map(function (id) {

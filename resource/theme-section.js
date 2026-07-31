@@ -9,6 +9,22 @@
 (function (global) {
   "use strict";
 
+  function tr(key, fallback) {
+    var C = (typeof window !== "undefined") && window.LessonCommon;
+    return (C && typeof C.t === "function") ? C.t(key, fallback) : fallback;
+  }
+
+  var LABEL_KEYS = {
+    clean: "settings.themeClean",
+    critters: "settings.themeCritters",
+    dark: "settings.themeDark"
+  };
+  var NOTE_KEYS = {
+    clean: "settings.themeCleanNote",
+    critters: "settings.themeCrittersNote",
+    dark: "settings.themeDarkNote"
+  };
+
   function create() {
     var Themes = global.Themes;
     var CourseTheme = global.CourseTheme;
@@ -16,14 +32,15 @@
 
     return {
       id: "theme",
-      title: "Theme",
+      title: tr("settings.theme", "Theme"),
       options: function () {
         var active = CourseTheme.get();
         return Themes.list().map(function (t) {
+          var note = t.note || "";
           return {
             id: t.id,
-            label: t.label,
-            note: t.note || "",
+            label: LABEL_KEYS[t.id] ? tr(LABEL_KEYS[t.id], t.label) : t.label,
+            note: NOTE_KEYS[t.id] ? tr(NOTE_KEYS[t.id], note) : note,
             swatch: t.swatch || [],
             active: t.id === active
           };

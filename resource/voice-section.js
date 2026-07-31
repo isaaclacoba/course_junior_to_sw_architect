@@ -10,13 +10,18 @@
 (function (global) {
   "use strict";
 
+  function t(key, fallback) {
+    var C = (typeof window !== "undefined") && window.LessonCommon;
+    return (C && typeof C.t === "function") ? C.t(key, fallback) : fallback;
+  }
+
   var LABELS = {
-    default: { label: "Default", note: "The standard course voice." },
-    child: { label: "Young learners", note: "Simple words, short sentences." },
-    academic: { label: "Academic", note: "Precise, formal wording." }
+    default: { key: "settings.voiceDefault", label: "Default", noteKey: "settings.voiceDefaultNote", note: "The standard course voice." },
+    child: { key: "settings.voiceChild", label: "Young learners", noteKey: "settings.voiceChildNote", note: "Simple words, short sentences." },
+    academic: { key: "settings.voiceAcademic", label: "Academic", noteKey: "settings.voiceAcademicNote", note: "Precise, formal wording." }
   };
-  function labelFor(id) { return (LABELS[id] && LABELS[id].label) || id; }
-  function noteFor(id) { return (LABELS[id] && LABELS[id].note) || ""; }
+  function labelFor(id) { return (LABELS[id] && t(LABELS[id].key, LABELS[id].label)) || id; }
+  function noteFor(id) { return (LABELS[id] && t(LABELS[id].noteKey, LABELS[id].note)) || ""; }
 
   // Build the section from a preference; returns null when there is nothing to
   // choose (fewer than two voices), so the caller can omit it.
@@ -25,7 +30,7 @@
 
     return {
       id: "voice",
-      title: "Reading voice",
+      title: t("settings.voice", "Reading voice"),
       options: function () {
         var active = pref.get();
         return pref.values.map(function (id) {

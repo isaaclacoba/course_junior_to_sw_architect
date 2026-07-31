@@ -1180,6 +1180,13 @@ input.almost {
   z-index: 40;
   font-family: inherit;
 }
+.c-lang {
+  position: fixed;
+  right: 22px;
+  bottom: 128px;
+  z-index: 40;
+  font-family: inherit;
+}
 .c-theme-btn {
   display: inline-flex;
   align-items: center;

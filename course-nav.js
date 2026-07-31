@@ -16,6 +16,13 @@
   var pillCheck = '<svg class="c-jb-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
   var partTick = '<svg class="c-part-tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
 
+  function esParts() {
+    try {
+      return (global.localStorage.getItem("course_lesson_lang") === "es" && global.LandingContent && global.LandingContent.parts) || null;
+    } catch (e) { return null; }
+  }
+  function tr(key, fb) { var t = global.ChromeText; return (t && t[key]) || fb; }
+
   var r = {};            // DOM refs, set in init
   var container = null;  // active track's DOM container
   var parts = [];        // .c-part elements for the active track
@@ -72,7 +79,7 @@
       var b = document.createElement("button");
       b.type = "button";
       b.className = "c-jb-pill";
-      b.innerHTML = pillCheck + '<span class="c-jb-num">' + ("0" + (i + 1)).slice(-2) + "</span>" + p.title;
+      b.innerHTML = pillCheck + '<span class="c-jb-num">' + ("0" + (i + 1)).slice(-2) + "</span>" + ((esParts() && esParts()[p.title]) || p.title);
       b.addEventListener("click", function () { jumpToPart(i); });
       r.jbTrack.appendChild(b);
       pills.push(b);
@@ -94,7 +101,7 @@
       pl.classList.toggle("is-done", full);
       if (!full) pl.classList.remove("open");
       var badge = pl.querySelector(".c-part-badge");
-      if (badge) badge.innerHTML = full ? total + " lessons \u00b7 done" + partTick : "";
+      if (badge) badge.innerHTML = full ? total + " " + tr("landing.lessons", "lessons") + " \u00b7 " + tr("landing.partDone", "done") + partTick : "";
       if (pills[i]) pills[i].classList.toggle("is-done", full);
     });
   }
