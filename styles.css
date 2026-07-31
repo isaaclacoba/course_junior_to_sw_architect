@@ -1680,6 +1680,21 @@ input.almost {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
 }
 
+/* ---- Concept "in this lesson" agenda chips ----
+   The default rules hardcode light pill backgrounds (#f3f3ee / #e7f1ee) with
+   color: var(--ink). In dark mode --ink is light, so light-on-light is
+   unreadable. Darken the surfaces so the light ink keeps its contrast; the
+   "New here" (introduces) chips get a subtle primary tint to stay highlighted. */
+[data-theme="dark"] .agenda-chip {
+  background: var(--bg-3);
+  border-color: var(--line);
+  color: var(--ink);
+}
+[data-theme="dark"] .agenda-chip--introduces {
+  background: rgba(var(--primary-rgb), 0.16);
+  border-color: rgba(var(--primary-rgb), 0.42);
+}
+
 /* ===================================================================
    Dark theme - interactive widgets (theory + AI)
    The vendored code-lab visuals (MemoryViz board/die scenes, the AI
