@@ -22,6 +22,11 @@
  *   5b. In-prose mentions - a [[concept:id|label]] marker in a migrated data.js
  *      must reference an introduced concept id (ERROR); a typo would otherwise
  *      render as a dead "Definition not found" chip with no build signal.
+ *   5c. Concept-text coverage (Phase-A i18n gate) - concept.<id>.def/.term keys
+ *      in a lesson's res bundles must reference an introduced id (ERROR), only in
+ *      the OWNER lesson (ERROR), and once a (voice,lang) bundle declares any
+ *      concept text it must define every introduced concept (missing .def ERROR).
+ *      Inert until concepts are migrated into the bundles.
  *   6. Drift guard - shells `node tools/generate.mjs --out <tmp>` and diffs the
  *      result (course-data.js, concept-index.js AND every migrated index.html)
  *      against what is committed (ERROR). Opt-in via VALIDATE_DRIFT=1; skipped by
@@ -258,20 +263,80 @@ export function checkResourceArity(lessons, report) {
       }
     }
 
-    // (b) + (c) every present bundle vs the default key set
+    // (b) + (c) every present bundle vs the default key set. The concept.*
+    // namespace is governed solely by checkConceptCoverage, so it is excluded
+    // from this PROSE subset/arity comparison (not an orphan, not a missing key).
     for (const b of bundles) {
       const keys = b.keys instanceof Set ? b.keys : new Set(b.keys);
       for (const k of keys) {
         if (defKeys.has(k)) continue;
         if (/^intro\.\d+$/.test(k)) continue; // intro is a valid non-default key
+        if (/^concept\./.test(k)) continue;   // concept text governed by checkConceptCoverage
         report.error(`Resource: "${lessonId}" bundle ${b.voice}/${b.lang} has unknown key "${k}" (not in default/${lang})`);
       }
       const isDefaultBase = b.voice === "default" && b.lang === lang;
       if (!isDefaultBase) {
         let missing = 0;
-        for (const k of defKeys) if (!keys.has(k)) missing++;
+        for (const k of defKeys) if (!/^concept\./.test(k) && !keys.has(k)) missing++;
         if (missing) {
           report.warn(`Resource: "${lessonId}" bundle ${b.voice}/${b.lang} omits ${missing} key(s) (default fallback covers them)`);
+        }
+      }
+    }
+  }
+}
+
+// Check (concept coverage): the Phase-A i18n gate. Concept text lives as
+// `concept.<id>.def` / `concept.<id>.term` keys in the OWNER lesson's bundles.
+//   lessons: [{ lessonId, bundles: [{ voice, lang, keys: Set<string> }] }]
+//   deps: { introducedIds: Set<id>, ownerByConcept: Map<id, lessonId> }
+// Rules (all ERROR):
+//   1. unknown id  - a concept.<id>.* key whose <id> is introduced by no lesson.
+//   2. ownership   - a concept.<id>.* key in a lesson that does not introduce <id>.
+//   3. coverage    - if a (voice,lang) bundle carries ANY concept.* key it must
+//      carry concept.<id>.def for EVERY concept that lesson introduces (`term`
+//      optional). A bundle with NO concept keys is untranslated and skipped, so
+//      the gate is inert until concepts are migrated, then enforces 100%.
+export function checkConceptCoverage(lessons, deps, report) {
+  const introducedIds = deps.introducedIds instanceof Set
+    ? deps.introducedIds : new Set(deps.introducedIds || []);
+  const ownerByConcept = deps.ownerByConcept instanceof Map
+    ? deps.ownerByConcept : new Map(Object.entries(deps.ownerByConcept || {}));
+
+  // Invert the owner map once: lessonId -> Set of concept ids it introduces.
+  const ownedByLesson = new Map();
+  for (const [cid, owner] of ownerByConcept) {
+    if (!ownedByLesson.has(owner)) ownedByLesson.set(owner, new Set());
+    ownedByLesson.get(owner).add(cid);
+  }
+
+  const KEY = /^concept\.(.+)\.(def|term)$/;
+
+  for (const { lessonId, bundles } of lessons) {
+    const owned = ownedByLesson.get(lessonId) || new Set();
+    for (const b of bundles || []) {
+      const keys = b.keys instanceof Set ? b.keys : new Set(b.keys);
+      const defsPresent = new Set(); // owned ids that have a .def in this bundle
+      let hasConceptKey = false;
+      for (const k of keys) {
+        const mm = KEY.exec(k);
+        if (!mm) continue;
+        hasConceptKey = true;
+        const id = mm[1];
+        if (!introducedIds.has(id)) {
+          report.error(`Concept text: "${lessonId}" bundle ${b.voice}/${b.lang} has "${k}" but "${id}" is not an introduced concept`);
+          continue;
+        }
+        if (ownerByConcept.get(id) !== lessonId) {
+          report.error(`Concept text: "${lessonId}" bundle ${b.voice}/${b.lang} defines "${k}" but "${id}" is introduced by "${ownerByConcept.get(id)}", not this lesson`);
+          continue;
+        }
+        if (mm[2] === "def") defsPresent.add(id);
+      }
+      if (!hasConceptKey) continue; // untranslated bundle - gate stays inert
+      for (const id of owned) {
+        if (!defsPresent.has(id)) {
+          report.error(`Concept text: "${lessonId}" bundle ${b.voice}/${b.lang} declares concept text but is missing "concept.${id}.def" (100% coverage required)`);
         }
       }
     }
@@ -401,6 +466,31 @@ function listJsonFiles(dir) {
   return out;
 }
 
+// Scan a lesson's res/strings base dir into [{ voice, lang, keys: Set<string> }]
+// - one entry per res/strings/<voice>/<lang>.json bundle. A malformed bundle
+// surfaces as an empty key set (reported by whichever check needs its keys).
+export function scanResourceBundles(baseDir) {
+  const bundles = [];
+  if (!fs.existsSync(baseDir)) return bundles;
+  for (const voice of fs.readdirSync(baseDir)) {
+    const voiceDir = path.join(baseDir, voice);
+    if (!fs.statSync(voiceDir).isDirectory()) continue;
+    for (const file of fs.readdirSync(voiceDir)) {
+      if (!file.endsWith(".json")) continue;
+      const lang = file.slice(0, -".json".length);
+      let obj = null;
+      try {
+        obj = JSON.parse(fs.readFileSync(path.join(voiceDir, file), "utf8"));
+      } catch {
+        obj = null; // a malformed bundle surfaces as an empty key set
+      }
+      const keys = obj && typeof obj === "object" ? new Set(Object.keys(obj)) : new Set();
+      bundles.push({ voice, lang, keys });
+    }
+  }
+  return bundles;
+}
+
 // Load the resource-arity inputs for every migrated build lesson that has a
 // resource layer (meta.resources): BUILD_CONFIG.tasks (the schema arity) and the
 // key set of every res/strings/<voice>/<lang>.json bundle.
@@ -420,29 +510,43 @@ export function loadResourceBundles(migrated, rootDir) {
     const base = m.meta.resources.base || "res/strings";
     const baseLang = m.meta.resources.lang || "en";
     const baseDir = path.join(rootDir, m.path, base);
-
-    const bundles = [];
-    if (fs.existsSync(baseDir)) {
-      for (const voice of fs.readdirSync(baseDir)) {
-        const voiceDir = path.join(baseDir, voice);
-        if (!fs.statSync(voiceDir).isDirectory()) continue;
-        for (const file of fs.readdirSync(voiceDir)) {
-          if (!file.endsWith(".json")) continue;
-          const lang = file.slice(0, -".json".length);
-          let obj = null;
-          try {
-            obj = JSON.parse(fs.readFileSync(path.join(voiceDir, file), "utf8"));
-          } catch {
-            obj = null; // a malformed bundle surfaces as an empty key set
-          }
-          const keys = obj && typeof obj === "object" ? new Set(Object.keys(obj)) : new Set();
-          bundles.push({ voice, lang, keys });
-        }
-      }
-    }
-    out.push({ lessonId: m.registryId, tasks, baseLang, bundles });
+    out.push({ lessonId: m.registryId, tasks, baseLang, bundles: scanResourceBundles(baseDir) });
   }
   return out;
+}
+
+// Load concept-text bundles for every migrated lesson that has a res/strings
+// dir, regardless of archetype - concept text (concept.<id>.def/.term) can be
+// introduced by any lesson kind. Returns [{ lessonId, bundles }] for
+// checkConceptCoverage. Lessons with no res/strings dir are omitted.
+export function loadConceptBundles(migrated, rootDir) {
+  const out = [];
+  for (const m of migrated) {
+    const base = (m.meta.resources && m.meta.resources.base) || "res/strings";
+    const baseDir = path.join(rootDir, m.path, base);
+    if (!fs.existsSync(baseDir)) continue;
+    out.push({ lessonId: m.registryId, bundles: scanResourceBundles(baseDir) });
+  }
+  return out;
+}
+
+// The set of concept ids introduced by a migrated lesson, and the owner map
+// (concept id -> the lessonId that introduces it). >1-introducer conflicts are
+// reported by checkConceptGraph; the owner map keeps the first seen introducer.
+export function introducedConceptIds(migrated) {
+  const set = new Set();
+  for (const m of migrated)
+    for (const it of (m.meta.concepts && m.meta.concepts.introduces) || [])
+      set.add(it.id);
+  return set;
+}
+
+export function conceptOwners(migrated) {
+  const map = new Map();
+  for (const m of migrated)
+    for (const it of (m.meta.concepts && m.meta.concepts.introduces) || [])
+      if (!map.has(it.id)) map.set(it.id, m.registryId);
+  return map;
 }
 
 // Every concept id introduced by a migrated lesson, unioned with the draft-
@@ -500,6 +604,11 @@ function main() {
   checkCheckpointConcepts(loadCheckpointQuizzes(migrated, root), knownIds, report);
   checkProseMentions(loadProseMentions(migrated, root), knownIds, report);
   checkResourceArity(loadResourceBundles(migrated, root), report);
+  checkConceptCoverage(
+    loadConceptBundles(migrated, root),
+    { introducedIds: introducedConceptIds(migrated), ownerByConcept: conceptOwners(migrated) },
+    report
+  );
 
   if (process.env.VALIDATE_DRIFT === "1") {
     const outDir = fs.mkdtempSync(path.join(os.tmpdir(), "concept-drift-"));
