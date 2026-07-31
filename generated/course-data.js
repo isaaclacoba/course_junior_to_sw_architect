@@ -905,6 +905,19 @@
               "pill": "gentle",
               "time": "15 min",
               "kind": "lesson"
+            },
+            {
+              "id": "ai-24",
+              "track": "ai",
+              "part": "the-building-blocks-of-ai",
+              "href": "content/ai/01-the-building-blocks-of-ai/08-ai-24/",
+              "key": "ai_24_awarded",
+              "total": 1,
+              "title": "Writing a good instruction",
+              "blurb": "How you ask does most of the work. Three moves make an instruction a model can follow - be specific, show an example, and ask for the answer in a form you can use.",
+              "pill": "gentle",
+              "time": "15 min",
+              "kind": "lesson"
             }
           ]
         },

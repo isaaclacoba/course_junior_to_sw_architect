@@ -1,0 +1,6 @@
+{
+  "concept.ai-few-shot.term": "Few-shot examples",
+  "concept.ai-few-shot.def": "Putting a couple of worked examples - an input and the answer you want - right in the prompt, so the model copies the pattern instead of guessing it.",
+  "concept.ai-output-format.term": "Output format",
+  "concept.ai-output-format.def": "Telling the model the exact shape to answer in - a template, a label, or a data format like JSON - so the reply is predictable and easy to use."
+}

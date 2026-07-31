@@ -79,6 +79,11 @@
       "revisitedBy": [],
       "usedBy": []
     },
+    "ai-few-shot": {
+      "introducedBy": "ai-24",
+      "revisitedBy": [],
+      "usedBy": []
+    },
     "ai-grounding": {
       "introducedBy": "ai-22",
       "revisitedBy": [],
@@ -139,6 +144,11 @@
       "revisitedBy": [],
       "usedBy": []
     },
+    "ai-output-format": {
+      "introducedBy": "ai-24",
+      "revisitedBy": [],
+      "usedBy": []
+    },
     "ai-planning": {
       "introducedBy": "ai-16",
       "revisitedBy": [
@@ -157,7 +167,8 @@
       "usedBy": [
         "ai-9",
         "ai-10",
-        "ai-4"
+        "ai-4",
+        "ai-24"
       ]
     },
     "ai-prompt-injection": {
@@ -295,7 +306,9 @@
       "revisitedBy": [
         "ai-13"
       ],
-      "usedBy": []
+      "usedBy": [
+        "ai-24"
+      ]
     },
     "ai-vector": {
       "introducedBy": "ai-14",
@@ -1669,6 +1682,17 @@
         "ai-tool-call"
       ]
     },
+    "ai-24": {
+      "introduces": [
+        "ai-few-shot",
+        "ai-output-format"
+      ],
+      "revisits": [],
+      "uses": [
+        "ai-prompt",
+        "ai-user-message"
+      ]
+    },
     "ai-3": {
       "introduces": [
         "ai-prompt"
@@ -2589,6 +2613,10 @@
       "term": "Evaluation",
       "def": "Turning a past failure into an automatic pass/fail check you run every time, so the same bug does not sneak back in."
     },
+    "ai-few-shot": {
+      "term": "Few-shot examples",
+      "def": "Putting a couple of worked examples - an input and the answer you want - right in the prompt, so the model copies the pattern instead of guessing it."
+    },
     "ai-grounding": {
       "term": "Grounding",
       "def": "Pulling the real source into the context and answering from it - citing it, and allowing \"I don't know\" - so the answer rests on a checkable fact instead of a guess."
@@ -2624,6 +2652,10 @@
     "ai-observability": {
       "term": "Observability",
       "def": "Being able to point at the exact step where a run went wrong in its record, so you can see what happened, not just that it failed."
+    },
+    "ai-output-format": {
+      "term": "Output format",
+      "def": "Telling the model the exact shape to answer in - a template, a label, or a data format like JSON - so the reply is predictable and easy to use."
     },
     "ai-planning": {
       "term": "Planning",

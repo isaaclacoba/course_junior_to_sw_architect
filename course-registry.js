@@ -126,6 +126,7 @@
     { track: "ai", part: "the-building-blocks-of-ai", id: "ai-10", href: "content/ai/01-the-building-blocks-of-ai/05-ai-10/", kind: "lesson", path: "content/ai/01-the-building-blocks-of-ai/05-ai-10" },
     { track: "ai", part: "the-building-blocks-of-ai", id: "ai-4", href: "content/ai/01-the-building-blocks-of-ai/06-ai-4/", kind: "lesson", path: "content/ai/01-the-building-blocks-of-ai/06-ai-4" },
     { track: "ai", part: "the-building-blocks-of-ai", id: "ai-5", href: "content/ai/01-the-building-blocks-of-ai/07-ai-5/", kind: "lesson", path: "content/ai/01-the-building-blocks-of-ai/07-ai-5" },
+    { track: "ai", part: "the-building-blocks-of-ai", id: "ai-24", href: "content/ai/01-the-building-blocks-of-ai/08-ai-24/", kind: "lesson", path: "content/ai/01-the-building-blocks-of-ai/08-ai-24" },
 
     // ---- ai / from-model-to-agent ----
     { track: "ai", part: "from-model-to-agent", id: "ai-6", href: "content/ai/02-from-model-to-agent/01-ai-6/", kind: "lesson", path: "content/ai/02-from-model-to-agent/01-ai-6" },

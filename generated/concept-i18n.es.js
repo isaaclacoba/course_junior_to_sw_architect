@@ -43,6 +43,10 @@
       "def": "Convertir un fallo pasado en una comprobación automática de pass/fail que ejecutas siempre, para que el mismo bug no vuelva a colarse.",
       "term": "Evaluación"
     },
+    "ai-few-shot": {
+      "def": "Poner un par de ejemplos resueltos - una entrada y la respuesta que quieres - dentro del propio prompt, para que el modelo copie el patrón en vez de adivinarlo.",
+      "term": "Ejemplos en el prompt (few-shot)"
+    },
     "ai-grounding": {
       "def": "Traer la fuente real al contexto y responder a partir de ella - citándola, y permitiendo un «no lo sé» - para que la respuesta se apoye en un dato comprobable y no en una suposición.",
       "term": "Grounding"
@@ -78,6 +82,10 @@
     "ai-observability": {
       "def": "Poder señalar en el registro el paso exacto donde una ejecución se torció, para ver qué pasó y no solo que falló.",
       "term": "Observabilidad"
+    },
+    "ai-output-format": {
+      "def": "Decirle al modelo la forma exacta en la que debe responder - una plantilla, una etiqueta o un formato de datos como JSON - para que la respuesta sea predecible y fácil de usar.",
+      "term": "Formato de salida"
     },
     "ai-planning": {
       "def": "Partir un objetivo demasiado grande para un solo movimiento en una lista ordenada de pasos pequeños y hacerlos de uno en uno.",
