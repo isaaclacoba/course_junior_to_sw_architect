@@ -98,6 +98,9 @@
     if (global.ResourceBindViz && global.LESSON_VIZ) {
       global.ResourceBindViz.apply(R, { page: global.PAGE, viz: global.LESSON_VIZ });
     }
+    if (global.ResourceBindCheckpoint && global.QUIZ_CONFIG) {
+      global.ResourceBindCheckpoint.apply(R, { page: global.PAGE, quiz: global.QUIZ_CONFIG });
+    }
   }
 
   // The chrome (shared UI) catalog is lang-only and site-wide. Load it into
@@ -143,8 +146,11 @@
       // A viz page's visual is mounted by page-shell during its injection; hold
       // it as a Localizable surface so a language swap re-renders the narrations.
       if (global.PageShellViz) surfaces.push(global.PageShellViz);
+      // A checkpoint page's Quiz is mounted by page-shell during its injection;
+      // hold it as a Localizable surface so a language swap re-creates the Quiz.
+      if (global.PageShellCheckpoint) surfaces.push(global.PageShellCheckpoint);
       // A build lesson injects its engine (manual mode) and mounts the widget; a
-      // viz lesson has no engine, so there is nothing more to inject.
+      // viz or checkpoint lesson has no engine, so there is nothing more to inject.
       if (!global.BUILD_CONFIG) return;
       return injectScript(engineSrc, { "data-manual": "" }).then(function () {
         if (global.BuildEngine) {

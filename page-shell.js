@@ -571,7 +571,22 @@
     hero.insertAdjacentElement("afterend", quizHost);
     if (!window.QUIZ_CONFIG.nextHref) window.QUIZ_CONFIG.nextHref = page.nextHref;
     try {
-      window.CodeLab.Quiz.create(quizHost, window.QUIZ_CONFIG);
+      let quizController = window.CodeLab.Quiz.create(quizHost, window.QUIZ_CONFIG);
+      // Localizable surface: a language swap re-binds QUIZ_CONFIG's strings
+      // (bind-checkpoint), then this re-creates the Quiz so the new text paints.
+      // destroy() removes the old root; a fresh create redraws a question set,
+      // which is acceptable on a language change.
+      window.PageShellCheckpoint = {
+        setLocale: () => {
+          try { if (quizController && quizController.destroy) quizController.destroy(); } catch (e) {}
+          quizHost.innerHTML = "";
+          try {
+            quizController = window.CodeLab.Quiz.create(quizHost, window.QUIZ_CONFIG);
+          } catch (e) {
+            console.error("lesson-quiz relocalize failed", e);
+          }
+        },
+      };
     } catch (err) {
       console.error("quiz mount failed", err);
       quizHost.remove();

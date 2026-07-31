@@ -320,6 +320,12 @@ function renderIndexHtml(m, variants) {
     // live in res/strings too; the binder is bind-viz and there is no engine.
     const controller = meta.runtime === "kernel" ? "kernel-controller" : "bootstrap";
     html = applyResourceTailViz(html, meta.resources, m.id, controller);
+  } else if (archetype === "checkpoint" && meta.resources) {
+    // A checkpoint lesson's prose (hero + quiz title/intro + question stems,
+    // options and explanations) can live in res/strings; the binder is
+    // bind-checkpoint and there is no engine (the Quiz is a code-lab widget).
+    const controller = meta.runtime === "kernel" ? "kernel-controller" : "bootstrap";
+    html = applyResourceTailCheckpoint(html, meta.resources, m.id, controller);
   }
 
   return html;
@@ -379,6 +385,39 @@ function applyResourceTailViz(html, resources, lessonId, controllerModule = "boo
   }
 
   const modules = ["resolver", "store", "manager", "settings", "preference", "theme-section", "voice-section", "lang-section", "bind-viz"]
+    .map((mod) => '    <script src="../../../../resource/' + mod + '.js"></script>')
+    .join("\n");
+  const resourceTail =
+    modules + "\n" +
+    '    <script\n' +
+    '      src="../../../../resource/' + controllerModule + '.js"\n' +
+    '      data-page-shell="../../../../page-shell.js"\n' +
+    '      data-res-base="' + base + '"\n' +
+    '      data-res-lang="' + lang + '"\n' +
+    '      data-res-langs="' + langs + '"\n' +
+    '      data-res-voices="' + voices + '"\n' +
+    '    ></script>';
+
+  return html.replace(staticTail, resourceTail);
+}
+
+// Checkpoint variant of the resource tail. Like viz, a checkpoint page mounts its
+// widget (the code-lab Quiz, from window.QUIZ_CONFIG in data.js) via page-shell,
+// with no engine. data.js is already loaded ahead of the tail, so we swap only
+// the trailing static page-shell.js load for the resource modules (with
+// bind-checkpoint) + the controller, which injects page-shell after binding.
+function applyResourceTailCheckpoint(html, resources, lessonId, controllerModule = "bootstrap") {
+  const base = resources.base || "res/strings";
+  const lang = resources.lang || "en";
+  const langs = (resources.langs && resources.langs.length ? resources.langs : [lang]).join(",");
+  const voices = (resources.voices || ["default"]).join(",");
+
+  const staticTail = '    <script src="../../../../page-shell.js"></script>';
+  if (html.indexOf(staticTail) === -1) {
+    throw new Error("checkpoint resource wiring: could not find the static page-shell tail for " + lessonId);
+  }
+
+  const modules = ["resolver", "store", "manager", "settings", "preference", "theme-section", "voice-section", "lang-section", "bind-checkpoint"]
     .map((mod) => '    <script src="../../../../resource/' + mod + '.js"></script>')
     .join("\n");
   const resourceTail =
