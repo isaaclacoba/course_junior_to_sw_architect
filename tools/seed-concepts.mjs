@@ -3,10 +3,11 @@
  * drafts in docs/concepts/<track>.concepts.json.
  *
  * `new-lesson.mjs` seeds concepts once, at migration time. When the drafts change
- * (e.g. after a vocabulary audit), the already-migrated meta.js are stale - the
- * generator reads meta.js, so it will not pick the change up on its own. Run this
- * to push the current drafts into every migrated lesson's meta.js, then re-run
- * `node tools/generate.mjs`.
+ * (e.g. after a vocabulary audit), the already-migrated lessons are stale - the
+ * generator reads them, so it will not pick the change up on its own. Run this to
+ * push the current drafts down: the GRAPH (ids + relationships) into each meta.js,
+ * and the TEXT (term/def) into that lesson's res/strings/default/en.json as
+ * `concept.<id>.term/.def`. Then re-run `node tools/generate.mjs`.
  *
  * `concepts` is the last property metaFileText writes, so this replaces the tail
  * of each meta.js from `\n  concepts:` onward. Only Node built-ins.
@@ -41,7 +42,25 @@ for (const l of reg.lessons) {
     console.log("skip (unexpected meta.js shape, not rewriting): " + l.id); skipped++; continue;
   }
   const draft = (drafts[l.track] || {})[l.id] || null;
-  const next = txt.slice(0, idx) + "\n  concepts: " + conceptsLiteral(draft) + ",\n};\n";
+  // Text (term/def) is a resource: seed it into res/strings/default/en.json.
+  const intro = (draft && draft.introduces) || [];
+  if (intro.length) {
+    const enDir = path.join(root, l.path, "res", "strings", "default");
+    const enPath = path.join(enDir, "en.json");
+    let en = {};
+    if (fs.existsSync(enPath)) en = JSON.parse(fs.readFileSync(enPath, "utf8"));
+    else fs.mkdirSync(enDir, { recursive: true });
+    for (const x of intro) {
+      if (x.term != null) en["concept." + x.id + ".term"] = x.term;
+      if (x.def != null) en["concept." + x.id + ".def"] = x.def;
+    }
+    fs.writeFileSync(enPath, JSON.stringify(en, null, 2) + "\n");
+  }
+  // Graph (ids + relationships) is metadata: seed the stripped block into meta.js.
+  const stripped = draft
+    ? { introduces: intro.map((x) => ({ id: x.id })), revisits: draft.revisits || [], uses: draft.uses || [] }
+    : null;
+  const next = txt.slice(0, idx) + "\n  concepts: " + conceptsLiteral(stripped) + ",\n};\n";
   fs.writeFileSync(metaPath, next);
   patched++;
   console.log("reseeded " + l.id + " (" + ((draft && draft.introduces) || []).length + " introduces)");

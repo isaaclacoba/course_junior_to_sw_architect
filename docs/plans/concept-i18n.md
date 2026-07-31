@@ -1,6 +1,6 @@
 # Concept term/def i18n (voice x language)
 
-Status: not started  -  Design: [docs/architecture/concept-i18n.md](../architecture/concept-i18n.md)
+Status: in progress  -  Design: [docs/architecture/concept-i18n.md](../architecture/concept-i18n.md)
 
 ## Goal
 Translate the ~208 concept `term`/`def`s (glossary + in-lesson define-panel) to
@@ -15,20 +15,22 @@ language; a small `ConceptI18n` adapter (English graph = fallback) feeds both th
 standalone glossary and the page-shell panel. English stays the base.
 
 ## Plan
-1. [ ] Migrate `meta.js` `term`/`def` -> `res/strings/default/en.json` (scripted) - verify: `concept-index.js` diff 0
-2. [ ] Update `seed-concepts.mjs`: graph -> `meta.js`, text -> `default/en.json` - verify: re-seed is idempotent
-3. [ ] `generate.mjs` reads text from bundles + emits `concept-i18n.<lang>.js` - verify: English index byte-identical
-4. [ ] `ConceptI18n` adapter (`resource/concept-i18n.js`), DOM-free, graph fallback - verify: unit shape + no-op = English
+1. [x] Migrate `meta.js` `term`/`def` -> `res/strings/default/en.json` (scripted) - verify: `concept-index.js` diff 0
+2. [x] Update `seed-concepts.mjs`: graph -> `meta.js`, text -> `default/en.json` - verify: re-seed is idempotent (no content change)
+3. [x] `generate.mjs` reads concept text from the en bundle - verify: English index byte-identical (concept-i18n.<lang>.js emission moved to Phase B, verified with data)
+4. [x] `ConceptI18n` adapter (`resource/concept-i18n.js`), DOM-free, graph fallback - verify: 6 unit tests pass
 5. [ ] page-shell: `conceptDef` via injected source + `PageShellConcepts` surface + re-callable `renderAgenda` - verify: en panel identical
 6. [ ] kernel-controller: load `concept-i18n.<lang>.js`, inject source, push surface - verify: live en->es swap re-renders chips
 7. [ ] glossary: use `ConceptI18n` + rebuild `dataset.search` from resolved text - verify: en DOM diff 0; es search matches
-8. [ ] validate.mjs: concept coverage gate (100% = ERROR) + id subset check - verify: 3 guard fixtures pass
+8. [x] validate.mjs: concept coverage gate (100% = ERROR) + id subset check - verify: 5 fixture tests pass; real repo stays 0 errors (inert)
 9. [ ] Phase A verify + commit - verify: gate 1-5 in design doc all green
 10. [ ] Phase B: author es defs to 100% coverage, fleet by track (`pr-`/`th-`/`ai-`) - verify: coverage gate green course-wide
 11. [ ] Phase C: extra voices/langs slots (`child`/`academic`, new lang) - verify: fallback child->default->graph
 
 ## Progress
 - 2026-07-31 Design approved, decisions locked, design-of-record + this brief committed. Not started.
+- 2026-07-31 Phase A: fanned out steps 4 (ConceptI18n) + 8 (validate gate) - both tested + committed (b4313bd), inert until migration. Migration (1-3) next.
+- 2026-07-31 Migration done (7a82f2c): 71 lessons' term/def moved to default/en.json, meta.js graph-only, generate reads from bundles. Gate PASSED: concept-index.js + course-data.js byte-identical; validate 0 errors (coverage gate live); seed-concepts idempotent. Next: consumers (5-7) + verify (9), then architect review.
 
 ## Open
 - None open; ready to start Phase A step 1 on the owner's go.
