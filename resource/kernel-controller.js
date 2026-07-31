@@ -33,6 +33,7 @@
   var langs = attr("data-res-langs", defaultLang).split(",").map(trim).filter(Boolean);
   var voices = attr("data-res-voices", "default").split(",").map(trim).filter(Boolean);
   var chromeBase = attr("data-chrome-base", "../../../../res/chrome");
+  var conceptsBase = attr("data-concepts-base", "../../../../generated");
 
   function injectScript(src, attrs) {
     return new Promise(function (resolve, reject) {
@@ -116,13 +117,37 @@
       .catch(function () { global.ChromeText = global.ChromeText || {}; });
   }
 
+  // Concept term/def overlays: build a ConceptI18n source (English graph = base)
+  // for the current voice/lang and inject it into the concept panel + agenda. The
+  // per-language overlay lives in generated/concept-i18n.<lang>.js; English needs
+  // none. A missing overlay degrades to the English graph.
+  var conceptDataLoaded = {};
+  function buildConceptSource(lang) {
+    if (!global.ConceptI18n || !global.PageShellConcepts) return;
+    global.PageShellConcepts.setConceptSource(global.ConceptI18n.create({
+      base: (global.ConceptIndex && global.ConceptIndex.defs) || {},
+      overlays: (global.ConceptI18nData && global.ConceptI18nData[lang]) || {},
+      selection: { voice: voicePref.get(), lang: lang }
+    }));
+  }
+  function loadConcepts(lang) {
+    if (lang === defaultLang || conceptDataLoaded[lang]) { buildConceptSource(lang); return Promise.resolve(); }
+    return new Promise(function (resolve) {
+      var s = document.createElement("script");
+      s.src = conceptsBase + "/concept-i18n." + lang + ".js";
+      s.onload = function () { conceptDataLoaded[lang] = true; buildConceptSource(lang); resolve(); };
+      s.onerror = function () { buildConceptSource(lang); resolve(); }; // absent = English fallback
+      global.document.head.appendChild(s);
+    });
+  }
+
   // Re-resolve for the current selection and repaint prose in place, guarded by
   // the generation token. The Settings highlight follows the (already-updated)
   // preference synchronously; the prose repaints when the bundle resolves.
   function relocalize() {
     if (settings) settings.refresh();
     var myGen = ++gen;
-    return Promise.all([manager.init(), loadChrome(langPref.get())]).then(function (arr) {
+    return Promise.all([manager.init(), loadChrome(langPref.get()), loadConcepts(langPref.get())]).then(function (arr) {
       if (myGen !== gen) return; // superseded by a newer selection
       bind(arr[0]); // refresh PAGE.hero.intro + BUILD_CONFIG.tasks once, before the fan-out
       surfaces.forEach(function (s) {
@@ -152,6 +177,9 @@
       // A checkpoint page's Quiz is mounted by page-shell during its injection;
       // hold it as a Localizable surface so a language swap re-creates the Quiz.
       if (global.PageShellCheckpoint) surfaces.push(global.PageShellCheckpoint);
+      // The concept panel + agenda are page-shell content; hold PageShellConcepts
+      // as a Localizable surface so a language swap re-localizes them.
+      if (global.PageShellConcepts) surfaces.push(global.PageShellConcepts);
       // A build lesson injects its engine (manual mode) and mounts the widget; a
       // viz or checkpoint lesson has no engine, so there is nothing more to inject.
       if (!global.BUILD_CONFIG) return;
@@ -164,12 +192,15 @@
       });
     })
     .then(function () {
-      // The hero was rendered in the target language (bind ran before heroHTML),
-      // but the breadcrumb + document title are set by the engine from the English
-      // registry. On a non-default language, trigger one hero repaint (now that the
-      // engine has set them) so PageShellHero localizes them too.
-      if (langPref.get() !== defaultLang && global.PageShellHero && typeof global.PageShellHero.setLocale === "function") {
-        try { global.PageShellHero.setLocale(); } catch (e) {}
+      return loadConcepts(langPref.get());
+    })
+    .then(function () {
+      // The hero, breadcrumb/title, and the concept agenda were rendered in the
+      // default language (bind + the engine ran before the concept source was set).
+      // On a non-default language, repaint them now from the injected source.
+      if (langPref.get() !== defaultLang) {
+        try { if (global.PageShellHero && global.PageShellHero.setLocale) global.PageShellHero.setLocale(); } catch (e) {}
+        try { if (global.PageShellConcepts && global.PageShellConcepts.setLocale) global.PageShellConcepts.setLocale(); } catch (e) {}
       }
     })
     .catch(function (err) {

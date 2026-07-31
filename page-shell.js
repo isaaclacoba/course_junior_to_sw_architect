@@ -280,11 +280,17 @@
   // data-concept-id; one delegated click handler opens a shared panel that reads
   // the def from window.ConceptIndex (loaded by the lesson page's script block).
 
+  // A ConceptI18n source (voice/lang-aware, graph as fallback) injected by the
+  // kernel-controller. Unset (legacy / non-kernel pages) => read the English
+  // graph directly, so the default render stays byte-identical.
+  let conceptSource = null;
   function conceptDef(id) {
+    if (conceptSource) return { term: conceptSource.term(id), def: conceptSource.def(id) };
     const CI = window.ConceptIndex;
     return (CI && CI.defs && CI.defs[id]) || null;
   }
   function conceptTerm(id) {
+    if (conceptSource) return conceptSource.term(id);
     const d = conceptDef(id);
     return d ? d.term : id;
   }
@@ -300,6 +306,8 @@
 
   // "In this lesson" - built from the page's own LESSON_META.concepts.
   function renderAgenda() {
+    const existing = hero.querySelector(".lesson-agenda");
+    if (existing) existing.remove();
     const meta = window.LESSON_META;
     const c = meta && meta.concepts;
     if (!c) return;
@@ -346,6 +354,7 @@
   function showConcept(id) {
     const d = conceptDef(id);
     const panel = conceptPanelEl();
+    panel.dataset.conceptId = id;
     panel.querySelector(".concept-panel-term").textContent = d ? d.term : id;
     panel.querySelector(".concept-panel-def").textContent = d ? d.def : "Definition not found.";
     const prefix = window.LESSON_META && window.LESSON_META.id ? "../../../../" : "";
@@ -358,6 +367,18 @@
     const panel = document.getElementById("conceptPanel");
     if (panel && !panel.hidden && !panel.contains(e.target)) panel.hidden = true;
   });
+
+  // Localizable surface: the kernel-controller injects a ConceptI18n source and,
+  // on a language swap, calls setLocale() to re-localize the agenda chips + an
+  // open panel. Never runs on the default render, so it stays byte-identical.
+  window.PageShellConcepts = {
+    setConceptSource: function (src) { conceptSource = src; },
+    setLocale: function () {
+      renderAgenda();
+      const panel = document.getElementById("conceptPanel");
+      if (panel && !panel.hidden && panel.dataset.conceptId) showConcept(panel.dataset.conceptId);
+    }
+  };
 
   function drillCard(p) {
     return `

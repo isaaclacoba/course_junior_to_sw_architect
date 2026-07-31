@@ -366,7 +366,7 @@ function applyResourceTail(html, resources, enginePath, lessonId, controllerModu
     throw new Error("resource wiring: could not find the static engine tail for " + lessonId);
   }
 
-  const modules = ["resolver", "store", "manager", "settings", "preference", "theme-section", "voice-section", "lang-section", "bind-build"]
+  const modules = ["resolver", "store", "manager", "settings", "preference", "theme-section", "voice-section", "lang-section", "concept-i18n", "bind-build"]
     .map((mod) => '    <script src="../../../../resource/' + mod + '.js"></script>')
     .join("\n");
   const resourceTail =
@@ -401,7 +401,7 @@ function applyResourceTailViz(html, resources, lessonId, controllerModule = "boo
     throw new Error("viz resource wiring: could not find the static page-shell tail for " + lessonId);
   }
 
-  const modules = ["resolver", "store", "manager", "settings", "preference", "theme-section", "voice-section", "lang-section", "bind-viz"]
+  const modules = ["resolver", "store", "manager", "settings", "preference", "theme-section", "voice-section", "lang-section", "concept-i18n", "bind-viz"]
     .map((mod) => '    <script src="../../../../resource/' + mod + '.js"></script>')
     .join("\n");
   const resourceTail =
@@ -434,7 +434,7 @@ function applyResourceTailCheckpoint(html, resources, lessonId, controllerModule
     throw new Error("checkpoint resource wiring: could not find the static page-shell tail for " + lessonId);
   }
 
-  const modules = ["resolver", "store", "manager", "settings", "preference", "theme-section", "voice-section", "lang-section", "bind-checkpoint"]
+  const modules = ["resolver", "store", "manager", "settings", "preference", "theme-section", "voice-section", "lang-section", "concept-i18n", "bind-checkpoint"]
     .map((mod) => '    <script src="../../../../resource/' + mod + '.js"></script>')
     .join("\n");
   const resourceTail =
