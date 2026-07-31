@@ -1,0 +1,15 @@
+{
+  "hero.eyebrow": "Teoría · Parte siete · Cómo piensa un agente",
+  "hero.title": "Planificación",
+  "intro.0": "Algunos objetivos son demasiado grandes para hacerlos de un solo movimiento. «Planear un finde» no es una acción - son una docena, y algunas dependen de otras. Un modelo que se lanza de cabeza suele perder el hilo a mitad de camino. Así que antes de actuar, un buen agente hace lo que harías tú: parte el objetivo en una lista ordenada de pasos más pequeños, y luego los va haciendo de uno en uno. Verás cómo un objetivo se convierte en un plan, y cómo el plan se lleva a cabo - incluido lo que pasa cuando un paso se atasca.",
+  "legend.0": "el paso en el que se trabaja ahora",
+  "legend.1": "un paso terminado",
+  "legend.2": "un paso bloqueado - toca replanificar",
+  "step.0.narr": "Un objetivo, demasiado grande para hacerlo de un solo movimiento. Reservas, horarios, presupuesto, un itinerario - todo enredado. Lo primero que hace un agente capaz no es actuar. Es **planificar**.",
+  "step.1.narr": "Parte el objetivo en una lista ordenada de pasos más pequeños - **descomposición de la tarea**. Cada paso es lo bastante pequeño como para hacerlo de verdad, y el orden captura qué depende de qué: necesitas las fechas antes de poder buscar vuelos.",
+  "step.2.narr": "Ahora trabaja **de un paso en un paso**. Paso uno: comprobar las fechas - las recuerda de la memoria. Hacer un solo paso mantiene al modelo centrado, en vez de hacer malabares con todo el viaje a la vez.",
+  "step.3.narr": "Paso hecho, sigue adelante. El paso dos llama a la herramienta de búsqueda de vuelos; el paso tres elige entre lo que volvió. Cada paso terminado encoge lo que queda y alimenta el siguiente.",
+  "step.4.narr": "No todo sale según lo previsto. El paso del hotel vuelve vacío - nada libre cerca del centro. Un guion rígido se rompería aquí. Un agente lo trata como una **señal**, no como un callejón sin salida.",
+  "step.5.narr": "Así que **replanifica**: rehace el paso bloqueado y añade una alternativa - amplía la búsqueda, coge una habitación a una parada de metro. El plan no está grabado en piedra; es una lista viva que el agente revisa según va aprendiendo.",
+  "step.6.narr": "Con una habitación encontrada, los últimos pasos encajan. Eso es la **planificación**: convertir un objetivo grande en una lista ordenada de pasos pequeños, hacerlos de uno en uno, y revisar cuando un paso se atasca. Es lo que mantiene a un agente en el buen camino durante una tarea larga, en vez de perder el hilo después del primer movimiento."
+}

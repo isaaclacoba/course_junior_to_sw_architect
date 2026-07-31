@@ -1,0 +1,14 @@
+{
+  "hero.eyebrow": "Teoría · Parte ocho · Hacer agentes fiables",
+  "hero.title": "¿Funcionó? Leer la traza",
+  "intro.0": "Cuando un agente se equivoca en algo, «la IA la lió» no es un diagnóstico. Como una ejecución no es más que esa lista de mensajes que viste antes, puedes leerla del tirón como la caja negra de un avión y ver exactamente qué paso se torció. Eso es la observabilidad. Júntala con la evaluación - una comprobación que decide si pasa o falla - y puedes saber si un agente funciona, y arreglarlo cuando no. Leerás la traza de una ejecución fallida, encontrarás el paso malo, y verás cómo una comprobación sencilla lo pilla automáticamente.",
+  "legend.0": "esto lo escribió el modelo",
+  "legend.1": "esto lo escribiste tú",
+  "legend.2": "esto lo escribió una herramienta o una comprobación",
+  "step.0.narr": "Un usuario dice que la propina salió mal. Todo lo que tienes es la **traza** - el registro completo de la ejecución: cada mensaje, cada llamada a herramienta, cada resultado. Aquí es donde empieza depurar un agente.",
+  "step.1.narr": "Léela de arriba abajo. La cuenta que montó el agente está bien: 80 por 0,15. Y la herramienta hizo su trabajo - la observación vuelve como **12**, que es correcto. Hasta aquí, nada está roto.",
+  "step.2.narr": "La ruptura está en la **última** línea. La herramienta dijo 12, pero el agente informó de **1,20 $** - malinterpretó su propia observación. Poder señalar el paso exacto que falla, en el registro, es la **observabilidad**: puedes ver qué pasó, no solo que salió mal.",
+  "step.3.narr": "Encontrarlo una vez a mano está bien. Pero no quieres releer cada traza para siempre. Así que conviértelo en una **comprobación**: para esta entrada, la propina final debería ser **12,00 $**. Pásala contra la traza - y **falla**, automáticamente.",
+  "step.4.narr": "Una comprobación es un test. Una carpeta de ellas - entradas reales emparejadas con la respuesta correcta - es una **suite de evals**. Pásala después de cada cambio y sabes, en segundos, si arreglaste el bug y si rompiste algo más.",
+  "step.5.narr": "Así que \"¿funcionó?\" tiene dos partes. **Observabilidad** - guarda la traza, para poder ver exactamente dónde se torció una ejecución. **Evaluación** - convierte cada bug en una comprobación que pasas cada vez, para que nunca pueda volver a colarse sin que te des cuenta. Así es como un agente se vuelve más fiable en vez de solo más complicado."
+}

@@ -1,0 +1,14 @@
+{
+  "hero.eyebrow": "Teoría · Parte siete · Cómo piensa un agente",
+  "hero.title": "Reflexión",
+  "intro.0": "El primer borrador rara vez es el mejor - tanto para un modelo como para nosotros. Si lo dejas a su aire, entrega su primer intento, con errores y todo. Pero puedes pedirle que haga algo sorprendentemente potente: mirar su propio trabajo, encontrar lo que está mal, y volver a intentarlo. Ese bucle - borrador, crítica, revisión - pilla errores que la primera pasada se dejó, sin que ninguna persona intervenga. Verás cómo una primera respuesta floja se comprueba y se mejora con el mismo modelo.",
+  "legend.0": "esto lo escribió el modelo",
+  "legend.1": "esto lo escribiste tú",
+  "legend.2": "esto lo escribió tu app",
+  "step.0.narr": "Una tarea pequeña con una trampa fácil de pasar por alto. Fíjate en la primera respuesta - parece correcta.",
+  "step.1.narr": "El **borrador**. Limpio, legible, y correcto para una lista normal. Pero una primera pasada rara vez cubre los casos límite - y este esconde un fallo.",
+  "step.2.narr": "En vez de darlo por bueno, ponemos al modelo a mirar su propio trabajo: **revisa tu respuesta buscando bugs y casos límite**. Revisar es una tarea distinta y más fácil que escribir - y el modelo suele ser bueno en ella.",
+  "step.3.narr": "La **crítica**. Al leer su propio código, el modelo pilla lo que se le escapó al escribir: una lista vacía divide por cero y revienta. Encontró su propio bug.",
+  "step.4.narr": "La **revisión**. Con el fallo señalado, el arreglo es obvio - trata primero la lista vacía. La segunda respuesta es mejor que la primera porque el modelo pudo ver la primera.",
+  "step.5.narr": "Eso es la **reflexión**: borrador, crítica, revisión. No es magia - el modelo no es más listo la segunda vez - pero una pasada nueva sobre su propia salida pilla errores que un solo intento se deja. Los agentes la usan para revisar un plan, releer el resultado de una herramienta, o comprobar dos veces una respuesta antes de comprometerse con ella."
+}

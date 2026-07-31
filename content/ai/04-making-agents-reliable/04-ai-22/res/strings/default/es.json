@@ -1,0 +1,14 @@
+{
+  "hero.eyebrow": "Teoría · Parte ocho · Hacer agentes fiables",
+  "hero.title": "Alucinación y grounding",
+  "intro.0": "Pregúntale a un modelo algo que no sabe y muchas veces responderá igualmente - con fluidez, con seguridad, y mal. Esto es una alucinación: detalle inventado que se lee igual que un hecho. Pasa porque el trabajo del modelo es producir texto plausible, no comprobar si es verdad. La cura es el grounding: dale fuentes reales de las que responder, y pídele que las señale. Verás una respuesta inventada con mucha seguridad, y luego la misma pregunta anclada a un documento real.",
+  "legend.0": "esto lo escribió el modelo",
+  "legend.1": "esto lo escribiste tú",
+  "legend.2": "una fuente que trajo la herramienta",
+  "step.0.narr": "Una pregunta sobre un dato concreto - la política de tu propia empresa. Al modelo nunca se le dijo esto. Fíjate cómo responde igualmente.",
+  "step.1.narr": "Da un número claro y seguro: 60 días. **Suena** autorizado - pero es inventado. Un modelo predice texto plausible; \"ventana de reembolso de 60 días\" es una frase plausible, así que sale. Esa respuesta segura pero equivocada es una **alucinación**.",
+  "step.2.narr": "El problema no es que el modelo mienta. No tiene ninguna fuente con la que contrastar, así que rellena el hueco con algo que se lee bien. El arreglo es **darle** una fuente - así que antes de que responda, traemos la política real.",
+  "step.3.narr": "Ahora el modelo responde a partir del texto que tiene delante, no de memoria: **30 días**, directo de la política. La misma pregunta, pero esta vez la respuesta está **grounded** - anclada a una fuente real que podría citar.",
+  "step.4.narr": "Ayuda pedir también la **cita** - qué línea usó - para que una persona pueda comprobarlo. Y, sobre todo, hay que dejar que el modelo diga **\"no lo sé\"** cuando la fuente no lo cubre, en vez de tirar de una suposición plausible.",
+  "step.5.narr": "La fuente no dice nada sobre los planes anuales, así que lo honesto es decirlo - no inventarse uno. Eso es el **grounding**: trae la fuente real, responde a partir de ella, cítala, y prefiere \"no lo sé\" antes que una suposición segura. Es lo que más hace, con diferencia, que un agente sea de fiar."
+}

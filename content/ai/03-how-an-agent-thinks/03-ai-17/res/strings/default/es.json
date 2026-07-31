@@ -1,0 +1,15 @@
+{
+  "hero.eyebrow": "Teoría · Parte siete · Cómo piensa un agente",
+  "hero.title": "Razonar y actuar (ReAct)",
+  "intro.0": "Ya has visto las dos mitades por separado: el modelo razonando con palabras, y el agente llamando a una herramienta. El patrón que las une tiene nombre - ReAct, de razonar más actuar. El agente escribe un pensamiento, hace una acción, lee lo que vuelve, y luego vuelve a pensar - una y otra vez. Es el bucle que ya conociste, ahora con el pensamiento a la vista. Verás cómo se responde una pregunta tejiendo pensamientos cortos con llamadas de verdad a herramientas.",
+  "legend.0": "esto lo escribió el modelo",
+  "legend.1": "esto lo escribiste tú",
+  "legend.2": "esto lo escribió una herramienta",
+  "step.0.narr": "Una pregunta que el modelo no puede responder de memoria. Necesita dos datos que no tiene - qué ciudad, y su tiempo - y hay que traerlos en orden.",
+  "step.1.narr": "Primero un **Pensamiento**: el modelo razona sobre lo que necesita antes de hacer nada. Todavía no la respuesta - un plan para el siguiente movimiento. Encuentra la ciudad, luego mira el tiempo que hace allí.",
+  "step.2.narr": "Luego una **Acción**: el modelo convierte ese pensamiento en una llamada concreta a una herramienta. Deja de escribir prosa y le hace una pregunta al mundo.",
+  "step.3.narr": "Vuelve una **Observación** de la herramienta - un dato real del mundo, no algo que el modelo se inventó. Este es el paso de \"observar\": entrada fresca que el siguiente pensamiento puede usar.",
+  "step.4.narr": "Ahora el bucle vuelve a dar la vuelta. Pensamiento nuevo, con la información que acaba de aprender: ya tiene la ciudad, así que mira el tiempo de **Brisbane**. Luego la acción correspondiente.",
+  "step.5.narr": "Aterriza la segunda observación. El modelo ya tiene los dos datos que le faltaban - cada uno traído, ninguno adivinado.",
+  "step.6.narr": "Sin nada más que traer, responde. Ese entrelazado - **Pensamiento, Acción, Observación**, repetir hasta terminar - es el patrón **ReAct**. Es el bucle de percibir-razonar-actuar-observar con un nombre en cada turno, y es como funcionan de verdad casi todos los agentes que usan herramientas."
+}

@@ -1,0 +1,14 @@
+{
+  "hero.eyebrow": "Teoría · Parte ocho · Hacer agentes fiables",
+  "hero.title": "¿Workflow o agente?",
+  "intro.0": "No todo lo que usa un modelo tiene que ser un agente. A menudo lo más simple que funciona es un workflow - un camino fijo que escribes tú mismo, los mismos pasos cada vez. Un agente es distinto: le das un objetivo y dejas que el modelo decida los pasos sobre la marcha. Los agentes son más flexibles, pero cuestan más y pueden irse por las ramas. La habilidad está en saber cuál necesita un trabajo - y tirar primero del más simple. Compararás los dos en el mismo tipo de tarea y verás dónde encaja cada uno.",
+  "legend.0": "el paso en el que se trabaja ahora",
+  "legend.1": "un paso terminado",
+  "legend.2": "un paso que tuvo que cambiar el plan",
+  "step.0.narr": "«Agente» no siempre es la respuesta. Aquí tienes un trabajo con un camino conocido: resumir un artículo, y luego traducir el resumen. Puedes escribir esos pasos por adelantado, siempre igual.",
+  "step.1.narr": "Un **workflow** ejecuta esos pasos fijos en orden. Sin decisiones, sin sorpresas - el camino no cambia nunca. Es barato, predecible y fácil de testear. Para una tarea conocida, tira de esto primero.",
+  "step.2.narr": "Ahora un trabajo distinto: averiguar por qué falló el deployment de anoche. Para esto no hay guion - no sabes los pasos hasta que empiezas a mirar. El camino hay que **descubrirlo**.",
+  "step.3.narr": "Un **agente** elige su siguiente paso en tiempo de ejecución. No tiene un plan escrito de antemano; decide qué hacer según lo que ha visto hasta ahora. Primer movimiento: leer los logs del deploy.",
+  "step.4.narr": "Los logs dicen \"out of memory\". Un workflow no habría sabido que tenía que preguntar eso - pero el agente **se adapta**: el nuevo paso que elige depende de lo que sacó el anterior. Esa es toda la diferencia.",
+  "step.5.narr": "Así que la regla general: si puedes escribir los pasos por adelantado, construye un **workflow** - es más simple, más barato y más fácil de fiar. Tira de un **agente** solo cuando el camino haya que resolverlo sobre la marcha. La agencia es un coste que pagas cuando lo necesitas, no algo por defecto."
+}

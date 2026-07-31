@@ -1,0 +1,14 @@
+{
+  "hero.eyebrow": "Teoría · Parte ocho · Hacer agentes fiables",
+  "hero.title": "Guardrails",
+  "intro.0": "Un agente que puede actuar en el mundo también puede actuar mal - borrar lo que no es, gastar dinero de verdad, responder una pregunta que debería rechazar. Los guardrails son las comprobaciones que pones a su alrededor: reglas sobre lo que entra, lo que sale, y qué acciones necesitan el visto bueno de una persona antes de pasar. Son lo que hace que un agente sea lo bastante seguro como para soltarlo. Verás cómo se pilla una petición arriesgada, y cómo una acción cara se detiene a esperar que una persona la apruebe.",
+  "legend.0": "esto lo escribió el modelo",
+  "legend.1": "esto lo escribiste tú",
+  "legend.2": "un guardrail en tu app",
+  "step.0.narr": "El agente tiene una regla clara: reembolsa hasta 50 $, cualquier cosa por encima necesita a una persona. Entonces llega un mensaje que intenta convencerlo de saltarse esa regla.",
+  "step.1.narr": "A un modelo solo se le puede convencer de casi cualquier cosa - \"ignora tus reglas\" a veces funciona. Así que el primer guardrail va **antes** del modelo: una **comprobación de entrada** que busca prompt injection y la marca.",
+  "step.2.narr": "Digamos que el modelo se deja llevar igualmente e intenta el reembolso grande. No confiamos en que se porte bien. El siguiente guardrail va **después** del modelo, delante de la herramienta: una **comprobación de acción** sobre lo que está a punto de hacer.",
+  "step.3.narr": "El guardrail de acción lee la llamada real a la herramienta y la comprueba contra la política que está en el código - no en el prompt. 5000 $ está por encima del límite de 50 $, así que no ejecuta el reembolso. Lo **retiene** para aprobación.",
+  "step.4.narr": "Ahora decide una persona - **una persona de por medio** para cualquier cosa arriesgada. Ve la petición marcada y la deniega. El dinero nunca se movió, por mucho que lo intentara el mensaje.",
+  "step.5.narr": "Así que el modelo le dice al cliente que no puede hacerlo, y el caso queda registrado. Eso son los **guardrails**: comprueba lo que entra, comprueba lo que el agente intenta hacer, y mantén a una persona en las decisiones arriesgadas. Las reglas viven en tu código, fuera del modelo - porque el modelo es justo la parte a la que se puede engatusar."
+}
