@@ -1,6 +1,6 @@
 # Concept term/def i18n (voice x language)
 
-Status: in progress  -  Design: [docs/architecture/concept-i18n.md](../architecture/concept-i18n.md)
+Status: es done (Phase A+B complete; Phase C = future slot)  -  Design: [docs/architecture/concept-i18n.md](../architecture/concept-i18n.md)
 
 ## Goal
 Translate the ~208 concept `term`/`def`s (glossary + in-lesson define-panel) to
@@ -24,7 +24,7 @@ standalone glossary and the page-shell panel. English stays the base.
 7. [x] glossary: use `ConceptI18n` + rebuild `dataset.search` from resolved text - verify: en DOM diff 0
 8. [x] validate.mjs: concept coverage gate (100% = ERROR) + id subset check - verify: 5 fixture tests pass; real repo stays 0 errors (inert)
 9. [x] Phase A verify + commit - verify: regenerate no drift, validate 0 err, 41/41 tests, tree clean
-10. [ ] Phase B: author es defs to 100% coverage, fleet by track (`pr-`/`th-`/`ai-`) - verify: coverage gate green course-wide
+10. [x] Phase B: author es defs to 100% coverage, fleet by track (`pr-`/`th-`/`ai-`) - verify: coverage gate green course-wide
 11. [ ] Phase C: extra voices/langs slots (`child`/`academic`, new lang) - verify: fallback child->default->graph
 
 ## Progress
@@ -33,6 +33,7 @@ standalone glossary and the page-shell panel. English stays the base.
 - 2026-07-31 Migration done (7a82f2c): 71 lessons' term/def moved to default/en.json, meta.js graph-only, generate reads from bundles. Gate PASSED: concept-index.js + course-data.js byte-identical; validate 0 errors (coverage gate live); seed-concepts idempotent. Next: consumers (5-7) + verify (9), then architect review.
 - 2026-07-31 Phase A COMPLETE: consumers wired - glossary (166bc64), page-shell + kernel (21e30e6). All gates green: generate no drift, validate 0 err, 41/41 tests, en byte-identical (glossary DOM diff 0, kernel agenda renders via source, no en fetch).
 - 2026-07-31 Architect review: SHIP-WITH-FIXES, no blockers, byte-identical confirmed. Fixed all 4 findings - live-swap gen-guard on the concept source, en = null (true legacy path + panel sentinel), English-base 100% now enforced by the validator, meta.js rewrite last-property guard. NITs 5/6 (term-null invariant, en.json normalization) documented as accepted. Re-verified: validate 0 err, 41/41 tests, seed idempotent, en byte-identical. Next: Phase B (author es + emit concept-i18n.es.js).
+- 2026-07-31 Phase B COMPLETE (90447ac): generate emits concept-i18n.<lang>.js; fleeted 208 es concept defs by track (control-flow proof + practical 77 / theory 81 / ai 46). All gates green: validate 0 err (es 100% course-wide), concept-index + course-data byte-identical, AI-voice clean, es glossary/agenda/panel render native with English fallback for kept terms; en unchanged. Concept i18n for Spanish is DONE. Phase C (child/academic voices, more langs) is an on-demand slot - the machinery already supports it.
 
 ## Open
-- None open; ready to start Phase A step 1 on the owner's go.
+- None. Spanish concept i18n is complete (Phase A+B). Phase C (child/academic voices, additional languages) is an on-demand slot - the machinery already supports it.
