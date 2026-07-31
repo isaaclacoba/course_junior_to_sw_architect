@@ -244,8 +244,6 @@
     root.appendChild(panel);
     document.body.appendChild(root);
 
-    render();
-
     document.addEventListener("click", function (e) {
       if (open && root && !root.contains(e.target)) setOpen(false);
     });

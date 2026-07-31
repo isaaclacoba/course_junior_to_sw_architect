@@ -72,8 +72,8 @@
       // lessonId -> { title, href } (CourseData does not expose this directly).
       var lessonMap = {};
       if (CD) {
-        CD.tracks().forEach(function (t) {
-          t.parts.forEach(function (p) {
+        CD.tracks().forEach(function (track) {
+          track.parts.forEach(function (p) {
             p.lessons.forEach(function (l) { lessonMap[l.id] = { title: l.title, href: l.href }; });
           });
         });

@@ -75,11 +75,12 @@
   function buildPills(track) {
     r.jbTrack.querySelectorAll(".c-jb-pill").forEach(function (n) { n.remove(); });
     pills = [];
+    var ep = esParts();
     track.parts.forEach(function (p, i) {
       var b = document.createElement("button");
       b.type = "button";
       b.className = "c-jb-pill";
-      b.innerHTML = pillCheck + '<span class="c-jb-num">' + ("0" + (i + 1)).slice(-2) + "</span>" + ((esParts() && esParts()[p.title]) || p.title);
+      b.innerHTML = pillCheck + '<span class="c-jb-num">' + ("0" + (i + 1)).slice(-2) + "</span>" + ((ep && ep[p.title]) || p.title);
       b.addEventListener("click", function () { jumpToPart(i); });
       r.jbTrack.appendChild(b);
       pills.push(b);
