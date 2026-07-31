@@ -1,0 +1,10 @@
+{
+  "hero.eyebrow": "Teoría · Parte uno · Qué es de verdad un ordenador",
+  "hero.title": "Qué arranca un programa",
+  "intro.0": "Un programa se ejecuta de una instrucción en una - pero ¿quién le da al play? Nada se arranca solo. Antes de que tu código pueda ejecutarse, algo tiene que cargarlo en la memoria y decidir dónde está la primerísima instrucción. Recorre lo de abajo para ver qué pone un programa en marcha.",
+  "step.0.narr": "Nada se arranca solo.\nEl **sistema operativo** es el programa al mando - decide lanzar tu programa y lo gestiona mientras se ejecuta.",
+  "step.1.narr": "El SO usa un **cargador** para copiar el programa del almacenamiento a la RAM.\nSolo una vez que está en la memoria puede la CPU ejecutarlo.",
+  "step.2.narr": "La ejecución siempre empieza en un lugar acordado, el **punto de entrada**.\nLa CPU necesita saber exactamente dónde empezar.",
+  "step.3.narr": "Por convención ese punto de entrada se llama simplemente `Main`.\nTu código empieza a ejecutarse desde su primera línea.",
+  "step.4.narr": "El programa se ejecuta desde `Main` hasta el final.\nCuando termina, el SO **libera su memoria** y el programa desaparece - hasta que se lanza otra vez."
+}

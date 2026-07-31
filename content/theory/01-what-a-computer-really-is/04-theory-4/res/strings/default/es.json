@@ -1,0 +1,12 @@
+{
+  "hero.eyebrow": "Teoría · Parte uno · Qué es de verdad un ordenador",
+  "hero.title": "Ejecutar muchos programas a la vez",
+  "intro.0": "Un núcleo de CPU hace una instrucción cada vez, y sin embargo mantienes un navegador, música y una app de chat funcionando juntos. No están exactamente ejecutándose a la vez - el sistema operativo cambia entre ellos más rápido de lo que notas, repartiendo el único núcleo. Recorre lo de abajo y mira cómo dos programas comparten un mismo ordenador.",
+  "step.0.narr": "Un programa en ejecución es un **proceso**.\nDos programas a la vez - un navegador y un reproductor de música - son dos procesos, cada uno cargado en su propio trozo de RAM aparte. Los colores marcan quién es quién.",
+  "step.1.narr": "Aquí está el enigma: un **núcleo** de CPU hace solo una instrucción cada vez.\nEntonces, ¿cómo parece que los dos procesos se ejecutan en el mismísimo momento?",
+  "step.2.narr": "Con un solo núcleo, se turnan.\nEl núcleo ejecuta un trozo del navegador, luego un trozo del reproductor de música, y vuelta - miles de veces por segundo. Ese turnarse rápido es el **tiempo compartido**.",
+  "step.3.narr": "El mismo núcleo, siguiente turno: ahora ejecuta el reproductor de música.\nSolo un proceso tiene el núcleo en cada instante - lo de 'a la vez' es en realidad un cambio rapidísimo. La parte del SO que elige de quién es el siguiente turno es el **planificador**.",
+  "step.4.narr": "Ahora dale al chip dos núcleos.\nEl núcleo 0 ejecuta el navegador y el núcleo 1 ejecuta el reproductor de música en el mismísimo instante - **paralelismo** de verdad, no solo un cambio rápido. Cada núcleo toma el color de su proceso.",
+  "step.5.narr": "Con tantos núcleos como procesos, el **planificador** tiene opciones de verdad:\n- ejecutarlos de verdad en paralelo\n- dejar un núcleo libre para el siguiente programa\n- repartir un trabajo pesado entre varios núcleos\nUn solo núcleo obliga a turnarse; más núcleos abren estas estrategias.",
+  "step.6.narr": "Se planifiquen como se planifiquen, cada proceso está amurallado en su propia memoria.\nUno no puede leer ni garabatear la de otro - eso es el **aislamiento**, así que un fallo en uno no se lleva a los demás por delante."
+}

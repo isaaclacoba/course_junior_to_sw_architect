@@ -1,0 +1,10 @@
+{
+  "hero.eyebrow": "Teoría · Parte uno · Qué es de verdad un ordenador",
+  "hero.title": "Cómo se ejecuta un programa",
+  "intro.0": "Un programa que está en el almacenamiento no hace nada - es solo un fichero esperando. Ejecutarlo es un acto aparte: la máquina lo copia en la memoria, y luego lo recorre de una instrucción en una, guardando por dónde va. Recorre la ejecución de abajo y míralo pasar.",
+  "step.0.narr": "Antes de poder ejecutarse, el programa se copia del disco duro - el almacenamiento a largo plazo - a la **RAM**.\nLa CPU solo ejecuta código que está en la memoria.",
+  "step.1.narr": "Luego la CPU repite un bucle: trae la siguiente instrucción de la memoria, la lleva a cabo, repite.\nEste es el **ciclo de captación y ejecución** (fetch-execute).",
+  "step.2.narr": "La CPU guarda por dónde va con un **contador de programa**.\nPor defecto simplemente pasa a la siguiente instrucción: línea 1, luego línea 2.",
+  "step.3.narr": "Algunas instrucciones son **saltos** - cambian el contador de programa a otra línea en vez de a la siguiente.\nAquí, mientras `x < 3`, salta de vuelta a la línea 2 - un bucle.",
+  "step.4.narr": "Los **datos** también viven en la memoria. `x` es un valor en una casilla.\nLas instrucciones lo leen y lo escriben según corre el bucle, hasta que `x` llega a 3 y el salto se detiene."
+}

@@ -1,0 +1,10 @@
+{
+  "hero.eyebrow": "Teoría · Parte uno · Qué es de verdad un ordenador",
+  "hero.title": "Texto, imágenes y sonido como números",
+  "intro.0": "La lección 5 mostró que todo son números. Recorre el visual para ver cómo llegan ahí las cosas reales que usas: un código acordado que se llama codificación, y luego texto, imágenes y sonido convirtiéndose cada uno en números en las mismas casillas - y por qué el mismo número significa cosas distintas bajo codificaciones distintas.",
+  "step.0.narr": "Para guardar algo como números, la gente se pone de acuerdo en un código: este número significa esta cosa, y al revés.\nEsa correspondencia acordada es una **codificación** - aquí, la letra `A` es `65` y la `B` es `66`.",
+  "step.1.narr": "El **texto** es el primer ejemplo. Cada carácter recibe un número según el código acordado, así que `\"Hi\"` se guarda como `H` = `72` y `i` = `105`.\nUn estándar mundial llamado Unicode le da un número a los caracteres de cada idioma.",
+  "step.2.narr": "Una **imagen** es una cuadrícula de puntitos de color llamados píxeles.\nEl color de cada píxel son unos pocos números - cuánto rojo, verde y azul - y mezclando esos tres se consigue cualquier color.",
+  "step.3.narr": "El **sonido** es una onda que sube y baja. El ordenador mide su altura miles de veces por segundo y guarda cada medida como un número - una muestra.\nReproduce las muestras en orden y oyes el sonido.",
+  "step.4.narr": "Texto, imagen y sonido acaban todos siendo lo mismo: números en casillas normales.\nUn número no significa nada por sí solo - la **codificación** que usa un programa es lo que decide si es una letra, un color, o un momento de sonido."
+}

@@ -1,0 +1,11 @@
+{
+  "hero.eyebrow": "Teoría · Parte uno · Qué es de verdad un ordenador",
+  "hero.title": "Qué es un programa",
+  "intro.0": "Usas apps todo el día sin preguntarte qué pasa de verdad por dentro. Debajo no hay magia - solo una máquina que sigue una lista de instrucciones diminutas y exactas, una detrás de otra, miles de millones de veces por segundo. Recorre la ejecución de abajo y ve qué es de verdad una sola instrucción.",
+  "step.0.narr": "Un ordenador sigue una lista de pasos **exactamente**, uno detrás de otro.\nNunca adivina ni improvisa.",
+  "step.1.narr": "Cada línea es una **instrucción** - una única acción diminuta y exacta.\nEsa acción puede asignar un valor, sumar dos números, o imprimir un resultado.",
+  "step.2.narr": "Un **programa** no es más que esa lista ordenada de instrucciones.\nCambia el orden y cambias lo que hace el programa.",
+  "step.3.narr": "Las instrucciones trabajan sobre **datos** - los valores guardados en memoria.\nAquí `a`, `b` y `sum` son los datos que usa este programa.",
+  "step.4.narr": "La **CPU** es la parte que ejecuta las instrucciones.\nTrae cada una de la memoria y la lleva a cabo, de una en una, miles de millones de veces por segundo.",
+  "step.5.narr": "Estas instrucciones diminutas no las escribes a mano.\nEscribes C#, y un **compilador** lo traduce a las instrucciones que la CPU entiende."
+}
