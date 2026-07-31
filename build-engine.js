@@ -20,7 +20,11 @@
     const tasks = cfg.tasks;
     const metaLabel = cfg.metaLabel || "";
     const progressNoun = cfg.progressNoun || "Task";
-    const runnerUrl = cfg.runnerUrl || "level3-app/index.html?runner=1";
+    // A migrated lesson lives four dirs deep (content/<track>/<part>/<lesson>/), so
+    // the root-relative runner host needs the same prefix its assets use; a flat
+    // page (no LESSON_META) keeps the root-relative default.
+    const rootPrefix = window.LESSON_META && window.LESSON_META.id ? "../../../../" : "";
+    const runnerUrl = cfg.runnerUrl || rootPrefix + "level3-app/index.html?runner=1";
     const xpKey = cfg.xpKey || "course_global_xp";
     const awardedKey = cfg.awardedKey;
     const awardAmount = cfg.awardAmount || 20;

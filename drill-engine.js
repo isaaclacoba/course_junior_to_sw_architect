@@ -33,7 +33,8 @@
   const prefix = cfg.prefix;
   const drills = cfg.drills;
   const runnablePrograms = cfg.runnablePrograms || [];
-  const runnerUrl = cfg.runnerUrl || "level3-app/index.html?runner=1";
+  const rootPrefix = window.LESSON_META && window.LESSON_META.id ? "../../../../" : "";
+  const runnerUrl = cfg.runnerUrl || rootPrefix + "level3-app/index.html?runner=1";
   const xpKey = cfg.xpKey || "course_global_xp";
   const awardedKey = cfg.awardedKey || `${prefix}_awarded`;
   const awardAmount = typeof cfg.awardAmount === "number" ? cfg.awardAmount : 20;
