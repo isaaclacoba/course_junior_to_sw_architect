@@ -1003,7 +1003,8 @@ ${result.runtimeError}`.trim(),
     authorCode: "your code wrote this",
     toolCall: "call \u2192",
     toolError: "\u2190 error",
-    toolResult: "\u2190 result"
+    toolResult: "\u2190 result",
+    fanCaption: "Probability of the next token"
   };
   function deriveRefs(stack = []) {
     const refs = [];
@@ -2120,13 +2121,14 @@ ${result.runtimeError}`.trim(),
 
   // src/dom/narration-view.ts
   var NarrationView = class {
-    constructor() {
+    constructor(labels = DEFAULT_VIZ_LABELS) {
+      this.stepWord = labels.step;
       this.el = document.createElement("div");
       this.el.className = "cl-mv-narr";
       this.el.innerHTML = `<span class="cl-mv-stepno" data-stepno></span><div class="cl-mv-narr-body" data-narr></div>`;
     }
     sync(ctx) {
-      this.set(ctx.model.narr ?? "", `STEP ${ctx.index + 1} / ${ctx.total}`);
+      this.set(ctx.model.narr ?? "", `${this.stepWord.toUpperCase()} ${ctx.index + 1} / ${ctx.total}`);
     }
     set(text, stepLabel) {
       this.el.querySelector("[data-narr]").innerHTML = renderNarration(text);
@@ -2180,8 +2182,9 @@ ${result.runtimeError}`.trim(),
 
   // src/dom/agent-view.ts
   var AgentView = class {
-    constructor(showFan = true) {
+    constructor(showFan = true, labels = DEFAULT_VIZ_LABELS) {
       this.showFan = showFan;
+      this.fanCaption = labels.fanCaption;
       this.el = document.createElement("div");
       this.el.className = "cl-ag";
       this.el.innerHTML = `
@@ -2282,7 +2285,7 @@ ${result.runtimeError}`.trim(),
     renderFan(scene) {
       const host = this.el.querySelector("[data-fan]");
       const rows = agentFanRows(scene.fan);
-      const caption = scene.fan?.caption ?? "Probability of the next token";
+      const caption = scene.fan?.caption ?? this.fanCaption;
       if (rows.length === 0) {
         host.className = "cl-ag-fan is-empty";
         host.innerHTML = `<span class="cl-ag-cap">${escapeHtml4(caption)}</span>`;
@@ -2988,9 +2991,9 @@ ${result.runtimeError}`.trim(),
         vartable: () => new VarTableView(),
         callstack: () => new CallStackView(),
         heapcards: (_spec, ctx) => new HeapCardsView(ctx.uid),
-        narration: () => new NarrationView(),
+        narration: (_spec, ctx) => new NarrationView(ctx.vizLabels),
         console: () => new ConsoleView(),
-        agent: (spec) => new AgentView(spec.fan),
+        agent: (spec, ctx) => new AgentView(spec.fan, ctx.vizLabels),
         agentloop: () => new AgentLoopView(),
         memoryshelf: () => new MemoryShelfView(),
         toolrack: (_spec, ctx) => new ToolRackView(ctx.vizLabels),

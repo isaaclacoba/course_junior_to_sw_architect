@@ -146,6 +146,7 @@
   "viz.toolCall": "call \u2192",
   "viz.toolError": "\u2190 error",
   "viz.toolResult": "\u2190 result",
+  "viz.fanCaption": "Probability of the next token",
   "settings.themeAria": "Choose a theme",
   "glossary.docTitle": "Concept glossary - C# course",
   "glossary.back": "Back to the course",

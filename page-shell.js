@@ -591,7 +591,7 @@
     const applyVizLabels = () => {
       const C = window.ChromeText;
       if (!C) return;
-      const keys = ["prev", "play", "pause", "next", "nextLesson", "reset", "step", "textSize", "textSmall", "textDefault", "textLarge", "authorYou", "authorApp", "authorModel", "authorCode", "toolCall", "toolError", "toolResult"];
+      const keys = ["prev", "play", "pause", "next", "nextLesson", "reset", "step", "textSize", "textSmall", "textDefault", "textLarge", "authorYou", "authorApp", "authorModel", "authorCode", "toolCall", "toolError", "toolResult", "fanCaption"];
       const labels = {};
       let any = false;
       keys.forEach((k) => { const v = C["viz." + k]; if (v != null) { labels[k] = v; any = true; } });
