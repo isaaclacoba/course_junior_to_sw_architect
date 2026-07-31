@@ -34,18 +34,27 @@ public class ReportFormatter
     public string Format(bool passed) => passed ? ""PASS"" : ""FAIL"";
 }
 
-// The destination is a side effect. An interface gives us a seam
-// we can swap (or fake in a test) without touching TestRunner.
+// The destination is a side effect. This interface stays focused on one job -
+// sending a message - so that is all TestRunner has to depend on.
 public interface IReporter
 {
     void Send(string message);
 }
 
-public class ConsoleReporter : IReporter
+// A separate, focused capability. Only reporters that can summarise implement
+// it, so a plain reporter is never forced to fake a Summarize it does not use.
+public interface ISummary
 {
-    public void Send(string message) => Console.WriteLine(message);
+    void Summarize(int passed, int failed);
 }
 
+public class ConsoleReporter : IReporter, ISummary
+{
+    public void Send(string message) => Console.WriteLine(message);
+    public void Summarize(int passed, int failed) => Console.WriteLine(passed + "" passed, "" + failed + "" failed"");
+}
+
+// Sends nothing and summarises nothing, so it implements only IReporter.
 public class SilentReporter : IReporter
 {
     public void Send(string message) { }
@@ -78,8 +87,10 @@ public class Program
         var formatter = new ReportFormatter();
 
         // Same TestRunner code, two different destinations - Liskov in action.
-        var runner = new TestRunner(formatter, new ConsoleReporter());
+        var reporter = new ConsoleReporter();
+        var runner = new TestRunner(formatter, reporter);
         runner.Run();
+        reporter.Summarize(1, 0);   // only reporters that summarise expose this
 
         var silentRunner = new TestRunner(formatter, new SilentReporter());
         silentRunner.Run();
@@ -201,6 +212,22 @@ public class Program
   I --> SR[SilentReporter added with no edits]"),
         new(
             7,
+            "Keep each interface focused",
+            "The summary lives on its own interface, so a plain reporter is not forced to implement it.",
+            "Give reporters a summary ability without bloating IReporter - put it on its own small interface, and let a reporter that has nothing to summarise implement only IReporter.",
+            new[]
+            {
+                new Hint("A console reporter can do more than send a line - it might also print a final tally like \"1 passed, 0 failed\". A silent reporter has nothing to summarise."),
+                new Hint("Resist adding Summarize to IReporter: that forces every reporter, even the silent one, to implement a method it ignores. Give the summary its own small interface, and let only the reporters that need it implement it."),
+                new Hint("Here's the shape:", "public interface ISummary\n{\n    void Summarize(int passed, int failed);\n}\n\npublic class ConsoleReporter : IReporter, ISummary { /* Send and Summarize */ }\n// SilentReporter stays : IReporter only"),
+            },
+            "No client should be forced to depend on methods it does not use. A silent reporter needs Send, not Summarize - so Summarize belongs on its own interface. Small, focused interfaces let each class implement only what it truly does. This is the Interface Segregation Principle.",
+            @"flowchart LR
+  IR[IReporter: Send] --> CR[ConsoleReporter]
+  IR --> SR[SilentReporter]
+  IS[ISummary: Summarize] --> CR"),
+        new(
+            8,
             "Prove substitutability",
             "Main runs TestRunner with both reporters, same TestRunner code.",
             "Main only runs TestRunner with one reporter.",

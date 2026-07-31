@@ -17,6 +17,7 @@ public class StructuralChecks
         new ReporterInterfaceRule(),
         new InjectReporterRule(),
         new SecondReporterRule(),
+        new SegregateInterfacesRule(),
         new ProveSubstitutabilityRule(),
     };
 
@@ -182,6 +183,34 @@ internal sealed class CapstoneSyntax
     private static bool DefinesMethod(ClassDeclarationSyntax cls, string name)
         => cls.Members.OfType<MethodDeclarationSyntax>().Any(m =>
             m.Identifier.Text == name && (m.Body != null || m.ExpressionBody != null));
+
+    // Interface Segregation: the reporter interface stays focused on Send, and an
+    // extra capability (summarising) lives on its own small interface - so a class
+    // that only sends is never forced to implement a method it ignores. We prove
+    // the split bought something by requiring a reporter that stays lean.
+    public bool InterfacesAreSegregated()
+    {
+        var reporter = ReporterInterface;
+        if (reporter == null) return false;
+
+        // IReporter must not have absorbed a second job.
+        if (reporter.Members.OfType<MethodDeclarationSyntax>().Count() != 1) return false;
+
+        var capability = Interfaces.FirstOrDefault(i =>
+            i != reporter
+            && !HasMethodNamed(i, "Send")
+            && i.Members.OfType<MethodDeclarationSyntax>().Count() == 1);
+        if (capability == null) return false;
+
+        var reporterName = reporter.Identifier.Text;
+        var capabilityName = capability.Identifier.Text;
+
+        var someoneImplementsCapability = Classes.Any(c => Implements(c, capabilityName));
+        var someReporterStaysLean = Classes.Any(c =>
+            Implements(c, reporterName) && !Implements(c, capabilityName));
+
+        return someoneImplementsCapability && someReporterStaysLean;
+    }
 }
 
 // Builds CodeAnchor lists from syntax nodes. Kept apart so rules read as intent.
@@ -305,10 +334,27 @@ internal sealed class SecondReporterRule : IMilestoneRule
         => (s.ReporterImplementerCount() >= 2, Anchor.None);
 }
 
-// 7. TestRunner is run with two different reporter types.
-internal sealed class ProveSubstitutabilityRule : IMilestoneRule
+// 7. A focused capability interface exists apart from IReporter, and a lean
+// reporter implements only IReporter.
+internal sealed class SegregateInterfacesRule : IMilestoneRule
 {
     public int MilestoneId => 7;
+
+    public (bool Passed, IReadOnlyList<CodeAnchor> Anchors) Evaluate(CapstoneSyntax s)
+    {
+        var passed = s.InterfacesAreSegregated();
+        var anchors = passed
+            ? Anchor.None
+            : Anchor.On(s.ReporterInterface, "target",
+                "keep this interface focused - put an extra ability on its own small interface");
+        return (passed, anchors);
+    }
+}
+
+// 8. TestRunner is run with two different reporter types.
+internal sealed class ProveSubstitutabilityRule : IMilestoneRule
+{
+    public int MilestoneId => 8;
 
     public (bool Passed, IReadOnlyList<CodeAnchor> Anchors) Evaluate(CapstoneSyntax s)
     {

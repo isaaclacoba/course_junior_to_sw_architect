@@ -97,6 +97,10 @@ testing, then SOLID, ending in one compiled refactor exercise.
    re-oriented each lesson.
 7. **Capstone milestones omit ISP** (the `I`), so the one integrative exercise
    does not exercise every principle it teaches.
+   DONE - the capstone now has an ISP milestone (7 of 8): a summary ability lives
+   on its own `ISummary` interface rather than bloating `IReporter`, so a plain
+   `SilentReporter` is never forced to implement a method it ignores. The
+   substitutability (Liskov) milestone moved to 8 to stay the climax.
 8. **Difficulty spikes.** `Practice the Basics` drill 10 and `The SOLID
    Principles` jump to several classes at once; add a step between.
 
@@ -168,8 +172,9 @@ there:
   `verify` probes; `writing-methods`/`lambdas`/`testing-basics` were hardened with
   `requireSource` (their graded logic lives in `Main`, so a `Program`-replacing
   probe cannot reach it).
-- DONE (mapping) - each Part 4 / Part 5 lesson now states the SOLID letter it
-  embodies. Still to do: add the ISP milestone to the capstone.
+- DONE - each Part 4 / Part 5 lesson now states the SOLID letter it embodies, and
+  the capstone gained an ISP milestone (a focused `ISummary` interface), so the
+  integrative exercise now walks all five principles.
 - Normalise one example family per Part and smooth the two difficulty spikes.
 - DONE (theory rhythm) - fixed the `theory-20`/`theory-21` order, added the
   `theory-7` recap, corrected the `theory-18` intro, and widened checkpoint

@@ -8,13 +8,13 @@
 ## Concept(s) taught
 The whole of SOLID applied to one program at once. The learner takes a small,
 working `TestRunner` that does three jobs and is welded to the console, and
-refactors it step by step. Seven milestones light up as the structure improves.
+refactors it step by step. Eight milestones light up as the structure improves.
 Unlike every other Practical lesson, grading is by **structure** (Roslyn syntax
 analysis of the submitted code), not by output match or blank match.
 
 ## Source layout
 - `CapstoneContent.cs` - `Capstone` static class: `StarterCode`, `ReferenceSolution`,
-  and the seven `Milestone[]` (title, pass/todo messages, tiered `Hint`s, an
+  and the eight `Milestone[]` (title, pass/todo messages, tiered `Hint`s, an
   explanation, and a per-milestone Mermaid diagram).
 - `StructuralChecks.cs` - `StructuralChecks.Run(code)` parses the submission with
   `CSharpSyntaxTree` and runs one `IMilestoneRule` per milestone; `CapstoneSyntax`
@@ -31,11 +31,13 @@ analysis of the submitted code), not by output match or blank match.
 | 4 | Abstract the destination | DIP (seam) | An interface exists with a `Send` method (or an interface whose name contains `Report`). |
 | 5 | Depend on the abstraction, injected | DIP | `TestRunner`'s constructor takes an interface parameter, and `TestRunner` neither `new`s a reporter nor touches `Console`. |
 | 6 | A second reporter, no edits to the first | O | Two or more classes implement the reporter interface. |
-| 7 | Prove substitutability | L | `TestRunner` is constructed with two *distinct* concrete reporter types (counted whether inlined or passed through a local variable). |
+| 7 | Keep each interface focused | I | The reporter interface has exactly one method, a *separate* one-method interface (a summary capability, not `Send`) exists, some class implements that capability, and some class implements the reporter interface *without* the capability (a lean reporter). |
+| 8 | Prove substitutability | L | `TestRunner` is constructed with two *distinct* concrete reporter types (counted whether inlined or passed through a local variable). |
 
-The five principles are covered as milestones tagged S (1-2), DI/DIP (3-5), O
-(6), and L (7). Interface Segregation is not a separate milestone here - the
-program is small enough that no fat interface arises; ISP is left to `level2.js`.
+The five principles are now covered as milestones tagged S (1-2), DI/DIP (3-5), O
+(6), I (7), and L (8). Interface Segregation is milestone 7: a summary ability
+lives on its own `ISummary` interface rather than bloating `IReporter`, so a
+plain `SilentReporter` is never forced to implement a method it ignores.
 
 ## Format
 Write real C# and have it graded structurally. The learner edits the starter in
@@ -59,7 +61,7 @@ reporter seam matters. It is correctly positioned last.
 
 ## Complexity rung
 The top rung of the Practical track. It removes all scaffolding: no blanks, no
-fixed expected output, a whole program to reshape across seven interacting
+fixed expected output, a whole program to reshape across eight interacting
 milestones. The milestone lights and tiered hints keep it approachable, but this
 is the one place the learner writes and restructures a full program unaided.
 
@@ -81,9 +83,9 @@ is the one place the learner writes and restructures a full program unaided.
   the answer.
 
 ## Gaps / issues
-- **ISP (the I) is absent** from the milestones; a learner who reaches the
-  capstone expecting all five letters mirrored will find only S, DI/DIP, O, L. It
-  is covered in `level2.js` but not reinforced here.
+- **ISP (the I) is now covered** as milestone 7 (a focused `ISummary` interface),
+  so a learner who reaches the capstone expecting all five letters mirrored finds
+  S, DI/DIP, O, I, and L. It is also introduced earlier in `level2.js`.
 - **No XP integration:** the card is `data-final="1"` with no `data-total`, so
   the capstone sits outside the XP/progress system the rest of the course uses -
   completion is not tracked the same way.
@@ -99,8 +101,10 @@ is the one place the learner writes and restructures a full program unaided.
   boot constraint, not a content gap).
 
 ## Verification status
-Read-only content audit (no compile performed here). The prior work-log records
-end-to-end headless verification of the injected capstone build: the host booted,
-rendered all seven milestones from this exercise, and the starter passed zero
-milestones as expected. Structural rules were read directly from
-`StructuralChecks.cs`.
+Read-only content audit, plus a targeted compile of the ISP change: a standalone
+Roslyn harness compiled `CapstoneContent.cs` + `StructuralChecks.cs` and confirmed
+`StructuralChecks.Run(ReferenceSolution)` passes all eight milestones while
+`Run(StarterCode)` passes zero, a fat-interface attempt fails only milestone 7,
+and the reference program compiles and runs warning-free. Earlier work-log entries
+record end-to-end headless verification of the injected capstone build (host boot,
+milestones rendered, starter at zero).
