@@ -6,7 +6,7 @@
       "id": "practical",
       "name": "Practical",
       "kicker": "Hands on",
-      "blurb": "Learn C# by writing and running real code, one small win at a time - up to a SOLID capstone.",
+      "blurb": "Learn C# by writing and running real code, one small win at a time - all the way to SOLID design.",
       "partPrefix": "Part ",
       "parts": [
         {
@@ -961,7 +961,7 @@
               "key": "ai_8_awarded",
               "total": 1,
               "title": "From LLM to agent",
-              "blurb": "Put the pieces together - model, context, memory, tools - and run them in a loop with a goal, and you get an agent. The capstone, and the bridge to the harder material ahead.",
+              "blurb": "Put the pieces together - model, context, memory, tools - and run them in a loop with a goal, and you get an agent. This is where the part lands, and the bridge to the harder material ahead.",
               "pill": "steady",
               "time": "15 min",
               "kind": "lesson"

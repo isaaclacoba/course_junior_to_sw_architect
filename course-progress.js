@@ -6,7 +6,7 @@
  *   - a storage seam (DIP): swap CourseProgress.storage for a fake in a test,
  *     so none of the progress logic hard-depends on localStorage;
  *   - the single definition of how a raw award count becomes a status
- *     (done / progress / todo, plus the capstone's "final") - deriveStatus;
+ *     (done / progress / todo, plus a "final" card) - deriveStatus;
  *   - a DOM-free summary of a whole track (counts, percentage, resume target),
  *     so the index just paints the result instead of computing it inline.
  *

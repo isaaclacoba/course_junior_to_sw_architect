@@ -45,7 +45,7 @@
   "task.6.summaryItems.3.text": "Don't make a class carry methods it never uses. Split the fat interface into `IWalker`, `ISwimmer` and `IFlyer`, and the fish only has to swim.",
   "task.6.summaryItems.4.title": "D - Dependency Inversion - ",
   "task.6.summaryItems.4.text": "Ask for an interface and take it from outside instead of building the real thing yourself. Once the `ILog` is handed in, a test can hand in a fake.",
-  "task.6.summaryClose": "So when someone asks why bother - each habit earns its place the first time the code has to change. You don't scatter interfaces everywhere up front; you reach for the right fix when a real reason to change turns up. That is the judgement the capstone asks for next.",
+  "task.6.summaryClose": "So when someone asks why bother - each habit earns its place the first time the code has to change. You don't scatter interfaces everywhere up front; you reach for the right fix when a real reason to change turns up. That is the judgement good design keeps asking for.",
   "concept.pr-open-closed.term": "Open/Closed",
   "concept.pr-open-closed.def": "Code that is open to new behaviour by adding a type, and closed to editing what already works.",
   "concept.pr-liskov-substitution.term": "Liskov Substitution",

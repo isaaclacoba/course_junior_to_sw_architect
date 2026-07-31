@@ -1,5 +1,5 @@
 // Visual for ai-8 "From LLM to agent" - a DATA-ONLY file. It uses the `agentloop`
-// panel: the capstone picture that assembles the pieces met one at a time - the
+// panel: the closing picture that assembles the pieces met one at a time - the
 // model, its context, memory and tools - and wraps them in a perceive-reason-act-
 // observe loop. This is the bridge into the architecture material that follows.
 (function () {

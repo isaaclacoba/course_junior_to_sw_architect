@@ -265,10 +265,5 @@
       { "id": "pr-dependency-injection" }
     ],
     "uses": [{ "id": "pr-composition" }, { "id": "pr-object" }]
-  },
-  "level3-app": {
-    "introduces": [],
-    "revisits": [],
-    "uses": []
   }
 }

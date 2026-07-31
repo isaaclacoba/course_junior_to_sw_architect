@@ -9,22 +9,19 @@
  *               one line; remove = delete one line.
  *
  * Per-lesson presentational data (title, blurb, pill, time, total, key) lives in
- * each lesson's content/.../meta.js. An external card (kind "external", no
- * meta.js) may instead inline its card fields on its lessons[] line.
+ * each lesson's content/.../meta.js.
  *
  * `id`   - stable identity: href minus a trailing ".html", or a trailing "/"
  *          dropped ("foo/" -> "foo").
- * `href` - the served path (content/.../ for a migrated lesson, or an external
- *          app path).
- * `kind` - "lesson", or "external" (an external app). The emitted card kind is
- *          "final" when `final` is set, else "lesson".
- * `path` - the content/... directory, or null for an external card.
+ * `href` - the served path (content/.../ for a migrated lesson).
+ * `kind` - always "lesson".
+ * `path` - the content/... directory.
  *
  * Frozen window.CourseRegistry = { tracks, lessons, byId }.
  */
 (function (global) {
   var tracks = [
-    { id: "practical", name: "Practical", kicker: "Hands on", partPrefix: "Part ", blurb: "Learn C# by writing and running real code, one small win at a time - up to a SOLID capstone.", parts: [
+    { id: "practical", name: "Practical", kicker: "Hands on", partPrefix: "Part ", blurb: "Learn C# by writing and running real code, one small win at a time - all the way to SOLID design.", parts: [
       { id: "understand-the-ideas", title: "Understand the ideas" },
       { id: "everyday-essentials", title: "Everyday essentials" },
       { id: "know-the-language", title: "Know the language" },

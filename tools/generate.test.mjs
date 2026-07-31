@@ -3,7 +3,7 @@
  *
  * Loads course-registry.js (CourseRegistry - the source of the course path) and
  * generated/course-data.js (CourseData - the built facade) in vm sandboxes and
- * asserts the two agree on order, ids, per-lesson fields, and the capstone. No
+ * asserts the two agree on order, ids, and per-lesson fields. No
  * manifest. Run: node --test tools/generate.test.mjs
  */
 import test from "node:test";
@@ -58,9 +58,9 @@ test("CourseData id order per track matches the registry", () => {
   });
 });
 
-test("lesson count equals the registry length (76)", () => {
+test("lesson count equals the registry length (75)", () => {
   assert.equal(dataLessons().length, Registry.lessons.length);
-  assert.equal(Registry.lessons.length, 76, "expected 76 registry lessons");
+  assert.equal(Registry.lessons.length, 75, "expected 75 registry lessons");
 });
 
 test("part kickers derive from partPrefix + position", () => {
@@ -73,7 +73,7 @@ test("each migrated lesson's card fields come from its meta.js", () => {
   const byId = {};
   dataLessons().forEach(function (l) { byId[l.id] = l; });
   Registry.lessons.forEach(function (line) {
-    if (!line.path) return; // external capstone handled separately
+    if (!line.path) return; // skip any line without a content path
     const meta = loadMeta(line.path);
     const card = byId[line.id];
     ["title", "blurb", "pill", "time", "key", "total"].forEach(function (f) {
@@ -82,20 +82,6 @@ test("each migrated lesson's card fields come from its meta.js", () => {
     assert.equal(card.href, line.href, `href mismatch for ${line.id}`);
     assert.equal(card.kind, "lesson", `kind mismatch for ${line.id}`);
   });
-});
-
-test("the external capstone card comes from its inlined registry line", () => {
-  const cap = dataLessons().find(function (l) { return l.id === "level3-app"; });
-  const line = Registry.lessons.find(function (l) { return l.id === "level3-app"; });
-  assert.ok(cap, "capstone not found in CourseData");
-  assert.equal(cap.kind, "final");
-  assert.equal(cap.final, true);
-  ["title", "blurb", "pill", "time"].forEach(function (f) {
-    assert.equal(cap[f], line[f], `capstone ${f} mismatch`);
-  });
-  assert.equal(cap.href, "level3-app/");
-  assert.ok(!("key" in cap), "capstone should have no key");
-  assert.ok(!("total" in cap), "capstone should have no total");
 });
 
 test("every lesson id is unique + non-empty; locateById agrees with locate", () => {

@@ -2,8 +2,7 @@
  * tools/generate.mjs - the course-data pipeline. `course-registry.js` is the
  * single source of the course path: `tracks[]` gives the track + part chrome and
  * order, `lessons[]` gives the lessons in reading order. A migrated lesson's
- * display fields come from its own `content/.../meta.js`; the external capstone
- * (no meta.js) takes them from its inlined registry line. Loaded in a Node `vm`
+ * display fields come from its own `content/.../meta.js`. Loaded in a Node `vm`
  * sandbox.
  *
  * Emits browser-loadable classic scripts under `generated/`:
@@ -44,11 +43,10 @@ const ORDINALS = ["", "one", "two", "three", "four", "five", "six", "seven",
   "eight", "nine", "ten", "eleven", "twelve"];
 
 // Build a lesson card with a canonical key order, omitting absent optionals, so
-// JSON serialization is deterministic. A migrated lesson's display fields come
-// from its meta.js; the external capstone (no meta) takes them from its inlined
-// registry line. Card kind is "final" when the line is final, else "lesson".
+// JSON serialization is deterministic. Display fields come from the lesson's
+// meta.js.
 function projectLesson(id, line, meta) {
-  const src = meta || line;
+  const src = meta;
   const o = {};
   o.id = id;
   o.track = line.track;
@@ -60,16 +58,14 @@ function projectLesson(id, line, meta) {
   o.blurb = src.blurb;
   o.pill = src.pill;
   o.time = src.time;
-  o.kind = line.final ? "final" : "lesson";
-  if (line.final !== undefined) o.final = line.final;
+  o.kind = "lesson";
   return o;
 }
 
 // Walk the registry: tracks[] carries the track + part chrome (and order),
 // lessons[] the lessons in reading order. Each part's kicker is rebuilt from the
-// track partPrefix + its position. A migrated lesson loads its meta.js (and is
-// pushed onto `migrated` for index.html + concept aggregation); the external
-// capstone is projected straight from its inlined registry line.
+// track partPrefix + its position. Each lesson loads its meta.js and is pushed
+// onto `migrated` for index.html + concept aggregation.
 function projectTracks(registry, migrated) {
   const seenIds = new Set();
   const lessonsIn = function (trackId, partId) {
@@ -93,17 +89,14 @@ function projectTracks(registry, migrated) {
             if (seenIds.has(id)) throw new Error("Duplicate lesson id: " + id);
             seenIds.add(id);
 
-            if (l.path) {
-              // MIGRATED: meta.js is the source. `l.path` is a repo-controlled
-              // registry field (never untrusted input), safe to join onto root.
-              const lessonDir = path.join(root, l.path);
-              const meta = loadWindowBag(path.join(lessonDir, "meta.js")).LESSON_META;
-              if (!meta) throw new Error("meta.js for " + id + " did not set window.LESSON_META");
-              migrated.push({ id: id, dir: lessonDir, relPath: l.path, meta: meta });
-              return projectLesson(id, l, meta);
-            }
-            // EXTERNAL (capstone): no meta.js - use the inlined registry fields.
-            return projectLesson(id, l, null);
+            // meta.js is the source. `l.path` is a repo-controlled registry
+            // field (never untrusted input), safe to join onto root.
+            if (!l.path) throw new Error("registry line for " + id + " has no content path");
+            const lessonDir = path.join(root, l.path);
+            const meta = loadWindowBag(path.join(lessonDir, "meta.js")).LESSON_META;
+            if (!meta) throw new Error("meta.js for " + id + " did not set window.LESSON_META");
+            migrated.push({ id: id, dir: lessonDir, relPath: l.path, meta: meta });
+            return projectLesson(id, l, meta);
           })
         };
       })

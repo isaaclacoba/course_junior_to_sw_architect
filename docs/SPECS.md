@@ -67,7 +67,6 @@ drafts plain and factual; do not ship model-register warmth or hype.
 | Recall + fill a blank in prose/code, optional Run | Drill | `drill-engine.js` | `window.DRILL_CONFIG` |
 | Write C# from scratch, Run, match output | Build | `build-engine.js` | `window.BUILD_CONFIG` |
 | Seal a Part | Checkpoint | `CodeLab.Quiz` via `theory-check-N.js` | question bank + `passRatio` |
-| Integrative refactor, compiled + structurally checked | Capstone | Roslyn WASM host (`level3-app`) | `level3-exercise/*.cs` `IExercise` |
 
 Reuse-first is non-negotiable: never write a new engine, runner, editor, or page
 controller. If a new archetype seems needed, it almost certainly is not.

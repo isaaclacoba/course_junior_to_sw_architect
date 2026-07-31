@@ -12,17 +12,17 @@ Frontend-only interactive exercises for colleagues practicing C# fundamentals an
 ## Run Locally
 
 Most of the site is plain HTML and works by opening `index.html` directly in a
-browser. The **Capstone** (live C# in the browser) is a Blazor WebAssembly app
-that downloads its runtime with `fetch`, which browsers block on `file://`. So
-to use the Capstone you must serve the folder over HTTP.
+browser. The in-browser C# runner (live compile + run) is a Blazor WebAssembly
+app that downloads its runtime with `fetch`, which browsers block on `file://`.
+So to use any Run button you must serve the folder over HTTP.
 
 ### Easiest way (any OS, needs Python)
 
 - Windows: double-click `serve.cmd`
 - macOS/Linux: run `./serve.sh`
 
-Then open `http://localhost:8080` and click through the levels. The theory and
-micro-exercise track and the Capstone programming task all work from there.
+Then open `http://localhost:8080` and click through the course. Every lesson
+and Run button works from there.
 
 ### If Python is not available
 
@@ -40,7 +40,7 @@ Then open `http://localhost:8080`.
 - `practice-the-basics.html`: Level 1 microcoding track (1 short drill per theory topic)
 - `the-solid-principles.html`: core C# coding drills (short writing exercises)
 - `reuse-without-regret.html`: Reuse Without Regret (read-to-understand inheritance/composition/polymorphism, guided code tour, runnable examples)
-- `level3-app/`: Capstone (live C# compile + run, published Blazor app)
+- `level3-app/`: in-browser C# runner (live compile + run, published Blazor app)
 
 ## Rebuilding the runner host
 

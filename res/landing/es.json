@@ -3,7 +3,7 @@
     "practical": {
       "name": "Práctico",
       "kicker": "Manos a la obra",
-      "blurb": "Aprende C# escribiendo y ejecutando código de verdad, victoria a victoria, hasta un capstone SOLID."
+      "blurb": "Aprende C# escribiendo y ejecutando código de verdad, victoria a victoria, hasta el diseño SOLID."
     },
     "theory": {
       "name": "Teoría",
@@ -165,10 +165,6 @@
       "title": "Los principios SOLID",
       "blurb": "Cinco hábitos que mantienen el código fácil de cambiar. Detecta cada problema en un proyecto real de test-automation y arréglalo como toca. Las ideas se apoyan en todo lo anterior a esta parte."
     },
-    "level3-app": {
-      "title": "Capstone: SOLID en la práctica",
-      "blurb": "Júntalo todo. Refactoriza un programa real y roto paso a paso. Tu C# compila y se ejecuta, con errores amables, pistas opcionales y una solución resuelta por si te atascas."
-    },
     "theory-1": {
       "title": "Qué es un programa",
       "blurb": "Mira una capa por debajo de las apps que usas. Qué es una instrucción, cómo un programa es una lista ordenada de ellas sobre datos, la CPU que las ejecuta y qué significa compilar."
@@ -311,7 +307,7 @@
     },
     "ai-8": {
       "title": "Del LLM al agente",
-      "blurb": "Junta las piezas - modelo, contexto, memoria, herramientas - y hazlas correr en un bucle con un objetivo, y tienes un agente. El capstone, y el puente hacia el material más difícil que viene."
+      "blurb": "Junta las piezas - modelo, contexto, memoria, herramientas - y hazlas correr en un bucle con un objetivo, y tienes un agente. Aquí es donde aterriza esta parte, y el puente hacia el material más difícil que viene."
     },
     "ai-13": {
       "title": "Qué es de verdad una ejecución: la transcripción",
