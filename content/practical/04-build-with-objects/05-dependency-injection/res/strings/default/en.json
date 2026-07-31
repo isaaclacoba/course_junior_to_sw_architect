@@ -43,5 +43,7 @@
   "task.6.summaryItems.4.text": "hand in a toy double to rehearse with no real dependency.",
   "task.6.summaryClose": "Next: Part five - Prove it works. You made a stand-in; now use it to actually test.",
   "concept.pr-dependency-injection.term": "Dependency injection",
-  "concept.pr-dependency-injection.def": "Handing a class the collaborators it needs from outside, usually through its constructor, instead of building them itself."
+  "concept.pr-dependency-injection.def": "Handing a class the collaborators it needs from outside, usually through its constructor, instead of building them itself.",
+  "task.6.summaryItems.5.title": "In SOLID - ",
+  "task.6.summaryItems.5.text": "receiving an abstraction instead of building it is the **D**, Dependency Inversion - the last of the five you will name in The SOLID Principles."
 }

@@ -4,7 +4,7 @@
   "intro.0": "Text is a value, not just something you print. You can build it from other values, reshape it, ask it questions, and rewrite it - and each move hands back a new piece of text rather than changing the old one. You write each one and run it.",
   "task.1.title": "Build text from parts",
   "task.1.concept": "Assemble a string from values",
-  "task.1.context": "Most text you show a user is **built** - a name here, a number there, glued into one line. Instead of joining pieces with `+`, you can drop each value straight into the text with `$\"...\"`: inside the quotes, `{name}` and `{legs}` are replaced by those values.\n\nWrite a `Critter` whose `Label(string name, int legs)` builds the line `\"<name> has <legs> legs\"`.",
+  "task.1.context": "Most text you show a user is **built** - a name here, a number there, glued into one line. Instead of joining pieces with `+`, you can drop each value straight into an interpolated string, written `$\"...\"`: inside the quotes, `{name}` and `{legs}` are replaced by those values.\n\nWrite a `Critter` whose `Label(string name, int legs)` builds the line `\"<name> has <legs> legs\"`.",
   "task.1.goal.0": "Give `Critter` a `string Label(string name, int legs)` that returns `$\"{name} has {legs} legs\"`.",
   "task.1.goal.1": "`Main` calls `Label(\"Ant\", 6)`, so the output is `Ant has 6 legs`.",
   "task.2.title": "Change the case",

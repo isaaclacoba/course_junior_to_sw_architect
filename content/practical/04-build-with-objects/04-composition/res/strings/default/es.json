@@ -42,5 +42,7 @@
   "task.6.summaryItems.4.text": "detrás de una interfaz, reemplaza una parte sin tocar el resto.",
   "task.6.summaryClose": "A continuación: ¿Por qué inyectar?",
   "concept.pr-single-inheritance.def": "C# deja que una clase herede de un único padre, así combinas varias piezas guardándolas en su lugar.",
-  "concept.pr-single-inheritance.term": "Una sola clase base"
+  "concept.pr-single-inheritance.term": "Una sola clase base",
+  "task.6.summaryItems.5.title": "En SOLID - ",
+  "task.6.summaryItems.5.text": "«favorecer la composición» no es una letra en sí, pero mantiene honesta la **L** (Liskov) - sin mentiras de tipo is-a - y hace fácil el intercambio de la **O** (Abierto/Cerrado)."
 }

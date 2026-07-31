@@ -43,5 +43,7 @@
   "task.6.summaryItems.4.text": "añade una clase; el bucle no cambia nunca.",
   "task.6.summaryClose": "A continuación: ¿Heredar o componer?",
   "concept.pr-runtime-dispatch.def": "El objeto real decide en tiempo de ejecución qué versión de un método se ejecuta, así añades un tipo nuevo en vez de otra rama.",
-  "concept.pr-runtime-dispatch.term": "Selección en tiempo de ejecución"
+  "concept.pr-runtime-dispatch.term": "Selección en tiempo de ejecución",
+  "task.6.summaryItems.5.title": "En SOLID - ",
+  "task.6.summaryItems.5.text": "que cualquier tipo haga de sustituto en un mismo sitio de llamada es la **L**, la Sustitución de Liskov; añadir una clase sin tocar el bucle es de nuevo la **O**, Abierto/Cerrado."
 }

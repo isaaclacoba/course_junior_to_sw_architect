@@ -1,7 +1,7 @@
 {
   "hero.eyebrow": "Parte seis · Diseña para el cambio",
   "hero.title": "Los principios SOLID",
-  "intro.0": "«¿Por qué seguir estos principios? ¿No es sobreingeniería?» Es una duda razonable. Sinceramente, cada uno tiene su razón de ser: te ahorra un buen dolor de cabeza el día que tienes que tocar código que no estaba pensado para cambiar. Aquí verás cada regla primero como una trampa - algo que parece correcto hasta que tienes que cambiarlo - y luego escribes la solución y la ejecutas.",
+  "intro.0": "«¿Por qué seguir estos principios? ¿No es sobreingeniería?» Es una duda razonable. Sinceramente, cada uno tiene su razón de ser: te ahorra un buen dolor de cabeza el día que tienes que tocar código que no estaba pensado para cambiar. Ya hiciste estos movimientos a mano en Movimientos de refactorización - SOLID solo le pone nombre a cada uno, y el instinto de cuándo merece la pena. Aquí verás cada regla primero como una trampa - algo que parece correcto hasta que tienes que cambiarlo - y luego escribes la solución y la ejecutas.",
   "intro.1": "<strong>SOLID</strong> son cinco hábitos - S, O, L, I, D - para escribir clases fáciles de cambiar sin romper el resto del código. No se trata de aplicarlos por todas partes desde el principio: aprendes cuándo merece la pena cada uno.",
   "task.1.title": "S - Responsabilidad Única: un animal, un trabajo",
   "task.1.concept": "Responsabilidad Única",

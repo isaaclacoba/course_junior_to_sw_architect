@@ -45,5 +45,7 @@
   "concept.pr-encapsulation.term": "Encapsulation",
   "concept.pr-encapsulation.def": "Grouping related state with the behaviour that uses it and hiding the inside, so callers go through the object.",
   "concept.pr-invariant.term": "Invariant",
-  "concept.pr-invariant.def": "A rule about an object's state that its own methods keep true, so nothing outside can break it."
+  "concept.pr-invariant.def": "A rule about an object's state that its own methods keep true, so nothing outside can break it.",
+  "task.6.summaryItems.5.title": "In SOLID - ",
+  "task.6.summaryItems.5.text": "\"one reason to change\" is the **S**, Single Responsibility - the first letter you will meet by name in The SOLID Principles."
 }

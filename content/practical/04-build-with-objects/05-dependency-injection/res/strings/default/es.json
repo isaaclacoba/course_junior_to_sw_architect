@@ -43,5 +43,7 @@
   "task.6.summaryItems.4.text": "entrega un double de juguete para ensayar sin ninguna dependencia real.",
   "task.6.summaryClose": "A continuación: Parte cinco - Demuestra que funciona. Hiciste un sustituto; ahora úsalo para testear de verdad.",
   "concept.pr-dependency-injection.def": "Darle a una clase los colaboradores que necesita desde fuera, normalmente por su constructor, en vez de que los cree ella misma.",
-  "concept.pr-dependency-injection.term": "Inyección de dependencias"
+  "concept.pr-dependency-injection.term": "Inyección de dependencias",
+  "task.6.summaryItems.5.title": "En SOLID - ",
+  "task.6.summaryItems.5.text": "recibir una abstracción en vez de construirla es la **D**, la Inversión de Dependencias - la última de las cinco que nombrarás en Los principios SOLID."
 }

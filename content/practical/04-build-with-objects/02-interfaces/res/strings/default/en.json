@@ -46,5 +46,7 @@
   "concept.pr-interface.term": "Interface",
   "concept.pr-interface.def": "A named promise of what methods a type offers, without saying how they work.",
   "concept.pr-program-to-interface.term": "Program to an interface",
-  "concept.pr-program-to-interface.def": "Depending on the promise rather than a concrete type, so any type that keeps it can be used."
+  "concept.pr-program-to-interface.def": "Depending on the promise rather than a concrete type, so any type that keeps it can be used.",
+  "task.6.summaryItems.5.title": "In SOLID - ",
+  "task.6.summaryItems.5.text": "a new type dropping in without editing the caller is the **O**, Open/Closed; depending on the promise is the abstraction the **D** (Dependency Inversion) later builds on."
 }

@@ -46,5 +46,7 @@
   "concept.pr-interface.def": "Una promesa con nombre de qué métodos ofrece un tipo, sin decir cómo funcionan.",
   "concept.pr-interface.term": "Interfaz",
   "concept.pr-program-to-interface.def": "Depender de la promesa en vez de un tipo concreto, así puede usarse cualquier tipo que la cumpla.",
-  "concept.pr-program-to-interface.term": "Programar contra una interfaz"
+  "concept.pr-program-to-interface.term": "Programar contra una interfaz",
+  "task.6.summaryItems.5.title": "En SOLID - ",
+  "task.6.summaryItems.5.text": "que un tipo nuevo encaje sin editar a quien llama es la **O**, Abierto/Cerrado; depender de la promesa es la abstracción sobre la que luego se apoya la **D** (Inversión de Dependencias)."
 }

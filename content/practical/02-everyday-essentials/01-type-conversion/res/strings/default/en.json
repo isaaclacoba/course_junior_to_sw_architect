@@ -19,7 +19,7 @@
   "task.3.goal.1": "`Main` calls `Whole(3.9)`, so the output is `3`.",
   "task.4.title": "Parse without crashing",
   "task.4.concept": "int.TryParse",
-  "task.4.context": "`int.Parse(\"cat\")` throws - the text is not a number, and the program stops. `int.TryParse` is the safe version: it returns a `bool` saying whether it worked, and puts the number into an `out` variable when it does.\n\nWrite a `Gate` whose `IsNumber(string text)` returns whether the text is a whole number.",
+  "task.4.context": "`int.Parse(\"cat\")` throws - the text is not a number, and the program stops. `int.TryParse` is the safe version: it returns a `bool` saying whether it worked, and puts the number into an `out` variable - a second result the method hands back through an argument - when it does.\n\nWrite a `Gate` whose `IsNumber(string text)` returns whether the text is a whole number.",
   "task.4.goal.0": "Give `Gate` a `bool IsNumber(string text)` that returns the result of `int.TryParse`.",
   "task.4.goal.1": "`Main` calls `IsNumber(\"cat\")`, so the output is `False`.",
   "task.5.title": "What you learned",

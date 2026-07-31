@@ -42,5 +42,7 @@
   "task.6.summaryItems.4.text": "behind an interface, replace one part without touching the rest.",
   "task.6.summaryClose": "Next: Why inject?",
   "concept.pr-single-inheritance.term": "One base class only",
-  "concept.pr-single-inheritance.def": "C# lets a class inherit from just one parent, so you combine several parts by holding them instead."
+  "concept.pr-single-inheritance.def": "C# lets a class inherit from just one parent, so you combine several parts by holding them instead.",
+  "task.6.summaryItems.5.title": "In SOLID - ",
+  "task.6.summaryItems.5.text": "\"favour composition\" is not a letter itself, but it keeps the **L** (Liskov) honest - no is-a lie - and makes the **O** (Open/Closed) swap easy."
 }

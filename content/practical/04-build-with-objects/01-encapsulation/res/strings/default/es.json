@@ -45,5 +45,7 @@
   "concept.pr-encapsulation.def": "Agrupar el estado relacionado con el comportamiento que lo usa y ocultar el interior, así quien llama pasa por el objeto.",
   "concept.pr-encapsulation.term": "Encapsulación",
   "concept.pr-invariant.def": "Una regla sobre el estado de un objeto que sus propios métodos mantienen cierta, así nada de fuera puede romperla.",
-  "concept.pr-invariant.term": "Invariante"
+  "concept.pr-invariant.term": "Invariante",
+  "task.6.summaryItems.5.title": "En SOLID - ",
+  "task.6.summaryItems.5.text": "«una sola razón para cambiar» es la **S**, la Responsabilidad Única - la primera letra que conocerás por su nombre en Los principios SOLID."
 }

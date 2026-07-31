@@ -43,5 +43,7 @@
   "task.6.summaryItems.4.text": "add a class; the loop never changes.",
   "task.6.summaryClose": "Next: Inherit or compose?",
   "concept.pr-runtime-dispatch.term": "Runtime selection",
-  "concept.pr-runtime-dispatch.def": "The real object deciding at run time which version of a method runs, so you add a new type instead of another branch."
+  "concept.pr-runtime-dispatch.def": "The real object deciding at run time which version of a method runs, so you add a new type instead of another branch.",
+  "task.6.summaryItems.5.title": "In SOLID - ",
+  "task.6.summaryItems.5.text": "any type standing in at one call site is the **L**, Liskov Substitution; adding a class without changing the loop is the **O**, Open/Closed again."
 }

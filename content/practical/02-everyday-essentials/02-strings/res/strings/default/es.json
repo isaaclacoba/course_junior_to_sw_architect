@@ -4,7 +4,7 @@
   "intro.0": "El texto es un valor, no solo algo que imprimes. Puedes construirlo a partir de otros valores, darle otra forma, hacerle preguntas y reescribirlo - y cada paso te devuelve un trozo de texto nuevo en vez de cambiar el de antes. Escribes cada uno y lo ejecutas.",
   "task.1.title": "Construye texto a partir de trozos",
   "task.1.concept": "Monta un string a partir de valores",
-  "task.1.context": "Casi todo el texto que le enseñas a un usuario está **construido** - un nombre aquí, un número allá, pegados en una sola línea. En vez de unir trozos con `+`, puedes meter cada valor directamente en el texto con `$\"...\"`: dentro de las comillas, `{name}` y `{legs}` se sustituyen por esos valores.\n\nEscribe un `Critter` cuyo `Label(string name, int legs)` construya la línea `\"<name> has <legs> legs\"`.",
+  "task.1.context": "Casi todo el texto que le enseñas a un usuario está **construido** - un nombre aquí, un número allá, pegados en una sola línea. En vez de unir trozos con `+`, puedes meter cada valor directamente en una string interpolada, escrita `$\"...\"`: dentro de las comillas, `{name}` y `{legs}` se sustituyen por esos valores.\n\nEscribe un `Critter` cuyo `Label(string name, int legs)` construya la línea `\"<name> has <legs> legs\"`.",
   "task.1.goal.0": "Dale a `Critter` un `string Label(string name, int legs)` que devuelva `$\"{name} has {legs} legs\"`.",
   "task.1.goal.1": "`Main` llama a `Label(\"Ant\", 6)`, así que la salida es `Ant has 6 legs`.",
   "task.2.title": "Cambia las mayúsculas",

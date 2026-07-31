@@ -19,7 +19,7 @@
   "task.3.goal.1": "`Main` llama a `Whole(3.9)`, así que la salida es `3`.",
   "task.4.title": "Parsea sin que reviente",
   "task.4.concept": "int.TryParse",
-  "task.4.context": "`int.Parse(\"cat\")` lanza una excepción - el texto no es un número, y el programa se para. `int.TryParse` es la versión segura: devuelve un `bool` que dice si funcionó, y mete el número en una variable `out` cuando lo consigue.\n\nEscribe un `Gate` cuyo `IsNumber(string text)` devuelva si el texto es un número entero.",
+  "task.4.context": "`int.Parse(\"cat\")` lanza una excepción - el texto no es un número, y el programa se para. `int.TryParse` es la versión segura: devuelve un `bool` que dice si funcionó, y mete el número en una variable `out` - un segundo resultado que el método te devuelve a través de un argumento - cuando lo consigue.\n\nEscribe un `Gate` cuyo `IsNumber(string text)` devuelva si el texto es un número entero.",
   "task.4.goal.0": "Dale a `Gate` un `bool IsNumber(string text)` que devuelva el resultado de `int.TryParse`.",
   "task.4.goal.1": "`Main` llama a `IsNumber(\"cat\")`, así que la salida es `False`.",
   "task.5.title": "Lo que has aprendido",
