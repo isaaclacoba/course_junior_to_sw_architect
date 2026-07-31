@@ -160,6 +160,15 @@
         }
       });
     })
+    .then(function () {
+      // The hero was rendered in the target language (bind ran before heroHTML),
+      // but the breadcrumb + document title are set by the engine from the English
+      // registry. On a non-default language, trigger one hero repaint (now that the
+      // engine has set them) so PageShellHero localizes them too.
+      if (langPref.get() !== defaultLang && global.PageShellHero && typeof global.PageShellHero.setLocale === "function") {
+        try { global.PageShellHero.setLocale(); } catch (e) {}
+      }
+    })
     .catch(function (err) {
       // Defensive only: store.load swallows fetch errors to {}, so init does not
       // reject in practice. If it ever did, the hero still shows its inlined PAGE

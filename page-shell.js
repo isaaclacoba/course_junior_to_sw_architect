@@ -233,6 +233,21 @@
   // Course-XP label node, links and agenda untouched - so no cached reference (e.g.
   // the engine's #courseXpLabel) is invalidated. Never runs on the initial render,
   // so the default hero stays byte-identical.
+  function repaintCrumb(h) {
+    let lang = "en";
+    try { lang = localStorage.getItem("course_lesson_lang") || "en"; } catch (e) {}
+    if (lang === "en") return;
+    if (h.title) document.title = h.title;
+    const metaEl = document.querySelector("p.meta");
+    if (!metaEl || !metaEl.textContent || !h.eyebrow || !h.title) return;
+    // The eyebrow reads "<kicker> \u00b7 <part title>"; the breadcrumb wants
+    // "<part title> \u00b7 <lesson title>". Reuse the localized pieces already on
+    // the page rather than depending on a per-lesson translation.
+    const segs = h.eyebrow.split("\u00b7");
+    const partTitle = (segs.length > 1 ? segs[segs.length - 1] : segs[0]).trim();
+    metaEl.textContent = partTitle + " \u00b7 " + h.title;
+  }
+
   function repaintHero() {
     const h = window.PAGE && window.PAGE.hero;
     if (!h) return;
@@ -240,6 +255,10 @@
     if (eyebrowEl && h.eyebrow != null) eyebrowEl.textContent = h.eyebrow;
     const h1 = hero.querySelector("h1");
     if (h1 && h.title != null) h1.textContent = h.title;
+    // Non-default language only: the breadcrumb + document title were filled from
+    // the English registry (not owned by heroHTML), so localize them here. Gated
+    // on lang so the default language stays byte-identical.
+    repaintCrumb(h);
     const xpLabel = hero.querySelector("#courseXpLabel");
     const anchor = xpLabel ? xpLabel.closest("p") : null;
     if (!anchor || !h1) return;
