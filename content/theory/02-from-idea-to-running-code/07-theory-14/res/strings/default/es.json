@@ -2,16 +2,17 @@
   "hero.eyebrow": "Teoría · Parte dos · De la idea al código en marcha",
   "hero.title": "Bugs: por qué los programas fallan",
   "intro.0": "Los programas fallan, y es normal. Esta lección cubre qué es un bug, los errores de sintaxis frente a los errores de lógica, qué significa depurar, y por qué encontrar y arreglar bugs es la mayor parte del trabajo. Cierra la Parte dos. Recorre el visual para ver cómo un error de sintaxis detiene la compilación y un error de lógica deja un valor equivocado.",
-  "step.0.narr": "Un **bug** es un error en las instrucciones.\nEl ordenador hizo exactamente lo que escribiste, no lo que querías decir - así que cuando un programa se porta mal, el fallo está casi siempre en el código.",
-  "step.1.narr": "Un tipo rompe las reglas del lenguaje - un **error de sintaxis**, como un símbolo que falta.\nEl compilador lo pilla antes de que nada se ejecute y se niega a compilar hasta que lo arreglas.",
-  "step.2.narr": "El otro tipo es más ladino. Este código compila y se ejecuta bien, pero usó `-` donde quería decir `+`, así que `total` sale `5` - cuando sumar `10` y `5` debería dar `15`.\nEso es un **error de lógica**: código válido haciendo lo que no es.",
-  "step.3.narr": "**Depurar** significa ir línea por línea, mirando cómo se llena cada casilla.\nPrimera línea: `a` recibe `10`.",
-  "step.4.narr": "Siguiente línea: `b` recibe `5`.\nHasta aquí las casillas guardan lo que esperas.",
+  "step.0.narr": "Un **bug** es un fallo en las instrucciones.\nEl ordenador hizo exactamente lo que escribiste, no lo que querías decir - así que cuando un programa se porta mal, la culpa casi siempre está en el código.",
+  "step.1.narr": "Una clase rompe las reglas del lenguaje - un **error de sintaxis**, como un símbolo que falta.\nEl compilador lo pilla antes de que se ejecute nada y se niega a compilar hasta que lo arreglas.",
+  "step.2.narr": "La otra clase es más traicionera. Este código compila y se ejecuta bien, pero usó `-` donde quería `+`, así que `total` sale `5` - cuando sumar `10` y `5` debería dar `15`.\nEso es un **error de lógica**: código válido haciendo lo que no toca.",
+  "step.3.narr": "**Depurar** es ir paso a paso línea por línea, mirando cómo se llena cada casilla.\nPrimera línea: `a` recibe `10`.",
+  "step.4.narr": "Línea siguiente: `b` recibe `5`.\nHasta aquí las casillas guardan lo que esperas.",
   "step.5.narr": "En esta línea el valor se tuerce - `total` se vuelve `5`, no `15`. Has **encontrado el bug**: el `-` debería ser un `+`.\nArregla esa línea, ejecuta otra vez, y `total` marca `15`.",
   "concept.th-bug.def": "Un fallo en el código - el ordenador hizo lo que escribiste, no lo que querías decir.",
   "concept.th-syntax-error.def": "Código que rompe las reglas del lenguaje, y que el compilador detecta antes de que el programa se ejecute.",
   "concept.th-syntax-error.term": "Error de sintaxis",
   "concept.th-logic-error.def": "Código válido que se ejecuta pero hace lo que no toca, como usar un menos donde querías un más.",
   "concept.th-logic-error.term": "Error de lógica",
-  "concept.th-debugging.def": "Recorrer el código línea a línea, mirando los valores, para encontrar dónde se tuerce."
+  "concept.th-debugging.def": "Recorrer el código línea a línea, mirando los valores, para encontrar dónde se tuerce.",
+  "legend.0": "cambió en este paso"
 }

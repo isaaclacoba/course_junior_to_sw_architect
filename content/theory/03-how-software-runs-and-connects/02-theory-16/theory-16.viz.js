@@ -1,9 +1,12 @@
-// Visual for theory-16 "References vs values" - data-only. Same layout as
-// lesson 15 (board + code + stack + heap): the CPU runs the lines while the
-// slots change. The honest model: every slot holds some bits directly. For a
-// value type those bits ARE the data; for a reference type those bits are an
-// address - a reference that points to an object on the heap. What decides
-// which you get is the TYPE, not the size.
+// Visual for theory-16 "References vs values" - data-only. LEVEL-2 execution
+// scene: the code with a moving current line, the running frame's variables on
+// the left, and the objects that live on the heap as cards on the right, joined
+// by a reference arrow. No board, no addresses. The one picture teaches the
+// split: a value type holds its data in the box; a reference type holds a
+// reference - an arrow - to an object that lives somewhere else. Copying follows
+// the same split: copy a value and you duplicate the data; copy a reference and
+// you duplicate the arrow, so both names point to the one object. And a
+// reference can point to nothing at all - that is null.
 (function () {
   "use strict";
 
@@ -13,47 +16,79 @@
     "int b = count;",
     "b = 9;",
     "Dog friend = pet;",
+    "Dog stray = null;",
   ];
+
+  // The one Dog object on the heap. `hotFields` spotlights a field that just
+  // changed; here the Dog never changes, so it stays quiet.
   const DOG = { id: "d1", type: "Dog", fields: [["Name", '"Rex"']] };
-  const frame = (vars) => ({ id: "f", name: "your program", vars });
-  const count = (extra) => ({ id: "count", addr: "0x7000", k: "count", v: "5", ...(extra || {}) });
-  const pet = (extra) => ({ id: "pet", addr: "0x7008", k: "pet", ref: "d1", ...(extra || {}) });
+
+  // A variable box. A value box holds its data (`count : 5`); a reference box
+  // holds `ref` - an arrow to a heap object; `v: "null"` is an explicit null.
+  const val = (id, v, hot) => ({ id, k: id, v: String(v), ...(hot ? { hot: true } : {}) });
+  const ref = (id, to, hot) => ({ id, k: id, ref: to, ...(hot ? { hot: true } : {}) });
+  const nul = (id, hot) => ({ id, k: id, v: "null", ...(hot ? { hot: true } : {}) });
+  const frame = (vars) => ({ id: "prog", name: "your program", vars });
 
   window.LESSON_VIZ = {
-    scene: { board: true, regions: ["code", "stack", "heap"], zoomTab: true },
-    chipName: "LPDDR5 RAM",
-    chipAddr: "what each slot really holds",
     code: CODE,
+    layout: {
+      visual: [{ type: "code" }, { type: "heapcards" }],
+      aside: [{ type: "narration" }, { type: "controls" }],
+    },
+    legend: [
+      { sw: "#2563eb", label: "a reference - an arrow to an object", round: true },
+      { sw: "#f59e0b", label: "changed this step" },
+      { sw: "#c0392b", label: "null - points to nothing" },
+    ],
     steps: [
       {
-        narr: "Every variable is a slot that holds some bits directly. For `count`, those bits are the number `5` itself - the data sits right there in the slot.\nThat makes `int` a value type: the slot holds the value.",
-        pc: 0, codeLive: true, ram: true, core: 0, highlight: ["code", "stack"], codeMark: { text: "5", kind: "expr" },
-        stack: [frame([count({ hot: true })])], heap: [],
+        narr: "A **value type** keeps its data right in the box. `int count = 5` puts the number `5` into `count` itself - the box *is* the value.\nNothing on the heap yet.",
+        pc: 0, codeLive: true, codeMark: { text: "5", kind: "expr" },
+        stack: [frame([val("count", 5, true)])],
+        heap: [],
       },
       {
-        narr: "`pet` is different. `new Dog(\"Rex\")` builds a `Dog` object on the heap.\n`pet`'s slot does not hold that Dog - it holds the Dog's address. That makes `Dog` a reference type.",
-        pc: 1, codeLive: true, ram: true, core: 1, highlight: ["code", "stack", "heap"], codeMark: { text: 'new Dog("Rex")', kind: "expr" },
-        stack: [frame([count(), pet({ hot: true })])], heap: [{ ...DOG }],
+        narr: "A **reference type** is different. `new Dog(\"Rex\")` builds a `Dog` object - it lives on the **heap**, the area for things whose lifetime is not tied to one line.\n`pet` does not hold that Dog. It holds a **reference** to it: the arrow.",
+        pc: 1, codeLive: true, codeMark: { text: 'new Dog("Rex")', kind: "expr" },
+        stack: [frame([val("count", 5), ref("pet", "d1", true)])],
+        heap: [{ ...DOG }],
       },
       {
-        narr: "So a reference is just a variable that holds - by value - a memory address.\nThe bits in `count` are a number; the bits in `pet` are an address. Follow that address (the arrow) and you reach the real `Dog` on the heap.",
-        pc: 1, codeLive: true, ram: true, highlight: ["stack", "heap"], glow: "d1",
-        stack: [frame([count(), pet({ hot: true })])], heap: [{ ...DOG }],
+        narr: "So the box `count` holds a number, and the box `pet` holds an arrow. Follow the arrow and you reach the real `Dog`.\nThe object is one thing; the reference is a small note that says where to find it.",
+        pc: 1, codeLive: true, glow: "d1",
+        stack: [frame([val("count", 5), ref("pet", "d1")])],
+        heap: [{ ...DOG }],
       },
       {
-        narr: "Copying now splits in two. Copy a value type - `int b = count` - and the bits themselves (the `5`) are duplicated into b's own slot.\n`b` gets its own separate `5`.",
-        pc: 2, codeLive: true, ram: true, core: 0, highlight: ["code", "stack"], codeMark: { text: "count", kind: "expr" },
-        stack: [frame([count(), pet(), { id: "b", addr: "0x7010", k: "b", v: "5", hot: true }])], heap: [{ ...DOG }],
+        narr: "Copying splits the same way. Copy a value - `int b = count` - and the *data* is duplicated. `b` gets its own `5`, in its own box.",
+        pc: 2, codeLive: true, codeMark: { text: "count", kind: "expr" },
+        stack: [frame([val("count", 5), ref("pet", "d1"), val("b", 5, true)])],
+        heap: [{ ...DOG }],
       },
       {
-        narr: "Because `b` holds its own copy, changing `b` to `9` leaves `count` at `5`.\nTwo separate slots, two separate numbers - they were never linked.",
-        pc: 3, codeLive: true, ram: true, core: 0, highlight: "stack", codeMark: { text: "9", kind: "expr" },
-        stack: [frame([count(), pet(), { id: "b", addr: "0x7010", k: "b", v: "9", hot: true }])], heap: [{ ...DOG }],
+        narr: "Because `b` has its own copy, changing `b` to `9` leaves `count` at `5`.\nTwo separate boxes, two separate numbers - they were never linked.",
+        pc: 3, codeLive: true, codeMark: { text: "9", kind: "expr" },
+        stack: [frame([val("count", 5), ref("pet", "d1"), val("b", 9, true)])],
+        heap: [{ ...DOG }],
       },
       {
-        narr: "Copy a reference type - `Dog friend = pet` - and it is the address that gets duplicated, not the Dog.\n`pet` and `friend` now hold the same address, so both point to the one `Dog`. Change it through either name and the other sees it - there is still only one object.",
-        pc: 4, codeLive: true, ram: true, core: 1, highlight: ["code", "stack", "heap"], glow: "d1", codeMark: { text: "pet", kind: "expr" },
-        stack: [frame([count(), pet(), { id: "b", addr: "0x7010", k: "b", v: "9" }, { id: "friend", addr: "0x7018", k: "friend", ref: "d1", hot: true }])], heap: [{ ...DOG }],
+        narr: "Copy a reference - `Dog friend = pet` - and it is the **arrow** that is duplicated, not the Dog. `pet` and `friend` now point to the *same* object.\nChange the Dog through either name and the other sees it, because there is still only one Dog.",
+        pc: 4, codeLive: true, glow: "d1", codeMark: { text: "pet", kind: "expr" },
+        stack: [frame([val("count", 5), ref("pet", "d1"), val("b", 9), ref("friend", "d1", true)])],
+        heap: [{ ...DOG }],
+      },
+      {
+        narr: "A reference can also point to **nothing**. `Dog stray = null` gives `stray` a box with no arrow at all - `null` means \"no object\".\nAsk a null reference to do something and the program stops with an error, so null is worth watching for.",
+        pc: 5, codeLive: true, codeMark: { text: "null", kind: "expr" },
+        stack: [frame([val("count", 5), ref("pet", "d1"), val("b", 9), ref("friend", "d1"), nul("stray", true)])],
+        heap: [{ ...DOG }],
+      },
+      {
+        narr: "The whole split in one picture:\n- **value type** (`int`) - the box holds the data; copying duplicates the data.\n- **reference type** (`Dog`) - the box holds an arrow to a heap object; copying duplicates the arrow, so names can share one object.\n- **null** - a reference to no object.\n\nWhich you get is decided by the **type**, not by how big the value is.",
+        pc: -1, codeLive: true,
+        stack: [frame([val("count", 5), ref("pet", "d1"), val("b", 9), ref("friend", "d1"), nul("stray")])],
+        heap: [{ ...DOG }],
       },
     ],
   };

@@ -2,12 +2,12 @@
   "hero.eyebrow": "Teoría · Parte dos · De la idea al código en marcha",
   "hero.title": "Funciones",
   "intro.0": "Copiar y pegar las mismas líneas por todo un programa parece que va bien hasta que tienes que cambiarlas en diez sitios a la vez. Una función es la salida: escribe los pasos una vez, ponles un nombre, y llámala cuando la necesites. Recorre lo de abajo para ver cómo una llamada entrega sus entradas y devuelve un resultado.",
-  "step.0.narr": "Una **función** es un paquete de pasos con nombre, y esos pasos viven en la zona de `código` de la memoria - aquí `add`, que toma dos números.\nLa CPU puede saltar a ellos siempre que se les llama.",
-  "step.1.narr": "Escribe los pasos una vez, y luego **reutilízalos**.\nLlama a `add` donde lo necesites, tantas veces como quieras, sin reescribir el cuerpo.",
-  "step.2.narr": "Llamar a `add(3, 5)` hace que la CPU salte al código de `add` y apila un nuevo **frame** - la memoria local propia de la función.\nLos argumentos se convierten en variables locales dentro de ese frame: `a = 3` y `b = 5`.",
-  "step.3.narr": "Ahora la CPU ejecuta el cuerpo de `add`: lee `a` y `b` del frame y calcula `a + b` - `8`.\nLas variables **locales** como `a` y `b` solo existen mientras este frame está en la pila.",
-  "step.4.narr": "`add` devuelve el resultado y su frame se **desapila** de la pila - esa memoria se recupera al instante.\nEl contador de programa vuelve a `main`, y el `8` aterriza en `r`.",
-  "step.5.narr": "Los programas están hechos de **muchas funciones** que se llaman entre sí.\n`main` es simplemente aquella en la que el programa empieza - el resto se llaman desde ahí.",
+  "step.0.narr": "Una **función** es un paquete de pasos con nombre, y esos pasos viven en la zona de `code` - aquí `add`, que toma dos números.\nEl programa empieza en `main`, así que el call stack tiene un frame.",
+  "step.1.narr": "Escribe los pasos una vez y luego **reutilízalos**.\nLlama a `add` donde lo necesites, tantas veces como quieras, sin reescribir el cuerpo.",
+  "step.2.narr": "Llamar a `add(3, 5)` apila un **frame** nuevo encima de `main` - la memoria local propia de la función.\nLos argumentos llegan como copias en ese frame: `a = 3` y `b = 5`.",
+  "step.3.narr": "Ahora la CPU ejecuta el cuerpo de `add`. Lee `a` y `b` del frame de arriba y calcula `a + b` - `8`.\nLas variables **locales** como `a` y `b` solo existen mientras este frame está en el stack.",
+  "step.4.narr": "`add` devuelve el resultado y su frame se **retira** del stack - esa memoria local desaparece.\nEl control vuelve a `main`, y `8` aterriza en `r`.",
+  "step.5.narr": "Los programas se construyen con **muchas funciones** que se llaman entre sí.\n`main` es simplemente aquella en la que arranca el programa - las demás se llaman desde ahí.",
   "concept.th-function.def": "Un conjunto de pasos con nombre que puedes llamar y reutilizar, con entradas y una salida.",
   "concept.th-function.term": "Función",
   "concept.th-parameter.def": "Una entrada con nombre que recibe una función, que llega como una variable local cuando se llama a la función.",
@@ -15,5 +15,7 @@
   "concept.th-return-value.def": "El resultado que una función devuelve a quien la llamó.",
   "concept.th-return-value.term": "Valor de retorno",
   "concept.th-local-variable.def": "Una variable que solo existe mientras se ejecuta su función.",
-  "concept.th-local-variable.term": "Variable local"
+  "concept.th-local-variable.term": "Variable local",
+  "legend.0": "la llamada en curso",
+  "legend.1": "cambió en este paso"
 }
