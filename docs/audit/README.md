@@ -79,6 +79,13 @@ testing, then SOLID, ending in one compiled refactor exercise.
 3. **SOLID mapping is left implicit** across all five Part 4 lessons and the
    testing/refactor lessons. Each lesson IS a SOLID letter (S/O/L/I/D) but never
    says so, so the capstone's principle names arrive without a back-reference.
+   > Progress 2026-07-31: DONE. Each Part 4 recap now names the letter it seeds -
+   > encapsulation **S**, interfaces **O** (+ the abstraction **D** builds on),
+   > polymorphism **L** (+ **O**), composition keeps **L** honest and eases **O**,
+   > dependency-injection **D** - and `testable-design` tags its habits (inject
+   > **D**, one job **S**). `refactor-moves` already maps each move to a principle.
+   > **I** (Interface Segregation) is intentionally not in Part 4; it lives in The
+   > SOLID Principles and is item 7 (capstone) below.
 4. **Grading holes.** `writing-methods`, `lambdas`, `testing-basics`,
    `test-doubles` and `first-builds` set no hidden `verify` probe, so a hardcoded
    constant can pass. Copy the probe pattern from `data-shapes`/`generics`.
@@ -157,9 +164,12 @@ there:
   expression-bodied `=>` in `reuse-without-regret`; `string?` and `$"..."` were
   already introduced at first use.
 - DONE - `Control Flow` and `LINQ` are now runnable (LINQ is a build lesson).
-  Still to do: add the missing hidden `verify` probes to the other build lessons.
-- State the SOLID letter each Part 4 / Part 5 / Part 6 lesson embodies, and add
-  the ISP milestone to the capstone.
+  DONE - closed the build-lesson grading holes: `test-doubles` got hidden
+  `verify` probes; `writing-methods`/`lambdas`/`testing-basics` were hardened with
+  `requireSource` (their graded logic lives in `Main`, so a `Program`-replacing
+  probe cannot reach it).
+- DONE (mapping) - each Part 4 / Part 5 lesson now states the SOLID letter it
+  embodies. Still to do: add the ISP milestone to the capstone.
 - Normalise one example family per Part and smooth the two difficulty spikes.
 - DONE (theory rhythm) - fixed the `theory-20`/`theory-21` order, added the
   `theory-7` recap, corrected the `theory-18` intro, and widened checkpoint

@@ -138,6 +138,7 @@
         { title: "has-a - ", text: "hold a part as a field and ask it to do the work." },
         { title: "One base class - ", text: "C# forbids inheriting three; compose the parts instead." },
         { title: "Swap a part - ", text: "behind an interface, replace one part without touching the rest." },
+        { title: "In SOLID - ", text: "\"favour composition\" is not a letter itself, but it keeps the **L** (Liskov) honest - no is-a lie - and makes the **O** (Open/Closed) swap easy." },
       ],
       summaryClose: "Next: Why inject?",
     },

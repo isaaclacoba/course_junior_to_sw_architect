@@ -145,6 +145,7 @@
         { title: "`: IAnimal` - ", text: "a class declares it keeps the promise." },
         { title: "Program to the interface - ", text: "depend on the promise, so any keeper of it fits." },
         { title: "Open to new types - ", text: "a brand-new class drops in without touching the caller." },
+        { title: "In SOLID - ", text: "a new type dropping in without editing the caller is the **O**, Open/Closed; depending on the promise is the abstraction the **D** (Dependency Inversion) later builds on." },
       ],
       summaryClose: "Next: Why many versions? - polymorphism.",
     },

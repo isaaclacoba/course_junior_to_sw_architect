@@ -154,6 +154,7 @@
         { title: "private - ", text: "hide a field so only the class can change it." },
         { title: "Guard the rule - ", text: "the one method that writes can reject nonsense." },
         { title: "One reason to change - ", text: "fix a rule once inside the object and every caller follows." },
+        { title: "In SOLID - ", text: "\"one reason to change\" is the **S**, Single Responsibility - the first letter you will meet by name in The SOLID Principles." },
       ],
       summaryClose: "Next: Why abstract? - pulling logic behind an interface.",
     },

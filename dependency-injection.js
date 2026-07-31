@@ -136,6 +136,7 @@
         { title: "Constructor injection - ", text: "receive the dependency through the constructor and keep it." },
         { title: "Depend on an interface - ", text: "inject `IAnimal`, so any animal that keeps the promise fits." },
         { title: "Swap in a stand-in - ", text: "hand in a toy double to rehearse with no real dependency." },
+        { title: "In SOLID - ", text: "receiving an abstraction instead of building it is the **D**, Dependency Inversion - the last of the five you will name in The SOLID Principles." },
       ],
       summaryClose: "Next: Part five - Prove it works. You made a stand-in; now use it to actually test.",
     },

@@ -77,8 +77,8 @@
       summaryIntro:
         "You do not bolt testability on afterwards. The shape that makes code easy to test is the shape that makes it easy to change.",
       summaryItems: [
-        { title: "Inject dependencies - ", text: "receive them, so a test can substitute a double." },
-        { title: "One job per class - ", text: "a single-purpose class has a single, simple test." },
+        { title: "Inject dependencies - ", text: "receive them, so a test can substitute a double. This is the **D** of SOLID, Dependency Inversion." },
+        { title: "One job per class - ", text: "a single-purpose class has a single, simple test. This is the **S**, Single Responsibility." },
         { title: "No hidden state - ", text: "input in, output out is the easiest thing to trust." },
       ],
       summaryClose: "These habits have names. Next: Design for change - the SOLID principles that make them deliberate.",

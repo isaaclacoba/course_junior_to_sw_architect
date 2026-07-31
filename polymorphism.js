@@ -143,6 +143,7 @@
         { title: "Over a list - ", text: "a single loop walks a `List<IAnimal>` of mixed kinds." },
         { title: "Runtime selection - ", text: "choose the implementation while the program runs." },
         { title: "Open to new behaviour - ", text: "add a class; the loop never changes." },
+        { title: "In SOLID - ", text: "any type standing in at one call site is the **L**, Liskov Substitution; adding a class without changing the loop is the **O**, Open/Closed again." },
       ],
       summaryClose: "Next: Inherit or compose?",
     },
