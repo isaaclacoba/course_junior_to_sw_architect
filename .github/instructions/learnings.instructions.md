@@ -28,6 +28,35 @@ grows into a procedure, promote it to a skill and leave a pointer here.
   filename to the right `page-shell.js` array (in reading order); never bump a
   count by hand, and never set `awardedKey`/`nextHref` in a lesson data file.
 
+## Git & GitHub identity
+
+- **GitHub attributes contributors from commit author/committer email and
+  `Co-authored-by:` trailers only - never from an email that merely appears in a
+  commit message's prose.** To confirm a denied identity is really gone after a
+  history rewrite, check four independent backend sources, not the web UI (which
+  caches): `gh api 'repos/<o>/<r>/contributors?anon=1&per_page=100'` (a removed
+  user still shows by its numeric id), the Insights contributor-graph data, an
+  anonymous `curl` of the overview HTML grepped for the name / email / avatar id,
+  and `gh api repos/<o>/<r>/commits/<sha>` (`.author.login` / `.committer.login`).
+  A sighting that survives all four is the browser cache or GitHub's async
+  recompute (minutes to ~24h), not a git problem - hard-refresh, don't re-rewrite.
+
+- **A history rewrite is not finished until EVERY local ref is reset - checking
+  only the branch you are on gives a false "clean".** After `filter-repo` +
+  force-push, the old commits (and their author email) stay reachable through
+  stale local branches you never touched (a `master` left behind), `backup/*`
+  branches, `refs/original/*`, and the reflogs. Point or delete all of them, then
+  `git reflog expire --expire=now --all && git gc --prune=now`, and verify with
+  `git log --all --format='%ae%n%ce' | grep -c <bad-email>` returning `0`. Also
+  fix the repo's local `git config user.email` - a stale value there (e.g. a work
+  address carried into a worktree) is what re-introduces the wrong identity on the
+  next commit in the first place.
+
+- **When the default SSH remote maps to a denied identity, push over HTTPS.** If a
+  machine's SSH key is tied to the account you are trying to purge, pushes will
+  re-attribute to it; use the HTTPS remote with a token in `~/.git-credentials`
+  for the correct account instead of switching the key.
+
 ## Theming
 
 - **Theming and dark mode is a skill - see `theme-authoring`.** A theme is one
