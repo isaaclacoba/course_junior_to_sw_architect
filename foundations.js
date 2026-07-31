@@ -13,7 +13,7 @@
       title: "Your first line",
       concept: "Printing",
       context:
-        "A program shows you something by printing it. `Console.WriteLine(...)` prints one line. Whatever you put in the quotes is text - a `string`.",
+        "A program shows you something by printing it. `Console.WriteLine(...)` prints one line. Whatever you put in the quotes is text - a `string`. The `class Program` and `static void Main()` wrapped around your code are the frame every C# program starts inside - treat them as a given for now; `class` and `static` are explained later.",
       example:
         'Console.WriteLine("Good morning");  // prints: Good morning',
       goal: [
@@ -33,7 +33,7 @@
       title: "A variable holds a value",
       concept: "Variables",
       context:
-        "A **variable** is a named box that holds a value. You give it a type, a name, and a value: `int legs = 4;` makes a whole number (`int`) called `legs` holding 4. Print the variable and you see what it holds.",
+        "A **variable** is a named box that holds a value. You give it a type, a name, and a value: `int legs = 4;` makes a whole number (`int`) called `legs` holding 4. Print the variable and you see what it holds. You can also let the compiler read the type off the value: `var legs = 4;` means the same as `int legs = 4;`. We usually spell the type out while it is new, but you will meet `var` in code that builds objects.",
       example:
         'int age = 7;\nConsole.WriteLine(age);  // prints: 7',
       goal: [

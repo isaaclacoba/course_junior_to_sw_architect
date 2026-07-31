@@ -44,7 +44,7 @@ public class Program
       "Polymorphism: one call, many behaviours - the payoff.",
     ],
     walk: [
-      { lines: 3, text: "Inheritance is the is-a way: `Cat : Animal`. The colon means Cat IS-A Animal, so it can reuse and override `Speak()`." },
+      { lines: 3, text: "Inheritance is the is-a way: `Cat : Animal`. The colon means Cat IS-A Animal, so it can reuse and override `Speak()`. The `=> \"Meow\"` is shorthand for a one-line method body - the same as writing `{ return \"Meow\"; }`." },
       { lines: 7, text: "Composition is the has-a way: `RoboCat` holds a `Heart` field. It OWNS a part instead of being a kind of it." },
       { lines: [10, 11], text: "Polymorphism is neither way - it is the payoff: hold a `Cat` in an `Animal`-shaped variable, and one call (`pet.Speak()`) adapts to the real object." },
     ],

@@ -65,6 +65,12 @@ testing, then SOLID, ending in one compiled refactor exercise.
    members and lambdas), the ternary `?:`, `$"..."` interpolation, `var`,
    `static`, and nullable `string?` all appear in earlier lessons than any
    explanation. Either introduce each once, early, or avoid it until taught.
+   > Progress 2026-07-31: DONE. `string?` (`foundations` t5) and `$"..."`
+   > (`strings` t0) were already introduced at first use in the grown course.
+   > Added one-time notes at the earliest appearance of the rest: `static` +
+   > `var` in `foundations` (t1/t2), ternary `?:` in `control-flow` t1 (before
+   > its first use in `linq`), and expression-bodied `=>` in `reuse-without-regret`
+   > step 1 (before `lambdas` teaches the lambda `=>`).
 2. **Ordering inversions.** `First Builds` (Part 2) uses interface + injection +
    open/closed as a taster long before Part 4 teaches them; `Data shapes` (Part
    3) formally teaches properties and `enum` after earlier lessons already used
@@ -146,8 +152,10 @@ there:
 
 - DONE - Removed the dead theory `.js` files (archived) and settled the single
   theory engine (`theory-N.viz.js`).
-- Introduce (once, early) every syntax token currently used before it is taught,
-  or remove it from early lessons.
+- DONE - Introduced (once, early) every syntax token that was used before it was
+  taught: `static`/`var` in `foundations`, ternary `?:` in `control-flow`,
+  expression-bodied `=>` in `reuse-without-regret`; `string?` and `$"..."` were
+  already introduced at first use.
 - DONE - `Control Flow` and `LINQ` are now runnable (LINQ is a build lesson).
   Still to do: add the missing hidden `verify` probes to the other build lessons.
 - State the SOLID letter each Part 4 / Part 5 / Part 6 lesson embodies, and add

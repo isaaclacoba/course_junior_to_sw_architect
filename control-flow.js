@@ -10,7 +10,7 @@
       title: "Branch with if / else",
       concept: "if / else",
       context:
-        "An `if` / `else if` / `else` chain picks exactly one branch, top to bottom. The pattern below sorts a temperature into bands; do the same to turn an error count into a level.",
+        "An `if` / `else if` / `else` chain picks exactly one branch, top to bottom. The pattern below sorts a temperature into bands; do the same to turn an error count into a level. For a plain either/or that yields one of two values, C# also has a compact form - the conditional expression `condition ? a : b`, read as \"if condition then a else b\". An `if` chain is clearer here with three outcomes; you will see `?:` used later.",
       example:
         'int temperature = 30;\nif (temperature >= 40)\n{\n    Console.WriteLine("hot");\n}\nelse if (temperature >= 20)\n{\n    Console.WriteLine("warm");\n}\nelse\n{\n    Console.WriteLine("cold");\n}',
       goal: [
