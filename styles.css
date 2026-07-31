@@ -1759,6 +1759,35 @@ input.almost {
 [data-theme="dark"] .cl-mv .cl-mv-obj .cl-mv-field { color: #b3bccc; }
 [data-theme="dark"] .cl-mv .cl-mv-obj .cl-mv-field.is-hot { background: #2e2410; box-shadow: inset 0 0 0 1px #5a4a1e; color: #e6a54a; }
 
+/* ---- Execution-scene panels (vartable / callstack / heapcards) ------
+   The audit line's code+state visualizer renders these NEWER panels through
+   the SAME MemoryViz widget. They read their surfaces from the --mv-* token
+   contract (unset = light default), and the element overrides above only cover
+   the older memory-scene classes, so drive the panels from the same dark
+   palette used above. Rules stay .cl-mv-qualified so they outweigh code-lab.css. */
+[data-theme="dark"] .cl-mv {
+  --mv-panel-bg: var(--bg-2);
+  --mv-panel-tag: var(--ink-soft);
+  --mv-surface: var(--card);
+  --mv-cool-bg: #161f2a;
+  --mv-cool-line: #2b3d5e;
+  --mv-caller-bg: #121822;
+  --mv-name-ink: #8a93a3;
+  --mv-empty-ink: #868d9c;
+  --mv-obj-field-ink: #b3bccc;
+  --mv-null-ink: #e06c5d;
+  --mv-accent-ink: var(--primary-2);
+  --mv-hot-bg: #2e2410;
+  --mv-hot-line: #6b5622;
+  --mv-hot-ring: #5a4a1e;
+  --mv-hot-ink: #e6a54a;
+  --mv-hot-inset: #5a4a1e;
+  --mv-obj-bg: #122a24;
+  --mv-obj-line: #22463c;
+  --mv-refdot-ring: #122a24;
+  --mv-dot-ring: #1c2740;
+}
+
 /* ---- AI agent scene: the next-token probability panel --------------- */
 [data-theme="dark"] .cl-ag .cl-ag-fan { background: var(--card); border-color: var(--line); }
 [data-theme="dark"] .cl-ag .cl-ag-tok-name { color: var(--ink); }
