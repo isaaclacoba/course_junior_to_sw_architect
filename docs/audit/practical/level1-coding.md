@@ -6,6 +6,10 @@
 > answers a yes/no question about its own state. The premature OO design content
 > (encapsulation/polymorphism/inheritance/composition/DI) is gone; those are
 > taught in Part 4. The notes below describe the earlier version.
+>
+> Follow-up 2026-07-31: because of that rewrite, the "drill 10 difficulty spike"
+> (cross-cutting item 8) no longer exists - the lesson is now four single-idea
+> tasks. Item 8 is closed for this lesson.
 
 - **Track / Part:** Practical - Part 1 Understand the ideas
 - **Engine / format:** drill-engine (fill-in-the-blank) with per-drill Run button

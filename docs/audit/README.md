@@ -95,6 +95,18 @@ testing, then SOLID, ending in one compiled refactor exercise.
    the capstone use a test-automation/reporter flavour, while Part 4 uses
    animals. Pick one running example family per Part so the learner is not
    re-oriented each lesson.
+   DONE (resolved by the restructure + verified). `First Builds` is gone;
+   `the-solid-principles` was rewritten to the animal family (Cat/Dog/Sparrow/
+   Penguin/Fish/Keeper), so Part 4 and both Part 6 build lessons (`refactor-moves`,
+   `the-solid-principles`) now share the animal family. The remaining per-Part
+   families are intentional and were left as-is: Part 1's utility variety is
+   deliberate syntax practice; Part 5's test-double infrastructure
+   (`FixedClock`/`SpyLog`) is the right subject for a testing part; the capstone's
+   test-automation is the fixed, compiled finale. The one within-Part "outlier",
+   `generics` (`Box<T>`/`Pair<A,B>`), is correctly domain-neutral - re-skinning a
+   generic container to animals would undercut the lesson that it holds any type
+   (its `verify` probes prove `Box<int>` and `Box<string>` both work), so it was
+   left unchanged.
 7. **Capstone milestones omit ISP** (the `I`), so the one integrative exercise
    does not exercise every principle it teaches.
    DONE - the capstone now has an ISP milestone (7 of 8): a summary ability lives
@@ -103,6 +115,17 @@ testing, then SOLID, ending in one compiled refactor exercise.
    substitutability (Liskov) milestone moved to 8 to stay the climax.
 8. **Difficulty spikes.** `Practice the Basics` drill 10 and `The SOLID
    Principles` jump to several classes at once; add a step between.
+   DONE (resolved by the restructure + one bridge). Both lessons were rewritten:
+   `practice-the-basics` is now a 4-task build lesson that stacks one idea per
+   task (the old 10-drill synthesis is gone), and `the-solid-principles` is a
+   5-task build lesson, one principle per task, each writing one small focused fix
+   (never more than 2-3 tiny types) - so neither still stacks many classes at
+   once. The only residual was a continuity gap: `refactor-moves`' recap promises
+   "the SOLID principles name these moves", but the SOLID intro didn't pick that
+   thread up. Added one bridging sentence to `the-solid-principles` intro ("You
+   already made these moves by hand in Refactor moves - SOLID just gives each one
+   a name..."). The `lambdas` -> `linq` step needs no new task: `linq` task 1
+   (`Where`) is already a single-operator intro that names the lambda tie-back.
 
 ---
 
@@ -175,7 +198,13 @@ there:
 - DONE - each Part 4 / Part 5 lesson now states the SOLID letter it embodies, and
   the capstone gained an ISP milestone (a focused `ISummary` interface), so the
   integrative exercise now walks all five principles.
-- Normalise one example family per Part and smooth the two difficulty spikes.
+- DONE - the theme split and both difficulty spikes were resolved by the course
+  restructure (verified): `the-solid-principles` and `practice-the-basics` were
+  rewritten (animal family; one idea/one small fix per task), so each Part now
+  shares a running example family where it should and no lesson stacks many
+  classes at once. Added a one-sentence `refactor-moves` -> SOLID bridge; left the
+  intentional per-Part families (Part 1 syntax variety, Part 5 test doubles,
+  domain-neutral `generics`, the compiled capstone) as-is.
 - DONE (theory rhythm) - fixed the `theory-20`/`theory-21` order, added the
   `theory-7` recap, corrected the `theory-18` intro, and widened checkpoint
   coverage. Still to do: the missing practical recaps and checkpoint distractors.

@@ -1,4 +1,17 @@
-# The SOLID Principles (`level2.js`)
+# The SOLID Principles (`the-solid-principles.js`, formerly `level2.js`)
+
+> Rewritten since this report: the lesson is now a write-from-scratch `build`
+> lesson (`window.BUILD_CONFIG`) of five tasks, one SOLID principle each (S, O, L,
+> I, D) plus a recap, on the ANIMAL family (Cat/FeedingSign, IAnimal/Cat/Dog,
+> Sparrow/Penguin, Fish/IWalker/ISwimmer/IFlyer, ILog/Keeper). Each task states
+> the trap in prose then has the learner write one small focused fix, gated by
+> `requireSource` and a hidden `verify` probe. This resolves two cross-cutting
+> items: (item 8) the "several classes at once" difficulty spike - each task now
+> writes one interface plus one or two tiny classes, the same grain as
+> `refactor-moves` and Part 4, and a one-sentence intro bridge now links the two
+> lessons; (item 6) the theme split - the lesson moved from test-automation to the
+> animal family shared by Part 4 and `refactor-moves`. The notes below describe
+> the earlier 10-drill fill-in-the-blank version.
 
 - **Track / Part:** Practical - Part 6 Design for change
 - **Engine / format:** drill-engine (runnable: quiz-less fill-in-the-blank with a Run button per drill)
