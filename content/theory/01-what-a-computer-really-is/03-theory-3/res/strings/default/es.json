@@ -6,5 +6,12 @@
   "step.1.narr": "El SO usa un **cargador** para copiar el programa del almacenamiento a la RAM.\nSolo una vez que está en la memoria puede la CPU ejecutarlo.",
   "step.2.narr": "La ejecución siempre empieza en un lugar acordado, el **punto de entrada**.\nLa CPU necesita saber exactamente dónde empezar.",
   "step.3.narr": "Por convención ese punto de entrada se llama simplemente `Main`.\nTu código empieza a ejecutarse desde su primera línea.",
-  "step.4.narr": "El programa se ejecuta desde `Main` hasta el final.\nCuando termina, el SO **libera su memoria** y el programa desaparece - hasta que se lanza otra vez."
+  "step.4.narr": "El programa se ejecuta desde `Main` hasta el final.\nCuando termina, el SO **libera su memoria** y el programa desaparece - hasta que se lanza otra vez.",
+  "concept.th-operating-system.def": "El programa que manda en la máquina - lanza tu programa y lo gestiona mientras se ejecuta.",
+  "concept.th-operating-system.term": "Sistema operativo",
+  "concept.th-loader.def": "La parte del sistema operativo que copia un programa del almacenamiento a la memoria para que pueda ejecutarse.",
+  "concept.th-loader.term": "Cargador",
+  "concept.th-entry-point.def": "El sitio donde un programa empieza a ejecutarse - la primera instrucción que el sistema operativo entrega a la CPU.",
+  "concept.th-entry-point.term": "Punto de entrada",
+  "concept.th-main.def": "La rutina por la que arranca un programa, normalmente llamada Main."
 }

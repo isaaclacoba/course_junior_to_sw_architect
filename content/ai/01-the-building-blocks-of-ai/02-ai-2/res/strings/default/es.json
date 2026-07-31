@@ -9,5 +9,6 @@
   "step.2.narr": "Una palabra común suele ser un solo token. Una palabra más larga o más rara se parte en trozos - aquí `doormat` se convierte en dos tokens, `door` y `mat`.",
   "step.3.narr": "Los signos de puntuación y los espacios también son tokens. Nada es gratis - hasta un punto es un token que el modelo lee y cuenta.",
   "step.4.narr": "¿Por qué importa? El límite de memoria del modelo y su precio se miden los dos en **tokens**, no en palabras. Aquí seis palabras, pero ocho tokens.",
-  "step.5.narr": "Así que quédate con esta imagen: todo lo que el modelo lee o escribe es un flujo de **tokens**. Cada lección a partir de esta se apoya en ello."
+  "step.5.narr": "Así que quédate con esta imagen: todo lo que el modelo lee o escribe es un flujo de **tokens**. Cada lección a partir de esta se apoya en ello.",
+  "concept.ai-token.def": "Un trozo pequeño de texto - más o menos una palabra o un pedazo de una, signos incluidos - y la unidad que el modelo lee, cuenta y factura."
 }

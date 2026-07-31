@@ -10,5 +10,11 @@
   "step.2.narr": "La ruptura está en la **última** línea. La herramienta dijo 12, pero el agente informó de **1,20 $** - malinterpretó su propia observación. Poder señalar el paso exacto que falla, en el registro, es la **observabilidad**: puedes ver qué pasó, no solo que salió mal.",
   "step.3.narr": "Encontrarlo una vez a mano está bien. Pero no quieres releer cada traza para siempre. Así que conviértelo en una **comprobación**: para esta entrada, la propina final debería ser **12,00 $**. Pásala contra la traza - y **falla**, automáticamente.",
   "step.4.narr": "Una comprobación es un test. Una carpeta de ellas - entradas reales emparejadas con la respuesta correcta - es una **suite de evals**. Pásala después de cada cambio y sabes, en segundos, si arreglaste el bug y si rompiste algo más.",
-  "step.5.narr": "Así que \"¿funcionó?\" tiene dos partes. **Observabilidad** - guarda la traza, para poder ver exactamente dónde se torció una ejecución. **Evaluación** - convierte cada bug en una comprobación que pasas cada vez, para que nunca pueda volver a colarse sin que te des cuenta. Así es como un agente se vuelve más fiable en vez de solo más complicado."
+  "step.5.narr": "Así que \"¿funcionó?\" tiene dos partes. **Observabilidad** - guarda la traza, para poder ver exactamente dónde se torció una ejecución. **Evaluación** - convierte cada bug en una comprobación que pasas cada vez, para que nunca pueda volver a colarse sin que te des cuenta. Así es como un agente se vuelve más fiable en vez de solo más complicado.",
+  "concept.ai-trace.def": "El registro posterior de los mensajes y llamadas a herramientas de una ejecución, que se lee para encontrar dónde falló.",
+  "concept.ai-observability.def": "Poder señalar en el registro el paso exacto donde una ejecución se torció, para ver qué pasó y no solo que falló.",
+  "concept.ai-evaluation.def": "Convertir un fallo pasado en una comprobación automática de pass/fail que ejecutas siempre, para que el mismo bug no vuelva a colarse.",
+  "concept.ai-trace.term": "Traza",
+  "concept.ai-observability.term": "Observabilidad",
+  "concept.ai-evaluation.term": "Evaluación"
 }

@@ -10,5 +10,6 @@
   "step.2.narr": "Cuando la ventana está llena, los **tokens más antiguos se caen por el principio**. Siguen siendo parte de la conversación - pero el modelo ya no puede verlos.",
   "step.3.narr": "Ese texto descartado desaparece de la vista. Pregunta por él ahora y el modelo adivina, igual que hacía sin contexto - porque para esos tokens, no lo tiene.",
   "step.4.narr": "Por esto un chat largo parece **olvidar** cómo empezó. Una ventana más grande aleja ese punto, pero todo modelo tiene una.",
-  "step.5.narr": "Así que la ventana de contexto es la vista a corto plazo del modelo - un presupuesto fijo de tokens. Para retener algo más allá de ella, necesitas **memoria**."
+  "step.5.narr": "Así que la ventana de contexto es la vista a corto plazo del modelo - un presupuesto fijo de tokens. Para retener algo más allá de ella, necesitas **memoria**.",
+  "concept.ai-context-window.def": "El tamaño máximo fijo del contexto, medido en tokens - cuando se llena, los tokens más viejos caen por el principio y el modelo deja de verlos."
 }

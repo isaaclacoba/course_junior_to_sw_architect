@@ -9,5 +9,14 @@
   "step.2.narr": "Ahora compara vectores. Los chunks cuyo significado está **cerca** de la pregunta puntúan alto; los que no tienen relación puntúan bajo. Esto es la **búsqueda por similitud** - emparejar por significado, no por palabras exactas, así que «batidora usada después de 40 días» encuentra los pasajes sobre «artículos usados» y la ventana de «30 días» aunque casi no compartan palabras.",
   "step.3.narr": "Quédate con los **primeros** - los chunks más cercanos - y descarta el resto. Estos son los que se traen al contexto. Esta es la **recuperación** de la generación aumentada por recuperación: traer el puñado de pasajes que importan, no el documento entero.",
   "step.4.narr": "El modelo lee la pregunta **con esos chunks delante** y responde a partir del texto, no de la memoria: los artículos usados no se pueden devolver, y hasta los sin abrir solo dentro de 30 días - así que 40 días está pasada la ventana. Anclado en una fuente real que hasta podría citar.",
-  "step.5.narr": "Eso es la recuperación: convierte la pregunta en un vector, encuentra los chunks más cercanos, ponlos en el contexto, y responde a partir de ellos. Es como un agente trabaja con conocimiento mucho más grande que su ventana - y mucho más fresco que su entrenamiento. La **memoria semántica** de la lección de memoria suele ser un almacén de recuperación igual que este."
+  "step.5.narr": "Eso es la recuperación: convierte la pregunta en un vector, encuentra los chunks más cercanos, ponlos en el contexto, y responde a partir de ellos. Es como un agente trabaja con conocimiento mucho más grande que su ventana - y mucho más fresco que su entrenamiento. La **memoria semántica** de la lección de memoria suele ser un almacén de recuperación igual que este.",
+  "concept.ai-retrieval.def": "Convertir una pregunta en un vector y encontrar los chunks guardados más cercanos a ella.",
+  "concept.ai-chunk.def": "Un trozo pequeño en que se parte un documento para poder guardarlo, buscarlo y traerlo al contexto de pocos en pocos.",
+  "concept.ai-embedding.def": "Convertir un texto en una lista de números que captura su significado - se hace por adelantado para cada chunk guardado, y otra vez para cada pregunta que llega.",
+  "concept.ai-vector.def": "La lista de números que produce un embedding - un punto en el espacio cuya cercanía a otro vector refleja cómo de cerca están sus significados.",
+  "concept.ai-similarity-search.def": "Puntuar los chunks guardados por cómo de cerca están sus vectores del vector de la pregunta, para que la coincidencia sea por significado y no por palabras exactas.",
+  "concept.ai-rag.def": "Todo el patrón de recuperar los chunks relevantes, meterlos en el contexto y responder a partir de ellos, en vez de fiarte del entrenamiento congelado del modelo.",
+  "concept.ai-retrieval.term": "Recuperación",
+  "concept.ai-vector.term": "Vector",
+  "concept.ai-similarity-search.term": "Búsqueda por similitud"
 }

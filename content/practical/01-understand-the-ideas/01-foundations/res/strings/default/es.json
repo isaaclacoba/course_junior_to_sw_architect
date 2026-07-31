@@ -48,5 +48,18 @@
   "task.7.summaryItems.4.text": "«aquí no hay nada» todavía; un tipo con `?` puede ser null.",
   "task.7.summaryItems.5.title": "Objeto - ",
   "task.7.summaryItems.5.text": "estado + comportamiento construido a partir de una `class` con `new`.",
-  "task.7.summaryClose": "A continuación: Practica lo básico - júntalo todo y empieza a decidir y repetir con el flujo de control."
+  "task.7.summaryClose": "A continuación: Practica lo básico - júntalo todo y empieza a decidir y repetir con el flujo de control.",
+  "concept.pr-printing.def": "Mostrar la salida línea a línea con Console.WriteLine, para ver qué ha hecho tu programa.",
+  "concept.pr-printing.term": "Impresión",
+  "concept.pr-variable.def": "Una caja con nombre que guarda un valor que puedes volver a leer y cambiar más tarde.",
+  "concept.pr-variable.term": "Variable",
+  "concept.pr-datatype.def": "La clase de un valor - int, double, bool, char, string y demás - que determina qué puedes hacer con él.",
+  "concept.pr-datatype.term": "Tipo de dato",
+  "concept.pr-assignment.def": "Guardar un valor en una variable con =, que se lee como «guardar» y no como «igual».",
+  "concept.pr-assignment.term": "Asignación",
+  "concept.pr-null.def": "Un valor especial que significa «aquí todavía no hay nada» - un tipo escrito con ? puede contenerlo.",
+  "concept.pr-object.def": "Una cosa construida a partir de una clase con new que junta el estado (lo que sabe) con el comportamiento (lo que hace).",
+  "concept.pr-object.term": "Objeto",
+  "concept.pr-class.def": "El plano a partir del cual se hace un objeto - nombra los datos del objeto y lo que puede hacer.",
+  "concept.pr-class.term": "Clase"
 }

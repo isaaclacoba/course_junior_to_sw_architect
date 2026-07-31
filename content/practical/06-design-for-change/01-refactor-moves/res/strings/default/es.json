@@ -45,5 +45,7 @@
   "task.6.summaryItems.3.text": "deja que cada objeto responda por sí mismo, así un caso nuevo es una clase nueva.",
   "task.6.summaryItems.4.title": "Parte una clase demasiado grande - ",
   "task.6.summaryItems.4.text": "un trabajo por clase significa un solo motivo para cambiar.",
-  "task.6.summaryClose": "Ese es el kit de herramientas. A continuación, los principios SOLID le ponen nombre a estos movimientos y te ayudan a juzgar cuándo merece la pena hacer cada uno."
+  "task.6.summaryClose": "Ese es el kit de herramientas. A continuación, los principios SOLID le ponen nombre a estos movimientos y te ayudan a juzgar cuándo merece la pena hacer cada uno.",
+  "concept.pr-refactoring.def": "Cambiar la forma de código que funciona sin cambiar lo que hace, en pasos pequeños y seguros.",
+  "concept.pr-refactoring.term": "Refactorización"
 }

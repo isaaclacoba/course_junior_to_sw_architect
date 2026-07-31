@@ -7,5 +7,11 @@
   "step.2.narr": "Como la condición era `true`, ejecuta la **rama `if`** e imprime `\"warm\"`.\nEl `else` se salta por completo.",
   "step.3.narr": "Si `temp` hubiera sido `5` en cambio, la misma pregunta respondería `false`.\nFíjate en la casilla: `temp` ahora guarda `5`.",
   "step.4.narr": "Con `false`, la rama `if` se salta y en su lugar se ejecuta la **rama `else`** - `print \"cold\"`.\nUna condición, dos caminos posibles.",
-  "step.5.narr": "Un **bucle** es el otro movimiento.\nEn vez de seguir adelante, salta hacia atrás para comprobar la condición otra vez, repitiendo los pasos mientras siga siendo `true` - así los escribes una vez, no cien."
+  "step.5.narr": "Un **bucle** es el otro movimiento.\nEn vez de seguir adelante, salta hacia atrás para comprobar la condición otra vez, repitiendo los pasos mientras siga siendo `true` - así los escribes una vez, no cien.",
+  "concept.th-condition.def": "Una pregunta de sí o no que hace el programa, como temp > 10, que da verdadero o falso.",
+  "concept.th-condition.term": "Condición",
+  "concept.th-branch.def": "Elegir entre caminos - ejecutar un bloque cuando una condición es verdadera y otro cuando es falsa.",
+  "concept.th-branch.term": "Bifurcación (if/else)",
+  "concept.th-loop.def": "Repetir pasos volviendo atrás para comprobar otra vez una condición, y así los escribes una vez en lugar de muchas.",
+  "concept.th-loop.term": "Bucle"
 }

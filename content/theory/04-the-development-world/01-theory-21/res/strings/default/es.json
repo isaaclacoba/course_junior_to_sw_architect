@@ -6,5 +6,15 @@
   "step.1.narr": "No tienes que buscar cada herramienta. Todo lenguaje viene con un gran conjunto de herramientas de serie - su **librería estándar**.\nEn `.NET` esa es la Base Class Library: texto, fechas, listas, ficheros, listos desde el momento en que empiezas.",
   "step.2.narr": "Cuando las herramientas de serie no lo cubren, tiras de un **paquete** - un conjunto de código que alguien publicó para que otros lo reutilicen.\nSe trae de fuera y se añade a tu proyecto.",
   "step.3.narr": "No persigues los paquetes a mano. Un **gestor de paquetes** trae los que le pides, instala la versión correcta, y se trae también sus dependencias - los paquetes de los que ellos a su vez dependen.\nEn `.NET` esa herramienta es `NuGet`.",
-  "step.4.narr": "Tu programa terminado se ejecuta como **una sola cosa** - tu código más todo ese código que te trajiste, cargados juntos en la memoria.\nAntes de construir algo, buscas lo que ya existe."
+  "step.4.narr": "Tu programa terminado se ejecuta como **una sola cosa** - tu código más todo ese código que te trajiste, cargados juntos en la memoria.\nAntes de construir algo, buscas lo que ya existe.",
+  "concept.th-library.def": "Código ya hecho que escribió y compartió otra persona, que llamas en vez de escribirlo tú.",
+  "concept.th-library.term": "Biblioteca",
+  "concept.th-standard-library.def": "El gran conjunto de herramientas integradas que trae todo lenguaje, listas en cuanto empiezas.",
+  "concept.th-standard-library.term": "Biblioteca estándar",
+  "concept.th-package.def": "Un conjunto de código que alguien publicó para que otros lo reutilicen, que se descarga y se añade a tu proyecto.",
+  "concept.th-package.term": "Paquete",
+  "concept.th-package-manager.def": "Una herramienta que descarga los paquetes que le pides, instala las versiones correctas y arrastra sus dependencias.",
+  "concept.th-package-manager.term": "Gestor de paquetes",
+  "concept.th-dependency.def": "Un paquete del que depende tu programa, que a su vez puede depender de otros paquetes.",
+  "concept.th-dependency.term": "Dependencia"
 }

@@ -37,5 +37,11 @@
   "task.5.summaryItems.2.text": "una propiedad expression-bodied `public string Label => \"cat:\" + Name;` calcula su valor cada vez, sin guardar nada.",
   "task.5.summaryItems.3.title": "Se asigna una vez al construir - ",
   "task.5.summaryItems.3.text": "`{ get; init; }` deja que el constructor asigne el valor y luego lo bloquea contra cualquier cambio posterior.",
-  "task.5.summaryClose": "La idea se lleva a casi todos los lenguajes de OO: un tipo elige qué es `public` o `private` y llega a su estado a través de una propiedad controlada en vez de un campo expuesto tal cual. Si conviene esconder un valor o no - y por qué - es la lección de encapsulación que viene."
+  "task.5.summaryClose": "La idea se lleva a casi todos los lenguajes de OO: un tipo elige qué es `public` o `private` y llega a su estado a través de una propiedad controlada en vez de un campo expuesto tal cual. Si conviene esconder un valor o no - y por qué - es la lección de encapsulación que viene.",
+  "concept.pr-access-modifier.def": "Un tipo que decide qué partes suyas puede ver el exterior, marcándolas como public o private.",
+  "concept.pr-access-modifier.term": "Modificador de acceso",
+  "concept.pr-property.def": "Una forma controlada de leer y cambiar el estado a través de un get y un set, en vez de exponer un campo directo.",
+  "concept.pr-property.term": "Propiedad",
+  "concept.pr-computed-property.def": "Una propiedad que calcula su valor cada vez que se lee, con =>, sin guardar nada propio.",
+  "concept.pr-computed-property.term": "Propiedad calculada"
 }

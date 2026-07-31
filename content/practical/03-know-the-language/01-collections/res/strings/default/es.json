@@ -52,5 +52,9 @@
   "task.8.summaryItems.4.text": "comprueba que una clave existe antes de leerla, para evitar un fallo.",
   "task.8.summaryItems.5.title": "Contar con un bucle - ",
   "task.8.summaryItems.5.text": "cuenta las coincidencias a mano; LINQ lo acortará a continuación.",
-  "task.8.summaryClose": "Lo siguiente en este itinerario: las formas de datos que llenan estas colecciones - properties, enums, structs y records."
+  "task.8.summaryClose": "Lo siguiente en este itinerario: las formas de datos que llenan estas colecciones - properties, enums, structs y records.",
+  "concept.pr-list.def": "Una fila de valores que crece y mengua - añades elementos, accedes por índice y la recorres - a diferencia de un array de tamaño fijo.",
+  "concept.pr-list.term": "Lista",
+  "concept.pr-dictionary.def": "Un almacén que asocia claves con valores, así buscas un elemento por su clave en vez de por su posición.",
+  "concept.pr-dictionary.term": "Diccionario"
 }

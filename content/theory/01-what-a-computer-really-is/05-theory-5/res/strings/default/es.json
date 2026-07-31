@@ -7,5 +7,11 @@
   "step.2.narr": "Con solo `0` y `1` para trabajar, se cuenta en **binario**.\nEsos ocho bits que marcan `0000 0001` significan el número uno.",
   "step.3.narr": "Cuenta uno más y los bits pasan a `0000 0010` - el número dos. El bit 0 se apaga y el bit 1 se enciende.\nCada **bit** de más que puedes usar duplica cuántos valores puedes alcanzar.",
   "step.4.narr": "Unos pasos más y `0000 0101` significa cinco. Los bits 0 y 2 están encendidos ahora.\nCada patrón de bits encendidos y apagados no es más que un número escrito en **binario**.",
-  "step.5.narr": "Junta ocho bits y tienes un **byte** - suficiente para `256` valores distintos, que es suficiente para una sola letra.\nPor eso los tamaños de la memoria y de los ficheros se miden en bytes."
+  "step.5.narr": "Junta ocho bits y tienes un **byte** - suficiente para `256` valores distintos, que es suficiente para una sola letra.\nPor eso los tamaños de la memoria y de los ficheros se miden en bytes.",
+  "concept.th-bit.def": "La pieza de información más pequeña - un único valor que es 0 (apagado) o 1 (encendido).",
+  "concept.th-bit.term": "Bit",
+  "concept.th-binary.def": "Contar usando solo ceros y unos; cada número es un patrón de bits encendidos y apagados.",
+  "concept.th-binary.term": "Binario",
+  "concept.th-byte.def": "Un grupo de ocho bits, suficiente para 256 valores distintos - la unidad en la que se miden la memoria y el tamaño de los ficheros.",
+  "concept.th-byte.term": "Byte"
 }

@@ -10,5 +10,6 @@
   "step.2.narr": "Así que pedimos uno. Una línea lo cambia todo: dile que **piense paso a paso**. Ahora el modelo tiene permiso - se espera de él - de escribir sus cuentas antes de la respuesta.",
   "step.3.narr": "Despliega los pasos. Y aquí está la clave: cada token que escribe cae de vuelta en el contexto que lee después - así que cada línea de cuentas sostiene a la siguiente. El razonamiento no es decoración; **es** el cálculo.",
   "step.4.narr": "Con los pasos delante, la última línea es fácil: **72**. El mismo modelo, la misma pregunta - la única diferencia es que escribió su razonamiento primero.",
-  "step.5.narr": "Eso es la **cadena de pensamiento**: darle al modelo espacio para razonar antes de responder. Cuesta unos tokens más y un poco de tiempo, pero en cualquier cosa con pasos es la diferencia entre una conjetura y una respuesta trabajada. Todo agente se apoya en esto - el razonamiento es el paso de «razonar» del bucle que viste."
+  "step.5.narr": "Eso es la **cadena de pensamiento**: darle al modelo espacio para razonar antes de responder. Cuesta unos tokens más y un poco de tiempo, pero en cualquier cosa con pasos es la diferencia entre una conjetura y una respuesta trabajada. Todo agente se apoya en esto - el razonamiento es el paso de «razonar» del bucle que viste.",
+  "concept.ai-chain-of-thought.def": "Pedirle al modelo que escriba su razonamiento paso a paso antes de responder - el desarrollo es el cálculo, no adorno, porque cada token que escribe vuelve al contexto que lee después."
 }

@@ -45,5 +45,8 @@
   "task.7.summaryItems.3.text": "lanza tu propia excepción cuando algo es inválido.",
   "task.7.summaryItems.4.title": "?? y ?. - ",
   "task.7.summaryItems.4.text": "da una alternativa para null, o accede a un miembro con seguridad sin reventar.",
-  "task.7.summaryClose": "Lo siguiente en este itinerario: genéricos - escribir tus propios tipos que funcionan con cualquier clase de valor, como el List<T> que ya has usado."
+  "task.7.summaryClose": "Lo siguiente en este itinerario: genéricos - escribir tus propios tipos que funcionan con cualquier clase de valor, como el List<T> que ya has usado.",
+  "concept.pr-exception-handling.def": "Mantener un programa en pie cuando algo falla capturando el error en vez de dejar que lo pare todo.",
+  "concept.pr-finally.def": "Un bloque que siempre se ejecuta después de un try, tanto si funcionó como si falló, para limpiar.",
+  "concept.pr-throw.def": "Lanzar tu propio error para señalar que algo va mal y detener el camino actual."
 }

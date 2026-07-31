@@ -10,5 +10,9 @@
   "step.2.narr": "En el paso tres ya tiene la respuesta. La parada más limpia de todas: **se alcanza el objetivo**, así que el bucle termina porque está hecho - no porque se quedara sin margen. La mayoría de las ejecuciones deberían parar así.",
   "step.3.narr": "Pero no todas las ejecuciones se portan bien. Aquí tienes una distinta que se atasca: la misma búsqueda, el mismo resultado vacío, una y otra vez. Está ocupada, está gastando dinero, y no va **a ninguna parte**.",
   "step.4.narr": "Dos guardias pillan esto. Una **comprobación de bucle** se da cuenta de que el agente repite una acción que no cambia nada, y el **presupuesto** está casi agotado. Con cualquiera de las dos basta para tirar del enchufe - el bucle se corta desde fuera.",
-  "step.5.narr": "Así que un agente necesita condiciones de parada escritas: **objetivo alcanzado**, **presupuesto de pasos agotado**, un **tope de gasto** en dólares, el **mismo movimiento repitiéndose**, o un **error grave**. Cumple cualquiera y el bucle termina. Un bucle que no puede pararse solo no es autonomía - es una factura desbocada, y el presupuesto es como te mantienes al mando de él."
+  "step.5.narr": "Así que un agente necesita condiciones de parada escritas: **objetivo alcanzado**, **presupuesto de pasos agotado**, un **tope de gasto** en dólares, el **mismo movimiento repitiéndose**, o un **error grave**. Cumple cualquiera y el bucle termina. Un bucle que no puede pararse solo no es autonomía - es una factura desbocada, y el presupuesto es como te mantienes al mando de él.",
+  "concept.ai-stopping-condition.def": "Un motivo para terminar el bucle - se alcanzó el objetivo, se gastó el presupuesto, el agente da vueltas o saltó un error grave - porque un agente decide su propio siguiente paso y si no correría para siempre.",
+  "concept.ai-step-budget.def": "Un tope de cuántos pasos puede dar una tarea - la correa de un bucle que cuesta una llamada al modelo en cada turno.",
+  "concept.ai-stopping-condition.term": "Condición de parada",
+  "concept.ai-step-budget.term": "Presupuesto de pasos"
 }

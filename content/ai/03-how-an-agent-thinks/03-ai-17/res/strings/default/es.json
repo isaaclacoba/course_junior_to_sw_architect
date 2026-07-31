@@ -11,5 +11,6 @@
   "step.3.narr": "Vuelve una **Observación** de la herramienta - un dato real del mundo, no algo que el modelo se inventó. Este es el paso de \"observar\": entrada fresca que el siguiente pensamiento puede usar.",
   "step.4.narr": "Ahora el bucle vuelve a dar la vuelta. Pensamiento nuevo, con la información que acaba de aprender: ya tiene la ciudad, así que mira el tiempo de **Brisbane**. Luego la acción correspondiente.",
   "step.5.narr": "Aterriza la segunda observación. El modelo ya tiene los dos datos que le faltaban - cada uno traído, ninguno adivinado.",
-  "step.6.narr": "Sin nada más que traer, responde. Ese entrelazado - **Pensamiento, Acción, Observación**, repetir hasta terminar - es el patrón **ReAct**. Es el bucle de percibir-razonar-actuar-observar con un nombre en cada turno, y es como funcionan de verdad casi todos los agentes que usan herramientas."
+  "step.6.narr": "Sin nada más que traer, responde. Ese entrelazado - **Pensamiento, Acción, Observación**, repetir hasta terminar - es el patrón **ReAct**. Es el bucle de percibir-razonar-actuar-observar con un nombre en cada turno, y es como funcionan de verdad casi todos los agentes que usan herramientas.",
+  "concept.ai-react.def": "El bucle con nombre detrás de un agente que usa herramientas: un pensamiento sobre el siguiente movimiento, una acción que llama a una herramienta, una observación del resultado real, repetido hasta que el agente tiene lo que necesita para responder."
 }

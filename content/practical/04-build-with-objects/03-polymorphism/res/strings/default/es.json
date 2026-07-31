@@ -41,5 +41,7 @@
   "task.6.summaryItems.3.text": "elige la implementación mientras el programa corre.",
   "task.6.summaryItems.4.title": "Abierto a comportamiento nuevo - ",
   "task.6.summaryItems.4.text": "añade una clase; el bucle no cambia nunca.",
-  "task.6.summaryClose": "A continuación: ¿Heredar o componer?"
+  "task.6.summaryClose": "A continuación: ¿Heredar o componer?",
+  "concept.pr-runtime-dispatch.def": "El objeto real decide en tiempo de ejecución qué versión de un método se ejecuta, así añades un tipo nuevo en vez de otra rama.",
+  "concept.pr-runtime-dispatch.term": "Selección en tiempo de ejecución"
 }

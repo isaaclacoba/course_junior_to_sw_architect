@@ -27,5 +27,9 @@
   "task.5.concept": "Construye con piezas pequeñas",
   "task.5.context": "Los métodos pueden llamarse entre sí, así que una respuesta más grande no es más que comprobaciones pequeñas combinadas. Este es el hábito sobre el que se apoya cada lección posterior.",
   "task.5.goal.0": "`Summary(int age)` debería devolver `\"Status: \"` seguido de `Category(age)`.",
-  "task.5.goal.1": "`Main` llama a `Summary(20)`, así que la salida debería ser `Status: adult`."
+  "task.5.goal.1": "`Main` llama a `Summary(20)`, así que la salida debería ser `Status: adult`.",
+  "concept.pr-method.def": "Un trozo de comportamiento con nombre que llamas para obtener una respuesta, así una regla se escribe una vez y se reutiliza.",
+  "concept.pr-method.term": "Método",
+  "concept.pr-parameter.def": "Un valor que le pasas a un método al llamarlo, para que el mismo método sirva con entradas distintas.",
+  "concept.pr-parameter.term": "Parámetro"
 }

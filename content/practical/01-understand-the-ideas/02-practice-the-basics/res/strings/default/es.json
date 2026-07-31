@@ -34,5 +34,11 @@
   "task.5.summaryItems.2.text": "`==` `!=` `>` `<` `>=` `<=` hacen una pregunta de sí/no y devuelven un `bool`.",
   "task.5.summaryItems.3.title": "Un objeto que responde - ",
   "task.5.summaryItems.3.text": "estado más un método que devuelve un `bool` sobre ese estado.",
-  "task.5.summaryClose": "A continuación: Flujo de control - usa estas respuestas de sí/no para decidir qué hace tu programa."
+  "task.5.summaryClose": "A continuación: Flujo de control - usa estas respuestas de sí/no para decidir qué hace tu programa.",
+  "concept.pr-arithmetic.def": "Calcular un valor nuevo a partir de otros con + - * /.",
+  "concept.pr-arithmetic.term": "Aritmética",
+  "concept.pr-string-concatenation.def": "Unir trozos de texto (y números convertidos a texto) uno tras otro con +.",
+  "concept.pr-string-concatenation.term": "Concatenación de strings",
+  "concept.pr-comparison.def": "Hacer una pregunta de sí/no con == != > < >= <= y obtener un bool.",
+  "concept.pr-comparison.term": "Comparación"
 }

@@ -11,5 +11,11 @@
   "step.3.narr": "Paso hecho, sigue adelante. El paso dos llama a la herramienta de búsqueda de vuelos; el paso tres elige entre lo que volvió. Cada paso terminado encoge lo que queda y alimenta el siguiente.",
   "step.4.narr": "No todo sale según lo previsto. El paso del hotel vuelve vacío - nada libre cerca del centro. Un guion rígido se rompería aquí. Un agente lo trata como una **señal**, no como un callejón sin salida.",
   "step.5.narr": "Así que **replanifica**: rehace el paso bloqueado y añade una alternativa - amplía la búsqueda, coge una habitación a una parada de metro. El plan no está grabado en piedra; es una lista viva que el agente revisa según va aprendiendo.",
-  "step.6.narr": "Con una habitación encontrada, los últimos pasos encajan. Eso es la **planificación**: convertir un objetivo grande en una lista ordenada de pasos pequeños, hacerlos de uno en uno, y revisar cuando un paso se atasca. Es lo que mantiene a un agente en el buen camino durante una tarea larga, en vez de perder el hilo después del primer movimiento."
+  "step.6.narr": "Con una habitación encontrada, los últimos pasos encajan. Eso es la **planificación**: convertir un objetivo grande en una lista ordenada de pasos pequeños, hacerlos de uno en uno, y revisar cuando un paso se atasca. Es lo que mantiene a un agente en el buen camino durante una tarea larga, en vez de perder el hilo después del primer movimiento.",
+  "concept.ai-planning.def": "Partir un objetivo demasiado grande para un solo movimiento en una lista ordenada de pasos pequeños y hacerlos de uno en uno.",
+  "concept.ai-task-decomposition.def": "Dividir un objetivo en pasos más pequeños cuyo orden refleja qué depende de qué, para que cada paso sea lo bastante pequeño para hacerlo de verdad.",
+  "concept.ai-replanning.def": "Cambiar el plan a mitad de ejecución cuando un paso se bloquea, en vez de seguir por una ruta que ya no funciona.",
+  "concept.ai-planning.term": "Planificación",
+  "concept.ai-task-decomposition.term": "Descomposición de la tarea",
+  "concept.ai-replanning.term": "Replanificación"
 }

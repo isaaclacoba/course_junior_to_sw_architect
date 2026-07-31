@@ -13,5 +13,12 @@
   "step.8.narr": "Llamar a `greet()` coloca sus propios valores encima - un **frame** nuevo.\nCada llamada recibe sus propias casillas, apiladas encima de las de quien la llamó.",
   "step.9.narr": "Cuando `greet()` termina, sus valores se sacan del stack directamente - **automáticamente**, sin código de limpieza.\nEl `Dog` del heap queda intacto; `run()` lo sigue usando.",
   "step.10.narr": "`run()` termina y su frame también se sale. El global `greeted` vivió toda la ejecución; el stack está vacío ahora, y nada apunta al `Dog`.\nAsí que más tarde el **garbage collector** recupera el espacio del heap que usaba.",
-  "step.11.narr": "Así que el cuadro completo, de dirección baja a alta:\n- `code` / `text` - las instrucciones de solo lectura\n- `rodata` - las constantes fijas\n- `data` y `bss` - los globales (con valor, y a cero)\n- `heap` - los objetos de vida larga, crece hacia un lado\n- `stack` - un frame por llamada, crece hacia el otro\n\nLas librerías compartidas también se cargan en regiones mapeadas, pero estas son las que toca tu código."
+  "step.11.narr": "Así que el cuadro completo, de dirección baja a alta:\n- `code` / `text` - las instrucciones de solo lectura\n- `rodata` - las constantes fijas\n- `data` y `bss` - los globales (con valor, y a cero)\n- `heap` - los objetos de vida larga, crece hacia un lado\n- `stack` - un frame por llamada, crece hacia el otro\n\nLas librerías compartidas también se cargan en regiones mapeadas, pero estas son las que toca tu código.",
+  "concept.th-address.def": "El número de un hueco de memoria, que permite al programa volver a encontrar ese hueco exacto.",
+  "concept.th-address.term": "Dirección",
+  "concept.th-stack.def": "La región de memoria para los valores que una función está usando ahora mismo, donde cada llamada añade un frame encima que se quita solo cuando la llamada termina.",
+  "concept.th-heap.def": "La región de memoria para los objetos que tienen que sobrevivir a la llamada que los creó, que se conservan hasta que nada los referencia.",
+  "concept.th-garbage-collector.def": "La parte que recupera la memoria del heap cuando ya nada apunta a un objeto.",
+  "concept.th-volatile.def": "Una propiedad de la RAM: es rápida de alcanzar pero se borra en cuanto se va la corriente.",
+  "concept.th-volatile.term": "Volátil"
 }

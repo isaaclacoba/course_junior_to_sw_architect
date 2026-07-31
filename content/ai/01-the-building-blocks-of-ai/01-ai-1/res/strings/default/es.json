@@ -11,5 +11,7 @@
   "step.2.narr": "Elige uno - normalmente el más probable - y lo **añade** al texto.",
   "step.3.narr": "Ahora `mat` es parte del texto. El modelo lo vuelve a leer entero, desde el principio.",
   "step.4.narr": "Elegir, añadir, repetir - **un token cada vez**. Cada token nuevo se elige a partir de un conjunto nuevo de probabilidades.",
-  "step.5.narr": "Ese bucle es **todo el modelo**. Todo lo que viene después - prompts, chat, memoria, herramientas, agentes - se construye alrededor de este único movimiento: leer el texto, predecir el siguiente token."
+  "step.5.narr": "Ese bucle es **todo el modelo**. Todo lo que viene después - prompts, chat, memoria, herramientas, agentes - se construye alrededor de este único movimiento: leer el texto, predecir el siguiente token.",
+  "concept.ai-llm.def": "Un modelo que lee el texto que hay hasta ahora y predice el siguiente token, una y otra vez.",
+  "concept.ai-next-token-prediction.def": "Para cada hueco, el modelo puntúa todos los tokens posibles, elige el más probable, lo añade y vuelve a leer el texto entero."
 }

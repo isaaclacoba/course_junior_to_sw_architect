@@ -11,5 +11,9 @@
   "step.3.narr": "Para razonar bien, **recupera** de la memoria - un dato guardado en un chat anterior, como tus fechas de viaje - y lo trae al contexto, exactamente como viste en la lección de memoria.",
   "step.4.narr": "Ahora **actúa**: llama a una **herramienta** - aquí una búsqueda de vuelos - para hacer algo en el mundo que no puede hacer solo con texto.",
   "step.5.narr": "El resultado de la herramienta se **observa** de vuelta en el contexto. El agente ha aprendido algo nuevo - y el bucle empieza otra vez, razonando a partir de lo que ahora sabe.",
-  "step.6.narr": "Eso es un agente: un **modelo** en el centro, un **contexto** que lee, **memoria** y **herramientas** de las que tira, todo girando en un bucle hasta cumplir el objetivo. Ahora tienes el vocabulario que da por sabido el material más difícil - y ahí es donde va este curso a continuación."
+  "step.6.narr": "Eso es un agente: un **modelo** en el centro, un **contexto** que lee, **memoria** y **herramientas** de las que tira, todo girando en un bucle hasta cumplir el objetivo. Ahora tienes el vocabulario que da por sabido el material más difícil - y ahí es donde va este curso a continuación.",
+  "concept.ai-agent.def": "Un modelo envuelto con su contexto, memoria y herramientas, y ejecutado en un bucle hacia un objetivo, para que decida y dé sus propios pasos.",
+  "concept.ai-agent-loop.def": "El ciclo percibir-razonar-actuar-observar que ejecuta un agente: lee la tarea, razona el siguiente movimiento, llama a una herramienta, observa el resultado y vuelve a empezar.",
+  "concept.ai-agent.term": "Agente",
+  "concept.ai-agent-loop.term": "Bucle del agente"
 }

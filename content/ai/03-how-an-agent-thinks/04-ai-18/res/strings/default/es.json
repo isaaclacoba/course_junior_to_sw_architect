@@ -10,5 +10,7 @@
   "step.2.narr": "En vez de darlo por bueno, ponemos al modelo a mirar su propio trabajo: **revisa tu respuesta buscando bugs y casos límite**. Revisar es una tarea distinta y más fácil que escribir - y el modelo suele ser bueno en ella.",
   "step.3.narr": "La **crítica**. Al leer su propio código, el modelo pilla lo que se le escapó al escribir: una lista vacía divide por cero y revienta. Encontró su propio bug.",
   "step.4.narr": "La **revisión**. Con el fallo señalado, el arreglo es obvio - trata primero la lista vacía. La segunda respuesta es mejor que la primera porque el modelo pudo ver la primera.",
-  "step.5.narr": "Eso es la **reflexión**: borrador, crítica, revisión. No es magia - el modelo no es más listo la segunda vez - pero una pasada nueva sobre su propia salida pilla errores que un solo intento se deja. Los agentes la usan para revisar un plan, releer el resultado de una herramienta, o comprobar dos veces una respuesta antes de comprometerse con ella."
+  "step.5.narr": "Eso es la **reflexión**: borrador, crítica, revisión. No es magia - el modelo no es más listo la segunda vez - pero una pasada nueva sobre su propia salida pilla errores que un solo intento se deja. Los agentes la usan para revisar un plan, releer el resultado de una herramienta, o comprobar dos veces una respuesta antes de comprometerse con ella.",
+  "concept.ai-reflection.def": "Hacer que el modelo revise su propio borrador, encuentre el fallo o caso límite que se le escapó y lo corrija - borrador, crítica, corrección, porque revisar es más fácil que escribir.",
+  "concept.ai-reflection.term": "Reflexión"
 }

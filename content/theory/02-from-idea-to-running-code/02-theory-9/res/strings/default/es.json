@@ -6,5 +6,7 @@
   "step.1.narr": "El **nombre** - `score` - está para las personas que leen el código.\nEntre bastidores la máquina usa la dirección de la casilla (`0x7000`); el nombre es una etiqueta cómoda sobre ella.",
   "step.2.narr": "El **valor** puede cambiar según corre el programa.\n`score = 25` escribe un valor nuevo en la misma casilla.",
   "step.3.narr": "Dos cosas que haces con una casilla: **escribir** (meter un valor) y leer (sacar el valor actual).\n`print score` lee lo que hay ahora - `25`.",
-  "step.4.narr": "Una casilla guarda solo **un valor a la vez**.\nCada valor nuevo reemplaza al anterior - el `10` desaparece en el momento en que se escribe `25`."
+  "step.4.narr": "Una casilla guarda solo **un valor a la vez**.\nCada valor nuevo reemplaza al anterior - el `10` desaparece en el momento en que se escribe `25`.",
+  "concept.th-variable.def": "Un hueco con nombre en memoria que guarda un valor que puedes leer y cambiar.",
+  "concept.th-variable.term": "Variable"
 }

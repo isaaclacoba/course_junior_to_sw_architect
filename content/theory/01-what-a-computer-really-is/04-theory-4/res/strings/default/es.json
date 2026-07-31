@@ -8,5 +8,16 @@
   "step.3.narr": "El mismo núcleo, siguiente turno: ahora ejecuta el reproductor de música.\nSolo un proceso tiene el núcleo en cada instante - lo de 'a la vez' es en realidad un cambio rapidísimo. La parte del SO que elige de quién es el siguiente turno es el **planificador**.",
   "step.4.narr": "Ahora dale al chip dos núcleos.\nEl núcleo 0 ejecuta el navegador y el núcleo 1 ejecuta el reproductor de música en el mismísimo instante - **paralelismo** de verdad, no solo un cambio rápido. Cada núcleo toma el color de su proceso.",
   "step.5.narr": "Con tantos núcleos como procesos, el **planificador** tiene opciones de verdad:\n- ejecutarlos de verdad en paralelo\n- dejar un núcleo libre para el siguiente programa\n- repartir un trabajo pesado entre varios núcleos\nUn solo núcleo obliga a turnarse; más núcleos abren estas estrategias.",
-  "step.6.narr": "Se planifiquen como se planifiquen, cada proceso está amurallado en su propia memoria.\nUno no puede leer ni garabatear la de otro - eso es el **aislamiento**, así que un fallo en uno no se lleva a los demás por delante."
+  "step.6.narr": "Se planifiquen como se planifiquen, cada proceso está amurallado en su propia memoria.\nUno no puede leer ni garabatear la de otro - eso es el **aislamiento**, así que un fallo en uno no se lleva a los demás por delante.",
+  "concept.th-process.def": "Un programa en ejecución, cargado en su propia parcela de memoria separada.",
+  "concept.th-process.term": "Proceso",
+  "concept.th-core.def": "Un trabajador dentro de la CPU; un solo núcleo ejecuta una instrucción cada vez.",
+  "concept.th-core.term": "Núcleo",
+  "concept.th-time-sharing.def": "Repartir un núcleo entre varios procesos por turnos, cambiando miles de veces por segundo para que parezca que se ejecutan a la vez.",
+  "concept.th-scheduler.def": "La parte del sistema operativo que decide qué proceso se lleva el núcleo a continuación.",
+  "concept.th-scheduler.term": "Planificador",
+  "concept.th-parallelism.def": "Ejecutar cosas en el mismo instante exacto en más de un núcleo.",
+  "concept.th-parallelism.term": "Paralelismo",
+  "concept.th-isolation.def": "Encerrar cada proceso en su propia memoria para que uno no pueda leer ni destrozar la de otro, y así un fallo queda contenido.",
+  "concept.th-isolation.term": "Aislamiento"
 }

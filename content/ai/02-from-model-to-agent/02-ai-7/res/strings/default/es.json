@@ -13,5 +13,9 @@
   "step.5.narr": "Llega una tarea nueva: **¿qué tiempo hace en Oslo?** El agente la compara con las descripciones y **elige** `getWeather` - no la búsqueda de vuelos, no la herramienta de email. Elegir la correcta es la primera decisión de verdad.",
   "step.6.narr": "Emite la llamada - pero hay una errata en el argumento: `Osloo` no es una ciudad, así que la herramienta devuelve un **error**, no un dato. Un modelo que solo produjera texto se quedaría atascado aquí. Un agente puede leer lo que volvió.",
   "step.7.narr": "Así que se **recupera**: lee el error, corrige el argumento, y **reintenta** - `getWeather(city: \"Oslo\")`. Esta vez vuelve un resultado de verdad: `4°C, clear`.",
-  "step.8.narr": "Eso es lo que hace que las herramientas sean fiables dentro del bucle: **elige** la que encaja, **llámala** con la forma que pide su esquema, y **recupérate** cuando una llamada vuelve mal. Elección, esquema y reintento son lo que convierten una única llamada con suerte en un agente que saca las cosas adelante."
+  "step.8.narr": "Eso es lo que hace que las herramientas sean fiables dentro del bucle: **elige** la que encaja, **llámala** con la forma que pide su esquema, y **recupérate** cuando una llamada vuelve mal. Elección, esquema y reintento son lo que convierten una única llamada con suerte en un agente que saca las cosas adelante.",
+  "concept.ai-tool.def": "Una función que el modelo puede llamar para hacer algo que el texto solo no puede - mirar el tiempo o enviar un mensaje - y leer el resultado.",
+  "concept.ai-tool-schema.def": "La descripción de una herramienta - su nombre y sus parámetros tipados - que el modelo lee para saber cuál encaja y cómo llamarla.",
+  "concept.ai-tool-call.def": "La petición estructurada que el modelo emite para ejecutar una herramienta: su nombre más los argumentos que necesita, con la forma que pide su schema.",
+  "concept.ai-tool.term": "Herramienta"
 }

@@ -6,5 +6,11 @@
   "step.1.narr": "Luego la CPU repite un bucle: trae la siguiente instrucción de la memoria, la lleva a cabo, repite.\nEste es el **ciclo de captación y ejecución** (fetch-execute).",
   "step.2.narr": "La CPU guarda por dónde va con un **contador de programa**.\nPor defecto simplemente pasa a la siguiente instrucción: línea 1, luego línea 2.",
   "step.3.narr": "Algunas instrucciones son **saltos** - cambian el contador de programa a otra línea en vez de a la siguiente.\nAquí, mientras `x < 3`, salta de vuelta a la línea 2 - un bucle.",
-  "step.4.narr": "Los **datos** también viven en la memoria. `x` es un valor en una casilla.\nLas instrucciones lo leen y lo escriben según corre el bucle, hasta que `x` llega a 3 y el salto se detiene."
+  "step.4.narr": "Los **datos** también viven en la memoria. `x` es un valor en una casilla.\nLas instrucciones lo leen y lo escriben según corre el bucle, hasta que `x` llega a 3 y el salto se detiene.",
+  "concept.th-ram.def": "La memoria de trabajo rápida del ordenador, donde un programa y sus datos tienen que estar antes de que la CPU pueda ejecutarlos.",
+  "concept.th-fetch-execute.def": "El bucle que la CPU repite sin parar: coge la siguiente instrucción de memoria, la ejecuta y vuelve a empezar.",
+  "concept.th-program-counter.def": "El marcador de la CPU - recuerda qué instrucción viene a continuación.",
+  "concept.th-program-counter.term": "Contador de programa",
+  "concept.th-jump.def": "Una instrucción que cambia el contador de programa a otra línea en vez de a la siguiente, y así funcionan los bucles y las decisiones.",
+  "concept.th-jump.term": "Salto"
 }

@@ -41,5 +41,7 @@
   "task.6.summaryItems.3.text": "inyecta `IAnimal`, así encaja cualquier animal que cumpla la promesa.",
   "task.6.summaryItems.4.title": "Mete un sustituto - ",
   "task.6.summaryItems.4.text": "entrega un double de juguete para ensayar sin ninguna dependencia real.",
-  "task.6.summaryClose": "A continuación: Parte cinco - Demuestra que funciona. Hiciste un sustituto; ahora úsalo para testear de verdad."
+  "task.6.summaryClose": "A continuación: Parte cinco - Demuestra que funciona. Hiciste un sustituto; ahora úsalo para testear de verdad.",
+  "concept.pr-dependency-injection.def": "Darle a una clase los colaboradores que necesita desde fuera, normalmente por su constructor, en vez de que los cree ella misma.",
+  "concept.pr-dependency-injection.term": "Inyección de dependencias"
 }

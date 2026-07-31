@@ -27,5 +27,8 @@
   "task.4.summaryItems.1.text": "devuelve un valor que elegiste, así montas un caso exacto y puedes predecir el resultado.",
   "task.4.summaryItems.2.title": "Spy - ",
   "task.4.summaryItems.2.text": "recuerda cómo se usó, así puedes confirmar que una llamada ocurrió cuando no hay valor de retorno que comprobar.",
-  "task.4.summaryClose": "A continuación: comprobable por diseño - los hábitos que hacen el código fácil de testear son los mismos que hay detrás de SOLID."
+  "task.4.summaryClose": "A continuación: comprobable por diseño - los hábitos que hacen el código fácil de testear son los mismos que hay detrás de SOLID.",
+  "concept.pr-test-double.def": "Un sustituto que controlas y que ocupa el lugar de una dependencia real en un test, como un reloj o la red.",
+  "concept.pr-stub.def": "Un test double que devuelve datos prefabricados que tú decides, así el código bajo prueba ve una respuesta conocida.",
+  "concept.pr-spy.def": "Un test double que registra cómo se le llamó, así puedes comprobar que el código lo usó correctamente."
 }

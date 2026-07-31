@@ -7,5 +7,13 @@
   "step.2.narr": "Las sentencias usan expresiones para conseguir valores.\nEsta sentencia toma el valor de `2 + 3` y lo guarda.",
   "step.3.narr": "La **asignación** es la parte de guardar.\nEl operador `=` escribe el valor calculado (`5`) en la casilla llamada `total`.",
   "step.4.narr": "Las sentencias se ejecutan **en orden**, de arriba abajo.\nSiguiente línea: `total = total + 1` - el operador `+` suma `1` a `5`, y luego el valor se escribe de vuelta.",
-  "step.5.narr": "La última sentencia lee `total` y lo imprime - `6`.\nUn paso detrás de otro, en el **orden** en que están escritos."
+  "step.5.narr": "La última sentencia lee `total` y lo imprime - `6`.\nUn paso detrás de otro, en el **orden** en que están escritos.",
+  "concept.th-statement.def": "Una instrucción completa - un único paso que da el programa.",
+  "concept.th-statement.term": "Sentencia",
+  "concept.th-expression.def": "Un trozo de código que produce un valor, como 2 + 3 que da 5.",
+  "concept.th-expression.term": "Expresión",
+  "concept.th-assignment.def": "Escribir un valor calculado en una variable, con el operador =.",
+  "concept.th-assignment.term": "Asignación",
+  "concept.th-operator.def": "Un símbolo como + o = que combina valores o actúa sobre ellos.",
+  "concept.th-operator.term": "Operador"
 }

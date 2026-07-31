@@ -45,5 +45,13 @@
   "task.7.summaryItems.3.text": "deja que una clase reciba su colaborador por el constructor, para que sea fácil de cambiar más tarde.",
   "task.7.summaryItems.4.title": "Conecta y ejecuta - ",
   "task.7.summaryItems.4.text": "construye las piezas, entrégalas y deja que hablen - la forma que tiene casi todo el código real.",
-  "task.7.summaryClose": "A continuación conocerás estas ideas por su nombre en el itinerario de diseño: responsabilidad única, y depender de lo que te entregan."
+  "task.7.summaryClose": "A continuación conocerás estas ideas por su nombre en el itinerario de diseño: responsabilidad única, y depender de lo que te entregan.",
+  "concept.pr-collaboration.def": "Un objeto que consigue hacer un trabajo pidiéndoselo a otro y actuando sobre la respuesta.",
+  "concept.pr-collaboration.term": "Colaboración entre objetos",
+  "concept.pr-delegation.def": "Pasarle un trabajo a un objeto que tienes guardado en vez de hacerlo tú mismo.",
+  "concept.pr-delegation.term": "Delegación",
+  "concept.pr-single-responsibility.def": "Un método o una clase que hace exactamente una cosa, así tiene una única razón para cambiar.",
+  "concept.pr-single-responsibility.term": "Una sola tarea",
+  "concept.pr-constructor.def": "El método especial que se ejecuta al crear un objeto, usado para preparar su estado inicial.",
+  "concept.pr-constructor.term": "Constructor"
 }

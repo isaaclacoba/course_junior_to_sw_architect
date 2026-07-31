@@ -12,5 +12,15 @@
   "step.4.narr": "La memoria **semántica** guarda lo que sigue siendo cierto, sin fecha pegada: datos sobre el mundo, o sobre ti. «Prefieres asiento de pasillo.» No importa *cuándo* lo dijiste - simplemente es cierto. Aquí es donde va el dato que guardaste hace un momento.",
   "step.5.narr": "La memoria **procedimental** guarda cómo hacer las cosas: las rutinas que sigue el asistente, como los pasos para reservar un viaje. Es menos «un dato» y más «un hábito» - la forma en que sabe actuar.",
   "step.6.narr": "Ahora llega una tarea: **reserva mi vuelo de siempre**. El asistente **recupera** los tipos correctos - la preferencia semántica y el último viaje episódico - y los sube de vuelta a la memoria de trabajo, donde el modelo puede leerlos.",
-  "step.7.narr": "Eso es la memoria: **guardar** lo que importa, **recuperarlo** cuando cuenta - a través de cuatro tipos de saber. Lo que pasa ahora, lo que pasó antes, lo que sigue siendo cierto, y cómo actuar, todo alimentando el único contexto de trabajo que el modelo lee. Guarda en el almacén correcto; recupera del almacén correcto cuando importa."
+  "step.7.narr": "Eso es la memoria: **guardar** lo que importa, **recuperarlo** cuando cuenta - a través de cuatro tipos de saber. Lo que pasa ahora, lo que pasó antes, lo que sigue siendo cierto, y cómo actuar, todo alimentando el único contexto de trabajo que el modelo lee. Guarda en el almacén correcto; recupera del almacén correcto cuando importa.",
+  "concept.ai-memory.def": "Guardar lo que importa en un almacén fuera del context window y recuperarlo cuando hace falta, para que un asistente recuerde entre turnos aunque cada llamada al modelo arranque de cero.",
+  "concept.ai-working-memory.def": "El contexto que el modelo lee ahora mismo - el borrador de la tarea entre manos, y lo primero que desaparece a medida que avanza el chat.",
+  "concept.ai-episodic-memory.def": "El almacén de lo que pasó antes - turnos y sucesos anteriores, cada uno atado a un momento, como el diario del asistente.",
+  "concept.ai-semantic-memory.def": "El almacén de lo que sigue siendo cierto sin fecha - datos sobre el mundo o sobre ti.",
+  "concept.ai-procedural-memory.def": "El almacén de cómo hacer las cosas - las rutinas y pasos que el asistente sigue para actuar.",
+  "concept.ai-memory.term": "Memoria",
+  "concept.ai-working-memory.term": "Memoria de trabajo",
+  "concept.ai-episodic-memory.term": "Memoria episódica",
+  "concept.ai-semantic-memory.term": "Memoria semántica",
+  "concept.ai-procedural-memory.term": "Memoria procedimental"
 }

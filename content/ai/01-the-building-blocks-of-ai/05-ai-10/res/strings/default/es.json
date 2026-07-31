@@ -10,5 +10,7 @@
   "step.2.narr": "Baja la temperatura y el abanico se afila: la palabra de arriba se lleva casi todo el peso, así que el modelo casi siempre la elige. Respuestas estables y predecibles.",
   "step.3.narr": "Súbela y el abanico se aplana: las palabras peor clasificadas tienen una oportunidad de verdad. Aquí cae en `pink` - más variedad, pero menos seguro.",
   "step.4.narr": "Ejecútalo otra vez a temperatura alta y puedes obtener una palabra totalmente distinta - `red` esta vez. Por esto el mismo prompt da respuestas distintas en intentos distintos.",
-  "step.5.narr": "Así que la temperatura cambia fiabilidad por variedad. Mantenla **baja** para trabajo factual y repetible; súbela para lluvia de ideas y escritura creativa. Las mismas probabilidades por debajo - solo cambia con cuánta osadía elige el modelo de entre ellas."
+  "step.5.narr": "Así que la temperatura cambia fiabilidad por variedad. Mantenla **baja** para trabajo factual y repetible; súbela para lluvia de ideas y escritura creativa. Las mismas probabilidades por debajo - solo cambia con cuánta osadía elige el modelo de entre ellas.",
+  "concept.ai-sampling.def": "En vez de coger siempre el candidato de arriba, el modelo elige el siguiente token al azar según las probabilidades - por eso el mismo prompt puede dar respuestas distintas.",
+  "concept.ai-temperature.def": "Un dial que redibuja el reparto de probabilidades del siguiente token: baja lo afina para respuestas estables y repetibles, alta lo aplana para más variedad."
 }

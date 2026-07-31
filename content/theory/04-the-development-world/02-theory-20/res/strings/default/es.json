@@ -5,5 +5,12 @@
   "step.0.narr": "El código nunca está del todo terminado; lo cambias constantemente.\nUna herramienta de **control de versiones** rastrea cada cambio que haces, así que nunca pierdes trabajo y siempre puedes ver qué cambió, y cuándo.",
   "step.1.narr": "Cuando llegas a un punto que vale la pena conservar, haces un **commit**.\nEs una instantánea guardada de tu código en ese momento, con un mensaje corto que dice qué cambió.",
   "step.2.narr": "Todos tus commits juntos forman un **historial** - una línea de tiempo de cómo creció el código, instantánea a instantánea.\nPuedes mirar hacia atrás a cualquier punto e incluso deshacer un cambio que resultó estar mal.",
-  "step.3.narr": "El control de versiones también deja que las personas **trabajen juntas**.\nCada uno guarda su propia copia y hace commits; aquí el commit de Ana se une al tuyo, así que el trabajo de todo el equipo se junta sin que nadie pise a nadie."
+  "step.3.narr": "El control de versiones también deja que las personas **trabajen juntas**.\nCada uno guarda su propia copia y hace commits; aquí el commit de Ana se une al tuyo, así que el trabajo de todo el equipo se junta sin que nadie pise a nadie.",
+  "concept.th-version-control.def": "Una herramienta que registra cada cambio de tu código, para que nunca pierdas trabajo y puedas ver qué cambió y cuándo.",
+  "concept.th-version-control.term": "Control de versiones",
+  "concept.th-commit.def": "Una instantánea guardada de tu código en un momento que merece la pena conservar, con un mensaje corto que describe el cambio.",
+  "concept.th-history.def": "La línea temporal de todos los commits - cómo creció el código, instantánea a instantánea.",
+  "concept.th-history.term": "Historial",
+  "concept.th-collaboration.def": "Varias personas trabajando en un mismo proyecto, cada una haciendo commit de sus cambios sin pisar los de los demás.",
+  "concept.th-collaboration.term": "Colaboración"
 }

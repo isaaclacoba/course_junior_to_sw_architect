@@ -9,5 +9,12 @@
   "step.4.narr": "Ahora **tiempo de ejecución**: el programa compilado ejecuta una instrucción cada vez. Se calcula `a + b` y se imprime `12`.\nEl programa por fin está haciendo su trabajo.",
   "step.5.narr": "*A qué* compila un compilador depende del lenguaje:\n- algunos compilan directo a **código máquina** para un **target** - una CPU y un sistema operativo concretos\n- otros compilan a una forma intermedia portable que un **runtime** remata en cada máquina, así una compilación corre en muchos sitios",
   "step.6.narr": "Cuando un lenguaje compila directo a código máquina, la compilación solo corre en el target para el que se hizo.\nPara ejecutarla en otro sitio haces **compilación cruzada**: compilas en tu portátil pero apuntas el compilador a otro target - digamos el chip de un móvil, o un servidor con un sistema operativo distinto.",
-  "step.7.narr": "Así que ten claras las dos fases:\n- **tiempo de compilación** - traducir la fuente y comprobar las reglas; los errores se pillan aquí\n- **tiempo de ejecución** - ejecutar el programa compilado\nY recuerda que el código máquina siempre es para algún target - por eso la misma fuente se puede compilar para muchas máquinas distintas."
+  "step.7.narr": "Así que ten claras las dos fases:\n- **tiempo de compilación** - traducir la fuente y comprobar las reglas; los errores se pillan aquí\n- **tiempo de ejecución** - ejecutar el programa compilado\nY recuerda que el código máquina siempre es para algún target - por eso la misma fuente se puede compilar para muchas máquinas distintas.",
+  "concept.th-compile-time.def": "La fase antes de que un programa se ejecute, cuando el compilador traduce el código fuente y comprueba las reglas.",
+  "concept.th-compile-time.term": "Tiempo de compilación",
+  "concept.th-run-time.def": "La fase en la que el programa ya construido se ejecuta de verdad, una instrucción cada vez.",
+  "concept.th-run-time.term": "Tiempo de ejecución",
+  "concept.th-build-error.def": "Un fallo que rompe las reglas y que el compilador detecta en tiempo de compilación, antes de que nada se ejecute.",
+  "concept.th-runtime-platform.def": "Una plataforma que remata y ejecuta un build portable en cada máquina, como .NET.",
+  "concept.th-cross-compile.def": "Construir en una máquina pero apuntando el compilador a un objetivo distinto - otra CPU u otro sistema operativo."
 }

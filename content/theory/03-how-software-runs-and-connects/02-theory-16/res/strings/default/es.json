@@ -7,5 +7,11 @@
   "step.2.narr": "Así que una referencia no es más que una variable que guarda - por valor - una dirección de memoria.\nLos bits de `count` son un número; los bits de `pet` son una dirección. Sigue esa dirección (la flecha) y llegas al `Dog` de verdad en el heap.",
   "step.3.narr": "Copiar ahora se parte en dos. Copia un tipo de valor - `int b = count` - y los propios bits (el `5`) se duplican en la casilla propia de b.\n`b` recibe su propio `5` aparte.",
   "step.4.narr": "Como `b` guarda su propia copia, cambiar `b` a `9` deja `count` en `5`.\nDos casillas separadas, dos números separados - nunca estuvieron enlazados.",
-  "step.5.narr": "Copia un tipo de referencia - `Dog friend = pet` - y lo que se duplica es la dirección, no el Dog.\n`pet` y `friend` ahora guardan la misma dirección, así que los dos apuntan al único `Dog`. Cámbialo por cualquiera de los dos nombres y el otro lo ve - sigue habiendo un solo objeto."
+  "step.5.narr": "Copia un tipo de referencia - `Dog friend = pet` - y lo que se duplica es la dirección, no el Dog.\n`pet` y `friend` ahora guardan la misma dirección, así que los dos apuntan al único `Dog`. Cámbialo por cualquiera de los dos nombres y el otro lo ve - sigue habiendo un solo objeto.",
+  "concept.th-value-type.def": "Un tipo cuya variable guarda los datos en sí, de modo que copiarla duplica el valor.",
+  "concept.th-value-type.term": "Tipo por valor",
+  "concept.th-reference-type.def": "Un tipo cuya variable guarda la dirección de un objeto en el heap, de modo que copiarla duplica solo la dirección.",
+  "concept.th-reference-type.term": "Tipo por referencia",
+  "concept.th-reference.def": "Un valor que es una dirección de memoria - síguela para llegar al objeto real.",
+  "concept.th-reference.term": "Referencia"
 }

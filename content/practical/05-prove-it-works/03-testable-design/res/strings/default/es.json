@@ -27,5 +27,9 @@
   "task.4.summaryItems.1.text": "una clase con un solo propósito tiene un test único y sencillo.",
   "task.4.summaryItems.2.title": "Sin estado escondido - ",
   "task.4.summaryItems.2.text": "entra la entrada, sale la salida es lo más fácil de fiar.",
-  "task.4.summaryClose": "Estos hábitos tienen nombre. A continuación: Diseña para el cambio - los principios SOLID que los hacen deliberados."
+  "task.4.summaryClose": "Estos hábitos tienen nombre. A continuación: Diseña para el cambio - los principios SOLID que los hacen deliberados.",
+  "concept.pr-testability.def": "Dar forma al código para que sea fácil de comprobar - dependencias inyectadas, una tarea cada uno y sin estado oculto.",
+  "concept.pr-testability.term": "Diseño testeable",
+  "concept.pr-pure-function.def": "Código que depende solo de sus entradas y no guarda estado oculto, así la misma llamada siempre da el mismo resultado.",
+  "concept.pr-pure-function.term": "Puro y predecible"
 }

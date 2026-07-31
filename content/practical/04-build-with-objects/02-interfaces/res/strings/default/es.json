@@ -42,5 +42,9 @@
   "task.6.summaryItems.3.text": "depende de la promesa, así que encaja cualquiera que la cumpla.",
   "task.6.summaryItems.4.title": "Abierto a tipos nuevos - ",
   "task.6.summaryItems.4.text": "una clase totalmente nueva entra sin tocar a quien la llama.",
-  "task.6.summaryClose": "A continuación: ¿Por qué muchas versiones? - polimorfismo."
+  "task.6.summaryClose": "A continuación: ¿Por qué muchas versiones? - polimorfismo.",
+  "concept.pr-interface.def": "Una promesa con nombre de qué métodos ofrece un tipo, sin decir cómo funcionan.",
+  "concept.pr-interface.term": "Interfaz",
+  "concept.pr-program-to-interface.def": "Depender de la promesa en vez de un tipo concreto, así puede usarse cualquier tipo que la cumpla.",
+  "concept.pr-program-to-interface.term": "Programar contra una interfaz"
 }

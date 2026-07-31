@@ -8,5 +8,10 @@
   "step.3.narr": "Ese puntero de nombre → inode tiene un nombre propio: un **enlace duro** (hard link).\nComo solo es un puntero, renombrar el fichero nunca toca los bytes.",
   "step.4.narr": "Un inode puede tener más de un nombre - más de un **enlace duro**.\nEl inode los cuenta: su **contador de enlaces**.",
   "step.5.narr": "Así que borrar es en realidad *desenlazar*: quitas un nombre.\nEl fichero desaparece solo cuando el **contador de enlaces** llega a `0`.",
-  "step.6.narr": "Un **enlace blando** (soft link) es otra cosa - un acceso directo. Es un fichero diminuto que solo guarda una **ruta** que seguir.\nMueve o borra el destino y el acceso directo se rompe."
+  "step.6.narr": "Un **enlace blando** (soft link) es otra cosa - un acceso directo. Es un fichero diminuto que solo guarda una **ruta** que seguir.\nMueve o borra el destino y el acceso directo se rompe.",
+  "concept.th-storage.def": "Hardware no volátil que conserva los datos después de que un programa pare y después de apagar la corriente.",
+  "concept.th-storage.term": "Almacenamiento",
+  "concept.th-persistence.def": "Conservar los datos más allá del final de un programa guardándolos en el almacenamiento, y volviéndolos a cargar después.",
+  "concept.th-persistence.term": "Persistencia",
+  "concept.th-inode.def": "Un fichero en disco es un inode - sus bytes más datos sobre ellos como el tamaño, la hora y quién puede leerlo - al que se llega a través de un nombre en una carpeta."
 }

@@ -27,5 +27,8 @@
   "task.5.concept": "record",
   "task.5.context": "Un `record` es un tipo de datos que compara por valor: dos records con el mismo contenido son iguales. (Una `class` compara por referencia, así que dos objetos separados nunca son iguales aunque tengan los mismos datos.) Define un record `Animal` y comprueba dos iguales.",
   "task.5.goal.0": "Define `record Animal(string Name, int Legs);`.",
-  "task.5.goal.1": "Main crea dos animales con el mismo Name y Legs e imprime si son iguales - que debería ser True."
+  "task.5.goal.1": "Main crea dos animales con el mismo Name y Legs e imprime si son iguales - que debería ser True.",
+  "concept.pr-enum.def": "Un tipo que es una de entre un conjunto fijo de opciones con nombre, como una pequeña lista de elecciones etiquetadas.",
+  "concept.pr-struct.def": "Un pequeño paquete de datos que se copia entero cuando lo asignas o lo pasas, así dos variables nunca comparten el mismo.",
+  "concept.pr-record.def": "Un tipo pensado para contener datos, donde dos cuentan como iguales cuando sus valores coinciden, no solo cuando son el mismo objeto."
 }

@@ -6,5 +6,16 @@
   "step.1.narr": "Normalmente un programa pregunta y otro responde. El que pregunta es el **cliente**; el que responde es el **servidor**.\nPiensa en un cliente y un camarero: el cliente pide, la cocina sirve.",
   "step.2.narr": "El cliente envía una **petición** por la red - 'dame esto, por favor'.\nAquí tu app le pide a un servidor de precios los últimos precios.",
   "step.3.narr": "El servidor devuelve una **respuesta** - la contestación.\nViaja de vuelta por el mismo cable y aterriza en la memoria de tu programa como datos que puedes usar.",
-  "step.4.narr": "Un servidor no hace cualquier cosa. Ofrece una lista fija de cosas que puedes pedir, y cómo pedirlas - esa lista es su **API**.\nComo una carta: pides lo que hay en ella, no lo que te apetezca."
+  "step.4.narr": "Un servidor no hace cualquier cosa. Ofrece una lista fija de cosas que puedes pedir, y cómo pedirlas - esa lista es su **API**.\nComo una carta: pides lo que hay en ella, no lo que te apetezca.",
+  "concept.th-network.def": "Los cables y enlaces inalámbricos que permiten a un programa hablar con otro, aunque estén en la otra punta del mundo.",
+  "concept.th-network.term": "Red",
+  "concept.th-client.def": "El programa que pide algo por una red.",
+  "concept.th-client.term": "Cliente",
+  "concept.th-server.def": "El programa que responde a las peticiones por una red.",
+  "concept.th-server.term": "Servidor",
+  "concept.th-request.def": "Un mensaje que un cliente envía pidiendo algo.",
+  "concept.th-request.term": "Petición",
+  "concept.th-response.def": "La respuesta que un servidor devuelve.",
+  "concept.th-response.term": "Respuesta",
+  "concept.th-api.def": "La lista fija de cosas que ofrece un servidor y cómo pedirlas - como un menú."
 }

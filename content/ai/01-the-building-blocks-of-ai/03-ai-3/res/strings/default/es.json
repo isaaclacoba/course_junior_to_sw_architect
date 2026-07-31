@@ -10,5 +10,6 @@
   "step.2.narr": "El modelo lee tu prompt y predice el siguiente token - el mismo movimiento de la primera lección.",
   "step.3.narr": "Luego sigue, continuando tu texto un token cada vez.",
   "step.4.narr": "Cambia el prompt y cambias lo que sale. Un arranque distinto lleva a un sitio completamente distinto.",
-  "step.5.narr": "Así que el prompt es tu texto de arranque - y para un modelo a secas, tu único volante. Todo lo que escribe sale de los tokens que le das."
+  "step.5.narr": "Así que el prompt es tu texto de arranque - y para un modelo a secas, tu único volante. Todo lo que escribe sale de los tokens que le das.",
+  "concept.ai-prompt.def": "El texto de partida que le das al modelo, que él simplemente continúa - cambia el prompt y cambia todo lo que viene después."
 }

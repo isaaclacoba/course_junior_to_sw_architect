@@ -10,5 +10,9 @@
   "step.2.narr": "El modelo lee los dos como un solo contexto. El mensaje de usuario dice **qué** responder; el mensaje de sistema dirige **cómo** responde.",
   "step.3.narr": "Con un mensaje de sistema `terse expert`, la respuesta es corta y seca.",
   "step.4.narr": "Ahora cambia **solo** el mensaje de sistema - la pregunta es palabra por palabra la misma - y todo el tono cambia.",
-  "step.5.narr": "Así que el mensaje de sistema es tu volante: fija ahí el rol y las reglas, y deja que el turno de usuario sea solo la pregunta. Es la forma más simple de moldear cómo se comporta un modelo."
+  "step.5.narr": "Así que el mensaje de sistema es tu volante: fija ahí el rol y las reglas, y deja que el turno de usuario sea solo la pregunta. Es la forma más simple de moldear cómo se comporta un modelo.",
+  "concept.ai-system-message.def": "Un mensaje oculto que va antes de tu turno y fija el papel y las reglas del modelo - la palanca más simple para guiar cómo responde.",
+  "concept.ai-user-message.def": "El mensaje que escribes - tu pregunta o petición, que dice qué responder, no cómo.",
+  "concept.ai-system-message.term": "Mensaje de sistema",
+  "concept.ai-user-message.term": "Mensaje de usuario"
 }

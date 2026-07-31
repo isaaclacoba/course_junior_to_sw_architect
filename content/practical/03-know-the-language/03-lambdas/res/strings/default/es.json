@@ -36,5 +36,8 @@
   "task.5.summaryItems.3.text": "una lambda puede leer las variables locales que tiene al lado; un método con nombre solo ve lo que le pasas.",
   "task.5.summaryItems.4.title": "Configúrala - ",
   "task.5.summaryItems.4.text": "mete dentro un valor que tienes ahora, y la misma lambda hace un trabajo nuevo.",
-  "task.5.summaryClose": "A continuación: LINQ - `legs.Count(...)` y `scores.Select(...)` hacen ese mismo foreach por ti, en una línea, con una lambda igual que estas. (Cuando un paso se merece un nombre de verdad, un método normal sigue valiendo - la lambda solo gana cuando es pequeña, va en línea, o necesita los valores de alrededor.)"
+  "task.5.summaryClose": "A continuación: LINQ - `legs.Count(...)` y `scores.Select(...)` hacen ese mismo foreach por ti, en una línea, con una lambda igual que estas. (Cuando un paso se merece un nombre de verdad, un método normal sigue valiendo - la lambda solo gana cuando es pequeña, va en línea, o necesita los valores de alrededor.)",
+  "concept.pr-lambda.def": "Una función diminuta sin nombre que puedes guardar en una variable y llamar más tarde.",
+  "concept.pr-closure.def": "Una lambda que lee las variables de alrededor de donde se escribió - algo que un método normal no puede hacer.",
+  "concept.pr-closure.term": "Captura"
 }

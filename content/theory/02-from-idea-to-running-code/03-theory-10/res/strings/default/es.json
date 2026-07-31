@@ -6,5 +6,7 @@
   "step.1.narr": "El **tipo** decide lo que puedes hacer con un valor.\nPuedes sumar dos `int` - `age + 1` tiene sentido. Sumar un `bool` a una palabra no, así que el compilador te para antes de que el programa se ejecute.",
   "step.2.narr": "Unos pocos **tipos** aparecen constantemente:\n- `int` para números enteros\n- `double` para decimales como `3.5`\n- `string` para texto\n- `bool` para `true`/`false`",
   "step.3.narr": "El tipo **viaja con la variable**.\n`age` es una casilla de números; guarda números, no texto. No vas a soltarle de repente `\"Rex\"` dentro.",
-  "step.4.narr": "Ese tipo se queda **fijo durante toda la vida de la casilla**.\nUna caja de números guarda números de principio a fin - que es justo lo que deja al compilador pillar un mal uso pronto."
+  "step.4.narr": "Ese tipo se queda **fijo durante toda la vida de la casilla**.\nUna caja de números guarda números de principio a fin - que es justo lo que deja al compilador pillar un mal uso pronto.",
+  "concept.th-type.def": "La clase de un valor - número, texto, verdadero/falso - que decide qué puedes hacer con él.",
+  "concept.th-type.term": "Tipo"
 }

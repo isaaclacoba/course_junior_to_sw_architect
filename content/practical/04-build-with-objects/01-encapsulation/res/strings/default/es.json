@@ -41,5 +41,9 @@
   "task.6.summaryItems.3.text": "el único método que escribe puede rechazar valores absurdos.",
   "task.6.summaryItems.4.title": "Un solo motivo para cambiar - ",
   "task.6.summaryItems.4.text": "arregla una regla una vez dentro del objeto y todos los que lo llaman van detrás.",
-  "task.6.summaryClose": "A continuación: ¿Por qué abstraer? - esconder la lógica detrás de una interfaz."
+  "task.6.summaryClose": "A continuación: ¿Por qué abstraer? - esconder la lógica detrás de una interfaz.",
+  "concept.pr-encapsulation.def": "Agrupar el estado relacionado con el comportamiento que lo usa y ocultar el interior, así quien llama pasa por el objeto.",
+  "concept.pr-encapsulation.term": "Encapsulación",
+  "concept.pr-invariant.def": "Una regla sobre el estado de un objeto que sus propios métodos mantienen cierta, así nada de fuera puede romperla.",
+  "concept.pr-invariant.term": "Invariante"
 }

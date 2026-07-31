@@ -6,5 +6,11 @@
   "step.1.narr": "El **texto** es el primer ejemplo. Cada carácter recibe un número según el código acordado, así que `\"Hi\"` se guarda como `H` = `72` y `i` = `105`.\nUn estándar mundial llamado Unicode le da un número a los caracteres de cada idioma.",
   "step.2.narr": "Una **imagen** es una cuadrícula de puntitos de color llamados píxeles.\nEl color de cada píxel son unos pocos números - cuánto rojo, verde y azul - y mezclando esos tres se consigue cualquier color.",
   "step.3.narr": "El **sonido** es una onda que sube y baja. El ordenador mide su altura miles de veces por segundo y guarda cada medida como un número - una muestra.\nReproduce las muestras en orden y oyes el sonido.",
-  "step.4.narr": "Texto, imagen y sonido acaban todos siendo lo mismo: números en casillas normales.\nUn número no significa nada por sí solo - la **codificación** que usa un programa es lo que decide si es una letra, un color, o un momento de sonido."
+  "step.4.narr": "Texto, imagen y sonido acaban todos siendo lo mismo: números en casillas normales.\nUn número no significa nada por sí solo - la **codificación** que usa un programa es lo que decide si es una letra, un color, o un momento de sonido.",
+  "concept.th-encoding.def": "Un código acordado que asigna a cada cosa un número y al revés - decide si un número significa una letra, un color o un sonido.",
+  "concept.th-encoding.term": "Codificación",
+  "concept.th-pixel.def": "Un diminuto punto de color de una imagen, cuyo color se guarda como cantidades de rojo, verde y azul.",
+  "concept.th-pixel.term": "Píxel",
+  "concept.th-sample.def": "Una medida de la altura de una onda de sonido, tomada miles de veces por segundo.",
+  "concept.th-sample.term": "Muestra"
 }

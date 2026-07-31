@@ -36,5 +36,9 @@
   "task.5.summaryItems.2.text": "un `int?` es o un número de verdad o `null`; comprueba primero y luego lee `.Value`.",
   "task.5.summaryItems.3.title": "Valor por defecto solo cuando está vacío con `??=` - ",
   "task.5.summaryItems.3.text": "`occupant ??= \"guest\"` rellena el hueco solo cuando es `null`, sin pisar nunca un valor de verdad.",
-  "task.5.summaryClose": "El hábito que te llevas dura más que los operadores: allí donde un valor pueda faltar, decide qué significa aquí que falte - un valor por defecto, un salto seguro, o un \"unknown\" claro - en vez de dejar que reviente. Otros lenguajes lo escriben `null`, `nil`, `None`, o un optional; el razonamiento es el mismo."
+  "task.5.summaryClose": "El hábito que te llevas dura más que los operadores: allí donde un valor pueda faltar, decide qué significa aquí que falte - un valor por defecto, un salto seguro, o un \"unknown\" claro - en vez de dejar que reviente. Otros lenguajes lo escriben `null`, `nil`, `None`, o un optional; el razonamiento es el mismo.",
+  "concept.pr-null-coalescing.def": "Dar un valor de reserva cuando algo está ausente con ?? (y rellenar un hueco solo cuando está vacío con ??=).",
+  "concept.pr-null-conditional.def": "Acceder a través de un objeto que podría no estar con ?., que se detiene en null en vez de reventar.",
+  "concept.pr-nullable-value-type.def": "Un valor normal como int o bool que acepta estar ausente añadiendo ?, como int?, así es o el valor o null.",
+  "concept.pr-nullable-value-type.term": "Tipo de valor nullable"
 }

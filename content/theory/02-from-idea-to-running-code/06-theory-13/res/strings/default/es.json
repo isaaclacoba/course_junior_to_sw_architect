@@ -7,5 +7,13 @@
   "step.2.narr": "Llamar a `add(3, 5)` hace que la CPU salte al código de `add` y apila un nuevo **frame** - la memoria local propia de la función.\nLos argumentos se convierten en variables locales dentro de ese frame: `a = 3` y `b = 5`.",
   "step.3.narr": "Ahora la CPU ejecuta el cuerpo de `add`: lee `a` y `b` del frame y calcula `a + b` - `8`.\nLas variables **locales** como `a` y `b` solo existen mientras este frame está en la pila.",
   "step.4.narr": "`add` devuelve el resultado y su frame se **desapila** de la pila - esa memoria se recupera al instante.\nEl contador de programa vuelve a `main`, y el `8` aterriza en `r`.",
-  "step.5.narr": "Los programas están hechos de **muchas funciones** que se llaman entre sí.\n`main` es simplemente aquella en la que el programa empieza - el resto se llaman desde ahí."
+  "step.5.narr": "Los programas están hechos de **muchas funciones** que se llaman entre sí.\n`main` es simplemente aquella en la que el programa empieza - el resto se llaman desde ahí.",
+  "concept.th-function.def": "Un conjunto de pasos con nombre que puedes llamar y reutilizar, con entradas y una salida.",
+  "concept.th-function.term": "Función",
+  "concept.th-parameter.def": "Una entrada con nombre que recibe una función, que llega como una variable local cuando se llama a la función.",
+  "concept.th-parameter.term": "Parámetro",
+  "concept.th-return-value.def": "El resultado que una función devuelve a quien la llamó.",
+  "concept.th-return-value.term": "Valor de retorno",
+  "concept.th-local-variable.def": "Una variable que solo existe mientras se ejecuta su función.",
+  "concept.th-local-variable.term": "Variable local"
 }

@@ -40,5 +40,7 @@
   "task.6.summaryItems.3.text": "C# prohíbe heredar de tres; en su lugar compón las partes.",
   "task.6.summaryItems.4.title": "Cambia una parte - ",
   "task.6.summaryItems.4.text": "detrás de una interfaz, reemplaza una parte sin tocar el resto.",
-  "task.6.summaryClose": "A continuación: ¿Por qué inyectar?"
+  "task.6.summaryClose": "A continuación: ¿Por qué inyectar?",
+  "concept.pr-single-inheritance.def": "C# deja que una clase herede de un único padre, así combinas varias piezas guardándolas en su lugar.",
+  "concept.pr-single-inheritance.term": "Una sola clase base"
 }

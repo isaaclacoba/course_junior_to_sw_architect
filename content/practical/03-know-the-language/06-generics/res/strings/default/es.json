@@ -21,5 +21,9 @@
   "task.4.concept": "Método genérico que devuelve un tipo genérico",
   "task.4.context": "Las clases genéricas y los métodos genéricos se combinan. `Box<T>` ya está escrito por ti. Añade un método genérico `Wrap<T>` que tome un `T` y devuelva un `Box<T>` que lo contenga - así el `T` del método fluye directo al tipo que construye.",
   "task.4.goal.0": "Dale a `Wrapper` un método `public Box<T> Wrap<T>(T item)` que devuelva `new Box<T>(item)`.",
-  "task.4.goal.1": "Main envuelve 5 e imprime el `Value` de la caja, así que la salida es 5."
+  "task.4.goal.1": "Main envuelve 5 e imprime el `Value` de la caja, así que la salida es 5.",
+  "concept.pr-generics.def": "Escribir un tipo con un hueco como Box<T> para que funcione con cualquier clase de valor, decidido por quien lo llama.",
+  "concept.pr-generics.term": "Genéricos",
+  "concept.pr-generic-method.def": "Un único método con un parámetro de tipo que funciona con cualquier tipo que le des.",
+  "concept.pr-generic-method.term": "Método genérico"
 }

@@ -6,5 +6,13 @@
   "step.1.narr": "Con miles de ficheros, los nombres por sí solos no bastan. El SO agrupa los ficheros en **carpetas** - un árbol que recorres para llegar a un fichero.\nEse recorrido es la ruta del fichero.",
   "step.2.narr": "Los programas no tocan el disco directamente. Le piden al **sistema operativo** que abra, lea o guarde un fichero.\nÉl comprueba primero los permisos - para que un programa no pueda destrozar los ficheros de otro.",
   "step.3.narr": "El SO también se pone entre los programas y los **dispositivos** de hardware - teclado, pantalla, impresora, red.\nUn programa le pide al SO, y el SO maneja el dispositivo en su nombre.",
-  "step.4.narr": "En conjunto, el **sistema operativo** es el gestor entre tus programas y todo lo demás: convierte el almacenamiento en bruto en **ficheros** con nombre dentro de **carpetas**, comprueba los **permisos** antes de abrirlos o guardarlos, y maneja los **dispositivos** de hardware en nombre de un programa - para que cada programa consiga lo que necesita sin pisar a los demás."
+  "step.4.narr": "En conjunto, el **sistema operativo** es el gestor entre tus programas y todo lo demás: convierte el almacenamiento en bruto en **ficheros** con nombre dentro de **carpetas**, comprueba los **permisos** antes de abrirlos o guardarlos, y maneja los **dispositivos** de hardware en nombre de un programa - para que cada programa consiga lo que necesita sin pisar a los demás.",
+  "concept.th-file.def": "Un conjunto de bytes con nombre en el almacenamiento, que puedes volver a encontrar por su nombre.",
+  "concept.th-file.term": "Fichero",
+  "concept.th-folder.def": "Un grupo de ficheros con nombre, organizado en un árbol que recorres para llegar a un fichero.",
+  "concept.th-folder.term": "Carpeta",
+  "concept.th-permissions.def": "Las reglas que el sistema operativo comprueba antes de dejar que un programa abra o cambie un fichero.",
+  "concept.th-permissions.term": "Permisos",
+  "concept.th-device.def": "Una pieza de hardware - teclado, pantalla, impresora, red - a la que los programas solo llegan pidiéndoselo al sistema operativo.",
+  "concept.th-device.term": "Dispositivo"
 }

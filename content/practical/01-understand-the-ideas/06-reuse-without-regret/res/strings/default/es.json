@@ -33,5 +33,13 @@
   "task.5.summaryItems.2.text": "una sola llamada sobre un tipo base se adapta a cada objeto real, así que no hay un if por tipo.",
   "task.5.summaryItems.3.title": "prefiere la composición",
   "task.5.summaryItems.3.text": "la herencia permite un solo padre y puede forzar un mal encaje; las partes que contienes nunca chocan - por eso tiramos de composición.",
-  "task.5.summaryClose": "Quédate con esta regla: ¿puedes decir con sinceridad que A es-un B, siempre y en todas partes? Si no - o si necesitas mezclar comportamientos - contén partes en su lugar. Volverás a apoyarte en esto cuando diseñes sistemas más grandes: el mismo movimiento de tiene-un te deja cambiar una parte por otra sin molestar al resto."
+  "task.5.summaryClose": "Quédate con esta regla: ¿puedes decir con sinceridad que A es-un B, siempre y en todas partes? Si no - o si necesitas mezclar comportamientos - contén partes en su lugar. Volverás a apoyarte en esto cuando diseñes sistemas más grandes: el mismo movimiento de tiene-un te deja cambiar una parte por otra sin molestar al resto.",
+  "concept.pr-inheritance.def": "Reutilizar reclamando parentesco - una clase hija es-un tipo de su padre y recibe los miembros del padre gratis.",
+  "concept.pr-inheritance.term": "Herencia",
+  "concept.pr-composition.def": "Reutilizar guardando piezas - una clase tiene-un objeto más pequeño como campo y le pide que haga el trabajo.",
+  "concept.pr-composition.term": "Composición",
+  "concept.pr-polymorphism.def": "Una llamada que se adapta al objeto real que hay detrás, así el mismo nombre de método da muchos comportamientos.",
+  "concept.pr-polymorphism.term": "Polimorfismo",
+  "concept.pr-favour-composition.def": "Preferir piezas tiene-un antes que herencia profunda, ya que la herencia puede forzar un mal encaje y varios padres chocan.",
+  "concept.pr-favour-composition.term": "Favorecer la composición"
 }
