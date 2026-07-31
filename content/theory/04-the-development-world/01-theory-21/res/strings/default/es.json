@@ -1,0 +1,10 @@
+{
+  "hero.eyebrow": "Teoría · Parte cuatro · El mundo del desarrollo",
+  "hero.title": "Apoyarse en el código de otros",
+  "intro.0": "Casi nunca escribirás un programa entero desde cero. Casi todo lo que construyes se apoya en código que otras personas ya escribieron - la propia caja de herramientas del lenguaje, y los paquetes que te traes. Una vez que lo sabes, trabajas de otra forma: buscas lo que ya existe antes de construirlo. Esto es qué es ese código compartido, y cómo llegas a él.",
+  "step.0.narr": "La mayor parte de lo que construyes reutiliza código que ya existe.\nUna **librería** es código ya hecho que otra persona escribió y compartió, así que lo llamas en vez de escribirlo tú - como `Json.Parse` aquí.",
+  "step.1.narr": "No tienes que buscar cada herramienta. Todo lenguaje viene con un gran conjunto de herramientas de serie - su **librería estándar**.\nEn `.NET` esa es la Base Class Library: texto, fechas, listas, ficheros, listos desde el momento en que empiezas.",
+  "step.2.narr": "Cuando las herramientas de serie no lo cubren, tiras de un **paquete** - un conjunto de código que alguien publicó para que otros lo reutilicen.\nSe trae de fuera y se añade a tu proyecto.",
+  "step.3.narr": "No persigues los paquetes a mano. Un **gestor de paquetes** trae los que le pides, instala la versión correcta, y se trae también sus dependencias - los paquetes de los que ellos a su vez dependen.\nEn `.NET` esa herramienta es `NuGet`.",
+  "step.4.narr": "Tu programa terminado se ejecuta como **una sola cosa** - tu código más todo ese código que te trajiste, cargados juntos en la memoria.\nAntes de construir algo, buscas lo que ya existe."
+}

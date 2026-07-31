@@ -1,0 +1,9 @@
+{
+  "hero.eyebrow": "Teoría · Parte cuatro · El mundo del desarrollo",
+  "hero.title": "Cómo se comparte el código",
+  "intro.0": "Cómo se rastrea y se comparte el propio código: control de versiones, commits, historial, y cómo un equipo trabaja junto en un mismo proyecto. Recorre la imagen para ver cómo se va construyendo un historial de commits. La última lección de teoría.",
+  "step.0.narr": "El código nunca está del todo terminado; lo cambias constantemente.\nUna herramienta de **control de versiones** rastrea cada cambio que haces, así que nunca pierdes trabajo y siempre puedes ver qué cambió, y cuándo.",
+  "step.1.narr": "Cuando llegas a un punto que vale la pena conservar, haces un **commit**.\nEs una instantánea guardada de tu código en ese momento, con un mensaje corto que dice qué cambió.",
+  "step.2.narr": "Todos tus commits juntos forman un **historial** - una línea de tiempo de cómo creció el código, instantánea a instantánea.\nPuedes mirar hacia atrás a cualquier punto e incluso deshacer un cambio que resultó estar mal.",
+  "step.3.narr": "El control de versiones también deja que las personas **trabajen juntas**.\nCada uno guarda su propia copia y hace commits; aquí el commit de Ana se une al tuyo, así que el trabajo de todo el equipo se junta sin que nadie pise a nadie."
+}

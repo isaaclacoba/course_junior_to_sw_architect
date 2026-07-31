@@ -1,0 +1,10 @@
+{
+  "hero.eyebrow": "Teoría · Parte tres · Cómo se ejecuta y se conecta el software",
+  "hero.title": "Programas que hablan",
+  "intro.0": "Cómo los programas se hablan entre sí a través de una red: clientes y servidores, peticiones y respuestas, y qué es una API. Recorre la imagen para ver cómo sale una petición y vuelve una respuesta.",
+  "step.0.narr": "Los programas no tienen por qué trabajar solos.\nConectado por una **red** - los cables y los enlaces inalámbricos entre ordenadores - un programa puede hablar con otro, incluso con uno en la otra punta del mundo.",
+  "step.1.narr": "Normalmente un programa pregunta y otro responde. El que pregunta es el **cliente**; el que responde es el **servidor**.\nPiensa en un cliente y un camarero: el cliente pide, la cocina sirve.",
+  "step.2.narr": "El cliente envía una **petición** por la red - 'dame esto, por favor'.\nAquí tu app le pide a un servidor de precios los últimos precios.",
+  "step.3.narr": "El servidor devuelve una **respuesta** - la contestación.\nViaja de vuelta por el mismo cable y aterriza en la memoria de tu programa como datos que puedes usar.",
+  "step.4.narr": "Un servidor no hace cualquier cosa. Ofrece una lista fija de cosas que puedes pedir, y cómo pedirlas - esa lista es su **API**.\nComo una carta: pides lo que hay en ella, no lo que te apetezca."
+}

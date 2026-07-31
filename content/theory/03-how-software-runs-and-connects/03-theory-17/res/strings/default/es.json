@@ -1,0 +1,13 @@
+{
+  "hero.eyebrow": "Teoría · Parte tres · Cómo se ejecuta y se conecta el software",
+  "hero.title": "El ciclo de compilar y ejecutar",
+  "intro.0": "Cómo el texto que escribes se convierte en un programa en marcha: código fuente, el compilador, el runtime de .NET, y los dos tipos de error. Recorre el visual para ver cómo una compilación se convierte en una ejecución.",
+  "step.0.narr": "El código que escribes no es más que **texto** en un fichero - letras y símbolos guardados en el disco.\nLa CPU no puede ejecutar texto; solo ejecuta instrucciones de máquina, así que algo tiene que traducirlo primero.",
+  "step.1.narr": "Eso pasa en **tiempo de compilación**, antes de que el programa se ejecute. El **compilador** lee tu fuente de arriba abajo y, según va, comprueba las reglas.\nRompe una y se para.",
+  "step.2.narr": "Aquí a la línea 2 le falta su `;`, así que el compilador se niega a compilar.\nEsto es un **error de compilación** - pillado en tiempo de compilación, antes de que se ejecute una sola línea.",
+  "step.3.narr": "Arregla el `;` y las reglas pasan, así que la **compilación** tiene éxito.\nEl programa terminado se carga en la memoria, listo para ejecutarse - compilarlo no era lo mismo que ejecutarlo.",
+  "step.4.narr": "Ahora **tiempo de ejecución**: el programa compilado ejecuta una instrucción cada vez. Se calcula `a + b` y se imprime `12`.\nEl programa por fin está haciendo su trabajo.",
+  "step.5.narr": "*A qué* compila un compilador depende del lenguaje:\n- algunos compilan directo a **código máquina** para un **target** - una CPU y un sistema operativo concretos\n- otros compilan a una forma intermedia portable que un **runtime** remata en cada máquina, así una compilación corre en muchos sitios",
+  "step.6.narr": "Cuando un lenguaje compila directo a código máquina, la compilación solo corre en el target para el que se hizo.\nPara ejecutarla en otro sitio haces **compilación cruzada**: compilas en tu portátil pero apuntas el compilador a otro target - digamos el chip de un móvil, o un servidor con un sistema operativo distinto.",
+  "step.7.narr": "Así que ten claras las dos fases:\n- **tiempo de compilación** - traducir la fuente y comprobar las reglas; los errores se pillan aquí\n- **tiempo de ejecución** - ejecutar el programa compilado\nY recuerda que el código máquina siempre es para algún target - por eso la misma fuente se puede compilar para muchas máquinas distintas."
+}

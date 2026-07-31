@@ -1,0 +1,12 @@
+{
+  "hero.eyebrow": "Teoría · Parte tres · Cómo se ejecuta y se conecta el software",
+  "hero.title": "Guardar datos",
+  "intro.0": "La memoria lo olvida todo cuando un programa se para - entonces, ¿cómo se queda la información? Recorre el visual para ver cómo los datos salen de la RAM hacia el almacenamiento, guardados como un fichero en el disco que vive más que el programa.",
+  "step.0.narr": "Mientras tu programa se ejecuta, sus datos están en la **RAM**. Cuando el programa se para, el sistema operativo recupera esa memoria para otros programas, así que tus datos desaparecen - y la RAM es **volátil** de todas formas: pierde la corriente y todo se esfuma.\nPara conservar algo después de que el programa termine, lo guardas en el **almacenamiento** como un **fichero**.",
+  "step.1.narr": "En el disco, el fichero en sí es un **inode**: tus **bytes**, más los datos sobre ellos - el tamaño, cuándo cambió, quién puede leerlo.",
+  "step.2.narr": "El **nombre** va aparte. Los nombres viven en un **directorio**, y cada uno apunta a un inode.\nUn directorio también es un fichero - sus bytes son esa lista de nombres.",
+  "step.3.narr": "Ese puntero de nombre → inode tiene un nombre propio: un **enlace duro** (hard link).\nComo solo es un puntero, renombrar el fichero nunca toca los bytes.",
+  "step.4.narr": "Un inode puede tener más de un nombre - más de un **enlace duro**.\nEl inode los cuenta: su **contador de enlaces**.",
+  "step.5.narr": "Así que borrar es en realidad *desenlazar*: quitas un nombre.\nEl fichero desaparece solo cuando el **contador de enlaces** llega a `0`.",
+  "step.6.narr": "Un **enlace blando** (soft link) es otra cosa - un acceso directo. Es un fichero diminuto que solo guarda una **ruta** que seguir.\nMueve o borra el destino y el acceso directo se rompe."
+}
