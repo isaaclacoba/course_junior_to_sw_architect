@@ -23,5 +23,6 @@
   "step.4.coreSub": "modelo de siguiente token",
   "step.5.stripCaption": "El texto hasta ahora",
   "step.5.coreSub": "modelo de siguiente token",
+  "concept.ai-prompt.term": "Prompt",
   "concept.ai-prompt.def": "El texto de partida que le das al modelo, que él simplemente continúa - cambia el prompt y cambia todo lo que viene después."
 }

@@ -18,6 +18,8 @@
   "step.3.coreSub": "modelo de siguiente token",
   "step.4.coreSub": "modelo de siguiente token",
   "step.5.coreSub": "modelo de siguiente token",
+  "concept.ai-llm.term": "Modelo grande de lenguaje (LLM)",
   "concept.ai-llm.def": "Un modelo que lee el texto que hay hasta ahora y predice el siguiente token, una y otra vez.",
+  "concept.ai-next-token-prediction.term": "Predicción del siguiente token",
   "concept.ai-next-token-prediction.def": "Para cada hueco, el modelo puntúa todos los tokens posibles, elige el más probable, lo añade y vuelve a leer el texto entero."
 }

@@ -14,7 +14,10 @@
   "concept.th-compile-time.term": "Tiempo de compilación",
   "concept.th-run-time.def": "La fase en la que el programa ya construido se ejecuta de verdad, una instrucción cada vez.",
   "concept.th-run-time.term": "Tiempo de ejecución",
+  "concept.th-build-error.term": "Error de compilación",
   "concept.th-build-error.def": "Un fallo que rompe las reglas y que el compilador detecta en tiempo de compilación, antes de que nada se ejecute.",
+  "concept.th-runtime-platform.term": "Runtime de .NET",
   "concept.th-runtime-platform.def": "Una plataforma que remata y ejecuta un build portable en cada máquina, como .NET.",
+  "concept.th-cross-compile.term": "Compilación cruzada",
   "concept.th-cross-compile.def": "Construir en una máquina pero apuntando el compilador a un objetivo distinto - otra CPU u otro sistema operativo."
 }

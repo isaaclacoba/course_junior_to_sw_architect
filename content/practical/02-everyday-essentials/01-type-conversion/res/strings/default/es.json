@@ -35,8 +35,12 @@
   "task.5.summaryItems.3.title": "Parsea sin que reviente - ",
   "task.5.summaryItems.3.text": "`int.TryParse` devuelve un `bool` que dice si el texto era un número, en vez de lanzar una excepción cuando no lo es.",
   "task.5.summaryClose": "Tira de `TryParse` antes que de `Parse` siempre que el texto pueda estar mal - las mismas conversiones entre double, string e int se aplican a todos los tipos que verás a continuación.",
+  "concept.pr-parse.term": "Parseo",
   "concept.pr-parse.def": "Leer un valor a partir de texto - int.Parse(\"3\") convierte el texto en el número 3.",
+  "concept.pr-to-string.term": "ToString",
   "concept.pr-to-string.def": "Convertir un valor a su forma de texto, para poder unir un número dentro de una etiqueta o un código.",
+  "concept.pr-cast.term": "Cast y truncamiento",
   "concept.pr-cast.def": "Convertir un valor a otro tipo con (int) - hacer cast de un double a int descarta la parte decimal en vez de redondear.",
+  "concept.pr-try-parse.term": "TryParse",
   "concept.pr-try-parse.def": "El parse seguro: devuelve un bool según si funcionó y escribe el número a través de un parámetro out en vez de reventar con texto inválido."
 }

@@ -12,10 +12,12 @@
       "term": "Bucle del agente"
     },
     "ai-chain-of-thought": {
-      "def": "Pedirle al modelo que escriba su razonamiento paso a paso antes de responder - el desarrollo es el cálculo, no adorno, porque cada token que escribe vuelve al contexto que lee después."
+      "def": "Pedirle al modelo que escriba su razonamiento paso a paso antes de responder - el desarrollo es el cálculo, no adorno, porque cada token que escribe vuelve al contexto que lee después.",
+      "term": "Cadena de pensamiento"
     },
     "ai-chunk": {
-      "def": "Un trozo pequeño en que se parte un documento para poder guardarlo, buscarlo y traerlo al contexto de pocos en pocos."
+      "def": "Un trozo pequeño en que se parte un documento para poder guardarlo, buscarlo y traerlo al contexto de pocos en pocos.",
+      "term": "Chunk"
     },
     "ai-citation": {
       "def": "Señalar la fuente exacta de la que salió una respuesta fundamentada, para poder rastrear la afirmación y comprobarla.",
@@ -26,10 +28,12 @@
       "term": "Contexto"
     },
     "ai-context-window": {
-      "def": "El tamaño máximo fijo del contexto, medido en tokens - cuando se llena, los tokens más viejos caen por el principio y el modelo deja de verlos."
+      "def": "El tamaño máximo fijo del contexto, medido en tokens - cuando se llena, los tokens más viejos caen por el principio y el modelo deja de verlos.",
+      "term": "Ventana de contexto"
     },
     "ai-embedding": {
-      "def": "Convertir un texto en una lista de números que captura su significado - se hace por adelantado para cada chunk guardado, y otra vez para cada pregunta que llega."
+      "def": "Convertir un texto en una lista de números que captura su significado - se hace por adelantado para cada chunk guardado, y otra vez para cada pregunta que llega.",
+      "term": "Embedding"
     },
     "ai-episodic-memory": {
       "def": "El almacén de lo que pasó antes - turnos y sucesos anteriores, cada uno atado a un momento, como el diario del asistente.",
@@ -40,20 +44,24 @@
       "term": "Evaluación"
     },
     "ai-grounding": {
-      "def": "Traer la fuente real al contexto y responder a partir de ella - citándola, y permitiendo un «no lo sé» - para que la respuesta se apoye en un dato comprobable y no en una suposición."
+      "def": "Traer la fuente real al contexto y responder a partir de ella - citándola, y permitiendo un «no lo sé» - para que la respuesta se apoye en un dato comprobable y no en una suposición.",
+      "term": "Grounding"
     },
     "ai-guardrail": {
-      "def": "Una regla que vive en tu código, fuera del modelo - revisa lo que entra y lo que el agente intenta hacer - porque a un modelo solo se le puede convencer de saltarse sus propias reglas."
+      "def": "Una regla que vive en tu código, fuera del modelo - revisa lo que entra y lo que el agente intenta hacer - porque a un modelo solo se le puede convencer de saltarse sus propias reglas.",
+      "term": "Guardrail"
     },
     "ai-hallucination": {
       "def": "Una respuesta segura de sí misma pero inventada, porque el modelo predice texto plausible en vez de verdad verificada y rellena cualquier hueco con algo que suena bien.",
       "term": "Alucinación"
     },
     "ai-human-in-the-loop": {
-      "def": "Exigir el visto bueno de una persona antes de que el agente haga algo arriesgado, para que las decisiones de más peso nunca queden solo en manos del modelo."
+      "def": "Exigir el visto bueno de una persona antes de que el agente haga algo arriesgado, para que las decisiones de más peso nunca queden solo en manos del modelo.",
+      "term": "Humano en el bucle"
     },
     "ai-llm": {
-      "def": "Un modelo que lee el texto que hay hasta ahora y predice el siguiente token, una y otra vez."
+      "def": "Un modelo que lee el texto que hay hasta ahora y predice el siguiente token, una y otra vez.",
+      "term": "Modelo grande de lenguaje (LLM)"
     },
     "ai-memory": {
       "def": "Guardar lo que importa en un almacén fuera del context window y recuperarlo cuando hace falta, para que un asistente recuerde entre turnos aunque cada llamada al modelo arranque de cero.",
@@ -64,7 +72,8 @@
       "term": "Rol del mensaje"
     },
     "ai-next-token-prediction": {
-      "def": "Para cada hueco, el modelo puntúa todos los tokens posibles, elige el más probable, lo añade y vuelve a leer el texto entero."
+      "def": "Para cada hueco, el modelo puntúa todos los tokens posibles, elige el más probable, lo añade y vuelve a leer el texto entero.",
+      "term": "Predicción del siguiente token"
     },
     "ai-observability": {
       "def": "Poder señalar en el registro el paso exacto donde una ejecución se torció, para ver qué pasó y no solo que falló.",
@@ -79,16 +88,20 @@
       "term": "Memoria procedimental"
     },
     "ai-prompt": {
-      "def": "El texto de partida que le das al modelo, que él simplemente continúa - cambia el prompt y cambia todo lo que viene después."
+      "def": "El texto de partida que le das al modelo, que él simplemente continúa - cambia el prompt y cambia todo lo que viene después.",
+      "term": "Prompt"
     },
     "ai-prompt-injection": {
-      "def": "Texto en la entrada que intenta anular las instrucciones del agente, como «ignora tus reglas», que una comprobación de entrada debería rastrear y marcar."
+      "def": "Texto en la entrada que intenta anular las instrucciones del agente, como «ignora tus reglas», que una comprobación de entrada debería rastrear y marcar.",
+      "term": "Inyección de prompts"
     },
     "ai-rag": {
-      "def": "Todo el patrón de recuperar los chunks relevantes, meterlos en el contexto y responder a partir de ellos, en vez de fiarte del entrenamiento congelado del modelo."
+      "def": "Todo el patrón de recuperar los chunks relevantes, meterlos en el contexto y responder a partir de ellos, en vez de fiarte del entrenamiento congelado del modelo.",
+      "term": "Generación aumentada por recuperación (RAG)"
     },
     "ai-react": {
-      "def": "El bucle con nombre detrás de un agente que usa herramientas: un pensamiento sobre el siguiente movimiento, una acción que llama a una herramienta, una observación del resultado real, repetido hasta que el agente tiene lo que necesita para responder."
+      "def": "El bucle con nombre detrás de un agente que usa herramientas: un pensamiento sobre el siguiente movimiento, una acción que llama a una herramienta, una observación del resultado real, repetido hasta que el agente tiene lo que necesita para responder.",
+      "term": "Razonar y actuar (ReAct)"
     },
     "ai-reflection": {
       "def": "Hacer que el modelo revise su propio borrador, encuentre el fallo o caso límite que se le escapó y lo corrija - borrador, crítica, corrección, porque revisar es más fácil que escribir.",
@@ -103,7 +116,8 @@
       "term": "Recuperación"
     },
     "ai-sampling": {
-      "def": "En vez de coger siempre el candidato de arriba, el modelo elige el siguiente token al azar según las probabilidades - por eso el mismo prompt puede dar respuestas distintas."
+      "def": "En vez de coger siempre el candidato de arriba, el modelo elige el siguiente token al azar según las probabilidades - por eso el mismo prompt puede dar respuestas distintas.",
+      "term": "Muestreo"
     },
     "ai-semantic-memory": {
       "def": "El almacén de lo que sigue siendo cierto sin fecha - datos sobre el mundo o sobre ti.",
@@ -130,20 +144,24 @@
       "term": "Descomposición de la tarea"
     },
     "ai-temperature": {
-      "def": "Un dial que redibuja el reparto de probabilidades del siguiente token: baja lo afina para respuestas estables y repetibles, alta lo aplana para más variedad."
+      "def": "Un dial que redibuja el reparto de probabilidades del siguiente token: baja lo afina para respuestas estables y repetibles, alta lo aplana para más variedad.",
+      "term": "Temperatura"
     },
     "ai-token": {
-      "def": "Un trozo pequeño de texto - más o menos una palabra o un pedazo de una, signos incluidos - y la unidad que el modelo lee, cuenta y factura."
+      "def": "Un trozo pequeño de texto - más o menos una palabra o un pedazo de una, signos incluidos - y la unidad que el modelo lee, cuenta y factura.",
+      "term": "Token"
     },
     "ai-tool": {
       "def": "Una función que el modelo puede llamar para hacer algo que el texto solo no puede - mirar el tiempo o enviar un mensaje - y leer el resultado.",
       "term": "Herramienta"
     },
     "ai-tool-call": {
-      "def": "La petición estructurada que el modelo emite para ejecutar una herramienta: su nombre más los argumentos que necesita, con la forma que pide su schema."
+      "def": "La petición estructurada que el modelo emite para ejecutar una herramienta: su nombre más los argumentos que necesita, con la forma que pide su schema.",
+      "term": "Llamada a herramienta"
     },
     "ai-tool-schema": {
-      "def": "La descripción de una herramienta - su nombre y sus parámetros tipados - que el modelo lee para saber cuál encaja y cómo llamarla."
+      "def": "La descripción de una herramienta - su nombre y sus parámetros tipados - que el modelo lee para saber cuál encaja y cómo llamarla.",
+      "term": "Esquema de la herramienta"
     },
     "ai-trace": {
       "def": "El registro posterior de los mensajes y llamadas a herramientas de una ejecución, que se lee para encontrar dónde falló.",
@@ -162,7 +180,8 @@
       "term": "Vector"
     },
     "ai-workflow": {
-      "def": "Pasos fijos ejecutados en un orden marcado cuando puedes escribir el camino por adelantado - más barato, predecible y fácil de testear que un agente."
+      "def": "Pasos fijos ejecutados en un orden marcado cuando puedes escribir el camino por adelantado - más barato, predecible y fácil de testear que un agente.",
+      "term": "Workflow"
     },
     "ai-working-memory": {
       "def": "El contexto que el modelo lee ahora mismo - el borrador de la tarea entre manos, y lo primero que desaparece a medida que avanza el chat.",
@@ -181,7 +200,8 @@
       "term": "Aritmética"
     },
     "pr-array": {
-      "def": "Una fila de valores ordenada y de tamaño fijo a la que llegas por posición (contando desde 0) y que mides con .Length."
+      "def": "Una fila de valores ordenada y de tamaño fijo a la que llegas por posición (contando desde 0) y que mides con .Length.",
+      "term": "Array"
     },
     "pr-assertion": {
       "def": "Una comprobación de que un resultado real coincide con lo que esperabas, que hace fallar el test cuando no.",
@@ -196,7 +216,8 @@
       "term": "Lógica booleana"
     },
     "pr-cast": {
-      "def": "Convertir un valor a otro tipo con (int) - hacer cast de un double a int descarta la parte decimal en vez de redondear."
+      "def": "Convertir un valor a otro tipo con (int) - hacer cast de un double a int descarta la parte decimal en vez de redondear.",
+      "term": "Cast y truncamiento"
     },
     "pr-class": {
       "def": "El plano a partir del cual se hace un objeto - nombra los datos del objeto y lo que puede hacer.",
@@ -223,10 +244,12 @@
       "term": "Propiedad calculada"
     },
     "pr-conditional": {
-      "def": "Elegir exactamente una rama que ejecutar comprobando condiciones, de arriba abajo."
+      "def": "Elegir exactamente una rama que ejecutar comprobando condiciones, de arriba abajo.",
+      "term": "if / else"
     },
     "pr-const": {
-      "def": "Un valor con nombre fijado donde lo escribes y que nunca cambia, para que un número suelto tenga un nombre claro."
+      "def": "Un valor con nombre fijado donde lo escribes y que nunca cambia, para que un número suelto tenga un nombre claro.",
+      "term": "const"
     },
     "pr-constructor": {
       "def": "El método especial que se ejecuta al crear un objeto, usado para preparar su estado inicial.",
@@ -257,10 +280,12 @@
       "term": "Encapsulación"
     },
     "pr-enum": {
-      "def": "Un tipo que es una de entre un conjunto fijo de opciones con nombre, como una pequeña lista de elecciones etiquetadas."
+      "def": "Un tipo que es una de entre un conjunto fijo de opciones con nombre, como una pequeña lista de elecciones etiquetadas.",
+      "term": "enum"
     },
     "pr-exception-handling": {
-      "def": "Mantener un programa en pie cuando algo falla capturando el error en vez de dejar que lo pare todo."
+      "def": "Mantener un programa en pie cuando algo falla capturando el error en vez de dejar que lo pare todo.",
+      "term": "try / catch"
     },
     "pr-expected-exception": {
       "def": "Escribir un test que solo pasa cuando el código lanza una excepción, para demostrar que falla a propósito.",
@@ -275,7 +300,8 @@
       "term": "Campo"
     },
     "pr-finally": {
-      "def": "Un bloque que siempre se ejecuta después de un try, tanto si funcionó como si falló, para limpiar."
+      "def": "Un bloque que siempre se ejecuta después de un try, tanto si funcionó como si falló, para limpiar.",
+      "term": "finally"
     },
     "pr-generic-method": {
       "def": "Un único método con un parámetro de tipo que funciona con cualquier tipo que le des.",
@@ -306,10 +332,12 @@
       "term": "Invariante"
     },
     "pr-lambda": {
-      "def": "Una función diminuta sin nombre que puedes guardar en una variable y llamar más tarde."
+      "def": "Una función diminuta sin nombre que puedes guardar en una variable y llamar más tarde.",
+      "term": "Lambda"
     },
     "pr-linq": {
-      "def": "Consultar una colección sin escribir un bucle, con operadores como Where, Any, All, Count y OrderBy."
+      "def": "Consultar una colección sin escribir un bucle, con operadores como Where, Any, All, Count y OrderBy.",
+      "term": "LINQ"
     },
     "pr-liskov-substitution": {
       "def": "Un subtipo debe poder usarse en cualquier sitio donde se espera su base, sin romper las suposiciones de quien llama.",
@@ -328,13 +356,16 @@
       "term": "Método"
     },
     "pr-null": {
-      "def": "Un valor especial que significa «aquí todavía no hay nada» - un tipo escrito con ? puede contenerlo."
+      "def": "Un valor especial que significa «aquí todavía no hay nada» - un tipo escrito con ? puede contenerlo.",
+      "term": "null"
     },
     "pr-null-coalescing": {
-      "def": "Dar un valor de reserva cuando algo está ausente con ?? (y rellenar un hueco solo cuando está vacío con ??=)."
+      "def": "Dar un valor de reserva cuando algo está ausente con ?? (y rellenar un hueco solo cuando está vacío con ??=).",
+      "term": "Fusión con null (??)"
     },
     "pr-null-conditional": {
-      "def": "Acceder a través de un objeto que podría no estar con ?., que se detiene en null en vez de reventar."
+      "def": "Acceder a través de un objeto que podría no estar con ?., que se detiene en null en vez de reventar.",
+      "term": "Acceso condicional (?.)"
     },
     "pr-nullable-value-type": {
       "def": "Un valor normal como int o bool que acepta estar ausente añadiendo ?, como int?, así es o el valor o null.",
@@ -349,17 +380,20 @@
       "term": "Abierto/Cerrado"
     },
     "pr-overloading": {
-      "def": "Dar a dos métodos el mismo nombre pero parámetros distintos, así el compilador elige el correcto según los argumentos."
+      "def": "Dar a dos métodos el mismo nombre pero parámetros distintos, así el compilador elige el correcto según los argumentos.",
+      "term": "Sobrecarga"
     },
     "pr-override": {
-      "def": "Reemplazar el comportamiento virtual de un tipo base en un subtipo, mientras el código que tiene la base sigue llamando a la versión del objeto real."
+      "def": "Reemplazar el comportamiento virtual de un tipo base en un subtipo, mientras el código que tiene la base sigue llamando a la versión del objeto real.",
+      "term": "Override"
     },
     "pr-parameter": {
       "def": "Un valor que le pasas a un método al llamarlo, para que el mismo método sirva con entradas distintas.",
       "term": "Parámetro"
     },
     "pr-parse": {
-      "def": "Leer un valor a partir de texto - int.Parse(\"3\") convierte el texto en el número 3."
+      "def": "Leer un valor a partir de texto - int.Parse(\"3\") convierte el texto en el número 3.",
+      "term": "Parseo"
     },
     "pr-polymorphism": {
       "def": "Una llamada que se adapta al objeto real que hay detrás, así el mismo nombre de método da muchos comportamientos.",
@@ -386,10 +420,12 @@
       "term": "Puro y predecible"
     },
     "pr-readonly": {
-      "def": "Un campo que se puede asignar una sola vez - en su declaración o en el constructor - y nunca reasignar."
+      "def": "Un campo que se puede asignar una sola vez - en su declaración o en el constructor - y nunca reasignar.",
+      "term": "readonly"
     },
     "pr-record": {
-      "def": "Un tipo pensado para contener datos, donde dos cuentan como iguales cuando sus valores coinciden, no solo cuando son el mismo objeto."
+      "def": "Un tipo pensado para contener datos, donde dos cuentan como iguales cuando sus valores coinciden, no solo cuando son el mismo objeto.",
+      "term": "record"
     },
     "pr-refactoring": {
       "def": "Cambiar la forma de código que funciona sin cambiar lo que hace, en pasos pequeños y seguros.",
@@ -408,13 +444,16 @@
       "term": "Una sola tarea"
     },
     "pr-split": {
-      "def": "Cortar texto por un separador para obtener un array de strings que puedes medir y recorrer, como \"a,b,c\" en tres trozos."
+      "def": "Cortar texto por un separador para obtener un array de strings que puedes medir y recorrer, como \"a,b,c\" en tres trozos.",
+      "term": "Split"
     },
     "pr-spy": {
-      "def": "Un test double que registra cómo se le llamó, así puedes comprobar que el código lo usó correctamente."
+      "def": "Un test double que registra cómo se le llamó, así puedes comprobar que el código lo usó correctamente.",
+      "term": "Spy"
     },
     "pr-static": {
-      "def": "Comportamiento o datos que pertenecen al tipo en sí y no a un objeto concreto, así se comparten y no necesitan una instancia."
+      "def": "Comportamiento o datos que pertenecen al tipo en sí y no a un objeto concreto, así se comparten y no necesitan una instancia.",
+      "term": "static"
     },
     "pr-string-concatenation": {
       "def": "Unir trozos de texto (y números convertidos a texto) uno tras otro con +.",
@@ -429,35 +468,44 @@
       "term": "Operaciones con strings"
     },
     "pr-struct": {
-      "def": "Un pequeño paquete de datos que se copia entero cuando lo asignas o lo pasas, así dos variables nunca comparten el mismo."
+      "def": "Un pequeño paquete de datos que se copia entero cuando lo asignas o lo pasas, así dos variables nunca comparten el mismo.",
+      "term": "struct"
     },
     "pr-stub": {
-      "def": "Un test double que devuelve datos prefabricados que tú decides, así el código bajo prueba ve una respuesta conocida."
+      "def": "Un test double que devuelve datos prefabricados que tú decides, así el código bajo prueba ve una respuesta conocida.",
+      "term": "Stub"
     },
     "pr-switch": {
-      "def": "Asignar un valor a varios case, cada uno terminado en break, con default recogiendo el resto."
+      "def": "Asignar un valor a varios case, cada uno terminado en break, con default recogiendo el resto.",
+      "term": "switch"
     },
     "pr-test-double": {
-      "def": "Un sustituto que controlas y que ocupa el lugar de una dependencia real en un test, como un reloj o la red."
+      "def": "Un sustituto que controlas y que ocupa el lugar de una dependencia real en un test, como un reloj o la red.",
+      "term": "Test double"
     },
     "pr-testability": {
       "def": "Dar forma al código para que sea fácil de comprobar - dependencias inyectadas, una tarea cada uno y sin estado oculto.",
       "term": "Diseño testeable"
     },
     "pr-throw": {
-      "def": "Lanzar tu propio error para señalar que algo va mal y detener el camino actual."
+      "def": "Lanzar tu propio error para señalar que algo va mal y detener el camino actual.",
+      "term": "throw"
     },
     "pr-to-string": {
-      "def": "Convertir un valor a su forma de texto, para poder unir un número dentro de una etiqueta o un código."
+      "def": "Convertir un valor a su forma de texto, para poder unir un número dentro de una etiqueta o un código.",
+      "term": "ToString"
     },
     "pr-tostring-override": {
-      "def": "Hacer override de ToString para que un tipo decida cómo se imprime, en vez de mostrar el nombre de su tipo."
+      "def": "Hacer override de ToString para que un tipo decida cómo se imprime, en vez de mostrar el nombre de su tipo.",
+      "term": "Forma de texto propia"
     },
     "pr-try-parse": {
-      "def": "El parse seguro: devuelve un bool según si funcionó y escribe el número a través de un parámetro out en vez de reventar con texto inválido."
+      "def": "El parse seguro: devuelve un bool según si funcionó y escribe el número a través de un parámetro out en vez de reventar con texto inválido.",
+      "term": "TryParse"
     },
     "pr-unit-test": {
-      "def": "Código que ejecuta tu código y comprueba el resultado, montado como preparar, actuar y comprobar."
+      "def": "Código que ejecuta tu código y comprueba el resultado, montado como preparar, actuar y comprobar.",
+      "term": "Test unitario"
     },
     "pr-variable": {
       "def": "Una caja con nombre que guarda un valor que puedes volver a leer y cambiar más tarde.",
@@ -468,7 +516,8 @@
       "term": "Dirección"
     },
     "th-api": {
-      "def": "La lista fija de cosas que ofrece un servidor y cómo pedirlas - como un menú."
+      "def": "La lista fija de cosas que ofrece un servidor y cómo pedirlas - como un menú.",
+      "term": "API"
     },
     "th-assignment": {
       "def": "Escribir un valor calculado en una variable, con el operador =.",
@@ -487,10 +536,12 @@
       "term": "Bifurcación (if/else)"
     },
     "th-bug": {
-      "def": "Un fallo en el código - el ordenador hizo lo que escribiste, no lo que querías decir."
+      "def": "Un fallo en el código - el ordenador hizo lo que escribiste, no lo que querías decir.",
+      "term": "Bug"
     },
     "th-build-error": {
-      "def": "Un fallo que rompe las reglas y que el compilador detecta en tiempo de compilación, antes de que nada se ejecute."
+      "def": "Un fallo que rompe las reglas y que el compilador detecta en tiempo de compilación, antes de que nada se ejecute.",
+      "term": "Error de compilación"
     },
     "th-byte": {
       "def": "Un grupo de ocho bits, suficiente para 256 valores distintos - la unidad en la que se miden la memoria y el tamaño de los ficheros.",
@@ -505,7 +556,8 @@
       "term": "Colaboración"
     },
     "th-commit": {
-      "def": "Una instantánea guardada de tu código en un momento que merece la pena conservar, con un mensaje corto que describe el cambio."
+      "def": "Una instantánea guardada de tu código en un momento que merece la pena conservar, con un mensaje corto que describe el cambio.",
+      "term": "Commit"
     },
     "th-compile-time": {
       "def": "La fase antes de que un programa se ejecute, cuando el compilador traduce el código fuente y comprueba las reglas.",
@@ -524,17 +576,20 @@
       "term": "Núcleo"
     },
     "th-cpu": {
-      "def": "La parte del ordenador que ejecuta las instrucciones, cogiendo y realizando una cada vez, miles de millones de veces por segundo."
+      "def": "La parte del ordenador que ejecuta las instrucciones, cogiendo y realizando una cada vez, miles de millones de veces por segundo.",
+      "term": "CPU"
     },
     "th-cross-compile": {
-      "def": "Construir en una máquina pero apuntando el compilador a un objetivo distinto - otra CPU u otro sistema operativo."
+      "def": "Construir en una máquina pero apuntando el compilador a un objetivo distinto - otra CPU u otro sistema operativo.",
+      "term": "Compilación cruzada"
     },
     "th-data": {
       "def": "Los valores con los que trabaja un programa, guardados en memoria.",
       "term": "Datos"
     },
     "th-debugging": {
-      "def": "Recorrer el código línea a línea, mirando los valores, para encontrar dónde se tuerce."
+      "def": "Recorrer el código línea a línea, mirando los valores, para encontrar dónde se tuerce.",
+      "term": "Depuración"
     },
     "th-dependency": {
       "def": "Un paquete del que depende tu programa, que a su vez puede depender de otros paquetes.",
@@ -557,7 +612,8 @@
       "term": "Expresión"
     },
     "th-fetch-execute": {
-      "def": "El bucle que la CPU repite sin parar: coge la siguiente instrucción de memoria, la ejecuta y vuelve a empezar."
+      "def": "El bucle que la CPU repite sin parar: coge la siguiente instrucción de memoria, la ejecuta y vuelve a empezar.",
+      "term": "Ciclo de búsqueda y ejecución"
     },
     "th-file": {
       "def": "Un conjunto de bytes con nombre en el almacenamiento, que puedes volver a encontrar por su nombre.",
@@ -572,10 +628,12 @@
       "term": "Función"
     },
     "th-garbage-collector": {
-      "def": "La parte que recupera la memoria del heap cuando ya nada apunta a un objeto."
+      "def": "La parte que recupera la memoria del heap cuando ya nada apunta a un objeto.",
+      "term": "Recolector de basura"
     },
     "th-heap": {
-      "def": "La región de memoria para los objetos que tienen que sobrevivir a la llamada que los creó, que se conservan hasta que nada los referencia."
+      "def": "La región de memoria para los objetos que tienen que sobrevivir a la llamada que los creó, que se conservan hasta que nada los referencia.",
+      "term": "Heap"
     },
     "th-high-level": {
       "def": "Un lenguaje cercano a las ideas humanas en vez de a las instrucciones en bruto de la máquina, de modo que una línea equivale a muchos pasos de la CPU.",
@@ -586,7 +644,8 @@
       "term": "Historial"
     },
     "th-inode": {
-      "def": "Un fichero en disco es un inode - sus bytes más datos sobre ellos como el tamaño, la hora y quién puede leerlo - al que se llega a través de un nombre en una carpeta."
+      "def": "Un fichero en disco es un inode - sus bytes más datos sobre ellos como el tamaño, la hora y quién puede leerlo - al que se llega a través de un nombre en una carpeta.",
+      "term": "Inode"
     },
     "th-instruction": {
       "def": "Una acción mínima, exacta y única que el ordenador ejecuta - como fijar un valor o sumar dos números.",
@@ -625,7 +684,8 @@
       "term": "Código máquina"
     },
     "th-main": {
-      "def": "La rutina por la que arranca un programa, normalmente llamada Main."
+      "def": "La rutina por la que arranca un programa, normalmente llamada Main.",
+      "term": "Main"
     },
     "th-network": {
       "def": "Los cables y enlaces inalámbricos que permiten a un programa hablar con otro, aunque estén en la otra punta del mundo.",
@@ -684,7 +744,8 @@
       "term": "Lenguaje de programación"
     },
     "th-ram": {
-      "def": "La memoria de trabajo rápida del ordenador, donde un programa y sus datos tienen que estar antes de que la CPU pueda ejecutarlos."
+      "def": "La memoria de trabajo rápida del ordenador, donde un programa y sus datos tienen que estar antes de que la CPU pueda ejecutarlos.",
+      "term": "RAM"
     },
     "th-reference": {
       "def": "Un valor que es una dirección de memoria - síguela para llegar al objeto real.",
@@ -711,7 +772,8 @@
       "term": "Tiempo de ejecución"
     },
     "th-runtime-platform": {
-      "def": "Una plataforma que remata y ejecuta un build portable en cada máquina, como .NET."
+      "def": "Una plataforma que remata y ejecuta un build portable en cada máquina, como .NET.",
+      "term": "Runtime de .NET"
     },
     "th-sample": {
       "def": "Una medida de la altura de una onda de sonido, tomada miles de veces por segundo.",
@@ -726,7 +788,8 @@
       "term": "Servidor"
     },
     "th-stack": {
-      "def": "La región de memoria para los valores que una función está usando ahora mismo, donde cada llamada añade un frame encima que se quita solo cuando la llamada termina."
+      "def": "La región de memoria para los valores que una función está usando ahora mismo, donde cada llamada añade un frame encima que se quita solo cuando la llamada termina.",
+      "term": "Stack"
     },
     "th-standard-library": {
       "def": "El gran conjunto de herramientas integradas que trae todo lenguaje, listas en cuanto empiezas.",
@@ -749,7 +812,8 @@
       "term": "Error de sintaxis"
     },
     "th-time-sharing": {
-      "def": "Repartir un núcleo entre varios procesos por turnos, cambiando miles de veces por segundo para que parezca que se ejecutan a la vez."
+      "def": "Repartir un núcleo entre varios procesos por turnos, cambiando miles de veces por segundo para que parezca que se ejecutan a la vez.",
+      "term": "Tiempo compartido"
     },
     "th-type": {
       "def": "La clase de un valor - número, texto, verdadero/falso - que decide qué puedes hacer con él.",

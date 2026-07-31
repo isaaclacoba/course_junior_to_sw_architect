@@ -13,5 +13,6 @@
   "concept.th-loader.term": "Cargador",
   "concept.th-entry-point.def": "El sitio donde un programa empieza a ejecutarse - la primera instrucción que el sistema operativo entrega a la CPU.",
   "concept.th-entry-point.term": "Punto de entrada",
+  "concept.th-main.term": "Main",
   "concept.th-main.def": "La rutina por la que arranca un programa, normalmente llamada Main."
 }

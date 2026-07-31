@@ -35,6 +35,7 @@
   "task.5.summaryItems.3.title": "Espera que falle - ",
   "task.5.summaryItems.3.text": "una excepción lanzada puede ser el resultado que pasa.",
   "task.5.summaryClose": "A continuación: test doubles - sustitutos que tú controlas, para que un test sea rápido y repetible.",
+  "concept.pr-unit-test.term": "Test unitario",
   "concept.pr-unit-test.def": "Código que ejecuta tu código y comprueba el resultado, montado como preparar, actuar y comprobar.",
   "concept.pr-assertion.def": "Una comprobación de que un resultado real coincide con lo que esperabas, que hace fallar el test cuando no.",
   "concept.pr-assertion.term": "Aserción",

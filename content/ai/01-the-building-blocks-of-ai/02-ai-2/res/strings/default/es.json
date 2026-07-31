@@ -22,5 +22,6 @@
   "step.4.coreSub": "lee tokens",
   "step.5.stripCaption": "El texto hasta ahora - un flujo de tokens",
   "step.5.coreSub": "lee tokens",
+  "concept.ai-token.term": "Token",
   "concept.ai-token.def": "Un trozo pequeño de texto - más o menos una palabra o un pedazo de una, signos incluidos - y la unidad que el modelo lee, cuenta y factura."
 }

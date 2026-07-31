@@ -23,6 +23,8 @@
   "step.4.coreSub": "se arriesga",
   "step.5.stripCaption": "Baja para estable, alta para creativo",
   "step.5.coreSub": "puntúa la siguiente palabra",
+  "concept.ai-sampling.term": "Muestreo",
   "concept.ai-sampling.def": "En vez de coger siempre el candidato de arriba, el modelo elige el siguiente token al azar según las probabilidades - por eso el mismo prompt puede dar respuestas distintas.",
+  "concept.ai-temperature.term": "Temperatura",
   "concept.ai-temperature.def": "Un dial que redibuja el reparto de probabilidades del siguiente token: baja lo afina para respuestas estables y repetibles, alta lo aplana para más variedad."
 }

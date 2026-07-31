@@ -115,7 +115,9 @@ function checkLesson(dir) {
       const looksProse = (v) => typeof v === "string" && /\p{L}/u.test(v) && v.length >= 4;
       for (const k of ref) {
         if (!has(k)) (isTerm(k) ? missingTerm : missingReq).push(k);
-        else if (valueOf(k) === englishSource[k] && looksProse(englishSource[k])) identical.push(k);
+        // A concept term is a controlled label; present == complete, even when a
+        // kept tech term (token, LINQ, RAM) legitimately equals English.
+        else if (!isTerm(k) && valueOf(k) === englishSource[k] && looksProse(englishSource[k])) identical.push(k);
       }
       if (missingReq.length || missingTerm.length || identical.length) {
         findings.push({ voice, lang, missingReq, missingTerm, identical });

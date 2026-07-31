@@ -38,5 +38,6 @@
   "step.5.pstep.1.text": "Comprobar el límite de memoria en la config",
   "step.5.pstep.1.note": "puesto demasiado bajo",
   "step.5.pstep.2.text": "Subir el límite y anotar el arreglo",
+  "concept.ai-workflow.term": "Workflow",
   "concept.ai-workflow.def": "Pasos fijos ejecutados en un orden marcado cuando puedes escribir el camino por adelantado - más barato, predecible y fácil de testear que un agente."
 }

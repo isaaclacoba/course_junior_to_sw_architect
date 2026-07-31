@@ -42,6 +42,7 @@
   "step.5.msg.4.text": "¿Y qué pasa con el plan anual?",
   "step.5.msg.5.text": "La política que tengo no menciona los planes anuales, así que no puedo decírtelo - lo consultaría con facturación.",
   "concept.ai-hallucination.def": "Una respuesta segura de sí misma pero inventada, porque el modelo predice texto plausible en vez de verdad verificada y rellena cualquier hueco con algo que suena bien.",
+  "concept.ai-grounding.term": "Grounding",
   "concept.ai-grounding.def": "Traer la fuente real al contexto y responder a partir de ella - citándola, y permitiendo un «no lo sé» - para que la respuesta se apoye en un dato comprobable y no en una suposición.",
   "concept.ai-citation.def": "Señalar la fuente exacta de la que salió una respuesta fundamentada, para poder rastrear la afirmación y comprobarla.",
   "concept.ai-hallucination.term": "Alucinación",

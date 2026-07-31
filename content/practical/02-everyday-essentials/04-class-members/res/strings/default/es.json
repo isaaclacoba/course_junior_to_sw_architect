@@ -40,8 +40,11 @@
   "task.5.summaryItems.3.title": "Un campo static - ",
   "task.5.summaryItems.3.text": "una sola copia compartida por todas las instancias; un contador `static` deja que cada oveja nueva sume al mismo total.",
   "task.5.summaryClose": "La idea se lleva a otros sitios: `const` y `readonly` dicen que un valor no va a cambiar, y `static` dice que algo es del tipo y no de un objeto. Otros lenguajes lo escriben distinto, pero las tres ideas son las mismas en todas partes.",
+  "concept.pr-static.term": "static",
   "concept.pr-static.def": "Comportamiento o datos que pertenecen al tipo en sí y no a un objeto concreto, así se comparten y no necesitan una instancia.",
+  "concept.pr-const.term": "const",
   "concept.pr-const.def": "Un valor con nombre fijado donde lo escribes y que nunca cambia, para que un número suelto tenga un nombre claro.",
+  "concept.pr-readonly.term": "readonly",
   "concept.pr-readonly.def": "Un campo que se puede asignar una sola vez - en su declaración o en el constructor - y nunca reasignar.",
   "concept.pr-field.def": "Una variable que pertenece a un objeto y guarda parte de su estado.",
   "concept.pr-field.term": "Campo"

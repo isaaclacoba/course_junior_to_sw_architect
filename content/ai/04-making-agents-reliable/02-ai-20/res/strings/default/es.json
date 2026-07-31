@@ -44,7 +44,10 @@
   "step.5.msg.4.text": "Comprobación de acción: 5000 $ supera el límite de 50 $. Retenido para aprobación.",
   "step.5.msg.5.text": "Denegado - esto parece fraudulento.",
   "step.5.msg.6.text": "No puedo procesar un reembolso de 5000 $ - supera mi límite y se ha marcado para revisión.",
+  "concept.ai-guardrail.term": "Guardrail",
   "concept.ai-guardrail.def": "Una regla que vive en tu código, fuera del modelo - revisa lo que entra y lo que el agente intenta hacer - porque a un modelo solo se le puede convencer de saltarse sus propias reglas.",
+  "concept.ai-prompt-injection.term": "Inyección de prompts",
   "concept.ai-prompt-injection.def": "Texto en la entrada que intenta anular las instrucciones del agente, como «ignora tus reglas», que una comprobación de entrada debería rastrear y marcar.",
+  "concept.ai-human-in-the-loop.term": "Humano en el bucle",
   "concept.ai-human-in-the-loop.def": "Exigir el visto bueno de una persona antes de que el agente haga algo arriesgado, para que las decisiones de más peso nunca queden solo en manos del modelo."
 }

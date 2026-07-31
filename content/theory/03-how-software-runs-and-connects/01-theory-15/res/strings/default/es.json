@@ -16,8 +16,11 @@
   "step.11.narr": "Así que el cuadro completo, de dirección baja a alta:\n- `code` / `text` - las instrucciones de solo lectura\n- `rodata` - las constantes fijas\n- `data` y `bss` - los globales (con valor, y a cero)\n- `heap` - los objetos de vida larga, crece hacia un lado\n- `stack` - un frame por llamada, crece hacia el otro\n\nLas librerías compartidas también se cargan en regiones mapeadas, pero estas son las que toca tu código.",
   "concept.th-address.def": "El número de un hueco de memoria, que permite al programa volver a encontrar ese hueco exacto.",
   "concept.th-address.term": "Dirección",
+  "concept.th-stack.term": "Stack",
   "concept.th-stack.def": "La región de memoria para los valores que una función está usando ahora mismo, donde cada llamada añade un frame encima que se quita solo cuando la llamada termina.",
+  "concept.th-heap.term": "Heap",
   "concept.th-heap.def": "La región de memoria para los objetos que tienen que sobrevivir a la llamada que los creó, que se conservan hasta que nada los referencia.",
+  "concept.th-garbage-collector.term": "Recolector de basura",
   "concept.th-garbage-collector.def": "La parte que recupera la memoria del heap cuando ya nada apunta a un objeto.",
   "concept.th-volatile.def": "Una propiedad de la RAM: es rápida de alcanzar pero se borra en cuanto se va la corriente.",
   "concept.th-volatile.term": "Volátil"

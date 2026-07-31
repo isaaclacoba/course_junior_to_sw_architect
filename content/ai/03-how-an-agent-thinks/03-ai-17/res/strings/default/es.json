@@ -57,5 +57,6 @@
   "step.6.msg.6.text": "Acción: getWeather(city: \"Brisbane\")",
   "step.6.msg.7.text": "Observación: 26 °C, soleado",
   "step.6.msg.8.text": "Los próximos Juegos Olímpicos son en Brisbane, donde ahora mismo hace 26 °C y está soleado.",
+  "concept.ai-react.term": "Razonar y actuar (ReAct)",
   "concept.ai-react.def": "El bucle con nombre detrás de un agente que usa herramientas: un pensamiento sobre el siguiente movimiento, una acción que llama a una herramienta, una observación del resultado real, repetido hasta que el agente tiene lo que necesita para responder."
 }

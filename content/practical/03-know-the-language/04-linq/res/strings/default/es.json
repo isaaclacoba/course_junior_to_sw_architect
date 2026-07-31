@@ -55,6 +55,7 @@
   "task.8.summaryItems.6.title": "OrderBy - ",
   "task.8.summaryItems.6.text": "ordena los elementos por el valor que elige la regla.",
   "task.8.summaryClose": "Lo siguiente en este itinerario: errores y null - manejar los casos en que algo sale mal o falta un valor.",
+  "concept.pr-linq.term": "LINQ",
   "concept.pr-linq.def": "Consultar una colección sin escribir un bucle, con operadores como Where, Any, All, Count y OrderBy.",
   "concept.pr-projection.def": "Convertir cada elemento en otra cosa con Select, produciendo una nueva secuencia de resultados.",
   "concept.pr-projection.term": "Proyección"

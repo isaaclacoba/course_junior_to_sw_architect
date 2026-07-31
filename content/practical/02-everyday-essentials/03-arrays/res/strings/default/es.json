@@ -42,6 +42,8 @@
   "task.6.summaryItems.4.title": "Parte el texto en trozos - ",
   "task.6.summaryItems.4.text": "`csv.Split(',')` convierte texto en un `string[]` que puedes medir y recorrer como cualquier otro array.",
   "task.6.summaryClose": "El tamaño de un array queda fijo en cuanto lo creas. Cuando necesites una fila que crece o encoge, tirarás de una lista - pero todos los movimientos que acabas de aprender se aplican igual.",
+  "concept.pr-array.term": "Array",
   "concept.pr-array.def": "Una fila de valores ordenada y de tamaño fijo a la que llegas por posición (contando desde 0) y que mides con .Length.",
+  "concept.pr-split.term": "Split",
   "concept.pr-split.def": "Cortar texto por un separador para obtener un array de strings que puedes medir y recorrer, como \"a,b,c\" en tres trozos."
 }

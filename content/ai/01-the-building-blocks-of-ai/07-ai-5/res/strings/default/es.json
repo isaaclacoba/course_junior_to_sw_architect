@@ -23,5 +23,6 @@
   "step.4.coreSub": "solo ve la ventana",
   "step.5.stripCaption": "Un presupuesto fijo de tokens",
   "step.5.coreSub": "solo ve la ventana",
+  "concept.ai-context-window.term": "Ventana de contexto",
   "concept.ai-context-window.def": "El tamaño máximo fijo del contexto, medido en tokens - cuando se llena, los tokens más viejos caen por el principio y el modelo deja de verlos."
 }

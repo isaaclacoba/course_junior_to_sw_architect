@@ -14,6 +14,7 @@
   "concept.th-program.term": "Programa",
   "concept.th-data.def": "Los valores con los que trabaja un programa, guardados en memoria.",
   "concept.th-data.term": "Datos",
+  "concept.th-cpu.term": "CPU",
   "concept.th-cpu.def": "La parte del ordenador que ejecuta las instrucciones, cogiendo y realizando una cada vez, miles de millones de veces por segundo.",
   "concept.th-compiler.def": "Una herramienta que traduce el código que escribes a las diminutas instrucciones que entiende la CPU.",
   "concept.th-compiler.term": "Compilador"

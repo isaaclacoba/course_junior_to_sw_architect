@@ -45,7 +45,9 @@
   "step.8.tool.1.desc": "vuelos entre dos ciudades",
   "step.8.tool.2.desc": "enviar un mensaje a alguien",
   "concept.ai-tool.def": "Una función que el modelo puede llamar para hacer algo que el texto solo no puede - mirar el tiempo o enviar un mensaje - y leer el resultado.",
+  "concept.ai-tool-schema.term": "Esquema de la herramienta",
   "concept.ai-tool-schema.def": "La descripción de una herramienta - su nombre y sus parámetros tipados - que el modelo lee para saber cuál encaja y cómo llamarla.",
+  "concept.ai-tool-call.term": "Llamada a herramienta",
   "concept.ai-tool-call.def": "La petición estructurada que el modelo emite para ejecutar una herramienta: su nombre más los argumentos que necesita, con la forma que pide su schema.",
   "concept.ai-tool.term": "Herramienta"
 }

@@ -8,6 +8,7 @@
   "step.3.narr": "El control de versiones también deja que las personas **trabajen juntas**.\nCada uno guarda su propia copia y hace commits; aquí el commit de Ana se une al tuyo, así que el trabajo de todo el equipo se junta sin que nadie pise a nadie.",
   "concept.th-version-control.def": "Una herramienta que registra cada cambio de tu código, para que nunca pierdas trabajo y puedas ver qué cambió y cuándo.",
   "concept.th-version-control.term": "Control de versiones",
+  "concept.th-commit.term": "Commit",
   "concept.th-commit.def": "Una instantánea guardada de tu código en un momento que merece la pena conservar, con un mensaje corto que describe el cambio.",
   "concept.th-history.def": "La línea temporal de todos los commits - cómo creció el código, instantánea a instantánea.",
   "concept.th-history.term": "Historial",

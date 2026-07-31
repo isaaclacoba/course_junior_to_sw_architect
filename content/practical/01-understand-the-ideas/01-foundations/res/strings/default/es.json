@@ -57,6 +57,7 @@
   "concept.pr-datatype.term": "Tipo de dato",
   "concept.pr-assignment.def": "Guardar un valor en una variable con =, que se lee como «guardar» y no como «igual».",
   "concept.pr-assignment.term": "Asignación",
+  "concept.pr-null.term": "null",
   "concept.pr-null.def": "Un valor especial que significa «aquí todavía no hay nada» - un tipo escrito con ? puede contenerlo.",
   "concept.pr-object.def": "Una cosa construida a partir de una clase con new que junta el estado (lo que sabe) con el comportamiento (lo que hace).",
   "concept.pr-object.term": "Objeto",

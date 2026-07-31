@@ -45,5 +45,6 @@
   "step.5.msg.3.text": "Espera - piénsalo paso a paso.",
   "step.5.msg.4.text": "3 cajas x 4 tarros = 12 tarros.\n12 tarros x 6 canicas = 72 canicas.",
   "step.5.msg.5.text": "Así que hay 72 canicas en total.",
+  "concept.ai-chain-of-thought.term": "Cadena de pensamiento",
   "concept.ai-chain-of-thought.def": "Pedirle al modelo que escriba su razonamiento paso a paso antes de responder - el desarrollo es el cálculo, no adorno, porque cada token que escribe vuelve al contexto que lee después."
 }

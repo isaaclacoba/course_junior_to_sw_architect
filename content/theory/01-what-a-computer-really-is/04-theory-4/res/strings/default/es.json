@@ -13,6 +13,7 @@
   "concept.th-process.term": "Proceso",
   "concept.th-core.def": "Un trabajador dentro de la CPU; un solo núcleo ejecuta una instrucción cada vez.",
   "concept.th-core.term": "Núcleo",
+  "concept.th-time-sharing.term": "Tiempo compartido",
   "concept.th-time-sharing.def": "Repartir un núcleo entre varios procesos por turnos, cambiando miles de veces por segundo para que parezca que se ejecutan a la vez.",
   "concept.th-scheduler.def": "La parte del sistema operativo que decide qué proceso se lleva el núcleo a continuación.",
   "concept.th-scheduler.term": "Planificador",

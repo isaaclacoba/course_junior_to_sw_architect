@@ -13,5 +13,6 @@
   "concept.th-storage.term": "Almacenamiento",
   "concept.th-persistence.def": "Conservar los datos más allá del final de un programa guardándolos en el almacenamiento, y volviéndolos a cargar después.",
   "concept.th-persistence.term": "Persistencia",
+  "concept.th-inode.term": "Inode",
   "concept.th-inode.def": "Un fichero en disco es un inode - sus bytes más datos sobre ellos como el tamaño, la hora y quién puede leerlo - al que se llega a través de un nombre en una carpeta."
 }

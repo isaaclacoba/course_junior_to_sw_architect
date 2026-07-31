@@ -46,8 +46,11 @@
   "task.6.summaryClose": "Estas son cosas esenciales de un sistema de tipos, no curiosidades de C# - casi todos los lenguajes de objetos tienen un tipo abstracto, un método que se puede sobrescribir, una forma de texto personalizada, y un gancho de limpieza. A continuación, conoces las colecciones y consultas que guardan y dan forma a muchos de estos objetos a la vez.",
   "concept.pr-abstract-type.def": "Una base que describe una forma que sus subtipos deben rellenar y que no se puede crear con new por sí misma.",
   "concept.pr-abstract-type.term": "Tipo abstracto",
+  "concept.pr-override.term": "Override",
   "concept.pr-override.def": "Reemplazar el comportamiento virtual de un tipo base en un subtipo, mientras el código que tiene la base sigue llamando a la versión del objeto real.",
+  "concept.pr-overloading.term": "Sobrecarga",
   "concept.pr-overloading.def": "Dar a dos métodos el mismo nombre pero parámetros distintos, así el compilador elige el correcto según los argumentos.",
+  "concept.pr-tostring-override.term": "Forma de texto propia",
   "concept.pr-tostring-override.def": "Hacer override de ToString para que un tipo decida cómo se imprime, en vez de mostrar el nombre de su tipo.",
   "concept.pr-idisposable.def": "Implementar IDisposable para que un bloque using ejecute Dispose en un punto conocido, incluso si algo dentro falla.",
   "concept.pr-idisposable.term": "Limpieza determinista"

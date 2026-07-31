@@ -17,5 +17,6 @@
   "concept.th-request.term": "Petición",
   "concept.th-response.def": "La respuesta que un servidor devuelve.",
   "concept.th-response.term": "Respuesta",
+  "concept.th-api.term": "API",
   "concept.th-api.def": "La lista fija de cosas que ofrece un servidor y cómo pedirlas - como un menú."
 }
