@@ -264,6 +264,60 @@ function conceptIndexFile(index) {
 `;
 }
 
+// Aggregate non-base concept text (concept.<id>.term/.def in each lesson's
+// res/strings/<voice>/<lang>.json, excluding the English base default/en) into
+// per-language overlay maps: lang -> { voice: { id: { term?, def? } } }. English
+// stays in concept-index.js; only translations are emitted here.
+function buildConceptI18n(migrated) {
+  const byLang = {};
+  const KEY = /^concept\.(.+)\.(term|def)$/;
+  migrated.forEach(function (m) {
+    const stringsDir = path.join(m.dir, "res", "strings");
+    let voiceDirs;
+    try { voiceDirs = fs.readdirSync(stringsDir); } catch (e) { return; }
+    voiceDirs.forEach(function (voice) {
+      let files;
+      try { files = fs.readdirSync(path.join(stringsDir, voice)); } catch (e) { return; }
+      files.forEach(function (file) {
+        const lm = /^(.+)\.json$/.exec(file);
+        if (!lm) return;
+        const lang = lm[1];
+        if (voice === "default" && lang === "en") return; // the English base lives in the graph
+        let bag;
+        try { bag = JSON.parse(fs.readFileSync(path.join(stringsDir, voice, file), "utf8")); } catch (e) { return; }
+        Object.keys(bag).forEach(function (k) {
+          const mm = KEY.exec(k);
+          if (!mm) return;
+          const v = ((byLang[lang] = byLang[lang] || {})[voice] = byLang[lang][voice] || {});
+          (v[mm[1]] = v[mm[1]] || {})[mm[2]] = bag[k];
+        });
+      });
+    });
+  });
+  return byLang;
+}
+
+// Deterministic deep key sort so the emitted overlay never churns spuriously.
+function sortDeep(v) {
+  if (Array.isArray(v)) return v.map(sortDeep);
+  if (v && typeof v === "object") {
+    const out = {};
+    Object.keys(v).sort().forEach(function (k) { out[k] = sortDeep(v[k]); });
+    return out;
+  }
+  return v;
+}
+
+function conceptI18nFile(lang, byVoice) {
+  const json = JSON.stringify(sortDeep(byVoice), null, 2);
+  return `${HEADER}
+(function (global) {
+  global.ConceptI18nData = global.ConceptI18nData || {};
+  global.ConceptI18nData[${JSON.stringify(lang)}] = ${json};
+})(typeof window !== "undefined" ? window : this);
+`;
+}
+
 // ---- index.html emission from templates/lesson.html.tmpl ----
 
 function htmlEscape(s) {
@@ -469,6 +523,19 @@ function main() {
   fs.mkdirSync(dataDir, { recursive: true });
   fs.writeFileSync(path.join(dataDir, "course-data.js"), courseDataFile(data));
   fs.writeFileSync(path.join(dataDir, "concept-index.js"), conceptIndexFile(buildConceptIndex(migrated)));
+
+  // Per-language concept text overlays (empty until translations exist). Remove
+  // stale files so deleting a language's text also removes its overlay.
+  const conceptI18n = buildConceptI18n(migrated);
+  fs.readdirSync(dataDir)
+    .filter(function (f) { return /^concept-i18n\..+\.js$/.test(f); })
+    .forEach(function (f) {
+      const lang = f.slice("concept-i18n.".length, -".js".length);
+      if (!conceptI18n[lang]) fs.unlinkSync(path.join(dataDir, f));
+    });
+  Object.keys(conceptI18n).sort().forEach(function (lang) {
+    fs.writeFileSync(path.join(dataDir, "concept-i18n." + lang + ".js"), conceptI18nFile(lang, conceptI18n[lang]));
+  });
 
   // Emit each migrated lesson's index.html (deterministic registry order). Under
   // --out these go to <outDir>/<relPath>/index.html (a scratch mirror) so the
