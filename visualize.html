@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Visualize my code</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="theme-registry.js"></script>
+    <script src="theme-switch.js"></script>
+    <link rel="stylesheet" href="vendor/code-lab/code-lab.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <section class="hero" id="pageHero"></section>
+      <section id="vizLabHost" class="lesson-viz cl-root"></section>
+    </main>
+
+    <script>
+      window.PAGE = {
+        hero: {
+          eyebrow: "Execution visualizer",
+          title: "Visualize my code",
+          intro: [
+            "Write a small C# program, press Visualize, and step through it one line at a time. You see the variables fill in, the call stack grow and shrink, and objects appear on the heap - the same picture the lessons draw, but for your own code.",
+            "Start with a few lines inside Main. As you step, the running line lights up in your code and the panel shows the call stack and the objects on the heap side by side.",
+          ],
+          links: [{ href: "index.html", label: "Back to the course" }],
+        },
+        prefix: "vl",
+      };
+    </script>
+
+    <script src="vendor/code-lab/code-lab.global.js"></script>
+    <script src="page-shell.js"></script>
+    <script>
+      (function () {
+        var host = document.getElementById("vizLabHost");
+        if (!host || !window.CodeLab || !window.CodeLab.VizLab) {
+          console.error("VizLab: host or component missing");
+          return;
+        }
+        window.CodeLab.VizLab.create(host, {
+          runnerUrl: "level3-app/index.html?runner=1",
+        });
+      })();
+    </script>
+  </body>
+</html>
