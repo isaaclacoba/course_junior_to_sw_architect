@@ -12,7 +12,7 @@
       title: "Build text from parts",
       concept: "Assemble a string from values",
       context:
-        "Most text you show a user is **built** - a name here, a number there, glued into one line. Instead of joining pieces with `+`, you can drop each value straight into the text with `$\"...\"`: inside the quotes, `{name}` and `{legs}` are replaced by those values.\n\nWrite a `Critter` whose `Label(string name, int legs)` builds the line `\"<name> has <legs> legs\"`.",
+        "Most text you show a user is **built** - a name here, a number there, glued into one line. Instead of joining pieces with `+`, you can drop each value straight into an interpolated string, written `$\"...\"`: inside the quotes, `{name}` and `{legs}` are replaced by those values.\n\nWrite a `Critter` whose `Label(string name, int legs)` builds the line `\"<name> has <legs> legs\"`.",
       example:
         "public class Badge\n{\n    public string Line(string owner, int id)\n    {\n        return $\"{owner} carries badge {id}\";\n    }\n}",
       goal: [

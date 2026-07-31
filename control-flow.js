@@ -36,7 +36,7 @@
       title: "Combine conditions",
       concept: "&& || !",
       context:
-        "`&&` is true only when both sides are, `||` is true when either side is, and `!` flips a bool. The pattern below mixes all three; do the same to decide access.",
+        "When a decision depends on more than one thing, you combine `bool` values with C#'s three boolean operators: `&&` (and), `||` (or), and `!` (not). `&&` is true only when both sides are, `||` is true when either side is, and `!` flips a bool. The pattern below mixes all three; do the same to decide access.",
       example:
         'bool paid = false;\nbool trial = true;\nbool locked = false;\nif ((paid || trial) && !locked)\n{\n    Console.WriteLine("access");\n}\nelse\n{\n    Console.WriteLine("blocked");\n}',
       goal: [
@@ -116,7 +116,7 @@
       title: "Skip and stop with foreach",
       concept: "foreach + break / continue",
       context:
-        "Inside a `foreach`, `continue` jumps to the next item and `break` ends the loop. The pattern below prints lines, skipping blanks and stopping at `END`; do the same with skip and stop.",
+        "A `foreach` loop walks a sequence, handing you each item in turn. Inside it, `continue` skips to the next item and `break` ends the loop early. The pattern below prints lines, skipping blanks and stopping at `END`; do the same with skip and stop.",
       example:
         'foreach (var line in lines)\n{\n    if (line == "") continue;\n    if (line == "END") break;\n    Console.WriteLine(line);\n}',
       goal: [

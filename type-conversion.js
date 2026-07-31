@@ -91,7 +91,7 @@
       title: "Parse without crashing",
       concept: "int.TryParse",
       context:
-        "`int.Parse(\"cat\")` throws - the text is not a number, and the program stops. `int.TryParse` is the safe version: it returns a `bool` saying whether it worked, and puts the number into an `out` variable when it does.\n\nWrite a `Gate` whose `IsNumber(string text)` returns whether the text is a whole number.",
+        "`int.Parse(\"cat\")` throws - the text is not a number, and the program stops. `int.TryParse` is the safe version: it returns a `bool` saying whether it worked, and puts the number into an `out` variable - a second result the method hands back through an argument - when it does.\n\nWrite a `Gate` whose `IsNumber(string text)` returns whether the text is a whole number.",
       example:
         "public class Field\n{\n    public bool Valid(string s)\n    {\n        return int.TryParse(s, out int _);\n    }\n}",
       goal: [
