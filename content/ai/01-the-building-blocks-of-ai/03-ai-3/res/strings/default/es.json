@@ -11,5 +11,17 @@
   "step.3.narr": "Luego sigue, continuando tu texto un token cada vez.",
   "step.4.narr": "Cambia el prompt y cambias lo que sale. Un arranque distinto lleva a un sitio completamente distinto.",
   "step.5.narr": "Así que el prompt es tu texto de arranque - y para un modelo a secas, tu único volante. Todo lo que escribe sale de los tokens que le das.",
+  "step.0.stripCaption": "The prompt - the text you give the model",
+  "step.0.coreSub": "next-token model",
+  "step.1.stripCaption": "Your prompt",
+  "step.1.coreSub": "next-token model",
+  "step.2.stripCaption": "The model reads it and predicts",
+  "step.2.coreSub": "next-token model",
+  "step.3.stripCaption": "It continues your text",
+  "step.3.coreSub": "next-token model",
+  "step.4.stripCaption": "A different prompt",
+  "step.4.coreSub": "next-token model",
+  "step.5.stripCaption": "Text so far",
+  "step.5.coreSub": "next-token model",
   "concept.ai-prompt.def": "El texto de partida que le das al modelo, que él simplemente continúa - cambia el prompt y cambia todo lo que viene después."
 }

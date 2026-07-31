@@ -39,7 +39,7 @@
   // in the step's scene object and is NOT part of the narration - so it needs its
   // own localization pass. Code identifiers (tool/param names, the emitted call)
   // and structural fields (role, state, score) are deliberately excluded.
-  var SCENE_PROPS = ["transcript", "agent", "agentLoop", "toolRack", "memoryShelf", "retrieval"];
+  var SCENE_PROPS = ["transcript", "agent", "agentLoop", "toolRack", "memoryShelf", "retrieval", "plan"];
 
   // For a scene of `type`, list [keySuffix, path] pairs: the res key is
   // "step.<i>.<keySuffix>" and `path` locates the string inside the scene.
@@ -76,6 +76,13 @@
       push("caption", ["caption"]);
       push("query", ["query"]);
       (sc.docs || []).forEach(function (_, j) { push("doc." + j, ["docs", j, "text"]); });
+    } else if (type === "plan") {
+      push("caption", ["caption"]);
+      push("goal", ["goal"]);
+      (sc.steps || []).forEach(function (_, j) {
+        push("pstep." + j + ".text", ["steps", j, "text"]);
+        push("pstep." + j + ".note", ["steps", j, "note"]);
+      });
     }
     return out;
   }
