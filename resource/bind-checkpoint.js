@@ -21,48 +21,30 @@
 (function (global) {
   "use strict";
 
-  function collect(R, prefix) {
-    var out = [];
-    for (var i = 0; ; i++) {
-      var v = R.get(prefix + i);
-      if (v === undefined) break;
-      out.push(v);
-    }
-    return out;
-  }
-
-  function applyHero(hero, R) {
-    if (!hero) return;
-    var intro = collect(R, "intro.");
-    if (intro.length) hero.intro = intro;
-    var title = R.get("hero.title");
-    if (title !== undefined) hero.title = title;
-    var eyebrow = R.get("hero.eyebrow");
-    if (eyebrow !== undefined) hero.eyebrow = eyebrow;
+  // Snapshot/restore (bindLeaf), indexed-run collection and the hero mapping live
+  // in resource/bind-origin.js (window.ResourceOrigin), which the controllers load
+  // before the first bind. bindLeaf here just forwards to it (resolved lazily, as
+  // the shared module is injected after this script tag parses).
+  function bindLeaf(obj, key, resolved) {
+    global.ResourceOrigin.bind(obj, key, resolved);
   }
 
   function applyQuiz(cfg, R) {
     if (!cfg) return;
-    var title = R.get("quiz.title");
-    if (title !== undefined) cfg.title = title;
-    var intro = R.get("quiz.intro");
-    if (intro !== undefined) cfg.intro = intro;
-    var metaLabel = R.get("quiz.metaLabel");
-    if (metaLabel !== undefined) cfg.metaLabel = metaLabel;
+    bindLeaf(cfg, "title", R.get("quiz.title"));
+    bindLeaf(cfg, "intro", R.get("quiz.intro"));
+    bindLeaf(cfg, "metaLabel", R.get("quiz.metaLabel"));
 
     if (!Array.isArray(cfg.questions)) return;
     cfg.questions.forEach(function (q, i) {
+      if (!q) return;
       var n = i + 1;
-      var stem = R.get("question." + n + ".stem");
-      if (q && stem !== undefined) q.stem = stem;
-      var concept = R.get("question." + n + ".concept");
-      if (q && concept !== undefined) q.concept = concept;
-      var why = R.get("question." + n + ".why");
-      if (q && why !== undefined) q.why = why;
-      if (q && Array.isArray(q.options)) {
+      bindLeaf(q, "stem", R.get("question." + n + ".stem"));
+      bindLeaf(q, "concept", R.get("question." + n + ".concept"));
+      bindLeaf(q, "why", R.get("question." + n + ".why"));
+      if (Array.isArray(q.options)) {
         q.options.forEach(function (opt, m) {
-          var v = R.get("question." + n + ".option." + m);
-          if (v !== undefined) q.options[m] = v;
+          bindLeaf(q.options, m, R.get("question." + n + ".option." + m));
         });
       }
     });
@@ -71,7 +53,7 @@
   // R: the resolver/manager (has get). ctx: { page, quiz } lesson globals.
   function apply(R, ctx) {
     if (!R || !ctx) return;
-    applyHero(ctx.page && ctx.page.hero, R);
+    global.ResourceOrigin.hero(ctx.page && ctx.page.hero, R);
     applyQuiz(ctx.quiz, R);
   }
 

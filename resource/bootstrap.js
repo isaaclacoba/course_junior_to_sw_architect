@@ -47,6 +47,15 @@
     });
   }
 
+  // The shared snapshot/restore module sits next to this controller. Loading it
+  // before the first bind means a generated page needs no regeneration to pick it
+  // up (it is not one of the page's own <script> tags).
+  var bindOriginSrc = attr("data-bind-origin", (self && self.src || "").replace(/[^/]*$/, "bind-origin.js"));
+  function ensureOrigin() {
+    if (global.ResourceOrigin) return Promise.resolve();
+    return injectScript(bindOriginSrc);
+  }
+
   var defaultVoice = voices.indexOf("default") >= 0 ? "default" : voices[0];
   var voicePref = global.ResourcePreference.create({
     storageKey: "course_lesson_voice",
@@ -99,7 +108,8 @@
       });
   }
 
-  manager.init()
+  ensureOrigin()
+    .then(function () { return manager.init(); })
     .then(function (R) {
       if (global.ResourceBindBuild) {
         global.ResourceBindBuild.apply(R, { page: global.PAGE, config: global.BUILD_CONFIG });

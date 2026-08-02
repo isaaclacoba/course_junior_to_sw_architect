@@ -12,9 +12,12 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 function loadBindBuild() {
+  const sandbox = { window: {}, WeakMap };
+  const ctx = vm.createContext(sandbox);
+  const origin = fs.readFileSync(path.join(__dirname, "..", "resource", "bind-origin.js"), "utf8");
+  vm.runInContext(origin, ctx);
   const src = fs.readFileSync(path.join(__dirname, "..", "resource", "bind-build.js"), "utf8");
-  const sandbox = { window: {} };
-  vm.runInNewContext(src, sandbox);
+  vm.runInContext(src, ctx);
   return sandbox.window.ResourceBindBuild;
 }
 

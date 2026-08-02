@@ -18,16 +18,8 @@
 
   function str(v) { return v === undefined ? "" : v; }
 
-  // Collect an indexed run "<prefix>0", "<prefix>1", ... until a gap.
-  function collect(R, prefix) {
-    var out = [];
-    for (var i = 0; ; i++) {
-      var v = R.get(prefix + i);
-      if (v === undefined) break;
-      out.push(v);
-    }
-    return out;
-  }
+  // Snapshot/restore + indexed-run collection live in resource/bind-origin.js
+  // (window.ResourceOrigin), which the controllers load before the first bind.
   function collectItems(R, prefix) {
     var out = [];
     for (var i = 0; ; i++) {
@@ -39,24 +31,8 @@
     return out;
   }
 
-  function applyIntro(hero, R) {
-    if (!hero) return;
-    var intro = collect(R, "intro.");
-    if (intro.length) hero.intro = intro; // only override when a voice supplies one
-  }
-
   // Hero fields the resolver may override when a voice/language supplies them.
-  // intro is apply-if-present (the default keeps its inlined intro); title/eyebrow
-  // the same, so an English page with no hero.* keys is unchanged.
-  function applyHero(hero, R) {
-    if (!hero) return;
-    applyIntro(hero, R);
-    var title = R.get("hero.title");
-    if (title !== undefined) hero.title = title;
-    var eyebrow = R.get("hero.eyebrow");
-    if (eyebrow !== undefined) hero.eyebrow = eyebrow;
-  }
-
+  // Shared with the other binders via ResourceOrigin.hero.
   function applyTasks(cfg, R) {
     if (!cfg || !Array.isArray(cfg.tasks)) return;
     cfg.tasks.forEach(function (t, i) {
@@ -64,7 +40,7 @@
       t.title = str(R.get("task." + n + ".title"));
       t.concept = str(R.get("task." + n + ".concept"));
       t.context = str(R.get("task." + n + ".context"));
-      t.goal = collect(R, "task." + n + ".goal.");
+      t.goal = global.ResourceOrigin.collect(R, "task." + n + ".goal.");
       if (t.summary) {
         t.summaryIntro = str(R.get("task." + n + ".summaryIntro"));
         t.summaryClose = str(R.get("task." + n + ".summaryClose"));
@@ -76,7 +52,7 @@
   // R: the resolver/manager (has get). ctx: { page, config } lesson globals.
   function apply(R, ctx) {
     if (!R || !ctx) return;
-    applyHero(ctx.page && ctx.page.hero, R);
+    global.ResourceOrigin.hero(ctx.page && ctx.page.hero, R);
     applyTasks(ctx.config, R);
   }
 

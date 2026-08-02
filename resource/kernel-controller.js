@@ -34,6 +34,10 @@
   var voices = attr("data-res-voices", "default").split(",").map(trim).filter(Boolean);
   var chromeBase = attr("data-chrome-base", "../../../../res/chrome");
   var conceptsBase = attr("data-concepts-base", "../../../../generated");
+  // The shared snapshot/restore module sits next to this controller. Loading it
+  // before the first bind means a generated page needs no regeneration to pick it
+  // up (it is not one of the page's own <script> tags).
+  var bindOriginSrc = attr("data-bind-origin", (self && self.src || "").replace(/[^/]*$/, "bind-origin.js"));
 
   function injectScript(src, attrs) {
     return new Promise(function (resolve, reject) {
@@ -46,6 +50,11 @@
       s.onerror = reject;
       document.body.appendChild(s);
     });
+  }
+
+  function ensureOrigin() {
+    if (global.ResourceOrigin) return Promise.resolve();
+    return injectScript(bindOriginSrc);
   }
 
   var defaultVoice = voices.indexOf("default") >= 0 ? "default" : voices[0];
@@ -166,10 +175,12 @@
     });
   }
 
-  // First load: resolve -> bind -> inject page-shell (renders hero + scaffold) ->
-  // mount Settings -> inject the engine in manual mode -> boot it, holding the
-  // hero and the widget as the localizable surfaces.
-  manager.init()
+  // First load: ensure the shared bind-origin module -> resolve -> bind -> inject
+  // page-shell (renders hero + scaffold) -> mount Settings -> inject the engine in
+  // manual mode -> boot it, holding the hero and the widget as the localizable
+  // surfaces.
+  ensureOrigin()
+    .then(function () { return manager.init(); })
     .then(function (R) {
       bind(R);
       return loadChrome(langPref.get());

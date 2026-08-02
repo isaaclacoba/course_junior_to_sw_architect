@@ -14,25 +14,12 @@
 (function (global) {
   "use strict";
 
-  // Collect an indexed run "<prefix>0", "<prefix>1", ... until a gap.
-  function collect(R, prefix) {
-    var out = [];
-    for (var i = 0; ; i++) {
-      var v = R.get(prefix + i);
-      if (v === undefined) break;
-      out.push(v);
-    }
-    return out;
-  }
-
-  function applyHero(hero, R) {
-    if (!hero) return;
-    var intro = collect(R, "intro.");
-    if (intro.length) hero.intro = intro;
-    var title = R.get("hero.title");
-    if (title !== undefined) hero.title = title;
-    var eyebrow = R.get("hero.eyebrow");
-    if (eyebrow !== undefined) hero.eyebrow = eyebrow;
+  // Snapshot/restore (bindLeaf), indexed-run collection and the hero mapping live
+  // in resource/bind-origin.js (window.ResourceOrigin), which the controllers load
+  // before the first bind. bindLeaf here just forwards to it (resolved lazily, as
+  // the shared module is injected after this script tag parses).
+  function bindLeaf(obj, key, resolved) {
+    global.ResourceOrigin.bind(obj, key, resolved);
   }
 
   // The scene panel a step carries (exactly one). Its human-readable prose lives
@@ -95,24 +82,18 @@
     }
     return cur;
   }
-  function setPath(obj, path, val) {
-    var cur = obj;
-    for (var i = 0; i < path.length - 1; i++) {
-      if (cur == null) return;
-      cur = cur[path[i]];
-    }
-    if (cur != null) cur[path[path.length - 1]] = val;
-  }
 
-  // Overwrite a step's scene prose with resolved strings, apply-if-present: a key
-  // absent from the bundle leaves the inline (English) value untouched.
+  // Bind a step's scene prose: resolved string when present, else the inline
+  // original (bindLeaf snapshots it once, so a language round-trip restores it). A
+  // leaf whose container is absent is skipped.
   function applySceneText(step, i, R) {
     for (var p = 0; p < SCENE_PROPS.length; p++) {
       var sc = step[SCENE_PROPS[p]];
       if (!sc) continue;
       sceneLeaves(SCENE_PROPS[p], sc).forEach(function (pair) {
-        var v = R.get("step." + i + "." + pair[0]);
-        if (v !== undefined && getPath(sc, pair[1]) !== undefined) setPath(sc, pair[1], v);
+        var path = pair[1];
+        var container = getPath(sc, path.slice(0, path.length - 1));
+        bindLeaf(container, path[path.length - 1], R.get("step." + i + "." + pair[0]));
       });
       return; // one scene per step
     }
@@ -122,15 +103,13 @@
     if (!viz) return;
     if (Array.isArray(viz.legend)) {
       viz.legend.forEach(function (item, i) {
-        var v = R.get("legend." + i);
-        if (item && v !== undefined) item.label = v;
+        if (item) bindLeaf(item, "label", R.get("legend." + i));
       });
     }
     if (Array.isArray(viz.steps)) {
       viz.steps.forEach(function (step, i) {
         if (!step) return;
-        var v = R.get("step." + i + ".narr");
-        if (v !== undefined) step.narr = v;
+        bindLeaf(step, "narr", R.get("step." + i + ".narr"));
         applySceneText(step, i, R);
       });
     }
@@ -139,7 +118,7 @@
   // R: the resolver/manager (has get). ctx: { page, viz } lesson globals.
   function apply(R, ctx) {
     if (!R || !ctx) return;
-    applyHero(ctx.page && ctx.page.hero, R);
+    global.ResourceOrigin.hero(ctx.page && ctx.page.hero, R);
     applyViz(ctx.viz, R);
   }
 
