@@ -14,5 +14,8 @@
   "concept.th-persistence.def": "Conservar los datos más allá del final de un programa guardándolos en el almacenamiento, y volviéndolos a cargar después.",
   "concept.th-persistence.term": "Persistencia",
   "concept.th-inode.term": "Inode",
-  "concept.th-inode.def": "Un fichero en disco es un inode - sus bytes más datos sobre ellos como el tamaño, la hora y quién puede leerlo - al que se llega a través de un nombre en una carpeta."
+  "concept.th-inode.def": "Un fichero en disco es un inode - sus bytes más datos sobre ellos como el tamaño, la hora y quién puede leerlo - al que se llega a través de un nombre en una carpeta.",
+  "step.7.narr": "Un solo fichero vale para pocos datos. Pero cuando muchos programas comparten un montón de datos relacionados - y los leen y cambian a la vez sin pisarse - recurres a una **base de datos**.\nEs almacenamiento organizado que mantiene los datos coherentes y deja que un programa pida justo las filas que necesita, en vez de leer un fichero entero a mano.",
+  "concept.th-database.term": "Base de datos",
+  "concept.th-database.def": "Almacenamiento organizado que muchos programas pueden compartir y cambiar a la vez sin pisarse, y al que se le puede pedir justo los datos que necesitan - el paso siguiente a un solo fichero."
 }

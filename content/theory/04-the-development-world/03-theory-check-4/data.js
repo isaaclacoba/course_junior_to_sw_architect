@@ -133,6 +133,45 @@
         correct: 0,
         why: "Version control lets each person commit their work and merges the changes together.",
       },
+      {
+        concept: "Branches",
+        conceptId: "th-vcs-branch",
+        stem: "Why open a branch before trying a risky change?",
+        options: [
+          "It gives you a separate line of commits, so the working version stays safe",
+          "It makes the code compile faster",
+          "It deletes the old history",
+          "It emails the change to your team",
+        ],
+        correct: 0,
+        why: "A branch is your own line of commits that splits off from the main one, so you can experiment without touching the version that works.",
+      },
+      {
+        concept: "Merging",
+        conceptId: "th-merge",
+        stem: "What does merging a branch do?",
+        options: [
+          "Brings its commits back into the main line, joining the two histories",
+          "Throws the branch's work away",
+          "Renames every file in the project",
+          "Stops anyone else from committing",
+        ],
+        correct: 0,
+        why: "Merging joins a branch's commits back into the main line, so the finished work becomes part of the shared history.",
+      },
+      {
+        concept: "Remote",
+        conceptId: "th-remote",
+        stem: "What is a remote in version control?",
+        options: [
+          "A shared copy of the history on a server that the whole team pushes to and pulls from",
+          "A faster CPU for building code",
+          "A backup that only you can see",
+          "A tool that writes commits for you",
+        ],
+        correct: 0,
+        why: "A remote is a shared copy of the history, often hosted on a platform like GitHub, so a team works through one agreed place.",
+      },
     ],
   };
 })();

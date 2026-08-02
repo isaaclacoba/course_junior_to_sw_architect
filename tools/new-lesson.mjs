@@ -143,8 +143,14 @@ function appendRegistryLine(o) {
     if (trackRe.test(lines[i]) && partRe.test(lines[i])) lastIdx = i;
   }
   if (lastIdx === -1) {
-    // No sibling: insert before the closing "];" of the lessons array.
+    // No sibling (a brand-new part): insert before the closing "];" of the
+    // lessons array. Anchor to "var lessons = [" first so we do not stop at the
+    // earlier "];" that closes the tracks array.
+    let start = 0;
     for (let i = 0; i < lines.length; i++) {
+      if (/var\s+lessons\s*=\s*\[/.test(lines[i])) { start = i; break; }
+    }
+    for (let i = start; i < lines.length; i++) {
       if (/^\s*\];\s*$/.test(lines[i])) { lastIdx = i - 1; break; }
     }
   }

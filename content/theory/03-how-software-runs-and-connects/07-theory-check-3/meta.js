@@ -6,9 +6,9 @@ window.LESSON_META = {
   eyebrow: "Theory · Part three · Checkpoint",
   title: "Part three checkpoint",
   intro: [
-    "A short checkpoint before you move on. Answer a handful of questions on Part three - where data lives, references versus values, building and running, saving data, and programs that talk - to lock it in and earn your XP."
+    "A short checkpoint before you move on. Answer a handful of questions on Part three - where data lives, references versus values, building and running, saving data, programs that talk, and keeping data safe - to lock it in and earn your XP."
   ],
-  blurb: "A short quiz to lock in Part three and earn your XP: where data lives, references versus values, building and running, saving data, and programs that talk.",
+  blurb: "A short quiz to lock in Part three and earn your XP: where data lives, references versus values, building and running, saving data, programs that talk, and keeping data safe.",
   links: [{ href: "index.html", label: "Back to the course" }],
   pill: "steady",
   time: "10 min",
@@ -62,6 +62,27 @@ window.LESSON_META = {
       },
       {
         "id": "th-api"
+      },
+      {
+        "id": "th-internet"
+      },
+      {
+        "id": "th-ip-address"
+      },
+      {
+        "id": "th-dns"
+      },
+      {
+        "id": "th-http"
+      },
+      {
+        "id": "th-database"
+      },
+      {
+        "id": "th-secret"
+      },
+      {
+        "id": "th-validation"
       }
     ],
     "uses": [

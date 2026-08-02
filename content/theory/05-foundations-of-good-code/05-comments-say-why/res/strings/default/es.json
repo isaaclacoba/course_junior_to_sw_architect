@@ -1,0 +1,12 @@
+{
+  "hero.eyebrow": "Teoría · Parte cinco · Fundamentos del buen código",
+  "hero.title": "Los comentarios dicen por qué",
+  "intro.0": "Un comentario es una nota para personas que la computadora ignora. Mal usado, solo repite lo que el código ya dice y poco a poco se queda desactualizado. Bien usado, captura lo único que el código no puede mostrar - el motivo. Recorre los dos tipos y mira cuál se gana su sitio.",
+  "step.0.narr": "Un **comentario** es una nota para personas, escrita dentro del código; la computadora se la salta.\nBien usado vale mucho. El truco está en saber qué comentarios se ganan su sitio.",
+  "step.1.narr": "Este solo repite lo que el código ya dice: `i = i + 1` con una nota que dice *suma uno a i*.\nNo añade información - y peor aún, si la línea cambia y la nota no, el comentario pasa a mentir. Repetir el código es un comentario que se pudre.",
+  "step.2.narr": "A menudo el mejor arreglo para un comentario es un nombre mejor. Renombra `i` a `retries` y la línea se explica sola: `retries = retries + 1`.\nNo hace falta comentario - el código dice *qué* por sí mismo.",
+  "step.3.narr": "Entonces, ¿qué les queda a los comentarios? Lo único que el código no puede mostrar: el **por qué**.\nAquí el código dice `batchSize = 100`. El comentario explica la razón que nunca adivinarías de la línea - la API no acepta más de 100 por llamada.",
+  "step.4.narr": "Así que deja que el código diga *qué*, y guarda los comentarios para el *por qué*.\nComenta el motivo sorprendente, la restricción, lo que aprendiste a base de golpes - no lo obvio, que un buen nombre ya le dice a quien lee.",
+  "concept.th-comment.term": "Comentario",
+  "concept.th-comment.def": "Una nota para personas escrita en el código que la computadora ignora. Un buen comentario explica por qué se hace algo, no el qué que el código ya muestra."
+}

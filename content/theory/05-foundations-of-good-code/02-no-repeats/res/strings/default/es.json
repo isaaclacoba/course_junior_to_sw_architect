@@ -1,0 +1,13 @@
+{
+  "hero.eyebrow": "Teoría · Parte cinco · Fundamentos del buen código",
+  "hero.title": "No te repitas",
+  "intro.0": "Copiar y pegar parece rápido. El problema llega después: la misma lógica vive ahora en dos sitios, y un día arreglas un fallo en una copia y te olvidas de la otra. Recorre una pequeña duplicación y observa cómo se reduce a un único lugar con nombre que todos los que lo llaman comparten.",
+  "step.0.narr": "Copiar y pegar parece rápido. Aquí la misma regla de impuestos está en dos sitios - el formulario de registro y la página de pago.\nAhora mismo coinciden, así que nada parece estar mal.",
+  "step.1.narr": "Esto es **duplicación**: la misma pieza de conocimiento escrita más de una vez.\nEl coste está escondido hasta que la regla cambia - y las reglas siempre cambian.",
+  "step.2.narr": "El tipo de impuesto cambia, así que actualizas la página de pago. Se te olvida que el formulario de registro todavía tiene el tipo antiguo.\nAhora las dos copias no coinciden, y una de ellas está mal sin que se note.",
+  "step.3.narr": "El arreglo es decirlo una sola vez. Mueve la regla a una única función con un nombre claro - `priceWithTax()` - para que viva en un solo hogar.",
+  "step.4.narr": "Ahora las dos páginas llaman a esa única función en vez de guardar su propia copia.\nCambia la regla en un sitio y todos los que la llaman lo reciben - no queda una segunda copia que olvidar.",
+  "step.5.narr": "Así que **no te repitas**: cada pieza de conocimiento pertenece a un solo lugar.\nCuando sientas la tentación de copiar y pegar lógica, dale un nombre y llámala en su lugar - tu yo futuro solo tendrá que arreglarla una vez.",
+  "concept.th-duplication.term": "Duplicación",
+  "concept.th-duplication.def": "La misma pieza de lógica escrita en más de un sitio, de modo que un cambio o un arreglo hay que repetirlo en todas partes a la vez - y es fácil olvidar una copia."
+}

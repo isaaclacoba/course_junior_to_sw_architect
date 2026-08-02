@@ -1,0 +1,4 @@
+{
+  "concept.th-single-purpose.term": "Single purpose",
+  "concept.th-single-purpose.def": "A function that does one job, so it earns a clear name, can be reused on its own, and can be checked in isolation - the everyday seed of the single-responsibility idea."
+}

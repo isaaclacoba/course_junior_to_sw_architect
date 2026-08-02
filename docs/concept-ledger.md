@@ -94,12 +94,19 @@ not an endorsement.
 | 15 | where-data-lives | 3 | RAM as numbered slots; regions: code, rodata, data, stack, heap | 2,9 |
 | 16 | references-vs-values | 3 | value types hold the data; reference types hold an address to an object on the heap | 15 |
 | 17 | build-and-run cycle | 3 | compile time vs run time; a build error; compiled vs interpreted vs in-between | 8 |
-| 18 | saving-data | 3 | RAM is wiped at exit; save to a file; a file is bytes plus metadata and a separate name | 15,7 |
-| 19 | programs-that-talk | 3 | client asks, server answers; a request gets a response back into memory | 4,7 |
-| - | checkpoint-3 | 3 | (review of Part 3) | 15-19 |
+| 18 | saving-data | 3 | RAM is wiped at exit; save to a file; a file is bytes plus metadata and a separate name; a database is the step up from one file for shared, concurrent, queryable data | 15,7 |
+| 19 | programs-that-talk | 3 | the internet joins networks into one; client asks, server answers; DNS resolves a name to an IP address; a request gets a response back into memory; HTTP is the web's request/response rules; an API is the fixed menu a server offers | 4,7 |
+| - | keeping-data-safe | 3 | some data is a secret - keep it out of code and logs and never show it back; permissions control who may read or change data; don't trust input - validate it before use | 7,18,19 |
+| - | checkpoint-3 | 3 | (review of Part 3) | 15-19, keeping-data-safe |
 | 21 | standing-on-other-code | 4 | you don't write everything; libraries and dependencies are code others wrote | 8 |
-| 20 | how-code-is-shared | 4 | version control keeps a history so many people work on one codebase | - |
+| 20 | how-code-is-shared | 4 | version control keeps a history; a branch is a safe parallel line, a merge brings the work back; a remote is the shared copy a platform hosts so a team works on one codebase | - |
 | - | checkpoint-4 | 4 | (review of Part 4) | 20,21 |
+| 22 | good-names | 5 | a name should say what a value holds or what a function does; clear beats short or long | 9,13 |
+| 23 | no-repeats | 5 | duplication is the same knowledge in many places; a fix has to be repeated and a copy is easy to miss; say it once (DRY) | 13,22 |
+| 24 | one-job | 5 | a function that does one job earns a clear name and can be reused alone; the seed of single responsibility | 13,22 |
+| 25 | write-for-readers | 5 | code is read more than written; prefer readability over cleverness | 22,24 |
+| 26 | comments-say-why | 5 | a comment explains why, not the what the code already shows; a good name removes most comments | 22,25 |
+| - | checkpoint-5 | 5 | (review of Part 5) | 22-26 |
 
 Note: Part 4 is taught Standing on other code (`theory-21`) then How code is
 shared (`theory-20`) - you reach for libraries the moment you code; version

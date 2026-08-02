@@ -1,0 +1,6 @@
+{
+  "concept.th-secret.term": "Secret",
+  "concept.th-secret.def": "Data that must stay private - a password, an API key, personal information - kept out of code and logs and never shown back.",
+  "concept.th-validation.term": "Input validation",
+  "concept.th-validation.def": "Checking that data from outside is what you expect before you use it, because input from a user, another program, or the network can be wrong or hostile."
+}

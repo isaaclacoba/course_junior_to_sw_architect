@@ -1,0 +1,14 @@
+{
+  "hero.eyebrow": "Teoría · Parte tres · Cómo se ejecuta y se conecta el software",
+  "hero.title": "Mantener los datos a salvo",
+  "intro.0": "En cuanto un programa guarda datos y habla con otros programas, algunos de esos datos importan más que el resto - y algunos son secretos. Recorre tres hábitos elementales que los mantienen a salvo: guardar los secretos, comprobar quién puede hacer qué, y no fiarte nunca de lo que llega de fuera.",
+  "step.0.narr": "En cuanto un programa guarda datos y habla con otros programas, algunos de esos datos importan más que el resto.\nUn `username` puede ser público, pero una `password` no puede filtrarse nunca. Los datos que tienes que mantener en privado son un **secreto**.",
+  "step.1.narr": "Así que trata un **secreto** con cuidado. Mantenlo fuera de tu código y fuera de tus logs, guárdalo en un sitio seguro y no lo imprimas nunca de vuelta - muestra `••••••`, no el valor real.\nLo mismo vale para una `apiKey` o cualquier cosa que dejaría a alguien actuar como tu usuario.",
+  "step.2.narr": "Incluso los datos que no son secretos no deberían poder cambiarlos cualquiera. Los **permisos** deciden quién puede leer o cambiar qué.\nAquí el `owner` puede leer y cambiar el registro, mientras que un `guest` solo puede leerlo - la misma idea que los permisos de ficheros, ahora protegiendo tus datos.",
+  "step.3.narr": "Los datos que llegan de fuera - un formulario, otro programa, la red - pueden estar mal o incluso ser hostiles. Así que **no te fíes de lo que llega**: comprueba que es lo que esperas antes de usarlo.\nUn valor como `\"25\"` podría ser una edad válida, pero `\"; wipe all\"` es un ataque - acepta el primero, rechaza el segundo.",
+  "step.4.narr": "Así que mantener los datos a salvo se reduce a tres hábitos que puedes empezar hoy.\nGuarda los **secretos**, comprueba los **permisos** antes de dejar que alguien lea o cambie datos, y **no te fíes de lo que llega** - valídalo primero. Nada de esto es avanzado; es el suelo sobre el que se construye el buen software.",
+  "concept.th-secret.term": "Secreto",
+  "concept.th-secret.def": "Datos que tienen que mantenerse en privado - una contraseña, una clave de API, información personal - mantenidos fuera del código y los logs, y que nunca se muestran de vuelta.",
+  "concept.th-validation.term": "Validación de entrada",
+  "concept.th-validation.def": "Comprobar que los datos que llegan de fuera son lo que esperas antes de usarlos, porque la entrada de un usuario, otro programa o la red puede estar mal o ser hostil."
+}

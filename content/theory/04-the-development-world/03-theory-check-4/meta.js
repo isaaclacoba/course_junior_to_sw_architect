@@ -50,6 +50,15 @@ window.LESSON_META = {
       },
       {
         "id": "th-collaboration"
+      },
+      {
+        "id": "th-vcs-branch"
+      },
+      {
+        "id": "th-merge"
+      },
+      {
+        "id": "th-remote"
       }
     ],
     "uses": [

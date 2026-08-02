@@ -980,6 +980,13 @@
       ],
       "usedBy": []
     },
+    "th-comment": {
+      "introducedBy": "comments-say-why",
+      "revisitedBy": [
+        "good-code-check"
+      ],
+      "usedBy": []
+    },
     "th-commit": {
       "introducedBy": "theory-20",
       "revisitedBy": [
@@ -1049,6 +1056,13 @@
         "theory-19"
       ]
     },
+    "th-database": {
+      "introducedBy": "theory-18",
+      "revisitedBy": [
+        "theory-check-3"
+      ],
+      "usedBy": []
+    },
     "th-debugging": {
       "introducedBy": "theory-14",
       "revisitedBy": [],
@@ -1064,6 +1078,20 @@
     "th-device": {
       "introducedBy": "theory-7",
       "revisitedBy": [],
+      "usedBy": []
+    },
+    "th-dns": {
+      "introducedBy": "theory-19",
+      "revisitedBy": [
+        "theory-check-3"
+      ],
+      "usedBy": []
+    },
+    "th-duplication": {
+      "introducedBy": "no-repeats",
+      "revisitedBy": [
+        "good-code-check"
+      ],
       "usedBy": []
     },
     "th-encoding": {
@@ -1099,6 +1127,7 @@
         "theory-18"
       ],
       "usedBy": [
+        "keeping-data-safe",
         "theory-check-3",
         "theory-20"
       ]
@@ -1115,10 +1144,14 @@
     "th-function": {
       "introducedBy": "theory-13",
       "revisitedBy": [
-        "theory-check-2"
+        "theory-check-2",
+        "good-names",
+        "no-repeats",
+        "one-job"
       ],
       "usedBy": [
-        "theory-15"
+        "theory-15",
+        "good-code-check"
       ]
     },
     "th-garbage-collector": {
@@ -1127,6 +1160,17 @@
       "usedBy": [
         "theory-check-3"
       ]
+    },
+    "th-good-name": {
+      "introducedBy": "good-names",
+      "revisitedBy": [
+        "no-repeats",
+        "one-job",
+        "write-for-readers",
+        "comments-say-why",
+        "good-code-check"
+      ],
+      "usedBy": []
     },
     "th-heap": {
       "introducedBy": "theory-15",
@@ -1150,6 +1194,13 @@
       ],
       "usedBy": []
     },
+    "th-http": {
+      "introducedBy": "theory-19",
+      "revisitedBy": [
+        "theory-check-3"
+      ],
+      "usedBy": []
+    },
     "th-inode": {
       "introducedBy": "theory-18",
       "revisitedBy": [
@@ -1165,6 +1216,20 @@
         "theory-check-1",
         "theory-11"
       ]
+    },
+    "th-internet": {
+      "introducedBy": "theory-19",
+      "revisitedBy": [
+        "theory-check-3"
+      ],
+      "usedBy": []
+    },
+    "th-ip-address": {
+      "introducedBy": "theory-19",
+      "revisitedBy": [
+        "theory-check-3"
+      ],
+      "usedBy": []
     },
     "th-isolation": {
       "introducedBy": "theory-4",
@@ -1224,6 +1289,13 @@
       "revisitedBy": [],
       "usedBy": []
     },
+    "th-merge": {
+      "introducedBy": "theory-20",
+      "revisitedBy": [
+        "theory-check-4"
+      ],
+      "usedBy": []
+    },
     "th-network": {
       "introducedBy": "theory-19",
       "revisitedBy": [],
@@ -1271,7 +1343,9 @@
     },
     "th-permissions": {
       "introducedBy": "theory-7",
-      "revisitedBy": [],
+      "revisitedBy": [
+        "keeping-data-safe"
+      ],
       "usedBy": []
     },
     "th-persistence": {
@@ -1335,6 +1409,14 @@
         "theory-17"
       ]
     },
+    "th-readability": {
+      "introducedBy": "write-for-readers",
+      "revisitedBy": [
+        "comments-say-why",
+        "good-code-check"
+      ],
+      "usedBy": []
+    },
     "th-reference": {
       "introducedBy": "theory-16",
       "revisitedBy": [
@@ -1346,6 +1428,13 @@
       "introducedBy": "theory-16",
       "revisitedBy": [
         "theory-check-3"
+      ],
+      "usedBy": []
+    },
+    "th-remote": {
+      "introducedBy": "theory-20",
+      "revisitedBy": [
+        "theory-check-4"
       ],
       "usedBy": []
     },
@@ -1388,12 +1477,28 @@
       "revisitedBy": [],
       "usedBy": []
     },
+    "th-secret": {
+      "introducedBy": "keeping-data-safe",
+      "revisitedBy": [
+        "theory-check-3"
+      ],
+      "usedBy": []
+    },
     "th-server": {
       "introducedBy": "theory-19",
       "revisitedBy": [],
       "usedBy": [
+        "keeping-data-safe",
         "theory-check-3"
       ]
+    },
+    "th-single-purpose": {
+      "introducedBy": "one-job",
+      "revisitedBy": [
+        "write-for-readers",
+        "good-code-check"
+      ],
+      "usedBy": []
     },
     "th-stack": {
       "introducedBy": "theory-15",
@@ -1456,6 +1561,13 @@
       ],
       "usedBy": []
     },
+    "th-validation": {
+      "introducedBy": "keeping-data-safe",
+      "revisitedBy": [
+        "theory-check-3"
+      ],
+      "usedBy": []
+    },
     "th-value-type": {
       "introducedBy": "theory-16",
       "revisitedBy": [
@@ -1469,13 +1581,21 @@
         "theory-10",
         "theory-11",
         "theory-13",
-        "theory-check-2"
+        "theory-check-2",
+        "good-names"
       ],
       "usedBy": [
         "theory-12",
         "theory-15",
         "theory-16"
       ]
+    },
+    "th-vcs-branch": {
+      "introducedBy": "theory-20",
+      "revisitedBy": [
+        "theory-check-4"
+      ],
+      "usedBy": []
     },
     "th-version-control": {
       "introducedBy": "theory-20",
@@ -1820,6 +1940,16 @@
         "pr-conditional"
       ]
     },
+    "comments-say-why": {
+      "introduces": [
+        "th-comment"
+      ],
+      "revisits": [
+        "th-good-name",
+        "th-readability"
+      ],
+      "uses": []
+    },
     "composition": {
       "introduces": [
         "pr-single-inheritance"
@@ -1936,6 +2066,29 @@
         "pr-class"
       ]
     },
+    "good-code-check": {
+      "introduces": [],
+      "revisits": [
+        "th-good-name",
+        "th-duplication",
+        "th-single-purpose",
+        "th-readability",
+        "th-comment"
+      ],
+      "uses": [
+        "th-function"
+      ]
+    },
+    "good-names": {
+      "introduces": [
+        "th-good-name"
+      ],
+      "revisits": [
+        "th-variable",
+        "th-function"
+      ],
+      "uses": []
+    },
     "interfaces": {
       "introduces": [
         "pr-interface",
@@ -1949,6 +2102,19 @@
         "pr-object",
         "pr-polymorphism",
         "pr-class"
+      ]
+    },
+    "keeping-data-safe": {
+      "introduces": [
+        "th-secret",
+        "th-validation"
+      ],
+      "revisits": [
+        "th-permissions"
+      ],
+      "uses": [
+        "th-file",
+        "th-server"
       ]
     },
     "lambdas": {
@@ -1978,6 +2144,16 @@
         "pr-comparison"
       ]
     },
+    "no-repeats": {
+      "introduces": [
+        "th-duplication"
+      ],
+      "revisits": [
+        "th-function",
+        "th-good-name"
+      ],
+      "uses": []
+    },
     "null-safety": {
       "introduces": [
         "pr-null-coalescing",
@@ -1992,6 +2168,16 @@
         "pr-object",
         "pr-conditional"
       ]
+    },
+    "one-job": {
+      "introduces": [
+        "th-single-purpose"
+      ],
+      "revisits": [
+        "th-function",
+        "th-good-name"
+      ],
+      "uses": []
     },
     "polymorphism": {
       "introduces": [
@@ -2272,7 +2458,8 @@
       "introduces": [
         "th-storage",
         "th-persistence",
-        "th-inode"
+        "th-inode",
+        "th-database"
       ],
       "revisits": [
         "th-ram",
@@ -2287,10 +2474,14 @@
     "theory-19": {
       "introduces": [
         "th-network",
+        "th-internet",
         "th-client",
         "th-server",
         "th-request",
         "th-response",
+        "th-ip-address",
+        "th-dns",
+        "th-http",
         "th-api"
       ],
       "revisits": [],
@@ -2320,7 +2511,10 @@
         "th-version-control",
         "th-commit",
         "th-history",
-        "th-collaboration"
+        "th-collaboration",
+        "th-vcs-branch",
+        "th-merge",
+        "th-remote"
       ],
       "revisits": [],
       "uses": [
@@ -2495,7 +2689,14 @@
         "th-inode",
         "th-request",
         "th-response",
-        "th-api"
+        "th-api",
+        "th-internet",
+        "th-ip-address",
+        "th-dns",
+        "th-http",
+        "th-database",
+        "th-secret",
+        "th-validation"
       ],
       "uses": [
         "th-address",
@@ -2518,7 +2719,10 @@
         "th-version-control",
         "th-commit",
         "th-history",
-        "th-collaboration"
+        "th-collaboration",
+        "th-vcs-branch",
+        "th-merge",
+        "th-remote"
       ],
       "uses": [
         "th-program"
@@ -2557,6 +2761,16 @@
         "pr-method",
         "pr-class"
       ]
+    },
+    "write-for-readers": {
+      "introduces": [
+        "th-readability"
+      ],
+      "revisits": [
+        "th-good-name",
+        "th-single-purpose"
+      ],
+      "uses": []
     },
     "writing-methods": {
       "introduces": [
@@ -3133,6 +3347,10 @@
       "term": "Collaboration",
       "def": "Several people working on one project, each committing their own changes without overwriting each other."
     },
+    "th-comment": {
+      "term": "Comment",
+      "def": "A note for humans written in the code that the computer ignores. A good comment explains why something is done, not what the code already shows."
+    },
     "th-commit": {
       "term": "Commit",
       "def": "A saved snapshot of your code at a moment worth keeping, with a short message describing the change."
@@ -3165,6 +3383,10 @@
       "term": "Data",
       "def": "The values a program works on, held in memory."
     },
+    "th-database": {
+      "term": "Database",
+      "def": "Organized storage that many programs can share and change at the same time without clashing, and can query for exactly the data they need - the step up from a single file."
+    },
     "th-debugging": {
       "term": "Debugging",
       "def": "Stepping through code line by line, watching the values, to find where it goes wrong."
@@ -3176,6 +3398,14 @@
     "th-device": {
       "term": "Device",
       "def": "A piece of hardware - keyboard, screen, printer, network - that programs reach only by asking the operating system."
+    },
+    "th-dns": {
+      "term": "DNS",
+      "def": "The system that looks up the IP address behind a name like example.com, like a phone book turning a name into a number."
+    },
+    "th-duplication": {
+      "term": "Duplication",
+      "def": "The same piece of logic written in more than one place, so a change or a fix has to be repeated everywhere at once - and one copy is easy to miss."
     },
     "th-encoding": {
       "term": "Encoding",
@@ -3209,6 +3439,10 @@
       "term": "Garbage collector",
       "def": "The part that reclaims heap memory once nothing points to an object any more."
     },
+    "th-good-name": {
+      "term": "Good name",
+      "def": "A name that says what a value holds or what a function does, so code explains itself and needs fewer comments."
+    },
     "th-heap": {
       "term": "Heap",
       "def": "The memory region for objects that must outlive the call that made them, kept until nothing refers to them."
@@ -3221,6 +3455,10 @@
       "term": "History",
       "def": "The timeline of all commits - how the code grew, snapshot by snapshot."
     },
+    "th-http": {
+      "term": "HTTP",
+      "def": "The shared set of rules the web follows for writing a request and a response - for example a GET request and a 200 OK response."
+    },
     "th-inode": {
       "term": "Inode",
       "def": "A file on disk is an inode - its bytes plus facts about them like size, time, and who can read it - reached through a name in a folder."
@@ -3228,6 +3466,14 @@
     "th-instruction": {
       "term": "Instruction",
       "def": "A single, tiny, exact action for the computer to carry out - like setting a value or adding two numbers."
+    },
+    "th-internet": {
+      "term": "Internet",
+      "def": "The giant network of networks that joins millions of separate networks into one, so a program can reach another almost anywhere."
+    },
+    "th-ip-address": {
+      "term": "IP address",
+      "def": "The number that identifies a machine on the internet, so a request knows where to go - like 142.250.1.14."
     },
     "th-isolation": {
       "term": "Isolation",
@@ -3264,6 +3510,10 @@
     "th-main": {
       "term": "Main",
       "def": "The routine a program starts from, usually named Main."
+    },
+    "th-merge": {
+      "term": "Merge",
+      "def": "Bringing a branch's commits back into the main line, so two histories become one again."
     },
     "th-network": {
       "term": "Network",
@@ -3325,6 +3575,10 @@
       "term": "RAM",
       "def": "The computer's fast working memory, where a program and its data must be before the CPU can run them."
     },
+    "th-readability": {
+      "term": "Readability",
+      "def": "How quickly a reader can understand code. Since code is read far more than it is written, the clearer version usually wins over the cleverer one."
+    },
     "th-reference": {
       "term": "Reference",
       "def": "A value that is a memory address - follow it to reach the real object."
@@ -3332,6 +3586,10 @@
     "th-reference-type": {
       "term": "Reference type",
       "def": "A type whose variable holds the address of an object on the heap, so copying it duplicates only the address."
+    },
+    "th-remote": {
+      "term": "Remote",
+      "def": "A shared copy of the history that lives on a server, so a whole team pushes and pulls commits through one agreed place - often hosted on a platform like GitHub."
     },
     "th-request": {
       "term": "Request",
@@ -3361,9 +3619,17 @@
       "term": "Scheduler",
       "def": "The part of the operating system that decides which process gets the core next."
     },
+    "th-secret": {
+      "term": "Secret",
+      "def": "Data that must stay private - a password, an API key, personal information - kept out of code and logs and never shown back."
+    },
     "th-server": {
       "term": "Server",
       "def": "The program that answers requests over a network."
+    },
+    "th-single-purpose": {
+      "term": "Single purpose",
+      "def": "A function that does one job, so it earns a clear name, can be reused on its own, and can be checked in isolation - the everyday seed of the single-responsibility idea."
     },
     "th-stack": {
       "term": "Stack",
@@ -3397,6 +3663,10 @@
       "term": "Type",
       "def": "The kind of a value - number, text, true/false - which decides what you can do with it."
     },
+    "th-validation": {
+      "term": "Input validation",
+      "def": "Checking that data from outside is what you expect before you use it, because input from a user, another program, or the network can be wrong or hostile."
+    },
     "th-value-type": {
       "term": "Value type",
       "def": "A type whose variable holds the data itself, so copying it duplicates the value."
@@ -3404,6 +3674,10 @@
     "th-variable": {
       "term": "Variable",
       "def": "A named slot in memory that holds a value you can read and change."
+    },
+    "th-vcs-branch": {
+      "term": "Branch",
+      "def": "A separate line of commits that splits off from the main one, so you can try a change without touching the version that works."
     },
     "th-version-control": {
       "term": "Version control",

@@ -1,0 +1,13 @@
+{
+  "hero.eyebrow": "Teoría · Parte cinco · Fundamentos del buen código",
+  "hero.title": "Una función, un trabajo",
+  "intro.0": "Cuando una función intenta hacer tres cosas a la vez, su nombre tiene que volverse vago y nunca puedes reutilizar solo una parte. Recorre una función que carga, comprueba y guarda todo a la vez, y observa cómo se divide en tres piezas pequeñas que hacen cada una un trabajo claro.",
+  "step.0.narr": "Aquí hay una función, `handleUser()`, haciendo tres trabajos separados: carga un usuario, comprueba el login y luego guarda el resultado.\nFunciona bien - pero fíjate en todo lo que está sosteniendo.",
+  "step.1.narr": "El primer coste es el nombre. Como hace tres cosas, ningún nombre honesto le encaja - así que acaba siendo vago, como `handleUser`.\nUn nombre vago no le dice nada a quien lee; tiene que abrir la función para averiguar qué hace de verdad.",
+  "step.2.narr": "El segundo coste es la reutilización. Imagina que en otro sitio solo quieres comprobar un login.\nNo puedes - llamar a `handleUser()` también cargaría y guardaría, cosa que no pediste. La comprobación está enredada con lo demás.",
+  "step.3.narr": "Así que dale a cada trabajo su propia función: `loadUser()`, `checkLogin()`, `saveUser()`.\nCada una hace una sola cosa, así que cada una se gana un nombre claro y honesto.",
+  "step.4.narr": "Ahora quien llama coge exactamente la pieza que necesita - solo `checkLogin()`, sin que venga nada más.\nLas funciones pequeñas de un solo propósito encajan como piezas de construcción.",
+  "step.5.narr": "Así que busca **una función, un trabajo**. Es más fácil de nombrar, más fácil de reutilizar y más fácil de comprobar por sí sola.\nEste es el germen cotidiano de una idea de diseño que verás más adelante - dar a cada pieza una única responsabilidad.",
+  "concept.th-single-purpose.term": "Propósito único",
+  "concept.th-single-purpose.def": "Una función que hace un solo trabajo, de modo que se gana un nombre claro, se puede reutilizar por sí sola y se puede comprobar de forma aislada - el germen cotidiano de la idea de responsabilidad única."
+}

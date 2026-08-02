@@ -18,6 +18,14 @@
     ...(extra || {}),
   });
 
+  const database = (extra) => ({
+    id: "db1",
+    type: "a database \u00b7 users table",
+    at: "disk",
+    fields: [["row 1", "Ada"], ["row 2", "Bo"], ["row 3", "Cy"]],
+    ...(extra || {}),
+  });
+
   window.LESSON_VIZ = {
     scene: { board: true, regions: ["stack", "heap"], zoomTab: false },
     regionTags: {
@@ -62,6 +70,11 @@
         narr: "A **soft link** is a different thing - a shortcut. It is a tiny file that just holds a **path** to follow.\nMove or delete the target and the shortcut breaks.",
         instr: "soft link", highlight: "stack",
         stack: [dir([entry('"diary.txt"'), soft('"latest"', '"diary.txt"', { hot: true })])], heap: [inode(1)],
+      },
+      {
+        narr: "A single file is fine for a little data. But when many programs share lots of related data - and read and change it at the same time without clashing - you reach for a **database**.\nIt is organized storage that keeps the data consistent and lets a program ask for exactly the rows it needs, instead of reading a whole file by hand.",
+        instr: "database", highlight: "heap", glow: "db1",
+        stack: [dir([entry('"diary.txt"')])], heap: [inode(1), database({ hot: true })],
       },
     ],
   };

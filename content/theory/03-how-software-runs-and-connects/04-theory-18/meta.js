@@ -31,6 +31,9 @@ window.LESSON_META = {
       },
       {
         "id": "th-inode"
+      },
+      {
+        "id": "th-database"
       }
     ],
     "revisits": [

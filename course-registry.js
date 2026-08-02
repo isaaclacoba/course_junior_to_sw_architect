@@ -33,14 +33,15 @@
       { id: "what-a-computer-really-is", title: "What a computer really is" },
       { id: "from-idea-to-running-code", title: "From idea to running code" },
       { id: "how-software-runs-and-connects", title: "How software runs and connects" },
-      { id: "the-development-world", title: "The development world" }
+      { id: "the-development-world", title: "The development world" },
+      { id: "foundations-of-good-code", title: "Foundations of good code" }
     ] },
     { id: "ai", name: "AI", kicker: "Agents from scratch", partPrefix: "AI · Part ", blurb: "A first look at how large language models and AI agents really work - tokens, context, memory, tools, planning, and keeping an agent reliable.", parts: [
       { id: "the-building-blocks-of-ai", title: "The building blocks of AI" },
       { id: "from-model-to-agent", title: "From model to agent" },
       { id: "how-an-agent-thinks", title: "How an agent thinks" },
       { id: "making-agents-reliable", title: "Making agents reliable" }
-    ] }
+    ] },
   ];
 
   var lessons = [
@@ -111,12 +112,21 @@
     { track: "theory", part: "how-software-runs-and-connects", id: "theory-17", href: "content/theory/03-how-software-runs-and-connects/03-theory-17/", kind: "lesson", path: "content/theory/03-how-software-runs-and-connects/03-theory-17" },
     { track: "theory", part: "how-software-runs-and-connects", id: "theory-18", href: "content/theory/03-how-software-runs-and-connects/04-theory-18/", kind: "lesson", path: "content/theory/03-how-software-runs-and-connects/04-theory-18" },
     { track: "theory", part: "how-software-runs-and-connects", id: "theory-19", href: "content/theory/03-how-software-runs-and-connects/05-theory-19/", kind: "lesson", path: "content/theory/03-how-software-runs-and-connects/05-theory-19" },
-    { track: "theory", part: "how-software-runs-and-connects", id: "theory-check-3", href: "content/theory/03-how-software-runs-and-connects/06-theory-check-3/", kind: "lesson", path: "content/theory/03-how-software-runs-and-connects/06-theory-check-3" },
+    { track: "theory", part: "how-software-runs-and-connects", id: "keeping-data-safe", href: "content/theory/03-how-software-runs-and-connects/06-keeping-data-safe/", kind: "lesson", path: "content/theory/03-how-software-runs-and-connects/06-keeping-data-safe" },
+    { track: "theory", part: "how-software-runs-and-connects", id: "theory-check-3", href: "content/theory/03-how-software-runs-and-connects/07-theory-check-3/", kind: "lesson", path: "content/theory/03-how-software-runs-and-connects/07-theory-check-3" },
 
     // ---- theory / the-development-world ----
     { track: "theory", part: "the-development-world", id: "theory-21", href: "content/theory/04-the-development-world/01-theory-21/", kind: "lesson", path: "content/theory/04-the-development-world/01-theory-21" },
     { track: "theory", part: "the-development-world", id: "theory-20", href: "content/theory/04-the-development-world/02-theory-20/", kind: "lesson", path: "content/theory/04-the-development-world/02-theory-20" },
     { track: "theory", part: "the-development-world", id: "theory-check-4", href: "content/theory/04-the-development-world/03-theory-check-4/", kind: "lesson", path: "content/theory/04-the-development-world/03-theory-check-4" },
+
+    // ---- theory / foundations-of-good-code ----
+    { track: "theory", part: "foundations-of-good-code", id: "good-names", href: "content/theory/05-foundations-of-good-code/01-good-names/", kind: "lesson", path: "content/theory/05-foundations-of-good-code/01-good-names" },
+    { track: "theory", part: "foundations-of-good-code", id: "no-repeats", href: "content/theory/05-foundations-of-good-code/02-no-repeats/", kind: "lesson", path: "content/theory/05-foundations-of-good-code/02-no-repeats" },
+    { track: "theory", part: "foundations-of-good-code", id: "one-job", href: "content/theory/05-foundations-of-good-code/03-one-job/", kind: "lesson", path: "content/theory/05-foundations-of-good-code/03-one-job" },
+    { track: "theory", part: "foundations-of-good-code", id: "write-for-readers", href: "content/theory/05-foundations-of-good-code/04-write-for-readers/", kind: "lesson", path: "content/theory/05-foundations-of-good-code/04-write-for-readers" },
+    { track: "theory", part: "foundations-of-good-code", id: "comments-say-why", href: "content/theory/05-foundations-of-good-code/05-comments-say-why/", kind: "lesson", path: "content/theory/05-foundations-of-good-code/05-comments-say-why" },
+    { track: "theory", part: "foundations-of-good-code", id: "good-code-check", href: "content/theory/05-foundations-of-good-code/06-good-code-check/", kind: "lesson", path: "content/theory/05-foundations-of-good-code/06-good-code-check" },
 
     // ---- ai / the-building-blocks-of-ai ----
     { track: "ai", part: "the-building-blocks-of-ai", id: "ai-1", href: "content/ai/01-the-building-blocks-of-ai/01-ai-1/", kind: "lesson", path: "content/ai/01-the-building-blocks-of-ai/01-ai-1" },

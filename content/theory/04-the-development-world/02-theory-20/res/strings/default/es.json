@@ -1,7 +1,7 @@
 {
   "hero.eyebrow": "Teoría · Parte cuatro · El mundo del desarrollo",
   "hero.title": "Cómo se comparte el código",
-  "intro.0": "Cómo se rastrea y se comparte el propio código: control de versiones, commits, historial, y cómo un equipo trabaja junto en un mismo proyecto. Recorre la imagen para ver cómo se va construyendo un historial de commits. La última lección de teoría.",
+  "intro.0": "Cómo se rastrea y se comparte el propio código: control de versiones, commits, historial, y cómo un equipo trabaja junto en un mismo proyecto - abriendo ramas para probar cambios sin riesgo, fusionándolas de vuelta, y compartiendo un único historial a través de un remoto. Recorre la imagen para ver cómo se va construyendo un historial de commits.",
   "step.0.narr": "El código nunca está del todo terminado; lo cambias constantemente.\nUna herramienta de **control de versiones** rastrea cada cambio que haces, así que nunca pierdes trabajo y siempre puedes ver qué cambió, y cuándo.",
   "step.1.narr": "Cuando llegas a un punto que vale la pena conservar, haces un **commit**.\nEs una instantánea guardada de tu código en ese momento, con un mensaje corto que dice qué cambió.",
   "step.2.narr": "Todos tus commits juntos forman un **historial** - una línea de tiempo de cómo creció el código, instantánea a instantánea.\nPuedes mirar hacia atrás a cualquier punto e incluso deshacer un cambio que resultó estar mal.",
@@ -13,5 +13,15 @@
   "concept.th-history.def": "La línea temporal de todos los commits - cómo creció el código, instantánea a instantánea.",
   "concept.th-history.term": "Historial",
   "concept.th-collaboration.def": "Varias personas trabajando en un mismo proyecto, cada una haciendo commit de sus cambios sin pisar los de los demás.",
-  "concept.th-collaboration.term": "Colaboración"
+  "concept.th-collaboration.term": "Colaboración",
+  "step.4.narr": "A veces quieres probar un cambio sin arriesgar la versión que funciona.\nAsí que abres una **rama** - tu propia línea de commits que se separa de la principal. Experimentas ahí con libertad, y la línea principal queda intacta.",
+  "step.5.narr": "Cuando el cambio está listo y funciona, **fusionas** la rama de vuelta.\nSus commits se unen a la línea principal, y las dos historias vuelven a ser una - ahora la copia de todos tiene el trabajo terminado.",
+  "step.6.narr": "Hasta ahora todo el historial vive en tu propia máquina. Un **remoto** es una copia compartida de él en un servidor, así que tú y tus compañeros empujáis (`push`) vuestros commits a un sitio acordado y os traéis (`pull`) los de los demás.\nUna plataforma como GitHub aloja ese remoto y añade un hogar para el proyecto - un lugar para incidencias, revisiones y navegar por el historial.",
+  "step.7.narr": "Así que el control de versiones hace mucho más que guardar instantáneas.\nAbres una **rama** para probar cosas sin riesgo, **fusionas** para traerlas de vuelta, y compartes un único historial mediante un **remoto** - que es como se construyen los proyectos reales entre todo un equipo, commit a commit.",
+  "concept.th-vcs-branch.term": "Rama",
+  "concept.th-vcs-branch.def": "Una línea de commits separada que se desvía de la principal, para que puedas probar un cambio sin tocar la versión que funciona.",
+  "concept.th-merge.term": "Fusión",
+  "concept.th-merge.def": "Traer los commits de una rama de vuelta a la línea principal, para que dos historias vuelvan a ser una.",
+  "concept.th-remote.term": "Remoto",
+  "concept.th-remote.def": "Una copia compartida del historial que vive en un servidor, para que todo un equipo empuje y traiga commits por un único sitio acordado - a menudo alojado en una plataforma como GitHub."
 }

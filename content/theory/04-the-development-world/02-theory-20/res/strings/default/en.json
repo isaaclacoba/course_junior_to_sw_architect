@@ -6,5 +6,11 @@
   "concept.th-history.term": "History",
   "concept.th-history.def": "The timeline of all commits - how the code grew, snapshot by snapshot.",
   "concept.th-collaboration.term": "Collaboration",
-  "concept.th-collaboration.def": "Several people working on one project, each committing their own changes without overwriting each other."
+  "concept.th-collaboration.def": "Several people working on one project, each committing their own changes without overwriting each other.",
+  "concept.th-vcs-branch.term": "Branch",
+  "concept.th-vcs-branch.def": "A separate line of commits that splits off from the main one, so you can try a change without touching the version that works.",
+  "concept.th-merge.term": "Merge",
+  "concept.th-merge.def": "Bringing a branch's commits back into the main line, so two histories become one again.",
+  "concept.th-remote.term": "Remote",
+  "concept.th-remote.def": "A shared copy of the history that lives on a server, so a whole team pushes and pulls commits through one agreed place - often hosted on a platform like GitHub."
 }

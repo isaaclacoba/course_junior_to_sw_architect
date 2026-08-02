@@ -563,6 +563,10 @@
       "def": "Varias personas trabajando en un mismo proyecto, cada una haciendo commit de sus cambios sin pisar los de los demás.",
       "term": "Colaboración"
     },
+    "th-comment": {
+      "def": "Una nota para personas escrita en el código que la computadora ignora. Un buen comentario explica por qué se hace algo, no el qué que el código ya muestra.",
+      "term": "Comentario"
+    },
     "th-commit": {
       "def": "Una instantánea guardada de tu código en un momento que merece la pena conservar, con un mensaje corto que describe el cambio.",
       "term": "Commit"
@@ -595,6 +599,10 @@
       "def": "Los valores con los que trabaja un programa, guardados en memoria.",
       "term": "Datos"
     },
+    "th-database": {
+      "def": "Almacenamiento organizado que muchos programas pueden compartir y cambiar a la vez sin pisarse, y al que se le puede pedir justo los datos que necesitan - el paso siguiente a un solo fichero.",
+      "term": "Base de datos"
+    },
     "th-debugging": {
       "def": "Recorrer el código línea a línea, mirando los valores, para encontrar dónde se tuerce.",
       "term": "Depuración"
@@ -606,6 +614,14 @@
     "th-device": {
       "def": "Una pieza de hardware - teclado, pantalla, impresora, red - a la que los programas solo llegan pidiéndoselo al sistema operativo.",
       "term": "Dispositivo"
+    },
+    "th-dns": {
+      "def": "El sistema que busca la dirección IP que hay detrás de un nombre como example.com, como una guía telefónica que convierte un nombre en un número.",
+      "term": "DNS"
+    },
+    "th-duplication": {
+      "def": "La misma pieza de lógica escrita en más de un sitio, de modo que un cambio o un arreglo hay que repetirlo en todas partes a la vez - y es fácil olvidar una copia.",
+      "term": "Duplicación"
     },
     "th-encoding": {
       "def": "Un código acordado que asigna a cada cosa un número y al revés - decide si un número significa una letra, un color o un sonido.",
@@ -639,6 +655,10 @@
       "def": "La parte que recupera la memoria del heap cuando ya nada apunta a un objeto.",
       "term": "Recolector de basura"
     },
+    "th-good-name": {
+      "def": "Un nombre que dice qué guarda un valor o qué hace una función, para que el código se explique solo y necesite menos comentarios.",
+      "term": "Buen nombre"
+    },
     "th-heap": {
       "def": "La región de memoria para los objetos que tienen que sobrevivir a la llamada que los creó, que se conservan hasta que nada los referencia.",
       "term": "Heap"
@@ -651,6 +671,10 @@
       "def": "La línea temporal de todos los commits - cómo creció el código, instantánea a instantánea.",
       "term": "Historial"
     },
+    "th-http": {
+      "def": "El conjunto de reglas compartidas que sigue la web para escribir una petición y una respuesta - por ejemplo una petición GET y una respuesta 200 OK.",
+      "term": "HTTP"
+    },
     "th-inode": {
       "def": "Un fichero en disco es un inode - sus bytes más datos sobre ellos como el tamaño, la hora y quién puede leerlo - al que se llega a través de un nombre en una carpeta.",
       "term": "Inode"
@@ -658,6 +682,14 @@
     "th-instruction": {
       "def": "Una acción mínima, exacta y única que el ordenador ejecuta - como fijar un valor o sumar dos números.",
       "term": "Instrucción"
+    },
+    "th-internet": {
+      "def": "La red de redes gigante que une millones de redes separadas en una sola, para que un programa pueda alcanzar a otro casi en cualquier parte.",
+      "term": "Internet"
+    },
+    "th-ip-address": {
+      "def": "El número que identifica a una máquina en internet, para que una petición sepa a dónde ir - como 142.250.1.14.",
+      "term": "Dirección IP"
     },
     "th-isolation": {
       "def": "Encerrar cada proceso en su propia memoria para que uno no pueda leer ni destrozar la de otro, y así un fallo queda contenido.",
@@ -694,6 +726,10 @@
     "th-main": {
       "def": "La rutina por la que arranca un programa, normalmente llamada Main.",
       "term": "Main"
+    },
+    "th-merge": {
+      "def": "Traer los commits de una rama de vuelta a la línea principal, para que dos historias vuelvan a ser una.",
+      "term": "Fusión"
     },
     "th-network": {
       "def": "Los cables y enlaces inalámbricos que permiten a un programa hablar con otro, aunque estén en la otra punta del mundo.",
@@ -755,6 +791,10 @@
       "def": "La memoria de trabajo rápida del ordenador, donde un programa y sus datos tienen que estar antes de que la CPU pueda ejecutarlos.",
       "term": "RAM"
     },
+    "th-readability": {
+      "def": "Lo rápido que quien lee puede entender el código. Como el código se lee mucho más de lo que se escribe, la versión más clara suele ganar a la más ingeniosa.",
+      "term": "Legibilidad"
+    },
     "th-reference": {
       "def": "Un valor que es una dirección de memoria - síguela para llegar al objeto real.",
       "term": "Referencia"
@@ -762,6 +802,10 @@
     "th-reference-type": {
       "def": "Un tipo cuya variable guarda la dirección de un objeto en el heap, de modo que copiarla duplica solo la dirección.",
       "term": "Tipo por referencia"
+    },
+    "th-remote": {
+      "def": "Una copia compartida del historial que vive en un servidor, para que todo un equipo empuje y traiga commits por un único sitio acordado - a menudo alojado en una plataforma como GitHub.",
+      "term": "Remoto"
     },
     "th-request": {
       "def": "Un mensaje que un cliente envía pidiendo algo.",
@@ -791,9 +835,17 @@
       "def": "La parte del sistema operativo que decide qué proceso se lleva el núcleo a continuación.",
       "term": "Planificador"
     },
+    "th-secret": {
+      "def": "Datos que tienen que mantenerse en privado - una contraseña, una clave de API, información personal - mantenidos fuera del código y los logs, y que nunca se muestran de vuelta.",
+      "term": "Secreto"
+    },
     "th-server": {
       "def": "El programa que responde a las peticiones por una red.",
       "term": "Servidor"
+    },
+    "th-single-purpose": {
+      "def": "Una función que hace un solo trabajo, de modo que se gana un nombre claro, se puede reutilizar por sí sola y se puede comprobar de forma aislada - el germen cotidiano de la idea de responsabilidad única.",
+      "term": "Propósito único"
     },
     "th-stack": {
       "def": "La región de memoria para los valores que una función está usando ahora mismo, donde cada llamada añade un frame encima que se quita solo cuando la llamada termina.",
@@ -827,6 +879,10 @@
       "def": "La clase de un valor - número, texto, verdadero/falso - que decide qué puedes hacer con él.",
       "term": "Tipo"
     },
+    "th-validation": {
+      "def": "Comprobar que los datos que llegan de fuera son lo que esperas antes de usarlos, porque la entrada de un usuario, otro programa o la red puede estar mal o ser hostil.",
+      "term": "Validación de entrada"
+    },
     "th-value-type": {
       "def": "Un tipo cuya variable guarda los datos en sí, de modo que copiarla duplica el valor.",
       "term": "Tipo por valor"
@@ -834,6 +890,10 @@
     "th-variable": {
       "def": "Un hueco con nombre en memoria que guarda un valor que puedes leer y cambiar.",
       "term": "Variable"
+    },
+    "th-vcs-branch": {
+      "def": "Una línea de commits separada que se desvía de la principal, para que puedas probar un cambio sin tocar la versión que funciona.",
+      "term": "Rama"
     },
     "th-version-control": {
       "def": "Una herramienta que registra cada cambio de tu código, para que nunca pierdas trabajo y puedas ver qué cambió y cuándo.",

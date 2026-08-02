@@ -4,5 +4,7 @@
   "concept.th-persistence.term": "Persistence",
   "concept.th-persistence.def": "Keeping data past the end of a program by saving it to storage, and loading it back later.",
   "concept.th-inode.term": "Inode",
-  "concept.th-inode.def": "A file on disk is an inode - its bytes plus facts about them like size, time, and who can read it - reached through a name in a folder."
+  "concept.th-inode.def": "A file on disk is an inode - its bytes plus facts about them like size, time, and who can read it - reached through a name in a folder.",
+  "concept.th-database.term": "Database",
+  "concept.th-database.def": "Organized storage that many programs can share and change at the same time without clashing, and can query for exactly the data they need - the step up from a single file."
 }

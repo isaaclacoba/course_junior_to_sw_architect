@@ -1,0 +1,4 @@
+{
+  "concept.th-duplication.term": "Duplication",
+  "concept.th-duplication.def": "The same piece of logic written in more than one place, so a change or a fix has to be repeated everywhere at once - and one copy is easy to miss."
+}

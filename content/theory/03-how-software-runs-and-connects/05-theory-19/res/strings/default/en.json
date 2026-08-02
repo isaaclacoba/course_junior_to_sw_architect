@@ -10,5 +10,13 @@
   "concept.th-response.term": "Response",
   "concept.th-response.def": "The answer a server sends back.",
   "concept.th-api.term": "API",
-  "concept.th-api.def": "The set list of things a server offers and how to ask for them - like a menu."
+  "concept.th-api.def": "The set list of things a server offers and how to ask for them - like a menu.",
+  "concept.th-internet.term": "Internet",
+  "concept.th-internet.def": "The giant network of networks that joins millions of separate networks into one, so a program can reach another almost anywhere.",
+  "concept.th-ip-address.term": "IP address",
+  "concept.th-ip-address.def": "The number that identifies a machine on the internet, so a request knows where to go - like 142.250.1.14.",
+  "concept.th-dns.term": "DNS",
+  "concept.th-dns.def": "The system that looks up the IP address behind a name like example.com, like a phone book turning a name into a number.",
+  "concept.th-http.term": "HTTP",
+  "concept.th-http.def": "The shared set of rules the web follows for writing a request and a response - for example a GET request and a 200 OK response."
 }

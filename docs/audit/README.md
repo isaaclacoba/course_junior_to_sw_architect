@@ -101,20 +101,30 @@ A from-zero mental model in four Parts, taught with the `MemoryViz` visual widge
 2. **How code works** - languages, variables, types, statements/expressions,
    decisions/loops, functions, bugs.
 3. **How software runs and connects** - where data lives (stack/heap),
-   references vs values, compile vs run time, saving to files, networking.
+   references vs values, compile vs run time, saving to files and databases,
+   networking (the internet, IP/DNS, HTTP), and keeping data safe.
 4. **The development world** - standing on other code (libraries/dependencies)
-   and how code is shared (version control).
+   and how code is shared (version control: branch, merge, remote).
+5. **Foundations of good code** - good names, no repeats (DRY), one job, write
+   for readers, comments say why - the bridge from "how code works" to design.
 
 This is a genuinely gentle, well-sequenced foundation for an absolute beginner.
 
 ### What is not covered (cycle 2 candidates)
 
-- **Foundations of good code** - naming, duplication, abstraction, readability -
-  the planned theory bridge from "how code works" to "how to design" is missing;
-  Part 4 jumps to tooling instead.
-- Databases and persistence beyond a single file.
-- Security basics (permissions are touched; auth, secrets, injection are not).
-- Deeper networking (the internet, addresses, protocols) past client/server.
+Several gaps the first audit raised are now **closed** for the elementary
+foundation:
+
+- **Foundations of good code** - DONE - a new Part 5 (good names, DRY, one job,
+  write for readers, comments say why) bridges "how code works" to design.
+- **Databases beyond a single file** - DONE - a databases beat closes `theory-18`.
+- **Security basics** - DONE - `keeping-data-safe` (secrets, permissions,
+  don't-trust-input) ends Part 3; auth and injection depth stay cycle 2.
+- **Deeper networking** - DONE - `theory-19` now names the internet, IP/DNS, HTTP.
+- **Version control depth** - DONE - `theory-20` now covers branch, merge, remote.
+
+Still open for cycle 2:
+
 - Concurrency concepts to partner the practical `async` gap.
 - How a compiler/interpreter works, past the one build-and-run lesson.
 
@@ -133,8 +143,9 @@ This is a genuinely gentle, well-sequenced foundation for an absolute beginner.
 4. **Checkpoints under-sample.** Partly addressed - `askCount` raised from 5 to
    7/7/10/7 (Parts 1-4) so each pass covers most of the Part. Distractor quality
    (some options too easy) is still open.
-5. **`theory-18` intro overpromises.** DONE - the intro no longer promises
-   databases; it matches the file-focused lesson.
+5. **`theory-18` intro overpromises.** DONE - the intro was matched to the
+   file-focused lesson; a databases beat was later added, so the lesson now
+   earns the databases mention it once overpromised.
 
 ---
 
@@ -169,9 +180,9 @@ lesson resting on a cycle-1 rung already taught:
 - **Practical Part 7+** - `async`/`await`; focused `abstract`/`virtual`; pattern
   matching; strings and parsing; file I/O and HTTP; LINQ aggregation and
   grouping; more collections; then an architecture/layering bridge above SOLID.
-- **Theory Part 5+** - foundations of good code (naming, duplication,
-  abstraction) as the missing bridge; databases; security basics; deeper
-  networking and the internet; concurrency concepts.
+- **Theory Part 5+** - foundations of good code, databases, security basics and
+  deeper networking/internet are now built (see "What is not covered"); what
+  remains for later tiers is concurrency concepts and compiler/interpreter internals.
 
 Sequence each new Part the same way this audit reads the current one: one idea
 per card, a recap to close, a checkpoint to seal, nothing used before it is
