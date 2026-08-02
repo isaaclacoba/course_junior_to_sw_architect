@@ -72,6 +72,7 @@ function projectTracks(registry, migrated) {
     return registry.lessons.filter(function (l) { return l.track === trackId && l.part === partId; });
   };
   return registry.tracks.map(function (t) {
+    if (!Array.isArray(t.parts)) throw new Error("track \"" + t.id + "\" has no parts[] (registry mid-edit?)");
     return {
       id: t.id,
       name: t.name,
