@@ -32,6 +32,12 @@
  * FLAGS
  *   --staged   (default) diff-aware: only the checks the staged paths trigger.
  *   --all      run every check across the whole repo (manual / CI use).
+ *   --push     pre-push mode: read the pushed ranges on stdin and run the BROWSER
+ *              i18n round-trip on the voiced lessons the push changes (a binder /
+ *              page-shell change fans out to every voiced lesson). This is the
+ *              slow, full-fidelity check only a real DOM can do - kept off
+ *              pre-commit, run once per push. Skips instantly when a push changes
+ *              no i18n-relevant files.
  *
  * OUTPUT / EXIT CONTRACT
  *   Prints a concise per-check PASS/FAIL summary; on any FAIL it also prints the
@@ -39,9 +45,9 @@
  *   check passes, 1 when any check fails, 2 on a usage error. Non-zero blocks the
  *   commit through the hook.
  *
- * ENABLE THE HOOK IN A FRESH CLONE (one-liner):
+ * ENABLE THE HOOKS IN A FRESH CLONE (one-liner):
  *   git config core.hooksPath .githooks
- *   (the tracked .githooks/pre-commit runs `node tools/audit-gate.mjs --staged`.)
+ *   (.githooks/pre-commit runs `--staged`; .githooks/pre-push runs `--push`.)
  */
 import fs from "node:fs";
 import os from "node:os";
@@ -188,6 +194,19 @@ function checkI18n(fanOutAll, voicedDirs) {
     `node tools/i18n-roundtrip.mjs --static ${rels.join(" ")}`, NODE, [tool, "--static", ...voicedDirs]);
 }
 
+// The BROWSER round-trip (pre-push): full-fidelity, drives real Chrome. Catches
+// the live-swap chrome leaks (breadcrumb, document.title) that --static cannot.
+function checkI18nBrowser(fanOutAll, voicedDirs) {
+  const tool = path.join(root, "tools", "i18n-roundtrip.mjs");
+  if (fanOutAll) {
+    run("i18n round-trip (browser, --all)", "node tools/i18n-roundtrip.mjs --all", NODE, [tool, "--all"]);
+    return;
+  }
+  const rels = voicedDirs.map((d) => path.relative(root, d));
+  run(`i18n round-trip (browser, ${rels.length} lesson${rels.length === 1 ? "" : "s"})`,
+    `node tools/i18n-roundtrip.mjs ${rels.join(" ")}`, NODE, [tool, ...voicedDirs]);
+}
+
 // ---------------------------------------------------------------------------
 // orchestration
 // ---------------------------------------------------------------------------
@@ -225,17 +244,65 @@ function planAll() {
   checkI18n(true, []);
 }
 
+// Pre-push: the changed files across every pushed range. git feeds the hook
+// "<localref> <localsha> <remoteref> <remotesha>" lines on stdin. A zero remote
+// sha (new ref) or a missing origin/master leaves the base unknown -> fan out to
+// every voiced lesson.
+const ZERO = /^0+$/;
+function originMaster() {
+  const r = git(["rev-parse", "--verify", "--quiet", "origin/master"]);
+  return r.status === 0 && r.stdout.trim() ? r.stdout.trim() : null;
+}
+function pushChangedFiles() {
+  let input = "";
+  if (!process.stdin.isTTY) { try { input = fs.readFileSync(0, "utf8"); } catch { input = ""; } }
+  const lines = input.split("\n").map((l) => l.trim()).filter(Boolean);
+  const ranges = [];
+  if (lines.length) {
+    for (const line of lines) {
+      const parts = line.split(/\s+/);
+      const localSha = parts[1], remoteSha = parts[3];
+      if (!localSha || ZERO.test(localSha)) continue; // branch deletion
+      ranges.push([(remoteSha && !ZERO.test(remoteSha)) ? remoteSha : originMaster(), localSha]);
+    }
+  } else {
+    ranges.push([originMaster(), "HEAD"]); // manual run: compare against origin/master
+  }
+  const files = new Set();
+  let unknownBase = false;
+  for (const [base, tip] of ranges) {
+    if (!base) { unknownBase = true; continue; }
+    const r = git(["diff", "--name-only", base, tip]);
+    if (r.status === 0) r.stdout.split("\n").map((s) => s.trim()).filter(Boolean).forEach((f) => files.add(f));
+    else unknownBase = true;
+  }
+  return { files: [...files], unknownBase };
+}
+
+function planPush({ files, unknownBase }) {
+  const fanOutAll = unknownBase || files.some((p) => isBinder(p) || p === "page-shell.js");
+  const triggers = files.filter((p) => isBinder(p) || p === "page-shell.js" || isVoicedFile(p));
+  if (!fanOutAll && !triggers.length) return; // nothing i18n-relevant in this push
+  if (fanOutAll) { checkI18nBrowser(true, []); return; }
+  const dirs = [...new Set(files.map(lessonDirOf).filter(Boolean))];
+  if (dirs.length) checkI18nBrowser(false, dirs);
+}
+
 function main() {
   const argv = process.argv.slice(2);
   const all = argv.includes("--all");
   const staged = argv.includes("--staged");
-  const unknown = argv.filter((a) => a !== "--all" && a !== "--staged");
+  const push = argv.includes("--push");
+  const unknown = argv.filter((a) => a !== "--all" && a !== "--staged" && a !== "--push");
   if (unknown.length) { say(`unknown flag(s): ${unknown.join(" ")}`); process.exit(2); }
-  if (all && staged) { say("choose one of --all or --staged"); process.exit(2); }
+  if ([all, staged, push].filter(Boolean).length > 1) { say("choose one of --all, --staged or --push"); process.exit(2); }
 
-  say(`${C.dim}audit-gate ${all ? "--all" : "--staged"}${C.reset}`);
+  const mode = all ? "--all" : push ? "--push" : "--staged";
+  say(`${C.dim}audit-gate ${mode}${C.reset}`);
   if (all) {
     planAll();
+  } else if (push) {
+    planPush(pushChangedFiles());
   } else {
     const files = stagedFiles();
     if (!files.length) { say("no staged changes - nothing to check"); process.exit(0); }

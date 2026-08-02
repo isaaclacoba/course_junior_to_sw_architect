@@ -1,0 +1,6 @@
+#!/bin/sh
+# Tracked pre-push hook. Enable in a fresh clone with:
+#   git config core.hooksPath .githooks
+# Runs the full-fidelity BROWSER i18n round-trip on the voiced lessons this push
+# changes (git feeds the pushed ranges on stdin). A non-zero exit blocks the push.
+exec node tools/audit-gate.mjs --push
