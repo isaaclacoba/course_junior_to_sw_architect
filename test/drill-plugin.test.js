@@ -285,3 +285,38 @@ test("Reset clears a typed value", async () => {
     assert.equal(inputEl(dom, 0).value, "");
   });
 });
+
+// The drill's own chrome (blank label, input placeholder, hint prefix, quiz
+// verdict) must come from the catalog, not from English baked into the plugin.
+// Two of these - the placeholder pair - are invisible to tools/check-literals.mjs
+// because the literal reaches the sink through a local variable, so this test is
+// the only guard on them.
+test("drill chrome is localized from the catalog", async () => {
+  await withDom("dr", async (dom) => {
+    globalThis.window.ChromeText = {
+      "drill.blank": "Hueco",
+      "drill.inputCode": "Escribe c\u00f3digo C# corto",
+      "drill.hint": "Pista",
+      "drill.quizNotQuite": "No exactamente. ",
+    };
+
+    const controller = LessonEngine.create(quizDrillConfig());
+    await controller.boot();
+
+    assert.match(inputRow(dom, 0).children[0].textContent, /^Hueco 1: /, "blank label localized");
+    assert.equal(inputEl(dom, 0).placeholder, "Escribe c\u00f3digo C# corto", "placeholder localized");
+
+    dom.getElementById("drHint").click();
+    assert.match(hintEl(dom, 0).textContent, /^Pista: /, "hint prefix localized");
+
+    const wrongBtn = dom.getElementById("drOptions").children
+      .find((b) => b.innerHTML.includes("To slow the program down"));
+    assert.ok(wrongBtn, "the wrong option button is rendered");
+    wrongBtn.click();
+    assert.match(
+      dom.getElementById("drQuizFeedback").innerHTML,
+      /^No exactamente\. /,
+      "quiz verdict localized"
+    );
+  });
+});

@@ -1045,3 +1045,20 @@ mirrored into the session todo list.
   untracked file from the concurrent session. Left for that session to fix - the
   linter catching hardcoded English in a file written the same hour is the
   clearest evidence it was needed.
+
+## 2026-08-03 20:11 - drill-plugin i18n: master was red, plus a linter blind spot
+- `kernel/engine/plugins/drill-plugin.js` landed with 6 hardcoded English strings,
+  turning `check-literals` (and so `npm run gate`) RED on master. All 6 keys already
+  existed in en.json AND es.json, so this was pure wiring: quiz verdict
+  (drill.quizCorrect / drill.quizNotQuite), the blank label (drill.blank), the hint
+  prefix (drill.hint), and the input placeholder pair (drill.inputText /
+  drill.inputCode).
+- The linter only reported 4 of the 6. The placeholder pair reaches `input.placeholder`
+  through a local `var placeholder`, and check-literals has no variable tracking - it
+  only sees literals assigned DIRECTLY to a sink. Known limitation, not worth a
+  dataflow engine; covered by a test instead.
+- NEW test "drill chrome is localized from the catalog" in test/drill-plugin.test.js
+  drives the plugin under a Spanish window.ChromeText. It is the only guard on the two
+  literals the linter cannot see. Mutation-checked: reverting each of the 4 call sites
+  to English fails the test (4/4 caught).
+- check-literals PASS (26 files), full suite 225/225, `npm run gate` PASS.

@@ -115,9 +115,12 @@
       return;
     }
     var correct = Boolean(opts[chosen] && opts[chosen].correct);
+    var verdict = correct
+      ? LC.t("drill.quizCorrect", "Correct. ")
+      : LC.t("drill.quizNotQuite", "Not quite. ");
     feedback.hidden = false;
     feedback.innerHTML = LC.renderInline(
-      ((correct ? "Correct. " : "Not quite. ") + (task.quiz.answerWhy || "")).trim()
+      (verdict + (task.quiz.answerWhy || "")).trim()
     );
     feedback.classList.toggle("is-good", correct);
     feedback.classList.toggle("is-bad", !correct);
@@ -196,7 +199,9 @@
     if (!host) return;
     var placeholder =
       (ctx.cfg && ctx.cfg.inputPlaceholder) ||
-      (mode === "theory" ? "Type your answer" : "Write short C# code");
+      (mode === "theory"
+        ? ctx.tr("drill.inputText", "Type your answer")
+        : ctx.tr("drill.inputCode", "Write short C# code"));
 
     host.innerHTML = "";
     state.inputs = {};
@@ -206,7 +211,7 @@
 
       var label = document.createElement("label");
       label.setAttribute("for", ctx.prefix + "-" + i);
-      label.textContent = "Blank " + b.id + ": " + b.label;
+      label.textContent = ctx.tr("drill.blank", "Blank") + " " + b.id + ": " + b.label;
 
       var input = document.createElement("input");
       input.id = ctx.prefix + "-" + i;
@@ -223,7 +228,7 @@
       if (h != null && h >= 0) {
         var hints = b.hints || [];
         var n = Math.min(h, hints.length - 1);
-        hint.textContent = "Hint: " + (hints[n] || "");
+        hint.textContent = ctx.tr("drill.hint", "Hint") + ": " + (hints[n] || "");
       }
 
       row.appendChild(label);
