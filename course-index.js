@@ -226,6 +226,16 @@
     setText("#cJbCta", "landing.jumpbarCta");
     var foot = document.querySelector(".c-foot");
     if (foot) foot.innerHTML = tr("landing.footerNote", "") + ' &middot; <a href="glossary.html">' + tr("landing.glossary", "Concept glossary") + "</a>";
+    // Icon-only controls carry their whole accessible name in aria-label, so a
+    // screen reader gets the page language only if these are translated too.
+    function setAria(sel, key) {
+      var el = document.querySelector(sel);
+      if (el) el.setAttribute("aria-label", tr(key, el.getAttribute("aria-label") || ""));
+    }
+    setAria("#cJbEdgeL", "landing.scrollLeft");
+    setAria("#cJbEdgeR", "landing.scrollRight");
+    setAria("#trackSwitch", "landing.chooseTrack");
+    setAria("#cTotop", "landing.backToTop");
     if (window.ChromeText["landing.title"]) document.title = window.ChromeText["landing.title"];
   }
 

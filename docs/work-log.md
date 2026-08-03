@@ -952,3 +952,7 @@ mirrored into the session todo list.
   (only the generated-file header differs). Drift gate extended to the root
   artefact; orphan-module guard added. 87/87 tests, audit-gate PASS, headless
   render OK for build/viz/checkpoint and the EN->ES switch.
+
+- 2026-08-03 13:25  a11y fix: the landing page four icon-only controls kept English
+  aria-labels under ES. The translations already existed in res/chrome/es.json
+  but nothing applied them. paintStaticChrome now sets them.
