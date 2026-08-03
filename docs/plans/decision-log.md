@@ -1,5 +1,5 @@
 # Decision log / activity archive
-Status: CLI built + tested + seeded - remaining: git-lfs, pre-push wiring  -  Design: [docs/architecture/decision-log.md](../architecture/decision-log.md)
+Status: CLI built + tested + seeded - remaining: git-lfs  -  Design: [docs/architecture/decision-log.md](../architecture/decision-log.md)
 
 ## Goal
 A searchable, in-repo archive of agent activity and design decisions - so any agent
@@ -21,7 +21,7 @@ supersession. Layer B committed plainly; the bulky parquet via git-lfs.
 5. [x] `record`: append one outputs row - verify: test - row lands with kind/feature/body.
 6. [x] `search` + `show` - verify: `show <feature>` prints decision chain; real search 0.30s.
 7. [x] Back-fill this session's decisions as the journal's first Layer B rows - verify: `show decision-log` / `show wow-enforcement`.
-8. [ ] Wire `etl` into pre-push - verify: hook runs it, archive not stale after a push.
+8. [x] Expose `etl` as `npm run journal:etl` (was briefly wired into pre-push; that hook was removed because it re-validated an already-checked tree on every push). Run it on demand - it only touches the local gitignored `activity/`.
 
 ## Progress
 - 2026-08-03 Design accepted after two ratification rounds + a grounding correction (tool outputs are ephemeral -> added the live `record` path).

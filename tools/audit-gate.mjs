@@ -32,12 +32,15 @@
  * FLAGS
  *   --staged   (default) diff-aware: only the checks the staged paths trigger.
  *   --all      run every check across the whole repo (manual / CI use).
- *   --push     pre-push mode: read the pushed ranges on stdin and run the BROWSER
- *              i18n round-trip on the voiced lessons the push changes (a binder /
- *              page-shell change fans out to every voiced lesson). This is the
- *              slow, full-fidelity check only a real DOM can do - kept off
- *              pre-commit, run once per push. Skips instantly when a push changes
- *              no i18n-relevant files.
+ *   --push     release mode (`npm run gate`): run the BROWSER i18n round-trip on
+ *              the voiced lessons this branch changes (a binder / page-shell
+ *              change fans out to every voiced lesson). This is the slow,
+ *              full-fidelity check only a real DOM can do - run it by hand before
+ *              you push. With no stdin it compares `origin/master..HEAD`; it also
+ *              still accepts git's pushed-range lines on stdin. Skips instantly
+ *              when nothing i18n-relevant changed - so after a push it is a
+ *              no-op, which is why it is not wired to a pre-push hook (that made
+ *              every push re-validate an already-validated tree).
  *
  * OUTPUT / EXIT CONTRACT
  *   Prints a concise per-check PASS/FAIL summary; on any FAIL it also prints the
@@ -47,7 +50,8 @@
  *
  * ENABLE THE HOOKS IN A FRESH CLONE (one-liner):
  *   git config core.hooksPath .githooks
- *   (.githooks/pre-commit runs `--staged`; .githooks/pre-push runs `--push`.)
+ *   (.githooks/pre-commit runs `--staged`. There is deliberately NO pre-push
+ *    hook - run `npm run gate` yourself before pushing.)
  */
 import fs from "node:fs";
 import os from "node:os";
@@ -338,7 +342,11 @@ function main() {
     planStaged(files);
   }
 
-  if (!results.length) { say(`${C.green}PASS${C.reset} no checks triggered by the staged paths`); process.exit(0); }
+  if (!results.length) {
+    const scope = all ? "the repo" : push ? "origin/master..HEAD" : "the staged paths";
+    say(`${C.green}PASS${C.reset} no checks triggered by ${scope}`);
+    process.exit(0);
+  }
 
   let failed = false;
   for (const r of results) {

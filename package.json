@@ -3,6 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "description": "Repo tooling deps (journal). Course itself is static, no build. No root type field: repo .js stays CommonJS; ESM tools use the .mjs extension.",
+  "scripts": {
+    "gate": "node tools/audit-gate.mjs --push",
+    "gate:all": "node tools/audit-gate.mjs --all",
+    "gate:staged": "node tools/audit-gate.mjs --staged",
+    "journal:etl": "node tools/journal.mjs etl"
+  },
   "dependencies": {
     "@duckdb/node-api": "1.5.5-r.3"
   }

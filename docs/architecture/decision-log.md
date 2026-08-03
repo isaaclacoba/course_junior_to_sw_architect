@@ -1,7 +1,7 @@
 # Decision log / activity archive - design of record
 
 Status: design ACCEPTED + CLI built, tested, and seeded with real data
-(2026-08-03). Remaining: git-lfs for `activity/`, pre-push ETL wiring.
+(2026-08-03). Remaining: git-lfs for `activity/`.
 Brief: [docs/plans/decision-log.md](../plans/decision-log.md)
 
 ## Context & trigger
@@ -53,7 +53,8 @@ while an agent still holds them in context.
 4. **Feature lifecycle** - `draft -> in-design -> building -> shipped` (+ `dropped`).
 5. **DoD** - key facets as typed columns + full DoD in the linked brief/design md.
 6. **CLI** - `tools/journal.mjs`: `etl`, `record`, `decision`, `feature`,
-   `search`, `show`. On demand + pre-push; live `record` on subagent-return.
+   `search`, `show`. On demand (`npm run journal:etl`); live `record` on
+   subagent-return.
 7. **Git storage** - `features/`, `decisions/`, `outputs/` committed plainly
    (small, non-regenerable); only the bulky, regenerable `activity/` firehose
    waits for git-lfs (not yet installed) and is gitignored meanwhile.

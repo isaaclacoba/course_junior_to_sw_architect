@@ -124,10 +124,23 @@ for the underlying manual steps (per-file `node --check`, temp `dotnet new
 console` compile, `google-chrome --headless --dump-dom`) to isolate one check.
 
 Git hooks (tracked) - enable once per clone: `git config core.hooksPath
-.githooks`. `pre-commit` runs `node tools/audit-gate.mjs --staged` (diff-aware
-mechanical gate); `pre-push` runs `--push` (browser i18n round-trip). Full
-EN<->ES round-trip on demand: `node tools/i18n-roundtrip.mjs` (see the
-`i18n-roundtrip` skill).
+.githooks`. Only `pre-commit` exists; it runs `node tools/audit-gate.mjs
+--staged` (the fast, diff-aware mechanical gate).
+
+There is deliberately **no pre-push hook**. The browser round-trip takes ~11
+minutes and ran on every push, re-validating a tree it had already passed - and
+it ran even on `git push --dry-run`, which looked like a hang. Run the health
+gate yourself, before you push:
+
+```bash
+npm run gate          # browser i18n round-trip on what origin/master..HEAD changes
+npm run gate:all      # every check, whole repo
+npm run gate:staged   # what the pre-commit hook runs
+```
+
+`npm run gate` skips instantly when nothing i18n-relevant changed, so it is
+cheap to run often. Full EN<->ES round-trip on demand: `node
+tools/i18n-roundtrip.mjs` (see the `i18n-roundtrip` skill).
 
 ## Engine work (code-lab + MemoryViz scenes)
 
