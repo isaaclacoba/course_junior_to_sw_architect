@@ -8,3 +8,11 @@ _site/
 
 # Audit-gate reports/logs (pre-push i18n round-trip postmortems)
 .audit-gate/
+node_modules/
+
+# Journal (decision log): bulky, regenerable ETL firehose + working files.
+# Curated docs/journal/{features,decisions,outputs}/ ARE committed (small, non-regenerable).
+# activity/ waits for git-lfs (see docs/architecture/decision-log.md).
+docs/journal/activity/
+docs/journal/_watermark.json
+docs/journal/config.json

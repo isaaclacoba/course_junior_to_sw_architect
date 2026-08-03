@@ -1,0 +1,9 @@
+{
+  "name": "csharp-oo-course-tools",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Repo tooling deps (journal). Course itself is static, no build. No root type field: repo .js stays CommonJS; ESM tools use the .mjs extension.",
+  "dependencies": {
+    "@duckdb/node-api": "1.5.5-r.3"
+  }
+}

@@ -11,4 +11,10 @@ LOG=".audit-gate/pre-push-$(date +%Y%m%dT%H%M%S).log"
 status=$(cat .audit-gate/.pushstatus 2>/dev/null || echo 1)
 rm -f .audit-gate/.pushstatus
 cp "$LOG" .audit-gate/pre-push-latest.log 2>/dev/null || true
+# Best-effort: refresh the local activity archive if a transcripts source is configured.
+# activity/ is gitignored (pending git-lfs), so this only updates the LOCAL archive;
+# it must never block a push, hence it does not touch $status.
+if [ -n "$JOURNAL_TRANSCRIPTS" ] || [ -f docs/journal/config.json ]; then
+  node tools/journal.mjs etl >/dev/null 2>&1 || echo "journal etl skipped/failed (non-fatal)"
+fi
 exit "$status"
