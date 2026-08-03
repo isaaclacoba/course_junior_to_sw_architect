@@ -5,3 +5,6 @@ level3-blazor/publish/
 level3-app/
 blazor-publish/
 _site/
+
+# Audit-gate reports/logs (pre-push i18n round-trip postmortems)
+.audit-gate/

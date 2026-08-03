@@ -3,4 +3,12 @@
 #   git config core.hooksPath .githooks
 # Runs the full-fidelity BROWSER i18n round-trip on the voiced lessons this push
 # changes (git feeds the pushed ranges on stdin). A non-zero exit blocks the push.
-exec node tools/audit-gate.mjs --push
+# The full console output is persisted to .audit-gate/ (and the tool also writes
+# .audit-gate/i18n-latest.json) so a blocked push can be postmortem-ed.
+mkdir -p .audit-gate
+LOG=".audit-gate/pre-push-$(date +%Y%m%dT%H%M%S).log"
+{ node tools/audit-gate.mjs --push; echo $? > .audit-gate/.pushstatus; } 2>&1 | tee "$LOG"
+status=$(cat .audit-gate/.pushstatus 2>/dev/null || echo 1)
+rm -f .audit-gate/.pushstatus
+cp "$LOG" .audit-gate/pre-push-latest.log 2>/dev/null || true
+exit "$status"

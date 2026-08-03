@@ -37,6 +37,8 @@
  *     --langs a,b      override the non-default langs to exercise (default: from
  *                      the lesson's res bundles, minus the default lang)
  *     --json           machine-readable report on stdout
+ *     --report <file>  write a persistent JSON results file (pass OR fail) so a
+ *                      blocked push is postmortem-able without a blind re-run
  *     --port <n>       fixed server port (default: ephemeral). Never reuses 8091.
  *     --settle <ms>    per-switch settle after the radio flips (default 700)
  *     --keep-open      do not kill Chrome on exit (debugging)
@@ -74,7 +76,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // args
 // ---------------------------------------------------------------------------
 function parseArgs(argv) {
-  const a = { dirs: [], all: false, static: false, json: false, port: 0, settle: 700, keepOpen: false, langs: null };
+  const a = { dirs: [], all: false, static: false, json: false, port: 0, settle: 700, keepOpen: false, langs: null, report: null };
   for (let i = 0; i < argv.length; i++) {
     const t = argv[i];
     if (t === "--all") a.all = true;
@@ -84,6 +86,7 @@ function parseArgs(argv) {
     else if (t === "--verbose") { a.verbose = true; VERBOSE = true; }
     else if (t === "--port") a.port = parseInt(argv[++i], 10) || 0;
     else if (t === "--settle") a.settle = parseInt(argv[++i], 10) || 700;
+    else if (t === "--report") a.report = argv[++i];
     else if (t === "--langs") a.langs = argv[++i].split(",").map((s) => s.trim()).filter(Boolean);
     else if (t.startsWith("--")) { say(`unknown flag ${t}`); process.exit(2); }
     else a.dirs.push(t);
@@ -508,6 +511,7 @@ async function browserRoundTrip(cdp, srvPort, dir, opts) {
     const after = await cdp.evaluate("JSON.stringify(window.__i18n.snap())").then(JSON.parse);
     const seen = new Set();
     for (const { sel, text } of after) {
+      if (!/\p{L}/u.test(text)) continue; // no letters -> language-invariant (e.g. "256"); identical in every language, so never a translation leak
       if (baseVals.has(text) || !midVals.has(text)) continue; // returned to default, or was never foreign
       if (seen.has(sel + "\u0000" + text)) continue; seen.add(sel + "\u0000" + text);
       leaks.push({ lang: L, sel, original: baseMap.has(sel) ? baseMap.get(sel) : "(not in default snapshot)", leaked: text });
@@ -525,6 +529,29 @@ async function waitApplied(cdp, labels, settle) {
 // main
 // ---------------------------------------------------------------------------
 function truncate(s, n = 80) { s = String(s).replace(/\s+/g, " "); return s.length > n ? s.slice(0, n - 1) + "\u2026" : s; }
+
+// Persist a testrunner-style report so a blocked push is postmortem-able without a
+// blind re-run. Written pass OR fail; parent dirs are created.
+function writeReport(file, failed, report) {
+  if (!file) return;
+  const leaking = report.filter((r) => (r.leaks && r.leaks.length) || r.error);
+  const out = {
+    tool: "i18n-roundtrip",
+    generatedAt: new Date().toISOString(),
+    pass: !failed,
+    total: report.length,
+    leaking: leaking.length,
+    leakingLessons: leaking.map((r) => r.lesson),
+    lessons: report,
+  };
+  try {
+    fs.mkdirSync(path.dirname(path.resolve(file)), { recursive: true });
+    fs.writeFileSync(file, JSON.stringify(out, null, 2));
+    say(`${C.dim}report: ${path.relative(root, path.resolve(file))}${C.reset}`);
+  } catch (e) {
+    say(`${C.yellow}could not write report ${file}: ${e.message}${C.reset}`);
+  }
+}
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
@@ -589,6 +616,7 @@ async function main() {
     say("");
     say(failed ? `${C.red}FAIL${C.reset} ${f}/${n} lesson(s) leaked` : `${C.green}PASS${C.reset} ${n} lesson(s) round-trip clean`);
   }
+  writeReport(args.report, failed, report);
   process.exit(failed ? 1 : 0);
 }
 

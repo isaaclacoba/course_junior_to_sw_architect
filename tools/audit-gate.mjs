@@ -65,6 +65,7 @@ const childEnv = { ...process.env, PATH: path.dirname(NODE) + path.delimiter + (
 
 const C = { red: "\x1b[31m", green: "\x1b[32m", yellow: "\x1b[33m", dim: "\x1b[2m", reset: "\x1b[0m" };
 const say = (s = "") => process.stdout.write(s + "\n");
+const trunc = (s, n = 90) => { s = String(s == null ? "" : s).replace(/\s+/g, " "); return s.length > n ? s.slice(0, n - 1) + "\u2026" : s; };
 
 // ---------------------------------------------------------------------------
 // git helpers
@@ -196,15 +197,43 @@ function checkI18n(fanOutAll, voicedDirs) {
 
 // The BROWSER round-trip (pre-push): full-fidelity, drives real Chrome. Catches
 // the live-swap chrome leaks (breadcrumb, document.title) that --static cannot.
+// Writes a persistent testrunner-style report under .audit-gate/ (pass OR fail) so
+// a blocked push is postmortem-able without a blind re-run, and records a COMPACT
+// summary (leaking lessons + selectors) rather than 80+ PASS lines.
 function checkI18nBrowser(fanOutAll, voicedDirs) {
   const tool = path.join(root, "tools", "i18n-roundtrip.mjs");
-  if (fanOutAll) {
-    run("i18n round-trip (browser, --all)", "node tools/i18n-roundtrip.mjs --all", NODE, [tool, "--all"]);
-    return;
-  }
-  const rels = voicedDirs.map((d) => path.relative(root, d));
-  run(`i18n round-trip (browser, ${rels.length} lesson${rels.length === 1 ? "" : "s"})`,
-    `node tools/i18n-roundtrip.mjs ${rels.join(" ")}`, NODE, [tool, ...voicedDirs]);
+  const reportDir = path.join(root, ".audit-gate");
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const reportPath = path.join(reportDir, `i18n-${stamp}.json`);
+  const latest = path.join(reportDir, "i18n-latest.json");
+
+  const targets = fanOutAll ? ["--all"] : voicedDirs;
+  const label = fanOutAll
+    ? "i18n round-trip (browser, --all)"
+    : `i18n round-trip (browser, ${voicedDirs.length} lesson${voicedDirs.length === 1 ? "" : "s"})`;
+  const shown = (fanOutAll ? ["--all"] : voicedDirs.map((d) => path.relative(root, d))).join(" ");
+  const command = `node tools/i18n-roundtrip.mjs ${shown} --report ${path.relative(root, reportPath)}`;
+
+  const r = spawnSync(NODE, [tool, ...targets, "--report", reportPath], { cwd: root, encoding: "utf8", env: childEnv, maxBuffer: 10 * 1024 * 1024 });
+  const passed = r.status === 0;
+
+  let detail = "";
+  try {
+    fs.mkdirSync(reportDir, { recursive: true });
+    if (fs.existsSync(reportPath)) fs.copyFileSync(reportPath, latest);
+    const rep = fs.existsSync(reportPath) ? JSON.parse(fs.readFileSync(reportPath, "utf8")) : null;
+    if (!passed && rep) {
+      const leaking = rep.lessons.filter((l) => (l.leaks && l.leaks.length) || l.error);
+      detail = `${rep.leaking}/${rep.total} lesson(s) leaked - full report: .audit-gate/i18n-latest.json\n` +
+        leaking.map((l) => l.error
+          ? `  ${l.lesson}: ERROR ${l.error}`
+          : `  ${l.lesson}:\n` + l.leaks.map((k) =>
+              `    [${k.lang}] ${k.sel}\n       default: ${trunc(k.original)}\n       leaked : ${trunc(k.leaked)}`).join("\n")
+        ).join("\n");
+    }
+  } catch (e) { detail += `\n(report read failed: ${e.message})`; }
+  if (!passed && !detail) detail = (r.stdout || "") + (r.stderr || "");
+  record(label, passed, command, detail);
 }
 
 // ---------------------------------------------------------------------------
