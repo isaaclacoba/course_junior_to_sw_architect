@@ -970,3 +970,19 @@ mirrored into the session todo list.
   orphan guard, manifest completeness, structural shape, ROOT_ARTIFACTS mapping.
   Closes the "generate.mjs and audit-gate.mjs have zero tests" gap for this
   pipeline. 92/92 pass.
+
+- 2026-08-03 14:02  page-shell split step 6-7. Step 6: the three extracted modules
+  are now unit-tested directly instead of through the 734-line generated shell -
+  lesson-common.test.js require()s the module (was vm-loading page-shell.js),
+  plus new chrome-text.test.js (14) and card-templates.test.js (12). 122/122 pass;
+  four mutations (tAttr never marks, tHtml stops escaping, repaintChrome no-op,
+  one id unprefixed) all caught, so the suites bite.
+  Step 7 sweep found two things. (a) A pre-existing FAIL: the Spanish bundle for
+  theory-5 comments-say-why was missing legend.0 since 5930267, so a Spanish
+  learner saw an English legend. Added "cambio en este paso" (the wording 6 other
+  lessons already use). (b) The reason it survived - tools/check-i18n.mjs was run
+  by NOTHING: not the gate, not CI. Its exit codes were already correct, it was
+  just never wired. Wired into audit-gate (same trigger as the round-trip) and
+  into the CI drift step; verified it blocks a real regression with exit 1.
+  Also documented why buildCard leaves Run/Next unmarked (build-engine owns those
+  labels, nav.next -> nav.nextLesson on the last card).

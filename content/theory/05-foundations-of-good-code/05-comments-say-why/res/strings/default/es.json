@@ -10,5 +10,6 @@
   "step.3.narr": "Entonces, ¿qué les queda a los comentarios? Lo único que el código no puede mostrar: el **por qué**.\nAquí el código dice `batchSize = 100`. El comentario explica la razón que nunca adivinarías de la línea - la API no acepta más de 100 por llamada.",
   "step.4.narr": "Así que deja que el código diga *qué*, y guarda los comentarios para el *por qué*.\nComenta el motivo sorprendente, la restricción, lo que aprendiste a base de golpes - no lo obvio, que un buen nombre ya le dice a quien lee.",
   "concept.th-comment.term": "Comentario",
-  "concept.th-comment.def": "Una nota para personas que la computadora ignora, usada para explicar por qué se hace algo en lugar del qué que el código ya muestra."
+  "concept.th-comment.def": "Una nota para personas que la computadora ignora, usada para explicar por qué se hace algo en lugar del qué que el código ya muestra.",
+  "legend.0": "cambió en este paso"
 }

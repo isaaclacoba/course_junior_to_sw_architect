@@ -20,6 +20,9 @@
  *                 tmp mirror against the committed generated/ + content/.../index.html)
  *                 when any staged path is under content/, or is course-registry.js
  *                 or tools/generate.mjs.
+ *   i18n (parity)  `node tools/check-i18n.mjs` - every localized key in a default
+ *                 bundle must exist in each overlay language, or that string
+ *                 silently renders English. Same trigger as the round-trip below.
  *   i18n (static)  `node tools/i18n-roundtrip.mjs --static` on the affected voiced
  *                 lesson dirs when any staged path is a resource binder
  *                 (resource/bind-*.js), page-shell.js, or a voiced lesson file
@@ -149,6 +152,13 @@ function checkValidate() {
   run("node tools/validate.mjs", "node tools/validate.mjs", NODE, [path.join(root, "tools", "validate.mjs")]);
 }
 
+// Translation parity: every localized key present in the default bundle must also
+// be present in each overlay language, or that string silently renders English.
+// Cheap (~1s, no browser) and repo-wide, so it runs whole rather than per-lesson.
+function checkI18nParity() {
+  run("node tools/check-i18n.mjs", "node tools/check-i18n.mjs", NODE, [path.join(root, "tools", "check-i18n.mjs")]);
+}
+
 // Generated files that live at the repo root rather than under generated/.
 const ROOT_ARTIFACTS = new Set(["page-shell.js"]);
 
@@ -269,6 +279,7 @@ function planStaged(staged) {
   }
   const i18nTriggers = staged.filter((p) => isBinder(p) || p === "page-shell.js" || isVoicedFile(p));
   if (i18nTriggers.length) {
+    checkI18nParity();
     const fanOutAll = staged.some((p) => isBinder(p) || p === "page-shell.js");
     if (fanOutAll) checkI18n(true, []);
     else {
@@ -283,6 +294,7 @@ function planAll() {
   checkTests();
   checkValidate();
   checkDrift();
+  checkI18nParity();
   checkI18n(true, []);
 }
 
