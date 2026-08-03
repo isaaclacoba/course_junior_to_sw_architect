@@ -46,6 +46,22 @@ grows into a procedure, promote it to a skill and leave a pointer here.
   with a `LESSON_META`-based `../../../../` prefix (flat pages, no `LESSON_META`, keep
   the bare default); explicit per-lesson `runnerUrl`s are already prefixed.
 
+## Gates & pushing
+
+- **Run the health gate yourself: `npm run gate`. There is deliberately no
+  pre-push hook.** The old `.githooks/pre-push` ran the ~11-minute browser
+  round-trip on every push, re-validating a tree the same gate had already
+  passed - and git runs `pre-push` even for `git push --dry-run`, so a no-op dry
+  run looked like a dead hang (the hook only writes its log at the end). If a
+  push or a `--dry-run` ever seems to hang for minutes with no output, suspect a
+  hook, not the network. `npm run gate` (also `gate:all`, `gate:staged`) skips
+  instantly when nothing i18n-relevant changed, so it is cheap to run often.
+- **Scope decides the gate's cost, so check what you touched.** `audit-gate
+  --push` fans out to all ~83 voiced lessons only when the diff includes
+  `page-shell.js` or a `resource/bind-*.js` binder; otherwise it checks just the
+  changed lesson dirs (4 lessons = ~30s vs ~11min). The fast `pre-commit` hook is
+  still enabled and still the thing that catches mechanical breakage.
+
 ## Git & GitHub identity
 
 - **Attribution comes ONLY from commit author/committer email + `Co-authored-by:`
@@ -58,9 +74,17 @@ grows into a procedure, promote it to a skill and leave a pointer here.
   `git config user.email` is fixed (a stale value there re-introduces the wrong
   identity on the next commit). Verify `git log --all --format='%ae%n%ce' | grep -c
   <bad-email>` returns `0`.
-- Push/remote identity specifics (SSH-vs-HTTPS, which token maps to which account)
-  live in `/memories/repo/course-git.md`; the "token-in-URL push does not advance
-  `origin/*`, read the tip with `git ls-remote`" rule lives in the `integration` skill.
+- **This repo's `origin` is SSH, and that SSH key maps to the DENIED identity - so
+  push over HTTPS with the `isaaclacoba` token.** Read it from
+  `~/.config/gh/hosts.yml` (`oauth_token:`); `gh auth token` does not exist in the
+  installed `gh`. Capture it into a variable and sanity-check it FIRST (`curl -H
+  "Authorization: Bearer $T" .../user` -> `isaaclacoba`); never inline a
+  command-substitution that can fail into the URL, or its error text lands in the
+  URL (`fatal: credential url cannot be parsed`). Redact the token from any echoed
+  output, and set `GIT_TERMINAL_PROMPT=0` so a bad credential fails fast instead of
+  blocking on a prompt.
+- The "token-in-URL push does not advance `origin/*`, read the tip with `git
+  ls-remote`" rule lives in the `integration` skill.
 
 ## Theming
 
