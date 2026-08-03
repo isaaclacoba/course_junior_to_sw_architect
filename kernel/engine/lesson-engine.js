@@ -1,9 +1,13 @@
 /*
  * kernel/engine/lesson-engine.js - the generic lesson engine CORE + plugin registry.
  *
- * Design of record: docs/architecture/lesson-engine.md. This is STEP 1 of the
- * phased unification: the archetype-BLIND core that owns all shared chrome, plus a
- * plugin registry keyed by archetype. It knows NOTHING about editors, Monaco,
+ * Design of record: docs/architecture/lesson-engine.md. This is the archetype-BLIND
+ * core that owns all shared chrome, plus a plugin registry keyed by archetype. It
+ * supports TWO plugin shapes: a PRACTICE plugin (build/drill/git) drives a graded
+ * tasks[] through the card loop + result panel + ctx.report; a WIDGET plugin
+ * (viz/checkpoint, plugin.body === "widget") owns one self-contained body (a
+ * MemoryViz / Quiz) with no tasks, no grading, and no result panel - it awards its
+ * own XP. It knows NOTHING about editors, Monaco,
  * Roslyn, blanks, terminals, or git - a plugin (a later step) owns its work
  * surface + its primary action and reports the result back through ctx.report.
  *
@@ -170,11 +174,16 @@
       return { boot: function () { return Promise.resolve(); }, render: function () {}, setLocale: function () {} };
     }
     if (!config || !Array.isArray(config.tasks) || !config.tasks.length) {
-      return { boot: function () { return Promise.resolve(); }, render: function () {}, setLocale: function () {} };
+      // A PRACTICE plugin needs tasks; a WIDGET plugin (viz/checkpoint) owns one
+      // self-contained body and carries none, so it is exempt from this guard.
+      if (!(plugin.body === "widget")) {
+        return { boot: function () { return Promise.resolve(); }, render: function () {}, setLocale: function () {} };
+      }
     }
+    var isWidget = plugin.body === "widget";
 
     var prefix = config.prefix;
-    var tasks = config.tasks;
+    var tasks = Array.isArray(config.tasks) ? config.tasks : [];
     var metaLabel = config.metaLabel || "";
     var progressNoun = config.progressNoun || "Task";
     var xpKey = config.xpKey || "course_global_xp";
@@ -223,7 +232,7 @@
     var renderProse = makeRenderProse(LC);
 
     function cardFromHash() { return LC.cardFromHash(tasks.length); }
-    var idx = cardFromHash();
+    var idx = isWidget ? 0 : cardFromHash();
     var surface = null; // whatever plugin.mount returns
 
     var ctx = {
@@ -328,6 +337,16 @@
 
     // ---- render ------------------------------------------------------------
     function render() {
+      if (isWidget) {
+        // A widget lesson's whole body is created by plugin.mount; the core adds no
+        // card chrome, result panel, or task nav - only the final "Next lesson" step.
+        if (prevBtn) prevBtn.disabled = true;
+        if (nextBtn) {
+          nextBtn.disabled = false;
+          nextBtn.textContent = tr("nav.nextLesson", "Next lesson");
+        }
+        return;
+      }
       var task = tasks[idx];
       try { history.replaceState(null, "", "#" + (idx + 1)); } catch (e) {}
       if (meta) meta.textContent = metaLabel;
@@ -373,6 +392,14 @@
     // cfg, then let the plugin repaint its own surface. Never touches the card
     // index or the learner's in-progress work.
     function setLocale() {
+      if (isWidget) {
+        // A widget owns its own prose; the core only refreshes the XP counter + the
+        // Next label, then lets the plugin re-localize (re-create) its widget.
+        renderXP();
+        if (nextBtn) nextBtn.textContent = tr("nav.nextLesson", "Next lesson");
+        if (plugin.setLocale) plugin.setLocale(surface);
+        return;
+      }
       var task = tasks[idx];
       if (title) title.textContent = task.title || "";
       if (context) context.innerHTML = renderProse(task.context);
@@ -406,7 +433,7 @@
         else if (typeof window !== "undefined") window.location.href = nextHref;
       });
     }
-    if (typeof window !== "undefined" && window.addEventListener) {
+    if (!isWidget && typeof window !== "undefined" && window.addEventListener) {
       window.addEventListener("hashchange", function () {
         var next = cardFromHash();
         if (next !== idx) goTo(next);

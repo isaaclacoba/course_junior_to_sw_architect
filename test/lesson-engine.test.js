@@ -293,3 +293,65 @@ test("a trailing summary card renders the recap and deactivates the plugin surfa
     assert.equal(dom.getElementById("ttNext").textContent, "Next lesson");
   });
 });
+
+// ---- widget plugins (viz / checkpoint shape) -------------------------------
+// A widget plugin owns one self-contained body (a MemoryViz / Quiz), carries no
+// tasks, and does not grade. The core must exempt it from the tasks guard, skip
+// the card chrome / result panel / task nav, and still fan setLocale out to it.
+function makeFakeWidgetPlugin(archetype) {
+  const calls = { mount: [], setLocale: [] };
+  return {
+    plugin: {
+      archetype,
+      body: "widget",
+      mount(ctx) { calls.mount.push(ctx); return { tag: archetype + "-widget" }; },
+      setLocale(surface) { calls.setLocale.push({ surface }); },
+    },
+    calls,
+  };
+}
+
+// A widget config carries NO tasks - the whole body is the plugin's widget.
+function widgetConfig(archetype) {
+  return { archetype, prefix: "tt", xpKey: "xp", awardedKey: "aw", awardAmount: 20 };
+}
+
+test("a widget plugin mounts one body with no tasks, grade, or result panel", async () => {
+  await withDom("tt", async (dom) => {
+    const fake = makeFakeWidgetPlugin("fake-viz");
+    LessonEngine.register(fake.plugin);
+    const controller = LessonEngine.create(widgetConfig("fake-viz"));
+    await controller.boot();
+
+    assert.equal(fake.calls.mount.length, 1, "the widget body is mounted once");
+    assert.equal(dom.getElementById("ttResult").hidden, true, "no result panel for a widget lesson");
+    assert.equal(dom.getElementById("ttPrev").disabled, true, "no in-lesson prev nav");
+    assert.equal(dom.getElementById("ttNext").disabled, false);
+    assert.equal(dom.getElementById("ttNext").textContent, "Next lesson");
+  });
+});
+
+test("a widget plugin gets setLocale fanned out with its surface", async () => {
+  await withDom("tt", async () => {
+    const fake = makeFakeWidgetPlugin("fake-viz2");
+    LessonEngine.register(fake.plugin);
+    const controller = LessonEngine.create(widgetConfig("fake-viz2"));
+    await controller.boot();
+
+    controller.setLocale();
+    assert.equal(fake.calls.setLocale.length, 1);
+    assert.equal(fake.calls.setLocale[0].surface.tag, "fake-viz2-widget");
+  });
+});
+
+test("Next on a widget lesson advances to the next lesson", async () => {
+  await withDom("tt", async (dom, hrefBox) => {
+    const fake = makeFakeWidgetPlugin("fake-viz3");
+    LessonEngine.register(fake.plugin);
+    const controller = LessonEngine.create(widgetConfig("fake-viz3"));
+    await controller.boot();
+
+    dom.getElementById("ttNext").click();
+    assert.equal(hrefBox.href, "next-lesson.html");
+  });
+});
