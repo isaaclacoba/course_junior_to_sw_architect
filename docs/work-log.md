@@ -946,3 +946,9 @@ mirrored into the session todo list.
   Corrected the architect review during grounding - a uniform 7x UMD split is not
   behaviour-preserving, so the design uses a hybrid shape plus a guard module.
   Brief + design of record written; no code yet.
+
+- 2026-08-03 13:19  page-shell split steps 1-2. kernel/page-shell/ holds 8 exact slices;
+  tools/generate.mjs concatenates them back into page-shell.js byte-identically
+  (only the generated-file header differs). Drift gate extended to the root
+  artefact; orphan-module guard added. 87/87 tests, audit-gate PASS, headless
+  render OK for build/viz/checkpoint and the EN->ES switch.

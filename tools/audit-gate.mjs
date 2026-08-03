@@ -149,6 +149,9 @@ function checkValidate() {
   run("node tools/validate.mjs", "node tools/validate.mjs", NODE, [path.join(root, "tools", "validate.mjs")]);
 }
 
+// Generated files that live at the repo root rather than under generated/.
+const ROOT_ARTIFACTS = new Set(["page-shell.js"]);
+
 // Generator drift: build to a scratch mirror and byte-diff every emitted file
 // against what is committed. The top-level data files map to generated/; the
 // nested content/.../index.html pages map straight to the repo root.
@@ -166,7 +169,12 @@ function checkDrift() {
       const abs = path.join(d, e.name);
       if (e.isDirectory()) { walk(abs); continue; }
       const rel = path.relative(tmp, abs);
-      const committed = path.dirname(rel) === "." ? path.join(root, "generated", rel) : path.join(root, rel);
+      // A top-level name in the mirror is a generated/ data file, EXCEPT the few
+      // artefacts that live at the repo root (page-shell.js is assembled from
+      // kernel/page-shell/). Nested paths already map straight to the root.
+      const committed = path.dirname(rel) !== "."
+        ? path.join(root, rel)
+        : path.join(root, ROOT_ARTIFACTS.has(rel) ? "" : "generated", rel);
       if (!fs.existsSync(committed) || !fs.readFileSync(committed).equals(fs.readFileSync(abs))) {
         drifted.push(path.relative(root, committed));
       }
@@ -254,7 +262,8 @@ function planStaged(staged) {
   if (staged.some((p) => p.startsWith("test/") || p.startsWith("resource/") || ROOT_ENGINES.has(p))) {
     checkTests();
   }
-  if (staged.some((p) => p.startsWith("content/") || p === "course-registry.js" || p === "tools/generate.mjs")) {
+  if (staged.some((p) => p.startsWith("content/") || p === "course-registry.js" || p === "tools/generate.mjs"
+    || p.startsWith("kernel/page-shell/") || p === "page-shell.js")) {
     checkValidate();
     checkDrift();
   }

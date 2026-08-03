@@ -1,5 +1,5 @@
 # Page-shell split
-Status: not started  -  Design: [docs/architecture/page-shell-split.md](../architecture/page-shell-split.md)
+Status: in progress  -  Design: [docs/architecture/page-shell-split.md](../architecture/page-shell-split.md)
 
 ## Goal
 
@@ -22,8 +22,8 @@ unambiguously the split.
 
 ## Plan
 
-1. [ ] Add the concat step to `tools/generate.mjs` + a generated-file header - verify: with the modules holding today's exact text, `node tools/generate.mjs` leaves `git diff --exit-code page-shell.js` clean.
-2. [ ] Extend the CI drift gate to cover the artifact - verify: a hand edit to `page-shell.js` fails `git diff --exit-code` in deploy.yml.
+1. [x] Add the concat step to `tools/generate.mjs` + a generated-file header - verify: the concat reproduced all 679 lines byte-for-byte (only the 3-line header differs); 87/87 tests, gate PASS.
+2. [x] Extend the CI drift gate to cover the artifact - verify: a hand edit makes `audit-gate` FAIL naming `page-shell.js`; deploy.yml diffs it too.
 3. [ ] Cut the three UMD modules: `lesson-common.js`, `chrome-text.js`, `card-templates.js` - verify: each `require()`s standalone in Node; `node --check` on the artifact.
 4. [ ] Cut the five fragments: `guard.js`, `hero.js`, `concepts.js`, `boot.js`, `viz-checkpoint.js` - verify: artifact still byte-identical to today's `page-shell.js` apart from the alias block and the hoist.
 5. [ ] Add the alias block and re-point the 19 bare call-sites - verify: `grep -n 'tHtml\|tAttr\|tSlot' kernel/page-shell/*.js` shows every call-site resolving; no `ReferenceError` in a headless render.
@@ -35,6 +35,8 @@ unambiguously the split.
 
 - 2026-08-03 Design round run with the owner. Decided: generated artifact at the repo root (not a thin loader, not injector changes); unit-test only the three pure modules; strictly behaviour-preserving; single full gate fan-out at the end.
 - 2026-08-03 Architect review of the load contract corrected during grounding: a uniform 7x UMD split is not behaviour-preserving - `page`/`hero` are shared consts and the guards use a bare `return` to abort the whole IIFE. Design switched to the hybrid shape and an eighth `guard.js` module.
+
+- 2026-08-03 Steps 1-2 done. Golden-master split: 8 exact slices under `kernel/page-shell/`, concatenated back byte-identically. Found and fixed two gaps the design missed - audit-gate's drift walker mapped every top-level mirror file to `generated/` (wrong for a root artefact), and a module on disk but absent from the manifest would have been silently dropped.
 
 ## Open
 
