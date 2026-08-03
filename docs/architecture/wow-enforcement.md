@@ -1,73 +1,69 @@
-# WoW enforcement - design of record
+# WoW support - design-round scaffolding (not enforcement)
 
-Status: designed (owner decided, 2026-08-03). BUILD DEFERRED - owner chose
-journal-first; the hook layer depends on the decision-log. See
-[docs/architecture/decision-log.md](decision-log.md).
+Status: design REFRAMED after an independent red-team (owner ratified, 2026-08-03).
+Honest goal: make the design-round WoW EASIER and more RELIABLE for cooperating
+agents, and give the human ONE dependable trigger - not to mechanically force it.
 Brief: [docs/plans/wow-enforcement.md](../plans/wow-enforcement.md)
 
-## Context & trigger
-The design-round way-of-working is documented - golden rule 6 in
-`copilot-instructions.md` and Phase 0 in the `work-brief` skill - but not
-enforced. A skill only loads when its `description` probabilistically matches, so
-an agent that does not recognize "new line of work" never sees Phase 0. The
-instruction is every-turn but skimmable and delegates. Nothing routes a new line
-of work to a design-first flow, and nothing gates code on a round having happened.
+## Why the reframe (red-team)
+The first design tried to ENFORCE the round with a hard-block hook + custom-agent
+routing. An independent red-team (recorded in the journal, feature `wow-enforcement`,
+D-5/6/7 supersede D-1/3) showed that is mostly ceremony:
+- Custom-agent AUTO-routing does not exist on this platform - agents are manually
+  selected; nothing auto-hands "new work" to an `architect`.
+- The pre-commit hook is opt-in (`core.hooksPath`), `--no-verify`-able, and not in CI,
+  so it constrains only already-cooperating agents.
+- Its "proof" (a journal `decision` row) is one forgeable CLI call.
+- A hard block repeats the friction the repo just removed with the pre-push gate (`42577c1`).
+- 5 of the 6 layers only fire AFTER the agent already decided the work is "new" - the
+  exact judgment we wanted to remove. No pre-code gate can force that classification.
 
-## Decided (owner, 2026-08-03)
-- Build **all five** layers below.
-- **Two agents**: `architect` (runs the round) + `auditor` (independent review).
-- Hook gate is a **hard block**, not a warning.
-- **Journal-first** sequencing: build the decision-log, then these layers.
+Real enforcement would need a CI/PR chokepoint (the repo deploys straight from `master`,
+none exists) + owner-attributable proof. Deferred until a PR gate exists (see Future).
 
-## The five layers
-1. **Instruction (always-on).** Rewrite golden rule 6 to be self-contained and
-   imperative - the trigger (feature / module / tool / refactor / ambiguous >3-step
-   task), the loop (ground -> ask batches, recommend but owner decides -> only then
-   build), and the forbidden anti-pattern (presenting your own choices as decided).
-   No longer a bare pointer to the skill.
-2. **`architect` custom agent** (`.github/agents/architect.agent.md`). Its whole
-   contract IS the round: ground (audit / PoC / subagent), ask batched decisions,
-   show UX as a non-functional HTML mockup, record each decision to the journal,
-   and hand off a brief + design-of-record. Tool-restricted: read / search / fetch
-   / ask / create docs + mockups + journal writes - NOT bulk source edits.
-3. **`auditor` custom agent** (`.github/agents/auditor.agent.md`). Independent
-   review against the owner's bar: architecture quality, code quality, unit-test
-   coverage, goal achievement. Read-only + writes a report. It never reviews a
-   design it authored (independence).
-4. **`work-brief` skill.** Broaden its `description` so it loads on
-   feature/module/tool/refactor/ambiguous-task, not only ">3 steps".
-5. **`/design-round` prompt** (`.github/prompts/design-round.prompt.md`).
-   Owner-typed kickoff for a named feature. A complement, not the enforcement.
-6. **Hook gate.** EXTEND the existing `tools/audit-gate.mjs` (reuse, do not add a
-   parallel hook): when a staged diff introduces new feature code, HARD BLOCK
-   unless the feature has `docs/plans/<slug>.md` + `docs/architecture/<slug>.md` +
-   at least one journal `decision` row. The journal is the machine-checkable proof
-   that a round happened.
+## What we build (honest-small)
+1. **Sharpen golden rule 6** (always-on, `copilot-instructions.md`) into a self-contained
+   imperative: the trigger (feature / module / tool / refactor / ambiguous >3-step task),
+   the loop (ground -> ask batches, recommend but the OWNER decides -> only then build),
+   and the forbidden anti-pattern (your choices presented as decided). Framed honestly as
+   a reliable prompt for cooperating agents, not a gate.
+2. **`/design-round` prompt** (`.github/prompts/design-round.prompt.md`) - the ONE
+   dependable trigger, because the HUMAN decides "this is new work" and types it. Kicks off
+   the round for a named feature: ground -> batched decisions -> brief + design-of-record +
+   journal decisions.
+3. **`architect` agent** (`.github/agents/architect.agent.md`) - an OPT-IN tool the human
+   or orchestrator invokes to run a round: read / search / ask / create-docs, records
+   decisions to the journal, hands off a brief + design-of-record. Tool-restricted (no bulk
+   source edits). Not auto-routed, not a gate.
+4. **`auditor` agent** (`.github/agents/auditor.agent.md`) - an OPT-IN independent reviewer:
+   read-only + report, run in a FRESH context seeded ONLY with the design-of-record + the
+   owner's bar (architecture quality, code quality, test coverage, goal fit), never the
+   authoring transcript. Fresh-context seeding is the only real independence available.
+5. **Broaden the `work-brief` skill** description triggers so Phase 0 loads on
+   feature / module / tool / refactor / ambiguous tasks, not only ">3 steps".
 
-## The coupling (why journal-first)
-A design round is not lint-checkable in general. It becomes checkable only because
-the decision-log emits evidence: a `feature` row + >=1 `decision` row + the linked
-brief/design md. So layer 6 cannot exist until the journal does - hence the owner's
-journal-first order. The journal's first back-filled entries are these very
-decisions (dogfood).
+## Dropped (with reason)
+- The hard-block hook (old layer 6) - theater; see red-team.
+- The "auto-routing / strongest lever / enforcement" framing for the agents.
 
-## Success signal / KPI
-- An agent handed a new line of work produces a brief + design + recorded decisions
-  BEFORE any feature code - observable in the diff order.
-- A bypass attempt (feature code, no round) is refused by the hook.
-- The `auditor` produces an independent report an agent did not author.
+## Success signal (honest)
+- A cooperating agent handed new work reliably runs the round (brief + design + journal
+  decisions appear before code) - because the instruction + skill make it the path of least
+  resistance, not because a gate forces it.
+- The human has a one-command way (`/design-round`) to force a round regardless of agent judgment.
+- Any design can get an independent auditor pass in a fresh context.
+We do NOT claim a lazy or mis-classifying agent is stopped - that needs the CI/PR path below.
 
-## Unit tests
-- Hook: a staged "new feature" diff with no brief/design/decision fails; the same
-  diff with the trio passes; a non-feature diff (content/docs/test) is exempt.
-- Agent/prompt/instruction files: lint their frontmatter (valid YAML, name matches
-  folder for agents) via the existing gate.
+## Future - the real-teeth path (deferred)
+If/when the repo grows a PR chokepoint (stops deploying straight from `master`): a CI check
+that fails a PR whose diff is feature-shaped but carries no design-of-record + an
+owner-attributable decision (a signal the agent cannot author alone).
 
-## Open - proposed, awaiting owner ratification
-1. **"Feature code" trigger for the hook.** Start conservative: a new
-   `tools/*.mjs` or a new top-level module/dir (excluding `content/`, `docs/`,
-   `test/`, generated). Tune from false positives. Precise glob = TBD.
-2. **Agent tool allow-lists.** Exact allowed tool sets for `architect` (no bulk
-   edits) and `auditor` (read-only + report) - drafted above, ratify the specifics.
-3. **Hook home.** Extend `tools/audit-gate.mjs` (recommended, reuses `.githooks`)
-   vs a new `.github/hooks/*.json` lifecycle hook.
+## Build order
+1 sharpen golden rule 6. 2 `/design-round` prompt. 3 `work-brief` triggers. 4 `architect`
+agent. 5 `auditor` agent. Each verified: renders/loads; agents have valid frontmatter,
+tool restrictions, and `name` matching the folder.
+
+## Open (build-time)
+- Exact tool allow-lists for `architect` (no bulk edits) / `auditor` (read-only).
+- Prompt + agent frontmatter per the `agent-customization` skill.

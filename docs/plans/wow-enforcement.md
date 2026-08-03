@@ -1,33 +1,26 @@
-# WoW enforcement
-Status: designed - build deferred (journal-first)  -  Design: [docs/architecture/wow-enforcement.md](../architecture/wow-enforcement.md)
+# WoW support - design-round scaffolding
+Status: reframed after red-team - ready to build (honest-small)  -  Design: [docs/architecture/wow-enforcement.md](../architecture/wow-enforcement.md)
 
 ## Goal
-Make the design-round way-of-working something agents reliably FOLLOW, not just a
-documented rule they can skim past. Today it lives in one skill (loads
-probabilistically) and one golden rule (a skimmable pointer); nothing routes a new
-line of work through it or gates code on it.
+Make the mandatory design-round WoW easier and more reliable for cooperating agents, and
+give the human one dependable trigger - not to mechanically force it (a red-team showed
+that isn't achievable here without a CI/PR chokepoint the repo doesn't have).
 
 ## Approach
-Five layers, from cheapest reach to strongest guarantee: an imperative always-on
-instruction; an `architect` agent whose whole contract is the round; an
-independent `auditor` agent; broader `work-brief` skill triggers; a `/design-round`
-prompt; and a hard-block hook (an extension of `tools/audit-gate.mjs`) that refuses
-new feature code lacking a brief + design + recorded decision. The hook needs the
-decision-log to exist, so it lands last.
+Honest-small: sharpen the always-on rule, ship a `/design-round` prompt (the human is the
+reliable trigger), build `architect` + `auditor` as opt-in tools, and broaden the
+`work-brief` skill's triggers. No hard-block hook, no auto-routing claims.
 
 ## Plan
-1. [ ] Build the decision-log journal first - blocks layer 6. See its brief.
-2. [ ] Sharpen golden rule 6 into a self-contained imperative rule - verify: reads as trigger+loop+anti-pattern with no external pointer needed.
-3. [ ] Add `architect` agent (`.github/agents/architect.agent.md`), tool-restricted - verify: spawns, refuses bulk source edits, runs the round.
-4. [ ] Add `auditor` agent (`.github/agents/auditor.agent.md`), read-only + report - verify: produces a review against the owner's bar.
-5. [ ] Broaden `work-brief` skill `description` triggers - verify: loads on feature/module/tool/refactor tasks.
-6. [ ] Add `/design-round` prompt - verify: kicks off a round for a named feature.
-7. [ ] Extend `audit-gate.mjs` hard-block gate - verify: new-feature diff without the trio fails; with it passes; non-feature diff exempt.
+1. [ ] Sharpen golden rule 6 in copilot-instructions.md (imperative, self-contained) - verify: reads as trigger+loop+anti-pattern, no external pointer needed.
+2. [ ] `/design-round` prompt (.github/prompts/design-round.prompt.md) - verify: kicks off a round for a named feature.
+3. [ ] Broaden the work-brief skill description triggers - verify: loads on feature/module/tool/refactor tasks.
+4. [ ] `architect` agent (.github/agents/architect.agent.md), tool-restricted, records to journal - verify: valid frontmatter, no bulk edits.
+5. [ ] `auditor` agent (.github/agents/auditor.agent.md), read-only + report, fresh-context - verify: valid frontmatter, produces an independent review.
 
 ## Progress
-- 2026-08-03 Design round done: all 5 layers, two agents (architect+auditor), hard block, journal-first. Recorded in the design-of-record.
+- 2026-08-03 Design round + independent red-team. Red-team showed the enforcement framing was mostly ceremony (no auto-routing here; opt-in/--no-verify-able/not-in-CI hook; forgeable proof; repeats the just-removed pre-push gate). Reframed to honest-small; dropped the hard-block hook; kept architect/auditor as opt-in tools. Journal: D-5/6/7 supersede D-1/3.
 
 ## Open
-- "Feature code" trigger heuristic for the hook (start with new `tools/*.mjs` + new top-level dirs).
-- Exact tool allow-lists for `architect` / `auditor`.
-- Hook home: extend `audit-gate.mjs` vs a new `.github/hooks/*.json`.
+- Tool allow-lists for architect/auditor; prompt + agent frontmatter (agent-customization skill).
+- Deferred: the real-teeth CI/PR path, until the repo has a PR chokepoint.
