@@ -122,6 +122,25 @@
     const matches = Grading.matches;
     const unmetRequirement = Grading.unmetRequirement;
     const describeExpected = Grading.describeExpected;
+
+    // Output mismatch is the one result message that has to embed lesson data (the
+    // expected output), so the grading kernel cannot own its copy - it stays
+    // language-free and English, and the engine maps it to the active language
+    // here, the same way every other result branch does. The English fallbacks are
+    // byte-identical to Grading.describeExpected, so a page with no catalog reads
+    // exactly as before.
+    function mismatchMessage(expected) {
+      if (!window.ChromeText) return describeExpected(expected);
+      return Array.isArray(expected)
+        ? LessonCommon.fill(
+            tr("result.mismatchLines", "Expected these lines, in order:\n{lines}\nAdjust your code and run again."),
+            { lines: expected.join("\n") }
+          )
+        : LessonCommon.fill(
+            tr("result.mismatch", 'Expected a line equal to "{expected}". Adjust your code and run again.'),
+            { expected: expected }
+          );
+    }
     function passesHiddenVerify(source, verify) {
       return Grading.passesHiddenVerify(source, verify, { run: (src) => runner.run(src) });
     }
@@ -316,7 +335,7 @@
         showOutput(out || tr("run.noOutput", "(no output)"), false);
         const unmet = unmetRequirement(code[idx], task.requireSource);
         if (!matches(out, task.expected)) {
-          setResult(false, () => describeExpected(task.expected));
+          setResult(false, () => mismatchMessage(task.expected));
         } else if (unmet) {
           setResult(false, () => unmet);
         } else if (task.verify && !(await passesHiddenVerify(code[idx], task.verify))) {

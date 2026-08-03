@@ -175,6 +175,46 @@ test("t ignores inherited Object keys rather than leaking them", () => {
   });
 });
 
+// fill() is what lets a localized string put lesson data anywhere in the
+// sentence. Concatenation would have pinned English word order onto every
+// translator; these tests pin the placeholder contract instead.
+test("fill substitutes a named placeholder", () => {
+  assert.equal(
+    LessonCommon.fill('Expected a line equal to "{expected}".', { expected: "Woof" }),
+    'Expected a line equal to "Woof".',
+  );
+});
+
+test("fill substitutes every occurrence and several names", () => {
+  assert.equal(LessonCommon.fill("{a}-{b}-{a}", { a: "x", b: "y" }), "x-y-x");
+});
+
+test("fill lets a translation reorder the value", () => {
+  assert.equal(LessonCommon.fill("{n} lineas esperadas", { n: 3 }), "3 lineas esperadas");
+});
+
+test("fill leaves an unknown placeholder visible rather than blanking it", () => {
+  assert.equal(LessonCommon.fill("keep {nope} here", { other: 1 }), "keep {nope} here");
+});
+
+test("fill tolerates missing vars entirely", () => {
+  assert.equal(LessonCommon.fill("nothing to fill", undefined), "nothing to fill");
+  assert.equal(LessonCommon.fill("{a}", undefined), "{a}");
+});
+
+test("fill does not pick up inherited Object keys", () => {
+  assert.equal(LessonCommon.fill("{toString}", {}), "{toString}");
+});
+
+test("fill coerces non-string values and templates", () => {
+  assert.equal(LessonCommon.fill("n={n}", { n: 0 }), "n=0");
+  assert.equal(LessonCommon.fill("{v}", { v: null }), "null");
+});
+
+test("fill does not rescan substituted text for placeholders", () => {
+  assert.equal(LessonCommon.fill("{a}", { a: "{b}", b: "boom" }), "{b}");
+});
+
 test("createOutputPanel showOutput and hideOutput toggle the element", () => {
   const output = fakeEl();
   const panel = LessonCommon.createOutputPanel({ output, errors: null });

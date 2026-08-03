@@ -99,6 +99,60 @@ test("describeExpected: array form lists the lines in order", () => {
   assert.ok(msg.includes("a\nb"));
 });
 
+// --- the localized mismatch copy ---------------------------------------------
+// build-engine.js localizes the output-mismatch message (the one result branch
+// whose copy has to embed lesson data) by filling result.mismatch/.mismatchLines
+// from the chrome catalog, keeping describeExpected as the English fallback.
+// These tests pin the two things that silently break that: an English catalog
+// value that drifts from describeExpected, and a translation that drops or
+// misspells a placeholder so the learner sees a literal "{expected}".
+const LessonCommon = require(path.join(__dirname, "..", "kernel", "page-shell", "lesson-common.js"));
+const CHROME = {
+  en: require(path.join(__dirname, "..", "res", "chrome", "en.json")),
+  es: require(path.join(__dirname, "..", "res", "chrome", "es.json")),
+};
+
+function mismatchFrom(catalog, expected) {
+  return Array.isArray(expected)
+    ? LessonCommon.fill(catalog["result.mismatchLines"], { lines: expected.join("\n") })
+    : LessonCommon.fill(catalog["result.mismatch"], { expected: expected });
+}
+
+test("the English catalog reproduces describeExpected byte for byte", () => {
+  for (const expected of ["Woof", 'has "quotes"', ["a", "b"], ["only"]]) {
+    assert.equal(mismatchFrom(CHROME.en, expected), G.describeExpected(expected));
+  }
+});
+
+test("every locale defines both mismatch keys", () => {
+  for (const [lang, catalog] of Object.entries(CHROME)) {
+    for (const key of ["result.mismatch", "result.mismatchLines"]) {
+      assert.equal(typeof catalog[key], "string", `${lang} is missing ${key}`);
+    }
+  }
+});
+
+test("every locale keeps the placeholder each message needs", () => {
+  for (const [lang, catalog] of Object.entries(CHROME)) {
+    assert.ok(catalog["result.mismatch"].includes("{expected}"), `${lang} result.mismatch lost {expected}`);
+    assert.ok(catalog["result.mismatchLines"].includes("{lines}"), `${lang} result.mismatchLines lost {lines}`);
+  }
+});
+
+test("no locale leaves an unfilled placeholder in the rendered message", () => {
+  for (const [lang, catalog] of Object.entries(CHROME)) {
+    for (const expected of ["Woof", ["a", "b"]]) {
+      const shown = mismatchFrom(catalog, expected);
+      assert.equal(/\{\w+\}/.test(shown), false, `${lang} rendered a literal placeholder: ${shown}`);
+    }
+  }
+});
+
+test("the Spanish message is actually translated, not the English string", () => {
+  assert.notEqual(CHROME.es["result.mismatch"], CHROME.en["result.mismatch"]);
+  assert.notEqual(CHROME.es["result.mismatchLines"], CHROME.en["result.mismatchLines"]);
+});
+
 // --- passesHiddenVerify: runner injected --------------------------------------
 function fakeRunner(result) {
   return { run: async () => result };

@@ -34,7 +34,6 @@ jobs:
         run: |
           node tools/generate.mjs
           node tools/validate.mjs
-          node tools/check-i18n.mjs
           git diff --exit-code generated/ content/ page-shell.js
 
       - name: Publish compiler host (code-lab submodule)

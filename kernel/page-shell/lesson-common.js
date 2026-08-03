@@ -141,6 +141,17 @@
       }
       return fallback;
     },
+    // Put values into a localized string: "...{expected}..." + { expected: "Woof" }.
+    // Named placeholders (not concatenation) so a translator can move the value to
+    // wherever the sentence needs it - Spanish rarely keeps English word order.
+    // Same {name} convention the code-lab widgets already use, so one syntax is
+    // true across every catalog. An unknown placeholder is left visible rather
+    // than blanked, so a typo shows up instead of quietly losing text.
+    fill(tpl, vars) {
+      return String(tpl).replace(/\{(\w+)\}/g, function (m, k) {
+        return vars && Object.prototype.hasOwnProperty.call(vars, k) ? String(vars[k]) : m;
+      });
+    },
   };
 
   return LessonCommon;

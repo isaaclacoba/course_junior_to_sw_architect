@@ -18,6 +18,8 @@
   "result.pass": "Output matched what the task asked for. XP awarded.",
   "result.compileFail": "The code did not compile. Read the errors above and try again.",
   "result.runtimeError": "It ran but threw an error. Fix it and run again.",
+  "result.mismatch": "Expected a line equal to \"{expected}\". Adjust your code and run again.",
+  "result.mismatchLines": "Expected these lines, in order:\n{lines}\nAdjust your code and run again.",
   "result.verifyFail": "Your code printed the right answer for this example, but a hidden check with different inputs failed. Make the logic work for any input, not just this one.",
   "result.error": "Something went wrong running the code.",
 

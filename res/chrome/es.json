@@ -18,6 +18,8 @@
   "result.pass": "La salida coincide con lo que pedía la tarea. XP otorgado.",
   "result.compileFail": "El código no compiló. Lee los errores de arriba e inténtalo de nuevo.",
   "result.runtimeError": "Se ejecutó pero lanzó un error. Corrígelo y ejecútalo de nuevo.",
+  "result.mismatch": "Esperaba una línea igual a \"{expected}\". Ajusta tu código y ejecútalo de nuevo.",
+  "result.mismatchLines": "Esperaba estas líneas, en orden:\n{lines}\nAjusta tu código y ejecútalo de nuevo.",
   "result.verifyFail": "Tu código imprimió la respuesta correcta para este ejemplo, pero una comprobación oculta con otras entradas falló. Haz que la lógica funcione para cualquier entrada, no solo para esta.",
   "result.error": "Algo salió mal al ejecutar el código.",
 

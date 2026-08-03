@@ -986,3 +986,26 @@ mirrored into the session todo list.
   into the CI drift step; verified it blocks a real regression with exit 1.
   Also documented why buildCard leaves Run/Next unmarked (build-engine owns those
   labels, nav.next -> nav.nextLesson on the last card).
+
+## 2026-08-03 17:00 - localized the mismatch message, and made the i18n round-trip parallel
+- Item 4 (i18n rollout plan, T1): the output-mismatch verdict was the last
+  hardcoded English string a learner could actually hit. `LessonCommon.fill()`
+  (a minimal `{name}` substitution - the course `t()` is a plain lookup and had
+  no interpolation) + `mismatchMessage()` in build-engine, backed by
+  `result.mismatch` / `result.mismatchLines` in the chrome catalogs. English is
+  byte-identical to the old `describeExpected`, pinned by a test, so nothing
+  moves for English readers; Spanish now switches live like the rest of chrome.
+- i18n-roundtrip: was ~13 min for 83 lessons and blocked any use of it as a
+  routine check. Now runs lessons concurrently, one tab each, and trims the
+  settle that fired straight AFTER a poll had already confirmed the state.
+  83 lessons: 780s -> 295s, still 83/83 PASS, output still in lesson order.
+- Sizing the tab pool by CPU cores was WRONG and OOM-killed the machine: a
+  lesson tab measures ~1.7GB, so 8 tabs on a 16-core box asks for ~14GB. The
+  pool is now budgeted from MemAvailable (capped at half the cores, and at 6),
+  with `--jobs` to override on an idle machine.
+- Fixed a pre-existing leak found while chasing that: killing only Chrome's
+  parent left its children writing into the temp profile, so the delete lost
+  the race with ENOTEMPTY and abandoned ~50MB per run. Kills the process group
+  now. Verified: 0 stray processes, 0 leftover profiles.
+- Reverted the CI check-i18n step (owner wants no CI gate for now); check-i18n
+  stays wired into the manual audit gate.
