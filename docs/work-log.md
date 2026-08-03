@@ -956,3 +956,9 @@ mirrored into the session todo list.
 - 2026-08-03 13:25  a11y fix: the landing page four icon-only controls kept English
   aria-labels under ES. The translations already existed in res/chrome/es.json
   but nothing applied them. paintStaticChrome now sets them.
+
+- 2026-08-03 13:36  page-shell split steps 3-5. lesson-common / chrome-text /
+  card-templates are now dual-UMD modules hoisted above the shared IIFE, with a
+  generated alias block re-binding the bare names the fragments still call.
+  All three require() standalone in Node. 87/87 tests; build, viz and checkpoint
+  render clean in EN and ES.

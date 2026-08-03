@@ -406,15 +406,29 @@ function landingI18nFile(overlay) {
 // else is a body FRAGMENT: those share the `page`/`hero` consts and the guard's
 // early return, so they must stay inside one closure to keep today's behaviour.
 const PAGE_SHELL_MODULES = [
-  { file: "lesson-common.js", outside: false },
-  { file: "chrome-text.js", outside: false },
+  { file: "lesson-common.js", outside: true },
+  { file: "chrome-text.js", outside: true },
   { file: "guard.js", outside: false },
   { file: "hero.js", outside: false },
   { file: "concepts.js", outside: false },
-  { file: "card-templates.js", outside: false },
+  { file: "card-templates.js", outside: true },
   { file: "boot.js", outside: false },
   { file: "viz-checkpoint.js", outside: false },
 ];
+
+// The fragments still call these by their bare names. The modules above are real
+// files with their own scope now, so re-bind their exports into the shared
+// closure - one line per name, rather than rewriting every call-site. The chrome
+// trio is bound as a set: they are always used together in template code.
+const PAGE_SHELL_ALIASES = [
+  "  var LessonCommon = window.LessonCommon;",
+  "  var chromeText = window.PageShellChromeText;",
+  "  var tHtml = chromeText.tHtml, tAttr = chromeText.tAttr, tSlot = chromeText.tSlot;",
+  "  var drillCard = window.PageShellCards.drillCard;",
+  "  var buildCard = window.PageShellCards.buildCard;",
+  "",
+  "",
+].join("\n");
 
 function pageShellFile() {
   const dir = path.join(root, "kernel", "page-shell");
@@ -429,7 +443,7 @@ function pageShellFile() {
   }
   const parts = [read("_header.js"), PAGE_SHELL_HEADER + "\n"];
   PAGE_SHELL_MODULES.filter((m) => m.outside).forEach((m) => parts.push(read(m.file)));
-  parts.push("(function () {\n");
+  parts.push("(function () {\n", PAGE_SHELL_ALIASES);
   PAGE_SHELL_MODULES.filter((m) => !m.outside).forEach((m) => parts.push(read(m.file)));
   parts.push("})();\n");
   return parts.join("");

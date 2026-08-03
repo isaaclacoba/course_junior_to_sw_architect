@@ -1,3 +1,14 @@
+// Shared lesson helpers: the storage seam, escaping, inline markup, progress
+// and the output panel. Used by both engines and by the page shell itself.
+//
+// A self-contained module: window.LessonCommon in the browser, module.exports in Node
+// so a unit test can require() it without loading the whole page shell.
+(function (root, factory) {
+  "use strict";
+  var api = factory();
+  if (typeof module === "object" && module.exports) module.exports = api;
+  else root.LessonCommon = api;
+})(typeof window !== "undefined" ? window : globalThis, function () {
   // Shared lesson helpers used by both engines (build + drill), so the escaping
   // and inline-markup rules live in one place. Defined before any early return
   // below so the engines can rely on it regardless of this page's config.
@@ -131,5 +142,6 @@
       return fallback;
     },
   };
-  window.LessonCommon = LessonCommon;
 
+  return LessonCommon;
+});

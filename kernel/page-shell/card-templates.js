@@ -1,3 +1,18 @@
+// The two archetype card scaffolds. drillCard is dormant (no live lesson uses
+// the drill engine today) but is kept as the base for a future exam track.
+//
+// A self-contained module: window.PageShellCards in the browser, module.exports in Node
+// so a unit test can require() it without loading the whole page shell.
+(function (root, factory) {
+  "use strict";
+  if (typeof module === "object" && module.exports) {
+    module.exports = factory(require("./chrome-text.js"));
+    return;
+  }
+  root.PageShellCards = factory(root.PageShellChromeText);
+})(typeof window !== "undefined" ? window : globalThis, function (chrome) {
+  var tHtml = chrome.tHtml, tAttr = chrome.tAttr, tSlot = chrome.tSlot;
+
   function drillCard(p) {
     return `
       <section class="card" aria-live="polite">
@@ -136,3 +151,5 @@
       </section>`;
   }
 
+  return { drillCard: drillCard, buildCard: buildCard };
+});
