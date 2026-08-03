@@ -28,6 +28,7 @@ var CodeLab = (() => {
     DEFAULT_MEMORY_STORES: () => DEFAULT_MEMORY_STORES,
     DEFAULT_VIZ_LABELS: () => DEFAULT_VIZ_LABELS,
     FULL_REGIONS: () => FULL_REGIONS,
+    GitGraph: () => GitGraph,
     IframeRunner: () => IframeRunner,
     MemoryViz: () => MemoryViz,
     MonacoEditor: () => MonacoEditor,
@@ -53,6 +54,7 @@ var CodeLab = (() => {
     drawQuiz: () => drawQuiz,
     firstUnanswered: () => firstUnanswered,
     formatToolSignature: () => formatToolSignature,
+    gitLayout: () => layout,
     goTo: () => goTo,
     loadMonaco: () => loadMonaco,
     makeTour: () => makeTour,
@@ -3610,11 +3612,11 @@ ${result.runtimeError}`.trim(),
     }
     render() {
       if (!this.lastTrace || !this.lastSteps) return;
-      const layout = this.memoryLayout();
+      const layout2 = this.memoryLayout();
       if (this.viz) {
         this.viz.setSteps(this.lastSteps, {
           code: this.lastTrace.code,
-          layout,
+          layout: layout2,
           preserveIndex: false
         });
         return;
@@ -3623,7 +3625,7 @@ ${result.runtimeError}`.trim(),
       this.viz = MemoryViz.create(this.stage, {
         code: this.lastTrace.code,
         steps: this.lastSteps,
-        layout,
+        layout: layout2,
         legend: this.legend,
         deriveRefs: true,
         autoDim: true,
@@ -3659,6 +3661,412 @@ ${result.runtimeError}`.trim(),
       this.editor.destroy();
       this.runner.destroy();
       this.root.remove();
+    }
+  };
+
+  // src/core/git-layout.ts
+  function headCommit(state) {
+    if (state.head.kind === "detached") return state.head.commit;
+    return state.refs.get(state.head.name) ?? null;
+  }
+  function headBranchShort(state) {
+    if (state.head.kind !== "branch") return void 0;
+    return state.head.name.replace(/^refs\/heads\//, "");
+  }
+  function layout(state) {
+    const oldestFirst = [...state.commits.keys()];
+    const xOf = /* @__PURE__ */ new Map();
+    oldestFirst.forEach((id, i) => xOf.set(id, i));
+    const newestFirst = [...oldestFirst].reverse();
+    const lanes = [];
+    const yOf = /* @__PURE__ */ new Map();
+    let maxLane = -1;
+    const firstFree = () => {
+      const free = lanes.indexOf(null);
+      return free === -1 ? lanes.length : free;
+    };
+    for (const id of newestFirst) {
+      const commit = state.commits.get(id);
+      const reserved = [];
+      for (let i = 0; i < lanes.length; i++) {
+        if (lanes[i] === id) reserved.push(i);
+      }
+      let lane;
+      if (reserved.length === 0) {
+        lane = firstFree();
+      } else {
+        lane = reserved[0];
+        for (let k = 1; k < reserved.length; k++) lanes[reserved[k]] = null;
+      }
+      yOf.set(id, lane);
+      if (lane > maxLane) maxLane = lane;
+      const parents = commit.parents;
+      if (parents.length === 0) {
+        lanes[lane] = null;
+      } else {
+        const fp = parents[0];
+        const existing = lanes.indexOf(fp);
+        if (existing === -1) {
+          lanes[lane] = fp;
+        } else {
+          const keep = Math.min(existing, lane);
+          const drop = Math.max(existing, lane);
+          lanes[keep] = fp;
+          if (drop !== keep) lanes[drop] = null;
+        }
+        for (let k = 1; k < parents.length; k++) {
+          const p = parents[k];
+          if (!lanes.includes(p)) lanes[firstFree()] = p;
+        }
+      }
+    }
+    const nodes = oldestFirst.map((id) => ({
+      id,
+      x: xOf.get(id),
+      y: yOf.get(id)
+    }));
+    const edges = [];
+    for (const id of newestFirst) {
+      for (const parent of state.commits.get(id).parents) {
+        edges.push({ from: id, to: parent });
+      }
+    }
+    const chips = [];
+    for (const [refName, commitId] of state.refs) {
+      if (refName.startsWith("refs/heads/")) {
+        chips.push({
+          label: refName.slice("refs/heads/".length),
+          kind: "branch",
+          commit: commitId
+        });
+      } else if (refName.startsWith("refs/tags/")) {
+        chips.push({
+          label: refName.slice("refs/tags/".length),
+          kind: "tag",
+          commit: commitId
+        });
+      }
+    }
+    const head = headCommit(state);
+    if (head !== null) {
+      const on = headBranchShort(state);
+      const chip = { label: "HEAD", kind: "head", commit: head };
+      if (on !== void 0) chip.on = on;
+      chips.push(chip);
+    }
+    return {
+      nodes,
+      edges,
+      chips,
+      width: oldestFirst.length,
+      height: maxLane + 1
+    };
+  }
+
+  // src/dom/git-graph-view.ts
+  var SVG_NS4 = "http://www.w3.org/2000/svg";
+  var COL_GAP = 128;
+  var ROW_GAP = 112;
+  var PAD_X = 64;
+  var PAD_TOP = 76;
+  var LABEL_BELOW = 54;
+  var NODE_R = 10;
+  var LANE_FALLBACK = ["#6366f1", "#14b8a6", "#f97316", "#a855f7", "#0ea5e9", "#e11d48"];
+  function laneVar(lane) {
+    const n = LANE_FALLBACK.length;
+    const i = (lane % n + n) % n;
+    return `var(--clg-lane-${i}, ${LANE_FALLBACK[i]})`;
+  }
+  function headCommit2(state) {
+    if (state.head.kind === "detached") return state.head.commit;
+    return state.refs.get(state.head.name) ?? null;
+  }
+  var GitGraph = class {
+    constructor() {
+      this.state = null;
+      this.handlers = [];
+      // Diff bookkeeping across renders, so only NEW nodes/edges animate.
+      this.prevNodeIds = /* @__PURE__ */ new Set();
+      this.prevEdgeKeys = /* @__PURE__ */ new Set();
+      this.prevZoneOf = /* @__PURE__ */ new Map();
+      // --- event delegation --------------------------------------------------
+      this.onClick = (ev) => {
+        const target = ev.target;
+        if (!target || typeof target.closest !== "function") return;
+        const refEl = target.closest("[data-ref]");
+        if (refEl) {
+          this.emit({ ref: refEl.dataset.ref });
+          return;
+        }
+        const commitEl = target.closest("[data-commit]");
+        if (commitEl) this.emit({ commit: commitEl.dataset?.commit });
+      };
+    }
+    // --- lifecycle ---------------------------------------------------------
+    mount(host, opts) {
+      this.root = document.createElement("div");
+      this.root.className = "cl-git";
+      this.graphWrap = document.createElement("div");
+      this.graphWrap.className = "cl-git-graph";
+      this.svg = document.createElementNS(SVG_NS4, "svg");
+      this.svg.setAttribute("class", "cl-git-svg");
+      this.chipLayer = document.createElement("div");
+      this.chipLayer.className = "cl-git-chips";
+      this.headEl = document.createElement("button");
+      this.headEl.setAttribute("type", "button");
+      this.headEl.className = "cl-git-chip is-head";
+      this.headEl.textContent = "HEAD";
+      this.headEl.dataset.ref = "HEAD";
+      this.headEl.hidden = true;
+      this.graphWrap.append(this.svg, this.chipLayer, this.headEl);
+      this.root.append(this.graphWrap, this.buildWorkArea());
+      this.root.addEventListener("click", this.onClick);
+      host.appendChild(this.root);
+      this.state = opts.state;
+      this.render(false);
+    }
+    setState(state, opts) {
+      this.state = state;
+      this.render(opts?.animate ?? false);
+    }
+    on(event, handler) {
+      if (event === "inspect") this.handlers.push(handler);
+    }
+    destroy() {
+      this.root.removeEventListener("click", this.onClick);
+      this.handlers.length = 0;
+      this.root.remove();
+    }
+    emit(p) {
+      for (const h of this.handlers) h(p);
+    }
+    // --- render ------------------------------------------------------------
+    render(animate) {
+      const state = this.state;
+      if (!state) return;
+      const g = layout(state);
+      const laneOf = /* @__PURE__ */ new Map();
+      const posOf = /* @__PURE__ */ new Map();
+      for (const node of g.nodes) {
+        laneOf.set(node.id, node.y);
+        posOf.set(node.id, this.px(node));
+      }
+      const width = PAD_X * 2 + Math.max(0, g.width - 1) * COL_GAP;
+      const height = PAD_TOP + Math.max(0, g.height - 1) * ROW_GAP + LABEL_BELOW;
+      this.svg.setAttribute("width", String(width));
+      this.svg.setAttribute("height", String(height));
+      this.svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      this.graphWrap.style.width = `${width}px`;
+      this.graphWrap.style.height = `${height}px`;
+      const newNodeIds = /* @__PURE__ */ new Set();
+      const newEdgeKeys = /* @__PURE__ */ new Set();
+      this.svg.replaceChildren();
+      this.drawEdges(g.edges, posOf, laneOf, animate, newEdgeKeys);
+      this.drawNodes(g.nodes, state, animate, newNodeIds);
+      this.drawChips(g.chips.filter((c) => c.kind !== "head"), posOf, laneOf);
+      this.placeHead(g.chips.find((c) => c.kind === "head"), posOf, animate);
+      this.renderZones(state, animate);
+      this.prevNodeIds = newNodeIds;
+      this.prevEdgeKeys = newEdgeKeys;
+    }
+    px(node) {
+      return { x: PAD_X + node.x * COL_GAP, y: PAD_TOP + node.y * ROW_GAP };
+    }
+    drawEdges(edges, posOf, laneOf, animate, newEdgeKeys) {
+      for (const edge of edges) {
+        const child = posOf.get(edge.from);
+        const parent = posOf.get(edge.to);
+        if (!child || !parent) continue;
+        const key = `${edge.from}>${edge.to}`;
+        newEdgeKeys.add(key);
+        const branchLane = Math.max(laneOf.get(edge.from) ?? 0, laneOf.get(edge.to) ?? 0);
+        let d;
+        if (child.y === parent.y) {
+          d = `M${parent.x},${parent.y} L${child.x},${child.y}`;
+        } else {
+          const midX = (parent.x + child.x) / 2;
+          d = `M${parent.x},${parent.y} C${midX},${parent.y} ${midX},${child.y} ${child.x},${child.y}`;
+        }
+        const isNew = animate && !this.prevEdgeKeys.has(key);
+        const path = svgEl("path", {
+          d,
+          class: isNew ? "cl-git-edge cl-git-edge-draw" : "cl-git-edge",
+          stroke: laneVar(branchLane),
+          fill: "none",
+          pathLength: 1
+        });
+        this.svg.appendChild(path);
+      }
+    }
+    drawNodes(nodes, state, animate, newNodeIds) {
+      for (const node of nodes) {
+        newNodeIds.add(node.id);
+        const { x, y } = this.px(node);
+        const isNew = animate && !this.prevNodeIds.has(node.id);
+        const group = svgEl("g", {
+          class: isNew ? "cl-git-node cl-git-appear" : "cl-git-node",
+          "data-commit": node.id
+        });
+        group.appendChild(
+          svgEl("circle", {
+            cx: x,
+            cy: y,
+            r: NODE_R,
+            class: "cl-git-dot",
+            fill: "var(--clg-node, #fff)",
+            stroke: laneVar(node.y),
+            "stroke-width": 3
+          })
+        );
+        const hash = svgEl("text", { x, y: y + 26, class: "cl-git-hash", "text-anchor": "middle" });
+        hash.textContent = node.id;
+        group.appendChild(hash);
+        const commit = state.commits.get(node.id);
+        const msg = svgEl("text", { x, y: y + 41, class: "cl-git-msg", "text-anchor": "middle" });
+        msg.textContent = commit?.message ?? "";
+        group.appendChild(msg);
+        this.svg.appendChild(group);
+      }
+    }
+    drawChips(chips, posOf, laneOf) {
+      this.chipLayer.replaceChildren();
+      const byCommit = /* @__PURE__ */ new Map();
+      for (const chip of chips) {
+        const bucket = byCommit.get(chip.commit) ?? [];
+        bucket.push(chip);
+        byCommit.set(chip.commit, bucket);
+      }
+      for (const [commit, bucket] of byCommit) {
+        const pos = posOf.get(commit);
+        if (!pos) continue;
+        const stack = document.createElement("div");
+        stack.className = "cl-git-chipstack";
+        stack.style.left = `${pos.x}px`;
+        stack.style.top = `${pos.y - 30}px`;
+        for (const chip of bucket) {
+          const pill = document.createElement("button");
+          pill.type = "button";
+          pill.className = `cl-git-chip is-${chip.kind}`;
+          pill.textContent = chip.label;
+          if (chip.kind === "branch") {
+            pill.style.background = laneVar(laneOf.get(commit) ?? 0);
+            pill.dataset.ref = `refs/heads/${chip.label}`;
+          } else {
+            pill.dataset.ref = `refs/tags/${chip.label}`;
+          }
+          stack.appendChild(pill);
+        }
+        this.chipLayer.appendChild(stack);
+      }
+    }
+    placeHead(head, posOf, animate) {
+      if (!head) {
+        this.headEl.hidden = true;
+        return;
+      }
+      const pos = posOf.get(head.commit);
+      if (!pos) {
+        this.headEl.hidden = true;
+        return;
+      }
+      if (!animate) {
+        this.headEl.style.transition = "none";
+      }
+      this.headEl.hidden = false;
+      this.headEl.dataset.ref = "HEAD";
+      this.headEl.dataset.on = head.on ?? "";
+      this.headEl.title = head.on ? `HEAD -> ${head.on}` : "HEAD (detached)";
+      this.headEl.classList.toggle("is-detached", head.on === void 0);
+      this.headEl.style.left = `${pos.x}px`;
+      this.headEl.style.top = `${pos.y - 54}px`;
+      if (!animate) {
+        void this.headEl.offsetWidth;
+        this.headEl.style.transition = "";
+      }
+    }
+    // --- working area ------------------------------------------------------
+    buildWorkArea() {
+      const work = document.createElement("div");
+      work.className = "cl-git-work";
+      const tree = this.zone("tree", "Working tree");
+      const staging = this.zone("index", "Staging");
+      const repo = this.zone("repo", "Repository");
+      work.append(
+        tree.wrap,
+        this.arrow("git add"),
+        staging.wrap,
+        this.arrow("git commit"),
+        repo.wrap
+      );
+      this.zoneBodies = { tree: tree.body, index: staging.body, repo: repo.body };
+      return work;
+    }
+    zone(kind, title) {
+      const wrap = document.createElement("div");
+      wrap.className = `cl-git-zone is-${kind}`;
+      const head = document.createElement("h3");
+      head.textContent = title;
+      const body = document.createElement("div");
+      body.className = "cl-git-zone-body";
+      wrap.append(head, body);
+      return { wrap, body };
+    }
+    arrow(label) {
+      const arrow = document.createElement("div");
+      arrow.className = "cl-git-arrow";
+      const kbd = document.createElement("span");
+      kbd.className = "cl-git-kbd";
+      kbd.textContent = label;
+      arrow.append(kbd, document.createTextNode("\u2192"));
+      return arrow;
+    }
+    renderZones(state, animate) {
+      const tree = [...state.worktree.keys()].sort();
+      const staged = [...state.index.keys()].sort();
+      const committed = this.reachablePaths(state);
+      for (const p of tree) committed.delete(p);
+      for (const p of staged) committed.delete(p);
+      const repo = [...committed].sort();
+      const nextZoneOf = /* @__PURE__ */ new Map();
+      this.fillZone("tree", tree, nextZoneOf, animate);
+      this.fillZone("index", staged, nextZoneOf, animate);
+      this.fillZone("repo", repo, nextZoneOf, animate);
+      this.prevZoneOf = nextZoneOf;
+    }
+    fillZone(zone, paths, nextZoneOf, animate) {
+      const body = this.zoneBodies[zone];
+      body.replaceChildren();
+      for (const path of paths) {
+        nextZoneOf.set(path, zone);
+        const moved = animate && this.prevZoneOf.get(path) !== zone;
+        const row = document.createElement("div");
+        row.className = moved ? "cl-git-file is-moved" : "cl-git-file";
+        const dot = document.createElement("span");
+        dot.className = "cl-git-fdot";
+        const name = document.createElement("span");
+        name.className = "cl-git-fname";
+        name.textContent = path;
+        row.append(dot, name);
+        body.appendChild(row);
+      }
+    }
+    /** Union of `paths` over every commit reachable from HEAD (empty when unborn). */
+    reachablePaths(state) {
+      const start = headCommit2(state);
+      const paths = /* @__PURE__ */ new Set();
+      if (start === null) return paths;
+      const seen = /* @__PURE__ */ new Set();
+      const stack = [start];
+      while (stack.length) {
+        const id = stack.pop();
+        if (seen.has(id)) continue;
+        seen.add(id);
+        const commit = state.commits.get(id);
+        if (!commit) continue;
+        for (const p of commit.paths) paths.add(p);
+        for (const parent of commit.parents) stack.push(parent);
+      }
+      return paths;
     }
   };
 

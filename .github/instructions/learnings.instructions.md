@@ -8,6 +8,16 @@ applyTo: '**'
 Durable rules discovered the hard way. Keep each to 1-4 sentences. If a learning
 grows into a procedure, promote it to a skill and leave a pointer here.
 
+## Design rounds (WoW)
+
+- **A widget's look-and-behaviour is a UX design decision - mockup + owner-decide -
+  even inside a "build" phase.** The design-of-record's contracts fix the DATA shapes
+  (`RepoState`, `layout() -> {nodes,edges,chips}`), NOT the visual. Do not let "the
+  design is done, this is just implementation" bypass the WoW: for any new visual
+  surface (a graph, a panel, an animation) show a non-functional HTML mockup and get
+  the owner's pick BEFORE coding the view. Symptom of the trap: fleeting agents to
+  build the view and "approving" it yourself.
+
 ## Editing
 
 - **Edit large shared files atomically via bash, not the `edit`/`create` tools.**

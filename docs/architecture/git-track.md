@@ -52,6 +52,22 @@ two-pane view). Those are where the fake model teaches least honestly.
 GitGraph renders a `RepoState` and does not care where it came from - so the teaching
 model (this track) and real-git-WASM (next track) share one visual, `RepoState` unchanged.
 
+## Visual & UX (owner-ratified 2026-08-03, via HTML mockup)
+- **Orientation: HORIZONTAL** (Learn-Git-Branching style) - time flows left->right,
+  branches are stacked rows, a merge dips to a branch row and rejoins. NOTE:
+  `git-layout` was first built vertical (y=time, x=lane); it needs an axis rework to
+  emit horizontal coordinates (x=time index, y=branch row) - the ordering + lane
+  algorithm are reusable, only the output mapping flips.
+- **Commit label: hash + message** under each dot (realistic 7-hex + readable message).
+- **Colour: one per branch** (main indigo, feature teal; tag amber; HEAD dark pill);
+  must follow the course dark theme.
+- **Working-area panel: three zones** - Working tree | Staging | Repository - with
+  files sliding between them on `add`/`commit`. Makes the worktree/index/repo model
+  visible; it is the practical view beside the graph.
+- **Animation: gentle (~400ms)** fade+slide for a new commit/edge. Merge draws the new
+  dot + both incoming edges (no full re-layout); the HEAD pill glides to its commit;
+  honour `prefers-reduced-motion` (instant for those users).
+
 ## Contracts
 1. **git-model** (code-lab `src/core/git-model.ts`, DOM-free): `RepoState` + pure ops
    `RepoState -> { state, effect }` (effect drives animation): `commit, add, branch,
