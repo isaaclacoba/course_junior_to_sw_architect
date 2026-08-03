@@ -23,9 +23,16 @@ authoring + workflow guide.
 5. **Minimal docs** - no new markdown files unless asked; code/content is
    self-explanatory. Prose voice (plain/warm, `backticks`, spaced hyphen ` - `,
    no emojis, no marketing) is canonical in `AGENTS.md` - follow it.
-6. **New line of work → design round first.** A feature, new module/tool, big
-   refactor, or a >3-step / self-discovering task starts with a design round WITH
-   the owner (never present your choices as decided). See the `work-brief` skill.
+6. **New line of work → design round first (WITH the owner).** For a feature, new
+   module/tool, big or scattered refactor, or an ambiguous >3-step task, before a
+   brief or any code: (a) GROUND - audit the real code or run a PoC so options are
+   real; (b) ASK the owner batches of 5-10 explicit decisions - recommend with
+   tradeoffs, but the owner decides; show UI as an HTML mockup, not prose; record
+   each decision to the journal (`node tools/journal.mjs decision ...`); (c) only at
+   near-zero ambiguity, write the brief + design-of-record, then build. FORBIDDEN:
+   presenting your own choices as decided, or extrapolating an architecture from a
+   few answers. The human can type `/design-round`; you can invoke the `architect` /
+   `auditor` agents; the full procedure is the `work-brief` skill (Phase 0).
 
 ## Architecture map
 

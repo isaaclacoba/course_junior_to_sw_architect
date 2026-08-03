@@ -3,9 +3,11 @@ name: work-brief
 description: >-
   Create and maintain a "work brief" - one skimmable file that is BOTH the
   owner's readable status page and the agent's step tracker for a non-trivial
-  task. USE FOR: starting a multi-step piece of work; giving the owner a
-  <=100-line "what are we doing" view; tracking progress with checkable steps +
-  a dated log; keeping a plan in sync across turns/sessions. DO NOT USE FOR:
+  task. USE FOR: starting a new line of work - a feature, a module, a tool, a
+  multi-hundred-line or scattered-logic refactor, or any task that is ambiguous
+  or not-yet-well-defined; starting a multi-step piece of work; giving the owner
+  a <=100-line "what are we doing" view; tracking progress with checkable steps
+  + a dated log; keeping a plan in sync across turns/sessions. DO NOT USE FOR:
   trivial one-step tasks (just do them); deep architecture/design rationale
   (write a design-of-record in docs/architecture/ and LINK it from the brief).
 ---
