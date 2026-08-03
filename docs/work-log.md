@@ -1009,3 +1009,39 @@ mirrored into the session todo list.
   now. Verified: 0 stray processes, 0 leftover profiles.
 - Reverted the CI check-i18n step (owner wants no CI gate for now); check-i18n
   stays wired into the manual audit gate.
+
+## 2026-08-03 18:08 - check-literals: stop new hardcoded English at the door (i18n item 5)
+- The gap: nothing detected a user-visible English literal added to an engine.
+  That is how the last batch got in, and why the mismatch verdict had to be
+  localized by hand this morning.
+- A PoC killed the obvious design first. A naive prose scan finds 337 literals
+  and essentially all of them are CORRECT, because `t(key, "English")` takes the
+  English as its fallback - at the string level a right and a wrong line are
+  identical. The discriminator is where the string FLOWS: does it reach
+  textContent / innerHTML / aria-label without passing through a translator?
+- tools/check-literals.mjs walks an acorn AST for exactly that. acorn is the
+  repo's first devDependency; a line regex was tried and matched across string
+  boundaries, so a real parser is the honest minimum. 0.14s repo-wide.
+- Escape hatch: `// i18n-ignore: <reason>` on the line, or on the line above it
+  for long statements. A reason is REQUIRED, so an exemption is reviewable in
+  the diff instead of invisible.
+- Findings, after the noise was tuned out: `concept.notFound` already existed in
+  BOTH catalogs (Spanish included) and the code never called it - a written
+  translation that could never render. Fixed.
+- Two false-positive classes were real bugs in the LINTER, found by reading its
+  output instead of trusting it: markup glue spliced into innerHTML, and the 4
+  landing-page aria-labels, which `setAria()` already localizes at runtime with
+  the inline English as its fallback. The linter now cross-references selectors
+  that JS pairs with a catalog key, so the correct pattern stays silent. My
+  earlier claim that those 4 were live violations was WRONG.
+- The language switcher is pragma'd, not translated: a language control names
+  its target language in that language.
+- drill-engine.js is excluded with a dated, removable reason - it is dead (0
+  pages load it) and is being migrated to a lesson-engine plugin.
+- 20 unit tests, all 6 mutations caught, and a real regression probe blocks with
+  exit 1. Wired into audit-gate (--staged when a non-content .js or index.html
+  changes, and in --all). Full suite 224/224.
+- KNOWN RED: 4 genuine findings in kernel/engine/plugins/drill-plugin.js, an
+  untracked file from the concurrent session. Left for that session to fix - the
+  linter catching hardcoded English in a file written the same hour is the
+  clearest evidence it was needed.

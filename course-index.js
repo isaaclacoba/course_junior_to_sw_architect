@@ -248,8 +248,9 @@
     btn.type = "button";
     btn.className = "c-theme-btn";
     var toEs = LANG !== "es";
+    // i18n-ignore: a language switch names its TARGET language in that language - translating it defeats the control
     btn.setAttribute("aria-label", toEs ? "Cambiar a espa\u00f1ol" : "Switch to English");
-    btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.9 6h-3a15 15 0 0 0-1.2-3.3A8 8 0 0 1 18.9 8ZM12 4c.7 0 1.7 1.4 2.3 4H9.7C10.3 5.4 11.3 4 12 4ZM4.3 14a8 8 0 0 1 0-4h3.2a17 17 0 0 0 0 4Zm.8 2h3a15 15 0 0 0 1.2 3.3A8 8 0 0 1 5.1 16Zm3-8h-3a8 8 0 0 1 4.2-3.3A15 15 0 0 0 8.1 8ZM12 20c-.7 0-1.7-1.4-2.3-4h4.6c-.6 2.6-1.6 4-2.3 4Zm2.7-6H9.3a15 15 0 0 1 0-4h5.4a15 15 0 0 1 0 4Zm.2 5.3a15 15 0 0 0 1.2-3.3h3a8 8 0 0 1-4.2 3.3ZM16.5 14a17 17 0 0 0 0-4h3.2a8 8 0 0 1 0 4Z"/></svg><span>' + (toEs ? "Espa\u00f1ol" : "English") + "</span>";
+    btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.9 6h-3a15 15 0 0 0-1.2-3.3A8 8 0 0 1 18.9 8ZM12 4c.7 0 1.7 1.4 2.3 4H9.7C10.3 5.4 11.3 4 12 4ZM4.3 14a8 8 0 0 1 0-4h3.2a17 17 0 0 0 0 4Zm.8 2h3a15 15 0 0 0 1.2 3.3A8 8 0 0 1 5.1 16Zm3-8h-3a8 8 0 0 1 4.2-3.3A15 15 0 0 0 8.1 8ZM12 20c-.7 0-1.7-1.4-2.3-4h4.6c-.6 2.6-1.6 4-2.3 4Zm2.7-6H9.3a15 15 0 0 1 0-4h5.4a15 15 0 0 1 0 4Zm.2 5.3a15 15 0 0 0 1.2-3.3h3a8 8 0 0 1-4.2 3.3ZM16.5 14a17 17 0 0 0 0-4h3.2a8 8 0 0 1 0 4Z"/></svg><span>' + (toEs ? "Espa\u00f1ol" : "English") + "</span>"; // i18n-ignore: same - the switch label is the target language's own name
     btn.addEventListener("click", function () {
       try { window.localStorage.setItem("course_lesson_lang", toEs ? "es" : "en"); } catch (e) {}
       window.location.reload();

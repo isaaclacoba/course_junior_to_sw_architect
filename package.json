@@ -11,5 +11,8 @@
   },
   "dependencies": {
     "@duckdb/node-api": "1.5.5-r.3"
+  },
+  "devDependencies": {
+    "acorn": "^8.18.0"
   }
 }

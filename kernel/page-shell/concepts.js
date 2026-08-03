@@ -84,7 +84,7 @@
     const panel = conceptPanelEl();
     activeConceptId = id;
     panel.querySelector(".concept-panel-term").textContent = d ? d.term : id;
-    panel.querySelector(".concept-panel-def").textContent = d ? d.def : "Definition not found.";
+    panel.querySelector(".concept-panel-def").textContent = d ? d.def : LessonCommon.t("concept.notFound", "Definition not found.");
     const prefix = window.LESSON_META && window.LESSON_META.id ? "../../../../" : "";
     panel.querySelector(".concept-panel-link").innerHTML = `<a href="${prefix}glossary.html">${tHtml("concept.openGlossary", "Open the glossary")}</a>`;
     panel.hidden = false;

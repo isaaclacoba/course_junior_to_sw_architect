@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /**
  * tools/audit-gate.mjs - the mechanical auditor gate. A fast, diff-aware runner
- * for the repo's DETERMINISTIC checks, wired as a pre-commit hook so a `git
- * commit` that would break the tree is BLOCKED. Node built-ins only, zero deps
- * (same convention as tools/verify-lesson.mjs). This header is the manual.
+ * for the repo's DETERMINISTIC checks. Run it BY HAND (npm run gate / gate:all /
+ * gate:staged) between pieces of work - there is deliberately no git hook, so
+ * committing and pushing never block. Node built-ins only (tools/check-literals.mjs
+ * is the one exception - it needs a real parser). This header is the manual.
  *
  * WHAT IT RUNS (and when). In the default --staged mode it reads the staged file
  * list (`git diff --cached --name-only --diff-filter=ACM`) and runs ONLY the
@@ -23,6 +24,10 @@
  *   i18n (parity)  `node tools/check-i18n.mjs` - every localized key in a default
  *                 bundle must exist in each overlay language, or that string
  *                 silently renders English. Same trigger as the round-trip below.
+ *   i18n (literals) `node tools/check-literals.mjs` - a string literal reaching a
+ *                 user-visible sink (textContent/innerHTML/aria-label/...) without
+ *                 passing through t(). Runs when any non-content .js or index.html
+ *                 is staged. This is the check that stops NEW hardcoded English.
  *   i18n (static)  `node tools/i18n-roundtrip.mjs --static` on the affected voiced
  *                 lesson dirs when any staged path is a resource binder
  *                 (resource/bind-*.js), page-shell.js, or a voiced lesson file
@@ -159,6 +164,13 @@ function checkI18nParity() {
   run("node tools/check-i18n.mjs", "node tools/check-i18n.mjs", NODE, [path.join(root, "tools", "check-i18n.mjs")]);
 }
 
+// Hardcoded user-visible English in the engines: a literal reaching textContent
+// / innerHTML / aria-label without passing through t(). Cheap (~0.5s, no
+// browser) and repo-wide, so it runs whole rather than per-file.
+function checkLiterals() {
+  run("node tools/check-literals.mjs", "node tools/check-literals.mjs", NODE, [path.join(root, "tools", "check-literals.mjs")]);
+}
+
 // Generated files that live at the repo root rather than under generated/.
 const ROOT_ARTIFACTS = new Set(["page-shell.js"]);
 
@@ -277,6 +289,10 @@ function planStaged(staged) {
     checkValidate();
     checkDrift();
   }
+  // Any engine/kernel JS or a localizable HTML page can introduce a raw literal.
+  if (staged.some((p) => (p.endsWith(".js") && !p.startsWith("content/")) || p === "index.html")) {
+    checkLiterals();
+  }
   const i18nTriggers = staged.filter((p) => isBinder(p) || p === "page-shell.js" || isVoicedFile(p));
   if (i18nTriggers.length) {
     checkI18nParity();
@@ -295,6 +311,7 @@ function planAll() {
   checkValidate();
   checkDrift();
   checkI18nParity();
+  checkLiterals();
   checkI18n(true, []);
 }
 
