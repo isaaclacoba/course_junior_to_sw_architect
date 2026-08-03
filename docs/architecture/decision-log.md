@@ -1,7 +1,7 @@
 # Decision log / activity archive - design of record
 
-Status: design ACCEPTED + CLI built, tested, and seeded with real data
-(2026-08-03). Remaining: git-lfs for `activity/`.
+Status: DONE (CLI built, tested, seeded; storage finalized 2026-08-03). The
+firehose stays local (public repo); Layer B is the public archive.
 Brief: [docs/plans/decision-log.md](../plans/decision-log.md)
 
 ## Context & trigger
@@ -55,19 +55,20 @@ while an agent still holds them in context.
 6. **CLI** - `tools/journal.mjs`: `etl`, `record`, `decision`, `feature`,
    `search`, `show`. On demand (`npm run journal:etl`); live `record` on
    subagent-return.
-7. **Git storage** - `features/`, `decisions/`, `outputs/` committed plainly
-   (small, non-regenerable); only the bulky, regenerable `activity/` firehose
-   waits for git-lfs (not yet installed) and is gitignored meanwhile.
+7. **Git storage** - `features/`, `decisions/`, `outputs/` committed plainly (the
+   public archive). The bulky, regenerable `activity/` firehose stays GITIGNORED
+   (local-only) because `origin` is a public repo; a git-lfs track rule sits in
+   `.gitattributes`, ready for a future PRIVATE mirror. (D-6 supersedes D-4.)
 8. **Decision ids** - readable `D-<slug>-<n>`.
 9. **session-store** - joined as an enrichment source now (files, refs, summaries).
 
 ## Schemas
-Path A `docs/journal/activity/*.parquet` (append-only set, git-lfs):
+Path A `docs/journal/activity/*.parquet` (append-only set; LOCAL/gitignored, lfs-ready):
 `session_id, ts, agent, kind, tool_name, bytes, preview(<=240), body(raw|null)`.
 Enriched from session-store per session (`repository, branch, summary, agent_name`);
 `session_files` / `session_refs` folded in as `kind='file'|'ref'` rows.
 
-Path A-live `docs/journal/outputs/*.parquet` (append, git-lfs):
+Path A-live `docs/journal/outputs/*.parquet` (append, committed plainly):
 `session_id, ts, agent, feature, kind(subagent|audit|poc|search|note), title,
 body(raw)`.
 
@@ -104,7 +105,8 @@ is a distinct event, no watermark needed.
   keeps/drops the right kinds.
 - CLI: arg parsing; `search` filters (`--session/--feature/--agent/--kind`).
 
-## Deferred detail (decide at build time)
-- Exact git-lfs track globs for `docs/journal/{activity,outputs}/`.
+## Deferred detail
+- Firehose lfs track rule is set (`docs/journal/activity/*.parquet`); it activates
+  only in a private mirror that un-ignores `activity/`.
 - `search` surface: fixed filters (`--text/--session/--feature/--agent/--kind`)
   over DuckDB `LIKE`, plus optional session-store FTS passthrough.
