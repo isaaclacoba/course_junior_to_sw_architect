@@ -199,8 +199,8 @@ Beside `drill` and `build` there is a narrated, stepped **visual** with no code
 editor. It powers the Theory "AI track" (`ai-N.*`) and the `theory-N.viz.js`
 visuals. It is data fed to the shared **MemoryViz** engine in `code-lab`; you do
 not write rendering code. (Building a *new* scene is engine work - see
-`.github/copilot-instructions.md` "Engine work", which points to
-`/memories/repo/memory-viz-component.md`, "Adding a MemoryViz scene".)
+`.github/copilot-instructions.md`, section "Engine work (code-lab + MemoryViz
+scenes)".)
 
 Under the generated flow a viz lesson is `archetype: viz`; its scene data lives
 in the lesson dir's `viz.js` (`window.LESSON_VIZ`) and its `index.html` is

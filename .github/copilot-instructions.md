@@ -144,10 +144,56 @@ tools/i18n-roundtrip.mjs` (see the `i18n-roundtrip` skill).
 
 ## Engine work (code-lab + MemoryViz scenes)
 
-Changing the engine itself - the `code-lab` module build/test/re-vendor loop, and
-the fixed 7-step checklist for adding a `MemoryViz` scene - is documented in
-`/memories/repo/memory-viz-component.md` ("code-lab module" + "Adding a MemoryViz
-scene"). Do not reinvent it; read that first.
+`code-lab/` is a git submodule. It exports a family of top-level widgets and
+helpers - `CodeLab`, `Tour`, `MonacoEditor` plus `loadMonaco`, `TextareaEditor`,
+`IframeRunner` / `RoslynIframeRunner`, `Quiz`, `MemoryViz`, `VizLab`, and error
+panel helpers - plus the Blazor/Roslyn `compiler-host`. Do not conflate levels: a
+widget is a top-level component; a scene is one visual panel inside `MemoryViz`.
+Adding a new widget is broader than adding a scene: it needs a new `CodeLab.*`
+export, its own `.cl-*` root, and a mount path from `page-shell.js`.
+
+When you change `code-lab`, run the loop inside `code-lab/`:
+
+```bash
+npm run typecheck
+npm test          # node --import tsx --test test/*.test.ts
+npm run build     # tsup -> dist/ ESM, CJS, IIFE, declarations, CSS, maps
+```
+
+After changing the component, rebuild and re-vendor the browser bundle:
+
+```bash
+cp dist/code-lab.global.js dist/code-lab.css ../vendor/code-lab/
+```
+
+Keep DOM-free logic in `src/core/`; that is the part to unit-test for new scenes.
+The large WASM `_framework` output is ignored (`level3-app/`, and `code-lab/dist/`
+when built there) and is never committed. Commit the submodule first, then bump
+the pointer and the re-vendored bundle in the course commit.
+
+Adding a `MemoryViz` scene is a fixed checklist:
+
+1. `src/core/<name>-model.ts` - define the scene data interface and a pure
+   resolver that clamps or normalises raw data for rendering. Follow the scene's
+   real names (`RetrievalScene` + `resolveRetrieval()`, `PlanScene` +
+   `resolvePlan()` for `planboard`). Unit-test it in `test/<name>-model.test.ts`.
+2. `src/dom/<name>-view.ts` - add a thin `<Name>View` with `el` and `sync(ctx)`.
+   Read the step field (`ctx.model.retrieval`, `ctx.model.plan`, etc.) and use
+   `escapeHtml` from `../core/narration.js`. Give it a unique root class such as
+   `cl-rg` or `cl-pb`.
+3. `src/core/memory-model.ts` - import and re-export the scene type, add the step
+   field to `Step`, and add the panel literal to `PanelType` (`retrieval`,
+   `planboard`, etc.).
+4. `src/dom/memory-viz.ts` - import the view and add it to `panelFactories`, e.g.
+   `retrieval: () => new RetrievalView()` or `planboard: () => new
+   PlanboardView()`.
+5. `src/index.ts` - export the scene types and resolver functions.
+6. `src/code-lab.css` - add the `.cl-xx` style block and add its caption selector
+   to the shared caption group.
+7. From `code-lab/`, run `npm run typecheck`, `npm test`, and `npm run build`;
+   then copy `dist/code-lab.global.js` and `dist/code-lab.css` to
+   `../vendor/code-lab/`. Confirm the new class/symbols are present in the
+   vendored bundle before authoring against it.
 
 ## Build & deploy
 
