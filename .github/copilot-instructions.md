@@ -23,6 +23,9 @@ authoring + workflow guide.
 5. **Minimal docs** - no new markdown files unless asked; code/content is
    self-explanatory. Prose voice (plain/warm, `backticks`, spaced hyphen ` - `,
    no emojis, no marketing) is canonical in `AGENTS.md` - follow it.
+6. **New line of work → design round first.** A feature, new module/tool, big
+   refactor, or a >3-step / self-discovering task starts with a design round WITH
+   the owner (never present your choices as decided). See the `work-brief` skill.
 
 ## Architecture map
 
