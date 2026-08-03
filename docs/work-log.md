@@ -902,3 +902,24 @@ all [data-theme="dark"]-scoped; re-checked headless). Temp harness removed.
 
 - Start: 2026-08-02 20:43:36 +0200 | Task: Refactor landing i18n to be lesson-owned - remove the central res/landing/es.json overlay. Each lesson now carries its own Spanish card text (card.title/card.blurb in res/strings/default/es.json); track+part chrome moves inline into course-registry.js i18n blocks; generate.mjs derives generated/landing-i18n.<lang>.json from both (part kicker derived from partPrefix + a localized ordinal). Root cause of the "Part five/Keeping data safe untranslated on the index" bug: English cards were generated from meta, Spanish cards were hand-authored centrally, so a new lesson auto-wired EN but silently omitted ES.
 - End: 2026-08-02 20:43:36 +0200 | Result: DONE (not committed). course-registry.js: i18n:{es:{...}} on 3 tracks + 15 parts. generate.mjs: ORDINALS_I18N.es + buildLandingI18n() emitting generated/landing-i18n.es.json (byte-identical overlay to the old hand-authored file - 205 keys, 0 diff). Migrated card.title/card.blurb into all 83 lesson es.json. course-index.js loader repointed to generated/landing-i18n.es.json (course-nav.js unchanged - same LandingContent shape). check-i18n.mjs: card.* folded into the per-lesson referenceFor() gate; checkLanding() repointed to registry-source completeness (FAIL on any track/part missing i18n for a targeted lang). verify-lesson.mjs verifyLanding() likewise. validate.mjs: card.* added to the orphan allow-list (English source is meta, not the en bundle). res/landing/ removed. SKILL.md updated. Verified: generate idempotent + no drift (course-data/concept-index unchanged, 0 i18n leak into EN manifest), validate 0 err/90 warn, check-i18n PASS, 53/53 tests, negative-tests on both gates (part title, track field, per-lesson card) FAIL exit 1 then PASS exit 0, headless ES index render (Part 5 "Fundamentos del buen codigo" charcode-exact, all 83 cards + 15 stages Spanish, keeping-data-safe card Spanish, 0 undefined, 0 English leak) and EN index render unchanged (LandingContent not fetched).
+
+## 2026-08-03 09:45:02 +0200 - SOLID design round (grading + drill-engine conformance)
+Design round (work-brief Phase 0) for the 6 SOLID-review findings. Reframed
+against the parked `lesson-platform-kernel.md` design-of-record: these revive its
+parked phases now the promotion-map triggers have fired (verify-lesson drift +
+the 4th binder). Collapsed 6 items -> 2 workstreams + 1 owner decision.
+Owner decisions: (1) 2 workstreams, A before B; (2) kernel-home = new
+`kernel/grading/` dir, narrowly scoped; (3) Workstream A design-full,
+build-incremental. Two architect subagents produced design-of-records + briefs:
+- docs/architecture/grading-subsystem.md + docs/plans/grading-subsystem.md
+  (items 1+5: DOM-free Grader seam, OutputMatchGrader shared by build-engine +
+  verify-lesson first, BlankMatchGrader deferred to B).
+- docs/architecture/drill-engine-conformance.md + docs/plans/drill-engine-conformance.md
+  (items 2+3+4: drill-engine gains the frozen create/setLocale/data-manual
+  contract, resource/bind-drill.js, God-module SRP split, chrome via LessonCommon.t).
+Design only - no engine/tool edits, nothing committed. Implementation steps
+mirrored into the session todo list.
+
+## 2026-08-03 09:47:28 +0200 - Workstream A increment 1 (kernel/grading OutputMatchGrader)
+- start
+- 2026-08-03 09:59:00 +0200  Workstream A increment 1 landed. Created kernel/grading/output-match.js (the first kernel/ dir - owner-chosen home), a DOM-free UMD module (window.KernelGrading in the browser, module.exports in Node) holding the shared C# output-grading policy: PROGRAM_CLASS_RE, matches, unmetRequirement, buildProbe, describeExpected, passesHiddenVerify (runner injected via deps.run), and a gradeOutput orchestrator. build-engine.js now delegates to it (local matches/unmetRequirement/buildProbe/describeExpected/passesHiddenVerify removed; same grade order + same localized messages). tools/verify-lesson.mjs imports the same module (its copied matches/buildProbe deleted) - the drift is gone. Both engine injectors (resource/kernel-controller.js live path, resource/bootstrap.js unused path) inject the grading module before the engine, deriving the path from engineSrc so no HTML page needed regeneration. Added test/grading.test.js (23 tests, fake runner, no DOM); updated test/build-engine.test.js to load the module into its vm sandbox. Verified: node --check all 7 files; node --test 76/76 (was 53 +23); verify-lesson on encapsulation with real dotnet - all 5 tasks pass output-match + requireSource + hidden verify probe; headless render EN+ES clean (0 undefined, engine rendered task title, injected output-match.js present, no "KernelGrading missing"); generate 83 lessons, validate 0 err/90 warn, check-i18n PASS. Not committed/pushed. BlankMatchGrader + the full Grader role remain for Workstream B.

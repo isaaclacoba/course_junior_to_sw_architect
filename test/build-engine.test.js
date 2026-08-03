@@ -71,6 +71,7 @@ function buildContext() {
   // page-shell.js exposes window.LessonCommon then bails (no window.PAGE); this
   // gives build-engine the real shared helpers.
   vm.runInContext(read("page-shell.js"), sandbox);
+  vm.runInContext(read("kernel/grading/output-match.js"), sandbox);
   vm.runInContext(read("build-engine.js"), sandbox);
   return {
     sandbox, els,

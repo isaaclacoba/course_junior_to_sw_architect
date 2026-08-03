@@ -204,13 +204,18 @@
       // A build lesson injects its engine (manual mode) and mounts the widget; a
       // viz or checkpoint lesson has no engine, so there is nothing more to inject.
       if (!global.BUILD_CONFIG) return;
-      return injectScript(engineSrc, { "data-manual": "" }).then(function () {
-        if (global.BuildEngine) {
-          var widget = global.BuildEngine.create(global.BUILD_CONFIG);
-          surfaces.push(widget);
-          return widget.boot();
-        }
-      });
+      // The build engine grades through the shared kernel/grading module; inject it
+      // (derived from the engine path, same repo-root base) before the engine.
+      var gradingSrc = engineSrc.replace(/build-engine\.js$/, "kernel/grading/output-match.js");
+      return injectScript(gradingSrc)
+        .then(function () { return injectScript(engineSrc, { "data-manual": "" }); })
+        .then(function () {
+          if (global.BuildEngine) {
+            var widget = global.BuildEngine.create(global.BUILD_CONFIG);
+            surfaces.push(widget);
+            return widget.boot();
+          }
+        });
     })
     .then(function () {
       return ensureConceptData(langPref.get());

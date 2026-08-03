@@ -101,9 +101,13 @@
   // are injected here (after binding), so they stay the same files the flat pages
   // load and the resource layer never edits them.
   function render() {
+    var gradingSrc = engineSrc.replace(/build-engine\.js$/, "kernel/grading/output-match.js");
     return injectScript(pageShellSrc)
       .then(function () {
         mountSettings();
+        return injectScript(gradingSrc);
+      })
+      .then(function () {
         return injectScript(engineSrc);
       });
   }

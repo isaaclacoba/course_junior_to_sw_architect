@@ -45,6 +45,7 @@ import http from "node:http";
 import vm from "node:vm";
 import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import KernelGrading from "../kernel/grading/output-match.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
@@ -108,21 +109,11 @@ function loadCodeLab() {
 }
 
 // ---------------------------------------------------------------------------
-// grading rule - copied from build-engine.js so it matches the engine exactly
+// grading rule - the SAME shared policy build-engine.js uses
+// (kernel/grading/output-match.js), so the verifier cannot certify behavior the
+// engine has dropped. No local copy to drift.
 // ---------------------------------------------------------------------------
-function matches(out, expected) {
-  const lines = out.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
-  if (Array.isArray(expected)) {
-    return lines.length === expected.length && expected.every((e, i) => lines[i] === e);
-  }
-  return lines.some((line) => line === expected);
-}
-
-function buildProbe(source, probeMain) {
-  const m = source.search(/(?:public\s+)?(?:static\s+)?(?:partial\s+)?class\s+Program\b/);
-  const base = m >= 0 ? source.slice(0, m) : source;
-  return base + probeMain;
-}
+const { matches, buildProbe } = KernelGrading;
 
 // ---------------------------------------------------------------------------
 // dotnet - one reusable console project, Program.cs swapped per compile

@@ -109,53 +109,21 @@
       showResult(ok, bodyFn());
     }
 
-    // expected as a string: any output line equals it.
-    // expected as an array: the non-empty output lines equal that exact sequence.
-    function matches(out, expected) {
-      const lines = out.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
-      if (Array.isArray(expected)) {
-        return (
-          lines.length === expected.length &&
-          expected.every((e, i) => lines[i] === e)
-        );
-      }
-      return lines.some((line) => line === expected);
+    // The C# output-grading policy lives in one shared module
+    // (kernel/grading/output-match.js) so the browser engine and the Node verifier
+    // grade a lesson the same way and cannot drift. matches/unmetRequirement/
+    // describeExpected are pure; the hidden verify probe needs the runner, so it is
+    // injected here.
+    const Grading = window.KernelGrading;
+    if (!Grading) {
+      if (window.console) window.console.error("build-engine: window.KernelGrading missing - load kernel/grading/output-match.js before build-engine.js");
+      return { boot: function () {}, render: function () {} };
     }
-
-    // Optional technique gate: a task may require the source to satisfy patterns
-    // (e.g. actually use a loop), so a hardcoded answer that prints the expected
-    // output is not enough. Returns the first failing requirement, or null.
-    function unmetRequirement(source, requirements) {
-      if (!Array.isArray(requirements)) return null;
-      for (const req of requirements) {
-        const re = req.pattern instanceof RegExp ? req.pattern : new RegExp(req.pattern);
-        if (!re.test(source)) return req.message || "Your code does not meet this task's requirement yet.";
-      }
-      return null;
-    }
-
-    // Hidden verification: re-run the learner's own classes against a different
-    // entry point (task.verify.main) with different inputs. A hardcoded answer
-    // that prints the expected value for the visible case fails here. The visible
-    // Main is the last top-level Program class, so we replace it with the probe.
-    function buildProbe(source, probeMain) {
-      const m = source.search(/(?:public\s+)?(?:static\s+)?(?:partial\s+)?class\s+Program\b/);
-      const base = m >= 0 ? source.slice(0, m) : source;
-      return base + probeMain;
-    }
-
-    async function passesHiddenVerify(source, verify) {
-      const probe = await runner.run(buildProbe(source, verify.main));
-      if (probe.errors && probe.errors.length) return false;
-      if (probe.runtimeError) return false;
-      return matches((probe.output || "").trim(), verify.expected);
-    }
-
-    function describeExpected(expected) {
-      if (Array.isArray(expected)) {
-        return `Expected these lines, in order:\n${expected.join("\n")}\nAdjust your code and run again.`;
-      }
-      return `Expected a line equal to "${expected}". Adjust your code and run again.`;
+    const matches = Grading.matches;
+    const unmetRequirement = Grading.unmetRequirement;
+    const describeExpected = Grading.describeExpected;
+    function passesHiddenVerify(source, verify) {
+      return Grading.passesHiddenVerify(source, verify, { run: (src) => runner.run(src) });
     }
 
     // Escaping and inline `backtick`/**bold** markup are shared with the drill
