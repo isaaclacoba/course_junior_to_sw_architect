@@ -1062,3 +1062,38 @@ mirrored into the session todo list.
   literals the linter cannot see. Mutation-checked: reverting each of the 4 call sites
   to English fails the test (4/4 caught).
 - check-literals PASS (26 files), full suite 225/225, `npm run gate` PASS.
+
+## 2026-08-03 20:45 - the gates could not tell a lesson from an empty one
+- Auditing the generic-lesson-engine design against the i18n tooling turned up a
+  hole in MY gates, not theirs. Renaming `window.BUILD_CONFIG` in one live lesson -
+  a one-line stand-in for step 5's rewrite of all 83 data.js - left every gate
+  green: i18n-roundtrip "round-trip clean", validate 0 errors, and verify-lesson
+  "1 passed" having graded ZERO tasks. The page was 11KB of empty scaffold where a
+  healthy one is 149KB.
+- Root cause: all three gates are DRIFT detectors, and drift detectors are silent
+  on the empty set. A lesson with no body snapshots identically across a language
+  swap, has no invalid fields, and has no failing tasks. Emptiness has to be
+  asserted; it is never implied.
+- NEW `lessonBody()` in tools/lib.mjs - one definition of "this lesson has a body"
+  (tasks / steps / questions), used by all three gates. It accepts BOTH the current
+  per-archetype globals AND the unified window.LESSON_CONFIG, so it follows the
+  lesson-engine migration forward instead of blocking it; what it rejects is a
+  lesson that resolves to NEITHER (or, ambiguously, to both - the likeliest way a
+  half-finished rewrite would look).
+- Wired: i18n-roundtrip checks the data file and then POLLS the real browser for a
+  painted body per archetype (a card title with text; a mounted .cl-mv / .cl-quiz)
+  - sampling once reports every healthy lesson as empty, since ready() fires before
+  the card paints. validate gained checkLessonBodies over all 83 lessons.
+  verify-lesson had three separate holes: it detected archetype by REGEX on the old
+  global name (degrading to "unknown" and verifying nothing), coerced a missing
+  config to {} (a vacuous pass over zero tasks), and its "title present" check
+  matched only the HERO, which renders from meta.js regardless. All three fixed;
+  archetype now comes from meta.js, which is the authority.
+- Proven, not assumed: 5/5 mutations of lessonBody caught by the new
+  test/lesson-body.test.js (11 tests); the original rename now fails all three
+  gates; and no false positives - 83/83 round-trip PASS, validate 0 errors,
+  full suite 236/236.
+- Re-verified AFTER the concurrent session landed steps 6a/6b (build, viz and
+  checkpoint now boot the generic engine live). The assertions hold on both the old
+  and the new engine, which is the point: they check what the learner sees, not
+  which engine drew it.

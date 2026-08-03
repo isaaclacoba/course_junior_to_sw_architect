@@ -54,3 +54,60 @@ export function conceptsLiteral(concepts) {
     .map((line, i) => (i === 0 ? line : "  " + line))
     .join("\n");
 }
+
+// ---------------------------------------------------------------------------
+// Non-emptiness: does a lesson actually HAVE a body?
+// ---------------------------------------------------------------------------
+// Every lesson gate compares a lesson against itself - the i18n round-trip
+// snapshots the bound ctx before/after a locale swap, validate walks the config
+// it finds, verify-lesson grades the tasks it finds. All three are DRIFT
+// detectors, and drift detectors are silent on the empty set: a lesson whose
+// config global is missing round-trips perfectly, has no invalid fields, and has
+// no failing tasks. Measured 2026-08-03 - renaming window.BUILD_CONFIG in a live
+// lesson left all three gates GREEN, with verify-lesson reporting "1 passed"
+// having graded zero tasks.
+//
+// So emptiness has to be asserted, not inferred. Each gate calls lessonBody()
+// and refuses to pass a lesson that yielded nothing.
+//
+// The name list is deliberately FORWARD-compatible: the generic lesson engine
+// collapses all four globals into one window.LESSON_CONFIG, so both spellings
+// are accepted. That turns this check into the thing that PROVES that migration
+// (a half-migrated lesson resolves to neither name and fails loudly) instead of
+// something the migration has to fight.
+export const CONFIG_GLOBALS = {
+  build: ["LESSON_CONFIG", "BUILD_CONFIG"],
+  drill: ["LESSON_CONFIG", "DRILL_CONFIG"],
+  viz: ["LESSON_CONFIG", "LESSON_VIZ"],
+  checkpoint: ["LESSON_CONFIG", "QUIZ_CONFIG", "CHECKPOINT_CONFIG"],
+};
+
+// The array that IS the lesson's body, per archetype.
+export const BODY_FIELD = { build: "tasks", drill: "tasks", viz: "steps", checkpoint: "questions" };
+
+// -> { ok:true, global, config, field, count } | { ok:false, reason }
+// `reason` is written for a human reading a failing gate, and names the globals
+// it looked for so a rename is obvious from the message alone.
+export function lessonBody(win, archetype) {
+  const names = CONFIG_GLOBALS[archetype];
+  const field = BODY_FIELD[archetype];
+  if (!names || !field) return { ok: false, reason: `unknown archetype "${archetype}"` };
+
+  const found = names.filter((n) => win && win[n]);
+  if (found.length === 0) {
+    return { ok: false, reason: `no lesson config - looked for window.${names.join(" / window.")}` };
+  }
+  if (found.length > 1) {
+    return { ok: false, reason: `ambiguous config - both window.${found.join(" and window.")} are set` };
+  }
+  const global = found[0];
+  const config = win[global];
+  const body = config[field];
+  if (!Array.isArray(body)) {
+    return { ok: false, reason: `window.${global}.${field} is ${body === undefined ? "missing" : typeof body}, expected an array` };
+  }
+  if (body.length === 0) {
+    return { ok: false, reason: `window.${global}.${field} is empty - the lesson has no body` };
+  }
+  return { ok: true, global, config, field, count: body.length };
+}

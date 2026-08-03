@@ -61,6 +61,7 @@ import crypto from "node:crypto";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
 import { fileURLToPath } from "node:url";
+import { lessonBody } from "./lib.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
@@ -174,6 +175,35 @@ function loadMeta(dir) {
   const win = loadLocalScripts(dir);
   return win.LESSON_META || null;
 }
+// A round-trip compares a lesson against ITSELF, so it is silent on the empty
+// set: a lesson whose config global is missing snapshots identically before and
+// after a language swap and "round-trips clean". Assert there is a body to
+// round-trip FIRST, so a rename or a broken data.js fails here instead of
+// passing vacuously. Returns an error string, or null when the lesson is sound.
+// The static check above reads the DATA file. It cannot see the other half of an
+// empty lesson: data that loads fine but never reaches the page because a binder
+// or the controller still looks for the old global. Measured 2026-08-03 - renaming
+// window.BUILD_CONFIG rendered a 11KB page with an EMPTY card (title, context and
+// progress all blank) where a healthy one is 149KB, and every gate still passed.
+// So also assert, in the real browser, that the archetype's body actually painted.
+const RENDERED = {
+  // practice archetypes paint the card header from the config; the scaffold ids
+  // exist either way, so the signal is that one of them has TEXT.
+  build: `[...document.querySelectorAll('[id$="Title"]')].some(e => e.textContent.trim())`,
+  drill: `[...document.querySelectorAll('[id$="Title"]')].some(e => e.textContent.trim())`,
+  // widget archetypes mount one code-lab widget; its root class is the signal.
+  viz: `!!document.querySelector('.cl-mv')`,
+  checkpoint: `!!document.querySelector('.cl-quiz')`,
+};
+
+function bodyCheck(dir) {
+  const win = loadLocalScripts(dir);
+  const meta = win.LESSON_META;
+  if (!meta) return null; // "no meta.js" is the caller's existing skip, not a failure
+  const r = lessonBody(win, meta.archetype);
+  return r.ok ? null : `empty lesson: ${r.reason}`;
+}
+
 function loadBinder(file, globalName) {
   // Preload sibling helpers the binder delegates to (e.g. bind-origin.js defines
   // ResourceOrigin, the shared snapshot/restore). Only load pure IIFE helpers -
@@ -214,6 +244,8 @@ function staticRoundTrip(dir) {
   const arch = meta.archetype;
   const spec = ARCH[arch];
   if (!spec) return { skip: `archetype ${arch} has no binder` };
+  const emptyErr = bodyCheck(dir);
+  if (emptyErr) return { error: emptyErr };
   const bind = loadBinder(spec.binder[0], spec.binder[1]);
 
   const page = { hero: heroFromMeta(meta) };
@@ -492,6 +524,8 @@ const labelsFor = (l) => LABELS[l] || [l];
 // browser round-trip for one lesson
 // ---------------------------------------------------------------------------
 async function browserRoundTrip(cdp, srvPort, dir, opts) {
+  const emptyErr = bodyCheck(dir);
+  if (emptyErr) return { error: emptyErr };
   const rel = path.relative(root, dir).split(path.sep).join("/");
   const url = `http://127.0.0.1:${srvPort}/${rel}/index.html`;
   const { dflt, nondefault } = lessonLangs(dir);
@@ -510,6 +544,18 @@ async function browserRoundTrip(cdp, srvPort, dir, opts) {
   for (let i = 0; i < 200; i++) { if (await cdp.evaluate("window.__i18n.ready()")) { up = true; break; } await sleep(100); }
   if (!up) return { error: "lesson did not render (settings gear / hero never appeared)" };
   await sleep(opts.settle);
+
+  // ready() only proves the hero + settings gear exist; the card body paints
+  // later (a widget archetype has to fetch and mount its widget). So POLL for the
+  // body the same way the readiness gate polls, rather than sampling once - a
+  // single sample here reports every healthy lesson as empty.
+  const arch = (loadMeta(dir) || {}).archetype;
+  const probe = RENDERED[arch];
+  if (probe) {
+    let painted = false;
+    for (let i = 0; i < 100; i++) { if (await cdp.evaluate(probe)) { painted = true; break; } await sleep(100); }
+    if (!painted) return { error: `empty lesson: the ${arch} body never rendered (the hero painted, the card did not)` };
+  }
 
   const heroRef = await cdp.evaluate("document.querySelector('#pageHero').textContent");
   const base = await cdp.evaluate("JSON.stringify(window.__i18n.snap())").then(JSON.parse);
@@ -619,6 +665,7 @@ async function main() {
       const rel = path.relative(root, dir);
       const r = staticRoundTrip(dir);
       if (r.skip) { if (!args.json) say(`${C.dim}skip ${rel} (${r.skip})${C.reset}`); continue; }
+      if (r.error) { failed = true; report.push({ lesson: rel, mode: "static", error: r.error }); if (!args.json) bad(`${rel} - ${r.error}`); continue; }
       const bad_ = r.leaks.length > 0;
       failed = failed || bad_;
       report.push({ lesson: rel, mode: "static", ...r });

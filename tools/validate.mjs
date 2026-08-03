@@ -40,7 +40,7 @@ import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { loadBrowserGlobal, idFromHref } from "./lib.mjs";
+import { loadBrowserGlobal, idFromHref, loadWindowBag, lessonBody } from "./lib.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
@@ -175,6 +175,35 @@ export function checkCoherence(migrated, report) {
     if (needsTotal && typeof m.meta.total !== "number") {
       report.error(`Coherence: "${m.registryId}" is a ${archetype || engine} lesson but meta.total is not a number (got ${JSON.stringify(m.meta.total)})`);
     }
+  }
+}
+
+// Check 4b: every migrated lesson actually HAS a body.
+// The other checks all validate the CONTENT of a config they managed to load, and
+// each of them quietly `continue`s past a lesson whose config is missing - so a
+// lesson with no body at all is the one thing that passes every check by having
+// nothing to check. That is exactly the failure mode of a config-global rename
+// (measured 2026-08-03: renaming window.BUILD_CONFIG left validate at 0 errors),
+// so it gets its own check instead of riding on the others.
+//
+// lessonBody() accepts both the current per-archetype globals and the unified
+// window.LESSON_CONFIG, so this check follows the lesson engine's migration
+// forward rather than blocking it - what it will NOT accept is a lesson that
+// resolves to neither, i.e. a half-migrated one.
+export function checkLessonBodies(migrated, rootDir, report) {
+  for (const m of migrated) {
+    const arch = m.meta.archetype;
+    if (!arch || arch === "unknown") continue;
+    const dir = path.join(rootDir, m.path);
+    if (!fs.existsSync(dir)) continue;
+    const dataFile = fs.readdirSync(dir).find((f) => f.endsWith(".viz.js")) || "data.js";
+    const dataPath = path.join(dir, dataFile);
+    if (!fs.existsSync(dataPath)) continue;
+    let win;
+    try { win = loadWindowBag(dataPath); }
+    catch (e) { report.error(`Body: "${m.registryId}" ${dataFile} did not run (${e.message})`); continue; }
+    const body = lessonBody(win, arch);
+    if (!body.ok) report.error(`Body: "${m.registryId}" (${arch}) has no body - ${body.reason}`);
   }
 }
 
@@ -585,6 +614,7 @@ function main() {
   const knownIds = knownConceptIds(migrated);
   checkConceptGraph(migrated.map((m) => ({ lessonId: m.registryId, meta: m.meta })), report);
   checkCoherence(migrated, report);
+  checkLessonBodies(migrated, root, report);
   checkCheckpointConcepts(loadCheckpointQuizzes(migrated, root), knownIds, report);
   checkProseMentions(loadProseMentions(migrated, root), knownIds, report);
   checkResourceArity(loadResourceBundles(migrated, root), report);

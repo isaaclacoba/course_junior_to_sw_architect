@@ -46,6 +46,7 @@ import vm from "node:vm";
 import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import KernelGrading from "../kernel/grading/output-match.js";
+import { lessonBody } from "./lib.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
@@ -260,6 +261,22 @@ function verifyViz(win, opts) {
   return allOk;
 }
 
+// Does the rendered DOM show a lesson BODY, not just the page furniture? The hero
+// and the card scaffold come from meta.js + page-shell, so they paint even when
+// the lesson's own config never arrives - which is why "no hero/title" and the
+// 500-byte floor both pass a blank lesson (measured: 11KB of empty scaffold).
+// The discriminator is per archetype: a practice lesson fills a card title from
+// its config, a widget lesson mounts its widget.
+function hasBody(dom, archetype) {
+  if (archetype === "build" || archetype === "drill") {
+    const titles = [...dom.matchAll(/id="[^"]*Title"[^>]*>([^<]*)</g)].map((m) => m[1]);
+    return titles.some((t) => t.trim());
+  }
+  if (archetype === "viz") return PANEL_CLASSES.some((c) => dom.includes(c));
+  if (archetype === "checkpoint") return dom.includes("cl-quiz");
+  return true; // unknown archetype: nothing to assert, the caller already warned
+}
+
 async function verifyRender(lessonDir, archetype, server, opts) {
   if (opts.noRender) { skip("headless render (--no-render)"); return true; }
   const relHtml = path.relative(root, path.join(lessonDir, "index.html"));
@@ -275,6 +292,7 @@ async function verifyRender(lessonDir, archetype, server, opts) {
     let localOk = true;
     if (undef > 0) { bad(`render[${lang}] DOM contains ${undef} "undefined"`); localOk = false; }
     if (!hasTitle) { bad(`render[${lang}] no hero/title rendered`); localOk = false; }
+    if (!hasBody(dom, archetype)) { bad(`render[${lang}] the page furniture rendered but the ${archetype} body did not - empty lesson`); localOk = false; }
     if (archetype === "viz" && !hasPanel) { bad(`render[${lang}] no scene panel class present`); localOk = false; }
     if (localOk) ok(`render[${lang}] clean (0 undefined, title present${archetype === "viz" ? ", panel present" : ""})`);
     allOk = allOk && localOk;
@@ -315,6 +333,16 @@ function detectArchetype(dir) {
   if (vizFile) return { archetype: "viz", dataFile: path.join(dir, vizFile) };
   const dataFile = path.join(dir, "data.js");
   if (!fs.existsSync(dataFile)) return { archetype: "unknown", dataFile: null };
+  // meta.js is the AUTHORITY on archetype. Sniffing the data source for a config
+  // global was the old way, and it silently degrades to "unknown" - i.e. verifies
+  // nothing while still reporting a pass - the moment that global is renamed.
+  const metaFile = path.join(dir, "meta.js");
+  if (fs.existsSync(metaFile)) {
+    try {
+      const meta = loadInWindow(metaFile).LESSON_META;
+      if (meta && meta.archetype) return { archetype: meta.archetype, dataFile };
+    } catch { /* fall through to the sniff below */ }
+  }
   const src = fs.readFileSync(dataFile, "utf8");
   if (/window\.BUILD_CONFIG/.test(src)) return { archetype: "build", dataFile };
   if (/window\.DRILL_CONFIG/.test(src)) return { archetype: "drill", dataFile };
@@ -395,9 +423,15 @@ async function verifyLesson(dir, server, opts) {
     catch (e) { bad(`loading ${path.basename(dataFile)} in sandbox: ${e.message}`); allOk = false; }
   }
 
-  if (win && archetype === "build") allOk = verifyBuild(win.BUILD_CONFIG || {}, opts) && allOk;
-  else if (win && archetype === "drill") allOk = verifyBuild(win.DRILL_CONFIG || {}, opts) && allOk;
-  else if (win && archetype === "viz") allOk = verifyViz(win, opts) && allOk;
+  // A missing config used to be coerced to {}, so verifyBuild looped over zero
+  // tasks and reported a pass. Resolve it properly and FAIL when there is no body
+  // - an empty lesson is the one thing a verifier must never call verified.
+  if (win && archetype !== "unknown") {
+    const body = lessonBody(win, archetype);
+    if (!body.ok) { bad(`no lesson body to verify - ${body.reason}`); allOk = false; }
+    else if (archetype === "build" || archetype === "drill") allOk = verifyBuild(body.config, opts) && allOk;
+    else if (archetype === "viz") allOk = verifyViz({ LESSON_VIZ: body.config }, opts) && allOk;
+  }
 
   allOk = (await verifyRender(dir, archetype, server, opts)) && allOk;
   return allOk;
