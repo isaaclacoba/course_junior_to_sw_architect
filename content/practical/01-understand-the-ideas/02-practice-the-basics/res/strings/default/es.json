@@ -1,4 +1,6 @@
 {
+  "card.title": "Practica lo básico",
+  "card.blurb": "Pon en práctica los fundamentos: haz cálculos con números, une texto y plantea preguntas de sí/no con comparaciones - el puente hacia el flujo de control. Escribe y ejecuta cada uno.",
   "hero.eyebrow": "Parte uno · Comprende las ideas",
   "hero.title": "Practica lo básico",
   "intro.0": "Fundamentos te dio valores, variables y objetos. Aquí los pones a trabajar: calcula con números, une texto y - el paso hacia el Flujo de control - haz preguntas de sí/no con comparaciones que devuelven un bool. Escribe y ejecuta cada uno.",

@@ -1,4 +1,6 @@
 {
+  "card.title": "Bugs: por qué los programas fallan",
+  "card.blurb": "Qué es un bug, errores de sintaxis frente a errores de lógica y qué es de verdad depurar. Cierra la Parte dos; la Parte tres sigue con cómo se ejecuta y se conecta el software.",
   "hero.eyebrow": "Teoría · Parte dos · De la idea al código en marcha",
   "hero.title": "Bugs: por qué los programas fallan",
   "intro.0": "Los programas fallan, y es normal. Esta lección cubre qué es un bug, los errores de sintaxis frente a los errores de lógica, qué significa depurar, y por qué encontrar y arreglar bugs es la mayor parte del trabajo. Cierra la Parte dos. Recorre el visual para ver cómo un error de sintaxis detiene la compilación y un error de lógica deja un valor equivocado.",

@@ -1,4 +1,6 @@
 {
+  "card.title": "Strings",
+  "card.blurb": "Construye texto a partir de trozos, cambia mayúsculas y minúsculas, busca dentro y reescribe partes - las cosas que haces con texto cada día.",
   "hero.eyebrow": "Parte dos · Fundamentos del día a día",
   "hero.title": "Strings",
   "intro.0": "El texto es un valor, no solo algo que imprimes. Puedes construirlo a partir de otros valores, darle otra forma, hacerle preguntas y reescribirlo - y cada paso te devuelve un trozo de texto nuevo en vez de cambiar el de antes. Escribes cada uno y lo ejecutas.",

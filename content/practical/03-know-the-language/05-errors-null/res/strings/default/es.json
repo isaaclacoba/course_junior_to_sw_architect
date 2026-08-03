@@ -1,4 +1,6 @@
 {
+  "card.title": "Manejo de excepciones",
+  "card.blurb": "Mantén un programa en pie cuando algo va mal: captura fallos con try/catch, limpia con finally, lanza los tuyos con throw - además de los operadores de null-safety ?? y ?.",
   "hero.eyebrow": "Parte tres · Conoce el lenguaje",
   "hero.title": "Manejo de excepciones",
   "intro.0": "Cuando algo sale mal, un programa puede pararse en seco - a menos que lo manejes. Escribe y ejecuta cada pieza: captura fallos con try/catch, lee qué falló desde el mensaje, limpia con finally, lanza el tuyo con throw, y accede a valores con seguridad con los operadores de seguridad ante null ?? y ?. (conociste null en Fundamentos).",

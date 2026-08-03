@@ -1,4 +1,6 @@
 {
+  "card.title": "Movimientos de refactorización",
+  "card.blurb": "Cambia la forma de un código que funciona sin cambiar lo que hace. Cinco refactorizaciones pequeñas - lleva el comportamiento junto a sus datos, depende de una interfaz, inyecta una dependencia, sustituye una rama, divide una clase - cada una un hábito que SOLID está a punto de nombrar.",
   "hero.eyebrow": "Parte seis · Diseña para el cambio",
   "hero.title": "Movimientos de refactorización",
   "intro.0": "Cuando el código ya funciona, ¿por qué cambiarlo? Porque la próxima persona que lo lea - a menudo tú, un mes después - todavía tiene que entenderlo. Reformar el código sin cambiar lo que hace se llama refactorizar. Aquí haces una pequeña mejora a cada uno de cinco programas. La salida no cambia nunca - solo cambia la forma.",

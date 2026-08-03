@@ -244,8 +244,9 @@ export function requiredDefaultKeys(tasks) {
 //   (a) missing a required default key            -> ERROR (incomplete default)
 //   (b) an unknown/orphan key in any bundle        -> ERROR (typo'd/out-of-range)
 //   (c) a non-default bundle missing some keys      -> WARN  (fallback covers it)
-// `intro.N` is a valid schema key a non-default voice may supply even though the
-// default bundle omits it, so it is never treated as an orphan.
+// `intro.N` and the lesson-owned card text (`card.title`/`card.blurb`, whose English
+// source is meta.title/meta.blurb) are valid keys a non-default bundle may supply
+// even though the default bundle omits them, so they are never treated as orphans.
 export function checkResourceArity(lessons, report) {
   for (const { lessonId, tasks, baseLang, bundles } of lessons) {
     const lang = baseLang || "en";
@@ -271,6 +272,7 @@ export function checkResourceArity(lessons, report) {
       for (const k of keys) {
         if (defKeys.has(k)) continue;
         if (/^intro\.\d+$/.test(k)) continue; // intro is a valid non-default key
+        if (/^card\.(title|blurb)$/.test(k)) continue; // card text; English source is meta.title/blurb, not the en bundle
         if (/^concept\./.test(k)) continue;   // concept text governed by checkConceptCoverage
         report.error(`Resource: "${lessonId}" bundle ${b.voice}/${b.lang} has unknown key "${k}" (not in default/${lang})`);
       }

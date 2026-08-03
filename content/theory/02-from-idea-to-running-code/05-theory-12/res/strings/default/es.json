@@ -1,4 +1,6 @@
 {
+  "card.title": "Decisiones y repetición",
+  "card.blurb": "Cómo un programa elige y repite: condiciones, if/else y bucles - en el fondo, los saltos de la Parte uno.",
   "hero.eyebrow": "Teoría · Parte dos · De la idea al código en marcha",
   "hero.title": "Decisiones y repetición",
   "intro.0": "Los programas hacen más que desfilar en línea recta por una lista - eligen y repiten. Esta lección cubre decisiones, condiciones, if/else, bucles, y cómo todo eso son en realidad los saltos de la Parte uno. Recorre el visual para ver cómo una variable elige un camino, y luego un bucle salta hacia atrás para volver a intentarlo.",

@@ -1,4 +1,6 @@
 {
+  "card.title": "¿Heredar o componer?",
+  "card.blurb": "¿No podemos heredarlo todo - incluso de tres clases a la vez? Topa con la mentira del «es un», el límite de un solo padre de C# y con componer piezas que puedes cambiar sin tocar el resto.",
   "hero.eyebrow": "Parte cuatro · Construye con objetos",
   "hero.title": "¿Heredar o componer?",
   "intro.0": "¿No podemos heredarlo todo y ya - incluso de tres clases a la vez? Parece la forma natural de reutilizar código, y muchas veces lo es. Pero no encaja en todos los casos, y forzarlo suele hacer que el código sea más difícil de cambiar después. Aquí verás cuándo la herencia es la herramienta adecuada, y la otra manera de construir una cosa a partir de piezas más pequeñas - para que puedas elegir la correcta cada vez.",

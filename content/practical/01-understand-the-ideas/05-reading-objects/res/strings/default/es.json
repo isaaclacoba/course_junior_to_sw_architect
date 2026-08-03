@@ -1,4 +1,6 @@
 {
+  "card.title": "Lectura de objetos",
+  "card.blurb": "Escribe unos cuantos objetos pequeños que colaboran - uno le pide datos a otro, cada tarea vive en un solo sitio y una clase usa lo que le pasan.",
   "hero.eyebrow": "Parte uno · Comprende las ideas",
   "hero.title": "Lectura de objetos",
   "intro.0": "Un pequeño paso adelante desde los ejercicios de rellenar huecos. Escribe unos cuantos objetos pequeños que trabajan juntos - uno le pide a otro lo que necesita, cada trabajo vive en un solo sitio, y una clase usa lo que le entregan. Nada de teoría nueva - solo los hábitos en los que se apoyarán los ejercicios de SOLID.",

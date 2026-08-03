@@ -1,4 +1,6 @@
 {
+  "card.title": "¿Qué es un LLM?",
+  "card.blurb": "El único movimiento que está en el centro de todo: un modelo que lee un texto y predice el siguiente token, una y otra vez. Míralo elegir entre los candidatos y continuar.",
   "hero.eyebrow": "Teoría · Parte cinco · Los cimientos de la IA",
   "hero.title": "¿Qué es un LLM?",
   "intro.0": "Seguramente ya has usado uno - escribe, responde y explica en lenguaje normal. Puede dar la sensación de que te entiende. Por debajo, sin embargo, hace algo mucho más simple y más raro: leer el texto que hay hasta ahora y adivinar el siguiente trocito, una y otra vez. Fíjate en ese único movimiento aquí abajo - es la base sobre la que se construye todo lo demás de este itinerario.",

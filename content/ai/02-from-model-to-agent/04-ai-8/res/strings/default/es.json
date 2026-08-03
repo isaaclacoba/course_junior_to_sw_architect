@@ -1,4 +1,6 @@
 {
+  "card.title": "Del LLM al agente",
+  "card.blurb": "Junta las piezas - modelo, contexto, memoria, herramientas - y hazlas correr en un bucle con un objetivo, y tienes un agente. Aquí es donde aterriza esta parte, y el puente hacia el material más difícil que viene.",
   "hero.eyebrow": "Teoría · Parte seis · Del modelo al agente",
   "hero.title": "Del LLM al agente",
   "intro.0": "Has conocido las piezas de una en una: el modelo, su contexto, la ventana, la memoria y las herramientas. Por sí solo, un modelo solo predice el siguiente token. Dale un objetivo, déjale llamar a herramientas y recuperar memoria, y haz correr todo en un bucle - y obtienes un agente que puede trabajar hacia algo. Esta última lección junta las piezas, y señala hacia dónde va el curso a continuación.",

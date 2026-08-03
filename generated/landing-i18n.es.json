@@ -1,0 +1,387 @@
+{
+  "lessons": {
+    "access-properties": {
+      "blurb": "Mantén privadas algunas partes de un tipo, expón otras y da acceso al estado a través de propiedades - un get y un set controlados - en vez de campos a pelo.",
+      "title": "Acceso y propiedades"
+    },
+    "ai-1": {
+      "blurb": "El único movimiento que está en el centro de todo: un modelo que lee un texto y predice el siguiente token, una y otra vez. Míralo elegir entre los candidatos y continuar.",
+      "title": "¿Qué es un LLM?"
+    },
+    "ai-10": {
+      "blurb": "Por qué un mismo prompt da respuestas distintas. El modelo muestrea su siguiente palabra de un abanico, y la temperatura decide con cuánta audacia - baja es estable, alta es variada.",
+      "title": "Muestreo y temperatura"
+    },
+    "ai-13": {
+      "blurb": "Descorre el telón. La ejecución entera de un agente es una única lista de mensajes que va creciendo - y el modelo solo escribe texto, tu código escribe los resultados de las herramientas, y la «memoria» no es más que reenviar la lista.",
+      "title": "Qué es de verdad una ejecución: la transcripción"
+    },
+    "ai-14": {
+      "blurb": "El conocimiento de un modelo se congela en el momento del entrenamiento y su ventana es pequeña. La recuperación convierte una pregunta en un vector, encuentra los trozos más cercanos de tus propios documentos y responde apoyándose en ellos - la idea detrás de RAG.",
+      "title": "Recuperación"
+    },
+    "ai-15": {
+      "blurb": "Pídele la respuesta y un modelo adivina; pídele que piense paso a paso y resuelve el problema. Descubre por qué escribir el razonamiento es el cálculo en sí, no adorno - chain-of-thought.",
+      "title": "Razonamiento"
+    },
+    "ai-16": {
+      "blurb": "Un objetivo demasiado grande para un solo movimiento se parte en una lista ordenada de pasos pequeños, que se hacen de uno en uno. Mira cómo un agente descompone una tarea - y replanifica cuando un paso se bloquea.",
+      "title": "Planificación"
+    },
+    "ai-17": {
+      "blurb": "Pensamiento, acción, observación, y vuelta a empezar. El patrón con nombre detrás de un agente que usa herramientas: razona el siguiente movimiento, llama a una herramienta, lee el resultado real y repite hasta que la respuesta esté fundamentada.",
+      "title": "Razonar y actuar (ReAct)"
+    },
+    "ai-18": {
+      "blurb": "Un primer borrador rara vez cubre los casos límite. Haz que el modelo revise su propio trabajo, encuentre el bug que se le escapó y lo corrija - borrador, crítica, corrección, el bucle que convierte una conjetura en una respuesta mejor.",
+      "title": "Reflexión"
+    },
+    "ai-19": {
+      "blurb": "«Agente» no siempre es la respuesta. Si puedes escribir los pasos de antemano, monta un workflow - más simple y más barato. Reserva la agencia para cuando el camino haya que descubrirlo sobre la marcha.",
+      "title": "¿Workflow o agente?"
+    },
+    "ai-2": {
+      "blurb": "Ni letras, ni exactamente palabras. Mira cómo el texto se parte en los trozos que el modelo lee y cuenta de verdad - y por qué los límites y el coste del modelo se miden en ellos.",
+      "title": "Tokens"
+    },
+    "ai-20": {
+      "blurb": "A un modelo se le puede convencer de que se salte sus propias reglas. Los guardrails viven en tu código, fuera del modelo: comprueba lo que entra, comprueba lo que el agente intenta hacer y deja a una persona al mando en las decisiones arriesgadas.",
+      "title": "Guardrails"
+    },
+    "ai-21": {
+      "blurb": "Un agente decide su siguiente movimiento, así que nada lo hace parar por sí solo. Un bucle que no puede parar es una factura desbocada. Mira las condiciones de parada - objetivo cumplido, presupuesto agotado, dando vueltas, error grave.",
+      "title": "Saber cuándo parar"
+    },
+    "ai-22": {
+      "blurb": "Un modelo responde con seguridad aunque no lo sepa - predice texto plausible, no verdad comprobada. El grounding lo arregla: trae la fuente real, responde a partir de ella, cítala y permite un «no lo sé».",
+      "title": "Alucinación y grounding"
+    },
+    "ai-23": {
+      "blurb": "Cada ejecución deja una traza de sus mensajes y llamadas a herramientas. Lee una que ha fallado para encontrar dónde se rompió (observabilidad), y conviértelo en una comprobación que ejecutas siempre (evaluación).",
+      "title": "¿Funcionó? Leer la traza"
+    },
+    "ai-24": {
+      "blurb": "Cómo preguntas hace casi todo el trabajo. Tres gestos hacen que un modelo pueda seguir una instrucción - sé específico, muestra un ejemplo y pide la respuesta en un formato que puedas usar.",
+      "title": "Escribir una buena instrucción"
+    },
+    "ai-3": {
+      "blurb": "El texto que le pasas al modelo para arrancar. Él lo continúa sin más - así que cambiar el prompt cambia todo lo que viene después.",
+      "title": "El prompt"
+    },
+    "ai-4": {
+      "blurb": "Todo lo que el modelo puede ver ahora mismo - el prompt, la conversación, cualquier dato que añadas. Mira cómo una respuesta a ciegas se vuelve segura en cuanto está el contexto.",
+      "title": "Contexto"
+    },
+    "ai-5": {
+      "blurb": "Ese contexto es finito, se mide en tokens. Cuando se llena, los tokens más antiguos se caen por el principio - por eso una conversación larga parece olvidar cómo empezó.",
+      "title": "La ventana de contexto"
+    },
+    "ai-6": {
+      "blurb": "La ventana se olvida, entonces, ¿cómo recuerda un asistente? Guarda lo que importa en un almacén fuera de la ventana, lo recupera cuando hace falta - y lo clasifica por tipos: qué pasó, qué sigue siendo cierto y cómo se hacen las cosas.",
+      "title": "Memoria"
+    },
+    "ai-7": {
+      "blurb": "Un modelo solo sabe producir texto. Las herramientas le dejan pedir que se ejecute una función y leer el resultado - luego echar mano de la correcta entre varias, llamarla con la forma que pide su schema y recuperarse cuando una llamada vuelve mal.",
+      "title": "Herramientas"
+    },
+    "ai-8": {
+      "blurb": "Junta las piezas - modelo, contexto, memoria, herramientas - y hazlas correr en un bucle con un objetivo, y tienes un agente. Aquí es donde aterriza esta parte, y el puente hacia el material más difícil que viene.",
+      "title": "Del LLM al agente"
+    },
+    "ai-9": {
+      "blurb": "Todo prompt tiene en realidad dos partes: tu mensaje y un system message oculto que fija el rol y las reglas del modelo. Cambia el system message y cambia el tono.",
+      "title": "Mensajes de sistema y de usuario"
+    },
+    "arrays": {
+      "blurb": "Guarda muchos valores en una fila fija y ordenada - accede a un elemento por su posición, mide la longitud y recorre todos con un bucle.",
+      "title": "Arrays"
+    },
+    "class-members": {
+      "blurb": "Parte del comportamiento y de los datos pertenecen al propio tipo, y algunos valores se fijan para siempre - escribe un helper static, una constante, un campo que se asigna una sola vez y un contador compartido.",
+      "title": "Static, const y readonly"
+    },
+    "collections": {
+      "blurb": "Los contenedores del día a día a los que recurre el código real: crea una lista y hazla crecer, recórrela, accede por índice, llénala con tus propios objetos y asocia claves con valores usando un diccionario.",
+      "title": "Colecciones"
+    },
+    "comments-say-why": {
+      "blurb": "Por qué los mejores comentarios explican el motivo, no lo obvio - y por qué un buen nombre hace innecesarios casi todos.",
+      "title": "Los comentarios dicen por qué"
+    },
+    "composition": {
+      "blurb": "¿No podemos heredarlo todo - incluso de tres clases a la vez? Topa con la mentira del «es un», el límite de un solo padre de C# y con componer piezas que puedes cambiar sin tocar el resto.",
+      "title": "¿Heredar o componer?"
+    },
+    "control-flow": {
+      "blurb": "Cómo el código decide y repite. Escribe un pequeño método que funcione para cada herramienta: if/else, lógica booleana, while, for, foreach con break/continue y switch - y ejecútalo.",
+      "title": "Flujo de control"
+    },
+    "data-shapes": {
+      "blurb": "Construye las cosas que guardan las colecciones. Escribe cinco programas pequeños que cubren propiedades, una propiedad calculada, un enum, un struct y un record - ejecuta cada uno y haz que la salida coincida.",
+      "title": "Formas de datos"
+    },
+    "dependency-injection": {
+      "blurb": "¿Por qué pasar las dependencias en vez de hacer new por todas partes? Nota el momento en que un animal fijado a fuego te da un buen dolor de cabeza, e inyéctalo - y pasa un doble de juguete para ensayar sin ningún animal real.",
+      "title": "¿Por qué inyectar?"
+    },
+    "encapsulation": {
+      "blurb": "¿Para qué clases y métodos, en vez de un Main gigante? Agrupa datos relacionados, pon el comportamiento junto a ellos, oculta el interior, protege una regla y luego cámbiala en un solo sitio.",
+      "title": "¿Por qué objetos?"
+    },
+    "errors-null": {
+      "blurb": "Mantén un programa en pie cuando algo va mal: captura fallos con try/catch, limpia con finally, lanza los tuyos con throw - además de los operadores de null-safety ?? y ?.",
+      "title": "Manejo de excepciones"
+    },
+    "foundations": {
+      "blurb": "Empieza aquí. Escribe y ejecuta tu primer C#: imprimir por pantalla, variables, los tipos de datos habituales, cambiar un valor, qué significa null y qué es un objeto.",
+      "title": "Fundamentos"
+    },
+    "generics": {
+      "blurb": "Has usado List&lt;T&gt; - ahora escribe el tuyo. Construye un Box&lt;T&gt;, un método genérico y un Pair&lt;A, B&gt; que funcionen con cualquier tipo de valor.",
+      "title": "Genéricos"
+    },
+    "good-code-check": {
+      "blurb": "El checkpoint de la Parte cinco: buenos nombres, sin duplicación, un trabajo por función, legibilidad y comentarios. Supéralo para cerrar los fundamentos del buen código.",
+      "title": "Checkpoint de fundamentos del buen código"
+    },
+    "good-names": {
+      "blurb": "Por qué un nombre es la documentación más barata que tienes, y cómo elegir uno que diga qué contiene un valor o qué hace una función.",
+      "title": "Buenos nombres"
+    },
+    "interfaces": {
+      "blurb": "¿Por qué esconder la lógica tras una interfaz? Mira cómo un cuidador se queda atascado con un solo animal, y cómo una interfaz lo libera - un mismo método saluda a todos los animales, y uno nuevo entra sin coste.",
+      "title": "¿Por qué abstraer?"
+    },
+    "keeping-data-safe": {
+      "blurb": "Tres hábitos de seguridad elementales para un junior: mantén los secretos fuera del código y de los logs, usa permisos para controlar quién lee o cambia los datos y valida la entrada que no escribiste tú.",
+      "title": "Mantener los datos a salvo"
+    },
+    "lambdas": {
+      "blurb": "Tu primer contacto con las lambdas - funciones diminutas y sin nombre que guardas en una variable. Descubre qué son, cómo responden sí/no y algo que un método normal no puede hacer: leer las variables de su alrededor. Las funcioncitas sobre las que corre LINQ justo después.",
+      "title": "Lambdas"
+    },
+    "linq": {
+      "blurb": "Consulta una colección sin escribir un bucle. Escribe tú cada consulta y ejecútala - Where, Count, Any, All, Select, FirstOrDefault y OrderBy, un operador por tarea.",
+      "title": "LINQ"
+    },
+    "no-repeats": {
+      "blurb": "Por qué la lógica copiada es una trampa de mantenimiento, y cómo llevarla a una única función con nombre mantiene cada arreglo en un solo sitio.",
+      "title": "No te repitas"
+    },
+    "null-safety": {
+      "blurb": "Tarde o temprano un valor no está ahí - devuelve un valor por defecto, accede con seguridad y di «desconocido» en vez de reventar.",
+      "title": "Seguridad ante null"
+    },
+    "one-job": {
+      "blurb": "Por qué una función que hace una sola cosa es fácil de nombrar, probar y reutilizar - la semilla cotidiana de la idea de responsabilidad única.",
+      "title": "Una función, un trabajo"
+    },
+    "polymorphism": {
+      "blurb": "¿Por qué varias implementaciones de la misma lógica en vez de un método lleno de ramas? Una llamada que resuelve el objeto, un bucle sobre muchos tipos y comportamiento nuevo con solo añadir una clase.",
+      "title": "¿Por qué muchas versiones?"
+    },
+    "practice-the-basics": {
+      "blurb": "Pon en práctica los fundamentos: haz cálculos con números, une texto y plantea preguntas de sí/no con comparaciones - el puente hacia el flujo de control. Escribe y ejecuta cada uno.",
+      "title": "Practica lo básico"
+    },
+    "reading-objects": {
+      "blurb": "Escribe unos cuantos objetos pequeños que colaboran - uno le pide datos a otro, cada tarea vive en un solo sitio y una clase usa lo que le pasan.",
+      "title": "Lectura de objetos"
+    },
+    "refactor-moves": {
+      "blurb": "Cambia la forma de un código que funciona sin cambiar lo que hace. Cinco refactorizaciones pequeñas - lleva el comportamiento junto a sus datos, depende de una interfaz, inyecta una dependencia, sustituye una rama, divide una clase - cada una un hábito que SOLID está a punto de nombrar.",
+      "title": "Movimientos de refactorización"
+    },
+    "reuse-without-regret": {
+      "blurb": "Construye tú mismo las dos formas de reutilizar código - heredar de un padre o contener partes más pequeñas - topa con el problema del diamante y descubre por qué echamos mano de la composición.",
+      "title": "Reutiliza sin arrepentirte"
+    },
+    "strings": {
+      "blurb": "Construye texto a partir de trozos, cambia mayúsculas y minúsculas, busca dentro y reescribe partes - las cosas que haces con texto cada día.",
+      "title": "Strings"
+    },
+    "test-doubles": {
+      "blurb": "Testea código que se apoya en un reloj, un número aleatorio o la red pasándole un doble que tú controlas: un fake, un stub y un spy.",
+      "title": "Test doubles"
+    },
+    "testable-design": {
+      "blurb": "Hay código que se pelea con cada test; otro código da gusto comprobarlo. Los hábitos que hacen el código testeable - inyectar, una sola tarea, sin estado oculto - son los que hay detrás de SOLID.",
+      "title": "Testeable por diseño"
+    },
+    "testing-basics": {
+      "blurb": "Un test no es más que código que ejecuta tu código y comprueba el resultado. Escribe los primeros - arrange, act, assert - incluido uno que espera un fallo a propósito.",
+      "title": "Qué es un test"
+    },
+    "the-solid-principles": {
+      "blurb": "Cinco hábitos que mantienen el código fácil de cambiar. Detecta cada problema en un proyecto real de test-automation y arréglalo como toca. Las ideas se apoyan en todo lo anterior a esta parte.",
+      "title": "Los principios SOLID"
+    },
+    "theory-1": {
+      "blurb": "Mira una capa por debajo de las apps que usas. Qué es una instrucción, cómo un programa es una lista ordenada de ellas sobre datos, la CPU que las ejecuta y qué significa compilar.",
+      "title": "Qué es un programa"
+    },
+    "theory-10": {
+      "blurb": "Cada valor tiene un tipo - número, texto, verdadero/falso - y el tipo decide qué puedes hacer con él.",
+      "title": "Tipos"
+    },
+    "theory-11": {
+      "blurb": "Las dos piezas con las que se construye cada línea de código: pasos que hacen cosas y trozos que producen valores.",
+      "title": "Sentencias y expresiones"
+    },
+    "theory-12": {
+      "blurb": "Cómo un programa elige y repite: condiciones, if/else y bucles - en el fondo, los saltos de la Parte uno.",
+      "title": "Decisiones y repetición"
+    },
+    "theory-13": {
+      "blurb": "Agrupar pasos bajo un nombre que puedes reutilizar, con entradas y una salida - cómo los programas siguen ordenados a medida que crecen.",
+      "title": "Funciones"
+    },
+    "theory-14": {
+      "blurb": "Qué es un bug, errores de sintaxis frente a errores de lógica y qué es de verdad depurar. Cierra la Parte dos; la Parte tres sigue con cómo se ejecuta y se conecta el software.",
+      "title": "Bugs: por qué los programas fallan"
+    },
+    "theory-15": {
+      "blurb": "Dónde guarda sus datos un programa en marcha: la memoria como huecos numerados, una variable como un hueco y las dos zonas que usa - el stack y el heap.",
+      "title": "Dónde viven los datos"
+    },
+    "theory-16": {
+      "blurb": "Por qué unas variables contienen un valor y otras solo apuntan a uno - y qué pasa de verdad cuando copias cada una. La idea detrás de cómo se comportan los objetos.",
+      "title": "Referencias frente a valores"
+    },
+    "theory-17": {
+      "blurb": "Cómo el código que escribes se convierte en un programa en marcha: el compilador, el runtime de .NET, errores en tiempo de compilación frente a tiempo de ejecución y el bucle de escribir, compilar y ejecutar.",
+      "title": "El ciclo de compilar y ejecutar"
+    },
+    "theory-18": {
+      "blurb": "La memoria se olvida cuando un programa se para. Cómo se conservan los datos: almacenamiento, ficheros, bases de datos y guardar frente a cargar.",
+      "title": "Guardar datos"
+    },
+    "theory-19": {
+      "blurb": "Cómo se comunican los programas a través de una red: internet, direcciones y DNS, clientes y servidores, peticiones y respuestas, HTTP y qué es una API.",
+      "title": "Programas que hablan"
+    },
+    "theory-2": {
+      "blurb": "Qué pasa cuando ejecutas un programa: se carga en memoria, la CPU repite el bucle de leer y ejecutar, no pierde el hilo y a veces salta a otro sitio.",
+      "title": "Cómo se ejecuta un programa"
+    },
+    "theory-20": {
+      "blurb": "Cómo se controla y se comparte el código: control de versiones, commits, historial y cómo un equipo trabaja sobre un mismo proyecto.",
+      "title": "Cómo se comparte el código"
+    },
+    "theory-21": {
+      "blurb": "Nunca construyes solo: librerías, la librería estándar, paquetes, un gestor de paquetes y las dependencias de las que depende tu programa.",
+      "title": "Apoyarse en el código de otros"
+    },
+    "theory-3": {
+      "blurb": "Qué pone en marcha un programa: el sistema operativo lo carga en memoria y lo arranca en su punto de entrada - normalmente una función llamada Main - donde empiezan tus instrucciones.",
+      "title": "Qué arranca un programa"
+    },
+    "theory-4": {
+      "blurb": "Un núcleo de CPU hace una sola cosa a la vez - entonces, ¿cómo funcionan a la vez decenas de apps? Procesos, cambios rápidos, el scheduler, los núcleos y por qué un cuelgue se queda contenido.",
+      "title": "Ejecutar muchos programas a la vez"
+    },
+    "theory-5": {
+      "blurb": "Texto, fotos, música - por debajo todo son números. Los bits, por qué los ordenadores usan solo dos estados, contar en binario y el byte.",
+      "title": "Cómo los ordenadores lo guardan todo como números"
+    },
+    "theory-6": {
+      "blurb": "Cómo una letra, una foto o una canción se convierten de verdad en números: codificaciones, texto Unicode, píxeles y color, sonido muestreado - y por qué un mismo número puede significar cosas distintas.",
+      "title": "Texto, imágenes y sonido como números"
+    },
+    "theory-7": {
+      "blurb": "Más allá de arrancar programas: cómo el sistema operativo convierte el almacenamiento en bruto en ficheros y carpetas, los protege y habla con tus dispositivos a través de drivers. Cierra la Parte uno.",
+      "title": "El trabajo más grande del sistema operativo"
+    },
+    "theory-8": {
+      "blurb": "Por qué no escribimos instrucciones de CPU en bruto, qué significa «alto nivel», los muchos lenguajes que existen y qué es la sintaxis.",
+      "title": "Qué es un lenguaje de programación"
+    },
+    "theory-9": {
+      "blurb": "La primera idea que usa cualquier programa: una caja con nombre que guarda un valor que puedes leer, escribir y cambiar.",
+      "title": "Variables"
+    },
+    "theory-check-1": {
+      "blurb": "Un cuestionario corto para afianzar la Parte uno y ganar tu XP: qué es un programa, cómo se ejecuta, muchos a la vez, bits y bytes y el sistema operativo.",
+      "title": "Checkpoint de la Parte uno"
+    },
+    "theory-check-2": {
+      "blurb": "Un cuestionario corto para afianzar la Parte dos y ganar tu XP: lenguajes, variables, tipos, sentencias, decisiones, funciones y bugs.",
+      "title": "Checkpoint de la Parte dos"
+    },
+    "theory-check-3": {
+      "blurb": "Un cuestionario corto para afianzar la Parte tres y ganar tu XP: dónde viven los datos, referencias frente a valores, compilar y ejecutar, guardar datos, programas que se comunican y mantener los datos a salvo.",
+      "title": "Checkpoint de la Parte tres"
+    },
+    "theory-check-4": {
+      "blurb": "El checkpoint final: librerías, la librería estándar, paquetes, dependencias y control de versiones. Supéralo para cerrar los fundamentos del software.",
+      "title": "Checkpoint de la Parte cuatro"
+    },
+    "type-conversion": {
+      "blurb": "Convierte texto en números y al revés, quita los decimales de un valor y parsea sin que reviente - las conversiones a las que recurres cada día.",
+      "title": "Conversión de tipos y parseo"
+    },
+    "type-system": {
+      "blurb": "Una base abstracta que no puedes instanciar, reemplazar comportamiento con override, un mismo nombre para entradas distintas, la forma en texto de un tipo y limpiar en un punto conocido.",
+      "title": "Tipos abstractos y sobrescritura"
+    },
+    "write-for-readers": {
+      "blurb": "Por qué la claridad gana a la astucia: el código se lee mucho más de lo que se escribe, así que la versión más sencilla suele ganar.",
+      "title": "Escribe para quien lee"
+    },
+    "writing-methods": {
+      "blurb": "Escribe una regla una vez y reutilízala. Le pasas a un método una entrada y te devuelve una respuesta - la misma idea que una comprobación que antes hacías a mano. La sintaxis es fácil; lo que importa es para qué sirve un método.",
+      "title": "Métodos"
+    }
+  },
+  "partKickers": {
+    "AI · Part four": "IA · Parte cuatro",
+    "AI · Part one": "IA · Parte uno",
+    "AI · Part three": "IA · Parte tres",
+    "AI · Part two": "IA · Parte dos",
+    "Part five": "Parte cinco",
+    "Part four": "Parte cuatro",
+    "Part one": "Parte uno",
+    "Part six": "Parte seis",
+    "Part three": "Parte tres",
+    "Part two": "Parte dos",
+    "Theory · Part five": "Teoría · Parte cinco",
+    "Theory · Part four": "Teoría · Parte cuatro",
+    "Theory · Part one": "Teoría · Parte uno",
+    "Theory · Part three": "Teoría · Parte tres",
+    "Theory · Part two": "Teoría · Parte dos"
+  },
+  "parts": {
+    "Build with objects": "Construye con objetos",
+    "Design for change": "Diseña para el cambio",
+    "Everyday essentials": "Fundamentos del día a día",
+    "Foundations of good code": "Fundamentos del buen código",
+    "From idea to running code": "De la idea al código en marcha",
+    "From model to agent": "Del modelo al agente",
+    "How an agent thinks": "Cómo piensa un agente",
+    "How software runs and connects": "Cómo se ejecuta y se conecta el software",
+    "Know the language": "Conoce el lenguaje",
+    "Making agents reliable": "Hacer agentes de fiar",
+    "Prove it works": "Demuestra que funciona",
+    "The building blocks of AI": "Los pilares de la IA",
+    "The development world": "El mundo del desarrollo",
+    "Understand the ideas": "Comprende las ideas",
+    "What a computer really is": "Qué es de verdad un ordenador"
+  },
+  "tracks": {
+    "ai": {
+      "blurb": "Un primer vistazo a cómo funcionan de verdad los LLM y los agentes de IA - tokens, contexto, memoria, herramientas, planificación y cómo mantener un agente de fiar.",
+      "kicker": "Agentes desde cero",
+      "name": "IA"
+    },
+    "practical": {
+      "blurb": "Aprende C# escribiendo y ejecutando código de verdad, victoria a victoria, hasta el diseño SOLID.",
+      "kicker": "Manos a la obra",
+      "name": "Práctico"
+    },
+    "theory": {
+      "blurb": "No necesitas base previa. Entiende qué es el software y cómo lo ejecuta de verdad un ordenador, desde cero.",
+      "kicker": "Desde cero",
+      "name": "Teoría"
+    }
+  }
+}

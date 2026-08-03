@@ -1,4 +1,6 @@
 {
+  "card.title": "Lambdas",
+  "card.blurb": "Tu primer contacto con las lambdas - funciones diminutas y sin nombre que guardas en una variable. Descubre qué son, cómo responden sí/no y algo que un método normal no puede hacer: leer las variables de su alrededor. Las funcioncitas sobre las que corre LINQ justo después.",
   "hero.eyebrow": "Parte tres · Conoce el lenguaje",
   "hero.title": "Lambdas",
   "intro.0": "Una lambda es una función diminuta sin nombre que escribes justo donde la necesitas y guardas en una variable. Este es tu primer vistazo a ellas: qué son, cómo responden a una pregunta de sí/no, y la única cosa que hacen que un método normal no puede - leer las variables que tienen al lado. En la próxima lección se las pasarás a LINQ. Escribe cada pequeño programa, ejecútalo y haz que la salida coincida.",

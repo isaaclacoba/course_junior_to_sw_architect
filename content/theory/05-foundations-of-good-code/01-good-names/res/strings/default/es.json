@@ -1,4 +1,6 @@
 {
+  "card.title": "Buenos nombres",
+  "card.blurb": "Por qué un nombre es la documentación más barata que tienes, y cómo elegir uno que diga qué contiene un valor o qué hace una función.",
   "hero.eyebrow": "Teoría · Parte cinco · Fundamentos del buen código",
   "hero.title": "Buenos nombres",
   "intro.0": "Lees código mucho más a menudo de lo que lo escribes, y quien lo lee sueles ser tú mismo, semanas después. La forma más barata de que el código se explique solo es un buen nombre. Recorre un fragmento vago y observa cómo se convierte en código que se lee como su propia descripción.",

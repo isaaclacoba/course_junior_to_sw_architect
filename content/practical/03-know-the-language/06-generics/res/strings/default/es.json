@@ -1,4 +1,6 @@
 {
+  "card.title": "Genéricos",
+  "card.blurb": "Has usado List&lt;T&gt; - ahora escribe el tuyo. Construye un Box&lt;T&gt;, un método genérico y un Pair&lt;A, B&gt; que funcionen con cualquier tipo de valor.",
   "hero.eyebrow": "Parte tres · Conoce el lenguaje",
   "hero.title": "Genéricos",
   "intro.0": "Has usado List<T> - un tipo que funciona con cualquier clase de valor. Ahora escribe el tuyo. Cuatro pequeños programas que construyes desde cero y ejecutas: un Box<T>, un método genérico, un Pair<A, B> y un método genérico que devuelve un tipo genérico. Escribe el tipo, ejecútalo y haz que la salida coincida.",

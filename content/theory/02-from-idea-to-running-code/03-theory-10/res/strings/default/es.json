@@ -1,4 +1,6 @@
 {
+  "card.title": "Tipos",
+  "card.blurb": "Cada valor tiene un tipo - número, texto, verdadero/falso - y el tipo decide qué puedes hacer con él.",
   "hero.eyebrow": "Teoría · Parte dos · De la idea al código en marcha",
   "hero.title": "Tipos",
   "intro.0": "Cada valor tiene un tipo - una clase. Esta lección cubre qué es un tipo, cómo decide lo que puedes hacer con un valor, los tipos comunes, y por qué los tipos pillan errores pronto. Responde una comprobación rápida sobre cada idea, y luego rellena el hueco en una frase sencilla.",

@@ -1,4 +1,6 @@
 {
+  "card.title": "¿Por qué abstraer?",
+  "card.blurb": "¿Por qué esconder la lógica tras una interfaz? Mira cómo un cuidador se queda atascado con un solo animal, y cómo una interfaz lo libera - un mismo método saluda a todos los animales, y uno nuevo entra sin coste.",
   "hero.eyebrow": "Parte cuatro · Construye con objetos",
   "hero.title": "¿Por qué abstraer?",
   "intro.0": "¿Por qué esconder lógica detrás de una interfaz, en vez de usar la clase que ya tienes? Al principio el paso de más parece una pérdida de tiempo. Pero en cuanto necesitas un segundo tipo de cosa, el código atado a una sola clase estorba. Aquí verás cómo una promesa compartida deja que un mismo trozo de código funcione con muchos tipos - incluso con los que escribas más tarde.",

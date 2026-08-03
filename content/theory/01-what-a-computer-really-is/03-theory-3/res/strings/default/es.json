@@ -1,4 +1,6 @@
 {
+  "card.title": "Qué arranca un programa",
+  "card.blurb": "Qué pone en marcha un programa: el sistema operativo lo carga en memoria y lo arranca en su punto de entrada - normalmente una función llamada Main - donde empiezan tus instrucciones.",
   "hero.eyebrow": "Teoría · Parte uno · Qué es de verdad un ordenador",
   "hero.title": "Qué arranca un programa",
   "intro.0": "Un programa se ejecuta de una instrucción en una - pero ¿quién le da al play? Nada se arranca solo. Antes de que tu código pueda ejecutarse, algo tiene que cargarlo en la memoria y decidir dónde está la primerísima instrucción. Recorre lo de abajo para ver qué pone un programa en marcha.",

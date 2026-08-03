@@ -1,4 +1,6 @@
 {
+  "card.title": "Dónde viven los datos",
+  "card.blurb": "Dónde guarda sus datos un programa en marcha: la memoria como huecos numerados, una variable como un hueco y las dos zonas que usa - el stack y el heap.",
   "hero.eyebrow": "Teoría · Parte tres · Cómo se ejecuta y se conecta el software",
   "hero.title": "Dónde viven los datos",
   "intro.0": "Cada valor que tu programa toca mientras se ejecuta tiene que estar en algún sitio, y ese sitio es la memoria. Pero la memoria no es un espacio único e indiviso - son unas cuantas zonas, cada una apropiada para un trabajo distinto. Recorre lo de abajo para ver dónde acaban un número, una variable y un objeto, y por qué.",

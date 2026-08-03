@@ -1,4 +1,6 @@
 {
+  "card.title": "Cómo se comparte el código",
+  "card.blurb": "Cómo se controla y se comparte el código: control de versiones, commits, historial y cómo un equipo trabaja sobre un mismo proyecto.",
   "hero.eyebrow": "Teoría · Parte cuatro · El mundo del desarrollo",
   "hero.title": "Cómo se comparte el código",
   "intro.0": "Cómo se rastrea y se comparte el propio código: control de versiones, commits, historial, y cómo un equipo trabaja junto en un mismo proyecto - abriendo ramas para probar cambios sin riesgo, fusionándolas de vuelta, y compartiendo un único historial a través de un remoto. Recorre la imagen para ver cómo se va construyendo un historial de commits.",

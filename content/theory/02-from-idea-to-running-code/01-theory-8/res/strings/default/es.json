@@ -1,4 +1,6 @@
 {
+  "card.title": "Qué es un lenguaje de programación",
+  "card.blurb": "Por qué no escribimos instrucciones de CPU en bruto, qué significa «alto nivel», los muchos lenguajes que existen y qué es la sintaxis.",
   "hero.eyebrow": "Teoría · Parte dos · De la idea al código en marcha",
   "hero.title": "Qué es un lenguaje de programación",
   "intro.0": "La Parte uno mostró cómo los ordenadores ejecutan instrucciones. Ahora empezamos a escribirlas. Esta lección cubre qué es un lenguaje de programación: por qué no escribimos instrucciones de CPU en crudo, qué significa 'de alto nivel', y que muchos lenguajes apuntan a una misma máquina. Recorre el visual para verlo pasar.",

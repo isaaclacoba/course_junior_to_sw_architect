@@ -1,4 +1,6 @@
 {
+  "card.title": "Los comentarios dicen por qué",
+  "card.blurb": "Por qué los mejores comentarios explican el motivo, no lo obvio - y por qué un buen nombre hace innecesarios casi todos.",
   "hero.eyebrow": "Teoría · Parte cinco · Fundamentos del buen código",
   "hero.title": "Los comentarios dicen por qué",
   "intro.0": "Un comentario es una nota para personas que la computadora ignora. Mal usado, solo repite lo que el código ya dice y poco a poco se queda desactualizado. Bien usado, captura lo único que el código no puede mostrar - el motivo. Recorre los dos tipos y mira cuál se gana su sitio.",

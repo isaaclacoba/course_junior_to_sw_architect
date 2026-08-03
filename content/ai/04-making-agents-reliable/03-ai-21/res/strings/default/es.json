@@ -1,4 +1,6 @@
 {
+  "card.title": "Saber cuándo parar",
+  "card.blurb": "Un agente decide su siguiente movimiento, así que nada lo hace parar por sí solo. Un bucle que no puede parar es una factura desbocada. Mira las condiciones de parada - objetivo cumplido, presupuesto agotado, dando vueltas, error grave.",
   "hero.eyebrow": "Teoría · Parte ocho · Hacer agentes fiables",
   "hero.title": "Saber cuándo parar",
   "intro.0": "Un bucle que puede seguir sin parar necesita saber cuándo dejarlo. La mayoría de las veces un agente para porque llegó al objetivo - pero no siempre. Puede quedarse atascado repitiéndose, perseguir una tarea que no se resuelve nunca, o ir acumulando coste sin que te des cuenta. Así que todo agente corre con una correa: un presupuesto de pasos, un límite de gasto, una comprobación de si va en círculos. Verás cómo una ejecución sana para al llegar al objetivo, y cómo una atascada se corta antes de quemar todo el presupuesto.",

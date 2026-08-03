@@ -1,4 +1,6 @@
 {
+  "card.title": "El ciclo de compilar y ejecutar",
+  "card.blurb": "Cómo el código que escribes se convierte en un programa en marcha: el compilador, el runtime de .NET, errores en tiempo de compilación frente a tiempo de ejecución y el bucle de escribir, compilar y ejecutar.",
   "hero.eyebrow": "Teoría · Parte tres · Cómo se ejecuta y se conecta el software",
   "hero.title": "El ciclo de compilar y ejecutar",
   "intro.0": "Cómo el texto que escribes se convierte en un programa en marcha: código fuente, el compilador, el runtime de .NET, y los dos tipos de error. Recorre el visual para ver cómo una compilación se convierte en una ejecución.",

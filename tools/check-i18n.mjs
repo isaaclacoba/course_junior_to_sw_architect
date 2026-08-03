@@ -12,8 +12,15 @@
 // it is in a same-lang bundle (voice/L or default/L) - an en-only key resolves to
 // English, i.e. untranslated.
 //
+// It ALSO checks the landing chrome. Card title/blurb are lesson-owned (card.title/
+// card.blurb in each lesson bundle, gated per-lesson like any other key). Track and
+// part chrome (track name/kicker/blurb/partPrefix and each part title) live inline in
+// course-registry.js i18n blocks; this gate FAILs if any track or part lacks a full
+// i18n block for a language some lesson targets - so a new Part added without its
+// translation fails here, even though the index would silently render English.
+//
 // Usage: node tools/check-i18n.mjs [--track <t>] [--lang <l>] [--json] [lessonDir ...]
-//   exit 1 if any lesson is missing keys for a declared language.
+//   exit 1 if any lesson - or the landing overlay - is missing keys for a language.
 import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
@@ -48,6 +55,47 @@ function lessonsFromRegistry() {
   return out;
 }
 
+// The registry object, source of the track + part chrome and its inline i18n blocks.
+function loadRegistry() {
+  const sandbox = { window: {} };
+  vm.runInNewContext(fs.readFileSync(REGISTRY, "utf8"), sandbox, { filename: REGISTRY });
+  return sandbox.window.CourseRegistry || null;
+}
+
+// Landing chrome coverage. Track name/kicker/blurb/partPrefix and each part title are
+// translated inline in course-registry.js i18n blocks (the generator derives the part
+// kicker and emits generated/landing-i18n.<lang>.json from them). This gate requires a
+// full i18n block on every track and part for each language ANY lesson targets, so
+// adding a Part without its translation fails here. Lesson CARD text is not checked
+// here - it is lesson-owned (card.title/card.blurb) and gated per-lesson.
+const TRACK_I18N_FIELDS = ["name", "kicker", "blurb", "partPrefix"];
+function checkLanding(langFilter) {
+  const registry = loadRegistry();
+  if (!registry || !Array.isArray(registry.tracks)) return [];
+  const targetLangs = new Set();
+  for (const { path: dir } of lessonsFromRegistry()) {
+    const meta = loadMeta(dir);
+    if (!meta || !meta.resources) continue;
+    const base = meta.resources.lang || "en";
+    for (const l of meta.resources.langs || []) if (l !== base) targetLangs.add(l);
+  }
+  const out = [];
+  for (const lang of targetLangs) {
+    if (langFilter && lang !== langFilter) continue;
+    const missTracks = [], missParts = [];
+    for (const t of registry.tracks) {
+      const ti = (t.i18n || {})[lang] || {};
+      for (const f of TRACK_I18N_FIELDS) if (typeof ti[f] !== "string") missTracks.push(t.id + "." + f);
+      for (const pt of t.parts || []) {
+        const pi = (pt.i18n || {})[lang] || {};
+        if (typeof pi.title !== "string") missParts.push(t.id + "/" + pt.id);
+      }
+    }
+    if (missTracks.length || missParts.length) out.push({ lang, missTracks, missParts });
+  }
+  return out;
+}
+
 // The English source value + expected key set for a lesson. englishSource holds
 // the authoritative English for each key (bundle value if present, else the
 // inline value from meta/viz); ref is the set of keys that MUST be translated.
@@ -64,6 +112,12 @@ function referenceFor(dir, meta) {
     if (!(key in englishSource) && typeof value === "string") englishSource[key] = value;
   };
 
+  // Card title/blurb are lesson-owned: their English source is meta.title/meta.blurb
+  // and their translations live in this lesson's own bundle (the index reads them from
+  // generated/landing-i18n.<lang>.json). Gating them here is what makes a missing
+  // Spanish card fail automatically, the same as any other key.
+  if (typeof meta.title === "string") add("card.title", meta.title);
+  if (typeof meta.blurb === "string") add("card.blurb", meta.blurb);
   // Hero + intro come from meta (inline for viz; also in the bundle for build).
   if (typeof meta.title === "string") add("hero.title", meta.title);
   if (typeof meta.eyebrow === "string") add("hero.eyebrow", meta.eyebrow);
@@ -163,8 +217,11 @@ for (const { path: dir } of lessons) {
   report.push({ dir: r.dir, refSize: r.refSize, findings: shown });
 }
 
+const landing = checkLanding(langFilter);
+const landingFail = landing.length > 0;
+
 if (asJson) {
-  console.log(JSON.stringify({ checked, failLessons, warnLessons, report }, null, 2));
+  console.log(JSON.stringify({ checked, failLessons, warnLessons, landing, report }, null, 2));
 } else {
   const fmt = (arr) => arr.slice(0, MAX_LIST).join(", ") + (arr.length > MAX_LIST ? ", ..." : "");
   for (const r of report) {
@@ -180,8 +237,13 @@ if (asJson) {
       }
     }
   }
+  for (const L of landing) {
+    if (L.missTracks.length) console.log(`FAIL  course-registry.js [${L.lang}]  ${L.missTracks.length} track chrome field(s) untranslated: ${fmt(L.missTracks)}`);
+    if (L.missParts.length) console.log(`FAIL  course-registry.js [${L.lang}]  ${L.missParts.length} part title(s) untranslated: ${fmt(L.missParts)}`);
+  }
   console.log(`\n${checked} lesson(s) checked; ${failLessons} with MISSING keys, ${warnLessons} with identical-value warnings.`);
-  console.log(failLessons ? "RESULT: FAIL (missing keys render English)" : "RESULT: PASS");
+  if (landingFail) console.log(`landing chrome: ${landing.length} language(s) with untranslated track/part chrome in course-registry.js (index renders English for those parts).`);
+  console.log(failLessons || landingFail ? "RESULT: FAIL (missing keys render English)" : "RESULT: PASS");
 }
 
-process.exit(failLessons ? 1 : 0);
+process.exit(failLessons || landingFail ? 1 : 0);

@@ -1,4 +1,6 @@
 {
+  "card.title": "Programas que hablan",
+  "card.blurb": "Cómo se comunican los programas a través de una red: internet, direcciones y DNS, clientes y servidores, peticiones y respuestas, HTTP y qué es una API.",
   "hero.eyebrow": "Teoría · Parte tres · Cómo se ejecuta y se conecta el software",
   "hero.title": "Programas que hablan",
   "intro.0": "Cómo los programas se hablan entre sí a través de una red: el internet que los conecta, cómo un cliente encuentra a un servidor por su dirección, peticiones y respuestas, las reglas HTTP que sigue la web, y qué es una API. Recorre la imagen para ver cómo sale una petición y vuelve una respuesta.",

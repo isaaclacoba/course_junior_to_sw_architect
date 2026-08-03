@@ -1,4 +1,6 @@
 {
+  "card.title": "Acceso y propiedades",
+  "card.blurb": "Mantén privadas algunas partes de un tipo, expón otras y da acceso al estado a través de propiedades - un get y un set controlados - en vez de campos a pelo.",
   "hero.eyebrow": "Parte dos · Fundamentos del día a día",
   "hero.title": "Acceso y propiedades",
   "intro.0": "Un tipo decide qué puede ver el mundo de fuera y cómo se llega a su estado. Dejas unas partes en private, expones otras y entregas valores a través de una propiedad - un get y set controlados - en vez de un campo tal cual. Escribes cada forma y la ejecutas.",

@@ -1,4 +1,6 @@
 {
+  "card.title": "Guardar datos",
+  "card.blurb": "La memoria se olvida cuando un programa se para. Cómo se conservan los datos: almacenamiento, ficheros, bases de datos y guardar frente a cargar.",
   "hero.eyebrow": "Teoría · Parte tres · Cómo se ejecuta y se conecta el software",
   "hero.title": "Guardar datos",
   "intro.0": "La memoria lo olvida todo cuando un programa se para - entonces, ¿cómo se queda la información? Recorre el visual para ver cómo los datos salen de la RAM hacia el almacenamiento, guardados como un fichero en el disco que vive más que el programa.",

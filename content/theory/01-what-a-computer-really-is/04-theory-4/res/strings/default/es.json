@@ -1,4 +1,6 @@
 {
+  "card.title": "Ejecutar muchos programas a la vez",
+  "card.blurb": "Un núcleo de CPU hace una sola cosa a la vez - entonces, ¿cómo funcionan a la vez decenas de apps? Procesos, cambios rápidos, el scheduler, los núcleos y por qué un cuelgue se queda contenido.",
   "hero.eyebrow": "Teoría · Parte uno · Qué es de verdad un ordenador",
   "hero.title": "Ejecutar muchos programas a la vez",
   "intro.0": "Un núcleo de CPU hace una instrucción cada vez, y sin embargo mantienes un navegador, música y una app de chat funcionando juntos. No están exactamente ejecutándose a la vez - el sistema operativo cambia entre ellos más rápido de lo que notas, repartiendo el único núcleo. Recorre lo de abajo y mira cómo dos programas comparten un mismo ordenador.",

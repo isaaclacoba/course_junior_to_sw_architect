@@ -251,7 +251,7 @@
   if (LANG === "es") {
     Promise.all([
       fetch("res/chrome/es.json").then(function (r) { return r.json(); }).catch(function () { return null; }),
-      fetch("res/landing/es.json").then(function (r) { return r.json(); }).catch(function () { return null; })
+      fetch("generated/landing-i18n.es.json").then(function (r) { return r.json(); }).catch(function () { return null; })
     ]).then(function (res) {
       if (res[0]) window.ChromeText = res[0];
       if (res[1]) window.LandingContent = res[1];

@@ -86,14 +86,32 @@ lesson.
      dir prefixes are cosmetic.
    - Do NOT hand-wire a card into the root `index.html`; the card data comes from
      `meta.js` via `generated/course-data.js`.
+   - **Localize the card (lesson-owned).** The lesson's own bundle carries its
+     card text: for every target language the site ships (currently `es`), add
+     `card.title` and `card.blurb` to `res/strings/default/<lang>.json`, alongside
+     `hero.title` and the rest. The generator collects these into
+     `generated/landing-i18n.<lang>.json` (what the index reads); there is NO
+     central `res/landing` file any more. A card left untranslated renders English
+     on the path while the lesson inside is Spanish - so `check-i18n` and
+     `verify-lesson` (step 9) fail if you forget, the same as any other key. Match
+     the neighbours' voice and the lesson's own `hero.title`.
+   - **If this lesson opens a NEW Part**, translate the Part chrome in
+     `course-registry.js`: add `i18n: { es: { title } }` to the part, and (for a new
+     track) `i18n: { es: { name, kicker, blurb, partPrefix } }` to the track, next to
+     the English. The part kicker ("Parte cinco") is DERIVED from `partPrefix` + a
+     localized ordinal - do not hand-write it. The landing gate fails on any track or
+     part missing its i18n block.
 8. **Update `docs/concept-ledger.md`** in this same change: add or move the
    lesson's row and any concept/surface it introduces.
 9. **Verify** with the one-command harness: `node tools/verify-lesson.mjs
    <lesson-dir>`. It runs the whole SPECS recipe - `node --check`; real-`dotnet`
    compile of every runnable program and the rebuilt `verify` probe; viz
    scene-resolver checks on every step; headless EN+ES render with no
-   `undefined` - and exits non-zero on failure. Add `--no-dotnet` / `--en-only`
-   to iterate faster. It cleans up after itself, so there is nothing to delete.
+   `undefined`; and a global landing-chrome gate (every track + part in
+   `course-registry.js` must carry a full i18n block for each language a lesson
+   targets; cards are covered by the per-lesson check) - and exits non-zero on
+   failure. Add `--no-dotnet` / `--en-only` to iterate faster. It cleans up after
+   itself, so there is nothing to delete.
 10. **Log end** in `docs/work-log.md` with a real `date` timestamp.
 
 ### Legacy flow (flat files) — only for not-yet-migrated lessons

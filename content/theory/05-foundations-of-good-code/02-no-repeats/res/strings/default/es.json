@@ -1,4 +1,6 @@
 {
+  "card.title": "No te repitas",
+  "card.blurb": "Por qué la lógica copiada es una trampa de mantenimiento, y cómo llevarla a una única función con nombre mantiene cada arreglo en un solo sitio.",
   "hero.eyebrow": "Teoría · Parte cinco · Fundamentos del buen código",
   "hero.title": "No te repitas",
   "intro.0": "Copiar y pegar parece rápido. El problema llega después: la misma lógica vive ahora en dos sitios, y un día arreglas un fallo en una copia y te olvidas de la otra. Recorre una pequeña duplicación y observa cómo se reduce a un único lugar con nombre que todos los que lo llaman comparten.",

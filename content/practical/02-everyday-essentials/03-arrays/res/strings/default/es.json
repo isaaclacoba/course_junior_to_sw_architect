@@ -1,4 +1,6 @@
 {
+  "card.title": "Arrays",
+  "card.blurb": "Guarda muchos valores en una fila fija y ordenada - accede a un elemento por su posición, mide la longitud y recorre todos con un bucle.",
   "hero.eyebrow": "Parte dos · Fundamentos del día a día",
   "hero.title": "Arrays",
   "intro.0": "Tarde o temprano un solo valor no basta - tienes una fila de nombres, una serie de puntuaciones, una lista de lecturas. Un array guarda muchos valores en una fila fija y ordenada, y te deja llegar a cualquiera por su posición. Escribes cada movimiento y lo ejecutas.",

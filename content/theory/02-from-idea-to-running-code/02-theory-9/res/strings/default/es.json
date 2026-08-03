@@ -1,4 +1,6 @@
 {
+  "card.title": "Variables",
+  "card.blurb": "La primera idea que usa cualquier programa: una caja con nombre que guarda un valor que puedes leer, escribir y cambiar.",
   "hero.eyebrow": "Teoría · Parte dos · De la idea al código en marcha",
   "hero.title": "Variables",
   "intro.0": "Echarás mano de una variable en la primera línea de código que escribas en tu vida, así que vale la pena saber qué es de verdad. No un contenedor misterioso - solo una casilla con nombre en la memoria que guarda un valor, que puedes volver a leer o sobrescribir. Abajo, una variable se asigna, se cambia y se lee, de un paso en un paso.",

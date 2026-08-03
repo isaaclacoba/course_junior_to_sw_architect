@@ -1,4 +1,6 @@
 {
+  "card.title": "Conversión de tipos y parseo",
+  "card.blurb": "Convierte texto en números y al revés, quita los decimales de un valor y parsea sin que reviente - las conversiones a las que recurres cada día.",
   "hero.eyebrow": "Parte dos · Fundamentos del día a día",
   "hero.title": "Conversión de tipos y parseo",
   "intro.0": "Los datos rara vez llegan en el tipo que necesitas - el texto tiene que volverse número, un número tiene que volverse texto, un decimal tiene que perder su fracción. Son las conversiones a las que recurres cada día. Escribes cada una y la ejecutas.",

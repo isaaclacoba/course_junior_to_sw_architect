@@ -1,4 +1,6 @@
 {
+  "card.title": "Razonamiento",
+  "card.blurb": "Pídele la respuesta y un modelo adivina; pídele que piense paso a paso y resuelve el problema. Descubre por qué escribir el razonamiento es el cálculo en sí, no adorno - chain-of-thought.",
   "hero.eyebrow": "Teoría · Parte siete · Cómo piensa un agente",
   "hero.title": "Razonamiento",
   "intro.0": "Hazle a un modelo una pregunta que necesita unos pasos de reflexión - un poco de aritmética, un pequeño acertijo de lógica - y si suelta lo primero que le sale, a menudo se equivoca. El arreglo tiene casi gracia: dile que piense paso a paso, y su acierto se dispara. No porque se haya vuelto más listo, sino porque escribir los pasos le da espacio para trabajar - cada token que escribe pasa a ser parte de lo que lee después. Verás la misma pregunta fallar como respuesta a bote pronto y luego acertar cuando el modelo razona en voz alta primero.",

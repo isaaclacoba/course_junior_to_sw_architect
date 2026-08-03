@@ -1,4 +1,6 @@
 {
+  "card.title": "Herramientas",
+  "card.blurb": "Un modelo solo sabe producir texto. Las herramientas le dejan pedir que se ejecute una función y leer el resultado - luego echar mano de la correcta entre varias, llamarla con la forma que pide su schema y recuperarse cuando una llamada vuelve mal.",
   "hero.eyebrow": "Teoría · Parte seis · Del modelo al agente",
   "hero.title": "Herramientas",
   "intro.0": "Un modelo puede escribir sobre el tiempo, pero no puede comprobarlo de verdad - su conocimiento se congeló cuando terminó el entrenamiento, y no tiene forma de llegar más allá de su propio texto. Las herramientas cambian eso: el modelo pide ejecutar una función, otra cosa hace el trabajo de verdad, y la respuesta vuelve a su contexto. Verás cómo una pregunta que no puede responder solo se convierte en una que sí - y luego lo que añade usar herramientas de verdad: leer el esquema de una herramienta, elegir la correcta entre varias, y recuperarse cuando una llamada vuelve mal.",

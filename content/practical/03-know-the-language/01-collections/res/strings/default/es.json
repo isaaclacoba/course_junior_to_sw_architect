@@ -1,4 +1,6 @@
 {
+  "card.title": "Colecciones",
+  "card.blurb": "Los contenedores del día a día a los que recurre el código real: crea una lista y hazla crecer, recórrela, accede por índice, llénala con tus propios objetos y asocia claves con valores usando un diccionario.",
   "hero.eyebrow": "Parte tres · Conoce el lenguaje",
   "hero.title": "Colecciones",
   "intro.0": "Los contenedores del día a día a los que echa mano el código real. Escribe y ejecuta cada uno: crea una List<T> y hazla crecer, recórrela con foreach, accede por índice, llénala con tus propios objetos y luego asocia claves a valores con un Dictionary.",

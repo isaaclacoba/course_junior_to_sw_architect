@@ -1,4 +1,6 @@
 {
+  "card.title": "Seguridad ante null",
+  "card.blurb": "Tarde o temprano un valor no está ahí - devuelve un valor por defecto, accede con seguridad y di «desconocido» en vez de reventar.",
   "hero.eyebrow": "Parte dos · Fundamentos del día a día",
   "hero.title": "Seguridad ante null",
   "intro.0": "Tarde o temprano un valor no está - un nombre que nadie rellenó, un objeto que nunca se construyó. Pídele a un valor ausente que haga algo y el programa revienta. Para arreglarlo, prevé el caso vacío: devuelve un valor por defecto, sáltalo con cuidado, o di claramente que no lo sabes. Escribes cada movimiento y lo ejecutas.",

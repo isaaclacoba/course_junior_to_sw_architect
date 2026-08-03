@@ -1,4 +1,6 @@
 {
+  "card.title": "Reutiliza sin arrepentirte",
+  "card.blurb": "Construye tú mismo las dos formas de reutilizar código - heredar de un padre o contener partes más pequeñas - topa con el problema del diamante y descubre por qué echamos mano de la composición.",
   "hero.eyebrow": "Parte uno · Comprende las ideas",
   "hero.title": "Reutiliza sin arrepentirte",
   "intro.0": "¿No puedes heredarlo todo y ya - una clase que toma de otra, y esa que toma de otra más? Muchas veces parece la forma natural de reutilizar código, y a veces lo es. Pero la herencia es una promesa fuerte, y forzarla donde no encaja suele hacer que el código sea más difícil de cambiar después.",

@@ -1,4 +1,6 @@
 {
+  "card.title": "Flujo de control",
+  "card.blurb": "Cómo el código decide y repite. Escribe un pequeño método que funcione para cada herramienta: if/else, lógica booleana, while, for, foreach con break/continue y switch - y ejecútalo.",
   "hero.eyebrow": "Parte uno · Comprende las ideas",
   "hero.title": "Flujo de control",
   "intro.0": "Cómo el código decide y repite. Cada uno de estos seis ejercicios coge una herramienta de flujo de control - if/else, lógica booleana, while, for, foreach con break/continue, switch - y te pide un pequeño método que funcione. El patrón se muestra encima de cada tarjeta; tú rellenas el cuerpo y lo ejecutas.",

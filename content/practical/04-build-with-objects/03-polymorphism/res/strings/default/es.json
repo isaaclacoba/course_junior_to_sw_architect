@@ -1,4 +1,6 @@
 {
+  "card.title": "¿Por qué muchas versiones?",
+  "card.blurb": "¿Por qué varias implementaciones de la misma lógica en vez de un método lleno de ramas? Una llamada que resuelve el objeto, un bucle sobre muchos tipos y comportamiento nuevo con solo añadir una clase.",
   "hero.eyebrow": "Parte cuatro · Construye con objetos",
   "hero.title": "¿Por qué muchas versiones?",
   "intro.0": "¿Por qué escribir varias clases pequeñas que hacen el mismo tipo de trabajo, en vez de un método con una rama para cada caso? El método único parece más ordenado - hasta que vuelve a crecer cada vez que aparece algo nuevo. Aquí verás cómo dejar que cada tipo lleve su propia versión evita que eso pase.",

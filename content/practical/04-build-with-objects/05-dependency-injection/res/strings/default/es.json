@@ -1,4 +1,6 @@
 {
+  "card.title": "¿Por qué inyectar?",
+  "card.blurb": "¿Por qué pasar las dependencias en vez de hacer new por todas partes? Nota el momento en que un animal fijado a fuego te da un buen dolor de cabeza, e inyéctalo - y pasa un doble de juguete para ensayar sin ningún animal real.",
   "hero.eyebrow": "Parte cuatro · Construye con objetos",
   "hero.title": "¿Por qué inyectar?",
   "intro.0": "¿Por qué entregarle a una clase las cosas que necesita, en vez de dejar que las construya ella misma? Construirlas en el momento es lo obvio, y al principio funciona. Pero ata la clase a esas decisiones exactas y hace difícil probarla por su cuenta. Aquí verás cómo entregar las dependencias mantiene una clase flexible - y fácil de probar con un sustituto.",

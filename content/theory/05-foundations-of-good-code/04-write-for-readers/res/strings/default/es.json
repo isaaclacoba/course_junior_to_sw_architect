@@ -1,4 +1,6 @@
 {
+  "card.title": "Escribe para quien lee",
+  "card.blurb": "Por qué la claridad gana a la astucia: el código se lee mucho más de lo que se escribe, así que la versión más sencilla suele ganar.",
   "hero.eyebrow": "Teoría · Parte cinco · Fundamentos del buen código",
   "hero.title": "Escribe para quien lee",
   "intro.0": "Una línea ingeniosa puede sentar de maravilla al escribirla y costarle minutos a cada lector después. Como el código se lee mucho más de lo que se escribe, quien lee es para quien realmente escribes. Recorre una línea densa y observa cómo se abre en algo que cualquiera puede seguir.",

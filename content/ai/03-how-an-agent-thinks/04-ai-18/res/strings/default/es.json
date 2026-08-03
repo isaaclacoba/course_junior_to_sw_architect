@@ -1,4 +1,6 @@
 {
+  "card.title": "Reflexión",
+  "card.blurb": "Un primer borrador rara vez cubre los casos límite. Haz que el modelo revise su propio trabajo, encuentre el bug que se le escapó y lo corrija - borrador, crítica, corrección, el bucle que convierte una conjetura en una respuesta mejor.",
   "hero.eyebrow": "Teoría · Parte siete · Cómo piensa un agente",
   "hero.title": "Reflexión",
   "intro.0": "El primer borrador rara vez es el mejor - tanto para un modelo como para nosotros. Si lo dejas a su aire, entrega su primer intento, con errores y todo. Pero puedes pedirle que haga algo sorprendentemente potente: mirar su propio trabajo, encontrar lo que está mal, y volver a intentarlo. Ese bucle - borrador, crítica, revisión - pilla errores que la primera pasada se dejó, sin que ninguna persona intervenga. Verás cómo una primera respuesta floja se comprueba y se mejora con el mismo modelo.",

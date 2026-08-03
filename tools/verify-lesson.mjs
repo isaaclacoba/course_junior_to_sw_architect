@@ -25,6 +25,12 @@
  *       literal "undefined", the hero title rendered, and - for viz - a scene
  *       panel class is present.
  *
+ * After the lessons, it runs one global check on the landing chrome: every track
+ * (name/kicker/blurb/partPrefix) and part (title) in course-registry.js must carry a
+ * full i18n block for each language a lesson targets - so a new Part added without its
+ * translation FAILS here. Card title/blurb are lesson-owned (card.title/card.blurb)
+ * and covered by the per-lesson i18n check, not here.
+ *
  * Usage:
  *   node tools/verify-lesson.mjs <lesson-dir | index.html | data.js> [more...]
  *   node tools/verify-lesson.mjs --all            # every migrated lesson
@@ -324,6 +330,66 @@ function detectArchetype(dir) {
   return { archetype: "unknown", dataFile };
 }
 
+// ---------------------------------------------------------------------------
+// landing chrome: every track (name/kicker/blurb/partPrefix) and part (title) in
+// course-registry.js must carry a full i18n block for each language a lesson targets,
+// or the index renders English for that part while the lesson's own pages are
+// translated. Lesson CARD text is lesson-owned and gated per-lesson. This is global
+// (not per-lesson), so it runs once per invocation.
+// ---------------------------------------------------------------------------
+function loadRegistryGlobal() {
+  const file = path.join(root, "course-registry.js");
+  if (!fs.existsSync(file)) return null;
+  const sandbox = { window: {} };
+  vm.runInNewContext(fs.readFileSync(file, "utf8"), sandbox, { filename: file });
+  return sandbox.window.CourseRegistry || null;
+}
+
+function loadMetaGlobal(dir) {
+  const file = path.join(dir, "meta.js");
+  if (!fs.existsSync(file)) return null;
+  const sandbox = { window: {} };
+  vm.runInNewContext(fs.readFileSync(file, "utf8"), sandbox, { filename: file });
+  return sandbox.window.LESSON_META || null;
+}
+
+const TRACK_I18N_FIELDS = ["name", "kicker", "blurb", "partPrefix"];
+function verifyLanding(opts) {
+  const registry = loadRegistryGlobal();
+  say(`\n${C.dim}=== landing chrome (course-registry.js i18n) ===${C.reset}`);
+  if (!registry || !Array.isArray(registry.tracks)) { skip("no course-registry.js"); return true; }
+  if (opts.enOnly) { skip("--en-only: skipping landing chrome languages"); return true; }
+  const targetLangs = new Set();
+  for (const dir of findAllLessons()) {
+    const meta = loadMetaGlobal(dir);
+    if (!meta || !meta.resources) continue;
+    const base = meta.resources.lang || "en";
+    for (const l of meta.resources.langs || []) if (l !== base) targetLangs.add(l);
+  }
+  if (!targetLangs.size) { skip("no lesson targets a non-base language"); return true; }
+  let allOk = true;
+  for (const lang of [...targetLangs].sort()) {
+    const missTracks = [], missParts = [];
+    for (const t of registry.tracks) {
+      const ti = (t.i18n || {})[lang] || {};
+      for (const f of TRACK_I18N_FIELDS) if (typeof ti[f] !== "string") missTracks.push(t.id + "." + f);
+      for (const pt of t.parts || []) {
+        const pi = (pt.i18n || {})[lang] || {};
+        if (typeof pi.title !== "string") missParts.push(t.id + "/" + pt.id);
+      }
+    }
+    if (missTracks.length || missParts.length) {
+      allOk = false;
+      if (missTracks.length) bad(`[${lang}] ${missTracks.length} track chrome field(s) untranslated: ${missTracks.slice(0, 8).join(", ")}`);
+      if (missParts.length) bad(`[${lang}] ${missParts.length} part title(s) untranslated: ${missParts.slice(0, 8).join(", ")}`);
+    } else {
+      const parts = registry.tracks.reduce((n, t) => n + (t.parts || []).length, 0);
+      ok(`[${lang}] all ${registry.tracks.length} tracks + ${parts} parts localized`);
+    }
+  }
+  return allOk;
+}
+
 async function verifyLesson(dir, server, opts) {
   const rel = path.relative(root, dir);
   const { archetype, dataFile } = detectArchetype(dir);
@@ -386,11 +452,14 @@ async function main() {
     cleanupProject();
   }
 
+  const landingOk = verifyLanding(opts);
+
   const failed = results.filter(([, r]) => !r);
   say(`\n${C.dim}--- summary ---${C.reset}`);
   say(`  ${results.length} lesson(s), ${C.green}${results.length - failed.length} passed${C.reset}${failed.length ? `, ${C.red}${failed.length} failed${C.reset}` : ""}`);
   for (const [d] of failed) say(`  ${C.red}x${C.reset} ${path.relative(root, d)}`);
-  process.exit(failed.length ? 1 : 0);
+  if (!landingOk) say(`  ${C.red}x${C.reset} landing chrome (course-registry.js) has untranslated track/part i18n`);
+  process.exit(failed.length || !landingOk ? 1 : 0);
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });

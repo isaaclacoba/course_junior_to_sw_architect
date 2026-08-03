@@ -1,4 +1,6 @@
 {
+  "card.title": "Qué es de verdad una ejecución: la transcripción",
+  "card.blurb": "Descorre el telón. La ejecución entera de un agente es una única lista de mensajes que va creciendo - y el modelo solo escribe texto, tu código escribe los resultados de las herramientas, y la «memoria» no es más que reenviar la lista.",
   "hero.eyebrow": "Teoría · Parte seis · Del modelo al agente",
   "hero.title": "Qué es de verdad una ejecución: la transcripción",
   "intro.0": "La memoria, las herramientas, el bucle - a estas alturas un agente puede parecer una mente trabajando. Esta lección descorre la cortina. Por debajo de todo, una ejecución es una única lista de mensajes que va creciendo, cada uno etiquetado con un rol y con quién lo escribió de verdad. Verás esa lista crecer a lo largo de un turno real y verás tres cosas que sorprenden a casi todo el mundo: el modelo solo escribe texto, el resultado de una herramienta lo escribe tu propio código, y la «memoria» no es más que esta lista enviada otra vez. Una vez que ves la lista, los prompts, la memoria y las herramientas dejan de ser trucos separados - todos son formas de manejarla.",

@@ -1,4 +1,6 @@
 {
+  "card.title": "Una función, un trabajo",
+  "card.blurb": "Por qué una función que hace una sola cosa es fácil de nombrar, probar y reutilizar - la semilla cotidiana de la idea de responsabilidad única.",
   "hero.eyebrow": "Teoría · Parte cinco · Fundamentos del buen código",
   "hero.title": "Una función, un trabajo",
   "intro.0": "Cuando una función intenta hacer tres cosas a la vez, su nombre tiene que volverse vago y nunca puedes reutilizar solo una parte. Recorre una función que carga, comprueba y guarda todo a la vez, y observa cómo se divide en tres piezas pequeñas que hacen cada una un trabajo claro.",

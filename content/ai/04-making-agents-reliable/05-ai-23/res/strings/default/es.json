@@ -1,4 +1,6 @@
 {
+  "card.title": "¿Funcionó? Leer la traza",
+  "card.blurb": "Cada ejecución deja una traza de sus mensajes y llamadas a herramientas. Lee una que ha fallado para encontrar dónde se rompió (observabilidad), y conviértelo en una comprobación que ejecutas siempre (evaluación).",
   "hero.eyebrow": "Teoría · Parte ocho · Hacer agentes fiables",
   "hero.title": "¿Funcionó? Leer la traza",
   "intro.0": "Cuando un agente se equivoca en algo, «la IA la lió» no es un diagnóstico. Como una ejecución no es más que esa lista de mensajes que viste antes, puedes leerla del tirón como la caja negra de un avión y ver exactamente qué paso se torció. Eso es la observabilidad. Júntala con la evaluación - una comprobación que decide si pasa o falla - y puedes saber si un agente funciona, y arreglarlo cuando no. Leerás la traza de una ejecución fallida, encontrarás el paso malo, y verás cómo una comprobación sencilla lo pilla automáticamente.",

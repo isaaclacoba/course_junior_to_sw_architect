@@ -1,4 +1,6 @@
 {
+  "card.title": "Apoyarse en el código de otros",
+  "card.blurb": "Nunca construyes solo: librerías, la librería estándar, paquetes, un gestor de paquetes y las dependencias de las que depende tu programa.",
   "hero.eyebrow": "Teoría · Parte cuatro · El mundo del desarrollo",
   "hero.title": "Apoyarse en el código de otros",
   "intro.0": "Casi nunca escribirás un programa entero desde cero. Casi todo lo que construyes se apoya en código que otras personas ya escribieron - la propia caja de herramientas del lenguaje, y los paquetes que te traes. Una vez que lo sabes, trabajas de otra forma: buscas lo que ya existe antes de construirlo. Esto es qué es ese código compartido, y cómo llegas a él.",

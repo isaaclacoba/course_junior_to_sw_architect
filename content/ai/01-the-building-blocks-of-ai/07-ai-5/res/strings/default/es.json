@@ -1,4 +1,6 @@
 {
+  "card.title": "La ventana de contexto",
+  "card.blurb": "Ese contexto es finito, se mide en tokens. Cuando se llena, los tokens más antiguos se caen por el principio - por eso una conversación larga parece olvidar cómo empezó.",
   "hero.eyebrow": "Teoría · Parte cinco · Los cimientos de la IA",
   "hero.title": "La ventana de contexto",
   "intro.0": "El contexto que un modelo puede leer tiene un límite duro, medido en tokens. Cuando una conversación crece más allá de ese presupuesto, los tokens más antiguos se caen por el principio y el modelo ya no puede verlos. Por eso un chat largo parece olvidar cómo empezó - y por eso hay que añadirle memoria por encima.",

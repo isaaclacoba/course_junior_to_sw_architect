@@ -1,4 +1,6 @@
 {
+  "card.title": "Memoria",
+  "card.blurb": "La ventana se olvida, entonces, ¿cómo recuerda un asistente? Guarda lo que importa en un almacén fuera de la ventana, lo recupera cuando hace falta - y lo clasifica por tipos: qué pasó, qué sigue siendo cierto y cómo se hacen las cosas.",
   "hero.eyebrow": "Teoría · Parte seis · Del modelo al agente",
   "hero.title": "Memoria",
   "intro.0": "Empieza un chat nuevo y el modelo no recuerda nada - cada llamada arranca de cero, leyendo solo el contexto que tiene delante. Entonces, ¿cómo es que un asistente parece acordarse de ti a lo largo de una conversación larga? Guarda lo que importa en un almacén que sobrevive al turno, y lo recuerda cuando toca. Y ese almacén no es una sola caja: la memoria de verdad se divide en tipos - lo que pasó, lo que sigue siendo cierto, y cómo hacer las cosas. Aquí verás cómo se guarda un dato, se clasifica en el tipo correcto, y se recupera justo cuando hace falta.",

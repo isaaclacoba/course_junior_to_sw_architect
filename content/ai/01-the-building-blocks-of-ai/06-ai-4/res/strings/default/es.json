@@ -1,4 +1,6 @@
 {
+  "card.title": "Contexto",
+  "card.blurb": "Todo lo que el modelo puede ver ahora mismo - el prompt, la conversación, cualquier dato que añadas. Mira cómo una respuesta a ciegas se vuelve segura en cuanto está el contexto.",
   "hero.eyebrow": "Teoría · Parte cinco · Los cimientos de la IA",
   "hero.title": "Contexto",
   "intro.0": "Un modelo solo sabe lo que puede leer ahora mismo. Pregúntale por algo que nunca le contaste y no hará más que adivinar. Dale primero un par de datos y la misma pregunta se vuelve fácil. Ese texto que puede leer - tu pregunta más lo que pongas antes de ella - es su contexto. Aquí verás cómo añadir contexto convierte una respuesta a ciegas en una respuesta clara.",

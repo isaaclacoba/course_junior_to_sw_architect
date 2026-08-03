@@ -1,4 +1,6 @@
 {
+  "card.title": "Mensajes de sistema y de usuario",
+  "card.blurb": "Todo prompt tiene en realidad dos partes: tu mensaje y un system message oculto que fija el rol y las reglas del modelo. Cambia el system message y cambia el tono.",
   "hero.eyebrow": "Teoría · Parte cinco · Los cimientos de la IA",
   "hero.title": "Mensajes de sistema y de usuario",
   "intro.0": "Cuando chateas con un asistente, escribes un mensaje - pero al modelo normalmente le pasan dos. Está tu mensaje, y está uno oculto que la app añade primero y que le dice al modelo quién ser y cómo comportarse. La misma pregunta, distinto mensaje oculto, y obtienes una respuesta muy diferente. Aquí verás esa palanca en acción.",

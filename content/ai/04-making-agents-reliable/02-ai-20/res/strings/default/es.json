@@ -1,4 +1,6 @@
 {
+  "card.title": "Guardrails",
+  "card.blurb": "A un modelo se le puede convencer de que se salte sus propias reglas. Los guardrails viven en tu código, fuera del modelo: comprueba lo que entra, comprueba lo que el agente intenta hacer y deja a una persona al mando en las decisiones arriesgadas.",
   "hero.eyebrow": "Teoría · Parte ocho · Hacer agentes fiables",
   "hero.title": "Guardrails",
   "intro.0": "Un agente que puede actuar en el mundo también puede actuar mal - borrar lo que no es, gastar dinero de verdad, responder una pregunta que debería rechazar. Los guardrails son las comprobaciones que pones a su alrededor: reglas sobre lo que entra, lo que sale, y qué acciones necesitan el visto bueno de una persona antes de pasar. Son lo que hace que un agente sea lo bastante seguro como para soltarlo. Verás cómo se pilla una petición arriesgada, y cómo una acción cara se detiene a esperar que una persona la apruebe.",

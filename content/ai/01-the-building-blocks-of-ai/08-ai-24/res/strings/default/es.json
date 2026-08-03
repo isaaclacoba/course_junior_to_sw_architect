@@ -1,4 +1,6 @@
 {
+  "card.title": "Escribir una buena instrucción",
+  "card.blurb": "Cómo preguntas hace casi todo el trabajo. Tres gestos hacen que un modelo pueda seguir una instrucción - sé específico, muestra un ejemplo y pide la respuesta en un formato que puedas usar.",
   "hero.eyebrow": "Teoría · Parte cinco · Los cimientos de la IA",
   "hero.title": "Escribir una buena instrucción",
   "intro.0": "Ya conoces las partes de un prompt - el mensaje que escribes y el mensaje de sistema que fija las reglas. Pero dos personas pueden pedir exactamente lo mismo y obtener respuestas muy distintas, porque cómo preguntas hace la mayor parte del trabajo. Una petición vaga recibe una respuesta vaga. Aquí verás tres pequeños movimientos que convierten una instrucción floja en una que un modelo sí puede seguir: di exactamente qué quieres, muestra un ejemplo cuando la forma sea difícil de describir, y pide la respuesta en una forma que puedas usar.",

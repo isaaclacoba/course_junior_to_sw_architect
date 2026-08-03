@@ -1,4 +1,6 @@
 {
+  "card.title": "LINQ",
+  "card.blurb": "Consulta una colección sin escribir un bucle. Escribe tú cada consulta y ejecútala - Where, Count, Any, All, Select, FirstOrDefault y OrderBy, un operador por tarea.",
   "hero.eyebrow": "Parte tres · Conoce el lenguaje",
   "hero.title": "LINQ",
   "intro.0": "En la lección de Colecciones construiste listas y las recorriste a mano para contar o encontrar cosas. LINQ te da herramientas ya hechas para hacerle una pregunta a una lista - quedarte solo con algunos elementos, contarlos, sacar un campo, ordenarlos - en una línea corta en vez de un foreach. Cada operador toma una lambda - la regla corta `x => ...` que escribiste en la lección de Lambdas - así que eliges el operador y escribes la regla. Aquí escribes cada consulta tú mismo y la ejecutas: un operador por tarea - Where, Count, Any, All, Select, FirstOrDefault y OrderBy.",

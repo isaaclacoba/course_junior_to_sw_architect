@@ -1,4 +1,6 @@
 {
+  "card.title": "Razonar y actuar (ReAct)",
+  "card.blurb": "Pensamiento, acción, observación, y vuelta a empezar. El patrón con nombre detrás de un agente que usa herramientas: razona el siguiente movimiento, llama a una herramienta, lee el resultado real y repite hasta que la respuesta esté fundamentada.",
   "hero.eyebrow": "Teoría · Parte siete · Cómo piensa un agente",
   "hero.title": "Razonar y actuar (ReAct)",
   "intro.0": "Ya has visto las dos mitades por separado: el modelo razonando con palabras, y el agente llamando a una herramienta. El patrón que las une tiene nombre - ReAct, de razonar más actuar. El agente escribe un pensamiento, hace una acción, lee lo que vuelve, y luego vuelve a pensar - una y otra vez. Es el bucle que ya conociste, ahora con el pensamiento a la vista. Verás cómo se responde una pregunta tejiendo pensamientos cortos con llamadas de verdad a herramientas.",

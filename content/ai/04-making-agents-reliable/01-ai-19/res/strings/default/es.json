@@ -1,4 +1,6 @@
 {
+  "card.title": "¿Workflow o agente?",
+  "card.blurb": "«Agente» no siempre es la respuesta. Si puedes escribir los pasos de antemano, monta un workflow - más simple y más barato. Reserva la agencia para cuando el camino haya que descubrirlo sobre la marcha.",
   "hero.eyebrow": "Teoría · Parte ocho · Hacer agentes fiables",
   "hero.title": "¿Workflow o agente?",
   "intro.0": "No todo lo que usa un modelo tiene que ser un agente. A menudo lo más simple que funciona es un workflow - un camino fijo que escribes tú mismo, los mismos pasos cada vez. Un agente es distinto: le das un objetivo y dejas que el modelo decida los pasos sobre la marcha. Los agentes son más flexibles, pero cuestan más y pueden irse por las ramas. La habilidad está en saber cuál necesita un trabajo - y tirar primero del más simple. Compararás los dos en el mismo tipo de tarea y verás dónde encaja cada uno.",

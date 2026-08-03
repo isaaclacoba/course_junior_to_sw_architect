@@ -1,4 +1,6 @@
 {
+  "card.title": "Funciones",
+  "card.blurb": "Agrupar pasos bajo un nombre que puedes reutilizar, con entradas y una salida - cómo los programas siguen ordenados a medida que crecen.",
   "hero.eyebrow": "Teoría · Parte dos · De la idea al código en marcha",
   "hero.title": "Funciones",
   "intro.0": "Copiar y pegar las mismas líneas por todo un programa parece que va bien hasta que tienes que cambiarlas en diez sitios a la vez. Una función es la salida: escribe los pasos una vez, ponles un nombre, y llámala cuando la necesites. Recorre lo de abajo para ver cómo una llamada entrega sus entradas y devuelve un resultado.",

@@ -1,4 +1,6 @@
 {
+  "card.title": "Cómo los ordenadores lo guardan todo como números",
+  "card.blurb": "Texto, fotos, música - por debajo todo son números. Los bits, por qué los ordenadores usan solo dos estados, contar en binario y el byte.",
   "hero.eyebrow": "Teoría · Parte uno · Qué es de verdad un ordenador",
   "hero.title": "Cómo los ordenadores lo guardan todo como números",
   "intro.0": "Texto, fotos, música - por debajo, un ordenador lo guarda todo como números, y esos números se construyen a partir de la cosa más simple de todas: un bit encendido o apagado. Recorre el visual para ver cómo un byte cambia un solo bit, cuenta hacia arriba en binario, y se junta como ocho bits - bits, dos estados, binario, y el byte.",

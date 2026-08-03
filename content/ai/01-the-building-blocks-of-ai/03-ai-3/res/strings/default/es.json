@@ -1,4 +1,6 @@
 {
+  "card.title": "El prompt",
+  "card.blurb": "El texto que le pasas al modelo para arrancar. Él lo continúa sin más - así que cambiar el prompt cambia todo lo que viene después.",
   "hero.eyebrow": "Teoría · Parte cinco · Los cimientos de la IA",
   "hero.title": "El prompt",
   "intro.0": "El modelo predice el siguiente token - pero ¿de dónde sale el primero? De ti. El prompt es el texto que le das al modelo para arrancar, y él simplemente lo continúa. Eso hace del prompt tu palanca principal: cambia el arranque y cambias todo lo que viene detrás.",

@@ -1,4 +1,6 @@
 {
+  "card.title": "Test doubles",
+  "card.blurb": "Testea código que se apoya en un reloj, un número aleatorio o la red pasándole un doble que tú controlas: un fake, un stub y un spy.",
   "hero.eyebrow": "Parte cinco · Demuestra que funciona",
   "hero.title": "Test doubles",
   "intro.0": "¿Cómo testeas código que depende de un reloj, un número aleatorio o la red - cosas que cambian en cada ejecución o salen fuera de tu programa? Le pasas un sustituto que tú controlas. Hacia esto apuntaba la inyección de dependencias: como una clase recibe sus dependencias en vez de crearlas, un test puede pasarle un fake, un stub o un spy.",

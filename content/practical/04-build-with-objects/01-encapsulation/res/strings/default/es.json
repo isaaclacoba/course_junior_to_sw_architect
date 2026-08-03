@@ -1,4 +1,6 @@
 {
+  "card.title": "¿Por qué objetos?",
+  "card.blurb": "¿Para qué clases y métodos, en vez de un Main gigante? Agrupa datos relacionados, pon el comportamiento junto a ellos, oculta el interior, protege una regla y luego cámbiala en un solo sitio.",
   "hero.eyebrow": "Parte cuatro · Construye con objetos",
   "hero.title": "¿Por qué objetos?",
   "intro.0": "¿Para qué molestarse con clases y métodos - por qué no meter todo en un gran Main? Al principio parece más simple. Pero según crece un programa, los datos sueltos y las reglas repartidas se vuelven difíciles de llevar. Aquí verás qué te dan los objetos: los datos y las reglas que los rodean, guardados en un solo sitio de fiar.",

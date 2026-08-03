@@ -1,4 +1,6 @@
 {
+  "card.title": "Mantener los datos a salvo",
+  "card.blurb": "Tres hábitos de seguridad elementales para un junior: mantén los secretos fuera del código y de los logs, usa permisos para controlar quién lee o cambia los datos y valida la entrada que no escribiste tú.",
   "hero.eyebrow": "Teoría · Parte tres · Cómo se ejecuta y se conecta el software",
   "hero.title": "Mantener los datos a salvo",
   "intro.0": "En cuanto un programa guarda datos y habla con otros programas, algunos de esos datos importan más que el resto - y algunos son secretos. Recorre tres hábitos elementales que los mantienen a salvo: guardar los secretos, comprobar quién puede hacer qué, y no fiarte nunca de lo que llega de fuera.",

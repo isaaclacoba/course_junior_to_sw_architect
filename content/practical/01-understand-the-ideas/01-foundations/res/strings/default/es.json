@@ -1,4 +1,6 @@
 {
+  "card.title": "Fundamentos",
+  "card.blurb": "Empieza aquí. Escribe y ejecuta tu primer C#: imprimir por pantalla, variables, los tipos de datos habituales, cambiar un valor, qué significa null y qué es un objeto.",
   "hero.eyebrow": "Parte uno · Comprende las ideas",
   "hero.title": "Fundamentos",
   "intro.0": "Antes de los objetos y el diseño, lo básico sobre lo que se construye todo lo demás. En seis pasos cortos escribes y ejecutas C# de verdad: imprimir, variables, los tipos de datos habituales, cambiar un valor, qué significa null y, por fin, qué es un objeto - estado y comportamiento juntos en un mismo sitio.",

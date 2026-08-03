@@ -1,4 +1,6 @@
 {
+  "card.title": "Static, const y readonly",
+  "card.blurb": "Parte del comportamiento y de los datos pertenecen al propio tipo, y algunos valores se fijan para siempre - escribe un helper static, una constante, un campo que se asigna una sola vez y un contador compartido.",
   "hero.eyebrow": "Parte dos · Fundamentos del día a día",
   "hero.title": "Static, const y readonly",
   "intro.0": "No todo valor pertenece a un único objeto. Hay comportamiento que vive en el tipo mismo, hay valores que quedan fijos en el momento en que los escribes, y hay otros que se asignan una sola vez al construir el objeto y luego no cambian nunca. Escribes cada tipo y lo ejecutas.",

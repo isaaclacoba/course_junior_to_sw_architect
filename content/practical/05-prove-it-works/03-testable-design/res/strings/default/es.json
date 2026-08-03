@@ -1,4 +1,6 @@
 {
+  "card.title": "Testeable por diseño",
+  "card.blurb": "Hay código que se pelea con cada test; otro código da gusto comprobarlo. Los hábitos que hacen el código testeable - inyectar, una sola tarea, sin estado oculto - son los que hay detrás de SOLID.",
   "hero.eyebrow": "Parte cinco · Demuestra que funciona",
   "hero.title": "Testeable por diseño",
   "intro.0": "Hay código que pelea contra cada test que escribes; otro código es un placer de comprobar. La diferencia no es suerte - es diseño. El código que recibe sus dependencias, hace un solo trabajo y no esconde estado es fácil de testear. Y resulta que esos mismos hábitos son los que la siguiente parte - los principios SOLID - convierten en algo deliberado. Las pruebas son donde 'diseñar para el cambio' deja de ser una idea y empieza a ser una sensación.",

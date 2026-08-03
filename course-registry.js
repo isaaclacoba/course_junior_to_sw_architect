@@ -5,6 +5,11 @@
  *   tracks[]  - the track + part CHROME (name, kicker, blurb, partPrefix, part
  *               titles), in display order. The generator derives each part's
  *               "Part one/two/..." kicker from partPrefix + its 1-based position.
+ *               Translations live inline in an `i18n: { <lang>: {...} }` block on
+ *               each track (name/kicker/blurb/partPrefix) and part (title) - the
+ *               generator emits generated/landing-i18n.<lang>.json from them, so a
+ *               new Part is translated here, next to its English, not in a separate
+ *               root file.
  *   lessons[] - every lesson in reading order. Order = array order. Add a lesson =
  *               one line; remove = delete one line.
  *
@@ -21,26 +26,26 @@
  */
 (function (global) {
   var tracks = [
-    { id: "practical", name: "Practical", kicker: "Hands on", partPrefix: "Part ", blurb: "Learn C# by writing and running real code, one small win at a time - all the way to SOLID design.", parts: [
-      { id: "understand-the-ideas", title: "Understand the ideas" },
-      { id: "everyday-essentials", title: "Everyday essentials" },
-      { id: "know-the-language", title: "Know the language" },
-      { id: "build-with-objects", title: "Build with objects" },
-      { id: "prove-it-works", title: "Prove it works" },
-      { id: "design-for-change", title: "Design for change" }
+    { id: "practical", name: "Practical", kicker: "Hands on", partPrefix: "Part ", blurb: "Learn C# by writing and running real code, one small win at a time - all the way to SOLID design.", i18n: { es: { name: "Práctico", kicker: "Manos a la obra", partPrefix: "Parte ", blurb: "Aprende C# escribiendo y ejecutando código de verdad, victoria a victoria, hasta el diseño SOLID." } }, parts: [
+      { id: "understand-the-ideas", title: "Understand the ideas", i18n: { es: { title: "Comprende las ideas" } } },
+      { id: "everyday-essentials", title: "Everyday essentials", i18n: { es: { title: "Fundamentos del día a día" } } },
+      { id: "know-the-language", title: "Know the language", i18n: { es: { title: "Conoce el lenguaje" } } },
+      { id: "build-with-objects", title: "Build with objects", i18n: { es: { title: "Construye con objetos" } } },
+      { id: "prove-it-works", title: "Prove it works", i18n: { es: { title: "Demuestra que funciona" } } },
+      { id: "design-for-change", title: "Design for change", i18n: { es: { title: "Diseña para el cambio" } } }
     ] },
-    { id: "theory", name: "Theory", kicker: "From zero", partPrefix: "Theory · Part ", blurb: "No background needed. Understand what software is and how a computer actually runs it, from the ground up.", parts: [
-      { id: "what-a-computer-really-is", title: "What a computer really is" },
-      { id: "from-idea-to-running-code", title: "From idea to running code" },
-      { id: "how-software-runs-and-connects", title: "How software runs and connects" },
-      { id: "the-development-world", title: "The development world" },
-      { id: "foundations-of-good-code", title: "Foundations of good code" }
+    { id: "theory", name: "Theory", kicker: "From zero", partPrefix: "Theory · Part ", blurb: "No background needed. Understand what software is and how a computer actually runs it, from the ground up.", i18n: { es: { name: "Teoría", kicker: "Desde cero", partPrefix: "Teoría · Parte ", blurb: "No necesitas base previa. Entiende qué es el software y cómo lo ejecuta de verdad un ordenador, desde cero." } }, parts: [
+      { id: "what-a-computer-really-is", title: "What a computer really is", i18n: { es: { title: "Qué es de verdad un ordenador" } } },
+      { id: "from-idea-to-running-code", title: "From idea to running code", i18n: { es: { title: "De la idea al código en marcha" } } },
+      { id: "how-software-runs-and-connects", title: "How software runs and connects", i18n: { es: { title: "Cómo se ejecuta y se conecta el software" } } },
+      { id: "the-development-world", title: "The development world", i18n: { es: { title: "El mundo del desarrollo" } } },
+      { id: "foundations-of-good-code", title: "Foundations of good code", i18n: { es: { title: "Fundamentos del buen código" } } }
     ] },
-    { id: "ai", name: "AI", kicker: "Agents from scratch", partPrefix: "AI · Part ", blurb: "A first look at how large language models and AI agents really work - tokens, context, memory, tools, planning, and keeping an agent reliable.", parts: [
-      { id: "the-building-blocks-of-ai", title: "The building blocks of AI" },
-      { id: "from-model-to-agent", title: "From model to agent" },
-      { id: "how-an-agent-thinks", title: "How an agent thinks" },
-      { id: "making-agents-reliable", title: "Making agents reliable" }
+    { id: "ai", name: "AI", kicker: "Agents from scratch", partPrefix: "AI · Part ", blurb: "A first look at how large language models and AI agents really work - tokens, context, memory, tools, planning, and keeping an agent reliable.", i18n: { es: { name: "IA", kicker: "Agentes desde cero", partPrefix: "IA · Parte ", blurb: "Un primer vistazo a cómo funcionan de verdad los LLM y los agentes de IA - tokens, contexto, memoria, herramientas, planificación y cómo mantener un agente de fiar." } }, parts: [
+      { id: "the-building-blocks-of-ai", title: "The building blocks of AI", i18n: { es: { title: "Los pilares de la IA" } } },
+      { id: "from-model-to-agent", title: "From model to agent", i18n: { es: { title: "Del modelo al agente" } } },
+      { id: "how-an-agent-thinks", title: "How an agent thinks", i18n: { es: { title: "Cómo piensa un agente" } } },
+      { id: "making-agents-reliable", title: "Making agents reliable", i18n: { es: { title: "Hacer agentes de fiar" } } }
     ] },
   ];
 

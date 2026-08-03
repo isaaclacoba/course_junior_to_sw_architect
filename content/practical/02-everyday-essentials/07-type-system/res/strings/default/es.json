@@ -1,4 +1,6 @@
 {
+  "card.title": "Tipos abstractos y sobrescritura",
+  "card.blurb": "Una base abstracta que no puedes instanciar, reemplazar comportamiento con override, un mismo nombre para entradas distintas, la forma en texto de un tipo y limpiar en un punto conocido.",
   "hero.eyebrow": "Parte dos · Fundamentos del día a día",
   "hero.title": "Tipos abstractos y sobrescritura",
   "intro.0": "Un tipo no tiene por qué ser una simple bolsa de datos. Puede describir una forma que se niega a construir por sí mismo, reemplazar un comportamiento que heredó, responder a un mismo nombre para distintas entradas, elegir cómo se imprime, y limpiar lo suyo en un punto conocido. Escribes cada uno de estos y lo ejecutas.",

@@ -1,4 +1,6 @@
 {
+  "card.title": "Referencias frente a valores",
+  "card.blurb": "Por qué unas variables contienen un valor y otras solo apuntan a uno - y qué pasa de verdad cuando copias cada una. La idea detrás de cómo se comportan los objetos.",
   "hero.eyebrow": "Teoría · Parte tres · Cómo se ejecuta y se conecta el software",
   "hero.title": "Referencias frente a valores",
   "intro.0": "Por qué algunas variables guardan un valor directamente mientras que otras solo apuntan a él. Recorre la memoria para ver valores en sus casillas, referencias que apuntan al heap, y qué pasa de verdad cuando copias una - la idea detrás de cómo se comportan los objetos.",

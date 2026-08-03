@@ -1,4 +1,6 @@
 {
+  "card.title": "Qué es un programa",
+  "card.blurb": "Mira una capa por debajo de las apps que usas. Qué es una instrucción, cómo un programa es una lista ordenada de ellas sobre datos, la CPU que las ejecuta y qué significa compilar.",
   "hero.eyebrow": "Teoría · Parte uno · Qué es de verdad un ordenador",
   "hero.title": "Qué es un programa",
   "intro.0": "Usas apps todo el día sin preguntarte qué pasa de verdad por dentro. Debajo no hay magia - solo una máquina que sigue una lista de instrucciones diminutas y exactas, una detrás de otra, miles de millones de veces por segundo. Recorre la ejecución de abajo y ve qué es de verdad una sola instrucción.",

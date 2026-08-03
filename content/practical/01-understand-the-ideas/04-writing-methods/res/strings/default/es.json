@@ -1,4 +1,6 @@
 {
+  "card.title": "Métodos",
+  "card.blurb": "Escribe una regla una vez y reutilízala. Le pasas a un método una entrada y te devuelve una respuesta - la misma idea que una comprobación que antes hacías a mano. La sintaxis es fácil; lo que importa es para qué sirve un método.",
   "hero.eyebrow": "Parte uno · Comprende las ideas",
   "hero.title": "Métodos",
   "intro.0": "Un método es un trozo de comportamiento con nombre: le das una entrada y te devuelve una respuesta - la misma idea que una comprobación que antes hacías a mano. La sintaxis aquí es pequeña a propósito. Lo que buscamos de verdad es que sientas para qué sirve un método: escribe una regla una vez y luego reutilízala.",

@@ -1,4 +1,6 @@
 {
+  "card.title": "Sentencias y expresiones",
+  "card.blurb": "Las dos piezas con las que se construye cada línea de código: pasos que hacen cosas y trozos que producen valores.",
   "hero.eyebrow": "Teoría · Parte dos · De la idea al código en marcha",
   "hero.title": "Sentencias y expresiones",
   "intro.0": "El código puede parecer un muro de símbolos hasta que te das cuenta de que está hecho de solo dos tipos de cosa: pasos que hacen algo, y trozos pequeños que calculan un valor. Distingue esos dos y el código deja de ser un borrón. Recorre lo de abajo y mira cómo se ejecuta una línea - primero el valor, luego el paso que lo guarda.",

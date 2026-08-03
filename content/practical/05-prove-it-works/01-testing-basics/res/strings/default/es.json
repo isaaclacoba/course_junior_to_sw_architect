@@ -1,4 +1,6 @@
 {
+  "card.title": "Qué es un test",
+  "card.blurb": "Un test no es más que código que ejecuta tu código y comprueba el resultado. Escribe los primeros - arrange, act, assert - incluido uno que espera un fallo a propósito.",
   "hero.eyebrow": "Parte cinco · Demuestra que funciona",
   "hero.title": "Qué es un test",
   "intro.0": "Acabas de entregarle a un cuidador un sustituto de juguete en vez de un animal de verdad. Esa es la mitad de testear - ahora hagamos la otra mitad y comprobemos de verdad el resultado. Un test no tiene nada de especial: es código normal que ejecuta tu código y pregunta '¿hizo lo correcto?'. Aquí escribirás tus primeros tests - preparar, actuar, afirmar - y verás por qué son la red de seguridad que te deja cambiar código sin miedo.",

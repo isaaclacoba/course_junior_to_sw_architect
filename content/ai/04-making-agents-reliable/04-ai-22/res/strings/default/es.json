@@ -1,4 +1,6 @@
 {
+  "card.title": "Alucinación y grounding",
+  "card.blurb": "Un modelo responde con seguridad aunque no lo sepa - predice texto plausible, no verdad comprobada. El grounding lo arregla: trae la fuente real, responde a partir de ella, cítala y permite un «no lo sé».",
   "hero.eyebrow": "Teoría · Parte ocho · Hacer agentes fiables",
   "hero.title": "Alucinación y grounding",
   "intro.0": "Pregúntale a un modelo algo que no sabe y muchas veces responderá igualmente - con fluidez, con seguridad, y mal. Esto es una alucinación: detalle inventado que se lee igual que un hecho. Pasa porque el trabajo del modelo es producir texto plausible, no comprobar si es verdad. La cura es el grounding: dale fuentes reales de las que responder, y pídele que las señale. Verás una respuesta inventada con mucha seguridad, y luego la misma pregunta anclada a un documento real.",

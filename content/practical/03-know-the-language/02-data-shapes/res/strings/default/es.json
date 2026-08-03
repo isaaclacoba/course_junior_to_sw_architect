@@ -1,4 +1,6 @@
 {
+  "card.title": "Formas de datos",
+  "card.blurb": "Construye las cosas que guardan las colecciones. Escribe cinco programas pequeños que cubren propiedades, una propiedad calculada, un enum, un struct y un record - ejecuta cada uno y haz que la salida coincida.",
   "hero.eyebrow": "Parte tres · Conoce el lenguaje",
   "hero.title": "Formas de datos",
   "intro.0": "Las colecciones guardan cosas; ahora construye las cosas que guardan. Cinco pequeños programas que escribes desde cero y ejecutas, cubriendo las maneras de cada día en que C# empaqueta datos: propiedades, una propiedad calculada, un enum, un struct y un record. Nada de huecos que rellenar - escribe el tipo, ejecútalo y haz que la salida coincida.",
