@@ -94,7 +94,11 @@
       var CL = codeLab();
       var host = document.createElement("section");
       host.className = "lesson-quiz";
-      if (ctx.hosts && ctx.hosts.surface) ctx.hosts.surface.appendChild(host);
+      // Mount right under the hero, exactly where page-shell placed it. A test
+      // page with no #pageHero falls back to the generic surface host / body.
+      var anchor = typeof document !== "undefined" && document.getElementById("pageHero");
+      if (anchor) anchor.insertAdjacentElement("afterend", host);
+      else if (ctx.hosts && ctx.hosts.surface) ctx.hosts.surface.appendChild(host);
       else if (typeof document !== "undefined" && document.body) document.body.appendChild(host);
 
       deriveMeta(ctx.cfg);

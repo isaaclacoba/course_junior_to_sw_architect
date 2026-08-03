@@ -413,7 +413,6 @@ const PAGE_SHELL_MODULES = [
   { file: "concepts.js", outside: false },
   { file: "card-templates.js", outside: true },
   { file: "boot.js", outside: false },
-  { file: "viz-checkpoint.js", outside: false },
 ];
 
 // The fragments still call these by their bare names. The modules above are real

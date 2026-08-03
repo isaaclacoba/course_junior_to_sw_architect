@@ -192,32 +192,39 @@
       mountSettings();
       if (global.PageShellHero) surfaces.push(global.PageShellHero);
       if (global.PageShellChrome) surfaces.push(global.PageShellChrome);
-      // A viz page's visual is mounted by page-shell during its injection; hold
-      // it as a Localizable surface so a language swap re-renders the narrations.
-      if (global.PageShellViz) surfaces.push(global.PageShellViz);
-      // A checkpoint page's Quiz is mounted by page-shell during its injection;
-      // hold it as a Localizable surface so a language swap re-creates the Quiz.
-      if (global.PageShellCheckpoint) surfaces.push(global.PageShellCheckpoint);
       // The concept panel + agenda are page-shell content; hold PageShellConcepts
       // as a Localizable surface so a language swap re-localizes them.
       if (global.PageShellConcepts) surfaces.push(global.PageShellConcepts);
-      // A build lesson mounts the generic lesson engine + the build plugin over the
-      // page-shell-rendered card scaffold; a viz or checkpoint lesson is still
-      // mounted by page-shell (their widget plugins land in a later pass).
-      if (!global.BUILD_CONFIG) return;
-      // Derive the repo-root base from the engine path, then load the grader the
-      // build plugin needs, the archetype-blind core (manual mode - the controller
-      // drives it, so its self-boot footer stands down), and the build plugin
-      // (which self-registers on the core). LessonEngine.create returns the same
-      // { boot, setLocale } shape the old BuildEngine.create did.
+
+      // Every archetype now boots the ONE generic lesson engine + its plugin.
+      // page-shell renders only the hero, the concept agenda, and - for build - the
+      // card scaffold; it no longer mounts the viz/checkpoint widgets. Dispatch by
+      // which lesson global is present, inject the archetype-blind core (manual mode,
+      // so its self-boot footer stands down) + the matching plugin (+ a practice
+      // grader), then create + boot it. LessonEngine.create returns the { boot,
+      // setLocale } shape the controller holds as a Localizable surface.
+      var archetype = global.BUILD_CONFIG ? "build"
+        : global.LESSON_VIZ ? "viz"
+        : global.QUIZ_CONFIG ? "checkpoint"
+        : null;
+      var cfg = archetype === "build" ? global.BUILD_CONFIG
+        : archetype === "viz" ? global.LESSON_VIZ
+        : archetype === "checkpoint" ? global.QUIZ_CONFIG
+        : null;
+      if (!archetype || !cfg) return;
+      cfg.archetype = archetype;
       var base = engineSrc.replace(/[^/]*$/, "");
-      global.BUILD_CONFIG.archetype = "build";
-      return injectScript(base + "kernel/grading/output-match.js")
+      var chain = Promise.resolve();
+      // A practice plugin grades through a kernel/grading module; load it first.
+      if (archetype === "build") {
+        chain = chain.then(function () { return injectScript(base + "kernel/grading/output-match.js"); });
+      }
+      return chain
         .then(function () { return injectScript(base + "kernel/engine/lesson-engine.js", { "data-manual": "" }); })
-        .then(function () { return injectScript(base + "kernel/engine/plugins/build-plugin.js"); })
+        .then(function () { return injectScript(base + "kernel/engine/plugins/" + archetype + "-plugin.js"); })
         .then(function () {
           if (global.LessonEngine) {
-            var widget = global.LessonEngine.create(global.BUILD_CONFIG);
+            var widget = global.LessonEngine.create(cfg);
             surfaces.push(widget);
             return widget.boot();
           }
