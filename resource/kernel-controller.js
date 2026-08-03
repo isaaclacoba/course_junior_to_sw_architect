@@ -201,17 +201,23 @@
       // The concept panel + agenda are page-shell content; hold PageShellConcepts
       // as a Localizable surface so a language swap re-localizes them.
       if (global.PageShellConcepts) surfaces.push(global.PageShellConcepts);
-      // A build lesson injects its engine (manual mode) and mounts the widget; a
-      // viz or checkpoint lesson has no engine, so there is nothing more to inject.
+      // A build lesson mounts the generic lesson engine + the build plugin over the
+      // page-shell-rendered card scaffold; a viz or checkpoint lesson is still
+      // mounted by page-shell (their widget plugins land in a later pass).
       if (!global.BUILD_CONFIG) return;
-      // The build engine grades through the shared kernel/grading module; inject it
-      // (derived from the engine path, same repo-root base) before the engine.
-      var gradingSrc = engineSrc.replace(/build-engine\.js$/, "kernel/grading/output-match.js");
-      return injectScript(gradingSrc)
-        .then(function () { return injectScript(engineSrc, { "data-manual": "" }); })
+      // Derive the repo-root base from the engine path, then load the grader the
+      // build plugin needs, the archetype-blind core (manual mode - the controller
+      // drives it, so its self-boot footer stands down), and the build plugin
+      // (which self-registers on the core). LessonEngine.create returns the same
+      // { boot, setLocale } shape the old BuildEngine.create did.
+      var base = engineSrc.replace(/[^/]*$/, "");
+      global.BUILD_CONFIG.archetype = "build";
+      return injectScript(base + "kernel/grading/output-match.js")
+        .then(function () { return injectScript(base + "kernel/engine/lesson-engine.js", { "data-manual": "" }); })
+        .then(function () { return injectScript(base + "kernel/engine/plugins/build-plugin.js"); })
         .then(function () {
-          if (global.BuildEngine) {
-            var widget = global.BuildEngine.create(global.BUILD_CONFIG);
+          if (global.LessonEngine) {
+            var widget = global.LessonEngine.create(global.BUILD_CONFIG);
             surfaces.push(widget);
             return widget.boot();
           }
