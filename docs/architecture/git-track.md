@@ -1,99 +1,102 @@
-# Git track - design of record
+# Git & GitHub track - design of record
 
-Status: draft  -  Brief: [docs/plans/git-track.md](../plans/git-track.md)
+Status: design ACCEPTED (owner ratified this round + independent red-team,
+2026-08-03). BUILD DEFERRED - after the WoW-enforcement layers.
+Brief: [docs/plans/git-track.md](../plans/git-track.md)
 
-Contracts other work must honour (the brief holds "where are we"). Locked at
-kickoff: teaching-model git for the learning lessons, real git via WASM later for
-GitHub-backed repos; one Git track (Theory + Practical); a command-line practical
-interface; a `CodeLab.GitGraph` widget that renders + animates + is interactive.
+## What & why
+A new 4th top-level track, "Git & GitHub", that teaches version control in the
+browser: a Theory part (stepped narration over a commit graph) and a Practical part
+(the learner types real git commands into a terminal and watches the graph react).
+No real git here - a teaching model we own. Real git over the network is the SEPARATE
+next track ("real projects backed on GitHub"), which reuses this track's visual.
+
+## Ratified decisions (owner, 2026-08-03; * = changed by the red-team)
+- New top-level track, Theory + Practical parts. Name: "Git & GitHub".
+- Teaching-model git (a commit-DAG + a parser we own), Learn-Git-Branching style.
+  Real-git-WASM is the next track, not this one.
+- Practical interface: a dependency-free line terminal. xterm.js waits for the next track.
+- Visual: a new `CodeLab.GitGraph` widget in code-lab (DOM-free model + layout, animated
+  view), unit-tested there, then vendored.
+- Commit ids: realistic short hashes - deterministic, DISPLAY-ONLY, never graded.*
+- Grading: per lesson - DAG-structural isomorphism (default) + optional output-match.
+- v1 scope CUT to a coherent local-git core (see Scope).*
+- A minimal file/index model underpins the working area (see Model).*
+- Conflicts ARE modeled, at path granularity, with `--abort`/`--continue`.*
+- i18n: practical terminal English-only (like the runnable drills); theory narration localized.
+
+## Model (RepoState) - paths + states, no file contents
+```
+RepoState = {
+  commits:  Map<hash, { id, parents[], message, paths[] }>, // paths[] = files this commit touched
+  refs:     Map<name, hash>,                                 // branches + tags
+  head:     { kind:"branch", name } | { kind:"detached", commit },
+  index:    Map<path, "staged">,                             // staging area
+  worktree: Map<path, "modified">,                           // unstaged edits
+  merge?:   { mergeHead, conflicted: path[] },               // transient, only mid-conflict
+}
+```
+`paths[]` is what lets a merge detect "both sides touched `app.js`" and raise a conflict.
+Not modeled in v1: stash shelf, remote-tracking refs + a remote RepoState, reflog.
+
+## Scope (v1)
+Ship: `init, add, status, commit -m, commit --amend, branch, switch/checkout -b, log,
+tag, reset --soft/--mixed/--hard` (meaningful because the file/index model exists),
+`merge` (fast-forward + 3-way with path conflicts + `--abort`/`--continue`),
+`rev-parse, rev-list` (`HEAD~n, ^, A..B`), detached HEAD. Single-pane graph.
+Defer to v1.1 / the real-git track: `rebase, rebase -i, rebase --onto, cherry-pick,
+stash, reflog`, and all remotes (`clone/fetch/push/pull`, remote-tracking refs, the
+two-pane view). Those are where the fake model teaches least honestly.
 
 ## The runtime seam
-GitGraph renders a `RepoState` and does not care where it came from - so the
-teaching model (Phases 1-3) and real-git-WASM (Phase 4) share one visual, and
-`RepoState` is unchanged between them.
+GitGraph renders a `RepoState` and does not care where it came from - so the teaching
+model (this track) and real-git-WASM (next track) share one visual, `RepoState` unchanged.
 
-## Contract 1 - the git model (code-lab `src/core/git-model.ts`, DOM-free)
-
-Shapes (teaching model; ids are sequential `C1, C2, ...` for legibility, with a
-display option for realistic short hashes later):
-
-```
-Commit    = { id, parents: id[], message }
-Ref name  = "refs/heads/<b>" (branch) | "refs/tags/<t>" (tag)     // remotes: Phase 4
-HEAD      = { kind: "branch", name } | { kind: "detached", commit: id }
-RepoState = { commits: Map<id,Commit>, refs: Map<name,id>, head, lanes? }
-```
-
-Pure ops `RepoState -> { state, effect }` (effect drives animation): `commit`
-(parent = HEAD commit; advance branch or move detached HEAD); `branch`/`tag(at?)`;
-`switch`/`checkout(create?)` (detached when a commit); `merge` (fast-forward, else a
-3-way merge commit); `rebase(onto, plan?)` (replay `mergeBase..HEAD` as new commits;
-`-i` plan = ordered `pick|reword|squash|drop`); `amend` (replace HEAD commit, move
-branch); `reset(mode, target)` (soft|mixed|hard); `revParse`, `revList`.
-
-Rev syntax to resolve: `HEAD`, `@`, `<branch>`, `<tag>`, `<shortid>`, `HEAD~n`,
-`HEAD^`, `HEAD^2`. Ranges for rev-list: `A..B`, `A...B`, `--all`.
-
-## Contract 2 - the command parser (code-lab `src/core/git-cli.ts`)
-
-`run(line, state) -> { state, output, effect, error? }`. Parses a `git <sub> ...`
-line into a model op, applies it, returns terminal text + an animation effect.
-
-MVP subcommands: `init, add, commit -m, commit --amend, log, status, branch,
-switch/checkout [-b], merge, rebase [--onto] [-i], reset [--soft|--mixed|--hard],
-tag, rev-parse, rev-list`. Unknown/blocked commands return a git-like error.
-
-## Contract 3 - the GitGraph widget (code-lab `src/dom/git-graph-view.ts`)
-
-Export `CodeLab.GitGraph`. Root class `.cl-git`. Layout math lives DOM-free in
-`src/core/git-layout.ts` (`layout(state) -> { nodes:[{id,x,y}], edges, chips }`) so
-it is unit-testable; the view only paints and animates.
-
-```
-const g = new CodeLab.GitGraph();
-g.mount(host, { state });            // sized container required
-g.setState(state, { animate: true }); // slide-in commit, re-lay rebase, draw merge
-g.on("inspect", ({ commit|ref }) => …); // v1 interactivity: click a node/chip
-g.destroy();
-```
-
-v1 interactivity = click a commit or ref chip to inspect/highlight. Drag-to-act is
-deferred.
-
-## Contract 4 - the practical engine (course `git-engine.js` + `window.GIT_CONFIG`)
-
-Mirrors `build-engine.js`: config-driven, mounted by page-shell. Mounts a
-dep-free line terminal (input + scrollback) beside the GitGraph.
-
-```
-GIT_CONFIG = { prefix, start: RepoState-seed,
-  goal: {type:"dag",target} | {type:"output",expected} | {type:"both"},
-  allowed: [...subcommands], hints, xpKey, awardedKey, awardAmount }
-```
-
-Each typed command runs through the parser, re-renders the graph, then checks the
-goal (target-DAG isomorphism, or expected output, or both). Reaching it awards XP.
-
-## Contract 5 - theory lessons (viz)
-
-Theory lessons step through git STATES with narration - GitGraph in a stepped mode,
-one state + narration per step (like MemoryViz). Reconcile the mount with
-page-shell's viz path in Phase 1 once the widget exists.
+## Contracts
+1. **git-model** (code-lab `src/core/git-model.ts`, DOM-free): `RepoState` + pure ops
+   `RepoState -> { state, effect }` (effect drives animation): `commit, add, branch,
+   tag, switch/checkout(-b), merge (ff | 3-way; conflict when both sides touch a path),
+   reset(soft|mixed|hard), revParse, revList`. A conflict yields transient
+   `{ mergeHead, conflicted[] }`; resolve = mark paths resolved then `commit`, or abort.
+2. **git-cli** (code-lab `src/core/git-cli.ts`): `run(line, state) -> { state, output,
+   effect, error? }` - parse a `git <sub>` line into an op, apply, return terminal text
+   + effect. Unknown/deferred commands return a git-like error.
+3. **GitGraph widget** (code-lab `src/dom/git-graph-view.ts`): `CodeLab.GitGraph`, root
+   `.cl-git`. Layout math DOM-free in `src/core/git-layout.ts`
+   (`layout(state) -> { nodes, edges, chips }`). `mount / setState({animate}) /
+   on("inspect")`. v1 interactivity: click a commit/chip to inspect. Animation honesty:
+   slide-in for new commits + fast-forward, a drawn merge node; no rebase/cross-pane
+   tween in v1 (those ops are deferred anyway).
+4. **git-engine** (course `git-engine.js` + `window.GIT_CONFIG`): terminal + GitGraph +
+   model, mounted by page-shell (mirrors build-engine). Goal:
+   `{type:"dag",target} | {type:"output",expected} | {type:"both"}`.
+5. **DAG grader** (NEW shared `kernel/grading/dag-match.js`, browser + node - like
+   `output-match.js`): equivalence = refs matched by name; HEAD checked; commits matched
+   by parent-structure + message, IGNORING id (so cherry-pick/rebase copies match);
+   merge parents order-insensitive by default (per-lesson strict opt-in). Wired into
+   `tools/verify-lesson.mjs` via a NEW headless parser path (neither exists today).
+6. **Theory viz**: GitGraph stepped mode (one `RepoState` + narration per step, like
+   MemoryViz). NEW `GIT_CONFIG`/stepped-GitGraph branch in `resource/kernel-controller.js`
+   + `page-shell.js`, surviving the relocalize destroy/re-create cycle.
 
 ## Where it lives
-code-lab `src/core` (`git-model`, `git-cli`, `git-layout` + `test/`), `src/dom`
-(`git-graph-view`), `src/index.ts` (export `CodeLab.GitGraph` + types),
-`src/code-lab.css` (`.cl-git`). Course: `git-engine.js`, a page-shell git mount,
-re-vendored `vendor/code-lab`. Content: `content/git/<part>/<lesson>/` + a `git`
-track in `course-registry.js`.
+code-lab `src/core` (git-model, git-cli, git-layout + `test/`), `src/dom`
+(git-graph-view), `src/index.ts` (export `CodeLab.GitGraph`), `src/code-lab.css`
+(`.cl-git`). Course: `git-engine.js`, a page-shell git mount, `kernel/grading/dag-match.js`,
+re-vendored `vendor/code-lab`. Content: `content/git/<part>/<lesson>/` + a `git` track
+in `course-registry.js`.
+
+## Concept graph (introduce-once)
+repo, commit, hash, DAG, HEAD, ref, branch, tag, working tree, index/staging area,
+fast-forward, three-way merge, conflict, abort/continue, reset modes, detached HEAD,
+rev-parse, rev-list.
 
 ## Phasing
-Phases 1-3 ship the teaching runtime end to end (widget -> engine -> content).
-Phase 4 spikes real git (isomorphic-git first; libgit2-WASM only if rebase fidelity
-demands it; GitHub auth via device flow/token is a Phase 4 concern).
+0 design (this doc + concept graph). 1 GitGraph widget (model + layout + view, code-lab
+tests). 2 parser + DAG grader + verify path + git-engine + page-shell mount. 3 content
+(theory viz + practical CLI + registry/generate). Real git = the NEXT track.
 
-## Open (decisions to settle as we build)
-- Commit ids: `Cn` (leaning, Learn-Git-Branching-like) vs realistic short hashes.
-- Terminal: dep-free custom line terminal (leaning) vs `xterm.js`.
-- Staging depth: only as deep as `reset --soft|--mixed|--hard` + `add`/`commit` need.
-- Theory viz integration; goal grading = target-DAG isomorphism (match shape + refs).
+## Build-time detail (ratify at build)
+- Merge-parent strictness in the equivalence relation (default order-insensitive).
+- Hash preimage (`parents + message + creation-order salt`) + a collision guard.
+- Conflict-resolution UX with no file contents (mark a path resolved, then commit).
