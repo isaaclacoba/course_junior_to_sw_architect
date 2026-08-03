@@ -962,3 +962,11 @@ mirrored into the session todo list.
   generated alias block re-binding the bare names the fragments still call.
   All three require() standalone in Node. 87/87 tests; build, viz and checkpoint
   render clean in EN and ES.
+
+- Start: 2026-08-03 13:38:06 | Task: Build DOM-free git-layout function for code-lab (git track Contract 3): pure layout(RepoState)->{nodes,edges,chips,width,height} + tests.
+- End: 2026-08-03 13:40:42 | Result: Added code-lab/src/core/git-layout.ts (exports layout + LayoutNode/LayoutEdge/LayoutChip/GraphLayout) and code-lab/test/git-layout.test.ts (9 tests). y=newest-first topo row; x=greedy top-down lane sweep with a lanes[] reservation array. typecheck clean; full suite 170/170 green. Not committed; did not touch index.ts/view/vendor.
+
+- 2026-08-03 13:41  tests for the page-shell concat pipeline (5): reproducibility,
+  orphan guard, manifest completeness, structural shape, ROOT_ARTIFACTS mapping.
+  Closes the "generate.mjs and audit-gate.mjs have zero tests" gap for this
+  pipeline. 92/92 pass.
