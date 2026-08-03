@@ -1,8 +1,9 @@
 ---
 name: concept-vocabulary-audit
 description: >-
-  Read-only audit of the course CONCEPT GRAPH (docs/concepts/*.concepts.json and
-  the seeded meta.js `concepts`) - the shared vocabulary across tracks, NOT
+  Read-only audit of the course CONCEPT GRAPH (the live migrated content: each
+  lesson's meta.js `concepts` ids/edges + res/strings/default/en.json concept
+  term/def) - the shared vocabulary across tracks, NOT
   individual lessons. USE FOR: reviewing concept `def`s for accuracy and voice;
   checking introduce-once and whether the right lesson introduces each concept;
   coverage gaps and over-fragmentation; id hygiene; cross-track overlap; verdicts
@@ -10,7 +11,7 @@ description: >-
   running one on request or after lessons/concepts change. DO NOT USE FOR:
   per-lesson content/pedagogy audits (use the course-audit skill); authoring or
   editing lessons (use lesson-authoring); APPLYING the fixes the audit recommends
-  (that is a normal edit to the drafts, done after the human signs off).
+  (that is a normal edit to the owning lesson's files, after the human signs off).
 ---
 
 # Auditing the concept vocabulary
@@ -40,25 +41,31 @@ This is NOT the `course-audit` skill: that maps what each individual lesson teac
 ## The fingerprint (the staleness marker)
 
 ```
-node -e 'const fs=require("fs"),c=require("crypto");let a=[],L=0;for(const t of["practical","theory","ai"]){const d=JSON.parse(fs.readFileSync("docs/concepts/"+t+".concepts.json","utf8"));L+=Object.keys(d).length;for(const l of Object.values(d))for(const x of(l.introduces||[]))a.push(x.id+"\u0001"+x.def);}a.sort();console.log("lessons="+L+" concepts="+a.length+" fp="+c.createHash("sha256").update(a.join("\n")).digest("hex").slice(0,12));'
+node -e 'const fs=require("fs"),c=require("crypto");const w={};new Function("window",fs.readFileSync("course-registry.js","utf8"))(w);let a=[],L=0;for(const l of w.CourseRegistry.lessons){if(!l.path)continue;L++;const g={};new Function("window",fs.readFileSync(l.path+"/meta.js","utf8"))(g);const cc=(g.LESSON_META&&g.LESSON_META.concepts)||{};let en={};try{en=JSON.parse(fs.readFileSync(l.path+"/res/strings/default/en.json","utf8"));}catch(e){}for(const x of(cc.introduces||[]))a.push(x.id+"\u0001"+(en["concept."+x.id+".def"]||""));}a.sort();console.log("lessons="+L+" concepts="+a.length+" fp="+c.createHash("sha256").update(a.join("\n")).digest("hex").slice(0,12));'
 ```
 
-It hashes the sorted set of introduced `id=def` pairs, so it moves only when a concept
-or a definition changes. Record the result in the report header:
+It reads each lesson from `course-registry.js`, then hashes the sorted set of
+introduced `id=def` pairs (id from `meta.js`, def from that lesson's
+`res/strings/default/en.json`), so it moves only when a concept or a definition
+changes. Record the result in the report header:
 `<!-- audit: fp=<hash> lessons=<n> concepts=<n> date=<YYYY-MM-DD> -->`.
-Baseline at skill creation: `lessons=76 concepts=207 fp=8b052068c017`.
-
-Once the drafts are retired (all lessons migrated, plan item 12), the authoritative
-source becomes each lesson's `content/**/meta.js` `concepts`; fingerprint and read
-those instead of the `docs/concepts/*.json` drafts.
+Baseline at skill creation: `lessons=76 concepts=207 fp=8b052068c017` (computed
+against the old drafts). Migration is now COMPLETE: the drafts
+(`docs/concepts/*.concepts.json`) were retired, and the live migrated content is
+the authoritative source - the recipe above reads it directly. Post-migration
+reference point: `lessons=83 concepts=225 fp=be2341fd08d6`.
 
 ## Inputs (ground truth - read-only)
 
-1. The graph: `docs/concepts/{practical,theory,ai}.concepts.json`. Shape, keyed by
-   lesson id: `{ introduces:[{id,term,def}], revisits:[{id}], uses:[{id}] }`. A concept
-   is introduced by exactly one lesson within its track (ids are track-scoped: `pr-`,
-   `th-`, `ai-`), and that lesson owns its one-sentence `def`. These drafts are the
-   authoritative source while migrating; `meta.js` is seeded from them.
+1. The graph, split across each lesson's folder (the authoritative source now that
+   migration is complete):
+   - `content/<track>/<part>/<lesson>/meta.js` `concepts` = the GRAPH:
+     `{ introduces:[{id}], revisits:[{id}], uses:[{id}] }` (ids + edges, no text).
+   - `content/.../res/strings/default/en.json` = the TEXT:
+     `concept.<id>.term` / `concept.<id>.def` (the English base; `es.json` etc. are
+     overlays). A concept is introduced by exactly one lesson within its track (ids are
+     track-scoped: `pr-`, `th-`, `ai-`), and that lesson owns its one-sentence `def`.
+   The old `docs/concepts/*.concepts.json` drafts were RETIRED - do not read them.
 2. Order + structure: `course-registry.js` (`window.CourseRegistry.tracks` = the
    track/part chrome in display order; `lessons` = every lesson in reading order).
    (This replaced the retired `course-manifest.js`.)
@@ -112,16 +119,18 @@ look solid so the human knows where to focus.
 
 ## Acting on the findings (a SEPARATE step, after the human signs off)
 
-The `docs/concepts/*.json` drafts are the reviewable authority. Applying accepted fixes is
-a normal edit to those files; then `node tools/generate.mjs` re-seeds each migrated
-lesson's `meta.js` and rebuilds `generated/concept-index.js`, and `node tools/validate.mjs`
-confirms the graph (0 errors; orphan warnings are expected while migration is incomplete).
+The live content is the authority. Applying an accepted fix is a normal edit to the
+owning lesson: a `def`/`term` change edits that lesson's `res/strings/default/en.json`
+(and its `es.json` etc. so translations stay in step); an edge or id change edits that
+lesson's `meta.js` `concepts`. Then `node tools/generate.mjs` rebuilds
+`generated/concept-index.js` + `generated/concept-i18n.<lang>.js`, and
+`node tools/validate.mjs` confirms the graph (0 errors; orphan warnings are expected).
 Never fold fixes in during the audit.
 
 ## Guardrails
 
-- Read-only. Never edit a concept JSON, a `meta.js`, or a lesson; never compile or run a
-  lesson; no push or commit unless asked.
+- Read-only. Never edit a `meta.js`, a lesson's `en.json`/`es.json`, or any lesson
+  content; never compile or run a lesson; no push or commit unless asked.
 - Base every finding on the actual file - do not infer a concept's meaning from its id or a
   lesson's content from its filename.
 - Voice of the report itself: plain, factual, ids/terms in `backticks`, spaced hyphen, no

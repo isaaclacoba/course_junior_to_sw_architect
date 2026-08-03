@@ -47,8 +47,8 @@ for (const l of reg.lessons) {
   }
   fs.writeFileSync(enPath, JSON.stringify(en, null, 2) + "\n");
 
-  // 2. Strip meta.js introduces[] to { id }; keep revisits/uses; reuse the same
-  //    serializer + positional rewrite seed-concepts.mjs uses.
+  // 2. Strip meta.js introduces[] to { id }; keep revisits/uses; reuse the
+  //    conceptsLiteral serializer + a positional rewrite of the concepts block.
   const stripped = {
     introduces: introduces.map((x) => ({ id: x.id })),
     revisits: c.revisits || [],

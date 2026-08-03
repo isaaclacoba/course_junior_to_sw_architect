@@ -110,9 +110,7 @@ export function checkRegistry(lessons, deps, report) {
 
 // Check 3: concept graph over migrated lessons.
 //   metas: [{ lessonId, meta }]
-//   plannedIds: ids the drafts intend to introduce (whose lesson may not be
-//   migrated yet); a reference to one of those is fine mid-migration.
-export function checkConceptGraph(metas, report, plannedIds = new Set()) {
+export function checkConceptGraph(metas, report) {
   const introducedBy = new Map(); // conceptId -> [lessonId, ...]
   const referenced = [];          // { id, from, via }
 
@@ -141,12 +139,11 @@ export function checkConceptGraph(metas, report, plannedIds = new Set()) {
     }
   }
 
-  // Every revisits/uses id must be introduced somewhere - by a migrated lesson
-  // or, during migration, by a lesson the drafts plan to introduce it.
+  // Every revisits/uses id must be introduced by some migrated lesson.
   const referencedIds = new Set();
   for (const ref of referenced) {
     referencedIds.add(ref.id);
-    if (!introducedBy.has(ref.id) && !plannedIds.has(ref.id)) {
+    if (!introducedBy.has(ref.id)) {
       report.error(`Concept: "${ref.from}" ${ref.via} unknown concept id "${ref.id}" (introduced by no lesson)`);
     }
   }
@@ -555,31 +552,13 @@ export function conceptOwners(migrated) {
   return map;
 }
 
-// Every concept id introduced by a migrated lesson, unioned with the draft-
-// planned ids (so a checkpoint may tag a concept whose introducer is another
-// track/part). This is the resolvable-concept set the checkpoint tags check against.
-export function knownConceptIds(migrated, plannedIds) {
-  const set = new Set(plannedIds);
+// Every concept id introduced by a migrated lesson. This is the resolvable-concept
+// set the checkpoint tags and prose mentions check against.
+export function knownConceptIds(migrated) {
+  const set = new Set();
   for (const m of migrated)
     for (const it of (m.meta.concepts && m.meta.concepts.introduces) || [])
       set.add(it.id);
-  return set;
-}
-
-// Union of every concept id the drafts (docs/concepts/*.concepts.json) intend to
-// introduce. Used to tolerate references to not-yet-migrated introducers.
-export function loadPlannedConceptIds(rootDir) {
-  const set = new Set();
-  const dir = path.join(rootDir, "docs", "concepts");
-  if (!fs.existsSync(dir)) return set;
-  for (const f of fs.readdirSync(dir)) {
-    if (!f.endsWith(".concepts.json")) continue;
-    try {
-      const d = JSON.parse(fs.readFileSync(path.join(dir, f), "utf8"));
-      for (const l of Object.values(d))
-        for (const it of (l.introduces || [])) set.add(it.id);
-    } catch { /* a malformed draft is a research artifact, not a gate */ }
-  }
   return set;
 }
 
@@ -603,9 +582,8 @@ function main() {
   );
 
   const migrated = loadMigrated(registry, root);
-  const plannedIds = loadPlannedConceptIds(root);
-  const knownIds = knownConceptIds(migrated, plannedIds);
-  checkConceptGraph(migrated.map((m) => ({ lessonId: m.registryId, meta: m.meta })), report, plannedIds);
+  const knownIds = knownConceptIds(migrated);
+  checkConceptGraph(migrated.map((m) => ({ lessonId: m.registryId, meta: m.meta })), report);
   checkCoherence(migrated, report);
   checkCheckpointConcepts(loadCheckpointQuizzes(migrated, root), knownIds, report);
   checkProseMentions(loadProseMentions(migrated, root), knownIds, report);

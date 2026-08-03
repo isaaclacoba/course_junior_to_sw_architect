@@ -1,104 +1,255 @@
-<!-- audit: fp=617584744ca3 lessons=76 concepts=208 date=2026-07-29 -->
-<!-- fixes applied 2026-07-29: the clear P3 (th-inode term, ai-react "grounded", ai-evaluation "can never") + the value-type P2 (pr-struct/pr-record/pr-nullable-value-type reworded) -> new fp f9f9b2b89215. The pr-single-inheritance / pr-runtime-dispatch merges were DECIDED 2026-07-29: KEEP BOTH SPLIT - pr-single-inheritance is a language fact, pr-favour-composition a design principle; pr-polymorphism is the what, pr-runtime-dispatch the how. No graph change. -->
-# Concept-graph vocabulary review (CG3 - fresh-eyes re-audit)
+<!-- audit: fp=be2341fd08d6 lessons=83 concepts=225 date=2026-08-03 -->
+<!-- CG4 re-audit 2026-08-03: migration is COMPLETE (all 83 lessons under content/); the
+     authoritative graph is now the migrated content - concept ids/edges in each
+     meta.js, term/def in each res/strings/default/en.json (concept.<id>.term/.def).
+     The docs/concepts/*.concepts.json DRAFTS are stale (75 lessons / 208 concepts,
+     fp f9f9b2b89215) and were NOT the source read for this audit. Fingerprint above
+     is over the live def source (en.json), not the drafts. No fixes applied. -->
+<!-- fixes applied 2026-08-03: the two P3 one-sentence-rule defs collapsed to a single
+     sentence in EN + ES - th-readability (write-for-readers) and th-comment
+     (comments-say-why); regenerated concept-index.js + concept-i18n.es.js;
+     validate 0 err/90 warn, check-i18n PASS. New live-def fp be2341fd08d6.
+     P2 theory-19 (10-concept density) DEFERRED to a dedicated split (its own
+     lesson audit), NOT applied here. -->
+# Concept-graph vocabulary review (CG4 - post-elementary-foundation re-audit)
 
 ## Status / fingerprint
 
-Graph fingerprint **unchanged** since the CG2 audit: `fp=617584744ca3`, 76 lessons, 208 concepts (re-computed against the drafts and confirmed equal to the migrated `content/**/meta.js` - `data-shapes/meta.js` matches its draft byte-for-byte, and the whole-graph meta.js fingerprint matches the drafts). So every *introduced def* is identical to the CG2-RESOLVED state; the CG2 P1/P2/P3 fixes are all present in the drafts (verified below). This CG3 pass therefore spends its effort on what the fingerprint does not capture: **edges, placement, coverage, cross-track overlap, id hygiene, voice**, plus fresh verification of the CG2 fixes.
+The graph grew since CG3: **83 lessons / 225 concepts** (was 76 / 208). The
+`+7` lessons and `+17` concepts are the elementary Theory work built since - the
+new Part 5 "Foundations of good code" (`good-names`, `no-repeats`, `one-job`,
+`write-for-readers`, `comments-say-why`, `good-code-check`), the deepened Part 3
+networking/storage beats (`theory-18`, `theory-19`), the deepened Part 4 VCS
+beat (`theory-20`), the `keeping-data-safe` security lesson, and two AI-track
+prompt concepts (`ai-few-shot`, `ai-output-format`).
+
+Fingerprints (all `slice(0,12)`):
+- CG3 recorded header: `617584744ca3`, 76 / 208 (`date=2026-07-29`).
+- Live def source (this audit, over `en.json` `concept.<id>.def`): `d95e6adc9682`, 83 / 225;
+  after the P3 fix below it is `be2341fd08d6` (two defs reworded).
+- The `docs/concepts/*.concepts.json` drafts: `f9f9b2b89215`, 75 / 208 - **stale**.
+
+The last two disagree because migration finished and the new concepts were
+authored directly in `content/`, never back-ported to the drafts. See the
+process finding below.
 
 ## Overall verdict
 
-**Good enough to build Phases 1-3 on.** All three graphs are technically accurate at the level each track teaches; the introduce-once rule holds; the revisit/uses spines track reading order; the voice is consistent with `AGENTS.md`. The CG2 fixes landed cleanly and are sound against the lesson content. The remaining findings are refinements, not blockers - no systemic problem, no rebuild.
+**Good enough to build on.** All 17 new defs are technically accurate at the
+level the Theory track teaches; the introduce-once rule holds across all three
+tracks (0 duplicate introducers); every `revisits`/`uses` edge resolves (0
+dangling, 0 forward references); the Part 5 chain and the checkpoints wire the
+new concepts correctly. Every CG3 fix has landed (reconciled below). The
+remaining findings are two one-sentence-rule slips, one dense lesson, and a
+process risk around the now-stale drafts. No blocker, no rebuild.
 
-New counts (fresh findings only, CG2 fixes excluded): **P1 = 0, P2 = 4, P3 = 4.**
+New counts (fresh findings only): **P1 = 0, P2 = 1, P3 = 2, plus 1 process risk.**
+The two P3 items were FIXED this pass (EN + ES); the process risk was RESOLVED this
+pass (drafts + seeder retired); the P2 density item is deferred to a dedicated
+`theory-19` split.
+
+## P0 (process) - the stale drafts were a hazard - RESOLVED 2026-08-03
+
+**Resolved:** the three `docs/concepts/*.concepts.json` drafts and the one-time
+`tools/seed-concepts.mjs` seeder were deleted; the migration-era
+`loadPlannedConceptIds` tolerance was removed from `validate.mjs`; and
+`concept-vocabulary-audit/SKILL.md`'s fingerprint recipe + "acting on findings"
+workflow now read/write the live `en.json` + `meta.js` source. `validate` stays
+0-error and the tests stay green. The finding as originally written is kept below
+for the record.
+
+Migration is complete: all 83 lessons live under `content/`, 0 remain on the old
+flat layout. The pipeline now reads concept **ids and edges** from each
+`meta.js` and concept **term/def** from each `res/strings/default/en.json`
+(`generate.mjs` line ~208 reads them back from `en.json`, explicitly "not
+meta.js"). The `docs/concepts/*.concepts.json` drafts are no longer read by
+`generate.mjs`; they are only consulted by `validate.mjs` (`loadPlannedConceptIds`,
+a migration-era tolerance for "not-yet-migrated introducers") and are the input
+to the one-time `seed-concepts.mjs`.
+
+Because the drafts are stale (missing all 17 new concepts and any CG3 def
+rewordings applied in `en.json`), two hazards follow:
+
+- **Re-running `tools/seed-concepts.mjs` would overwrite the live lessons with
+  the stale drafts, deleting the 17 new concepts' defs.** It is now a foot-gun,
+  not a maintenance tool.
+- **This skill's own staleness fingerprint recipe reads the drafts** and so
+  reports `75 / 208`, understating the true graph; and the skill's "acting on
+  findings" step ("edit the drafts, then `generate.mjs` re-seeds each lesson")
+  is outdated - `generate.mjs` reads `en.json`, so a draft edit no longer
+  propagates.
+
+Recommended fix (APPLIED 2026-08-03): retire the drafts and the `seed-concepts.mjs`
+seeder, drop the migration-era `loadPlannedConceptIds` tolerance from
+`validate.mjs`, and update `concept-vocabulary-audit/SKILL.md` so its fingerprint
+and its "acting on findings" workflow read/write the live `en.json` concept text.
+All done this pass.
 
 ## P1 - Correctness
 
-**None.** No introduced def is technically wrong or misleading against its lesson content or the domain. Spot-checks that confirm the CG2 fixes are accurate, not just applied:
-- `ai-14 / ai-embedding` - reworded def ("done ahead of time for every stored chunk, and again for each incoming question") matches the viz exactly (chunks embedded "once, ahead of time"; the question "turn it into an embedding" at query time). Correct.
-- `ai-14 / ai-retrieval` narrowed to the lookup step and `ai-rag` now owns the full fetch-and-answer pattern - matches the viz recap. Overlap resolved.
-- `reading-objects / pr-constructor` - the lesson uses a constructor in every card (`public Clock(int hour) { _hour = hour; }`, "take its collaborator through the constructor"); the def is accurate and the placement is earned.
-- `class-members / pr-readonly` ("set once - at its declaration or in the constructor - and never reassigned") - now technically complete.
-- `theory-18 / th-inode` - def matches the viz (inode = bytes + facts, reached through a name in a directory).
+**None.** No introduced def is technically wrong or misleading against its
+lesson content or the domain. Spot-checks on the 17 new concepts:
+
+- `theory-19 / th-ip-address` ("The number that identifies a machine on the
+  internet ... like 142.250.1.14") - accurate at the elementary level; a real
+  dotted-quad example.
+- `theory-19 / th-dns`, `th-http`, `th-api` - the phone-book, request/response,
+  and "menu" framings are correct and plain.
+- `theory-18 / th-database` - "many programs can share and change at the same
+  time without clashing, and can query for exactly the data they need" -
+  correct (concurrency + query), positioned as "the step up from a single file".
+- `keeping-data-safe / th-secret`, `th-validation` - both accurate; validation's
+  "input from a user, another program, or the network can be wrong or hostile"
+  is the right elementary framing (trust boundary without the jargon).
+- `theory-20 / th-vcs-branch`, `th-merge`, `th-remote` - all correct; `th-remote`
+  names GitHub only as an example of a hosting platform, not as the definition.
+- Part 5 `th-good-name`, `th-duplication`, `th-single-purpose` - accurate and
+  plain; `th-single-purpose` correctly frames itself as "the everyday seed of
+  the single-responsibility idea" (a preview, not a re-definition of SRP).
 
 ## P2 - Introduction placement & coverage
 
-- **`data-shapes` / `pr-struct`, `pr-record`, `null-safety` / `pr-nullable-value-type` lean on practical-untaught terms.** `pr-struct` = "A **value type** that is copied ... rather than shared **by reference**"; `pr-record` = "compared by its values rather than by **identity**"; `pr-nullable-value-type` = "A **value type** that opts in to being absent". The practical track never introduces a concept for *value type* / *reference type* / *identity* (those live only in theory: `th-value-type`, `th-reference-type`, `th-reference`). This is the same class of gap CG2 fixed for `class`/`field`, but for "value type/reference". Fix options: (a) add a light `pr-value-type` (or fold into `pr-struct`'s owning lesson as an explicit sentence) and have `data-shapes`/`null-safety` revisit it, or (b) keep the plain-English use but stop leaning on the bare term. Non-blocking.
+- **`theory-19` introduces 10 concepts in one lesson** (`th-network`,
+  `th-internet`, `th-client`, `th-server`, `th-request`, `th-response`,
+  `th-ip-address`, `th-dns`, `th-http`, `th-api`) - the densest lesson in the
+  graph by a wide margin (next is 7: `foundations`, `theory-20`). For an
+  *elementary* foundation this is a lot of new vocabulary at once. It reads as a
+  deliberate "how the internet works" overview, and the ids/edges are clean, so
+  this is a judgment call rather than a defect: either accept it as a labelled
+  survey lesson, or consider splitting addressing (`internet`/`ip-address`/`dns`)
+  from the request cycle (`client`/`server`/`request`/`response`/`http`/`api`)
+  into two beats to lower the load. Flag for the human; non-blocking.
 
-- **`composition` / `pr-single-inheritance` overlaps `reuse-without-regret` / `pr-favour-composition`.** `pr-favour-composition`'s def already carries the reasoning ("multiple parents clash"), and `pr-single-inheritance` ("C# lets a class inherit from just one parent, so you combine several parts by holding them instead") restates that same fact as its own concept. Merge candidate, or sharpen `pr-single-inheritance` to the pure language rule (one base class) and let `pr-favour-composition` own the *why*. **DECIDED 2026-07-29: keep both** - a language fact (single inheritance) and a design principle (favour composition) are worth teaching as distinct concepts even though they point at the same conclusion.
+- **Coverage of Part 5 looks complete for an elementary pass.** `good-names`,
+  DRY (`th-duplication`), single-purpose, readability, and comments are the
+  canonical clean-code starters and none is missing. One optional future
+  candidate a mentor might expect - a named-constant / "no magic numbers" idea -
+  is currently folded into `th-good-name`; that is a fine call at this level and
+  adding it now would fragment. No action needed.
 
-- **`polymorphism` / `pr-runtime-dispatch` vs `reuse-without-regret` / `pr-polymorphism`** (carried from CG2, still open by design). "The real object deciding at run time which version runs" restates polymorphism's mechanism; it earns its keep only via the "add a type, not another branch" angle. Weakest practical introduction; keep if trimming Part 4 vocabulary is undesirable, else merge. **DECIDED 2026-07-29: keep both** - `pr-polymorphism` is the *what* (one call, many behaviours), `pr-runtime-dispatch` the *how* (the runtime picks the override); distinct enough to keep.
-
-- **`ai-1` defines itself with "token" one lesson before `ai-2` introduces `ai-token`.** `ai-llm` ("predicts the next **token**") and `ai-next-token-prediction` ("scores every possible **token**") both use the word before it is taught. Analogous to CG2's theory-3 "function" note. Hard to avoid - "next-token prediction" is the whole of lesson 1 - so accept, but flag: it is the one spot the ai track names a not-yet-introduced concept in a def.
-
-- **Coverage (minor, defensible): `theory-18` teaches "hard link" and "soft link" by name in prose but the graph names neither** (only `th-inode`). CG2 recommended exactly this fold and it was applied; noting only that a coverage reviewer will see two named-in-lesson terms with no concept id. Acceptable under the track's "keep it shallow" aim.
+- **`th-inode` remains a borderline depth call** (carried, agreed at CG3). The
+  def is accurate ("A file on disk is an inode - its bytes plus facts ... reached
+  through a name in a folder") and it now has a distinct display term, but
+  "inode" is a deep filesystem term for an elementary track. Keeping it is
+  defensible because it anchors `th-persistence`/`th-storage`/`th-database`; noted
+  only so a coverage reviewer is not surprised.
 
 ## P3 - Voice, id hygiene, edges
 
-- **NEW term collision: `th-file` (theory-7, term "File") and `th-inode` (theory-18, term "File").** CG2's own inode-fold set `th-inode`'s display term to "File", which now collides with `th-file`'s "File" inside the same track. Two concepts rendering as the identical word "File" is confusing in a glossary. Fix: rename `th-inode`'s term to "File on disk" or "Inode" (the id already implies the latter).
+- **Two new defs were two sentences - the one-sentence-per-def rule** (the only
+  two multi-sentence defs in all 225). **FIXED this pass in EN + ES:**
+  - `write-for-readers / th-readability` was "How quickly a reader can understand
+    code. Since code is read far more than it is written, the clearer version
+    usually wins over the cleverer one." Now one sentence: "How quickly a reader
+    can understand code - and since code is read far more than it is written, the
+    clearer version usually beats the cleverer one." (ES reworded to match.)
+  - `comments-say-why / th-comment` was "A note for humans written in the code that
+    the computer ignores. A good comment explains why something is done, not what
+    the code already shows." Now one sentence: "A note for humans that the computer
+    ignores, best used to explain why something is done rather than what the code
+    already shows." (ES reworded to match.)
 
-- **`ai-17` / `ai-react` uses "grounded" before `ai-grounding` is taught.** "...repeated until the answer is **grounded**" (Part 3) forward-references `ai-grounding` (ai-22, Part 4). Reword to "until the answer rests on a real result" or accept the plain use, but it is jargon-before-taught by the strict rule.
+- **`th-single-purpose` names `single-responsibility` before it is taught**
+  ("the everyday seed of the single-responsibility idea"). It is a hedged
+  preview, not a definition, so it is acceptable under the same latitude given to
+  `ai-1`'s use of "token" at CG3 - noted, not a required fix.
 
-- **Near-duplicate ids: `pr-to-string` (type-conversion) vs `pr-tostring-override` (type-system).** Distinct meaning (calling `ToString` vs overriding it), but the ids differ only by a suffix and both terms mention ToString. Acceptable; noted for id hygiene.
+- **`th-good-name` uses "comments" before `th-comment` is introduced** ("code
+  explains itself and needs fewer comments"). "Comment" is an everyday word here,
+  not the taught concept; harmless, noted for completeness only.
 
-- **Mild absolute in `ai-23` / `ai-evaluation`:** "...so the same bug **can never** sneak back in." Slight overstatement per the "hedge absolutes" rule; trim to "so the same bug does not sneak back in".
+- **id hygiene: clean.** No near-duplicate ids within any track (checked
+  singular/plural and shared-prefix pairs); the CG3 `pr-to-string` /
+  `pr-tostring-override` pair now renders as distinct display terms ("ToString"
+  vs "Custom text form"), so the glossary no longer collides. No new term
+  collisions across the 225 concepts.
 
-Solid, do-not-touch areas (fresh confirmation): the practical Part 1 -> Part 4 revisit spine (`pr-single-responsibility` -> encapsulation/testable-design/refactor-moves/SOLID; `pr-polymorphism`/`pr-override`/`pr-inheritance` into interfaces/polymorphism/SOLID; `pr-constructor` -> class-members/dependency-injection); the theory checkpoint revisit/uses chains (checks 1-4 pull the right earlier ids); and the ai edges (`ai-8` pulling context/memory/tool; `ai-14` revisiting `ai-semantic-memory`; `ai-17` revisiting agent-loop + chain-of-thought; `ai-22` revisiting retrieval). Well modelled.
+Solid, do-not-touch areas (fresh confirmation): the Part 5 revisit spine
+(`th-good-name` introduced in `good-names`, revisited by the four later Part-5
+lessons and `good-code-check`; `write-for-readers` revisits `th-single-purpose`;
+`comments-say-why` revisits `th-readability`); the theory checkpoints
+(`theory-check-3` pulls the new networking/storage/security ids,
+`theory-check-4` pulls the VCS ids, `good-code-check` pulls all five good-code
+ids); and `keeping-data-safe` revisiting `th-permissions` while using `th-file`
+and `th-server`. Well modelled.
 
 ## Cross-track overlap (for the unify-or-keep-scoped decision)
 
-Concepts appearing in more than one track under different ids (unchanged from CG2 - the CG2 additions `pr-class`/`pr-field`/`pr-constructor` add no new cross-track pairs, since theory/ai teach no OO):
+The eight true synonym rows from CG3 are unchanged (`variable`, `type`,
+`assignment`, `method`/`function`, `parameter`, `loop`, `conditional`/`branch`,
+`arithmetic`/`operator` across practical/theory). Confirmed programmatically:
+the only exact term collisions across track prefixes are `variable`,
+`assignment`, `loop`, `parameter` - all expected, all pitched at a different
+depth per track. Recommendation unchanged: **keep track-scoped for now.**
 
-| Idea | practical | theory | ai |
-| --- | --- | --- | --- |
-| variable | `pr-variable` | `th-variable` | - |
-| type | `pr-datatype` | `th-type` | - |
-| assignment | `pr-assignment` | `th-assignment` | - |
-| method / function | `pr-method` | `th-function` | - |
-| parameter | `pr-parameter` | `th-parameter` | - |
-| loop | `pr-loop` | `th-loop` | - |
-| conditional / branch | `pr-conditional`, `pr-boolean-logic` | `th-condition`, `th-branch` | - |
-| arithmetic / operator | `pr-arithmetic` | `th-operator` | - |
-| value vs reference | `pr-struct` (value type) | `th-value-type`, `th-reference-type`, `th-reference` | - |
-| **collaboration (DIFFERENT meaning)** | `pr-collaboration` (objects) | `th-collaboration` (people) | - |
-| **memory (DIFFERENT sense)** | - | `th-ram`/`th-stack`/`th-heap` (hardware) | `ai-memory` family (assistant recall) |
+One NEW deliberate cross-track bridge from Part 5:
 
-The first eight rows are true synonyms across practical/theory and the natural unify candidates *if the tracks ever merge*. Recommendation: **keep track-scoped for now** - each track pitches the term at a different depth (theory `th-variable` = "a named slot in memory"; practical `pr-variable` = "a named box you read back and change"). The last two rows share only a *word*, not a concept - keep scoped whatever you decide.
+| Idea | practical | theory |
+| --- | --- | --- |
+| single purpose / SRP | `pr-single-responsibility` (the principle) | `th-single-purpose` (the elementary seed) |
+
+`th-single-purpose`'s def explicitly links to `pr-single-responsibility`; this is
+a good, intentional ramp (plain "one job" in Theory -> the named principle in
+Practical), not an accidental duplicate. Keep both. The other four good-code
+concepts (`th-good-name`, `th-duplication`, `th-readability`, `th-comment`) have
+no named practical counterpart - Practical demonstrates them inside build
+lessons rather than naming them - which is fine.
 
 ## Judgment-call verdicts
 
-1. **SRP owned by `reading-objects`, not `the-solid-principles`** - **Agree.** Content teaches "one job per method / separate the jobs"; SOLID revisits it and owns O/L/I/D. Correct.
-2. **Inheritance/composition/polymorphism owned by `reuse-without-regret` (Part 1), Part-4 lessons revisit** - **Agree.** Full 12-card teaching lesson; ownership earned; revisits right.
-3. **`pr-dependency-injection` (wiring) kept separate from `pr-dependency-inversion` (principle)** - **Agree.** Genuinely different, correctly split.
-4. **`ai-6` introducing the 5-part memory taxonomy** - **Agree.** Each of working/episodic/semantic/procedural is a distinct viz step under the `ai-memory` umbrella; all earned.
-5. **`ai-grounding` owned by `ai-22`, not `ai-14`** - **Agree.** Retrieval = mechanics; grounding = truth/citation framing with hallucination. Right.
-6. **`th-run-time` vs `th-runtime-platform`** - **Agree distinct; CG2's display-term fix (".NET runtime") is applied and resolves the on-screen clash.**
-7. **`ai-transcript` vs `ai-trace`** - **Agree, now distinct.** CG2's sharpen landed: transcript = "the input the model is re-sent each step"; trace = "the after-the-fact record ... read to find where it went wrong". Good.
-8. **Constructor placed in `reading-objects`, revisited by `class-members`/`dependency-injection`** (CG2's new call) - **Agree.** It is the earliest lesson where constructors carry weight (every card defines and uses one); def accurate.
-9. **`pr-single-inheritance` as its own concept** - **Weak agree / merge candidate** (see P2); the `pr-favour-composition` def already leaks its content.
+1. **Part 5 owns the good-code vocabulary in THEORY, not Practical** - **Agree.**
+   The elementary track is the right home for the plain "one job / good name /
+   don't repeat" ideas; Practical shows them in code and `pr-single-responsibility`
+   carries the named principle. The `th-single-purpose` -> SRP bridge is correct.
+2. **`theory-19` packing a 10-concept networking overview** - **Weak agree.**
+   Defensible as a survey beat, but the densest lesson in the graph; see P2.
+3. **`th-inode` kept at elementary depth** - **Agree (carried).** Anchors the
+   storage/persistence/database trio; def is accurate.
+4. Carried CG3 decisions still standing: **`pr-single-inheritance` vs
+   `pr-favour-composition` keep split** (language fact vs design principle);
+   **`pr-runtime-dispatch` vs `pr-polymorphism` keep split** (how vs what);
+   **`ai-1` using "token" before `ai-2`** accepted (next-token prediction is the
+   whole of lesson 1). No change.
 
-## Reconciliation with CG2
+## Reconciliation with CG3
 
-**CG2 findings confirmed still-resolved (all applied and accurate against content):**
-- P1 `ai-embedding` reworded - confirmed vs viz. ✔
-- P1 `pr-readonly` completed ("at its declaration or in the constructor") - ✔
-- P2 Constructor concept added (`pr-constructor`, reading-objects) - ✔
-- P2 Class / Field added (`pr-class` in foundations, `pr-field` in class-members) - ✔ (defs no longer lean on undefined "class"/"field")
-- P2 `ai-retrieval` vs `ai-rag` overlap split - ✔
-- P2 theory-3 "function" forward reference removed (`th-main` = "the routine...", `th-entry-point` = "the place...") - ✔
-- P2 theory-18 inode folded to a single concept (hard/soft-link dropped as named ids) - ✔
-- P3 editorial tails trimmed on `ai-llm`, `ai-transcript`, `ai-workflow` - ✔
-- P3 `th-runtime-platform` term renamed to ".NET runtime" - ✔
-- P3 `ai-transcript` vs `ai-trace` sharpened - ✔
+**CG3 findings now RESOLVED in the live content (verified against `en.json`):**
+- P3 `th-file` / `th-inode` "File" term collision - **fixed**: `th-inode`'s term
+  is now "Inode" (was "File"). This was CG3's highest-value fix; it landed.
+- P3 `ai-react` used "grounded" before `ai-grounding` - **fixed**: def now ends
+  "repeated until the agent has what it needs to answer".
+- P3 `ai-evaluation` "can never" absolute - **fixed**: now "so the same bug does
+  not sneak back in".
+- P2 practical value-type/reference/identity dependency - **fixed by
+  rewording** (CG3 option b): `pr-struct` ("copied whole ... so two variables
+  never share the same one"), `pr-record` ("count as equal when their values
+  match, not just when they are the same object"), and `pr-nullable-value-type`
+  ("A plain value like int or bool ... adding ?") no longer lean on the untaught
+  bare terms. No `pr-value-type` was added, and none is needed.
+- P3 `pr-to-string` / `pr-tostring-override` near-duplicate ids - display terms
+  now distinct; id similarity remains but is harmless. Closed.
 
-**New findings CG2 missed (fresh eyes):**
-- P2: practical `value type`/`reference`/`identity` dependency (`pr-struct`, `pr-record`, `pr-nullable-value-type`) - the same undefined-term class CG2 only caught for class/field.
-- P2: `pr-single-inheritance` overlaps `pr-favour-composition`. **DECIDED: keep split (fact vs principle).**
-- P2: `pr-runtime-dispatch` overlaps `pr-polymorphism`. **DECIDED: keep split (what vs how).**
-- P2: `ai-1` uses "token" one lesson before `ai-2` introduces it.
-- P3: **`th-file` and `th-inode` now share the display term "File"** - a collision *introduced by CG2's own inode-fold* and not caught at the time.
-- P3: `ai-react` uses "grounded" before `ai-grounding`; `ai-evaluation` mild absolute; `pr-to-string`/`pr-tostring-override` near-duplicate ids.
+**CG3 findings still open BY DESIGN (unchanged):**
+- `ai-1` naming "token" one lesson before `ai-2` introduces it (accepted).
+- `pr-single-inheritance` / `pr-favour-composition` and `pr-runtime-dispatch` /
+  `pr-polymorphism` overlaps (DECIDED: keep split).
+- `theory-18` naming hard/soft link in prose without concept ids (accepted -
+  shallow by intent).
 
 ## Bottom line
 
-**P1 = 0, P2 = 4, P3 = 4** (new). No blocker; the highest-value single fix is the **`th-file` / `th-inode` "File" term collision** (rename `th-inode`'s term), followed by naming a practical *value type* concept so `pr-struct`/`pr-record`/`pr-nullable-value-type` stop leaning on an untaught term. **Phases 1-3 are cleared to start.** No fixes applied (read-only, per request).
+**P1 = 0, P2 = 1, P3 = 2, plus one process risk.** The elementary-foundation
+concepts are accurate, well-placed, and correctly wired, and every CG3 fix has
+landed. Status of the follow-ups:
+
+- **DONE this pass:** the two P3 defs (`th-readability`, `th-comment`) were
+  collapsed to one sentence in EN + ES and the generated files were rebuilt
+  (live-def fp `be2341fd08d6`; validate 0 err, check-i18n PASS).
+- **DONE this pass:** retired the stale `docs/concepts/*` drafts and the
+  `seed-concepts.mjs` seeder, removed the dead `loadPlannedConceptIds` code from
+  `validate.mjs`, and repointed this skill's fingerprint / "acting on findings"
+  recipe at the live `en.json` + `meta.js` source.
+- **DEFERRED (needs its own lesson audit):** split the 10-concept `theory-19`
+  networking overview into two lighter beats.
+
+No blocker.

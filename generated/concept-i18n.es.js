@@ -564,7 +564,7 @@
       "term": "Colaboración"
     },
     "th-comment": {
-      "def": "Una nota para personas escrita en el código que la computadora ignora. Un buen comentario explica por qué se hace algo, no el qué que el código ya muestra.",
+      "def": "Una nota para personas que la computadora ignora, usada para explicar por qué se hace algo en lugar del qué que el código ya muestra.",
       "term": "Comentario"
     },
     "th-commit": {
@@ -792,7 +792,7 @@
       "term": "RAM"
     },
     "th-readability": {
-      "def": "Lo rápido que quien lee puede entender el código. Como el código se lee mucho más de lo que se escribe, la versión más clara suele ganar a la más ingeniosa.",
+      "def": "Lo rápido que quien lee puede entender el código - y como el código se lee mucho más de lo que se escribe, la versión más clara suele ganar a la más ingeniosa.",
       "term": "Legibilidad"
     },
     "th-reference": {

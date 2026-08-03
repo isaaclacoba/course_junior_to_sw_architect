@@ -17,8 +17,10 @@ every phase has a Verify gate that must pass before the next begins.
 2. **One resource mechanism for all display text.** Concept text uses the same
    `res/strings/<voice>/<lang>.json` bundles, resolver, and validation as prose.
    No separate concept overlay, no validation carve-out.
-3. **English is the base**, authored in `res/strings/default/en.json`, seeded
-   from the canonical `docs/concepts/*.concepts.json`. Non-English are overlays.
+3. **English is the base**, authored in each lesson's `res/strings/default/en.json`.
+   Non-English are overlays. (Historically seeded once from the
+   `docs/concepts/*.concepts.json` drafts; those drafts were retired after migration
+   completed - the lesson files are now the authored source.)
 4. **Build-time aggregation.** `generate.mjs` aggregates concept text into
    generated per-language artifacts; consumers load them. Editing a translation
    is a regenerate, exactly like editing an English string today.
@@ -36,17 +38,19 @@ panel + agenda chips + `[[concept:...]]` mentions** (`page-shell.js`). Must be
 voice- AND language-aware, native Spanish first (`default`/`es`), other voices as
 future slots. Forces: static hosting (client-side fetch only); the glossary has no
 kernel/resolver wired; the English render must stay byte-identical; the audited
-English graph (`docs/concepts`) must remain the single canonical source.
+English graph - now the live migrated content (each lesson's `meta.js` +
+`res/strings/default/en.json`) - remains the single canonical source.
 
 ## 3. Architecture
 
-Pipeline (one canonical source; two seeded targets; one derived index per voice/lang):
+Pipeline (authored per lesson; one derived index per voice/lang). The concept graph
+is authored directly in each lesson - the `docs/concepts/*.concepts.json` drafts and
+the one-time `seed-concepts.mjs` seeder were retired once migration completed:
 
 ```
-docs/concepts/<track>.concepts.json    (canonical: id, term, def, relationships; audited)
-        |  seed-concepts.mjs
-        +--> meta.js  concepts: { introduces:[{id}], revisits:[{id}], uses:[{id}] }   (GRAPH, metadata)
-        +--> res/strings/default/en.json  concept.<id>.term / concept.<id>.def          (TEXT, English base)
+content/<track>/<part>/<lesson>/
+  meta.js  concepts: { introduces:[{id}], revisits:[{id}], uses:[{id}] }   (GRAPH, metadata - authored)
+  res/strings/default/en.json  concept.<id>.term / concept.<id>.def        (TEXT, English base - authored)
 
 res/strings/<voice>/<lang>.json  concept.<id>.term? / concept.<id>.def   (TEXT, translations - authored)
 
@@ -106,7 +110,7 @@ window.PageShellConcepts = { setConceptSource(ci18n), setLocale() }
 
 | File | Change |
 |---|---|
-| `tools/seed-concepts.mjs` | Seed text into `res/strings/default/en.json` (`concept.<id>.term/.def`); seed only the graph (ids + relationships) into `meta.js`. |
+| `tools/seed-concepts.mjs` (migration-only, since **retired**) | Seeded text into `res/strings/default/en.json` (`concept.<id>.term/.def`) and the graph (ids + relationships) into `meta.js`. Removed after migration completed; the lesson files are now authored directly. |
 | every `content/**/meta.js` | `concepts.introduces[]` becomes `[{id}]` (drop `term`/`def`); `revisits`/`uses` unchanged. (Migration, scripted.) |
 | every `content/**/res/strings/default/en.json` | gains `concept.<id>.term/.def` for concepts that lesson introduces. (Migration, scripted.) |
 | `tools/generate.mjs` | Read concept `term`/`def` from `default/en.json` (not meta); still emit byte-identical `concept-index.js`. Emit `concept-i18n.<lang>.js` per non-default lang from the bundles. |

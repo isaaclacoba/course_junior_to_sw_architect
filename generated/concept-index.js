@@ -3349,7 +3349,7 @@
     },
     "th-comment": {
       "term": "Comment",
-      "def": "A note for humans written in the code that the computer ignores. A good comment explains why something is done, not what the code already shows."
+      "def": "A note for humans that the computer ignores, best used to explain why something is done rather than what the code already shows."
     },
     "th-commit": {
       "term": "Commit",
@@ -3577,7 +3577,7 @@
     },
     "th-readability": {
       "term": "Readability",
-      "def": "How quickly a reader can understand code. Since code is read far more than it is written, the clearer version usually wins over the cleverer one."
+      "def": "How quickly a reader can understand code - and since code is read far more than it is written, the clearer version usually beats the cleverer one."
     },
     "th-reference": {
       "term": "Reference",
