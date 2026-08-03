@@ -29,18 +29,12 @@ editor through `CodeLab.MonacoEditor`. This is the same editor used by
 
 ## Reuse existing components
 
-Before building anything, look for an existing component (`code-lab`,
-`build-engine.js`, `drill-engine.js`, `level3-app`) and reuse it. Introducing a
-parallel pattern instead of reusing what exists is not acceptable.
+Reuse an existing component (`code-lab`, `build-engine.js`, `drill-engine.js`,
+`level3-app`) before building anything; a parallel pattern is not acceptable (see
+`copilot-instructions.md` golden rule 1).
 
 ## Runner
 
 Code runs through the shared Roslyn host:
 `new CodeLab.RoslynIframeRunner({ url: "level3-app/index.html?runner=1" })`.
 Do not build another runner.
-
-## Workflow
-
-- Log task start and end in `docs/work-log.md` with the `date` command.
-- No emojis, no buzzwords, minimal docs (no new markdown unless asked).
-- Delete any temporary `_*.html` test harness files before finishing.

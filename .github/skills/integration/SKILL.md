@@ -19,9 +19,11 @@ description: >-
 Two multi-day lines of work must become one, and one of them is the PUBLIC branch
 that GitHub Pages deploys. This is the safeguarded, non-destructive playbook that
 took a real 38-commit + 72-commit merge from "refused push" to a green deploy with
-no `git push -f`. The one-line gotchas live in
-`.github/instructions/learnings.instructions.md` (sections "Git & GitHub identity"
-and "Landing a large divergent branch"); this skill is the end-to-end method.
+no `git push -f`. The compressed one-line scars for this playbook live under
+"Landing a large divergent branch (integration)" in
+`.github/instructions/learnings.instructions.md` (which points back here);
+related identity scars are under its "Git & GitHub identity" section. This skill
+is the end-to-end method.
 
 ## The mental model (read this first)
 

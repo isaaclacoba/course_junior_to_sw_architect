@@ -27,8 +27,9 @@ runner, editor, or page controller. If you think you need one, re-read
 3. `AGENTS.md` (root) - the prose voice rules. Non-negotiable, and iterated: when
    your prose misses the author's voice, expect the author to sharpen `AGENTS.md`
    and ask you to regenerate.
-4. `.github/copilot-instructions.md` - architecture and the concrete
-   "How to add a lesson" mechanics and load orders.
+4. `.github/copilot-instructions.md` - architecture and the generated
+   "How to add a lesson" flow. (The legacy flat-flow config shapes and load
+   orders live in this skill's "Legacy flow" section below, not there.)
 5. `.github/instructions/code-editor.instructions.md` - Monaco-only, reuse-first.
 6. `docs/audit/README.md` - what already exists, so you slot in without
    duplicating or contradicting a neighbour, and so you avoid the known traps.
@@ -64,11 +65,13 @@ lesson.
    `archetype`, and the `concepts` graph
    `{ introduces:[{id,term,def}], revisits:[{id}], uses:[{id}] }`. A concept's
    `def` lives ONLY in the one lesson that introduces it.
-   - `--new` does NOT seed `concepts` (only `--from` does) - fill them by hand, or
-     run `node tools/seed-concepts.mjs` to push `docs/concepts/<track>.concepts.json`
-     into every migrated `meta.js`. If this lesson is the sole introducer of a
-     concept, its `introduces` entry (with the `def`) MUST stay, or `validate.mjs`
-     fails downstream where another lesson revisits/uses it.
+   - `--new` does NOT seed `concepts` (only `--from` does) - fill them by hand: the
+     `introduces`/`revisits`/`uses` ids + edges go in this `meta.js`, and each
+     introduced concept's `term`/`def` go in this lesson's
+     `res/strings/default/en.json` as `concept.<id>.term` / `concept.<id>.def` (with
+     the `es.json` translation beside it). If this lesson is the sole introducer of a
+     concept, its `introduces` entry MUST stay, or `validate.mjs` fails downstream
+     where another lesson revisits/uses it.
 6. **Fill `data.js`** with the lesson content (`window.BUILD_CONFIG` /
    `DRILL_CONFIG`, plus `viz.js` `window.LESSON_VIZ` for a viz lesson) to the
    config shape in SPECS. Honour the principles and cadence invariants (below).
@@ -117,19 +120,64 @@ lesson.
 ### Legacy flow (flat files) — only for not-yet-migrated lessons
 
 The cadence invariants are the same; only the file split and the hand-written
-page differ.
+page differ. Do NOT author a new flat lesson - this is only for editing one that
+has not migrated yet.
 
-- **Write the data file** `<name>.js` to the config shape in SPECS. Honour the
-  principles: teach the portable concept in plain surface, one idea per card, a
-  recap to close, nothing used before taught, grade the concept (set
-  `requireSource` + a hidden `verify` probe for builds), make it runnable if it
-  executes cleanly, state the SOLID letter if relevant.
-- **Write the HTML page** `<name>.html` with the exact load order for the
-  archetype (SPECS / copilot-instructions). Set `window.PAGE` with a unique
-  `prefix`.
-- **Wire the card** into the right Part stage in `index.html`. Ensure
-  `awardedKey == data-key`, and `data-total` = XP-awarding cards excluding the
-  recap.
+**Quiz + fill-in-the-blank (theory or runnable drills) - `drill-engine`:**
+
+1. `<name>.js` sets `window.DRILL_CONFIG`:
+   - `prefix`, `metaLabel`, `progressNoun`, `awardedKey`, `awardAmount`,
+     `drills: [...]`.
+   - Each drill: `{ title, concept, context, snippet (with {{1}} blanks), points[],
+     blanks[{ id, label, answer, accept?[], hints[], explain[{ text, highlight }] }] }`.
+   - Optional per-card `quiz: { question, options[{ text, correct }], answerWhy }`
+     (the right option is also required to award XP).
+   - Optional final `{ summary: true, summaryIntro, summaryItems[{title,text}],
+     summaryClose, blanks: [] }` recap card (excluded from the progress count).
+   - For runnable drills, add `runnablePrograms` (index-aligned, complete programs)
+     plus `runnerUrl`, `xpKey`. Pure-theory lessons omit these (no Run button).
+2. `<name>.html` (copy `control-flow.html` for theory, `collections.html` for
+   runnable) sets `window.PAGE` (`archetype: "drill"`, matching `prefix`). Load
+   order: Prism (3 tags) -> `vendor/code-lab/code-lab.global.js` -> `page-shell.js`
+   -> `<name>.js` -> `drill-engine.js`.
+
+**Write-from-scratch - `build-engine`:**
+
+1. `<name>.js` sets `window.BUILD_CONFIG` (`prefix`, `tasks[]`, `runnerUrl`,
+   `xpKey`, `awardedKey`, `awardAmount`).
+   - Each task: `{ title, concept, context, example?, goal[], expected,
+     requireSource?[{ pattern, message }], verify?{ main, expected, message },
+     starter, solution }`.
+   - `expected`: a string (any output line equals it) or an array (the non-empty
+     lines must equal that exact sequence).
+   - `verify.main` MUST start with `class Program` - the engine replaces the
+     learner's source from `class Program` onward with it to re-run hidden inputs.
+2. `<name>.html` (copy `first-builds.html`) `archetype: "build"`. Load order:
+   `vendor/code-lab/code-lab.global.js` -> `page-shell.js` -> `<name>.js` ->
+   `build-engine.js`. No Prism, no separate Monaco loader - `code-lab` ships Monaco
+   via `CodeLab.loadMonaco()`.
+
+**Wire the card** into the right Part stage in `index.html`:
+
+```html
+<li class="c-step">
+  <a class="c-card" href="<name>.html" data-key="<name>_awarded" data-total="<N>">
+    <span class="c-node" aria-hidden="true"></span>
+    <div class="c-card-top">
+      <h3 class="c-card-title">Title</h3>
+      <span class="c-status">Not started</span>
+    </div>
+    <p class="c-card-blurb">One or two plain sentences.</p>
+    <div class="c-card-meta">
+      <span class="c-pill c-pill--gentle">Gentle</span>
+      <span class="c-meta-time">20 min</span>
+    </div>
+  </a>
+</li>
+```
+
+`data-total` = XP-awarding cards (exclude the recap summary card). `data-key`
+must match the lesson's `awardedKey`. Pills: `gentle` / `steady` / `challenging`.
 
 ## Preflight checklist (run before calling it done)
 
@@ -151,7 +199,8 @@ Beside `drill` and `build` there is a narrated, stepped **visual** with no code
 editor. It powers the Theory "AI track" (`ai-N.*`) and the `theory-N.viz.js`
 visuals. It is data fed to the shared **MemoryViz** engine in `code-lab`; you do
 not write rendering code. (Building a *new* scene is engine work - see
-`.github/copilot-instructions.md`, "Adding a MemoryViz scene".)
+`.github/copilot-instructions.md` "Engine work", which points to
+`/memories/repo/memory-viz-component.md`, "Adding a MemoryViz scene".)
 
 Under the generated flow a viz lesson is `archetype: viz`; its scene data lives
 in the lesson dir's `viz.js` (`window.LESSON_VIZ`) and its `index.html` is

@@ -17,13 +17,12 @@ authoring + workflow guide.
 2. **One editor: `CodeLab.MonacoEditor`** via `await CodeLab.loadMonaco()`.
    One runner: `CodeLab.RoslynIframeRunner({ url: "level3-app/index.html?runner=1" })`.
 3. **Log work** in `docs/work-log.md`: a start line and an end line, each with a
-   real timestamp from the `date` command (the repo's instruction files require this).
-4. **No emojis, no marketing language, minimal docs.** Do not create new
-   markdown files unless asked. Code/content should be self-explanatory.
-5. **Verify before claiming done** (see "Verifying your work"), then **clean up**
+   real timestamp from the `date` command.
+4. **Verify before claiming done** (see "Verifying your work"), then **clean up**
    any temp harness files (`_*.html`, `/tmp/...`).
-6. **Voice consistency.** Lessons use plain, warm, direct prose, programming
-   terms in `backticks`, and a spaced hyphen ` - ` (not em-dashes). Keep it.
+5. **Minimal docs** - no new markdown files unless asked; code/content is
+   self-explanatory. Prose voice (plain/warm, `backticks`, spaced hyphen ` - `,
+   no emojis, no marketing) is canonical in `AGENTS.md` - follow it.
 
 ## Architecture map
 
@@ -105,130 +104,34 @@ Notes:
 
 ### Legacy flow (flat files) — only for not-yet-migrated lessons
 
-Pick the archetype that matches the pedagogy:
+Do NOT author a new flat lesson. The flat `<name>.js` + `<name>.html` archetype
+config shapes (drill/build), their exact script load orders, and the copy-paste
+`index.html` card block now live in `.github/skills/lesson-authoring/SKILL.md`
+("Legacy flow"). Read that when editing a not-yet-migrated lesson.
 
-### Quiz + fill-in-the-blank (theory or runnable drills) — `drill-engine`
+## Verifying your work
 
-1. Create `<name>.js` setting `window.DRILL_CONFIG`:
-   - `prefix`, `metaLabel`, `progressNoun`, `awardedKey`, `awardAmount`,
-     `drills: [...]`.
-   - Each drill: `{ title, concept, context, snippet (with {{1}} blanks), points[],
-     blanks[{ id, label, answer, accept?[], hints[], explain[{ text, highlight }] }] }`.
-   - Optional per-card `quiz: { question, options[{ text, correct }], answerWhy }`
-     (the right option is also required to award XP).
-   - Optional final `{ summary: true, summaryIntro, summaryItems[{title,text}], summaryClose, blanks: [] }` recap card (excluded from the progress count).
-   - For runnable drills, add `runnablePrograms` (index-aligned, complete programs)
-     plus `runnerUrl`, `xpKey`. Pure-theory lessons omit these (no Run button).
-2. Create `<name>.html` (copy `control-flow.html` for theory, `collections.html`
-   for runnable). Set `window.PAGE` (`archetype: "drill"`, matching `prefix`).
-   Load order: Prism (3 tags) → `vendor/code-lab/code-lab.global.js` →
-   `page-shell.js` → `<name>.js` → `drill-engine.js`.
+**Run `node tools/verify-lesson.mjs <lesson-dir>` first - it does everything in
+one command**: `node --check`, real-dotnet compile+grade of every build task
+(output match + `requireSource` + the hidden `verify` probe), viz scene-resolver
+checks on every step, and a headless EN+ES render asserting no `undefined`. It
+exits non-zero (so it doubles as a CI gate) and cleans up after itself. Flags:
+`--no-dotnet` `--no-render` `--no-viz` `--en-only` `--quiet` `--all`. Only reach
+for the underlying manual steps (per-file `node --check`, temp `dotnet new
+console` compile, `google-chrome --headless --dump-dom`) to isolate one check.
 
-### Write-from-scratch — `build-engine`
+Git hooks (tracked) - enable once per clone: `git config core.hooksPath
+.githooks`. `pre-commit` runs `node tools/audit-gate.mjs --staged` (diff-aware
+mechanical gate); `pre-push` runs `--push` (browser i18n round-trip). Full
+EN<->ES round-trip on demand: `node tools/i18n-roundtrip.mjs` (see the
+`i18n-roundtrip` skill).
 
-1. Create `<name>.js` setting `window.BUILD_CONFIG` (`prefix`, `tasks[]`,
-   `runnerUrl`, `xpKey`, `awardedKey`, `awardAmount`).
-   - Each task: `{ title, concept, context, example?, goal[], expected,
-     requireSource?[{ pattern, message }], verify?{ main, expected, message },
-     starter, solution }`.
-   - `expected`: a string (any output line equals it) or an array (the non-empty
-     lines must equal that exact sequence).
-   - `verify.main` MUST start with `class Program` — the engine replaces the
-     learner's source from `class Program` onward with it to re-run hidden inputs.
-2. Create `<name>.html` (copy `first-builds.html`). `archetype: "build"`.
-   Load order: `vendor/code-lab/code-lab.global.js` → `page-shell.js` →
-   `<name>.js` → `build-engine.js`. (No Prism, no separate Monaco loader —
-   `code-lab` ships Monaco via `CodeLab.loadMonaco()`.)
+## Engine work (code-lab + MemoryViz scenes)
 
-### Wire it into the path
-
-Add a card to `index.html` inside the right `Part` stage:
-
-```html
-<li class="c-step">
-  <a class="c-card" href="<name>.html" data-key="<name>_awarded" data-total="<N>">
-    <span class="c-node" aria-hidden="true"></span>
-    <div class="c-card-top">
-      <h3 class="c-card-title">Title</h3>
-      <span class="c-status">Not started</span>
-    </div>
-    <p class="c-card-blurb">One or two plain sentences.</p>
-    <div class="c-card-meta">
-      <span class="c-pill c-pill--gentle">Gentle</span>
-      <span class="c-meta-time">20 min</span>
-    </div>
-  </a>
-</li>
-```
-
-`data-total` = number of XP-awarding cards (exclude the recap summary card).
-`data-key` must match the lesson's `awardedKey`. Pills: `gentle` / `steady` / `challenging`.
-
-## Verifying your work (the recipe that catches real bugs)
-
-**Run `node tools/verify-lesson.mjs <lesson-dir>` first - it does all of the
-below in one command**: `node --check`, real-dotnet compile+grade of every
-build task (output match + `requireSource` + the hidden `verify` probe), viz
-scene-resolver checks on every step, and a headless EN+ES render asserting no
-`undefined`. It exits non-zero on failure, so it doubles as a CI gate and
-cleans up after itself. Flags: `--no-dotnet` `--no-render` `--no-viz`
-`--en-only` `--quiet` `--all`. The manual recipe below is what it automates -
-reach for a single step only when you need to check it in isolation.
-
-1. `node --check <name>.js` for every JS file you touch.
-2. For runnable content, extract the programs and compile them with real dotnet:
-   load the data file in a Node `vm` with `{ window: {}, console }`, read
-   `window.DRILL_CONFIG.runnablePrograms` / `window.BUILD_CONFIG.tasks`, write each
-   to a temp `dotnet new console` project's `Program.cs`, run, and compare output
-   to `expected`. For build tasks also rebuild the hidden `verify` probe exactly
-   as the engine does (base source up to `class Program` + `verify.main`) and run
-   the `requireSource` regexes against the solution.
-3. Headless render: `python3 -m http.server <port>` then
-   `google-chrome --headless --dump-dom http://localhost:<port>/<name>.html`.
-   Confirm the first card, the inputs/quiz, progress label, and NO `undefined`.
-   Real C# in WASM needs real wall-clock time; a virtual-time budget can fail it.
-4. Remove every temp artifact before finishing.
-
-## code-lab module (only when changing the engine itself)
-
-Inside `code-lab/` (run there): `npm run typecheck`, `npm test`
-(`node --import tsx --test test/*.test.ts`), `npm run build` (tsup → `dist/`:
-ESM/CJS/IIFE/.d.ts/css). After changing the component, rebuild and **re-vendor**
-the IIFE bundle + css into the course `vendor/code-lab/`. Keep the DOM-free logic
-in `src/core/` covered by unit tests. The 72MB WASM `_framework` output is never
-committed (git-ignored); binaries are compiled, not tracked.
-
-## Adding a MemoryViz scene (engine work)
-
-This is ONE kind of code-lab extension - adding a scene to the `MemoryViz`
-widget. Adding a whole NEW widget (a sibling of `Quiz`/`MemoryViz`/`Tour`) is a
-broader task: a new `CodeLab.*` export, its own `.cl-*` root, and its own mount
-path from `page-shell.js`; the steps below are the scene-specific subset.
-
-A "scene" is one visual panel (`transcript`, `agentloop`, `memoryshelf`,
-`toolrack`, `retrieval`, `planboard`, ...). Adding one is a fixed checklist
-across `code-lab/src`, then a re-vendor:
-
-1. `src/core/<name>-model.ts` - the pure, DOM-free model: a `<Name>Scene`
-   interface plus a `resolve<Name>()` that clamps/normalises the raw scene into a
-   `Resolved...` shape. Unit-test it in `test/<name>-model.test.ts`; the model is
-   the only part with tests.
-2. `src/dom/<name>-view.ts` - a thin `<Name>View` with `el` + `sync(ctx)` that
-   reads `ctx.model.<field>` and renders. Use `escapeHtml` from
-   `../core/narration.js`. Give it a unique root class (`cl-rg`, `cl-pb`, ...).
-3. `src/core/memory-model.ts` - add the scene field to `Step`, add its literal to
-   the `PanelType` union, and re-export the scene type.
-4. `src/dom/memory-viz.ts` - import the view and add a factory entry
-   (`<name>: () => new <Name>View()`).
-5. `src/index.ts` - export the model's types and its `resolve...` functions.
-6. `src/code-lab.css` - add a `.cl-xx` style block and its caption to the shared
-   caption group.
-7. `cd code-lab && npm run typecheck && npm test && npm run build`, then re-vendor:
-   `cp dist/code-lab.global.js dist/code-lab.css ../vendor/code-lab/`. Confirm the
-   new class/symbols are in the vendored bundle before authoring against it.
-
-Commit the submodule FIRST, then bump the pointer + re-vendored bundle in the
-course commit.
+Changing the engine itself - the `code-lab` module build/test/re-vendor loop, and
+the fixed 7-step checklist for adding a `MemoryViz` scene - is documented in
+`/memories/repo/memory-viz-component.md` ("code-lab module" + "Adding a MemoryViz
+scene"). Do not reinvent it; read that first.
 
 ## Build & deploy
 
