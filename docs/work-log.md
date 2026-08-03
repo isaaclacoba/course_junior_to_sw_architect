@@ -940,3 +940,9 @@ mirrored into the session todo list.
 - 2026-08-03 12:12:34 +0200  Guidance-surface sweep after the hook removal. Added a 'Gates & pushing' section to learnings.instructions.md (no pre-push hook by design; run `npm run gate`; pre-push fires on `git push --dry-run` too, which is why a dry run looked like a hang; fan-out only on page-shell/binder, else ~30s). Inlined the SSH-vs-HTTPS push-identity rule that pointed at the non-existent `/memories/repo/course-git.md`. Remaining dangling pointer: `/memories/repo/memory-viz-component.md`, referenced by copilot-instructions.md:149 and lesson-authoring/SKILL.md:203 - that memory store does not exist in this environment; flagged for the author, not rewritten.
 - 2026-08-03 12:20:23 +0200  Closed the last dangling guidance pointer. `/memories/repo/memory-viz-component.md` did not exist, so copilot-instructions.md and lesson-authoring/SKILL.md both told agents to read a missing file. Inlined the verified content into copilot-instructions.md 'Engine work': the code-lab submodule loop (typecheck/test/build + re-vendor to vendor/code-lab, submodule commit first) and the 7-step MemoryViz scene checklist. Verified against real source, correcting drift: planboard uses PlanScene/resolvePlan (not PlanboardScene), the factory map is `panelFactories`, code-lab also exports VizLab, and `_framework` is ignored via level3-app//code-lab/dist/ rather than a direct pattern. 0 /memories/ references left in .github/.
 
+
+- 2026-08-03 13:04  design round for the page-shell split (item 2). Load contract decided:
+  page-shell.js becomes a generated artifact concatenated from kernel/page-shell/*.
+  Corrected the architect review during grounding - a uniform 7x UMD split is not
+  behaviour-preserving, so the design uses a hybrid shape plus a guard module.
+  Brief + design of record written; no code yet.
