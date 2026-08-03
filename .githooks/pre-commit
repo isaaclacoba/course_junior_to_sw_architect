@@ -1,5 +1,0 @@
-#!/bin/sh
-# Tracked pre-commit hook. Enable in a fresh clone with:
-#   git config core.hooksPath .githooks
-# Runs the diff-aware mechanical gate; a non-zero exit blocks the commit.
-exec node tools/audit-gate.mjs --staged

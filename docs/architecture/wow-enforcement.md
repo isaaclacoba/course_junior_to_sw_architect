@@ -12,7 +12,9 @@ D-5/6/7 supersede D-1/3) showed that is mostly ceremony:
 - Custom-agent AUTO-routing does not exist on this platform - agents are manually
   selected; nothing auto-hands "new work" to an `architect`.
 - The pre-commit hook is opt-in (`core.hooksPath`), `--no-verify`-able, and not in CI,
-  so it constrains only already-cooperating agents.
+  so it constrains only already-cooperating agents. (Since 2026-08-03 it does not
+  exist at all - the owner removed every hook so commits and pushes never block;
+  QA rounds run between development. That only strengthens this point.)
 - Its "proof" (a journal `decision` row) is one forgeable CLI call.
 - A hard block repeats the friction the repo just removed with the pre-push gate (`42577c1`).
 - 5 of the 6 layers only fire AFTER the agent already decided the work is "new" - the

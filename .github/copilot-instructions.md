@@ -130,24 +130,23 @@ exits non-zero (so it doubles as a CI gate) and cleans up after itself. Flags:
 for the underlying manual steps (per-file `node --check`, temp `dotnet new
 console` compile, `google-chrome --headless --dump-dom`) to isolate one check.
 
-Git hooks (tracked) - enable once per clone: `git config core.hooksPath
-.githooks`. Only `pre-commit` exists; it runs `node tools/audit-gate.mjs
---staged` (the fast, diff-aware mechanical gate).
+**There are deliberately NO git hooks - no pre-commit, no pre-push.** Committing
+and pushing are always instant. QA is a thing you RUN, not a thing that runs you:
+the owner's rule is that health rounds happen between development, never in the
+way of a commit or a push. Do not add a hook back, and do not add a CI gate,
+without being asked.
 
-There is deliberately **no pre-push hook**. The browser round-trip takes ~11
-minutes and ran on every push, re-validating a tree it had already passed - and
-it ran even on `git push --dry-run`, which looked like a hang. Run the health
-gate yourself, before you push:
+Run the gate yourself, in between pieces of work:
 
 ```bash
-npm run gate          # browser i18n round-trip on what origin/master..HEAD changes
+npm run gate          # what origin/master..HEAD changed
 npm run gate:all      # every check, whole repo
-npm run gate:staged   # what the pre-commit hook runs
+npm run gate:staged   # just what is staged
 ```
 
-`npm run gate` skips instantly when nothing i18n-relevant changed, so it is
-cheap to run often. Full EN<->ES round-trip on demand: `node
-tools/i18n-roundtrip.mjs` (see the `i18n-roundtrip` skill).
+`npm run gate` skips instantly when nothing i18n-relevant changed, so it is cheap
+to run often. Full EN<->ES round-trip on demand: `node tools/i18n-roundtrip.mjs`
+(see the `i18n-roundtrip` skill); it runs lessons in parallel, ~5 min for all 83.
 
 ## Engine work (code-lab + MemoryViz scenes)
 

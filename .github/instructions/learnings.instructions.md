@@ -58,19 +58,27 @@ grows into a procedure, promote it to a skill and leave a pointer here.
 
 ## Gates & pushing
 
-- **Run the health gate yourself: `npm run gate`. There is deliberately no
-  pre-push hook.** The old `.githooks/pre-push` ran the ~11-minute browser
-  round-trip on every push, re-validating a tree the same gate had already
-  passed - and git runs `pre-push` even for `git push --dry-run`, so a no-op dry
-  run looked like a dead hang (the hook only writes its log at the end). If a
-  push or a `--dry-run` ever seems to hang for minutes with no output, suspect a
-  hook, not the network. `npm run gate` (also `gate:all`, `gate:staged`) skips
-  instantly when nothing i18n-relevant changed, so it is cheap to run often.
+- **There are NO git hooks, by owner's decision. Never add one back.** Both the
+  `pre-push` and the `pre-commit` hook were removed: QA rounds happen BETWEEN
+  development, and a commit or a push must never block on them. The owner
+  accepts that a regression can slip in between rounds - that is the price he
+  has chosen for fast pushes. Do not add a hook or a CI gate without being asked.
+- **Run the health gate yourself: `npm run gate`** (also `gate:all`,
+  `gate:staged`). It skips instantly when nothing i18n-relevant changed, so it is
+  cheap to run often. If a push ever seems to hang for minutes with no output,
+  suspect a hook someone re-added, not the network.
 - **Scope decides the gate's cost, so check what you touched.** `audit-gate
   --push` fans out to all ~83 voiced lessons only when the diff includes
   `page-shell.js` or a `resource/bind-*.js` binder; otherwise it checks just the
-  changed lesson dirs (4 lessons = ~30s vs ~11min). The fast `pre-commit` hook is
-  still enabled and still the thing that catches mechanical breakage.
+  changed lesson dirs (4 lessons = ~30s, all 83 = ~5min).
+- **Size a browser worker pool by MEMORY, not cores.** A headless lesson tab is a
+  real renderer holding Monaco plus the page and measures ~1.7GB, so "one per two
+  cores" on a 16-core box asks for ~14GB and OOM-kills the machine. Budget from
+  `MemAvailable`, and never scale a concurrency knob from 3 items straight to 83.
+- **Kill Chrome's process GROUP, not its parent.** Signalling only the parent
+  leaves renderer/zygote children writing into the temp profile, so `rmSync`
+  loses the race with `ENOTEMPTY` and abandons ~50MB per run. `spawn` it
+  `detached: true` and `process.kill(-pid)`.
 
 ## Git & GitHub identity
 
