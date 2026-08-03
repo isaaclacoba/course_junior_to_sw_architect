@@ -1,47 +1,66 @@
-// Visual for "Write for the reader" - data-only. Board + Code panel (theory-17
-// style): a dense, clever line versus a plain multi-line version that any reader
-// can follow. Same result, less decoding. codeMark points at the hard-to-read
-// spot; the clear version needs no mark.
+// Visual for "Write for the reader" - data-only. LEVEL-0 execution scene (theory-9
+// style): the code with a moving current line plus a flat Name | Value table. We
+// first run a clever one-liner - the answer just appears, with no way to watch the
+// branch fire - then run the same logic written plainly and step through it one
+// branch at a time, so the reader can follow exactly what happens.
 (function () {
   "use strict";
 
   const CLEVER = [
-    "d = (h > 100) ? \"big\" : (h > 10 ? \"mid\" : \"small\");",
+    "size = herd > 100 ? \"big\" : herd > 10 ? \"mid\" : \"small\";",
   ];
   const CLEAR = [
     "string size;",
-    "if (herd > 100) size = \"big\";",
-    "else if (herd > 10) size = \"mid\";",
-    "else size = \"small\";",
+    "if (herd > 100)  size = \"big\";",
+    "else if (herd > 10)  size = \"mid\";",
+    "else  size = \"small\";",
   ];
 
+  // One box in the variable table. `hot` marks the box that changed THIS step;
+  // omit a value to show it as "unassigned".
+  const box = (k, v, hot) => (v == null ? { id: k, k, empty: true } : { id: k, k, v: String(v), hot });
+  const frame = (vars) => ({ id: "prog", name: "your program", vars });
+
   window.LESSON_VIZ = {
-    scene: { board: true, regions: ["code"], zoomTab: false },
-    chipName: "source",
-    chipAddr: "read more than written",
     code: CLEAR,
+    layout: {
+      visual: [{ type: "code" }, { type: "vartable" }],
+      aside: [{ type: "narration" }, { type: "controls" }],
+    },
+    legend: [{ sw: "#f59e0b", label: "changed this step" }],
     steps: [
       {
         narr: "Code is read far more often than it is written - by teammates, and by you months from now.\nSo the person you are really writing for is the **reader**, not the compiler. The compiler is happy either way.",
-        code: CLEVER, pc: -1, instr: "clever", highlight: "soc", codeLive: true,
-        codeMark: { line: 0, text: "(h > 100) ? \"big\" : (h > 10 ? \"mid\"", kind: "op" },
+        code: CLEVER, pc: -1, codeLive: true,
+        stack: [frame([box("herd", 40), box("size", null)])],
       },
       {
-        narr: "Here is a clever one-liner. It works, and it is fewer characters.\nBut to know what it does you have to untangle the nested `?:` and decode what `d` and `h` mean. That decoding is a tax the reader pays every single time.",
-        code: CLEVER, pc: 0, instr: "decode it...", highlight: "soc", codeLive: true,
-        codeMark: { line: 0, text: "d = (h > 100)", kind: "op" },
+        narr: "Here is a clever one-liner. It works, and it is fewer characters.\nBut to follow it you have to untangle the nested `?:` in your head. The machine jumps straight to the answer - the reader cannot, and pays that tax every time.",
+        code: CLEVER, pc: 0, codeLive: true,
+        codeMark: { text: "herd > 100 ? \"big\" : herd > 10 ? \"mid\" : \"small\"", kind: "op" },
+        stack: [frame([box("herd", 40), box("size", "\"mid\"", true)])],
       },
       {
-        narr: "Now the same logic written plainly: real names, one branch per line.\nIt is a few lines longer - and it reads top to bottom like a sentence, with nothing to untangle.",
-        code: CLEAR, pc: -1, instr: "clear", highlight: "soc", codeLive: true,
+        narr: "Now the same logic, written plainly: one branch per line, in the order they are checked.\nIt is a few lines longer - and it reads top to bottom like a sentence, with nothing to untangle.",
+        code: CLEAR, pc: 0, codeLive: true,
+        stack: [frame([box("herd", 40), box("size", null)])],
       },
       {
-        narr: "Both versions give the exact same answer. The difference is not the result - it is how long the next person stares before they understand.\nClever saved you a few seconds once; clear saves every reader minutes, every time.",
-        code: CLEAR, pc: 1, instr: "same result", highlight: "soc", codeLive: true,
+        narr: "Walk it as the reader would. `herd` is `40`, so the first branch - `herd > 100` - is false and gets skipped.\nThe check and its answer sit together on one line, in plain sight.",
+        code: CLEAR, pc: 1, codeLive: true,
+        codeMark: { text: "herd > 100", kind: "op" },
+        stack: [frame([box("herd", 40), box("size", null)])],
       },
       {
-        narr: "So write for the reader: prize **readability** over cleverness.\nWhen two versions do the same thing, pick the one a tired teammate understands fastest - that is almost always the plainer one.",
-        code: CLEAR, pc: -1, instr: "done", highlight: "soc", codeLive: true,
+        narr: "The next branch asks `herd > 10`. `40` clears it, so `size` becomes `\"mid\"`.\nYou can see exactly which branch fired, because each one has its own line.",
+        code: CLEAR, pc: 2, codeLive: true,
+        codeMark: { text: "herd > 10", kind: "op" },
+        stack: [frame([box("herd", 40), box("size", "\"mid\"", true)])],
+      },
+      {
+        narr: "Both versions land on the same answer - `\"mid\"`. The difference is not the result; it is how long the next person stares before they trust it.\nSo write for the reader: prize **readability** over cleverness. When two versions do the same thing, pick the one a tired teammate follows fastest - almost always the plainer one.",
+        code: CLEAR, pc: -1, codeLive: true,
+        stack: [frame([box("herd", 40), box("size", "\"mid\"")])],
       },
     ],
   };

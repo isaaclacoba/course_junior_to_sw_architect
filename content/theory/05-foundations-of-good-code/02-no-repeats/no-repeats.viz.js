@@ -17,14 +17,14 @@
   const drifted = () => ({
     id: "drift", name: "one copy fixed, one missed",
     vars: [
-      slot("a", "signup form", "price = base * 1.21"),
-      slot("b", "checkout page", "price = base * 1.10  \u2717 stale"),
+      slot("a", "signup form", "price = base * 1.21  \u2717 stale"),
+      slot("b", "checkout page", "price = base * 1.10"),
     ],
   });
   const oneHome = () => ({
     id: "one", name: "one named home",
     vars: [
-      slot("f", "priceWithTax()", "base * 1.21"),
+      slot("f", "priceWithTax()", "base * 1.10"),
     ],
   });
   const shared = () => ({

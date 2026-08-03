@@ -5,10 +5,12 @@
   "hero.title": "Escribe para quien lee",
   "intro.0": "Una línea ingeniosa puede sentar de maravilla al escribirla y costarle minutos a cada lector después. Como el código se lee mucho más de lo que se escribe, quien lee es para quien realmente escribes. Recorre una línea densa y observa cómo se abre en algo que cualquiera puede seguir.",
   "step.0.narr": "El código se lee mucho más a menudo de lo que se escribe - por compañeros, y por ti dentro de unos meses.\nAsí que la persona para la que realmente escribes es quien **lee**, no el compilador. Al compilador le da igual.",
-  "step.1.narr": "Aquí hay una línea ingeniosa. Funciona, y tiene menos caracteres.\nPero para saber qué hace tienes que desenredar el `?:` anidado y descifrar qué significan `d` y `h`. Ese descifrado es un impuesto que quien lee paga cada vez.",
-  "step.2.narr": "Ahora la misma lógica escrita de forma sencilla: nombres reales, una rama por línea.\nOcupa unas pocas líneas más - y se lee de arriba abajo como una frase, sin nada que desenredar.",
-  "step.3.narr": "Las dos versiones dan exactamente la misma respuesta. La diferencia no es el resultado - es cuánto tarda la siguiente persona en entenderlo.\nLo ingenioso te ahorró unos segundos una vez; lo claro le ahorra minutos a cada lector, cada vez.",
-  "step.4.narr": "Así que escribe para quien lee: valora la **legibilidad** por encima del ingenio.\nCuando dos versiones hacen lo mismo, elige la que un compañero cansado entiende más rápido - casi siempre es la más sencilla.",
+  "step.1.narr": "Aquí hay una línea ingeniosa. Funciona, y tiene menos caracteres.\nPero para seguirla tienes que desenredar el `?:` anidado en tu cabeza. La máquina salta directa a la respuesta - quien lee no puede, y paga ese impuesto cada vez.",
+  "step.2.narr": "Ahora la misma lógica, escrita de forma sencilla: una rama por línea, en el orden en que se comprueban.\nOcupa unas pocas líneas más - y se lee de arriba abajo como una frase, sin nada que desenredar.",
+  "step.3.narr": "Recórrela como lo haría quien lee. `herd` es `40`, así que la primera rama - `herd > 100` - es falsa y se salta.\nLa comprobación y su respuesta están juntas en una línea, a la vista.",
+  "step.4.narr": "La siguiente rama pregunta `herd > 10`. `40` la supera, así que `size` pasa a ser `\"mid\"`.\nSe ve exactamente qué rama se activó, porque cada una tiene su propia línea.",
+  "step.5.narr": "Las dos versiones llegan a la misma respuesta - `\"mid\"`. La diferencia no es el resultado; es cuánto tarda la siguiente persona en fiarse de él.\nAsí que escribe para quien lee: valora la **legibilidad** por encima del ingenio. Cuando dos versiones hacen lo mismo, elige la que un compañero cansado sigue más rápido - casi siempre la más sencilla.",
+  "legend.0": "cambió en este paso",
   "concept.th-readability.term": "Legibilidad",
-  "concept.th-readability.def": "Lo rápido que quien lee puede entender el código. Como el código se lee mucho más de lo que se escribe, la versión más clara suele ganar a la más ingeniosa."
+  "concept.th-readability.def": "Lo rápido que quien lee puede entender el código - y como el código se lee mucho más de lo que se escribe, la versión más clara suele ganar a la más ingeniosa."
 }

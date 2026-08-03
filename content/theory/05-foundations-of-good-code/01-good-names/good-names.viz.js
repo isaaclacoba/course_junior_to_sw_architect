@@ -49,7 +49,7 @@
         stack: [clearFrame()],
       },
       {
-        narr: "The same rule fits functions. `check()` could check anything - a name that vague makes you open the function just to find out.\n`checkLogin()` says what it does, so you can read the line that calls it and move on.",
+        narr: "The same rule has a shape worth naming. A variable holds a thing, so name it with a **noun** - `timeoutSeconds`, `loginWorks`. A function does a thing, so name it with a **verb**.\n`check()` could check anything - a name that vague makes you open the function to find out. `checkLogin()` leads with a verb and says which action it runs, so you read the calling line and move on.",
         stack: [funcFrame()],
       },
       {

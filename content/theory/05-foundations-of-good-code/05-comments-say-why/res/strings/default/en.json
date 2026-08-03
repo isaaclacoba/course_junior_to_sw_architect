@@ -1,4 +1,4 @@
 {
   "concept.th-comment.term": "Comment",
-  "concept.th-comment.def": "A note for humans written in the code that the computer ignores. A good comment explains why something is done, not what the code already shows."
+  "concept.th-comment.def": "A note for humans that the computer ignores, best used to explain why something is done rather than what the code already shows."
 }
