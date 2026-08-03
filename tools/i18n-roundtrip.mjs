@@ -40,6 +40,10 @@
  *     --report <file>  write a persistent JSON results file (pass OR fail) so a
  *                      blocked push is postmortem-able without a blind re-run
  *     --port <n>       fixed server port (default: ephemeral). Never reuses 8091.
+ *     --jobs <n>       lessons round-tripped at once, each in its own tab.
+ *                      Default is sized from FREE MEMORY, not cores: a tab is a
+ *                      real renderer and measures ~1.7GB. Also capped at half
+ *                      the cores and at 6. Raise it only on an idle machine.
  *     --settle <ms>    per-switch settle after the radio flips (default 700)
  *     --keep-open      do not kill Chrome on exit (debugging)
  *     --verbose        print each snapshot/switch step
@@ -55,6 +59,7 @@ import http from "node:http";
 import vm from "node:vm";
 import crypto from "node:crypto";
 import { spawn } from "node:child_process";
+import { once } from "node:events";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -72,11 +77,31 @@ const ok = (m) => say(`  ${C.green}PASS${C.reset} ${m}`);
 const bad = (m) => say(`  ${C.red}FAIL${C.reset} ${m}`);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// A lesson tab is a real Chrome renderer holding Monaco plus the whole page, and
+// it measures at roughly a gigabyte. The limit here is therefore memory, not
+// cores: a 16-core box still only fits a handful of tabs, and sizing by core
+// count is how you exhaust a developer machine that is already running a
+// desktop. Budget from what is actually free, leave most of it alone, and still
+// stay under half the cores.
+const TAB_MB = 1700;
+function availableMb() {
+  try {
+    const m = fs.readFileSync("/proc/meminfo", "utf8").match(/MemAvailable:\s+(\d+) kB/);
+    if (m) return Math.floor(Number(m[1]) / 1024);
+  } catch {}
+  return Math.floor(os.freemem() / 1024 / 1024);
+}
+function defaultJobs() {
+  const cores = (os.cpus() || []).length || 4;
+  const byMemory = Math.floor((availableMb() * 0.7) / TAB_MB);
+  return Math.max(1, Math.min(6, Math.floor(cores / 2), byMemory));
+}
+
 // ---------------------------------------------------------------------------
 // args
 // ---------------------------------------------------------------------------
 function parseArgs(argv) {
-  const a = { dirs: [], all: false, static: false, json: false, port: 0, settle: 700, keepOpen: false, langs: null, report: null };
+  const a = { dirs: [], all: false, static: false, json: false, port: 0, settle: 700, keepOpen: false, langs: null, report: null, jobs: 0 };
   for (let i = 0; i < argv.length; i++) {
     const t = argv[i];
     if (t === "--all") a.all = true;
@@ -86,6 +111,7 @@ function parseArgs(argv) {
     else if (t === "--verbose") { a.verbose = true; VERBOSE = true; }
     else if (t === "--port") a.port = parseInt(argv[++i], 10) || 0;
     else if (t === "--settle") a.settle = parseInt(argv[++i], 10) || 700;
+    else if (t === "--jobs") a.jobs = parseInt(argv[++i], 10) || 0;
     else if (t === "--report") a.report = argv[++i];
     else if (t === "--langs") a.langs = argv[++i].split(",").map((s) => s.trim()).filter(Boolean);
     else if (t.startsWith("--")) { say(`unknown flag ${t}`); process.exit(2); }
@@ -348,11 +374,13 @@ class Cdp {
 // ---------------------------------------------------------------------------
 // launch Chrome headless, return a page-target CDP session
 // ---------------------------------------------------------------------------
-function httpJson(port, pathname) {
+function httpJson(port, pathname, method = "GET") {
   return new Promise((resolve, reject) => {
-    http.get({ host: "127.0.0.1", port, path: pathname }, (res) => {
+    const req = http.request({ host: "127.0.0.1", port, path: pathname, method }, (res) => {
       let d = ""; res.on("data", (c) => (d += c)); res.on("end", () => { try { resolve(JSON.parse(d)); } catch (e) { reject(e); } });
-    }).on("error", reject);
+    });
+    req.on("error", reject);
+    req.end();
   });
 }
 async function launchChrome() {
@@ -361,7 +389,7 @@ async function launchChrome() {
     "--headless=new", "--disable-gpu", "--no-sandbox", "--disable-dev-shm-usage",
     "--no-first-run", "--no-default-browser-check", "--remote-debugging-port=0",
     `--user-data-dir=${profile}`, "about:blank",
-  ], { stdio: ["ignore", "ignore", "ignore"] });
+  ], { stdio: ["ignore", "ignore", "ignore"], detached: true });
 
   const portFile = path.join(profile, "DevToolsActivePort");
   let devPort = 0;
@@ -384,7 +412,20 @@ async function launchChrome() {
   await cdp.connect(target.webSocketDebuggerUrl);
   await cdp.send("Page.enable");
   await cdp.send("Runtime.enable");
-  return { proc, cdp, profile };
+  return { proc, cdp, profile, devPort };
+}
+
+// One more tab in the SAME browser, as its own CDP session. Lessons are fully
+// independent of each other, so N tabs can round-trip N lessons at once; the
+// cost that matters is per-lesson wall-clock, and it is nearly all waiting.
+async function openTab(devPort) {
+  const t = await httpJson(devPort, "/json/new?about:blank", "PUT");
+  if (!t || !t.webSocketDebuggerUrl) throw new Error("could not open a browser tab");
+  const cdp = new Cdp();
+  await cdp.connect(t.webSocketDebuggerUrl);
+  await cdp.send("Page.enable");
+  await cdp.send("Runtime.enable");
+  return { cdp, id: t.id };
 }
 
 // ---------------------------------------------------------------------------
@@ -500,7 +541,7 @@ async function browserRoundTrip(cdp, srvPort, dir, opts) {
     await waitApplied(cdp, labelsFor(dflt), opts.settle);
     // let the async prose repaint settle
     for (let i = 0; i < 40; i++) { if (await cdp.evaluate("document.querySelector('#pageHero').textContent") === heroRef) break; await sleep(100); }
-    await sleep(opts.settle);
+    await sleep(grace(opts.settle));
 
     // A leak = text that was shown IN L (foreign) and is STILL shown after
     // returning to the default, yet is NOT a default-language value. Comparing
@@ -520,9 +561,14 @@ async function browserRoundTrip(cdp, srvPort, dir, opts) {
   return { leaks, langs };
 }
 
+// Grace after a poll has already CONFIRMED the state. The poll is the real wait;
+// this only covers a repaint landing a frame later, so it does not need the full
+// settle budget - that budget exists for the UNPOLLED volatility samples.
+const grace = (settle) => Math.min(settle, 150);
+
 async function waitApplied(cdp, labels, settle) {
   for (let i = 0; i < 100; i++) { if (await cdp.evaluate(`window.__i18n.applied(${JSON.stringify(labels)})`)) break; await sleep(50); }
-  await sleep(settle);
+  await sleep(grace(settle));
 }
 
 // ---------------------------------------------------------------------------
@@ -586,11 +632,37 @@ async function main() {
     let chrome;
     try {
       chrome = await launchChrome();
-      for (const dir of dirs) {
-        const rel = path.relative(root, dir);
-        let r;
-        try { r = await browserRoundTrip(chrome.cdp, port, dir, { settle: args.settle, langs: args.langs }); }
-        catch (e) { r = { error: e.message }; }
+      // Lessons are independent, and a round-trip is nearly all waiting on a
+      // page, so run several at once in their own tabs. Results are collected by
+      // index and reported in lesson order, so output stays deterministic no
+      // matter which tab finishes first.
+      const jobs = Math.max(1, Math.min(args.jobs || defaultJobs(), dirs.length));
+      const results = new Array(dirs.length);
+      let next = 0;
+      const tabs = [{ cdp: chrome.cdp }];
+      for (let i = 1; i < jobs; i++) tabs.push(await openTab(chrome.devPort));
+      vsay(`  ${jobs} tab(s) for ${dirs.length} lesson(s)`);
+
+      // Findings are reported in lesson order further down, so nothing is printed
+      // here. But a silent minutes-long run looks hung, so tick a counter on
+      // stderr - it stays out of --json and out of a redirected report.
+      let done = 0;
+      const ticking = !args.json && process.stderr.isTTY;
+      await Promise.all(tabs.map(async (tab) => {
+        for (;;) {
+          const i = next++;
+          if (i >= dirs.length) return;
+          try { results[i] = await browserRoundTrip(tab.cdp, port, dirs[i], { settle: args.settle, langs: args.langs }); }
+          catch (e) { results[i] = { error: e.message }; }
+          done++;
+          if (ticking) process.stderr.write(`\r  ${done}/${dirs.length} lesson(s) checked`);
+        }
+      }));
+      if (ticking) process.stderr.write("\r\x1b[2K");
+
+      for (let i = 0; i < dirs.length; i++) {
+        const rel = path.relative(root, dirs[i]);
+        const r = results[i];
         if (r.error) { failed = true; report.push({ lesson: rel, mode: "browser", error: r.error }); if (!args.json) bad(`${rel} - ${r.error}`); continue; }
         const bad_ = r.leaks.length > 0;
         failed = failed || bad_;
@@ -606,7 +678,16 @@ async function main() {
       }
     } finally {
       try { server.close(); } catch {}
-      if (chrome && !args.keepOpen) { try { chrome.cdp.close(); } catch {} try { chrome.proc.kill(); } catch {} try { fs.rmSync(chrome.profile, { recursive: true, force: true }); } catch {} }
+      if (chrome && !args.keepOpen) {
+        try { chrome.cdp.close(); } catch {}
+        // Signalling only the parent leaves its renderer and zygote children
+        // writing into the profile, so the delete races them and loses with
+        // ENOTEMPTY - abandoning ~50MB of temp on every run. The profile is
+        // disposable, so take the whole process group down at once instead.
+        try { process.kill(-chrome.proc.pid, "SIGKILL"); } catch { try { chrome.proc.kill("SIGKILL"); } catch {} }
+        try { await Promise.race([once(chrome.proc, "exit"), sleep(3000)]); } catch {}
+        try { fs.rmSync(chrome.profile, { recursive: true, force: true, maxRetries: 20, retryDelay: 100 }); } catch {}
+      }
     }
   }
 
