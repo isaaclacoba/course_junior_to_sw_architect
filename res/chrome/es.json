@@ -35,6 +35,13 @@
   "run.noOutput": "(sin salida)",
   "run.couldNotRun": "No se pudo ejecutar el código.",
 
+  "errors.heading": "Arreglemos esto primero",
+  "errors.note": "A menudo un solo fallo al principio (una llave, un par\u00e9ntesis o un punto y coma de m\u00e1s o de menos) basta para confundir todo lo que viene despu\u00e9s. Arregla el primero y vuelve a ejecutar.",
+  "errors.why": "Saber por qu\u00e9",
+  "errors.hideWhy": "Ocultar el porqu\u00e9",
+  "errors.warningHeading": "Ha funcionado, pero lee esto",
+  "errors.warningNote": "El compilador lo ha construido, as\u00ed que no es un error. Te est\u00e1 avisando de que estas l\u00edneas no pueden estar haciendo lo que parece que hacen. El c\u00f3digo que funciona y aun as\u00ed est\u00e1 mal es el caro.",
+
   "drill.check": "Comprobar",
   "drill.hint": "Pista",
   "drill.showAnswer": "Ver respuesta",

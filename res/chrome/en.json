@@ -35,6 +35,13 @@
   "run.noOutput": "(no output)",
   "run.couldNotRun": "Could not run the code.",
 
+  "errors.heading": "Let's fix this first",
+  "errors.note": "Often a single early mistake (a missing or extra { } ( ) ;) is enough to confuse the rest. Fix the top one first, then run again.",
+  "errors.why": "Learn why",
+  "errors.hideWhy": "Hide why",
+  "errors.warningHeading": "It ran - but read this",
+  "errors.warningNote": "The compiler built this, so it is not an error. It is telling you these lines cannot be doing what they look like they do. Code that runs and is still wrong is the expensive kind.",
+
   "drill.check": "Check",
   "drill.hint": "Hint",
   "drill.showAnswer": "Show Answer",

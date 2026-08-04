@@ -490,6 +490,10 @@
           }
           if (editor.setMarkers) editor.setMarkers([]);
           op.clearErrors();
+          // Compiled, so nothing is blocked - but a warning here means the code
+          // that just "worked" is not doing what it looks like it does, and that
+          // is worth more than a green tick.
+          if (op.showWarnings) op.showWarnings(res.warnings);
           if (res.runtimeError) {
             op.showOutput((res.output + "\n" + res.runtimeError).trim(), true);
             return {

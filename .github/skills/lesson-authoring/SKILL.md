@@ -133,7 +133,12 @@ and the per-archetype engines it loaded are gone.
       one rule in one place, private fields, uniform formatting - in `starter`,
       `solution`, `verify.main` and `example` alike. The only bad code allowed is
       the specific flaw a card exists to fix, and its `solution` is still clean.
-- [ ] Build tasks have a technique gate AND a hidden `verify` probe.
+- [ ] **Every `solution` compiles warning-free.** `verify-lesson` fails on the
+      warnings the learner is shown (CS1718, CS0219, CS0162, ...) and notes
+      CS8618. A warning on the answer we call correct is broken content.
+- [ ] Build tasks have a technique gate AND a hidden `verify` probe, and the probe
+      passes an input the visible run does NOT use - otherwise code that only
+      looks right can pass the card.
 - [ ] **The goal tracker is granular**: every member the solution adds has its
       own row, every move inside a method body has its own step row, and every
       goal starts RED on the starter. See "The live goal tracker".
@@ -314,6 +319,59 @@ public int HungryCount(List<Cat> cats)
 
 `tools/validate.mjs` gates the mechanical half of this (single-letter names,
 magic numbers). The rest is your judgement - the gate is a floor, not the bar.
+
+### The compiler is part of the marking, so your solution must be warning-clean
+
+The run surface shows the learner a curated set of compiler **warnings**, not just
+errors. These are the diagnostics that mean "this line cannot be doing what it
+looks like it does": a comparison or assignment with the same thing on both sides,
+unreachable code, a variable or field written but never read, a condition whose
+answer never changes.
+
+That has a direct consequence for authoring: **if a task's `solution` trips one of
+those warnings, the learner is shown a warning panel sitting on top of the answer
+we just told them was correct.** So it is a hard failure, not a nitpick, and
+`tools/verify-lesson.mjs` fails the lesson with the exact ids it saw:
+
+```
+FAIL task 1 "..." solution compiles with warning(s) the learner would be shown: CS0219
+```
+
+The list lives in `TeachingWarningIds` in
+`code-lab/compiler-host/Services/CompilerService.cs`, mirrored in
+`SHOWN_WARNING_IDS` in `tools/lib/lesson-validators.mjs`. **Change one and you must
+change the other**, or the tool will pass content the runtime then complains about.
+
+One id is deliberately in the host list but NOT in the tool's: **CS8618**
+(uninitialised non-nullable field). `dotnet new console` enables nullable reference
+types and the browser host does not, so the verifier sees CS8618 on code the
+learner is never warned about. Failing on it would fail lessons over a diagnostic
+that does not exist where it matters, so it is reported as a note. Still fix it -
+`public string Name { get; set; } = "";` - because a string field that starts null
+is a real defect, just not one the browser will point at.
+
+Two things follow for the prose you write:
+
+- A `starter` MAY trip a warning when that warning is the lesson's subject - the
+  same narrow exception as above. That is a feature: the learner runs the broken
+  starter and the compiler explains the flaw in the same words the card does.
+- Never write a card whose success depends on the learner NOT noticing a warning.
+  If the card passes while the compiler is objecting, the card is wrong.
+
+### Correct output is not proof of correct code
+
+This is the reason the warnings are shown at all, and it is worth stating in the
+lessons themselves where it fits.
+
+A reader of the SOLID card wrote `hoursSinceMeal >= hoursSinceMeal`. It compiles.
+It runs. It prints `FEED`, which is exactly what the visible card asked for. It is
+also always true, so the method has stopped deciding anything at all - and only
+the hidden `verify` probe, which passes a different number, caught it.
+
+**A card that only checks the visible output can be passed by code that does not
+work.** That is what `verify` is for, and it is why a build task that makes a
+decision should nearly always have one. Write the probe so it passes an input the
+visible run does not use.
 
 ## Word budget for build-task context
 

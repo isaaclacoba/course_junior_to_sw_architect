@@ -114,6 +114,23 @@
         output.hidden = true;
         output.textContent = "";
       }
+      // The panel's own strings are chrome, so they come from the same catalog as
+      // the rest of the furniture - otherwise a Spanish lesson explains itself in
+      // English the moment the code fails to compile.
+      const labels = () => ({
+        heading: LessonCommon.t("errors.heading", "Let's fix this first"),
+        note: LessonCommon.t(
+          "errors.note",
+          "Often a single early mistake (a missing or extra { } ( ) ;) is enough to confuse the rest. Fix the top one first, then run again.",
+        ),
+        why: LessonCommon.t("errors.why", "Learn why"),
+        hideWhy: LessonCommon.t("errors.hideWhy", "Hide why"),
+        warningHeading: LessonCommon.t("errors.warningHeading", "It ran - but read this"),
+        warningNote: LessonCommon.t(
+          "errors.warningNote",
+          "The compiler built this, so it is not an error. It is telling you these lines cannot be doing what they look like they do. Code that runs and is still wrong is the expensive kind.",
+        ),
+      });
       function clearErrors() {
         const show = panel();
         if (show) show(errors, []);
@@ -122,12 +139,22 @@
         const show = panel();
         if (show) {
           if (output) output.hidden = true;
-          return show(errors, list);
+          return show(errors, list, labels(), { kind: "error" });
         }
         showOutput((list || []).map((e) => e.friendly || e.raw).join("\n"), true);
         return Boolean(list && list.length);
       }
-      return { showOutput, hideOutput, clearErrors, showErrors };
+      // Advisory diagnostics from a run that DID compile. They share the error
+      // host because the two can never be on screen together, and they must sit
+      // above the output for the same reason errors do - the output looks right,
+      // which is exactly why the warning is worth reading.
+      function showWarnings(list) {
+        if (!list || !list.length) return false;
+        const show = panel();
+        if (!show) return false;
+        return show(errors, list, labels(), { kind: "warning" });
+      }
+      return { showOutput, hideOutput, clearErrors, showErrors, showWarnings };
     },
     // Chrome (UI furniture) text lookup: the localized string for the current
     // language from window.ChromeText, else the English fallback when no catalog

@@ -74,6 +74,20 @@ export function createValidators(deps) {
   const { ok, bad, skip, note } = deps.report;
   const { matches, buildProbe } = deps.grading;
 
+  // Mirrors TeachingWarningIds in the compiler host: the diagnostics the run
+  // surface actually shows. Anything outside this set stays a note, so the gate
+  // enforces exactly what a learner sees and not a stricter private standard.
+  //
+  // CS8618 is deliberately NOT here even though the host lists it. `dotnet new
+  // console` turns nullable reference types on, the browser host does not, so
+  // this project sees CS8618 on code the learner never gets warned about. Failing
+  // on it would mean failing lessons over a diagnostic that does not exist where
+  // it matters. It is reported below as its own note instead.
+  const SHOWN_WARNING_IDS = new Set([
+    "CS1717", "CS1718", "CS0162", "CS0164", "CS0168",
+    "CS0169", "CS0219", "CS0414", "CS0472", "CS0652",
+  ]);
+
   // --- build / drill: compile + run each task's solution ---------------------
   function verifyCompiled({ config, opts }) {
     if (opts.noDotnet) { skip("dotnet compile (--no-dotnet)"); return true; }
@@ -90,7 +104,20 @@ export function createValidators(deps) {
         bad(`${label} output != expected\n    expected: ${JSON.stringify(t.expected)}\n    got: ${JSON.stringify((run.output || "").trim())}`);
         allOk = false;
       } else ok(`${label} solution runs and matches expected`);
-      if (run.warnings) note(`solution compiled with ${run.warnings} warning(s)`);
+      // The runner shows these same ids to the learner. A solution that trips one
+      // would hand them a warning panel on the answer we told them was right, so
+      // this is a failure and not a note. The list mirrors TeachingWarningIds in
+      // code-lab/compiler-host/Services/CompilerService.cs - keep the two in step.
+      const shown = (run.warningIds || []).filter((id) => SHOWN_WARNING_IDS.has(id));
+      if (shown.length) {
+        bad(`${label} solution compiles with warning(s) the learner would be shown: ${shown.join(", ")}`);
+        allOk = false;
+      } else if (run.warnings) note(`solution compiled with ${run.warnings} warning(s), none shown to the learner`);
+      // Not learner-visible today, but it IS the house rule (an uninitialised
+      // string field starts null), so it is worth surfacing without failing.
+      if ((run.warningIds || []).includes("CS8618")) {
+        note(`${label} solution has an uninitialised non-nullable field (CS8618 under real dotnet; the browser does not warn). Give it a default.`);
+      }
 
       for (const req of t.requireSource || []) {
         const re = req.pattern instanceof RegExp ? req.pattern : new RegExp(req.pattern);

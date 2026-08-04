@@ -99,8 +99,10 @@ function compileRun(source) {
   const stderr = r.stderr || "";
   const stdout = r.stdout || "";
   const built = !/error [A-Z]{2}\d+/.test(stdout + stderr) && r.status === 0;
-  const warnings = (stdout.match(/warning [A-Z]{2}\d+/g) || []).length;
-  return { built, output: stdout, errors: stdout + stderr, warnings };
+  // Keep the ids, not just a count: the runner shows a specific set of warnings
+  // to the learner, so the check has to be able to ask WHICH ones fired.
+  const warningIds = [...new Set((stdout.match(/warning ([A-Z]{2}\d+)/g) || []).map((w) => w.split(" ")[1]))];
+  return { built, output: stdout, errors: stdout + stderr, warnings: warningIds.length, warningIds };
 }
 function cleanupProject() { if (_proj) { fs.rmSync(_proj, { recursive: true, force: true }); _proj = null; } }
 

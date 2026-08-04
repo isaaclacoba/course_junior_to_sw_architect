@@ -1549,3 +1549,61 @@ verify-lesson --all 85/85; real-dotnet run of the SOLID lesson passes both
 locales; and CDP across 1600/1440/1280/1100/1024/800px shows no horizontal
 overflow at any width, no clipped row, and the tracker still ticking live from
 typing alone (all five boxes red to green, no Run).
+
+## 2026-08-04 16:45 - 17:50 - the compiler already knew
+
+Following up on the reader who could not see why their card failed. Their code
+compared `hoursSinceMeal >= hoursSinceMeal` - always true, so the method had
+stopped deciding anything. Roslyn had spotted it and said so, CS1718, "did you
+mean to compare something else?". We threw that away: both compile paths filtered
+`Severity == Error` before anyone saw it.
+
+So the fix was not to write better error messages. It was to stop discarding the
+ones we already had.
+
+Two separate leaks, same shape:
+
+`CompilerService` builds a `Why` paragraph per diagnostic - the concept behind the
+message, not the fix - and `RunnerBridge` mapped `new RunError(e.Line, e.Friendly,
+e.Raw)` on the way out. The `Why` died at the wire. The Blazor capstone has had a
+"Learn why" toggle all along; the 85 lessons never got the text to put in one.
+Carried it across and gave the shared panel the same disclosure, folded shut by
+default - someone mid-fix wants the fix, someone hitting it a third time wants
+the idea. `Tracer` was passing `null` for friendly text outright, so both now read
+the one table.
+
+Then warnings. Not all of them - a wall of advisory noise teaches nothing. Only
+the ones that mean "this line cannot be doing what it looks like it does":
+comparison or assignment to the same thing, unreachable code, a value written and
+never read, a condition whose answer never changes. They ride in their own
+`Warnings` list, never `Errors`, so a run that compiled is never reported as a
+failure. The panel turns amber and says "It ran - but read this", which is the
+whole point: code that runs and is still wrong is the expensive kind.
+
+The panel was also passing no labels at all, so a Spanish lesson explained itself
+in English the moment anything went wrong. Six chrome keys, both catalogues.
+
+The guard matters more than the feature. If OUR OWN `solution` trips one of these,
+the learner gets a warning panel sitting on the answer we just called correct - so
+`verify-lesson` now fails on exactly the ids the runtime shows, and the id list in
+the tool has a comment pointing at the one in the host. Proved it by planting a
+dead variable: "FAIL task 1 solution compiles with warning(s) the learner would be
+shown: CS0219".
+
+It immediately caught a real one - `data-shapes` task 1 shipped
+`public string Name { get; set; }` with no default, which is the exact CS8618
+gotcha written down in our own instructions. Fixed.
+
+That find also exposed an asymmetry worth knowing: `dotnet new console` enables
+nullable reference types and the browser host does not, so CS8618 fires in the
+verifier and never in front of a learner. Failing on it would fail lessons over a
+diagnostic that does not exist where it matters, so it is a note, and the reason
+is written next to both lists. A mirror that is not actually a mirror is how this
+repo keeps growing checks that quietly drift.
+
+Verified: 439/439 course tests, 366/366 code-lab; validate 0 errors; check-i18n 0
+missing; check-literals clean; i18n round-trip 83/83; verify-lesson --all with
+real dotnet 87/87. In a real browser, on the reporter's own code: output "FEED",
+amber panel, "Learn why" opening the paragraph, and in Spanish "Ha funcionado,
+pero lee esto" / "Saber por que". Clean code shows no panel; a genuine compile
+error still shows the red one, now with its own "Learn why".

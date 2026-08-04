@@ -26,7 +26,7 @@
         message: "Mittens is right for this example only. The property must store and return whatever Name is set to."
       },
       starter: "using System;\n\npublic class Cat\n{\n    // TODO: add a Name property with get and set\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var cat = new Cat();\n        cat.Name = \"Mittens\";\n        Console.WriteLine(cat.Name);\n    }\n}\n",
-      solution: "using System;\n\npublic class Cat\n{\n    public string Name { get; set; }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var cat = new Cat();\n        cat.Name = \"Mittens\";\n        Console.WriteLine(cat.Name);\n    }\n}\n"
+      solution: "using System;\n\npublic class Cat\n{\n    public string Name { get; set; } = \"\";\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var cat = new Cat();\n        cat.Name = \"Mittens\";\n        Console.WriteLine(cat.Name);\n    }\n}\n"
     },
     {
       example: "public class Square\n{\n    public int Side { get; set; }\n    public int Area => Side * Side;\n}",
