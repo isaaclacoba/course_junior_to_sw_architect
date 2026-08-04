@@ -8,6 +8,20 @@ applyTo: '**'
 Durable rules discovered the hard way. Keep each to 1-4 sentences. If a learning
 grows into a procedure, promote it to a skill and leave a pointer here.
 
+## Other agents' work (ABSOLUTE)
+
+- **NEVER modify, revert, restore, stash or discard a file another session is
+  working in - not even to "clean up", and never `git checkout --` on a shared
+  build artefact.** Another Copilot session often works the same branch and
+  worktree at the same time. Their uncommitted edits are invisible work in
+  progress; touching them destroys it. This was violated once by reverting
+  `vendor/code-lab/code-lab.global.js` (built from their in-flight
+  `csharp-symbols.ts`), which silently made the vendored bundle stale.
+- **Commit only your own files, by explicit pathspec, and leave everything else
+  alone.** If a shared file blocks you, say so and stop - do not "fix" it. What
+  you commit must stand on committed source; their uncommitted work simply does
+  not ship, and that is fine.
+
 ## Design rounds (WoW)
 
 - **A widget's look-and-behaviour is a UX design decision - mockup + owner-decide -
