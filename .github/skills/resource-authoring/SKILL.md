@@ -57,7 +57,7 @@ The course adapter (also in `resource/`) maps the generic engine to this course:
 - `bind-build.js` - the key-schema mapper for BUILD lessons. Knows the schema
   (`intro.N`, `task.N.title|concept|context|goal.i`, the recap's
   `summaryIntro|summaryItems.i.title|text|summaryClose`) and writes resolved
-  strings onto `window.PAGE` (hero intro) and `window.BUILD_CONFIG` (task prose).
+  strings onto `window.PAGE` (hero intro) and `window.LESSON_CONFIG` (task prose).
 - `theme-section.js` / `voice-section.js` - section data for the popover (theme
   list from `theme-switch.js`; reading-voice list + human labels).
 - `bootstrap.js` - the composition root. Reads config from its own `data-*`
@@ -110,7 +110,7 @@ live under that task's index like any other.
 ## Rules and gotchas
 
 - **Default stays byte-identical.** `bind-build` applies the default bundle back
-  onto `BUILD_CONFIG`, so `default/en.json` must reproduce the original prose
+  onto `LESSON_CONFIG`, so `default/en.json` must reproduce the original prose
   exactly. The hero intro is apply-if-present: the default keeps its inline
   `meta.intro`; only a non-default voice supplies `intro.N`.
 - **Concept markers live in the bundle prose.** `[[concept:id|label]]` sits

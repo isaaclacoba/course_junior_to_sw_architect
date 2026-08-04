@@ -69,9 +69,9 @@ reference point: `lessons=83 concepts=225 fp=be2341fd08d6`.
 2. Order + structure: `course-registry.js` (`window.CourseRegistry.tracks` = the
    track/part chrome in display order; `lessons` = every lesson in reading order).
    (This replaced the retired `course-manifest.js`.)
-3. Lesson CONTENT to check `def`s against: a flat `<id>.js` (`BUILD_CONFIG`/`DRILL_CONFIG`
-   per-card `title`/`concept`/`context`/`goal`), `<id>.viz.js` (`LESSON_VIZ` narrated
-   `steps`), `<id>.html` hero - OR, if migrated, `content/<track>/<NN-part>/<NN-id>/`.
+3. Lesson CONTENT to check `def`s against: a migrated lesson's `data.js` /
+   `<id>.viz.js` sets `window.LESSON_CONFIG` (per-card `title`/`concept`/`context`/
+   `goal`, or viz narrated `steps`) under `content/<track>/<NN-part>/<NN-id>/`.
 4. `AGENTS.md` - the voice a `def` must follow: plain, warm, ONE sentence, no
    jargon-before-taught, a spaced hyphen ` - ` not em-dashes, no hype, not circular.
 

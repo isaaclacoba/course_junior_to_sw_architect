@@ -72,9 +72,9 @@ lesson.
      the `es.json` translation beside it). If this lesson is the sole introducer of a
      concept, its `introduces` entry MUST stay, or `validate.mjs` fails downstream
      where another lesson revisits/uses it.
-6. **Fill `data.js`** with the lesson content (`window.BUILD_CONFIG` /
-   `DRILL_CONFIG`, plus `viz.js` `window.LESSON_VIZ` for a viz lesson) to the
-   config shape in SPECS. Honour the principles and cadence invariants (below).
+6. **Fill `data.js`** with the lesson content (`window.LESSON_CONFIG` - the one
+   global for every archetype; a viz lesson sets it in `viz.js`) to the config
+   shape in SPECS. Honour the principles and cadence invariants (below).
    Do NOT put `nextHref`/`nextLabel` in the data file; nav derives from the
    registry.
    - A build `starter` may intentionally NOT compile when the objective is to
@@ -203,7 +203,7 @@ not write rendering code. (Building a *new* scene is engine work - see
 scenes)".)
 
 Under the generated flow a viz lesson is `archetype: viz`; its scene data lives
-in the lesson dir's `viz.js` (`window.LESSON_VIZ`) and its `index.html` is
+in the lesson dir's `viz.js` (`window.LESSON_CONFIG`) and its `index.html` is
 generated. The two-file mechanics below are the **legacy** flat layout, still
 valid for not-yet-migrated `ai-N.*` / `theory-N.viz.js` lessons.
 
