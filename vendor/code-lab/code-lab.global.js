@@ -23,13 +23,16 @@ var CodeLab = (() => {
   __export(src_exports, {
     ALL_REGIONS: () => ALL_REGIONS,
     CodeLab: () => CodeLab,
+    CommandHistory: () => CommandHistory,
     DEFAULT_LOOP_MEMORIES: () => DEFAULT_LOOP_MEMORIES,
     DEFAULT_LOOP_TOOLS: () => DEFAULT_LOOP_TOOLS,
     DEFAULT_MEMORY_STORES: () => DEFAULT_MEMORY_STORES,
     DEFAULT_VIZ_LABELS: () => DEFAULT_VIZ_LABELS,
     FULL_REGIONS: () => FULL_REGIONS,
+    GitError: () => GitError,
     GitGraph: () => GitGraph,
     IframeRunner: () => IframeRunner,
+    LineTerminal: () => LineTerminal,
     MemoryViz: () => MemoryViz,
     MonacoEditor: () => MonacoEditor,
     PlainHighlighter: () => PlainHighlighter,
@@ -54,7 +57,21 @@ var CodeLab = (() => {
     drawQuiz: () => drawQuiz,
     firstUnanswered: () => firstUnanswered,
     formatToolSignature: () => formatToolSignature,
+    gitBranch: () => branch,
+    gitCheckout: () => checkout,
+    gitCommit: () => commit,
+    gitInit: () => init,
     gitLayout: () => layout,
+    gitMerge: () => merge,
+    gitMergeAbort: () => mergeAbort,
+    gitReset: () => reset,
+    gitResolvePaths: () => resolvePaths,
+    gitRevList: () => revList,
+    gitRevParse: () => revParse,
+    gitRun: () => run,
+    gitStage: () => stage,
+    gitTag: () => tag,
+    gitTokenize: () => tokenize,
     goTo: () => goTo,
     loadMonaco: () => loadMonaco,
     makeTour: () => makeTour,
@@ -1642,8 +1659,8 @@ ${result.runtimeError}`.trim(),
 
   // src/dom/svg.ts
   var SVG_NS = "http://www.w3.org/2000/svg";
-  function svgEl(tag, attrs) {
-    const node = document.createElementNS(SVG_NS, tag);
+  function svgEl(tag2, attrs) {
+    const node = document.createElementNS(SVG_NS, tag2);
     for (const key in attrs) node.setAttribute(key, String(attrs[key]));
     return node;
   }
@@ -2008,8 +2025,8 @@ ${result.runtimeError}`.trim(),
       };
       const regionHtml = regions.map((name) => {
         const d = REGIONS[name];
-        const tag = tagOverrides[name] ?? d.tag;
-        return `<div class="cl-mv-region ${d.cls}" data-region="${name}"${d.regionAttr ? " " + d.regionAttr : ""}><span class="cl-mv-tag">${tag}</span>${d.body}</div>`;
+        const tag2 = tagOverrides[name] ?? d.tag;
+        return `<div class="cl-mv-region ${d.cls}" data-region="${name}"${d.regionAttr ? " " + d.regionAttr : ""}><span class="cl-mv-tag">${tag2}</span>${d.body}</div>`;
       }).join("");
       const cols = regions.map((name) => `${REGIONS[name].weight}fr`).join(" ");
       this.el = document.createElement("div");
@@ -4085,7 +4102,7 @@ ${result.runtimeError}`.trim(),
       return free === -1 ? lanes.length : free;
     };
     for (const id of newestFirst) {
-      const commit = state.commits.get(id);
+      const commit2 = state.commits.get(id);
       const reserved = [];
       for (let i = 0; i < lanes.length; i++) {
         if (lanes[i] === id) reserved.push(i);
@@ -4099,7 +4116,7 @@ ${result.runtimeError}`.trim(),
       }
       yOf.set(id, lane);
       if (lane > maxLane) maxLane = lane;
-      const parents = commit.parents;
+      const parents = commit2.parents;
       if (parents.length === 0) {
         lanes[lane] = null;
       } else {
@@ -4184,9 +4201,13 @@ ${result.runtimeError}`.trim(),
     constructor() {
       this.state = null;
       this.handlers = [];
+      // The ghost overlay for the current state (see the header note).
+      this.ghost = /* @__PURE__ */ new Set();
+      this.diverged = /* @__PURE__ */ new Set();
       // Diff bookkeeping across renders, so only NEW nodes/edges animate.
       this.prevNodeIds = /* @__PURE__ */ new Set();
       this.prevEdgeKeys = /* @__PURE__ */ new Set();
+      this.prevGhostIds = /* @__PURE__ */ new Set();
       this.prevZoneOf = /* @__PURE__ */ new Map();
       // --- event delegation --------------------------------------------------
       this.onClick = (ev) => {
@@ -4198,7 +4219,9 @@ ${result.runtimeError}`.trim(),
           return;
         }
         const commitEl = target.closest("[data-commit]");
-        if (commitEl) this.emit({ commit: commitEl.dataset?.commit });
+        if (!commitEl) return;
+        const commit2 = commitEl.dataset?.commit;
+        this.emit(commit2 !== void 0 && this.ghost.has(commit2) ? { commit: commit2, ghost: true } : { commit: commit2 });
       };
     }
     // --- lifecycle ---------------------------------------------------------
@@ -4222,11 +4245,21 @@ ${result.runtimeError}`.trim(),
       this.root.addEventListener("click", this.onClick);
       host.appendChild(this.root);
       this.state = opts.state;
+      this.setOverlay(opts);
       this.render(false);
     }
     setState(state, opts) {
       this.state = state;
+      this.setOverlay(opts);
       this.render(opts?.animate ?? false);
+    }
+    /** Replace the overlay wholesale. Omitting a list means "none": the overlay
+     *  belongs to the state snapshot, so a caller that stops passing ghosts gets a
+     *  fully solid graph rather than stale fading. A commit named in both lists is
+     *  treated as diverged - the learner has it, so it is not missing. */
+    setOverlay(opts) {
+      this.diverged = new Set(opts?.diverged ?? []);
+      this.ghost = new Set((opts?.ghost ?? []).filter((id) => !this.diverged.has(id)));
     }
     on(event, handler) {
       if (event === "inspect") this.handlers.push(handler);
@@ -4267,6 +4300,7 @@ ${result.runtimeError}`.trim(),
       this.renderZones(state, animate);
       this.prevNodeIds = newNodeIds;
       this.prevEdgeKeys = newEdgeKeys;
+      this.prevGhostIds = new Set(this.ghost);
     }
     px(node) {
       return { x: PAD_X + node.x * COL_GAP, y: PAD_TOP + node.y * ROW_GAP };
@@ -4287,9 +4321,13 @@ ${result.runtimeError}`.trim(),
           d = `M${parent.x},${parent.y} C${midX},${parent.y} ${midX},${child.y} ${child.x},${child.y}`;
         }
         const isNew = animate && !this.prevEdgeKeys.has(key);
+        const ghosted = this.ghost.has(edge.from);
+        const classes = ["cl-git-edge"];
+        if (isNew && !ghosted) classes.push("cl-git-edge-draw");
+        if (ghosted) classes.push("cl-git-edge-ghost");
         const path = svgEl("path", {
           d,
-          class: isNew ? "cl-git-edge cl-git-edge-draw" : "cl-git-edge",
+          class: classes.join(" "),
           stroke: laneVar(branchLane),
           fill: "none",
           pathLength: 1
@@ -4301,9 +4339,14 @@ ${result.runtimeError}`.trim(),
       for (const node of nodes) {
         newNodeIds.add(node.id);
         const { x, y } = this.px(node);
-        const isNew = animate && !this.prevNodeIds.has(node.id);
+        const ghosted = this.ghost.has(node.id);
+        const isNew = animate && !ghosted && (!this.prevNodeIds.has(node.id) || this.prevGhostIds.has(node.id));
+        const classes = ["cl-git-node"];
+        if (isNew) classes.push("cl-git-appear");
+        if (ghosted) classes.push("cl-git-ghost");
+        else if (this.diverged.has(node.id)) classes.push("cl-git-diverged");
         const group = svgEl("g", {
-          class: isNew ? "cl-git-node cl-git-appear" : "cl-git-node",
+          class: classes.join(" "),
           "data-commit": node.id
         });
         group.appendChild(
@@ -4320,9 +4363,9 @@ ${result.runtimeError}`.trim(),
         const hash = svgEl("text", { x, y: y + 26, class: "cl-git-hash", "text-anchor": "middle" });
         hash.textContent = node.id;
         group.appendChild(hash);
-        const commit = state.commits.get(node.id);
+        const commit2 = state.commits.get(node.id);
         const msg = svgEl("text", { x, y: y + 41, class: "cl-git-msg", "text-anchor": "middle" });
-        msg.textContent = commit?.message ?? "";
+        msg.textContent = commit2?.message ?? "";
         group.appendChild(msg);
         this.svg.appendChild(group);
       }
@@ -4335,8 +4378,8 @@ ${result.runtimeError}`.trim(),
         bucket.push(chip);
         byCommit.set(chip.commit, bucket);
       }
-      for (const [commit, bucket] of byCommit) {
-        const pos = posOf.get(commit);
+      for (const [commit2, bucket] of byCommit) {
+        const pos = posOf.get(commit2);
         if (!pos) continue;
         const stack = document.createElement("div");
         stack.className = "cl-git-chipstack";
@@ -4346,9 +4389,10 @@ ${result.runtimeError}`.trim(),
           const pill = document.createElement("button");
           pill.type = "button";
           pill.className = `cl-git-chip is-${chip.kind}`;
+          if (this.ghost.has(commit2)) pill.classList.add("cl-git-ghost");
           pill.textContent = chip.label;
           if (chip.kind === "branch") {
-            pill.style.background = laneVar(laneOf.get(commit) ?? 0);
+            pill.style.background = laneVar(laneOf.get(commit2) ?? 0);
             pill.dataset.ref = `refs/heads/${chip.label}`;
           } else {
             pill.dataset.ref = `refs/tags/${chip.label}`;
@@ -4376,6 +4420,7 @@ ${result.runtimeError}`.trim(),
       this.headEl.dataset.on = head.on ?? "";
       this.headEl.title = head.on ? `HEAD -> ${head.on}` : "HEAD (detached)";
       this.headEl.classList.toggle("is-detached", head.on === void 0);
+      this.headEl.classList.toggle("cl-git-ghost", this.ghost.has(head.commit));
       this.headEl.style.left = `${pos.x}px`;
       this.headEl.style.top = `${pos.y - 54}px`;
       if (!animate) {
@@ -4460,12 +4505,872 @@ ${result.runtimeError}`.trim(),
         const id = stack.pop();
         if (seen.has(id)) continue;
         seen.add(id);
-        const commit = state.commits.get(id);
-        if (!commit) continue;
-        for (const p of commit.paths) paths.add(p);
-        for (const parent of commit.parents) stack.push(parent);
+        const commit2 = state.commits.get(id);
+        if (!commit2) continue;
+        for (const p of commit2.paths) paths.add(p);
+        for (const parent of commit2.parents) stack.push(parent);
       }
       return paths;
+    }
+  };
+
+  // src/core/git-model.ts
+  var GitError = class extends Error {
+    constructor(message) {
+      super(message);
+      this.name = "GitError";
+    }
+  };
+  function fnv1a(str) {
+    let h = 2166136261;
+    for (let i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  function makeHash(parents, message, seq) {
+    const preimage = parents.join(",") + "\n" + message + "\n" + seq;
+    return fnv1a(preimage).toString(16).padStart(8, "0").slice(0, 7);
+  }
+  function cloneState(s) {
+    return {
+      commits: new Map(s.commits),
+      refs: new Map(s.refs),
+      head: s.head.kind === "branch" ? { kind: "branch", name: s.head.name } : { kind: "detached", commit: s.head.commit },
+      index: new Map(s.index),
+      worktree: new Map(s.worktree),
+      merge: s.merge ? { mergeHead: s.merge.mergeHead, conflicted: [...s.merge.conflicted] } : void 0,
+      seq: s.seq
+    };
+  }
+  function headCommit3(s) {
+    if (s.head.kind === "detached") return s.head.commit;
+    return s.refs.get(s.head.name) ?? null;
+  }
+  function moveHead(s, to) {
+    if (s.head.kind === "branch") {
+      s.refs.set(s.head.name, to);
+    } else {
+      s.head = { kind: "detached", commit: to };
+    }
+  }
+  function ancestors(s, start) {
+    const seen = /* @__PURE__ */ new Set();
+    const stack = [start];
+    while (stack.length) {
+      const h = stack.pop();
+      if (seen.has(h)) continue;
+      seen.add(h);
+      const c = s.commits.get(h);
+      if (c) for (const p of c.parents) stack.push(p);
+    }
+    return seen;
+  }
+  function mergeBases(s, a, b) {
+    const aAnc = ancestors(s, a);
+    const common = [...ancestors(s, b)].filter((h) => aAnc.has(h));
+    const bases = [];
+    for (const c of common) {
+      let isBase = true;
+      for (const d of common) {
+        if (d === c) continue;
+        const dAnc = ancestors(s, d);
+        dAnc.delete(d);
+        if (dAnc.has(c)) {
+          isBase = false;
+          break;
+        }
+      }
+      if (isBase) bases.push(c);
+    }
+    return bases;
+  }
+  function changedPaths(s, tip, base) {
+    const baseAnc = base ? ancestors(s, base) : /* @__PURE__ */ new Set();
+    const paths = /* @__PURE__ */ new Set();
+    for (const h of ancestors(s, tip)) {
+      if (baseAnc.has(h)) continue;
+      const c = s.commits.get(h);
+      if (c) for (const p of c.paths) paths.add(p);
+    }
+    return paths;
+  }
+  function mergeCommitPaths(s, h, o) {
+    const base = mergeBases(s, h, o)[0] ?? null;
+    const hp = changedPaths(s, h, base);
+    const op = changedPaths(s, o, base);
+    return [.../* @__PURE__ */ new Set([...hp, ...op])];
+  }
+  function firstParent(s, h) {
+    const c = s.commits.get(h);
+    if (!c || c.parents.length === 0) {
+      throw new GitError(`revision ${h} has no parent`);
+    }
+    return c.parents[0];
+  }
+  function nthParent(s, h, n) {
+    const c = s.commits.get(h);
+    if (!c || c.parents.length < n) {
+      throw new GitError(`revision ${h} has no parent ${n}`);
+    }
+    return c.parents[n - 1];
+  }
+  function resolveBase(s, tok) {
+    if (tok === "HEAD" || tok === "@") {
+      const h = headCommit3(s);
+      if (h === null) throw new GitError("HEAD is unborn");
+      return h;
+    }
+    if (s.refs.has(tok)) return s.refs.get(tok);
+    const bref = `refs/heads/${tok}`;
+    if (s.refs.has(bref)) return s.refs.get(bref);
+    const tref = `refs/tags/${tok}`;
+    if (s.refs.has(tref)) return s.refs.get(tref);
+    if (s.commits.has(tok)) return tok;
+    if (/^[0-9a-f]{4,40}$/.test(tok)) {
+      const matches = [...s.commits.keys()].filter((h) => h.startsWith(tok));
+      if (matches.length === 1) return matches[0];
+      if (matches.length > 1) throw new GitError(`ambiguous short id: ${tok}`);
+    }
+    throw new GitError(`unknown revision: ${tok}`);
+  }
+  function init() {
+    return {
+      commits: /* @__PURE__ */ new Map(),
+      refs: /* @__PURE__ */ new Map(),
+      head: { kind: "branch", name: "refs/heads/main" },
+      index: /* @__PURE__ */ new Map(),
+      worktree: /* @__PURE__ */ new Map(),
+      seq: 0
+    };
+  }
+  function stage(state, paths) {
+    const s = cloneState(state);
+    for (const p of paths) {
+      s.index.set(p, "staged");
+      s.worktree.delete(p);
+    }
+    return { state: s, effect: { kind: "none" } };
+  }
+  function commit(state, message) {
+    const s = cloneState(state);
+    const head = headCommit3(s);
+    if (s.merge) {
+      if (s.merge.conflicted.length > 0) {
+        throw new GitError("cannot commit: unresolved conflicts remain");
+      }
+      if (head === null) throw new GitError("cannot merge into an unborn branch");
+      const other = s.merge.mergeHead;
+      const parents2 = [head, other];
+      const paths2 = mergeCommitPaths(s, head, other);
+      const id2 = makeHash(parents2, message, s.seq);
+      s.seq += 1;
+      s.commits.set(id2, { id: id2, parents: parents2, message, paths: paths2 });
+      moveHead(s, id2);
+      s.merge = void 0;
+      s.index.clear();
+      return { state: s, effect: { kind: "merge", id: id2 } };
+    }
+    if (s.index.size === 0) throw new GitError("nothing to commit");
+    const parents = head === null ? [] : [head];
+    const paths = [...s.index.keys()];
+    const id = makeHash(parents, message, s.seq);
+    s.seq += 1;
+    s.commits.set(id, { id, parents, message, paths });
+    moveHead(s, id);
+    s.index.clear();
+    return { state: s, effect: { kind: "commit", id } };
+  }
+  function branch(state, name, at) {
+    const s = cloneState(state);
+    const ref = `refs/heads/${name}`;
+    if (s.refs.has(ref)) throw new GitError(`branch '${name}' already exists`);
+    const target = at !== void 0 ? revParse(s, at) : headCommit3(s);
+    if (target === null) throw new GitError("cannot create a branch: HEAD is unborn");
+    s.refs.set(ref, target);
+    return { state: s, effect: { kind: "branch", ref, commit: target } };
+  }
+  function tag(state, name, at) {
+    const s = cloneState(state);
+    const ref = `refs/tags/${name}`;
+    if (s.refs.has(ref)) throw new GitError(`tag '${name}' already exists`);
+    const target = at !== void 0 ? revParse(s, at) : headCommit3(s);
+    if (target === null) throw new GitError("cannot create a tag: HEAD is unborn");
+    s.refs.set(ref, target);
+    return { state: s, effect: { kind: "tag", ref, commit: target } };
+  }
+  function checkout(state, target, opts) {
+    const s = cloneState(state);
+    if (opts?.create) {
+      const ref = `refs/heads/${target}`;
+      if (s.refs.has(ref)) throw new GitError(`branch '${target}' already exists`);
+      const at = headCommit3(s);
+      if (at === null) throw new GitError("cannot create a branch: HEAD is unborn");
+      s.refs.set(ref, at);
+      s.head = { kind: "branch", name: ref };
+      return { state: s, effect: { kind: "checkout", ref } };
+    }
+    const bref = `refs/heads/${target}`;
+    if (s.refs.has(bref)) {
+      s.head = { kind: "branch", name: bref };
+      return { state: s, effect: { kind: "checkout", ref: bref } };
+    }
+    if (target.startsWith("refs/heads/") && s.refs.has(target)) {
+      s.head = { kind: "branch", name: target };
+      return { state: s, effect: { kind: "checkout", ref: target } };
+    }
+    const commitId = revParse(s, target);
+    s.head = { kind: "detached", commit: commitId };
+    return { state: s, effect: { kind: "checkout", commit: commitId } };
+  }
+  function merge(state, otherRev) {
+    const s = cloneState(state);
+    const h = headCommit3(s);
+    if (h === null) throw new GitError("cannot merge into an unborn branch");
+    const o = revParse(s, otherRev);
+    const hAnc = ancestors(s, h);
+    if (hAnc.has(o)) {
+      return { state: s, effect: { kind: "none" } };
+    }
+    const oAnc = ancestors(s, o);
+    if (oAnc.has(h)) {
+      moveHead(s, o);
+      return { state: s, effect: { kind: "ff", from: h, to: o } };
+    }
+    const base = mergeBases(s, h, o)[0] ?? null;
+    const hPaths = changedPaths(s, h, base);
+    const oPaths = changedPaths(s, o, base);
+    const conflicted = [...hPaths].filter((p) => oPaths.has(p)).sort();
+    if (conflicted.length > 0) {
+      s.merge = { mergeHead: o, conflicted };
+      return { state: s, effect: { kind: "conflict", paths: conflicted } };
+    }
+    const message = `Merge ${otherRev}`;
+    const parents = [h, o];
+    const paths = mergeCommitPaths(s, h, o);
+    const id = makeHash(parents, message, s.seq);
+    s.seq += 1;
+    s.commits.set(id, { id, parents, message, paths });
+    moveHead(s, id);
+    return { state: s, effect: { kind: "merge", id } };
+  }
+  function mergeAbort(state) {
+    const s = cloneState(state);
+    if (!s.merge) throw new GitError("no merge in progress");
+    s.merge = void 0;
+    return { state: s, effect: { kind: "none" } };
+  }
+  function resolvePaths(state, paths) {
+    const s = cloneState(state);
+    if (!s.merge) throw new GitError("no merge in progress");
+    const remaining = s.merge.conflicted.filter((p) => !paths.includes(p));
+    s.merge = { mergeHead: s.merge.mergeHead, conflicted: remaining };
+    return { state: s, effect: { kind: "none" } };
+  }
+  function reset(state, mode, targetRev) {
+    const s = cloneState(state);
+    const target = revParse(s, targetRev);
+    moveHead(s, target);
+    if (mode === "mixed") {
+      for (const p of s.index.keys()) s.worktree.set(p, "modified");
+      s.index.clear();
+    } else if (mode === "hard") {
+      s.index.clear();
+      s.worktree.clear();
+    }
+    return { state: s, effect: { kind: "reset", mode, to: target } };
+  }
+  function revParse(state, rev) {
+    const m = rev.match(/^([^~^]+)(.*)$/);
+    if (!m) throw new GitError(`unknown revision: ${rev}`);
+    let commitId = resolveBase(state, m[1]);
+    const ops = m[2];
+    let i = 0;
+    while (i < ops.length) {
+      const ch = ops[i];
+      i++;
+      let num = "";
+      while (i < ops.length && ops[i] >= "0" && ops[i] <= "9") {
+        num += ops[i];
+        i++;
+      }
+      if (ch === "~") {
+        const n = num === "" ? 1 : parseInt(num, 10);
+        for (let k = 0; k < n; k++) commitId = firstParent(state, commitId);
+      } else if (ch === "^") {
+        const n = num === "" ? 1 : parseInt(num, 10);
+        commitId = nthParent(state, commitId, n);
+      } else {
+        throw new GitError(`unknown revision: ${rev}`);
+      }
+    }
+    return commitId;
+  }
+  function revList(state, range) {
+    let set;
+    if (range.trim() === "--all") {
+      set = /* @__PURE__ */ new Set();
+      for (const ref of state.refs.values()) {
+        for (const h of ancestors(state, ref)) set.add(h);
+      }
+      if (state.head.kind === "detached") {
+        for (const h of ancestors(state, state.head.commit)) set.add(h);
+      }
+    } else if (range.includes("...")) {
+      const [a, b] = range.split("...");
+      const aAnc = ancestors(state, revParse(state, a.trim()));
+      const bAnc = ancestors(state, revParse(state, b.trim()));
+      set = /* @__PURE__ */ new Set();
+      for (const h of aAnc) if (!bAnc.has(h)) set.add(h);
+      for (const h of bAnc) if (!aAnc.has(h)) set.add(h);
+    } else if (range.includes("..")) {
+      const [a, b] = range.split("..");
+      const aAnc = ancestors(state, revParse(state, a.trim()));
+      set = /* @__PURE__ */ new Set();
+      for (const h of ancestors(state, revParse(state, b.trim()))) {
+        if (!aAnc.has(h)) set.add(h);
+      }
+    } else {
+      set = ancestors(state, revParse(state, range.trim()));
+    }
+    return [...state.commits.keys()].filter((h) => set.has(h)).reverse();
+  }
+
+  // src/core/git-cli.ts
+  function tokenize(line) {
+    const tokens = [];
+    let cur = "";
+    let quoted = false;
+    let inDouble = false;
+    let inSingle = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (inDouble) {
+        if (ch === '"') inDouble = false;
+        else cur += ch;
+      } else if (inSingle) {
+        if (ch === "'") inSingle = false;
+        else cur += ch;
+      } else if (ch === '"') {
+        inDouble = true;
+        quoted = true;
+      } else if (ch === "'") {
+        inSingle = true;
+        quoted = true;
+      } else if (ch === " " || ch === "	") {
+        if (cur !== "" || quoted) {
+          tokens.push(cur);
+          cur = "";
+          quoted = false;
+        }
+      } else {
+        cur += ch;
+      }
+    }
+    if (cur !== "" || quoted) tokens.push(cur);
+    return tokens;
+  }
+  function headCommit4(s) {
+    if (s.head.kind === "detached") return s.head.commit;
+    return s.refs.get(s.head.name) ?? null;
+  }
+  function currentBranch(s) {
+    return s.head.kind === "branch" ? s.head.name.replace("refs/heads/", "") : null;
+  }
+  function fnv1a2(str) {
+    let h = 2166136261;
+    for (let i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  function makeHash2(parents, message, seq) {
+    const preimage = parents.join(",") + "\n" + message + "\n" + seq;
+    return fnv1a2(preimage).toString(16).padStart(8, "0").slice(0, 7);
+  }
+  function cloneState2(s) {
+    return {
+      commits: new Map(s.commits),
+      refs: new Map(s.refs),
+      head: s.head.kind === "branch" ? { kind: "branch", name: s.head.name } : { kind: "detached", commit: s.head.commit },
+      index: new Map(s.index),
+      worktree: new Map(s.worktree),
+      merge: s.merge ? { mergeHead: s.merge.mergeHead, conflicted: [...s.merge.conflicted] } : void 0,
+      seq: s.seq
+    };
+  }
+  function moveHead2(s, to) {
+    if (s.head.kind === "branch") s.refs.set(s.head.name, to);
+    else s.head = { kind: "detached", commit: to };
+  }
+  function amend(state, message) {
+    const s = cloneState2(state);
+    const h = headCommit4(s);
+    if (h === null) throw new GitError("You do not have anything to amend.");
+    const old = s.commits.get(h);
+    const parents = old.parents;
+    const paths = [.../* @__PURE__ */ new Set([...old.paths, ...s.index.keys()])];
+    const msg = message ?? old.message;
+    const id = makeHash2(parents, msg, s.seq);
+    s.seq += 1;
+    s.commits.set(id, { id, parents, message: msg, paths });
+    moveHead2(s, id);
+    s.index.clear();
+    return { state: s, effect: { kind: "commit", id } };
+  }
+  function commitLine(s, id) {
+    const c = s.commits.get(id);
+    const label = currentBranch(s) ?? "detached HEAD";
+    const root = c.parents.length === 0 ? " (root-commit)" : "";
+    return `[${label}${root} ${id}] ${c.message}`;
+  }
+  function decorate(s, id) {
+    const parts = [];
+    if (s.head.kind === "branch" && s.refs.get(s.head.name) === id) {
+      parts.push(`HEAD -> ${s.head.name.replace("refs/heads/", "")}`);
+    } else if (s.head.kind === "detached" && s.head.commit === id) {
+      parts.push("HEAD");
+    }
+    const branches = [];
+    const tags = [];
+    for (const [ref, h] of s.refs) {
+      if (h !== id) continue;
+      if (ref.startsWith("refs/heads/")) {
+        const name = ref.replace("refs/heads/", "");
+        if (!(s.head.kind === "branch" && s.head.name === ref)) branches.push(name);
+      } else if (ref.startsWith("refs/tags/")) {
+        tags.push("tag: " + ref.replace("refs/tags/", ""));
+      }
+    }
+    parts.push(...branches.sort(), ...tags.sort());
+    return parts.length ? ` (${parts.join(", ")})` : "";
+  }
+  function statusText(s) {
+    const lines = [];
+    if (s.head.kind === "branch") {
+      lines.push(`On branch ${s.head.name.replace("refs/heads/", "")}`);
+      if (headCommit4(s) === null) lines.push("No commits yet");
+    } else {
+      lines.push(`HEAD detached at ${s.head.commit}`);
+    }
+    if (s.merge && s.merge.conflicted.length > 0) {
+      lines.push("You have unmerged paths.");
+      lines.push('  (fix conflicts and run "git commit")');
+      lines.push("Unmerged paths:");
+      lines.push('  (use "git add <file>..." to mark resolution)');
+      for (const p of [...s.merge.conflicted].sort()) {
+        lines.push(`	both modified:   ${p}`);
+      }
+    }
+    const staged = [...s.index.keys()].sort();
+    if (staged.length > 0) {
+      lines.push("Changes to be committed:");
+      lines.push('  (use "git restore --staged <file>..." to unstage)');
+      for (const p of staged) lines.push(`	modified:   ${p}`);
+    }
+    const modified = [...s.worktree.keys()].sort();
+    if (modified.length > 0) {
+      lines.push("Changes not staged for commit:");
+      lines.push('  (use "git add <file>..." to update what will be committed)');
+      for (const p of modified) lines.push(`	modified:   ${p}`);
+    }
+    if (!s.merge && staged.length === 0 && modified.length === 0) {
+      lines.push("nothing to commit, working tree clean");
+    }
+    return lines.join("\n");
+  }
+  function logText(s, oneline) {
+    const ids = revList(s, "HEAD");
+    if (oneline) {
+      return ids.map((id) => `${id}${decorate(s, id)} ${s.commits.get(id).message}`).join("\n");
+    }
+    return ids.map((id) => {
+      const c = s.commits.get(id);
+      return `commit ${id}${decorate(s, id)}
+
+    ${c.message}`;
+    }).join("\n\n");
+  }
+  var KNOWN = /* @__PURE__ */ new Set([
+    "init",
+    "add",
+    "status",
+    "commit",
+    "branch",
+    "switch",
+    "checkout",
+    "merge",
+    "reset",
+    "tag",
+    "log",
+    "rev-parse",
+    "rev-list"
+  ]);
+  function ok(state, output, effect) {
+    return { state, output, effect };
+  }
+  function unknown(state, sub) {
+    const msg = `git: '${sub}' is not a git command. See 'git --help'.`;
+    return { state, output: msg, effect: { kind: "none" }, error: msg };
+  }
+  function run(line, state) {
+    let tokens = tokenize(line);
+    if (tokens.length && tokens[0] === "git") tokens = tokens.slice(1);
+    if (tokens.length === 0) {
+      return ok(state, "", { kind: "none" });
+    }
+    const sub = tokens[0];
+    const args = tokens.slice(1);
+    try {
+      switch (sub) {
+        case "init": {
+          return ok(init(), "Initialized empty Git repository", { kind: "none" });
+        }
+        case "add": {
+          if (state.merge) {
+            const paths2 = args.includes(".") ? [...state.merge.conflicted] : args;
+            if (paths2.length === 0) {
+              return { state, output: "Nothing specified, nothing added.", effect: { kind: "none" }, error: "Nothing specified, nothing added." };
+            }
+            const r2 = resolvePaths(state, paths2);
+            return ok(r2.state, "", r2.effect);
+          }
+          const paths = [];
+          for (const a of args) {
+            if (a === ".") paths.push(...state.worktree.keys());
+            else paths.push(a);
+          }
+          if (args.length === 0) {
+            return { state, output: "Nothing specified, nothing added.", effect: { kind: "none" }, error: "Nothing specified, nothing added." };
+          }
+          const r = stage(state, paths);
+          return ok(r.state, "", r.effect);
+        }
+        case "status": {
+          return ok(state, statusText(state), { kind: "none" });
+        }
+        case "commit": {
+          const amendFlag = args.includes("--amend");
+          const mi = args.indexOf("-m");
+          const message = mi >= 0 ? args[mi + 1] : void 0;
+          if (amendFlag) {
+            const r2 = amend(state, message);
+            return ok(r2.state, commitLine(r2.state, r2.effect.id), r2.effect);
+          }
+          if (message === void 0 || message === "") {
+            const msg = "Aborting commit due to empty commit message.";
+            return { state, output: msg, effect: { kind: "none" }, error: msg };
+          }
+          const r = commit(state, message);
+          const id = r.effect.id;
+          return ok(r.state, commitLine(r.state, id), r.effect);
+        }
+        case "branch": {
+          const positional = args.filter((a) => !a.startsWith("-"));
+          if (positional.length === 0) {
+            const names = [...state.refs.keys()].filter((r2) => r2.startsWith("refs/heads/")).map((r2) => r2.replace("refs/heads/", "")).sort();
+            const cur = currentBranch(state);
+            const out = names.map((n) => n === cur ? `* ${n}` : `  ${n}`).join("\n");
+            return ok(state, out, { kind: "none" });
+          }
+          const r = branch(state, positional[0], positional[1]);
+          return ok(r.state, "", r.effect);
+        }
+        case "switch":
+        case "checkout": {
+          const create = args.includes("-c") || args.includes("-b");
+          const positional = args.filter((a) => !a.startsWith("-"));
+          if (positional.length === 0) {
+            const msg = "fatal: missing branch or commit argument";
+            return { state, output: msg, effect: { kind: "none" }, error: "missing branch or commit argument" };
+          }
+          const target = positional[0];
+          const r = checkout(state, target, { create });
+          let out;
+          if (create) {
+            out = `Switched to a new branch '${target}'`;
+          } else if (r.effect.kind === "checkout" && "commit" in r.effect && r.effect.commit) {
+            const c = r.state.commits.get(r.effect.commit);
+            out = `HEAD is now at ${r.effect.commit} ${c.message}`;
+          } else {
+            out = `Switched to branch '${target}'`;
+          }
+          return ok(r.state, out, r.effect);
+        }
+        case "merge": {
+          if (args.includes("--abort")) {
+            const r2 = mergeAbort(state);
+            return ok(r2.state, "", r2.effect);
+          }
+          const rev = args.find((a) => !a.startsWith("-"));
+          if (rev === void 0) {
+            const msg = "fatal: No commit specified and merge.defaultToUpstream not set.";
+            return { state, output: msg, effect: { kind: "none" }, error: "No commit specified" };
+          }
+          const r = merge(state, rev);
+          let out;
+          switch (r.effect.kind) {
+            case "none":
+              out = "Already up to date.";
+              break;
+            case "ff":
+              out = `Updating ${r.effect.from}..${r.effect.to}
+Fast-forward`;
+              break;
+            case "merge":
+              out = "Merge made by the 'ort' strategy.";
+              break;
+            case "conflict":
+              out = r.effect.paths.map((p) => `CONFLICT (content): Merge conflict in ${p}`).join("\n") + "\nAutomatic merge failed; fix conflicts and then commit the result.";
+              break;
+            default:
+              out = "";
+          }
+          return ok(r.state, out, r.effect);
+        }
+        case "reset": {
+          let mode = "mixed";
+          if (args.includes("--soft")) mode = "soft";
+          else if (args.includes("--hard")) mode = "hard";
+          else if (args.includes("--mixed")) mode = "mixed";
+          const rev = args.find((a) => !a.startsWith("-")) ?? "HEAD";
+          const r = reset(state, mode, rev);
+          let out = "";
+          if (mode === "hard") {
+            const to = r.effect.to;
+            out = `HEAD is now at ${to} ${r.state.commits.get(to).message}`;
+          }
+          return ok(r.state, out, r.effect);
+        }
+        case "tag": {
+          const positional = args.filter((a) => !a.startsWith("-"));
+          if (positional.length === 0) {
+            const names = [...state.refs.keys()].filter((ref) => ref.startsWith("refs/tags/")).map((ref) => ref.replace("refs/tags/", "")).sort();
+            return ok(state, names.join("\n"), { kind: "none" });
+          }
+          const r = tag(state, positional[0], positional[1]);
+          return ok(r.state, "", r.effect);
+        }
+        case "log": {
+          const oneline = args.includes("--oneline");
+          return ok(state, logText(state, oneline), { kind: "none" });
+        }
+        case "rev-parse": {
+          const rev = args.find((a) => !a.startsWith("-"));
+          if (rev === void 0) {
+            const msg = "fatal: rev-parse: no revision given";
+            return { state, output: msg, effect: { kind: "none" }, error: "no revision given" };
+          }
+          return ok(state, revParse(state, rev), { kind: "none" });
+        }
+        case "rev-list": {
+          const range = args.find((a) => a === "--all" || !a.startsWith("-"));
+          if (range === void 0) {
+            const msg = "fatal: rev-list: no revision given";
+            return { state, output: msg, effect: { kind: "none" }, error: "no revision given" };
+          }
+          return ok(state, revList(state, range).join("\n"), { kind: "none" });
+        }
+        default:
+          if (KNOWN.has(sub)) {
+            return unknown(state, sub);
+          }
+          return unknown(state, sub);
+      }
+    } catch (e) {
+      if (e instanceof GitError) {
+        return { state, output: e.message, effect: { kind: "none" }, error: e.message };
+      }
+      const msg = e instanceof Error ? e.message : String(e);
+      return { state, output: `fatal: ${msg}`, effect: { kind: "none" }, error: msg };
+    }
+  }
+
+  // src/core/terminal-history.ts
+  var DEFAULT_LIMIT = 100;
+  var CommandHistory = class {
+    constructor(limit = DEFAULT_LIMIT) {
+      this.items = [];
+      /** Index into `items`; `items.length` means "on the live line". */
+      this.cursor = 0;
+      this.draft = "";
+      this.limit = Math.max(1, limit);
+    }
+    /** Entered commands, oldest first. */
+    get entries() {
+      return this.items;
+    }
+    /** Record a command and return to the live line. Blank lines are not stored,
+     *  and a command identical to the previous one is not stored twice. */
+    push(line) {
+      const value = line.trim();
+      if (value !== "" && this.items[this.items.length - 1] !== value) {
+        this.items.push(value);
+        if (this.items.length > this.limit) this.items.shift();
+      }
+      this.reset();
+    }
+    /** Older entry, or `null` when already at the oldest (or history is empty).
+     *  `current` is the text on the live line, parked on the first step back. */
+    prev(current) {
+      if (this.cursor === 0) return null;
+      if (this.cursor === this.items.length) this.draft = current;
+      this.cursor -= 1;
+      return this.items[this.cursor] ?? null;
+    }
+    /** Newer entry, the parked draft when stepping back onto the live line, or
+     *  `null` when already on the live line. */
+    next() {
+      if (this.cursor >= this.items.length) return null;
+      this.cursor += 1;
+      return this.cursor === this.items.length ? this.draft : this.items[this.cursor] ?? null;
+    }
+    /** Drop the walk position and the parked draft. */
+    reset() {
+      this.cursor = this.items.length;
+      this.draft = "";
+    }
+  };
+
+  // src/dom/line-terminal.ts
+  var DEFAULT_PROMPT = "$";
+  var LineTerminal = class {
+    constructor() {
+      this.root = null;
+      this.scroll = null;
+      this.input = null;
+      this.prompt = DEFAULT_PROMPT;
+      this.onCommand = null;
+      this.history = new CommandHistory();
+      // --- input -------------------------------------------------------------
+      this.onKeyDown = (ev) => {
+        const input = this.input;
+        if (!input) return;
+        if (ev.key === "Enter") {
+          ev.preventDefault();
+          this.submit(input.value);
+          return;
+        }
+        if (ev.key === "ArrowUp") {
+          ev.preventDefault();
+          this.recall(this.history.prev(input.value));
+          return;
+        }
+        if (ev.key === "ArrowDown") {
+          ev.preventDefault();
+          this.recall(this.history.next());
+        }
+      };
+      /** Clicking anywhere in the console puts the caret back on the live line -
+       *  except when the click ended a selection, so output stays copyable. */
+      this.onRootClick = (ev) => {
+        if (ev.target === this.input) return;
+        const sel = typeof document.getSelection === "function" ? document.getSelection() : null;
+        if (sel && sel.toString() !== "") return;
+        this.focus();
+      };
+    }
+    // --- lifecycle ---------------------------------------------------------
+    mount(host, opts) {
+      this.prompt = opts.prompt ?? DEFAULT_PROMPT;
+      this.onCommand = opts.onCommand;
+      const root = document.createElement("div");
+      root.className = "cl-term";
+      const scroll = document.createElement("div");
+      scroll.className = "cl-term-scroll";
+      scroll.setAttribute("role", "log");
+      scroll.setAttribute("aria-live", "polite");
+      scroll.setAttribute("aria-label", "Terminal output");
+      const row = document.createElement("div");
+      row.className = "cl-term-row";
+      row.append(this.promptSpan());
+      const input = document.createElement("input");
+      input.className = "cl-term-input";
+      input.type = "text";
+      input.setAttribute("aria-label", "Terminal command");
+      input.autocomplete = "off";
+      input.spellcheck = false;
+      input.setAttribute("autocapitalize", "off");
+      input.setAttribute("autocorrect", "off");
+      row.append(input);
+      root.append(scroll, row);
+      root.addEventListener("click", this.onRootClick);
+      input.addEventListener("keydown", this.onKeyDown);
+      host.appendChild(root);
+      this.root = root;
+      this.scroll = scroll;
+      this.input = input;
+      for (const line of opts.intro ?? []) this.write(line);
+    }
+    destroy() {
+      this.root?.removeEventListener("click", this.onRootClick);
+      this.input?.removeEventListener("keydown", this.onKeyDown);
+      this.root?.remove();
+      this.root = null;
+      this.scroll = null;
+      this.input = null;
+      this.onCommand = null;
+      this.history.reset();
+    }
+    // --- public API --------------------------------------------------------
+    /** Append output to the scrollback. Embedded newlines become separate lines,
+     *  so a caller can hand over a whole command result in one call. */
+    write(text, kind = "out") {
+      if (!this.scroll) return;
+      for (const line of String(text).split("\n")) {
+        const el = document.createElement("div");
+        el.className = `cl-term-line is-${kind}`;
+        el.textContent = line;
+        this.scroll.appendChild(el);
+      }
+      this.scrollToEnd();
+    }
+    /** Wipe the scrollback. The prompt line, its text, and focus are untouched. */
+    clear() {
+      if (this.scroll) this.scroll.textContent = "";
+    }
+    focus() {
+      this.input?.focus();
+    }
+    submit(raw) {
+      const line = raw.trim();
+      if (this.input) this.input.value = "";
+      this.echo(line);
+      this.history.push(line);
+      if (line !== "") this.onCommand?.(line);
+    }
+    /** Put a recalled entry on the live line, caret at the end. `null` means the
+     *  walk hit an end, so the line stays as it is. */
+    recall(value) {
+      const input = this.input;
+      if (!input || value === null) return;
+      input.value = value;
+      const end = value.length;
+      if (typeof input.setSelectionRange === "function") input.setSelectionRange(end, end);
+    }
+    // --- rendering helpers -------------------------------------------------
+    /** Echo what was entered into the scrollback, so the transcript reads like a
+     *  real session. A blank line echoes a bare prompt. */
+    echo(line) {
+      if (!this.scroll) return;
+      const el = document.createElement("div");
+      el.className = "cl-term-line is-cmd";
+      el.append(this.promptSpan());
+      el.append(document.createTextNode(line === "" ? "" : ` ${line}`));
+      this.scroll.appendChild(el);
+      this.scrollToEnd();
+    }
+    promptSpan() {
+      const el = document.createElement("span");
+      el.className = "cl-term-prompt";
+      el.textContent = this.prompt;
+      el.setAttribute("aria-hidden", "true");
+      return el;
+    }
+    scrollToEnd() {
+      if (this.scroll) this.scroll.scrollTop = this.scroll.scrollHeight;
     }
   };
 
