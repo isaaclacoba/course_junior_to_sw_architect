@@ -79,7 +79,7 @@
   "concept.pr-dependency-inversion.term": "Dependency Inversion",
   "concept.pr-dependency-inversion.def": "High-level code depending on an abstraction rather than a concrete detail, so the detail can change freely.",
   "task.1.require.0": "Give `Cat` a `string CheckAndSign(int hoursSinceMeal)` method.",
-  "task.1.verify": "The card has to be decided from the hours passed in, not fixed. A cat that ate two hours ago should read FULL.",
+  "task.1.verify": "A cat that ate two hours ago should read FULL. Check both sides of the comparison - the card comes from `hoursSinceMeal` measured against the threshold, not from a fixed answer and not from the hours compared with themselves.",
   "task.2.require.0": "There is still a `HoursUntilHungry = 6` in the file. The vet said four hours - and the rule is written in more than one place.",
   "task.2.require.1": "Keep the `FrontDesk` - the point of this card is that both places have to agree.",
   "task.3.require.0": "Give `Cat` a `bool IsHungry()` that answers from its own stored hours.",

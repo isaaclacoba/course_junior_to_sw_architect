@@ -247,7 +247,11 @@ test("every visible label in gitCard goes through a chrome key", () => {
 });
 
 test("every archetype emits a single live-region card root", () => {
+  // Matched on the role rather than the exact class string: a card may carry a
+  // layout modifier (buildCard adds `card--split`), and what matters here is that
+  // there is exactly ONE live region per card, not how it is skinned.
   for (const html of [cards.buildCard("bp"), cards.drillCard("cf"), cards.gitCard("gt")]) {
-    assert.equal(html.match(/<section class="card" aria-live="polite">/g).length, 1);
+    const roots = html.match(/<section class="card(?: [^"]*)?" aria-live="polite">/g);
+    assert.equal(roots.length, 1);
   }
 });

@@ -330,7 +330,7 @@
 
   function buildCard(p) {
     return `
-      <section class="card" aria-live="polite">
+      <section class="card card--split" aria-live="polite">
         <header class="challenge-head">
           <div>
             <p id="${p}Meta" class="meta"></p>
@@ -343,38 +343,43 @@
           </div>
         </header>
 
-        <section id="${p}ExampleWrap" class="example-box" hidden>
-          <h3${tAttr("card.pattern")}>${tHtml("card.pattern", "Here's the pattern")}</h3>
-          <pre class="code-example"><code id="${p}Example" class="language-csharp"></code></pre>
-        </section>
+        <div class="build-split">
+          <div class="build-col build-col--brief">
+            <section id="${p}ExampleWrap" class="example-box" hidden>
+              <h3${tAttr("card.pattern")}>${tHtml("card.pattern", "Here's the pattern")}</h3>
+              <pre class="code-example"><code id="${p}Example" class="language-csharp"></code></pre>
+            </section>
 
-        <section class="coach">
-          <h3${tAttr("card.goal")}>${tHtml("card.goal", "Goal")}</h3>
-          <ul id="${p}Goal" class="coach-list"></ul>
-          <p class="context">
-            ${tSlot("card.expected", "Expected output:")} <strong id="${p}Expected" class="expected-line"></strong>
-          </p>
-        </section>
+            <section class="coach">
+              <h3${tAttr("card.goal")}>${tHtml("card.goal", "Goal")}</h3>
+              <ul id="${p}Goal" class="coach-list"></ul>
+              <p class="context">
+                ${tSlot("card.expected", "Expected output:")} <strong id="${p}Expected" class="expected-line"></strong>
+              </p>
+            </section>
+          </div>
 
+          <div class="build-col build-col--work">
+            <section class="fill-section">
+              <h3${tAttr("card.yourcode")}>${tHtml("card.yourcode", "Your Code")}</h3>
+              <div id="${p}Editor" class="code-editor-host"></div>
+            </section>
 
-        <section class="fill-section">
-          <h3${tAttr("card.yourcode")}>${tHtml("card.yourcode", "Your Code")}</h3>
-          <div id="${p}Editor" class="code-editor-host"></div>
-        </section>
+            <section class="actions">
+              <button id="${p}Run" class="btn primary" type="button">${tHtml("nav.run", "Run")}</button>
+              <button id="${p}Solution" class="btn danger" type="button"${tAttr("nav.solution")}>${tHtml("nav.solution", "Show Solution")}</button>
+              <button id="${p}Reset" class="btn" type="button"${tAttr("nav.reset")}>${tHtml("nav.reset", "Reset")}</button>
+            </section>
 
-        <section class="actions">
-          <button id="${p}Run" class="btn primary" type="button">${tHtml("nav.run", "Run")}</button>
-          <button id="${p}Solution" class="btn danger" type="button"${tAttr("nav.solution")}>${tHtml("nav.solution", "Show Solution")}</button>
-          <button id="${p}Reset" class="btn" type="button"${tAttr("nav.reset")}>${tHtml("nav.reset", "Reset")}</button>
-        </section>
+            <div id="${p}Errors" class="run-errors" hidden></div>
+            <pre id="${p}Output" class="run-output" hidden></pre>
 
-        <div id="${p}Errors" class="run-errors" hidden></div>
-        <pre id="${p}Output" class="run-output" hidden></pre>
-
-        <section id="${p}Result" class="result-panel" hidden>
-          <h3 id="${p}ResultTitle"></h3>
-          <p id="${p}ResultBody"></p>
-        </section>
+            <section id="${p}Result" class="result-panel" hidden>
+              <h3 id="${p}ResultTitle"></h3>
+              <p id="${p}ResultBody"></p>
+            </section>
+          </div>
+        </div>
 
         <section id="${p}Summary" class="summary-section" hidden>
           <p id="${p}SummaryIntro" class="context"></p>

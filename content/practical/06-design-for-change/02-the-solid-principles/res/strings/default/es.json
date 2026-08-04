@@ -83,7 +83,7 @@
   "concept.pr-dependency-inversion.def": "El código de alto nivel depende de una abstracción y no de un detalle concreto, así el detalle puede cambiar libremente.",
   "concept.pr-dependency-inversion.term": "Inversión de dependencias",
   "task.1.require.0": "Dale a `Cat` un método `string CheckAndSign(int hoursSinceMeal)`.",
-  "task.1.verify": "La tarjeta tiene que decidirse a partir de las horas que se le pasan, no estar fija. Un gato que comió hace dos horas debería marcar FULL.",
+  "task.1.verify": "Un gato que comió hace dos horas debería marcar FULL. Revisa los dos lados de la comparación - la tarjeta sale de `hoursSinceMeal` medido contra el umbral, no de una respuesta fija ni de las horas comparadas consigo mismas.",
   "task.2.require.0": "Todavía queda un `HoursUntilHungry = 6` en el archivo. La veterinaria dijo cuatro horas - y la regla está escrita en más de un sitio.",
   "task.2.require.1": "Conserva el `FrontDesk` - el objetivo de esta tarjeta es que los dos sitios tienen que coincidir.",
   "task.3.require.0": "Dale a `Cat` un `bool IsHungry()` que responda a partir de las horas guardadas.",

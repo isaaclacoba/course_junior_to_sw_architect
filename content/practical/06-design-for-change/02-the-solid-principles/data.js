@@ -46,7 +46,7 @@
       verify: {
         main: "class Program\n{\n    static void Main()\n    {\n        var cat = new Cat();\n        System.Console.WriteLine(cat.CheckAndSign(2));\n    }\n}\n",
         expected: "FULL",
-        message: "The card has to be decided from the hours passed in, not fixed. A cat that ate two hours ago should read FULL."
+        message: "A cat that ate two hours ago should read FULL. Check both sides of the comparison - the card comes from `hoursSinceMeal` measured against the threshold, not from a fixed answer and not from the hours compared with themselves."
       },
       starter: "using System;\n\npublic class Cat\n{\n    private const int HoursUntilHungry = 6;\n\n    // TODO: HoursUntilHungry or more hours since the last meal means the card\n    // reads FEED. Anything less reads FULL.\n    public string CheckAndSign(int hoursSinceMeal)\n    {\n        return \"\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var whiskers = new Cat();\n        Console.WriteLine(whiskers.CheckAndSign(7));\n    }\n}\n",
       solution: "using System;\n\npublic class Cat\n{\n    private const int HoursUntilHungry = 6;\n\n    public string CheckAndSign(int hoursSinceMeal)\n    {\n        return hoursSinceMeal >= HoursUntilHungry ? \"FEED\" : \"FULL\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var whiskers = new Cat();\n        Console.WriteLine(whiskers.CheckAndSign(7));\n    }\n}\n"

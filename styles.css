@@ -581,6 +581,79 @@ h4 {
   border-top: 1px solid var(--hair-2);
 }
 
+/* --- the build card's two-column split ---------------------------------------
+   The goal tracker is a map the learner reads WHILE typing, not a briefing they
+   read once and scroll away from. Stacked, every keystroke in the editor pushed
+   the shape they were building off the top of the screen. Side by side, the
+   boxes tick in the corner of the eye as the code that lights them is written.
+   One column below 1080px, where side-by-side would squeeze the editor. */
+.card--split {
+  /* Same breakout as .lesson-viz: the negative margin re-centres a box that is
+     wider than the 980px reading column, instead of letting it push the page
+     sideways. */
+  width: min(1320px, 94vw);
+  margin-inline: calc(50% - min(1320px, 94vw) / 2);
+}
+
+.build-split {
+  display: grid;
+  grid-template-columns: minmax(0, 27rem) minmax(0, 1fr);
+  gap: 1.1rem;
+  align-items: start;
+  margin-top: 1rem;
+}
+
+.build-col {
+  min-width: 0;
+}
+
+/* Sticky so a long editor cannot scroll the goals away. It scrolls internally
+   when the tracker itself is taller than the viewport. */
+.build-col--brief {
+  position: sticky;
+  top: 0.8rem;
+  max-height: calc(100vh - 1.6rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.build-col--brief .coach {
+  margin-top: 0;
+}
+
+.build-col--brief .example-box + .coach {
+  margin-top: 0.8rem;
+}
+
+.build-col--work .fill-section {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+@media (max-width: 1080px) {
+  .card--split {
+    width: auto;
+    margin-inline: 0;
+  }
+
+  .build-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .build-col--brief {
+    position: static;
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .build-col--work .fill-section {
+    margin-top: 1.2rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--hair-2);
+  }
+}
+
 /* --- the live goal tracker (UML class boxes) --------------------------------
    Structural goals render as UML-style class boxes with a header (type name +
    bases) and one row per member signature. Run-gated goals are short lines below
@@ -601,7 +674,9 @@ h4 {
 .coach-list.has-tracker {
   padding-left: 0;
   list-style: none;
-  gap: 0.6rem;
+  gap: 0.45rem;
+  font-size: 0.92rem;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
 }
 
 .goal-box {
@@ -625,7 +700,7 @@ h4 {
 }
 
 .goal-box-header {
-  padding: 0.3rem 0.5rem;
+  padding: 0.22rem 0.45rem;
   background: var(--bg-2);
   border-bottom: 1px solid var(--line);
   font-weight: 600;
@@ -676,22 +751,35 @@ h4 {
 }
 
 .goal-box-members {
-  padding: 0.25rem 0.5rem;
+  padding: 0.2rem 0.45rem;
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.1rem;
 }
 
 /* One member row = one subtask, each with its own tick, so progress inside a
    class is visible instead of one box that stays grey until the last keystroke. */
-.goal-member {
+/* Doubled up on .goal-code deliberately: that class is declared later and sets
+   `white-space: nowrap` for inline use, so a single-class selector here would
+   lose and the row would clip. The row IS the instruction - a signature like
+   `int HungryCount(List<Cat> cats)` has to wrap, never vanish off the edge. */
+.goal-member,
+.goal-code.goal-member {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.3rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.goal-box-header .goal-code {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .goal-member-tick {
   flex: none;
+  margin-top: 0.18em;
   width: 0.95em;
   height: 0.95em;
   display: inline-flex;
@@ -715,8 +803,8 @@ h4 {
 }
 
 .goal-box-caption {
-  padding: 0.25rem 0.5rem 0.35rem;
-  font-size: 0.82em;
+  padding: 0.2rem 0.45rem 0.3rem;
+  font-size: 0.8em;
   color: var(--ink-soft);
   border-top: 1px dashed var(--hair-1);
 }
@@ -785,12 +873,13 @@ h4 {
   color: var(--good-line);
 }
 
-/* -- narrow width: boxes stack full-width -- */
-@media (min-width: 36rem) {
-  .goal-box {
-    width: calc(50% - 0.3rem);
-  }
-}
+/* The old rule here set every box to `width: calc(50% - 0.3rem)`. The list is a
+   single-column grid, so that never produced two across - it just made each box
+   half as wide as the space it had, which passed unnoticed while the card was
+   the full 980px. In the narrower tracker column it halved an already narrow
+   box and wrapped every signature. Track sizing does the job properly: the
+   boxes fill one column when the tracker is beside the editor, and flow into
+   two or three when it sits full width above it. */
 
 /* -- reduced motion -- */
 @media (prefers-reduced-motion: reduce) {

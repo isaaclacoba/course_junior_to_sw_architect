@@ -1514,3 +1514,38 @@ now actually runs the tracker on all 84 lessons, 84 pass; real-dotnet run of the
 SOLID lesson passes; es round-trip clean; and CDP confirms in a real browser that
 the reporter's own source turns `FrontDesk` green from typing alone, with the two
 `Main` steps they had not done still correctly grey.
+
+## 2026-08-04 16:11 - 16:42 - the tracker beside the editor, not above it
+
+Stacked, the goal tracker was a briefing: the learner read it once, scrolled it
+off the top, and typed the rest of the card blind. It is meant to be a map read
+WHILE typing. Split the build card into two columns - the shape to build on the
+left, the editor on the right - with the left column sticky so the boxes tick in
+the corner of the eye as the code that lights them is written. One column again
+below 1080px, where side by side would squeeze the editor.
+
+Two latent layout bugs surfaced once the column got narrower:
+
+`.goal-code` sets `white-space: nowrap` for inline use, and the member rows reuse
+that class, so every signature longer than the box was simply cut off - `int
+HungryCount(List<Cat> cats)` rendered as `int HungryCount(List<`. The row IS the
+instruction; it can wrap, it can never disappear. The override needs the doubled
+`.goal-code.goal-member` selector because `.goal-code` is declared later.
+
+Worse, `@media (min-width: 36rem)` set every box to `width: calc(50% - 0.3rem)`.
+The list is a single-column grid, so that never produced two boxes across - it
+just made each box half as wide as the space it had, which nobody noticed while
+the card was the full 980px. Replaced with `repeat(auto-fill, minmax(16rem,
+1fr))`, which fills one column beside the editor and flows into three when the
+tracker sits full width above it.
+
+Also fixed the feedback on card 1. A reader's `hoursSinceMeal >= hoursSinceMeal`
+was rejected correctly - it is always true, and `csc` even warns CS1718 - but the
+message said the card must not be "fixed", which is not what they had done. It
+now names the real trap: check BOTH sides of the comparison. English and Spanish.
+
+Verified: 370/370 course tests; validate 0 errors; check-i18n 0 missing keys;
+verify-lesson --all 85/85; real-dotnet run of the SOLID lesson passes both
+locales; and CDP across 1600/1440/1280/1100/1024/800px shows no horizontal
+overflow at any width, no clipped row, and the tracker still ticking live from
+typing alone (all five boxes red to green, no Run).
