@@ -144,6 +144,10 @@
       "blurb": "Entrega una carpeta a git y guarda tus primeras versiones. Tres ejercicios cortos en un terminal de verdad: arranca el repositorio, elige qué archivos entran y guárdalos - el gráfico se dibuja solo mientras escribes.",
       "title": "Tu primer commit"
     },
+    "git-where-am-i": {
+      "blurb": "Lee tu propio repositorio antes de cambiarlo. Pregúntale a git qué está esperando a guardarse y qué guardaste ya, y añade el siguiente commit sabiendo exactamente dónde estás.",
+      "title": "¿Dónde estoy?"
+    },
     "good-code-check": {
       "blurb": "El checkpoint de la Parte cinco: buenos nombres, sin duplicación, un trabajo por función, legibilidad y comentarios. Supéralo para cerrar los fundamentos del buen código.",
       "title": "Checkpoint de fundamentos del buen código"

@@ -199,6 +199,10 @@
       "def": "Una instantánea guardada de los archivos que elegiste, con un mensaje corto que dice cuál fue el cambio.",
       "term": "Commit"
     },
+    "gt-hash": {
+      "def": "El código corto que git le da a un commit como nombre, para que puedas señalar esa instantánea exacta.",
+      "term": "Hash"
+    },
     "gt-repository": {
       "def": "La carpeta que git vigila, junto con todas las instantáneas que has guardado en ella.",
       "term": "Repositorio"

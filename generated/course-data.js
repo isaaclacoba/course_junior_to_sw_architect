@@ -1253,6 +1253,19 @@
               "pill": "gentle",
               "time": "20 min",
               "kind": "lesson"
+            },
+            {
+              "id": "git-where-am-i",
+              "track": "git",
+              "part": "first-steps",
+              "href": "content/git/01-first-steps/03-git-where-am-i/",
+              "key": "git_where_am_i_awarded",
+              "total": 2,
+              "title": "Where am I?",
+              "blurb": "Read your own repository before you change it. Ask git what is waiting to be saved and what you have saved already, then add the next commit knowing exactly where you stand.",
+              "pill": "gentle",
+              "time": "15 min",
+              "kind": "lesson"
             }
           ]
         }

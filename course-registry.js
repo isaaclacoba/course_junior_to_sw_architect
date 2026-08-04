@@ -167,7 +167,8 @@
     { track: "ai", part: "making-agents-reliable", id: "ai-23", href: "content/ai/04-making-agents-reliable/05-ai-23/", kind: "lesson", path: "content/ai/04-making-agents-reliable/05-ai-23" },
 
     // ---- git / first-steps ----
-    { track: "git", part: "first-steps", id: "git-first-commit", href: "content/git/01-first-steps/01-git-first-commit/", kind: "lesson", path: "content/git/01-first-steps/01-git-first-commit" }
+    { track: "git", part: "first-steps", id: "git-first-commit", href: "content/git/01-first-steps/01-git-first-commit/", kind: "lesson", path: "content/git/01-first-steps/01-git-first-commit" },
+    { track: "git", part: "first-steps", id: "git-where-am-i", href: "content/git/01-first-steps/03-git-where-am-i/", kind: "lesson", path: "content/git/01-first-steps/03-git-where-am-i" },
   ];
 
   var byIdIndex = {};

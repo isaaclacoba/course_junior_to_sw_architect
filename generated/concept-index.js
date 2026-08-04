@@ -327,23 +327,36 @@
     },
     "gt-commit": {
       "introducedBy": "git-first-commit",
+      "revisitedBy": [
+        "git-where-am-i"
+      ],
+      "usedBy": []
+    },
+    "gt-hash": {
+      "introducedBy": "git-where-am-i",
       "revisitedBy": [],
       "usedBy": []
     },
     "gt-repository": {
       "introducedBy": "git-first-commit",
-      "revisitedBy": [],
+      "revisitedBy": [
+        "git-where-am-i"
+      ],
       "usedBy": []
     },
     "gt-staging-area": {
       "introducedBy": "git-first-commit",
       "revisitedBy": [],
-      "usedBy": []
+      "usedBy": [
+        "git-where-am-i"
+      ]
     },
     "gt-working-tree": {
       "introducedBy": "git-first-commit",
       "revisitedBy": [],
-      "usedBy": []
+      "usedBy": [
+        "git-where-am-i"
+      ]
     },
     "pr-abstract-type": {
       "introducedBy": "type-system",
@@ -2096,6 +2109,19 @@
       "revisits": [],
       "uses": []
     },
+    "git-where-am-i": {
+      "introduces": [
+        "gt-hash"
+      ],
+      "revisits": [
+        "gt-commit",
+        "gt-repository"
+      ],
+      "uses": [
+        "gt-staging-area",
+        "gt-working-tree"
+      ]
+    },
     "good-code-check": {
       "introduces": [],
       "revisits": [
@@ -3012,6 +3038,10 @@
     "gt-commit": {
       "term": "Commit",
       "def": "A saved snapshot of the files you picked, with a short message saying what the change was."
+    },
+    "gt-hash": {
+      "term": "Hash",
+      "def": "The short code git gives a commit as its name, so you can point at that exact snapshot."
     },
     "gt-repository": {
       "term": "Repository",
