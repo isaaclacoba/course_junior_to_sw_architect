@@ -18,25 +18,19 @@
  * makes it unit-testable on plain command arrays.
  */
 import KernelGitProgress from "../../kernel/engine/git-progress.js";
+// How to READ an authored task is shared with the PAGE (the git plugin), so
+// this gate can never seed a different repository than the learner is given.
+import KernelGitTask from "../../kernel/grading/git-task.js";
 
-// A RepoState, not a command list. The plugin accepts one as-is, so the
-// verifier and the tests may pass one too.
-function isRepoState(s) {
-  return !!(s && s.commits && s.commits.get && s.refs && s.refs.forEach && s.head);
-}
+const { isRepoState, filesOf } = KernelGitTask;
 
 function isCommandList(v) {
   return Array.isArray(v) && v.every((c) => typeof c === "string" && c.trim());
 }
 
-// The plugin's own accessors, so authoring aliases stay in one truth.
-export function startOf(task) { return task && (task.start || task.commands); }
-export function targetOf(task) { return task && (task.target || task.targetCommands); }
-export function solutionOf(task) {
-  const s = task && task.solution;
-  if (Array.isArray(s)) return s;
-  return s ? [s] : [];
-}
+// Re-exported so callers (and tests) have one import for reading a task.
+export const { startOf, targetOf, solutionOf } = KernelGitTask;
+export { filesOf };
 
 // Wrap a loaded CodeLab bundle as the runtime this module takes. Returns null
 // when the bundle cannot run git at all (a stale re-vendor), so the caller can
@@ -74,25 +68,6 @@ function toState(git, spec, files) {
   if (isRepoState(spec)) return { state: spec, failed: null };
   if (Array.isArray(spec)) return replay(git, spec, null, files);
   return { state: git.init(files), failed: null };
-}
-
-// Mirrors the plugin's filesOf: declared `files` plus every path the card's own
-// commands add. Kept in step with kernel/engine/plugins/git-plugin.js, the same
-// way startOf/targetOf/solutionOf above are.
-export function filesOf(task) {
-  if (!task) return [];
-  const out = new Set(task.files || []);
-  for (const list of [startOf(task), targetOf(task), solutionOf(task)]) {
-    if (!Array.isArray(list)) continue;
-    for (const line of list) for (const path of addedPaths(line)) out.add(path);
-  }
-  return [...out];
-}
-
-function addedPaths(line) {
-  const words = String(line || "").trim().split(/\s+/);
-  if (words[0] !== "git" || words[1] !== "add") return [];
-  return words.slice(2).filter((w) => w && !w.startsWith("-") && w !== "." && w !== "*");
 }
 
 function fail(code, reason) { return { ok: false, code, reason }; }

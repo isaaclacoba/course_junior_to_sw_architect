@@ -56,8 +56,11 @@ test("build loads its grader AND the structure policy the tracker reads", () => 
 test("git loads its graders AND the shared progress module, in that order", () => {
   // git grades in two dimensions: the commit DAG (shape) and the three-area end
   // state (which files a commit touched, what is staged, what is modified). Both
-  // must load before git-progress, which composes them.
+  // must load before git-progress, which composes them. git-task comes first:
+  // it is how an authored task is READ, which the plugin needs before anything
+  // can be graded at all.
   assert.deepEqual(deps().git, [
+    "kernel/grading/git-task.js",
     "kernel/grading/dag-match.js",
     "kernel/grading/state-match.js",
     "kernel/engine/git-progress.js",

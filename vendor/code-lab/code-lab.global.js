@@ -4767,6 +4767,21 @@ ${result.runtimeError}`.trim(),
     }
     return { state: s, effect: { kind: "none" } };
   }
+  function amend(state, message) {
+    const s = cloneState(state);
+    const h = headCommit3(s);
+    if (h === null) throw new GitError("You do not have anything to amend.");
+    const old = s.commits.get(h);
+    const parents = old.parents;
+    const paths = [.../* @__PURE__ */ new Set([...old.paths, ...s.index.keys()])];
+    const msg = message ?? old.message;
+    const id = makeHash(parents, msg, s.seq);
+    s.seq += 1;
+    s.commits.set(id, { id, parents, message: msg, paths });
+    moveHead(s, id);
+    s.index.clear();
+    return { state: s, effect: { kind: "commit", id } };
+  }
   function unstage(state, paths) {
     const s = cloneState(state);
     const tracked = trackedPaths(s, headCommit3(s));
@@ -5238,54 +5253,8 @@ ${result.runtimeError}`.trim(),
 The most similar command is
 	${near}` : head;
   }
-  function headCommit4(s) {
-    if (s.head.kind === "detached") return s.head.commit;
-    return s.refs.get(s.head.name) ?? null;
-  }
   function currentBranch(s) {
     return s.head.kind === "branch" ? s.head.name.replace("refs/heads/", "") : null;
-  }
-  function fnv1a2(str) {
-    let h = 2166136261;
-    for (let i = 0; i < str.length; i++) {
-      h ^= str.charCodeAt(i);
-      h = Math.imul(h, 16777619);
-    }
-    return h >>> 0;
-  }
-  function makeHash2(parents, message, seq) {
-    const preimage = parents.join(",") + "\n" + message + "\n" + seq;
-    return fnv1a2(preimage).toString(16).padStart(8, "0").slice(0, 7);
-  }
-  function cloneState2(s) {
-    return {
-      commits: new Map(s.commits),
-      refs: new Map(s.refs),
-      head: s.head.kind === "branch" ? { kind: "branch", name: s.head.name } : { kind: "detached", commit: s.head.commit },
-      index: new Map(s.index),
-      worktree: new Map(s.worktree),
-      merge: s.merge ? { mergeHead: s.merge.mergeHead, conflicted: [...s.merge.conflicted] } : void 0,
-      seq: s.seq
-    };
-  }
-  function moveHead2(s, to) {
-    if (s.head.kind === "branch") s.refs.set(s.head.name, to);
-    else s.head = { kind: "detached", commit: to };
-  }
-  function amend(state, message) {
-    const s = cloneState2(state);
-    const h = headCommit4(s);
-    if (h === null) throw new GitError("You do not have anything to amend.");
-    const old = s.commits.get(h);
-    const parents = old.parents;
-    const paths = [.../* @__PURE__ */ new Set([...old.paths, ...s.index.keys()])];
-    const msg = message ?? old.message;
-    const id = makeHash2(parents, msg, s.seq);
-    s.seq += 1;
-    s.commits.set(id, { id, parents, message: msg, paths });
-    moveHead2(s, id);
-    s.index.clear();
-    return { state: s, effect: { kind: "commit", id } };
   }
   function commitLine(s, id) {
     const c = s.commits.get(id);
@@ -5322,7 +5291,7 @@ The most similar command is
     const header = [];
     if (s.head.kind === "branch") {
       header.push(`On branch ${s.head.name.replace("refs/heads/", "")}`);
-      if (headCommit4(s) === null) header.push("No commits yet");
+      if (headCommit3(s) === null) header.push("No commits yet");
     } else {
       header.push(`HEAD detached at ${s.head.commit}`);
     }
@@ -5783,8 +5752,12 @@ Fast-forward`;
       this.echo(line);
       this.history.push(line);
       if (line === "") return;
+      if (this.shell) {
+        this.dispatch(line);
+        this.onCommand?.(line);
+        return;
+      }
       this.onCommand?.(line);
-      this.dispatch(line);
     }
     /** Run the line through the shell, if there is one, and show what came back. */
     dispatch(line) {

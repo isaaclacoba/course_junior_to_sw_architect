@@ -119,53 +119,26 @@
     }
     return state;
   }
-  function isRepoState(s) {
-    return !!(s && s.commits && s.commits.get && s.refs && s.refs.forEach && s.head);
+  // How to READ an authored task lives in one module, shared with the verifier
+  // (tools/lib/git-validate.mjs). Resolved lazily so script order cannot bite.
+  function gitTask() {
+    var g = typeof globalThis !== "undefined" ? globalThis : null;
+    if (g && g.KernelGitTask) return g.KernelGitTask;
+    if (typeof require === "function") {
+      try { return require("../../grading/git-task.js"); } catch (e) {}
+    }
+    throw new Error("git-plugin needs KernelGitTask (kernel/grading/git-task.js) loaded first");
   }
+  function startOf(task) { return gitTask().startOf(task); }
+  function targetOf(task) { return gitTask().targetOf(task); }
+  function solutionOf(task) { return gitTask().solutionOf(task); }
+  function filesOf(task) { return gitTask().filesOf(task); }
+  function isRepoState(s) { return gitTask().isRepoState(s); }
+
   function toState(CL, spec, files) {
     if (Array.isArray(spec)) return replay(CL, spec, files);
     if (isRepoState(spec)) return spec;
     return replay(CL, [], files);
-  }
-
-  // Which files the card's folder holds. Two sources, unioned:
-  //  - inferred: any path the card itself adds (start, target or solution). If a
-  //    card says `git add cat.txt`, then cat.txt obviously exists.
-  //  - declared `files`: the override, for files that must be VISIBLE but never
-  //    added - the `notes.md` a learner is asked to leave out.
-  // Anything else still fails like real git, so `git add nope.txt` is an error.
-  function filesOf(task) {
-    if (!task) return [];
-    var seen = Object.create(null);
-    var out = [];
-    function take(paths) {
-      for (var i = 0; i < paths.length; i++) {
-        if (seen[paths[i]]) continue;
-        seen[paths[i]] = true;
-        out.push(paths[i]);
-      }
-    }
-    take(task.files || []);
-    var lists = [startOf(task) || [], targetOf(task) || [], solutionOf(task)];
-    for (var j = 0; j < lists.length; j++) {
-      if (!Array.isArray(lists[j])) continue;
-      for (var k = 0; k < lists[j].length; k++) take(addedPaths(lists[j][k]));
-    }
-    return out;
-  }
-
-  // The paths one `git add` line names. Flags and pathspecs like `.` or `-A` are
-  // not filenames, so they seed nothing.
-  function addedPaths(line) {
-    var words = String(line || "").trim().split(/\s+/);
-    if (words[0] !== "git" || words[1] !== "add") return [];
-    var out = [];
-    for (var i = 2; i < words.length; i++) {
-      var w = words[i];
-      if (!w || w.charAt(0) === "-" || w === "." || w === "*") continue;
-      out.push(w);
-    }
-    return out;
   }
 
   // The terminal the learner types into. A lesson may inject its own shell (one
@@ -177,13 +150,6 @@
     if (injected) return injected;
     if (!CL.Shell || typeof CL.createGitCommand !== "function") return null;
     return new CL.Shell().register(CL.createGitCommand());
-  }
-  function startOf(task) { return task && (task.start || task.commands); }
-  function targetOf(task) { return task && (task.target || task.targetCommands); }
-  function solutionOf(task) {
-    var s = task && task.solution;
-    if (Array.isArray(s)) return s;
-    return s ? [s] : [];
   }
 
   // ---- the single canvas ---------------------------------------------------

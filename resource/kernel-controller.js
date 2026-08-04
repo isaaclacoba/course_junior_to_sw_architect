@@ -48,7 +48,7 @@
   // row (drill, viz, checkpoint) simply has none.
   var ARCHETYPE_DEPS = {
     build: ["kernel/grading/output-match.js", "kernel/grading/structure-match.js"],
-    git: ["kernel/grading/dag-match.js", "kernel/grading/state-match.js", "kernel/engine/git-progress.js"]
+    git: ["kernel/grading/git-task.js", "kernel/grading/dag-match.js", "kernel/grading/state-match.js", "kernel/engine/git-progress.js"]
   };
 
   function injectScript(src, attrs) {

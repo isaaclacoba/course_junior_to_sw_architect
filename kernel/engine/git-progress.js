@@ -224,7 +224,9 @@
           : "the commit " + quote(step.message) + " is missing";
       case "head":
         return step.detached
-          ? "HEAD should be detached"
+          ? (step.wrongCommit
+            ? "HEAD is detached at the wrong commit"
+            : "HEAD should be detached")
           : (step.onBranch
             ? "HEAD is on '" + step.onBranch + "' but should be on '" + step.short + "'"
             : "HEAD should be on '" + step.short + "'");
@@ -369,8 +371,24 @@
           onBranch: ah.kind === "branch" ? D.refLabel(ah.name).short : null
         };
       }
-    } else if (th.kind === "detached" && ah.kind !== "detached") {
-      headStep = { kind: "head", detached: true, name: null, short: null, onBranch: ah.kind === "branch" ? D.refLabel(ah.name).short : null };
+    } else if (th.kind === "detached") {
+      // Detached-vs-detached still has to be CHECKED, not assumed equal: the two
+      // repos have different id spaces, so compare the same dag-match signature
+      // dag-match compares. Skipping this let a card report "the target shape is
+      // reached" while refusing to pass, because dag-match had failed on a HEAD
+      // this function never looked at.
+      var wrongCommit =
+        ah.kind === "detached" && signT(th.commit) !== signA(ah.commit);
+      if (ah.kind !== "detached" || wrongCommit) {
+        headStep = {
+          kind: "head",
+          detached: true,
+          wrongCommit: wrongCommit,
+          name: null,
+          short: null,
+          onBranch: ah.kind === "branch" ? D.refLabel(ah.name).short : null
+        };
+      }
     }
 
     var nextStep = null;
