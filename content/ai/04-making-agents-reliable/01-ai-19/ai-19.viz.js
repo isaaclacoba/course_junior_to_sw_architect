@@ -12,7 +12,7 @@
     { sw: "#e0708a", label: "a step that had to change the plan" },
   ];
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     code: [],
     legend: legend,
     layout: {

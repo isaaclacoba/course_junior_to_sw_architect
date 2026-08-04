@@ -27,7 +27,7 @@
       state: opts && opts.match ? (opts.match.includes(i) ? "match" : "dim") : "idle",
     }));
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     code: [],
     legend: [
       { sw: "#ffd479", label: "the closest chunks - retrieved" },

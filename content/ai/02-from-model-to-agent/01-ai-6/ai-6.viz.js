@@ -9,7 +9,7 @@
 
   const WORKING_CAP = "Working memory \u2014 the context read right now";
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     code: [],
     legend: [
       { sw: "#cfe8df", label: "a remembered item" },

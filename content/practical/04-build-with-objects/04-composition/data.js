@@ -2,7 +2,7 @@
 // the classes themselves. The arc: real is-a inheritance, the is-a lie (compose
 // instead), C#'s one-base-class limit (hold parts), combining parts, and swapping
 // a part behind an interface. Sets up dependency injection. Verify probes re-run
-// the learner's types differently. Data only: window.BUILD_CONFIG.
+// the learner's types differently. Data only: window.LESSON_CONFIG.
 (function () {
   "use strict";
 
@@ -113,7 +113,7 @@
     }
   ];
 
-  window.BUILD_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "comp",
     metaLabel: "Build with objects · Inherit or compose",
     progressNoun: "Build",

@@ -40,7 +40,7 @@
     },
   ];
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     code: [],
     legend: [
       { sw: "#ffd479", label: "the tool chosen / the call sent", round: true },

@@ -18,7 +18,7 @@
     "print(a + b);",
   ];
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     scene: { board: true, regions: ["code"], zoomTab: false },
     chipName: "RAM",
     chipAddr: "source is translated, then run",

@@ -21,7 +21,7 @@
   const box = (k, v, hot) => (v == null ? { id: k, k, empty: true } : { id: k, k, v: String(v), hot });
   const frame = (vars) => ({ id: "prog", name: "your program", vars });
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     code: WHY,
     layout: {
       visual: [{ type: "code" }, { type: "vartable" }],

@@ -38,7 +38,7 @@
     ],
   });
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     scene: { board: false, regions: ["stack"], zoomTab: false },
     regionTags: { stack: "SLOTS <span>· things become numbers</span>" },
     chipName: "RAM",

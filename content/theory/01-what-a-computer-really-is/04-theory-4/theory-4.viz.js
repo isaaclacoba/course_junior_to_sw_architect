@@ -22,7 +22,7 @@
   const procB = () => ({ id: "pB", name: "Process B · music", vars: bData, accent: MUSIC });
   const both = () => [procA(), procB()];
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     scene: { board: true, regions: ["stack"], zoomTab: true },
     regionTags: { stack: "PROCESSES <span>· each isolated in its own RAM</span>" },
     chipName: "RAM",

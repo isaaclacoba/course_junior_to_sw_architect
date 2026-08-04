@@ -18,7 +18,7 @@
     text: "A shelf holds 3 boxes. Each box has 4 jars. Each jar has 6 marbles. How many marbles in total?",
   };
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     code: [],
     legend: legend,
     layout: {

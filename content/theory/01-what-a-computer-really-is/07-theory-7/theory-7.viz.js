@@ -6,7 +6,7 @@
 
   const file = (id, name, size) => ({ id, type: "File", fields: [["name", name], ["size", size]] });
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     scene: { board: true, regions: ["heap"], zoomTab: false },
     chipName: "UFS storage",
     chipAddr: "files on disk",

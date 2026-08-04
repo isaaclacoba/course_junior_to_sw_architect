@@ -8,7 +8,7 @@
 
   const RESPONSE = { id: "resp", type: "Response", fields: [["symbol", '"ACME"'], ["price", "42"]] };
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     scene: { board: true, regions: ["heap"], zoomTab: false },
     chipName: "RAM",
     chipAddr: "data arriving from another program",

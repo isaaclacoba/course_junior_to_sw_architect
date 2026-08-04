@@ -26,7 +26,7 @@
     ...(extra || {}),
   });
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     scene: { board: true, regions: ["stack", "heap"], zoomTab: false },
     regionTags: {
       stack: 'DIRECTORY <span>· names</span>',

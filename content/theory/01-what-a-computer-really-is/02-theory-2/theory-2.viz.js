@@ -12,7 +12,7 @@
   ];
   const x = (v) => [{ id: "x", k: "x", v: String(v) }];
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     scene: { board: true, regions: ["code", "global"], zoomTab: true },
     chipName: "RAM",
     chipAddr: "the instructions and the data they work on",

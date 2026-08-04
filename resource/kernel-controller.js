@@ -99,17 +99,18 @@
     settings.mount();
   }
 
-  // Bind by which lesson global is present: a build page sets BUILD_CONFIG, a
-  // viz page sets LESSON_VIZ. Only one exists per page, so both guards are safe.
+  // Bind the one unified lesson global (window.LESSON_CONFIG) with the archetype's
+  // binder, dispatched by window.LESSON_META.archetype (one config per page).
   function bind(R) {
-    if (global.ResourceBindBuild && global.BUILD_CONFIG) {
-      global.ResourceBindBuild.apply(R, { page: global.PAGE, config: global.BUILD_CONFIG });
-    }
-    if (global.ResourceBindViz && global.LESSON_VIZ) {
-      global.ResourceBindViz.apply(R, { page: global.PAGE, viz: global.LESSON_VIZ });
-    }
-    if (global.ResourceBindCheckpoint && global.QUIZ_CONFIG) {
-      global.ResourceBindCheckpoint.apply(R, { page: global.PAGE, quiz: global.QUIZ_CONFIG });
+    var cfg = global.LESSON_CONFIG;
+    var arch = global.LESSON_META && global.LESSON_META.archetype;
+    if (!cfg || !arch) return;
+    if (arch === "build" && global.ResourceBindBuild) {
+      global.ResourceBindBuild.apply(R, { page: global.PAGE, config: cfg });
+    } else if (arch === "viz" && global.ResourceBindViz) {
+      global.ResourceBindViz.apply(R, { page: global.PAGE, viz: cfg });
+    } else if (arch === "checkpoint" && global.ResourceBindCheckpoint) {
+      global.ResourceBindCheckpoint.apply(R, { page: global.PAGE, quiz: cfg });
     }
   }
 
@@ -167,7 +168,7 @@
     var myGen = ++gen;
     return Promise.all([manager.init(), loadChrome(langPref.get()), ensureConceptData(langPref.get())]).then(function (arr) {
       if (myGen !== gen) return; // superseded by a newer selection
-      bind(arr[0]); // refresh PAGE.hero.intro + BUILD_CONFIG.tasks once, before the fan-out
+      bind(arr[0]); // refresh PAGE.hero.intro + LESSON_CONFIG once, before the fan-out
       buildConceptSource(langPref.get()); // gen-guarded: never sets a stale source
       surfaces.forEach(function (s) {
         if (s && typeof s.setLocale === "function") s.setLocale();
@@ -203,15 +204,9 @@
       // so its self-boot footer stands down) + the matching plugin (+ a practice
       // grader), then create + boot it. LessonEngine.create returns the { boot,
       // setLocale } shape the controller holds as a Localizable surface.
-      var archetype = global.BUILD_CONFIG ? "build"
-        : global.LESSON_VIZ ? "viz"
-        : global.QUIZ_CONFIG ? "checkpoint"
-        : null;
-      var cfg = archetype === "build" ? global.BUILD_CONFIG
-        : archetype === "viz" ? global.LESSON_VIZ
-        : archetype === "checkpoint" ? global.QUIZ_CONFIG
-        : null;
-      if (!archetype || !cfg) return;
+      var cfg = global.LESSON_CONFIG;
+      var archetype = global.LESSON_META && global.LESSON_META.archetype;
+      if (!cfg || !archetype) return;
       cfg.archetype = archetype;
       var base = engineSrc.replace(/[^/]*$/, "");
       var chain = Promise.resolve();

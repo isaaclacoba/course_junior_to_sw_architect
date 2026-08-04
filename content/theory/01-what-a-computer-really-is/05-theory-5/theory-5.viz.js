@@ -19,7 +19,7 @@
   const TWO = [0, 0, 0, 0, 0, 0, 1, 0];
   const FIVE = [0, 0, 0, 0, 0, 1, 0, 1];
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     scene: { board: true, regions: ["stack"], zoomTab: false },
     regionTags: { stack: "ONE BYTE <span>· eight on/off bits</span>" },
     chipName: "RAM",

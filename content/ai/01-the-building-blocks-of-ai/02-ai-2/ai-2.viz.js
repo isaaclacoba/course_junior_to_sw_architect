@@ -13,7 +13,7 @@
 
   const core = (live) => ({ label: "LLM", sub: "reads tokens", live: live });
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     code: [],
     legend: [
       { sw: "#16232a", label: "one token" },

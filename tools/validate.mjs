@@ -452,7 +452,7 @@ export function loadCheckpointQuizzes(migrated, rootDir) {
     if (!fs.existsSync(dataPath)) continue;
     let cfg;
     try {
-      cfg = loadBrowserGlobal(dataPath, "QUIZ_CONFIG");
+      cfg = loadBrowserGlobal(dataPath, "LESSON_CONFIG");
     } catch {
       continue;
     }
@@ -534,7 +534,7 @@ export function loadResourceBundles(migrated, rootDir) {
     if (!fs.existsSync(dataPath)) continue;
     let cfg;
     try {
-      cfg = loadBrowserGlobal(dataPath, "BUILD_CONFIG");
+      cfg = loadBrowserGlobal(dataPath, "LESSON_CONFIG");
     } catch {
       continue; // a broken data.js is reported by other checks
     }

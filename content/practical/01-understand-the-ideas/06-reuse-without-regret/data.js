@@ -123,7 +123,7 @@
     }
   ];
 
-  window.BUILD_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "rwr",
     metaLabel: "Understand the ideas · Reuse without regret",
     progressNoun: "Step",

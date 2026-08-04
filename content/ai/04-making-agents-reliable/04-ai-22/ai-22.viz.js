@@ -15,7 +15,7 @@
   const SYS = { role: "system", text: "You answer questions about our company's policies." };
   const Q = { role: "user", text: "What's our refund window for enterprise plans?" };
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     code: [],
     legend: legend,
     layout: {

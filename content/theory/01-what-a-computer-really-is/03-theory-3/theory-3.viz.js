@@ -11,7 +11,7 @@
     "}",
   ];
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     scene: { board: true, regions: ["code"], zoomTab: true },
     chipName: "RAM",
     chipAddr: "the program, loaded and started",

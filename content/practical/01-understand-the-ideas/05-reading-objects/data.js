@@ -6,7 +6,7 @@
 // Part 1, between Writing Methods and the SOLID drills. This file holds only the
 // mechanics (example code, expected output, grading probes, starter/solution).
 // The teaching prose (titles, concepts, context, goals, recap) lives in
-// res/strings/<voice>/en.json and is applied onto window.BUILD_CONFIG by
+// res/strings/<voice>/en.json and is applied onto window.LESSON_CONFIG by
 // resource/bootstrap.js before build-engine.js renders.
 (function () {
   "use strict";
@@ -132,7 +132,7 @@
     },
   ];
 
-  window.BUILD_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "ro",
     metaLabel: "Understand the ideas \u00b7 Reading Objects",
     progressNoun: "Step",

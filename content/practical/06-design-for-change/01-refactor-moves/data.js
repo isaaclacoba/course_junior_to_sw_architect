@@ -5,7 +5,7 @@
 // name next. The expected output never changes (behaviour preserved); the
 // requireSource gate enforces the new shape; a hidden verify probe proves the
 // refactor is real, not faked.
-// Data only: window.BUILD_CONFIG.
+// Data only: window.LESSON_CONFIG.
 (function () {
   "use strict";
 
@@ -179,7 +179,7 @@
     }
   ];
 
-  window.BUILD_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "rm",
     metaLabel: "Design for change · Refactor moves",
     progressNoun: "Build",

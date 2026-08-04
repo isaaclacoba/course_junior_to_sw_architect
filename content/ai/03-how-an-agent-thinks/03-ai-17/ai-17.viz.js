@@ -17,7 +17,7 @@
   };
   const Q = { role: "user", text: "What's the weather where the next Olympics are held?" };
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     code: [],
     legend: legend,
     layout: {

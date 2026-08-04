@@ -1,10 +1,10 @@
 // Theory track - Part 2 checkpoint. Closes Part two ("From idea to code") and
-// awards XP once on a pass. Data only: sets window.QUIZ_CONFIG for the code-lab
+// awards XP once on a pass. Data only: sets window.LESSON_CONFIG for the code-lab
 // Quiz component (CodeLab.Quiz), which owns the bank draw / shuffle / grading.
 (function () {
   "use strict";
 
-  window.QUIZ_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "chk2",
     metaLabel: "From idea to code \u00b7 Part two checkpoint",
     title: "Part two checkpoint",

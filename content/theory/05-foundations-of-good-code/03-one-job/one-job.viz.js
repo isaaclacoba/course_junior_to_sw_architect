@@ -36,7 +36,7 @@
     ],
   });
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     scene: { board: false, regions: ["stack"], zoomTab: false },
     regionTags: { stack: "WHAT A FUNCTION DOES <span>\u00b7 one job, or many</span>" },
     chipName: "function",

@@ -1,5 +1,5 @@
 // Exception handling - Part three. A code-lab write-and-run build lesson
-// (build-engine.js reads window.BUILD_CONFIG). The learner writes each piece of
+// (build-engine.js reads window.LESSON_CONFIG). The learner writes each piece of
 // error handling and runs it: try/catch, reading the message, finally, throw,
 // and the null-safety operators ?? and ?. (null itself is taught in Foundations).
 // Animal theme throughout. Every task's output is a fixed, culture-independent
@@ -96,7 +96,7 @@
     }
   ];
 
-  window.BUILD_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "en",
     metaLabel: "Know the language · Exception handling",
     progressNoun: "Step",

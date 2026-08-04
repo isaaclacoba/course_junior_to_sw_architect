@@ -3,7 +3,7 @@
 // if-per-animal method, then each animal carrying its own sound, one loop over a
 // mixed list, choosing the animal at runtime, and adding one without touching the
 // loop. Builds on IAnimal. Verify probes re-run the learner's types differently;
-// loop-in-Main tasks are gated by requireSource. Data only: window.BUILD_CONFIG.
+// loop-in-Main tasks are gated by requireSource. Data only: window.LESSON_CONFIG.
 (function () {
   "use strict";
 
@@ -117,7 +117,7 @@
     }
   ];
 
-  window.BUILD_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "poly",
     metaLabel: "Build with objects · Why many versions",
     progressNoun: "Build",

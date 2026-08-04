@@ -1,12 +1,12 @@
 // Theory track - Part 3 checkpoint. Closes Part three ("How software runs") and
-// awards XP once on a pass. Data only: sets window.QUIZ_CONFIG for the code-lab
+// awards XP once on a pass. Data only: sets window.LESSON_CONFIG for the code-lab
 // Quiz component (CodeLab.Quiz), which owns the bank draw / shuffle / grading.
 // IMPORTANT: options must stay PLAIN - no **bold** or emphasis that could single
 // out the correct answer. Emphasis lives only in the stem and the explanation.
 (function () {
   "use strict";
 
-  window.QUIZ_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "chk3",
     metaLabel: "How software runs \u00b7 Part three checkpoint",
     title: "Part three checkpoint",

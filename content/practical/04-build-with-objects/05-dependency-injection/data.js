@@ -2,7 +2,7 @@
 // learner writes the Keeper class themselves. The arc: newing a tool inside,
 // the moment that bites, receiving it through the constructor, depending on an
 // interface, and handing in a toy stand-in. Verify probes re-run the learner's
-// type differently. Data only: window.BUILD_CONFIG.
+// type differently. Data only: window.LESSON_CONFIG.
 (function () {
   "use strict";
 
@@ -98,7 +98,7 @@
     }
   ];
 
-  window.BUILD_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "di",
     metaLabel: "Build with objects · Why inject",
     progressNoun: "Build",

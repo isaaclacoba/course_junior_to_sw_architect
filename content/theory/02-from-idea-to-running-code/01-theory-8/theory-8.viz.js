@@ -11,7 +11,7 @@
     "print(total)",
   ];
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     scene: { board: true, regions: ["code"], zoomTab: false },
     chipName: "SoC",
     chipAddr: "the CPU only speaks machine code",

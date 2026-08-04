@@ -6,7 +6,7 @@
 // `class` where a `struct` or `record` is wanted prints the wrong answer.
 //
 // Data only: the controller lives in build-engine.js, which reads
-// window.BUILD_CONFIG. Light, animal-themed examples throughout.
+// window.LESSON_CONFIG. Light, animal-themed examples throughout.
 (function () {
   "use strict";
 
@@ -88,7 +88,7 @@
     }
   ];
 
-  window.BUILD_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "ds",
     metaLabel: "Know the language · Data shapes",
     progressNoun: "Build",

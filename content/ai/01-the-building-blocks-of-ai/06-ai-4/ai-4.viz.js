@@ -30,7 +30,7 @@
   const QUESTION = user(["What", "does", "Luna", "eat", "?"]);
   const FACTS = ctx(["Luna", "is", "a", "cat", ".", "Luna", "loves", "tuna", "."]);
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     code: [],
     legend: [
       { sw: "#37d3a6", label: "your question" },

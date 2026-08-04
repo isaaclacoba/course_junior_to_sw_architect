@@ -8,7 +8,7 @@
 
   const GOAL = "Plan a weekend trip to Lisbon";
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     code: [],
     legend: [
       { sw: "#ffd479", label: "the step being worked now" },

@@ -1,5 +1,5 @@
 // Collections - Part three. A code-lab write-and-run build lesson (build-engine.js
-// reads window.BUILD_CONFIG). The learner writes and runs the everyday container
+// reads window.LESSON_CONFIG). The learner writes and runs the everyday container
 // types: List<T> (make, walk, index), a list of your own objects, and
 // Dictionary<TKey,TValue> (store, look up, check a key), then a manual tally that
 // LINQ later shortens. Animal theme throughout. All outputs are culture-safe
@@ -131,7 +131,7 @@
     }
   ];
 
-  window.BUILD_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "col",
     metaLabel: "Know the language · Collections",
     progressNoun: "Step",

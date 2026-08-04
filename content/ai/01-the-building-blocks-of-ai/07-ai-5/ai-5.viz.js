@@ -33,7 +33,7 @@
       opts || {}
     );
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     code: [],
     legend: [
       { sw: "#8fb7ab", label: "in the window (still visible)" },

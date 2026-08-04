@@ -35,7 +35,7 @@
     ],
   });
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     scene: { board: false, regions: ["stack"], zoomTab: false },
     regionTags: { stack: "WHERE THE RULE LIVES <span>\u00b7 one place, or many</span>" },
     chipName: "logic",

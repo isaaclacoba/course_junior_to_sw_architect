@@ -8,7 +8,7 @@
 
   const GOAL = "answer: who won the 2019 final?";
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     code: [],
     legend: [
       { sw: "#ffd479", label: "the piece working right now" },

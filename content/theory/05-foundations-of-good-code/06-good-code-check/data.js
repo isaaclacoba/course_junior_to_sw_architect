@@ -1,11 +1,11 @@
 // Theory track - Part 5 checkpoint. Closes Part five ("Foundations of good
-// code") and awards XP once on a pass. Data only: sets window.QUIZ_CONFIG for
+// code") and awards XP once on a pass. Data only: sets window.LESSON_CONFIG for
 // the code-lab Quiz component (CodeLab.Quiz), which owns the draw / shuffle /
 // grading. Bank of 8, six drawn each attempt.
 (function () {
   "use strict";
 
-  window.QUIZ_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "chk5",
     metaLabel: "Foundations of good code \u00b7 Part five checkpoint",
     title: "Part five checkpoint",

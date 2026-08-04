@@ -17,7 +17,7 @@
     { t: "roof", p: 0.04 },
   ];
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     code: [],
     legend: [
       { sw: "#37d3a6", label: "your prompt" },

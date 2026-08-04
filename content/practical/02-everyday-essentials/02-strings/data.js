@@ -1,5 +1,5 @@
 // Unit 2 - "C# up close": Strings (text operations). Write-from-scratch builds.
-// Data only: build-engine.js reads window.BUILD_CONFIG (loaded after this file).
+// Data only: build-engine.js reads window.LESSON_CONFIG (loaded after this file).
 // Portable idea: text is a value you can build from parts, reshape, search and
 // transform. C# is just the surface we practise it on here.
 // Culture-safe: never prints a raw double/decimal; every task prints strings or
@@ -97,7 +97,7 @@
     }
   ];
 
-  window.BUILD_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "str",
     metaLabel: "Everyday essentials · Strings",
     progressNoun: "Step",

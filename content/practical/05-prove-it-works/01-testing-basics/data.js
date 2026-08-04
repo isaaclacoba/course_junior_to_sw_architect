@@ -2,7 +2,7 @@
 // scratch builds. The arc: Arrange-Act-Assert, checking the exact result, a
 // reusable assertion, and expecting a failure on purpose. This closes the loop
 // opened by dependency injection (the ToyDog stand-in) and sets up SOLID.
-// Data only: window.BUILD_CONFIG.
+// Data only: window.LESSON_CONFIG.
 (function () {
   "use strict";
 
@@ -88,7 +88,7 @@
     }
   ];
 
-  window.BUILD_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "tb",
     metaLabel: "Prove it works · What a test is",
     progressNoun: "Build",

@@ -38,7 +38,7 @@
     { t: "grey", p: 0.09 },
   ];
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     code: [],
     legend: [
       { sw: "#8fb7ab", label: "the prompt so far" },

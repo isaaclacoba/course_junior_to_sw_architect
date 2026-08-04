@@ -17,7 +17,7 @@
     return ids.map((i) => all[i]);
   };
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     scene: { board: true, regions: ["code", "global"], zoomTab: true },
     chipName: "RAM",
     chipAddr: "the program and the data it works on",

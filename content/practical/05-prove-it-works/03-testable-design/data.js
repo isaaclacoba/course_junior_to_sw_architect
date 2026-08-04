@@ -2,7 +2,7 @@
 // from-scratch builds. The point: the habits that make code easy to test - inject
 // dependencies, one job per class, no hidden state - are exactly the habits SOLID
 // formalises. This lesson is the bridge into "Design for change".
-// Data only: window.BUILD_CONFIG.
+// Data only: window.LESSON_CONFIG.
 (function () {
   "use strict";
 
@@ -56,7 +56,7 @@
     }
   ];
 
-  window.BUILD_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "xd",
     metaLabel: "Prove it works · Testable by design",
     progressNoun: "Build",

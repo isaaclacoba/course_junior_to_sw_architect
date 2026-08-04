@@ -116,7 +116,7 @@
     .then(function () { return manager.init(); })
     .then(function (R) {
       if (global.ResourceBindBuild) {
-        global.ResourceBindBuild.apply(R, { page: global.PAGE, config: global.BUILD_CONFIG });
+        global.ResourceBindBuild.apply(R, { page: global.PAGE, config: global.LESSON_CONFIG });
       }
       return render();
     })

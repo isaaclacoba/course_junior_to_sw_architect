@@ -19,7 +19,7 @@
   const box = (k, v, hot) => (v == null ? { id: k, k, empty: true } : { id: k, k, v: String(v), hot });
   const frame = (id, name, vars) => ({ id, name, vars });
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     code: CODE,
     layout: {
       visual: [{ type: "code" }, { type: "callstack" }],

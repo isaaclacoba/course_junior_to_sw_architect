@@ -29,7 +29,7 @@
 
   const core = (live) => ({ label: "LLM", sub: "next-token model", live: live });
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     code: [],
     legend: [
       { sw: "#16232a", label: "token the model reads" },

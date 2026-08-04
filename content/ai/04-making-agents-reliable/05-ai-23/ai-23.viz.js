@@ -23,7 +23,7 @@
     { role: "assistant", text: "The tip is $1.20." },
   ];
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     code: [],
     legend: legend,
     layout: {

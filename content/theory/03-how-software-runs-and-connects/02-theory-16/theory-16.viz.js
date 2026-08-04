@@ -30,7 +30,7 @@
   const nul = (id, hot) => ({ id, k: id, v: "null", ...(hot ? { hot: true } : {}) });
   const frame = (vars) => ({ id: "prog", name: "your program", vars });
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     code: CODE,
     layout: {
       visual: [{ type: "code" }, { type: "heapcards" }],

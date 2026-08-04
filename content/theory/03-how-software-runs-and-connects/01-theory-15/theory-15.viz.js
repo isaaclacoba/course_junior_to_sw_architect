@@ -20,7 +20,7 @@
   const DOG = { id: "d1", type: "Dog", fields: [["Name", '"Rex"']] };
   const runFrame = (vars) => ({ id: "run", name: "run()", vars });
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     scene: { board: true, regions: ["code", "rodata", "data", "bss", "stack", "heap"], zoomTab: true },
     chipName: "LPDDR5 RAM",
     chipAddr: "where the running program keeps its data",

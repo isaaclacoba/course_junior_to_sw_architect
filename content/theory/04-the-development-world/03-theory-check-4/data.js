@@ -1,10 +1,10 @@
 // Theory track - Part 4 checkpoint. Closes Part four ("The development world")
-// and awards XP once on a pass. Data only: sets window.QUIZ_CONFIG for the
+// and awards XP once on a pass. Data only: sets window.LESSON_CONFIG for the
 // code-lab Quiz component (CodeLab.Quiz), which owns the draw / shuffle / grading.
 (function () {
   "use strict";
 
-  window.QUIZ_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "chk4",
     metaLabel: "The development world \u00b7 Part four checkpoint",
     title: "Part four checkpoint",

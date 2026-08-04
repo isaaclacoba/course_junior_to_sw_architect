@@ -18,7 +18,7 @@
     text: "def average(xs):\n    return sum(xs) / len(xs)",
   };
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     code: [],
     legend: legend,
     layout: {

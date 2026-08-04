@@ -7,7 +7,7 @@
 //
 // The portable idea is "query a collection without writing a loop"; the operator
 // names are the C# surface for it. Data only: build-engine.js reads
-// window.BUILD_CONFIG. Animal theme throughout; every query runs over a
+// window.LESSON_CONFIG. Animal theme throughout; every query runs over a
 // `List<Animal>` where each animal has Name and Legs.
 (function () {
   "use strict";
@@ -158,7 +158,7 @@
     }
   ];
 
-  window.BUILD_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "lq",
     metaLabel: "Know the language · LINQ",
     progressNoun: "Query",

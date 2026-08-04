@@ -7,7 +7,7 @@
 (function () {
   "use strict";
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     code: [],
     legend: [
       { sw: "#37d3a6", label: "your instruction - the prompt you write" },

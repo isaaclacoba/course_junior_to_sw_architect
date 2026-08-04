@@ -4,7 +4,7 @@
 // Pair<A, B>, and a generic method that returns a generic type. Each task is
 // graded so the concept is unavoidable - a verify probe re-runs the learner's
 // type with a different T, so a version hardcoded to int fails.
-// Data only: build-engine.js reads window.BUILD_CONFIG.
+// Data only: build-engine.js reads window.LESSON_CONFIG.
 (function () {
   "use strict";
 
@@ -79,7 +79,7 @@
     }
   ];
 
-  window.BUILD_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "gen",
     metaLabel: "Know the language · Generics",
     progressNoun: "Build",

@@ -1,5 +1,5 @@
 // Unit 2 - "C# up close": Type conversion & parsing. Write-from-scratch builds.
-// Data only: build-engine.js reads window.BUILD_CONFIG (loaded after this file).
+// Data only: build-engine.js reads window.LESSON_CONFIG (loaded after this file).
 // Culture-safe: never prints a raw double/decimal (the browser locale would
 // decide the separator); every task prints ints, strings or booleans.
 (function () {
@@ -95,7 +95,7 @@
     }
   ];
 
-  window.BUILD_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "tc",
     metaLabel: "Everyday essentials · Type conversion",
     progressNoun: "Step",

@@ -1,12 +1,12 @@
 // Theory track - Part 1 checkpoint. A graded assessment that closes Part one
 // ("Foundations - the machine") and awards XP once on a pass. Data only: it sets
-// window.QUIZ_CONFIG for the code-lab Quiz component (CodeLab.Quiz), which owns
+// window.LESSON_CONFIG for the code-lab Quiz component (CodeLab.Quiz), which owns
 // the bank draw / option shuffle / grading. Questions are scenario-based where
 // possible, with distractors that are plausible rather than obviously wrong.
 (function () {
   "use strict";
 
-  window.QUIZ_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "chk1",
     metaLabel: "Foundations \u00b7 Part one checkpoint",
     title: "Part one checkpoint",

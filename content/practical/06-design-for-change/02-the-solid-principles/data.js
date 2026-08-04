@@ -4,7 +4,7 @@
 // shape and its concrete cost), then asks the learner to write the fix. The
 // output is fixed, the requireSource gate enforces the SOLID technique, and a
 // hidden verify probe re-runs the learner's classes against different inputs so
-// a faked answer cannot pass. Data only: window.BUILD_CONFIG (build-engine.js
+// a faked answer cannot pass. Data only: window.LESSON_CONFIG (build-engine.js
 // reads it, loaded after this file).
 (function () {
   "use strict";
@@ -179,7 +179,7 @@
     }
   ];
 
-  window.BUILD_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "l2",
     metaLabel: "Design for change · The SOLID principles",
     progressNoun: "Step",

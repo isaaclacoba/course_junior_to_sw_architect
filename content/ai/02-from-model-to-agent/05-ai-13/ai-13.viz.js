@@ -18,7 +18,7 @@
   const tool = (o) => ({ role: "tool", text: "4\u00b0C, clear", ...o });
   const answer = (o) => ({ role: "assistant", text: "It's 4\u00b0C and clear in Oslo - bring a warm jacket.", ...o });
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     code: [],
     legend: [
       { sw: "#7baaff", label: "your app wrote it - the instructions" },

@@ -2,7 +2,7 @@
 // scratch builds. A double is a stand-in for a real dependency so a test is
 // fast, repeatable and under your control. The arc: fake a shaky dependency,
 // feed canned data, and spy on an interaction. Builds directly on injection
-// (Part four). Data only: window.BUILD_CONFIG.
+// (Part four). Data only: window.LESSON_CONFIG.
 (function () {
   "use strict";
 
@@ -78,7 +78,7 @@
     }
   ];
 
-  window.BUILD_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "td",
     metaLabel: "Prove it works · Test doubles",
     progressNoun: "Build",

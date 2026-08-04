@@ -70,7 +70,9 @@ export function loadWindowGlobal(file, name = "LESSON_VIZ") {
   const src = fs.readFileSync(file, "utf8");
   const sandbox = { window: {} };
   vm.runInNewContext(src, sandbox, { filename: file });
-  return sandbox.window[name];
+  // The unified engine collapses all archetype globals into window.LESSON_CONFIG;
+  // prefer it, falling back to the legacy per-archetype name.
+  return sandbox.window.LESSON_CONFIG !== undefined ? sandbox.window.LESSON_CONFIG : sandbox.window[name];
 }
 
 // Extract [key, english] scene entries for a lesson's viz (window.LESSON_VIZ).

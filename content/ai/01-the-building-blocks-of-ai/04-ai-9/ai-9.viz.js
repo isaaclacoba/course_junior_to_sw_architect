@@ -18,7 +18,7 @@
   const REPLY_TERSE = ["Mass", "attracts", "mass", ".", "More", "mass", ",", "stronger", "pull", "."];
   const REPLY_KID = ["Earth", "gives", "everything", "a", "big", "hug", "that", "never", "lets", "go", "!"];
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     code: [],
     legend: [
       { sw: "#7baaff", label: "system message (role and rules)" },

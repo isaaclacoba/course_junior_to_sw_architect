@@ -30,7 +30,7 @@
     ],
   });
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     scene: { board: false, regions: ["stack"], zoomTab: false },
     regionTags: { stack: "NAMES <span>\u00b7 say what it holds or does</span>" },
     chipName: "names",

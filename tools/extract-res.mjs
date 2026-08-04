@@ -142,7 +142,7 @@ export function buildMechanicsDataJs(rawDataJs, config, strippedTasks) {
     "(function () {\n" +
     '  "use strict";\n\n' +
     "  const tasks = " + tasksLiteral + ";\n\n" +
-    "  window.BUILD_CONFIG = {\n" +
+    "  window.LESSON_CONFIG = {\n" +
     cfgLines.join("\n") + "\n" +
     "  };\n" +
     "})();\n"
@@ -185,9 +185,10 @@ export function planExtraction(lessonDir, opts) {
     throw new Error(`extract-res only handles build lessons; ${lessonDir} archetype is ${JSON.stringify(meta.archetype)}`);
   }
 
-  const config = loadWindowBag(dataPath).BUILD_CONFIG;
+  const dataBag = loadWindowBag(dataPath);
+  const config = dataBag.LESSON_CONFIG || dataBag.BUILD_CONFIG;
   if (!config || !Array.isArray(config.tasks)) {
-    throw new Error(`data.js in ${lessonDir} has no window.BUILD_CONFIG.tasks`);
+    throw new Error(`data.js in ${lessonDir} has no window.LESSON_CONFIG.tasks`);
   }
 
   const rawData = fs.readFileSync(dataPath, "utf8");

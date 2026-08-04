@@ -1,6 +1,6 @@
 // Practice the Basics - the bridge between Foundations and Control Flow.
 // A code-lab write-and-run build lesson (build-engine.js reads
-// window.BUILD_CONFIG). Foundations gave you values, variables and objects.
+// window.LESSON_CONFIG). Foundations gave you values, variables and objects.
 // Here you compute with them, join text, and - the bridge - ask yes/no
 // questions with comparisons that produce a bool. Control Flow then acts on
 // those answers. No if/else or loops yet.
@@ -90,7 +90,7 @@
     }
   ];
 
-  window.BUILD_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "l1c",
     metaLabel: "Understand the ideas · Practice the Basics",
     progressNoun: "Step",

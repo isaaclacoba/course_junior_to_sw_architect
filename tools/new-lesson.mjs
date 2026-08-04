@@ -116,13 +116,13 @@ function scaffoldNew(args) {
   fs.writeFileSync(path.join(dir, "meta.js"), metaFileText(meta));
 
   if (archetype === "viz") {
-    fs.writeFileSync(path.join(dir, id + ".viz.js"), "(function () {\n  \"use strict\";\n  window.LESSON_VIZ = { steps: [] };\n})();\n");
+    fs.writeFileSync(path.join(dir, id + ".viz.js"), "(function () {\n  \"use strict\";\n  window.LESSON_CONFIG = { steps: [] };\n})();\n");
   } else if (archetype === "build") {
-    fs.writeFileSync(path.join(dir, "data.js"), "(function () {\n  \"use strict\";\n  window.BUILD_CONFIG = { prefix: \"" + id.replace(/-/g, "") + "\", tasks: [] };\n})();\n");
+    fs.writeFileSync(path.join(dir, "data.js"), "(function () {\n  \"use strict\";\n  window.LESSON_CONFIG = { prefix: \"" + id.replace(/-/g, "") + "\", tasks: [] };\n})();\n");
   } else if (archetype === "drill") {
-    fs.writeFileSync(path.join(dir, "data.js"), "(function () {\n  \"use strict\";\n  window.DRILL_CONFIG = { prefix: \"" + id.replace(/-/g, "") + "\", drills: [] };\n})();\n");
+    fs.writeFileSync(path.join(dir, "data.js"), "(function () {\n  \"use strict\";\n  window.LESSON_CONFIG = { prefix: \"" + id.replace(/-/g, "") + "\", drills: [] };\n})();\n");
   } else {
-    fs.writeFileSync(path.join(dir, "data.js"), "(function () {\n  \"use strict\";\n  window.QUIZ_CONFIG = { questions: [] };\n})();\n");
+    fs.writeFileSync(path.join(dir, "data.js"), "(function () {\n  \"use strict\";\n  window.LESSON_CONFIG = { questions: [] };\n})();\n");
   }
 
   appendRegistryLine({ track: track, part: part, id: id, relPath: relPath });

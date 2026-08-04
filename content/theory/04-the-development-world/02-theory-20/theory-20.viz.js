@@ -15,7 +15,7 @@
   const c4 = () => commit("c4", "7a8b \u00b7 [branch retries] try it", [file("c4a", "Login.cs", "changed")]);
   const c5 = () => commit("c5", "9c0d \u00b7 merge retries into main", [file("c5a", "Login.cs", "merged")]);
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     scene: { board: false, regions: ["stack"], zoomTab: false },
     regionTags: { stack: "HISTORY <span>\u00b7 newest commit on top</span>" },
     chipName: "history",

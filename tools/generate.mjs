@@ -470,8 +470,8 @@ function loadTemplateVariants() {
 // Read a build/drill lesson's element-id prefix from its data.js config global.
 function prefixFromData(dir) {
   const bag = loadWindowBag(path.join(dir, "data.js"));
-  const cfg = bag.BUILD_CONFIG || bag.DRILL_CONFIG;
-  if (!cfg || !cfg.prefix) throw new Error("data.js in " + dir + " has no BUILD_CONFIG/DRILL_CONFIG prefix");
+  const cfg = bag.LESSON_CONFIG || bag.BUILD_CONFIG || bag.DRILL_CONFIG;
+  if (!cfg || !cfg.prefix) throw new Error("data.js in " + dir + " has no LESSON_CONFIG prefix");
   return cfg.prefix;
 }
 

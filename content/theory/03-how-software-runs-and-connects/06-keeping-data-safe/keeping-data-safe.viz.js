@@ -37,7 +37,7 @@
     ],
   });
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     scene: { board: false, regions: ["stack"], zoomTab: false },
     regionTags: { stack: "KEEPING DATA SAFE <span>\u00b7 secrets, permissions, input</span>" },
     chipName: "safety",

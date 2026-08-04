@@ -12,7 +12,7 @@
     "print data.Count;",
   ];
 
-  window.LESSON_VIZ = {
+  window.LESSON_CONFIG = {
     scene: { board: true, regions: ["code"], zoomTab: false },
     chipName: "RAM",
     chipAddr: "your code plus code you did not write",

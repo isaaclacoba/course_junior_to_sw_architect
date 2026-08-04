@@ -1,7 +1,7 @@
 // Control Flow - write-and-run practice with the control-flow tools: if/else,
 // boolean logic, while, for, foreach with break/continue, and switch. Each card
 // asks for a small working method. Part 1, after Practice the Basics. Data only:
-// the controller lives in build-engine.js, which reads window.BUILD_CONFIG.
+// the controller lives in build-engine.js, which reads window.LESSON_CONFIG.
 (function () {
   "use strict";
 
@@ -156,7 +156,7 @@
     }
   ];
 
-  window.BUILD_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "cf",
     metaLabel: "Understand the ideas · Control Flow",
     progressNoun: "Step",

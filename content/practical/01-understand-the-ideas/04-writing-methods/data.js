@@ -1,5 +1,5 @@
 // Act 1, Lesson 5 - Methods. Data only; the controller is build-engine.js,
-// which reads window.BUILD_CONFIG (loaded after this file).
+// which reads window.LESSON_CONFIG (loaded after this file).
 // Pacing rule: keep the syntax trivial, put the effort into seeing what a
 // method is FOR. Each task rises one small step: return, parameter, decision,
 // reuse across inputs, then one method calling another.
@@ -74,7 +74,7 @@
     }
   ];
 
-  window.BUILD_CONFIG = {
+  window.LESSON_CONFIG = {
     prefix: "wm",
     metaLabel: "Part one - Lesson 5",
     progressNoun: "Step",
