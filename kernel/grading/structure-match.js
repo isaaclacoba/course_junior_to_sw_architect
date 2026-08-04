@@ -315,5 +315,10 @@
   return {
     meets: meets, evaluate: evaluate, rows: rows, describe: describe,
     symbolName: symbolName, rowLabel: rowLabel, verdicts: verdicts,
+    // Exported so the validator can ask "did the body of this type change?"
+    // against the SAME text the tracker reads. Two implementations of "the
+    // code inside this class" would drift, and the check that drifts is the
+    // check that stops catching anything.
+    typeBody: typeBody, stripComments: stripComments, squeeze: squeeze,
   };
 });

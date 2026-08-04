@@ -1646,3 +1646,41 @@ In Spanish the toggle reads "Saber por que" and turns into "Ocultar el porque"
 when opened. The explanation text itself is still English: it comes from the
 host, not from the chrome catalogue, and that is now written down in the skill
 rather than left to be rediscovered.
+
+## 2026-08-04 18:25 - 19:10 - the step everyone forgets is the caller
+
+A reader pointed at the SOLID tracker and said the live goals should tell them
+about the refactoring in Main. I had done that on card 3 and nowhere else. Four
+of the seven cards rewire Main and none of them said a word about it.
+
+The reason it slipped is worth writing down. Every check we had reads
+DECLARATIONS - a field, a constructor, a method - and rewiring a caller declares
+nothing at all. It is statements inside a method that already existed. So a card
+could move every line of Main and the granularity check, the tracker check and
+the whole suite would still say PASS. The work with the least support in the
+lesson was the work with the least support in the tooling, which is not a
+coincidence: nobody noticed because nothing looked.
+
+So the four cards now have a Program box with a row per move - hold the cat in
+an IAnimal, ask it to speak, hand the keeper its log - and checkCallSiteTracked
+compares the body of Main between starter and solution and fails the lesson when
+nothing tracks the difference. I proved it by deleting the box I had just added
+to card 5 and watching it name card 5.
+
+Card 2 taught me something I did not expect. The reader asked for Main there too,
+and Main on that card needs no edit, so I gave it a box anyway - and a test that
+has been sitting there all along caught it: every goal must start red, and mine
+started green. It was right. A tick you did not earn is worse than no tick. The
+information was still worth having, because a student just told the rule lives in
+two places will go hunting for a third, so it is a prose line now instead of a
+box: Main stays as it is, the two above are the whole change.
+
+The other card 2 fix is the same lesson from the other side. Its boxes hung the
+edit off the GATE, and a source condition on the gate is a prerequisite for every
+row under it - so the box sat entirely grey and then turned entirely green in one
+jump. All-or-nothing, which is the exact lamp the rows exist to replace. The
+shape belongs in the gate and the edit belongs in its own row.
+
+Verified: 439/439, 89/89 lessons with the new check, real dotnet on all seven
+SOLID solutions, and a headless render showing the new rows on card 4. Both new
+rules are in the skill.

@@ -207,6 +207,25 @@ of progress. So:
    every step** - this course teaches design, not C# recall, so never make them
    guess the mechanics.
 
+3. **If `Main` changes, it gets a box. If it does not, say so in prose.** The
+   caller is the step authors forget, because rewiring it declares nothing and
+   so every declaration-based check stays quiet. `checkCallSiteTracked` now
+   compares the body of the type holding `Main` between `starter` and
+   `solution` and fails the lesson when nothing tracks the difference.
+
+   The mirror case matters just as much. When `Main` genuinely needs no edit,
+   a student who was just told the rule lives in two places will go hunting for
+   a third, so name `Main` in a goal line - as prose, `{ gate: null }`, with no
+   `code` box. Never a box: it would be green before they typed anything, and
+   an unearned tick is worse than no tick.
+
+4. **Keep `writes`/`gone` on the ROW, not on the box gate, when it is the edit
+   itself.** A source condition on the gate is a prerequisite for every row
+   beneath it, so the whole box sits grey and then flips green in one jump -
+   the exact all-or-nothing lamp the rows exist to replace. Put the structural
+   shape in the gate (`{ type: "Cat", member: "CheckAndSign" }`) and the edit in
+   its own row (`{ row: "const int HoursUntilHungry = 4", writes: "...", gone: "..." }`).
+
 ### Two rules that keep the tracker honest
 
 - **Every goal must start RED on the untouched starter.** A goal that is already

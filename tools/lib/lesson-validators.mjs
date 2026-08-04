@@ -208,6 +208,7 @@ export function createValidators(deps) {
       });
     }
     checkGranularity(t, label, types, note);
+    checkCallSiteTracked(t, label, types, note);
     if (trackerOk) {
       ok(`${label} goal tracker lights up fully on the solution (${gates.length} gate(s), ${rowCount} row(s))`);
     }
@@ -222,6 +223,58 @@ export function createValidators(deps) {
   // method present in the solution but not in the starter - must have its own
   // row. That is what makes the tracker a set of subtasks instead of a
   // pass/fail lamp, and it is the piece an author forgets first.
+  // The granularity check above reads DECLARATIONS, so it is blind to the one
+  // place a card almost always changes and almost never tracks: the caller.
+  // Rewiring `Main` declares no field and no method - it is statements inside a
+  // method that already existed - so a card can move every line of it and every
+  // check here still passes while the tracker says nothing at all.
+  //
+  // That is not a hypothetical. Four of the seven SOLID cards rewired `Main`
+  // with no row watching it, and the learner was left to infer the last step of
+  // the refactor from the expected output. So: if the caller's body changes
+  // between starter and solution, some box must be watching it.
+  function checkCallSiteTracked(t, label, solTypes, fail) {
+    const CL = deps.codeLab();
+    let starterSrc = t.starter || "";
+    if (!starterSrc || !t.solution) return;
+
+    const holder = solTypes.find((x) => (x.members || []).some((m) => m.name === "Main"));
+    if (!holder) return;
+
+    // Comments are not work, and neither is reindenting.
+    const bodyOf = (src) => structure.squeeze(
+      structure.stripComments(structure.typeBody(structure.stripComments(src), holder.name)));
+    let before, after;
+    try {
+      before = bodyOf(starterSrc);
+      after = bodyOf(t.solution);
+    } catch {
+      return;
+    }
+    if (!before || !after || before === after) return;
+
+    const boxes = (t.goals || []).filter((g) => g && g.code).map((g) => {
+      const list = Array.isArray(g.code) ? g.code : [g.code];
+      return {
+        head: String(structure.rowLabel(list[0]) || "").split(":")[0].trim().split(/\s+/).pop(),
+        steps: list.slice(1).filter((r) => r && typeof r === "object").length,
+      };
+    });
+    const box = boxes.find((b) => b.head === holder.name);
+    if (!box) {
+      bad(`${label} rewires \`${holder.name}.Main\` between starter and solution, but no goal box tracks it. ` +
+        `Wiring the new pieces together is real work the learner must do - give it a "${holder.name}" box with a step row ` +
+        `({ row, writes }) per move, or the last step of the refactor is the one step with no help.`);
+      fail();
+      return;
+    }
+    if (!box.steps) {
+      bad(`${label} has a "${holder.name}" box but no step rows, so the rewiring of \`Main\` is untracked. ` +
+        `Statements declare no symbol, so a member row can never see them - each move needs a { row, writes } step row.`);
+      fail();
+    }
+  }
+
   function checkGranularity(t, label, solTypes, fail) {
     const CL = deps.codeLab();
     let starterTypes = [];

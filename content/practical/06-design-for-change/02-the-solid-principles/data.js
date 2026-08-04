@@ -61,14 +61,33 @@
         "2 need feeding"
       ],
       goals: [
+        // The gate stays purely structural and the EDIT lives in a step row.
+        // Hanging `gone` off the box instead would make it a prerequisite of
+        // every row under it, so the whole box sits grey and then turns green
+        // in one jump - the opposite of tracking the work step by step.
         {
-          code: ["class Cat", "string CheckAndSign(int hoursSinceMeal)"],
-          gate: { type: "Cat", member: "CheckAndSign", gone: "HoursUntilHungry = 6" }
+          code: [
+            "class Cat",
+            { row: "const int HoursUntilHungry = 4", writes: "HoursUntilHungry = 4", gone: "HoursUntilHungry = 6" },
+            "string CheckAndSign(int hoursSinceMeal)"
+          ],
+          gate: { type: "Cat", member: "CheckAndSign" }
         },
         {
-          code: ["class FrontDesk", "int HungryCount(List<int> hoursPerCat)"],
-          gate: { type: "FrontDesk", member: "HungryCount", gone: "HoursUntilHungry = 6" }
+          code: [
+            "class FrontDesk",
+            { row: "const int HoursUntilHungry = 4", writes: "HoursUntilHungry = 4", gone: "HoursUntilHungry = 6" },
+            "int HungryCount(List<int> hoursPerCat)"
+          ],
+          gate: { type: "FrontDesk", member: "HungryCount" }
         },
+        // A learner told the rule lives in two places will go hunting for a
+        // third, so `Main` is named here to stop the hunt - as PROSE, with no
+        // gate. It needs no edit on this card, and a box that is green before
+        // the learner types anything is a tick they did not earn. The one card
+        // where `Main` really does change is the next one, and there it is a
+        // box with a row per move.
+        { gate: null },
         { gate: null }
       ],
       requireSource: [
@@ -169,6 +188,18 @@
         { code: ["interface IAnimal", "string Speak()"], gate: { type: "IAnimal", kind: "interface", member: "Speak" } },
         { code: ["Cat : IAnimal", "string Speak()"], gate: { type: "Cat", base: "IAnimal", member: "Speak" } },
         { code: ["Dog : IAnimal", "string Speak()"], gate: { type: "Dog", base: "IAnimal", member: "Speak" } },
+        // `Main` is the only caller, so it is where the new shape has to be
+        // wired in - and none of that work declares a symbol, it is all
+        // statements. Step rows watch the source instead, so the learner sees
+        // the rewiring tick off one move at a time.
+        {
+          code: [
+            "class Program",
+            { row: "IAnimal animal = new Cat()", writes: ["IAnimal", "new Cat()"] },
+            { row: "animal.Speak()", writes: ".Speak()" }
+          ],
+          gate: { type: "Program", member: "Main" }
+        },
         { gate: { absent: "AnimalVoice" } },
         { gate: null }
       ],
@@ -211,6 +242,18 @@
         { code: ["interface IMover", "string Move()"], gate: { type: "IMover", kind: "interface", member: "Move" } },
         { code: ["Sparrow : IMover", "string Move()"], gate: { type: "Sparrow", base: "IMover", member: "Move" } },
         { code: ["Penguin : IMover", "string Move()"], gate: { type: "Penguin", base: "IMover", member: "Move" } },
+        // `Main` is the only caller, so it is where the new shape has to be
+        // wired in - and none of that work declares a symbol, it is all
+        // statements. Step rows watch the source instead, so the learner sees
+        // the rewiring tick off one move at a time.
+        {
+          code: [
+            "class Program",
+            { row: "IMover bird = new Penguin()", writes: "IMover" },
+            { row: "bird.Move()", writes: ".Move()" }
+          ],
+          gate: { type: "Program", member: "Main" }
+        },
         { gate: { absent: "Bird" } },
         { gate: null }
       ],
@@ -257,6 +300,17 @@
         { code: ["interface ISwimmer", "string Swim()"], gate: { type: "ISwimmer", kind: "interface", member: "Swim" } },
         { code: ["interface IFlyer", "string Fly()"], gate: { type: "IFlyer", kind: "interface", member: "Fly" } },
         { code: ["Fish : ISwimmer", "string Swim()"], gate: { type: "Fish", base: "ISwimmer", member: "Swim" } },
+        // `Main` is the only caller, so it is where the new shape has to be
+        // wired in - and none of that work declares a symbol, it is all
+        // statements. Step rows watch the source instead, so the learner sees
+        // the rewiring tick off one move at a time.
+        {
+          code: [
+            "class Program",
+            { row: "ISwimmer fish = new Fish()", writes: "ISwimmer" }
+          ],
+          gate: { type: "Program", member: "Main" }
+        },
         { gate: { absent: "IAnimalActions" } },
         { gate: null }
       ],
@@ -303,7 +357,18 @@
         { code: ["interface ILog", "void Write(string message)"], gate: { type: "ILog", kind: "interface", member: "Write" } },
         { code: ["ConsoleLog : ILog", "void Write(string message)"], gate: { type: "ConsoleLog", base: "ILog", member: "Write" } },
         { code: ["class Keeper", "ILog _log", "Keeper(ILog log)", "void Feed()"], gate: { type: "Keeper", member: "Keeper" } },
-        { gate: null },
+        // `Main` is the only caller, so it is where the new shape has to be
+        // wired in - and none of that work declares a symbol, it is all
+        // statements. Step rows watch the source instead, so the learner sees
+        // the rewiring tick off one move at a time.
+        {
+          code: [
+            "class Program",
+            { row: "new Keeper(new ConsoleLog())", writes: "new Keeper(new ConsoleLog())" }
+          ],
+          gate: { type: "Program", member: "Main" }
+        },
+        { gate: { type: "Keeper", member: "Feed", gone: "new ConsoleLog()" } },
         { gate: null }
       ],
       requireSource: [
