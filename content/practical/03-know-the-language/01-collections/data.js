@@ -1,4 +1,4 @@
-// Collections - Part three. A code-lab write-and-run build lesson (build-engine.js
+// Collections - Part three. A code-lab write-and-run build lesson (the build plugin
 // reads window.LESSON_CONFIG). The learner writes and runs the everyday container
 // types: List<T> (make, walk, index), a list of your own objects, and
 // Dictionary<TKey,TValue> (store, look up, check a key), then a manual tally that

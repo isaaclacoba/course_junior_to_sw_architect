@@ -5,7 +5,7 @@
 // (value equality). The grader is chosen so the concept is unavoidable - a
 // `class` where a `struct` or `record` is wanted prints the wrong answer.
 //
-// Data only: the controller lives in build-engine.js, which reads
+// Data only: the build plugin reads
 // window.LESSON_CONFIG. Light, animal-themed examples throughout.
 (function () {
   "use strict";

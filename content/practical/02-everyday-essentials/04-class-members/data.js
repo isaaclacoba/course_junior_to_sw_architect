@@ -1,5 +1,5 @@
 // Unit 2 - "C# up close": static, const, and readonly. Write-from-scratch builds.
-// Data only: build-engine.js reads window.LESSON_CONFIG (loaded after this file).
+// Data only: the build plugin reads window.LESSON_CONFIG (loaded after this file).
 // Portable idea, not a keyword tour: some behaviour and data belong to the TYPE
 // itself rather than to each instance, and some values are fixed once and never
 // change. C# spells these `static`, `const`, and `readonly`; most languages have

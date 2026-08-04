@@ -1,7 +1,7 @@
 // Reuse without regret - Part 1, after Reading Objects. Build the two ways to
 // reuse code: a child that is-a parent (inheritance), and an object that has-a
 // part (composition). Meet virtual/override polymorphism and the diamond problem,
-// and see why we favour composition. Data only; build-engine.js reads BUILD_CONFIG.
+// and see why we favour composition. Data only; the build plugin reads window.LESSON_CONFIG.
 (function () {
   "use strict";
 

@@ -1,4 +1,4 @@
-// Act 1, Lesson 5 - Methods. Data only; the controller is build-engine.js,
+// Act 1, Lesson 5 - Methods. Data only; the engine is the build plugin,
 // which reads window.LESSON_CONFIG (loaded after this file).
 // Pacing rule: keep the syntax trivial, put the effort into seeing what a
 // method is FOR. Each task rises one small step: return, parameter, decision,

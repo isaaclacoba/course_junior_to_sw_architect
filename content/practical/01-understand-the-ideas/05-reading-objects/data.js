@@ -7,7 +7,7 @@
 // mechanics (example code, expected output, grading probes, starter/solution).
 // The teaching prose (titles, concepts, context, goals, recap) lives in
 // res/strings/<voice>/en.json and is applied onto window.LESSON_CONFIG by
-// resource/bootstrap.js before build-engine.js renders.
+// the resource layer before the build plugin renders.
 (function () {
   "use strict";
 

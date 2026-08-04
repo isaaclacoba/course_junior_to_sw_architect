@@ -6,7 +6,7 @@
 // work here is choosing and writing the right operator.
 //
 // The portable idea is "query a collection without writing a loop"; the operator
-// names are the C# surface for it. Data only: build-engine.js reads
+// names are the C# surface for it. Data only: the build plugin reads
 // window.LESSON_CONFIG. Animal theme throughout; every query runs over a
 // `List<Animal>` where each animal has Name and Legs.
 (function () {

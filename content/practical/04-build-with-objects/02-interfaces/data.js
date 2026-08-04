@@ -3,7 +3,7 @@
 // collaborator that is not the focus) is given. The arc: two look-alike classes,
 // a method stuck on one type, naming the promise, programming to it, and a new
 // type that just fits. Verify probes re-run the learner's types differently.
-// Data only: build-engine.js reads window.LESSON_CONFIG.
+// Data only: the build plugin reads window.LESSON_CONFIG.
 (function () {
   "use strict";
 

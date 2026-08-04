@@ -1,5 +1,5 @@
 // Unit 2 - "Everyday essentials": Abstract types and overriding. Write-from-scratch builds.
-// Data only: build-engine.js reads window.LESSON_CONFIG (loaded after this file).
+// Data only: the build plugin reads window.LESSON_CONFIG (loaded after this file).
 // Culture-safe: every task prints strings, ints or booleans - never a raw
 // double/decimal, whose separator the browser locale would decide.
 (function () {

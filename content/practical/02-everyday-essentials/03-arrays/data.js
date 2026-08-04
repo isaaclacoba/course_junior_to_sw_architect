@@ -1,5 +1,5 @@
 // Unit 2 - "C# up close": Arrays. Write-from-scratch builds.
-// Data only: build-engine.js reads window.LESSON_CONFIG (loaded after this file).
+// Data only: the build plugin reads window.LESSON_CONFIG (loaded after this file).
 // Teaches the portable idea - a fixed-size, ordered sequence you index into,
 // measure and walk over - with C# arrays as the surface.
 // Culture-safe: never prints a raw double/decimal; every task prints ints,

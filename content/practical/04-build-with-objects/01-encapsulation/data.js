@@ -3,7 +3,7 @@
 // tasks build the case for objects - hold related data together, put behaviour
 // with it, hide the inside, guard a rule, then change that rule in one place.
 // A verify probe re-runs the learner's own type with different values, so a
-// hardcoded answer fails. Data only: build-engine.js reads window.LESSON_CONFIG.
+// hardcoded answer fails. Data only: the build plugin reads window.LESSON_CONFIG.
 (function () {
   "use strict";
 

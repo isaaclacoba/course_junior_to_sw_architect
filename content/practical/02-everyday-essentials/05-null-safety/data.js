@@ -1,5 +1,5 @@
 // Unit 2 - "C# up close": Null-safety. Write-from-scratch builds.
-// Data only: build-engine.js reads window.LESSON_CONFIG (loaded after this file).
+// Data only: the build plugin reads window.LESSON_CONFIG (loaded after this file).
 // Portable idea: a value may be absent ("no value"), and robust code handles
 // that case instead of crashing on it. C# is the surface (`??`, `?.`, `int?`,
 // `??=`); the concept exists in every language (null / nil / None / optional).

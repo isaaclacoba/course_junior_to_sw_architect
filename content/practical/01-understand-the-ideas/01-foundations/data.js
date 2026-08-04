@@ -1,5 +1,5 @@
 // Foundations - the first practical lesson. Rewritten as a code-lab
-// write-and-run build lesson (build-engine.js reads window.LESSON_CONFIG). It
+// write-and-run build lesson (the build plugin reads window.LESSON_CONFIG). It
 // teaches the actual language basics a beginner needs before anything else:
 // printing, variables, datatypes, assignment, null, and finally what an object
 // is (state + behaviour, class vs instance). No if/else or loops yet - those

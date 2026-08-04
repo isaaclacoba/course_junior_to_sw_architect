@@ -1,5 +1,5 @@
 // Unit 2 - "C# up close": Access and properties. Write-from-scratch builds.
-// Data only: build-engine.js reads window.LESSON_CONFIG (loaded after this file).
+// Data only: the build plugin reads window.LESSON_CONFIG (loaded after this file).
 // Portable idea, C# surface: a type controls what parts of it are visible from
 // outside (public / private / protected), and it exposes state through a
 // controlled property (a get/set) rather than a raw exposed field. Most OO

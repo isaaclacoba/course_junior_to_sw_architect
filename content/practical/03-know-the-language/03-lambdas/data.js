@@ -9,7 +9,7 @@
 // named method cannot, (4) so you can bake in a value you have now. The recap
 // bridges to LINQ and notes a normal method still works when a step deserves a
 // name. The learner completes each lambda body; only the usage is given. Data
-// only: build-engine.js reads window.LESSON_CONFIG; Run compiles through the
+// only: the build plugin reads window.LESSON_CONFIG; Run compiles through the
 // shared code-lab Roslyn/WASM host. Animal flavour throughout. The Main body is
 // left empty on purpose: the learner assembles a few simple lines - declare a
 // lambda, then actually use it over a small array with a loop. The worked example
