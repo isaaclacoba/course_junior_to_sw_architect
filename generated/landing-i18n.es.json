@@ -213,7 +213,7 @@
       "title": "Qué es un test"
     },
     "the-solid-principles": {
-      "blurb": "Cinco hábitos que mantienen el código fácil de cambiar. Detecta cada problema en un proyecto real de test-automation y arréglalo como toca. Las ideas se apoyan en todo lo anterior a esta parte.",
+      "blurb": "Cinco hábitos que mantienen el código fácil de cambiar. Escribes primero la versión ingenua, sientes lo que cuesta un cambio de lo más normal, y luego construyes la forma que lo hace barato. Las ideas se apoyan en todo lo anterior a esta parte.",
       "title": "Los principios SOLID"
     },
     "theory-1": {

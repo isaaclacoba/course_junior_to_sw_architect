@@ -424,12 +424,12 @@
               "track": "practical",
               "part": "design-for-change",
               "href": "content/practical/06-design-for-change/02-the-solid-principles/",
-              "key": "level2_awarded",
-              "total": 5,
+              "key": "solid_awarded",
+              "total": 7,
               "title": "The SOLID Principles",
-              "blurb": "Five habits that keep code easy to change. Spot each problem in a real test-automation project, then fix it the right way. The ideas lean on everything before this part.",
+              "blurb": "Five habits that keep code easy to change. You write the naive version first, feel what one ordinary change costs, then build the shape that makes it cheap. The ideas lean on everything before this part.",
               "pill": "challenging",
-              "time": "35 min",
+              "time": "45 min",
               "kind": "lesson"
             }
           ]

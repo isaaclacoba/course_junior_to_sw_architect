@@ -20,6 +20,12 @@ grows into a procedure, promote it to a skill and leave a pointer here.
 
 ## Editing
 
+- **Never put backticks in a `-m` commit message - write the message to a file and
+  use `git commit -F`.** A double-quoted `-m "... `binder` field ..."` makes the
+  shell RUN the backticked word as a command and substitute its (empty) output, so
+  the commit silently lands with a mangled message ("one  field") and a stray
+  "command not found" in the terminal. This repo's voice uses `backticks` constantly,
+  so the trap is permanent: `cat > /tmp/msg.txt <<'EOF' ... EOF` then `commit -F`.
 - **Edit large shared files atomically via bash, not the `edit`/`create` tools.**
   On big files that take several seconds to write - `index.html`,
   `page-shell.js` - the `edit`/`create` tools can be interrupted mid-write when a

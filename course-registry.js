@@ -47,6 +47,9 @@
       { id: "how-an-agent-thinks", title: "How an agent thinks", i18n: { es: { title: "Cómo piensa un agente" } } },
       { id: "making-agents-reliable", title: "Making agents reliable", i18n: { es: { title: "Hacer agentes de fiar" } } }
     ] },
+    { id: "git", name: "Git", kicker: "Version control", partPrefix: "Git · Part ", blurb: "Never used git or a terminal? Type real commands and watch the repository draw itself - commits, branches, merges, and how to undo a mistake.", i18n: { es: { name: "Git", kicker: "Control de versiones", partPrefix: "Git · Parte ", blurb: "¿Nunca has usado git ni un terminal? Escribe comandos de verdad y mira cómo se dibuja el repositorio - commits, ramas, fusiones y cómo deshacer un error." } }, parts: [
+      { id: "first-steps", title: "First steps", i18n: { es: { title: "Primeros pasos" } } }
+    ] },
   ];
 
   var lessons = [
@@ -161,7 +164,10 @@
     { track: "ai", part: "making-agents-reliable", id: "ai-20", href: "content/ai/04-making-agents-reliable/02-ai-20/", kind: "lesson", path: "content/ai/04-making-agents-reliable/02-ai-20" },
     { track: "ai", part: "making-agents-reliable", id: "ai-21", href: "content/ai/04-making-agents-reliable/03-ai-21/", kind: "lesson", path: "content/ai/04-making-agents-reliable/03-ai-21" },
     { track: "ai", part: "making-agents-reliable", id: "ai-22", href: "content/ai/04-making-agents-reliable/04-ai-22/", kind: "lesson", path: "content/ai/04-making-agents-reliable/04-ai-22" },
-    { track: "ai", part: "making-agents-reliable", id: "ai-23", href: "content/ai/04-making-agents-reliable/05-ai-23/", kind: "lesson", path: "content/ai/04-making-agents-reliable/05-ai-23" }
+    { track: "ai", part: "making-agents-reliable", id: "ai-23", href: "content/ai/04-making-agents-reliable/05-ai-23/", kind: "lesson", path: "content/ai/04-making-agents-reliable/05-ai-23" },
+
+    // ---- git / first-steps ----
+    { track: "git", part: "first-steps", id: "git-first-commit", href: "content/git/01-first-steps/01-git-first-commit/", kind: "lesson", path: "content/git/01-first-steps/01-git-first-commit" }
   ];
 
   var byIdIndex = {};
