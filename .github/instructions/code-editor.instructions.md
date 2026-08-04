@@ -21,17 +21,17 @@ editor through `CodeLab.MonacoEditor`. This is the same editor used by
   Prism-as-editor, or any other hand-rolled editor.
 - DO NOT load Monaco directly per page or reinvent the loader. Use
   `CodeLab.loadMonaco()`.
-- DO NOT write a new editor controller. The shared write-and-run engine is
-  `build-engine.js`, driven by `window.BUILD_CONFIG`. Add a lesson by writing a
-  data-only `*.js` that sets `BUILD_CONFIG` plus an HTML page that loads, in
-  order: `vendor/code-lab/code-lab.global.js`, the lesson data file, then
-  `build-engine.js`.
+- DO NOT write a new editor controller. The shared write-and-run body is the
+  `build` plugin (`kernel/engine/plugins/build-plugin.js`) on the generic engine
+  (`kernel/engine/lesson-engine.js`), driven by `window.LESSON_CONFIG`. A build
+  lesson is a data-only `data.js` that sets `LESSON_CONFIG`; the generated page's
+  kernel controller injects the core + the build plugin.
 
 ## Reuse existing components
 
-Reuse an existing component (`code-lab`, `build-engine.js`, `drill-engine.js`,
-`level3-app`) before building anything; a parallel pattern is not acceptable (see
-`copilot-instructions.md` golden rule 1).
+Reuse an existing component (`code-lab`, `kernel/engine/lesson-engine.js` + its
+plugins, `level3-app`) before building anything; a parallel pattern is not
+acceptable (see `copilot-instructions.md` golden rule 1).
 
 ## Runner
 

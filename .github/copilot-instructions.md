@@ -36,17 +36,23 @@ authoring + workflow guide.
 
 ## Architecture map
 
-Shared engines (root of repo):
+Shared engine (one generic engine + archetype plugins):
 
-- `page-shell.js` — renders the hero and, for the `drill`/`build` archetypes, the
-  card scaffold, from a small `window.PAGE` config. All element ids are
-  `prefix + suffix` (e.g. `cf` + `Title` = `cfTitle`).
-- `drill-engine.js` — the fill-in-the-blank + optional multiple-choice quiz
-  engine. Reads `window.DRILL_CONFIG`. Powers theory/quiz lessons and runnable
-  drills. Snippet `{{n}}` markers become blank inputs.
-- `build-engine.js` — the write-from-scratch engine (Monaco editor, run, match
-  output). Reads `window.BUILD_CONFIG`. Grades by output match + optional
-  `requireSource` technique gate + optional hidden `verify` probe.
+- `kernel/engine/lesson-engine.js` — the archetype-BLIND core. Owns all shared
+  chrome (header, XP + award, result panel, prev/next-lesson nav, `setLocale`) and
+  dispatches to a plugin by `window.LESSON_META.archetype`. Every lesson sets ONE
+  `window.LESSON_CONFIG`. Element ids are `prefix + suffix` (e.g. `cf` + `Title`).
+- `kernel/engine/plugins/*-plugin.js` — the per-archetype bodies (each
+  self-registers on the core): `build` (Monaco write-and-run; output match +
+  `requireSource` + hidden `verify`), `drill` (fill-in-the-blank + quiz; `{{n}}`
+  markers become blanks), `viz` (mounts `CodeLab.MemoryViz`), `checkpoint` (mounts
+  `CodeLab.Quiz`). build/drill grade via `kernel/grading/{output-match,blank-match}.js`.
+- `page-shell.js` — renders the hero + concept agenda + (for build) the card
+  scaffold from `window.PAGE`; the engine drives the body. Generated from the
+  `kernel/page-shell/` modules.
+- `resource/kernel-controller.js` — the live-swap composition root: binds the
+  voice/language strings onto `window.LESSON_CONFIG`, injects the core + the
+  archetype's plugin, and re-localizes in place.
 - `styles.css` — all shared styling. Put shared lesson CSS here, not per page.
 
 The compiler (do not reinvent):
@@ -94,9 +100,9 @@ generated.
    `archetype`, and the `concepts` graph
    `{ introduces:[{id,term,def}], revisits:[{id}], uses:[{id}] }`. A concept's
    `def` lives ONLY in the one lesson that introduces it.
-3. Fill `data.js` (the lesson content: `window.BUILD_CONFIG` / `DRILL_CONFIG`,
-   plus `viz.js` `window.LESSON_VIZ` for a viz lesson). Same config shapes as the
-   legacy engines below - only the file split and the page HTML differ. Do NOT
+3. Fill `data.js` (the lesson content: `window.LESSON_CONFIG` - the ONE global for
+   every archetype; a viz lesson sets it in `<id>.viz.js`). The core dispatches the
+   plugin by `meta.archetype`. Do NOT
    put `nextHref`/`nextLabel` in the data file; nav derives from the registry.
 4. `node tools/generate.mjs` writes `generated/course-data.js`,
    `generated/concept-index.js`, and the lesson's `content/.../index.html`.

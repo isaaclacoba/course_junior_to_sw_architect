@@ -61,26 +61,26 @@ drafts plain and factual; do not ship model-register warmth or hype.
 
 ## 1. Pick the archetype
 
-| Pedagogy | Archetype | Engine | Config |
+| Pedagogy | Archetype | Plugin | Config |
 |---|---|---|---|
-| Concept-only, absolute beginner, no code writing | Theory visual | `CodeLab.MemoryViz` via `theory-N.viz.js` | a `chip` + ordered `steps[]` |
-| Recall + fill a blank in prose/code, optional Run | Drill | `drill-engine.js` | `window.DRILL_CONFIG` |
-| Write C# from scratch, Run, match output | Build | `build-engine.js` | `window.BUILD_CONFIG` |
-| Seal a Part | Checkpoint | `CodeLab.Quiz` via `theory-check-N.js` | question bank + `passRatio` |
+| Concept-only, absolute beginner, no code writing | Theory visual | `viz` plugin (mounts `CodeLab.MemoryViz`) | `window.LESSON_CONFIG` (a `chip` + ordered `steps[]`) |
+| Recall + fill a blank in prose/code, optional Run | Drill | `drill` plugin | `window.LESSON_CONFIG` |
+| Write C# from scratch, Run, match output | Build | `build` plugin | `window.LESSON_CONFIG` |
+| Seal a Part | Checkpoint | `checkpoint` plugin (mounts `CodeLab.Quiz`) | `window.LESSON_CONFIG` (question bank + `passRatio`) |
 
 Reuse-first is non-negotiable: never write a new engine, runner, editor, or page
 controller. If a new archetype seems needed, it almost certainly is not.
 
 Direction (MANDATORY): every practical lesson that shows or runs code MUST use the
-code-lab Monaco editor via `build-engine` (write real code, Run it). The
-fill-in-the-blank `drill-engine` is **not acceptable** for practical lessons - do
+code-lab Monaco editor via the `build` plugin (write real code, Run it). The
+fill-in-the-blank `drill` plugin is **not acceptable** for practical lessons - do
 not create or leave one. Reach for `drill`/quiz only for pure recall with no code.
 Theory stays concept-only via the visual (`MemoryViz`). This rule is
 non-negotiable; see `.github/instructions/code-editor.instructions.md`.
 
 ## 2. Config shapes (the exact surface)
 
-### DRILL_CONFIG
+### LESSON_CONFIG - drill shape
 ```
 prefix, metaLabel, progressNoun, awardedKey, awardAmount,
 drills: [{
@@ -97,7 +97,7 @@ runnerUrl, xpKey
 { summary:true, summaryIntro, summaryItems:[{title,text}], summaryClose, blanks:[] }
 ```
 
-### BUILD_CONFIG
+### LESSON_CONFIG - build shape
 ```
 prefix, runnerUrl, xpKey, awardedKey, awardAmount,
 tasks: [{
