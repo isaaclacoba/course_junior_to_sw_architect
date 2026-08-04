@@ -93,6 +93,7 @@ var CodeLab = (() => {
     resolveModel: () => resolveModel,
     resolvePlan: () => resolvePlan,
     resolveRackTools: () => resolveRackTools,
+    resolveRepo: () => resolveRepo,
     resolveRetrieval: () => resolveRetrieval,
     resolveTranscript: () => resolveTranscript,
     scanCSharp: () => scanCSharp,
@@ -3381,856 +3382,6 @@ ${result.runtimeError}`.trim(),
     }
   };
 
-  // src/dom/viz-controls.ts
-  var DEFAULT_LEGEND = [
-    { sw: "#37d3a6", label: "data in RAM" },
-    { sw: "#2b6a5b", label: "active CPU core" },
-    { sw: "#ffd479", label: "signal on the bus", round: true },
-    { sw: "#2563eb", label: "stack frame (a call)" },
-    { sw: "#1f6f5f", label: "reference to an object", round: true }
-  ];
-  var SVG_NS3 = "http://www.w3.org/2000/svg";
-  function legendHtml(items) {
-    return items.map((i) => {
-      const round = i.round ? ";border-radius:50%" : "";
-      return `<span><i class="cl-mv-sw" style="background:${i.sw}${round}"></i>${i.label}</span>`;
-    }).join("");
-  }
-  function stepPercent(step, total) {
-    return total <= 1 ? 0 : step / (total - 1) * 100;
-  }
-  function notableLabel(kind) {
-    return kind === "new-object" ? "new object" : kind;
-  }
-  var VizControls = class {
-    constructor(actions, handlers, nextHref, legend, nextLabel = DEFAULT_VIZ_LABELS.nextLesson, labels = DEFAULT_VIZ_LABELS) {
-      this.nextHref = nextHref;
-      this.nextLabel = nextLabel;
-      this.labels = labels;
-      this.el = document.createElement("div");
-      this.el.innerHTML = `
-      <div class="cl-mv-controls">
-        <button data-c="prev">${labels.prev}</button>
-        <button data-c="play" class="cl-mv-primary">${labels.play}</button>
-        <button data-c="next" class="cl-mv-primary">${labels.next}</button>
-        <button data-c="reset">${labels.reset}</button>
-        <span class="cl-mv-spacer"></span>
-        <div class="cl-mv-textsize" role="group" aria-label="${labels.textSize}">
-          <span class="cl-mv-aa" aria-hidden="true">Aa</span>
-          <button data-size="0.9" title="${labels.textSmall}" aria-label="${labels.textSmall}">S</button>
-          <button data-size="1" title="${labels.textDefault}" aria-label="${labels.textDefault}">M</button>
-          <button data-size="1.2" title="${labels.textLarge}" aria-label="${labels.textLarge}">L</button>
-        </div>
-      </div>
-      <div class="cl-mv-scrubwrap">
-        <svg class="cl-mv-depth" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
-        <input type="range" class="cl-mv-scrub" data-scrub min="0" value="0" step="1" aria-label="${labels.step}" />
-        <div class="cl-mv-marks" data-marks></div>
-      </div>
-      <div class="cl-mv-legend">${legendHtml(legend && legend.length ? legend : DEFAULT_LEGEND)}</div>`;
-      const controls = this.el.querySelector(".cl-mv-controls");
-      actions.forEach((a, i) => {
-        const b = document.createElement("button");
-        b.className = "cl-mv-action";
-        b.textContent = a.label;
-        b.dataset.action = String(i);
-        controls.appendChild(b);
-      });
-      this.el.addEventListener("click", (e) => {
-        const btn = e.target.closest("button");
-        if (!btn) return;
-        if (btn.dataset.size != null) return handlers.onFontSize(Number(btn.dataset.size));
-        switch (btn.dataset.c) {
-          case "prev":
-            return handlers.onPrev();
-          case "next":
-            return handlers.onNext();
-          case "play":
-            return handlers.onPlay();
-          case "reset":
-            return handlers.onReset();
-          default:
-            if (btn.dataset.action != null) handlers.onAction(Number(btn.dataset.action));
-        }
-      });
-      const scrub = this.el.querySelector("[data-scrub]");
-      scrub.addEventListener("input", () => handlers.onSeek(Number(scrub.value)));
-    }
-    sync(ctx) {
-      this.update(ctx);
-    }
-    setActiveSize(scale) {
-      this.el.querySelectorAll(".cl-mv-textsize button").forEach((b) => {
-        b.classList.toggle("is-active", Number(b.dataset.size) === scale);
-      });
-    }
-    setDerived(derived, onJump) {
-      const depth = this.el.querySelector(".cl-mv-depth");
-      const marks = this.el.querySelector("[data-marks]");
-      const total = derived.callDepth.length;
-      depth.textContent = "";
-      marks.textContent = "";
-      if (total > 0) {
-        const maxDepth = Math.max(1, ...derived.callDepth);
-        const points = derived.callDepth.map((d, i) => {
-          const x = stepPercent(i, total);
-          const y = 90 - Math.max(0, d) / maxDepth * 75;
-          return `${x},${y}`;
-        }).join(" ");
-        const line = document.createElementNS(SVG_NS3, "polyline");
-        line.setAttribute("points", points);
-        line.setAttribute("fill", "none");
-        line.setAttribute("vector-effect", "non-scaling-stroke");
-        depth.appendChild(line);
-      }
-      derived.notables.forEach((notable) => {
-        const label = notableLabel(notable.kind);
-        const mark = document.createElement("button");
-        mark.type = "button";
-        mark.className = `cl-mv-mark is-${notable.kind}`;
-        mark.style.left = `${stepPercent(notable.step, total)}%`;
-        mark.setAttribute("aria-label", `Jump to ${label} at step ${notable.step}`);
-        mark.title = `Jump to ${label} at step ${notable.step}`;
-        mark.addEventListener("click", () => onJump(notable.step));
-        marks.appendChild(mark);
-      });
-    }
-    update(state) {
-      this.el.querySelector('[data-c="prev"]').disabled = state.atStart;
-      const next2 = this.el.querySelector('[data-c="next"]');
-      if (state.atEnd && this.nextHref) {
-        next2.disabled = false;
-        next2.textContent = this.nextLabel;
-      } else {
-        next2.disabled = state.atEnd;
-        next2.textContent = this.labels.next;
-      }
-      const scrub = this.el.querySelector("[data-scrub]");
-      scrub.max = String(Math.max(0, state.total - 1));
-      scrub.value = String(state.index);
-    }
-    setPlaying(playing) {
-      this.el.querySelector('[data-c="play"]').textContent = playing ? this.labels.pause : this.labels.play;
-    }
-    resetActions() {
-      this.el.querySelectorAll("button.cl-mv-action").forEach((b) => b.disabled = false);
-    }
-    disableAction(index) {
-      const btn = this.el.querySelector(`button[data-action="${index}"]`);
-      if (btn) btn.disabled = true;
-    }
-  };
-
-  // src/dom/memory-viz.ts
-  var instanceSeq = 0;
-  var WORDS_PER_MINUTE = 300;
-  var MIN_STEP_MS = 2600;
-  var MemoryViz = class _MemoryViz {
-    constructor(host, config) {
-      this.panels = [];
-      this.controls = null;
-      this.scale = 1;
-      this.panelFactories = {
-        board: (_spec, ctx) => new BoardView(ctx.uid),
-        die: (spec, ctx) => new MemoryDieView(ctx.uid, ctx.code, ctx.labels, spec.regions ?? ctx.regions, ctx.zoomTab, ctx.regionTags),
-        code: (_spec, ctx) => new CodePanel(ctx.code),
-        vartable: () => new VarTableView(),
-        callstack: () => new CallStackView(),
-        heapcards: (_spec, ctx) => new HeapCardsView(ctx.uid),
-        narration: (_spec, ctx) => new NarrationView(ctx.vizLabels),
-        console: () => new ConsoleView(),
-        agent: (spec, ctx) => new AgentView(spec.fan, ctx.vizLabels),
-        agentloop: () => new AgentLoopView(),
-        memoryshelf: () => new MemoryShelfView(),
-        toolrack: (_spec, ctx) => new ToolRackView(ctx.vizLabels),
-        transcript: (_spec, ctx) => new TranscriptView(ctx.vizLabels),
-        retrieval: () => new RetrievalView(),
-        planboard: () => new PlanboardView(),
-        controls: (_spec, ctx) => this.controls = new VizControls(ctx.actions, ctx.handlers, ctx.nextHref, ctx.legend, ctx.nextLabel, ctx.vizLabels)
-      };
-      this.onResize = () => {
-        this.relayout();
-      };
-      const uid = instanceSeq++;
-      const scene = config.scene ?? {};
-      const regions = scene.regions ?? ALL_REGIONS;
-      const showBoard = scene.board !== false;
-      const zoomTab = scene.zoomTab !== false;
-      this.actions = config.actions ?? [];
-      this.nextHref = config.nextHref;
-      this.nextLabel = config.nextLabel;
-      this.onXpChange = config.onXpChange;
-      this.onStep = config.onStep;
-      this.progress = new ProgressStore(
-        config.xpKey ?? "codelab_xp",
-        config.awardedKey,
-        typeof config.awardAmount === "number" ? config.awardAmount : 20
-      );
-      this.deriveRefs = config.deriveRefs !== false;
-      this.autoDim = config.autoDim !== false;
-      this.steps = config.steps ?? [];
-      this.player = new VizPlayer(this.steps, {
-        deriveRefs: this.deriveRefs,
-        autoDim: this.autoDim
-      });
-      this.autoplay = new Autoplay({
-        stepMs: () => this.stepDurationMs(),
-        atEnd: () => this.player.state.atEnd,
-        advance: () => this.step(this.player.next()),
-        onStop: () => this.controls?.setPlaying(false)
-      });
-      this.scale = config.fontScale ?? 1;
-      this.handlers = {
-        onPrev: () => this.step(this.player.prev(), false),
-        onNext: () => {
-          if (this.player.state.atEnd && this.nextHref) {
-            window.location.href = this.nextHref;
-            return;
-          }
-          this.step(this.player.next());
-        },
-        onReset: () => {
-          this.stop();
-          this.step(this.player.reset(), false);
-        },
-        onPlay: () => this.autoplay.isPlaying ? this.stop() : this.play(),
-        onAction: (i) => this.runAction(i),
-        onFontSize: (s) => this.setFont(s),
-        onSeek: (i) => {
-          this.stop();
-          this.step(this.player.goTo(i), false);
-        }
-      };
-      const vizLabels = { ...DEFAULT_VIZ_LABELS, ...config.labels };
-      this.buildCtx = {
-        uid,
-        code: config.code ?? [],
-        labels: {
-          chipName: config.chipName ?? "LPDDR5 RAM",
-          chipAddr: config.chipAddr ?? "address space  0x0000 \u2192 0xFFFF"
-        },
-        regions,
-        zoomTab,
-        actions: this.actions,
-        handlers: this.handlers,
-        regionTags: config.regionTags ?? {},
-        legend: config.legend,
-        nextHref: this.nextHref,
-        nextLabel: this.nextLabel ?? vizLabels.nextLesson,
-        vizLabels
-      };
-      this.layout = config.layout ?? {
-        visual: [
-          ...showBoard ? [{ type: "board" }] : [],
-          { type: "die", regions }
-        ],
-        aside: [{ type: "narration" }, { type: "controls" }]
-      };
-      this.root = document.createElement("div");
-      this.root.className = "cl-mv";
-      this.root.style.setProperty("--mv-fs", String(this.scale));
-      if (config.background) this.root.style.setProperty("--mv-bg", config.background);
-      this.visualCol = document.createElement("div");
-      this.visualCol.className = "cl-mv-visual";
-      this.asideCol = document.createElement("div");
-      this.asideCol.className = "cl-mv-aside";
-      this.root.append(this.visualCol);
-      this.buildPanels();
-      host.appendChild(this.root);
-      this.wireControls();
-      window.addEventListener("resize", this.onResize);
-      this.refreshXp();
-      this.step(this.player.state, false);
-    }
-    /** Replace the scene without tearing the widget down: rebuild the player and
-     *  the panels in place, and (by default) hold the current step index so a
-     *  level toggle does not send the learner back to the first step. `code` and
-     *  `layout` override the code lines and the panel arrangement when given. */
-    setSteps(steps, opts = {}) {
-      if (steps.length === 0) throw new Error("MemoryViz.setSteps needs at least one step");
-      this.stop();
-      const keepIndex = opts.preserveIndex !== false ? this.player.state.index : 0;
-      this.steps = steps;
-      if (opts.code) this.buildCtx.code = opts.code;
-      if (opts.layout) this.layout = opts.layout;
-      this.player = new VizPlayer(steps, { deriveRefs: this.deriveRefs, autoDim: this.autoDim });
-      this.buildPanels();
-      this.wireControls();
-      this.step(this.player.goTo(Math.min(keepIndex, steps.length - 1)), false);
-    }
-    /** (Re)build the visual + aside panels from the current layout into the two
-     *  columns. Clears any prior panels first, so it is safe to call repeatedly. */
-    buildPanels() {
-      this.controls = null;
-      this.panels.length = 0;
-      this.visualCol.textContent = "";
-      this.asideCol.textContent = "";
-      (this.layout.visual ?? []).forEach((spec) => {
-        const p = this.makePanel(spec, this.buildCtx);
-        this.panels.push(p);
-        this.visualCol.appendChild(p.el);
-      });
-      (this.layout.aside ?? []).forEach((spec) => {
-        const p = this.makePanel(spec, this.buildCtx);
-        this.panels.push(p);
-        this.asideCol.appendChild(p.el);
-      });
-      if (this.asideCol.childElementCount > 0) {
-        if (!this.asideCol.parentNode) this.root.append(this.asideCol);
-        this.root.classList.remove("cl-mv-single");
-      } else {
-        if (this.asideCol.parentNode) this.asideCol.remove();
-        this.root.classList.add("cl-mv-single");
-      }
-    }
-    /** Feed the freshly built controls panel the font size and the derived-trace
-     *  scrubber for the current steps. No-op when the layout has no controls. */
-    wireControls() {
-      if (!this.controls) return;
-      this.controls.setActiveSize(this.scale);
-      this.controls.setDerived(deriveTrace(this.steps), this.handlers.onSeek);
-    }
-    static create(host, config) {
-      return new _MemoryViz(host, config);
-    }
-    destroy() {
-      this.stop();
-      window.removeEventListener("resize", this.onResize);
-      this.root.remove();
-    }
-    // ---- composition ------------------------------------------------------
-    makePanel(spec, ctx) {
-      const build = this.panelFactories[spec.type];
-      if (!build) throw new Error("MemoryViz: unknown panel type " + String(spec.type));
-      return build(spec, ctx);
-    }
-    // ---- orchestration ----------------------------------------------------
-    step(state, animate = true) {
-      if (this.controls) this.controls.resetActions();
-      this.syncAll(state);
-      this.onStep?.({ pc: state.model.pc ?? -1, index: state.index, total: state.total });
-      if (animate) this.animateAll(state);
-      if (state.atEnd) {
-        this.stop();
-        this.markComplete();
-      }
-    }
-    /** Report the current tracked XP to the host, which owns any XP label. */
-    refreshXp() {
-      this.onXpChange?.(this.progress.xp());
-    }
-    /** Mark the lesson complete and grant XP once, when the last step is reached. */
-    markComplete() {
-      this.progress.awardOnce();
-      this.refreshXp();
-    }
-    runAction(index) {
-      const action = this.actions[index];
-      if (!action) return;
-      const state = this.player.applyAction(action);
-      this.syncAll(state);
-      this.animateAll(state);
-      if (action.once && this.controls) this.controls.disableAction(index);
-    }
-    syncAll(state) {
-      const ctx = {
-        model: state.model,
-        index: state.index,
-        total: state.total,
-        atStart: state.atStart,
-        atEnd: state.atEnd
-      };
-      for (const p of this.panels) p.sync(ctx);
-    }
-    animateAll(state) {
-      for (const p of this.panels) if (p.animate) void p.animate(state.model);
-    }
-    play() {
-      if (!this.controls) return;
-      if (this.player.state.atEnd) this.step(this.player.reset(), false);
-      this.controls.setPlaying(true);
-      this.autoplay.start();
-    }
-    /** Hold each step long enough to read its narration at ~300 words/minute. */
-    stepDurationMs() {
-      const words = (this.player.state.model.narr ?? "").trim().split(/\s+/).filter(Boolean).length;
-      const readMs = words / WORDS_PER_MINUTE * 6e4;
-      return Math.max(MIN_STEP_MS, Math.round(readMs) + 500);
-    }
-    stop() {
-      this.autoplay.stop();
-    }
-    setFont(scale) {
-      this.scale = scale;
-      this.root.style.setProperty("--mv-fs", String(scale));
-      if (this.controls) this.controls.setActiveSize(scale);
-      this.relayout();
-    }
-    relayout() {
-      const model = this.player.state.model;
-      for (const p of this.panels) if (p.onResize) p.onResize(model);
-    }
-  };
-
-  // src/core/exec-tracer-model.ts
-  function traceToSteps(trace) {
-    const src = trace.code ?? [];
-    const steps = collapseCallEntries(trace.steps ?? []);
-    const out = [];
-    let prevValues = /* @__PURE__ */ new Map();
-    let prevFields = /* @__PURE__ */ new Map();
-    let prevGlobals = /* @__PURE__ */ new Map();
-    let prevStdout = "";
-    steps.forEach((ts, i) => {
-      const values = /* @__PURE__ */ new Map();
-      const stack = (ts.frames ?? []).map(
-        (f) => frameToFrame(f, values, prevValues, i === 0)
-      );
-      const fields = /* @__PURE__ */ new Map();
-      const heap = (ts.heap ?? []).map(
-        (o) => objectToObject(o, fields, prevFields, i === 0)
-      );
-      const globalValues = /* @__PURE__ */ new Map();
-      const globals = globalSlots(ts.statics ?? [], globalValues, prevGlobals, i === 0);
-      const rodata = globalSlots(ts.consts ?? []);
-      const stdout = ts.stdout ?? "";
-      const printed = stdout.startsWith(prevStdout) ? stdout.slice(prevStdout.length) : stdout;
-      const prevFrames = i > 0 ? steps[i - 1].frames ?? [] : [];
-      const prevHeapIds = new Set((i > 0 ? steps[i - 1].heap ?? [] : []).map((o) => o.id));
-      const step = {
-        narr: describeStep(prevFrames, ts, stack, heap, prevHeapIds, globals, printed, src),
-        pc: typeof ts.line === "number" && ts.line > 0 ? ts.line - 1 : -1,
-        codeLive: true,
-        stack,
-        heap
-      };
-      if (globals.length) step.globals = globals;
-      if (rodata.length) step.rodata = rodata;
-      if (printed) step.printed = printed;
-      if (stdout) step.output = stdout;
-      out.push(step);
-      prevValues = values;
-      prevFields = fields;
-      prevGlobals = globalValues;
-      prevStdout = stdout;
-    });
-    const lastTs = steps[steps.length - 1];
-    if (lastTs) {
-      const values = /* @__PURE__ */ new Map();
-      const stack = (lastTs.frames ?? []).map(
-        (f) => frameToFrame(f, values, prevValues, false)
-      );
-      const fields = /* @__PURE__ */ new Map();
-      const heap = (lastTs.heap ?? []).map(
-        (o) => objectToObject(o, fields, prevFields, false)
-      );
-      const globals = globalSlots(lastTs.statics ?? [], /* @__PURE__ */ new Map(), prevGlobals, false);
-      const rodata = globalSlots(lastTs.consts ?? []);
-      const printedLines = prevStdout ? prevStdout.replace(/\n+$/, "").split("\n").length : 0;
-      const terminal = {
-        narr: trace.truncated ? "Stopped early - there were too many steps to show the rest." : printedLines > 0 ? `The program finished. It printed ${printedLines} line${printedLines === 1 ? "" : "s"}.` : "The program finished without printing anything.",
-        pc: -1,
-        codeLive: true,
-        stack,
-        heap
-      };
-      if (globals.length) terminal.globals = globals;
-      if (rodata.length) terminal.rodata = rodata;
-      if (prevStdout) terminal.output = prevStdout;
-      out.push(terminal);
-    }
-    return out;
-  }
-  function collapseCallEntries(steps) {
-    const drop = /* @__PURE__ */ new Set();
-    for (let i = 1; i + 1 < steps.length; i++) {
-      const prev2 = steps[i - 1];
-      const cur = steps[i];
-      const next2 = steps[i + 1];
-      const curLen = cur.frames?.length ?? 0;
-      const pushed = curLen > (prev2.frames?.length ?? 0);
-      if (!pushed) continue;
-      if (cur.line !== next2.line) continue;
-      if (curLen !== (next2.frames?.length ?? 0)) continue;
-      const curTop = cur.frames?.[curLen - 1];
-      const nextTop = next2.frames?.[curLen - 1];
-      if (!curTop || !nextTop || curTop.id !== nextTop.id) continue;
-      drop.add(i);
-    }
-    return drop.size ? steps.filter((_, i) => !drop.has(i)) : steps;
-  }
-  function frameToFrame(f, values, prevValues, firstStep) {
-    const vars = (f.vars ?? []).map((v) => {
-      const id = `${f.id}:${v.name}`;
-      const display = v.ref != null ? refDisplay(v) : v.value ?? "";
-      values.set(id, display);
-      const hot = !firstStep && prevValues.get(id) !== display;
-      const slot = { id, k: v.name, hot };
-      if (v.ref != null) slot.ref = v.ref;
-      else slot.v = v.value ?? "";
-      return slot;
-    });
-    const frame = { id: f.id, name: f.name, vars };
-    if (f.kind) frame.kind = f.kind;
-    if (f.recv) frame.recv = f.recv;
-    if (typeof f.line === "number") frame.line = f.line;
-    return frame;
-  }
-  function objectToObject(o, fields, prevFields, firstStep) {
-    const hotFields = [];
-    (o.fields ?? []).forEach(([name, value]) => {
-      const key = `${o.id}:${name}`;
-      fields.set(key, value);
-      if (!firstStep && prevFields.get(key) !== value) hotFields.push(name);
-    });
-    const obj = { id: o.id, type: o.type, fields: o.fields ?? [], hotFields };
-    if (typeof o.no === "number") obj.no = o.no;
-    return obj;
-  }
-  function globalSlots(globals, values, prevValues, firstStep = false) {
-    return (globals ?? []).map((g) => {
-      const owner = g.owner ?? "";
-      const id = `${owner}.${g.name}`;
-      const v = g.value ?? "";
-      values?.set(id, v);
-      const slot = {
-        id,
-        k: owner ? `${owner}.${g.name}` : g.name,
-        v
-      };
-      if (prevValues && !firstStep && prevValues.get(id) !== v) slot.hot = true;
-      return slot;
-    });
-  }
-  function refDisplay(v) {
-    return v.ref != null ? `\u2192${v.ref}` : v.value ?? "null";
-  }
-  function describeStep(prevFrames, ts, stack, heap, prevHeapIds, globals, printed, src) {
-    const curFrames = ts.frames ?? [];
-    const prevLen = prevFrames.length;
-    const curLen = curFrames.length;
-    if (curLen > prevLen) return callNarration(curFrames[curLen - 1]);
-    if (curLen < prevLen) return returnNarration(prevFrames[prevLen - 1], curFrames[curLen - 1]);
-    if (printed) return printedNarration(printed);
-    const topFrame = stack[stack.length - 1];
-    const hotSlot = topFrame ? topFrame.vars.find((v) => v.hot) : void 0;
-    const created = heap.find((o) => !prevHeapIds.has(o.id));
-    if (created && hotSlot && hotSlot.ref != null && hotSlot.ref === created.id) {
-      return "Set `" + hotSlot.k + "` to a new `" + created.type + "`";
-    }
-    if (created) {
-      const label = typeof created.no === "number" ? `${created.type} #${created.no}` : created.type;
-      return typeof created.no === "number" ? "Created a `" + created.type + "` (`" + label + "`)" : "Created a `" + created.type + "`";
-    }
-    if (hotSlot) {
-      if (hotSlot.ref != null) return "Pointed `" + hotSlot.k + "` at `" + heapLabel(hotSlot.ref, heap) + "`";
-      return "Set `" + hotSlot.k + "` to `" + (hotSlot.v ?? "") + "`";
-    }
-    const g = globals.find((s) => s.hot);
-    if (g) return "Set `" + g.k + "` to `" + g.v + "`";
-    return runningNarration(ts.line, src);
-  }
-  function callNarration(top) {
-    if (top.kind === "entry") return "Entered `" + (top.name || "Main") + "`";
-    if (top.kind === "ctor") {
-      const type = (top.name || "").replace(/^new\s+/, "") || "object";
-      return "Called the `" + type + "` constructor";
-    }
-    const m = methodLabel(top);
-    return top.recv ? "Called `" + m + "` on `" + top.recv + "`" : "Called `" + m + "`";
-  }
-  function returnNarration(left, back) {
-    const backName = back ? back.name : null;
-    if (left.kind === "ctor") {
-      const type = (left.name || "").replace(/^new\s+/, "") || "object";
-      return backName ? "The `" + type + "` constructor finished - back in `" + backName + "`" : "The `" + type + "` constructor finished";
-    }
-    const m = methodLabel(left);
-    return backName ? "`" + m + "` returned to `" + backName + "`" : "`" + m + "` returned";
-  }
-  function methodLabel(f) {
-    const name = f.name || "?";
-    return name.endsWith(")") ? name : name + "()";
-  }
-  function printedNarration(printed) {
-    const parts = printed.replace(/\n+$/, "").split("\n");
-    const first = (parts[0] ?? "").replace(/`/g, "");
-    if (first === "") return "Printed a blank line";
-    const shown = parts.length > 1 ? first + " \u2026" : first;
-    return "Printed `" + shown + "`";
-  }
-  function heapLabel(ref, heap) {
-    const o = heap.find((h) => h.id === ref);
-    if (!o) return "an object";
-    return typeof o.no === "number" ? `${o.type} #${o.no}` : o.type;
-  }
-  function runningNarration(line, src) {
-    const text = typeof line === "number" && line > 0 ? (src[line - 1] ?? "").trim() : "";
-    if (!text) return "Running the program.";
-    return "Running this line: `" + text + "`";
-  }
-
-  // src/dom/error-panel.ts
-  var DEFAULT_LABELS2 = {
-    heading: "Let's fix this first",
-    note: "Often a single early mistake (a missing or extra { } ( ) ;) is enough to confuse the rest. Fix the top one first, then run again.",
-    why: "Learn why",
-    hideWhy: "Hide why",
-    warningHeading: "It ran - but read this",
-    warningNote: "The compiler built this, so it is not an error. It is telling you these lines cannot be doing what they look like they do. Code that runs and is still wrong is the expensive kind."
-  };
-  function locText(e) {
-    if (e.line == null) return "";
-    return e.column != null ? `Line ${e.line}, col ${e.column}` : `Line ${e.line}`;
-  }
-  function renderErrorPanel(errors, labels = {}, options = {}) {
-    const l = { ...DEFAULT_LABELS2, ...labels };
-    const isWarning = options.kind === "warning";
-    const section = document.createElement("section");
-    section.className = isWarning ? "cl-errors cl-errors--warning" : "cl-errors";
-    const heading = document.createElement("h3");
-    heading.textContent = isWarning ? l.warningHeading : l.heading;
-    section.appendChild(heading);
-    const note = document.createElement("p");
-    note.className = "cl-errors-note";
-    note.textContent = isWarning ? l.warningNote : l.note;
-    section.appendChild(note);
-    const list = document.createElement("ul");
-    for (const e of errors) {
-      const li = document.createElement("li");
-      const loc = locText(e);
-      if (loc) {
-        const locEl = document.createElement("span");
-        locEl.className = "cl-error-loc";
-        locEl.textContent = loc;
-        li.appendChild(locEl);
-      }
-      if (e.friendly) {
-        const friendly = document.createElement("span");
-        friendly.className = "cl-error-friendly";
-        friendly.textContent = e.friendly;
-        li.appendChild(friendly);
-      }
-      const raw = document.createElement("span");
-      raw.className = "cl-error-raw";
-      raw.textContent = e.raw;
-      li.appendChild(raw);
-      if (e.why) {
-        const toggle = document.createElement("button");
-        toggle.type = "button";
-        toggle.className = "cl-error-why-toggle";
-        toggle.textContent = l.why;
-        toggle.setAttribute("aria-expanded", "false");
-        const why = document.createElement("p");
-        why.className = "cl-error-why";
-        why.textContent = e.why;
-        why.hidden = true;
-        toggle.addEventListener("click", () => {
-          why.hidden = !why.hidden;
-          toggle.textContent = why.hidden ? l.why : l.hideWhy;
-          toggle.setAttribute("aria-expanded", why.hidden ? "false" : "true");
-        });
-        li.appendChild(toggle);
-        li.appendChild(why);
-      }
-      list.appendChild(li);
-    }
-    section.appendChild(list);
-    return section;
-  }
-  function showErrorPanel(host, errors, labels, options) {
-    host.textContent = "";
-    if (!errors || errors.length === 0) {
-      host.hidden = true;
-      return false;
-    }
-    host.appendChild(renderErrorPanel(errors, labels, options));
-    host.hidden = false;
-    return true;
-  }
-
-  // src/dom/viz-lab.ts
-  function normalizeErrors(errors) {
-    return errors.map((e) => ({
-      line: e.line ?? void 0,
-      friendly: e.friendly ?? void 0,
-      raw: e.raw
-    }));
-  }
-  var DEFAULT_STARTER = [
-    "class Program",
-    "{",
-    "    static void Main()",
-    "    {",
-    "        int a = 3;",
-    "        int b = 4;",
-    "        int total = a + b;",
-    "        System.Console.WriteLine(total);",
-    "    }",
-    "}"
-  ].join("\n");
-  var VizLab = class _VizLab {
-    constructor(host, config) {
-      this.editor = new MonacoEditor();
-      this.lastTrace = null;
-      this.lastSteps = null;
-      this.viz = null;
-      this.ready = false;
-      this.legend = config.legend;
-      this.language = config.language ?? "csharp";
-      this.runner = new IframeRunner({
-        url: config.runnerUrl,
-        readyTimeout: config.readyTimeout ?? 18e4
-      });
-      this.root = document.createElement("div");
-      this.root.className = "cl-vl";
-      const editorPane = document.createElement("div");
-      editorPane.className = "cl-vl-editor";
-      const toolbar = document.createElement("div");
-      toolbar.className = "cl-vl-toolbar";
-      this.vizBtn = document.createElement("button");
-      this.vizBtn.type = "button";
-      this.vizBtn.className = "cl-btn cl-primary cl-vl-run";
-      this.vizBtn.textContent = "Preparing compiler...";
-      this.vizBtn.disabled = true;
-      this.vizBtn.setAttribute("data-viz", "");
-      this.vizBtn.addEventListener("click", () => void this.visualize());
-      this.statusEl = document.createElement("span");
-      this.statusEl.className = "cl-vl-status";
-      this.statusEl.setAttribute("role", "status");
-      this.statusEl.setAttribute("aria-live", "polite");
-      toolbar.append(this.vizBtn, this.statusEl);
-      this.editorHost = document.createElement("div");
-      this.editorHost.className = "cl-vl-monaco";
-      editorPane.append(toolbar, this.editorHost);
-      this.stage = document.createElement("div");
-      this.stage.className = "cl-vl-stage";
-      this.showHint("Write a small program, then press Visualize to watch it run.");
-      this.root.append(editorPane, this.stage);
-      host.appendChild(this.root);
-      void this.boot(config.starter ?? DEFAULT_STARTER);
-    }
-    static create(host, config) {
-      return new _VizLab(host, config);
-    }
-    async boot(starter) {
-      await loadMonaco();
-      await this.editor.mount(this.editorHost, {
-        value: starter,
-        language: this.language,
-        readOnly: false,
-        autoHeight: { minHeight: 220, maxHeight: 640 }
-      });
-      try {
-        await this.runner.warm();
-      } catch {
-      } finally {
-        this.ready = true;
-        this.vizBtn.disabled = false;
-        this.vizBtn.textContent = "Visualize";
-      }
-    }
-    async visualize() {
-      if (!this.ready) return;
-      const code = this.editor.getValue();
-      this.vizBtn.disabled = true;
-      this.vizBtn.textContent = "Tracing...";
-      this.setStatus("");
-      try {
-        const outcome = await this.runner.trace(code);
-        if (!outcome.compiled) {
-          const errors = normalizeErrors(outcome.errors);
-          this.showErrors(errors);
-          this.setStatus("Did not compile.");
-          if (this.editor.setMarkers) this.editor.setMarkers(errors);
-          return;
-        }
-        if (this.editor.setMarkers) this.editor.setMarkers([]);
-        if (!outcome.trace || outcome.trace.steps.length === 0) {
-          this.showHint("That program produced no steps to show. Add a statement or two inside Main.");
-          this.setStatus("Nothing to trace.");
-          return;
-        }
-        this.lastTrace = outcome.trace;
-        this.lastSteps = traceToSteps(outcome.trace);
-        this.render();
-        const n = Math.max(0, this.lastSteps.length - 1);
-        let msg = `Traced ${n} step${n === 1 ? "" : "s"}.`;
-        if (outcome.trace.truncated) msg += " Stopped early - the program ran too long.";
-        if (outcome.runtimeError) msg += ` It threw: ${outcome.runtimeError}`;
-        this.setStatus(msg);
-      } catch (err) {
-        this.showHint("The tracer took too long or could not load. Try again.");
-        this.setStatus(String(err.message || err));
-      } finally {
-        this.vizBtn.disabled = false;
-        this.vizBtn.textContent = "Visualize";
-      }
-    }
-    /** The one layout: the memory view (call stack + heap objects) in the wide
-     *  column, then narration, the console output, and the transport controls in
-     *  the reading rail. The console sits right under the narration so "this line
-     *  runs" and "this is what it printed" read together. */
-    memoryLayout() {
-      return {
-        visual: [{ type: "heapcards" }],
-        aside: [{ type: "narration" }, { type: "console" }, { type: "controls" }]
-      };
-    }
-    render() {
-      if (!this.lastTrace || !this.lastSteps) return;
-      const layout2 = this.memoryLayout();
-      if (this.viz) {
-        this.viz.setSteps(this.lastSteps, {
-          code: this.lastTrace.code,
-          layout: layout2,
-          preserveIndex: false
-        });
-        return;
-      }
-      this.stage.textContent = "";
-      this.viz = MemoryViz.create(this.stage, {
-        code: this.lastTrace.code,
-        steps: this.lastSteps,
-        layout: layout2,
-        legend: this.legend,
-        deriveRefs: true,
-        autoDim: true,
-        onStep: (info) => this.editor.highlightLine?.(info.pc)
-      });
-    }
-    showHint(text) {
-      this.editor.highlightLine?.(null);
-      this.teardownViz();
-      this.stage.textContent = "";
-      const hint = document.createElement("p");
-      hint.className = "cl-vl-hint";
-      hint.textContent = text;
-      this.stage.appendChild(hint);
-    }
-    showErrors(errors) {
-      this.editor.highlightLine?.(null);
-      this.teardownViz();
-      this.stage.textContent = "";
-      this.stage.appendChild(renderErrorPanel(errors));
-    }
-    teardownViz() {
-      this.viz?.destroy();
-      this.viz = null;
-      this.lastTrace = null;
-      this.lastSteps = null;
-    }
-    setStatus(text) {
-      this.statusEl.textContent = text;
-    }
-    destroy() {
-      this.teardownViz();
-      this.editor.destroy();
-      this.runner.destroy();
-      this.root.remove();
-    }
-  };
-
   // src/core/git-layout.ts
   function headCommit(state) {
     if (state.head.kind === "detached") return state.head.commit;
@@ -4331,7 +3482,7 @@ ${result.runtimeError}`.trim(),
   }
 
   // src/dom/git-graph-view.ts
-  var SVG_NS4 = "http://www.w3.org/2000/svg";
+  var SVG_NS3 = "http://www.w3.org/2000/svg";
   var COL_GAP = 128;
   var ROW_GAP = 112;
   var PAD_X = 64;
@@ -4381,7 +3532,7 @@ ${result.runtimeError}`.trim(),
       this.root.className = "cl-git";
       this.graphWrap = document.createElement("div");
       this.graphWrap.className = "cl-git-graph";
-      this.svg = document.createElementNS(SVG_NS4, "svg");
+      this.svg = document.createElementNS(SVG_NS3, "svg");
       this.svg.setAttribute("class", "cl-git-svg");
       this.chipLayer = document.createElement("div");
       this.chipLayer.className = "cl-git-chips";
@@ -4666,6 +3817,16 @@ ${result.runtimeError}`.trim(),
       return paths;
     }
   };
+
+  // src/core/repo-scene.ts
+  function resolveRepo(scene) {
+    if (!scene || !Array.isArray(scene.commands)) return null;
+    return {
+      files: Array.isArray(scene.files) ? scene.files.slice() : [],
+      commands: scene.commands.slice(),
+      note: scene.note
+    };
+  }
 
   // src/core/git-model.ts
   var GitError = class extends Error {
@@ -5642,6 +4803,903 @@ Fast-forward`;
     if (tokens.length === 0) return { state, output: "", effect: { kind: "none" } };
     return runGit(tokens, state);
   }
+
+  // src/dom/repo-view.ts
+  var RepoView = class {
+    constructor() {
+      this.graph = new GitGraph();
+      this.mounted = false;
+      this.el = document.createElement("div");
+      this.el.className = "cl-rp";
+      this.graphHost = document.createElement("div");
+      this.graphHost.className = "cl-rp-graph";
+      this.noteEl = document.createElement("p");
+      this.noteEl.className = "cl-rp-cap";
+      this.el.append(this.graphHost, this.noteEl);
+    }
+    /** Replay a step's commands into the repository it describes. A command that
+     *  errors is an authoring bug, not a learner mistake: it is reported and the
+     *  replay continues, so the graph shows the shortfall instead of vanishing. */
+    build(files, commands) {
+      let state = files.length ? addFiles(init(), files).state : init();
+      for (const line of commands) {
+        let res;
+        try {
+          res = run(line, state);
+        } catch (err) {
+          console.warn(`repo scene: setup command failed - '${line}':`, err);
+          continue;
+        }
+        if (res.error) console.warn(`repo scene: setup command failed - '${line}': ${res.output}`);
+        if (res.state) state = res.state;
+      }
+      return state;
+    }
+    sync(ctx) {
+      const scene = resolveRepo(ctx.model.repo);
+      if (!scene) return;
+      const state = this.build(scene.files, scene.commands);
+      if (!this.mounted) {
+        this.graph.mount(this.graphHost, { state });
+        this.mounted = true;
+      } else {
+        this.graph.setState(state, { animate: true });
+      }
+      this.noteEl.innerHTML = scene.note ? escapeHtml4(scene.note) : "";
+      this.noteEl.hidden = !scene.note;
+    }
+  };
+
+  // src/dom/viz-controls.ts
+  var DEFAULT_LEGEND = [
+    { sw: "#37d3a6", label: "data in RAM" },
+    { sw: "#2b6a5b", label: "active CPU core" },
+    { sw: "#ffd479", label: "signal on the bus", round: true },
+    { sw: "#2563eb", label: "stack frame (a call)" },
+    { sw: "#1f6f5f", label: "reference to an object", round: true }
+  ];
+  var SVG_NS4 = "http://www.w3.org/2000/svg";
+  function legendHtml(items) {
+    return items.map((i) => {
+      const round = i.round ? ";border-radius:50%" : "";
+      return `<span><i class="cl-mv-sw" style="background:${i.sw}${round}"></i>${i.label}</span>`;
+    }).join("");
+  }
+  function stepPercent(step, total) {
+    return total <= 1 ? 0 : step / (total - 1) * 100;
+  }
+  function notableLabel(kind) {
+    return kind === "new-object" ? "new object" : kind;
+  }
+  var VizControls = class {
+    constructor(actions, handlers, nextHref, legend, nextLabel = DEFAULT_VIZ_LABELS.nextLesson, labels = DEFAULT_VIZ_LABELS) {
+      this.nextHref = nextHref;
+      this.nextLabel = nextLabel;
+      this.labels = labels;
+      this.el = document.createElement("div");
+      this.el.innerHTML = `
+      <div class="cl-mv-controls">
+        <button data-c="prev">${labels.prev}</button>
+        <button data-c="play" class="cl-mv-primary">${labels.play}</button>
+        <button data-c="next" class="cl-mv-primary">${labels.next}</button>
+        <button data-c="reset">${labels.reset}</button>
+        <span class="cl-mv-spacer"></span>
+        <div class="cl-mv-textsize" role="group" aria-label="${labels.textSize}">
+          <span class="cl-mv-aa" aria-hidden="true">Aa</span>
+          <button data-size="0.9" title="${labels.textSmall}" aria-label="${labels.textSmall}">S</button>
+          <button data-size="1" title="${labels.textDefault}" aria-label="${labels.textDefault}">M</button>
+          <button data-size="1.2" title="${labels.textLarge}" aria-label="${labels.textLarge}">L</button>
+        </div>
+      </div>
+      <div class="cl-mv-scrubwrap">
+        <svg class="cl-mv-depth" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <input type="range" class="cl-mv-scrub" data-scrub min="0" value="0" step="1" aria-label="${labels.step}" />
+        <div class="cl-mv-marks" data-marks></div>
+      </div>
+      <div class="cl-mv-legend">${legendHtml(legend && legend.length ? legend : DEFAULT_LEGEND)}</div>`;
+      const controls = this.el.querySelector(".cl-mv-controls");
+      actions.forEach((a, i) => {
+        const b = document.createElement("button");
+        b.className = "cl-mv-action";
+        b.textContent = a.label;
+        b.dataset.action = String(i);
+        controls.appendChild(b);
+      });
+      this.el.addEventListener("click", (e) => {
+        const btn = e.target.closest("button");
+        if (!btn) return;
+        if (btn.dataset.size != null) return handlers.onFontSize(Number(btn.dataset.size));
+        switch (btn.dataset.c) {
+          case "prev":
+            return handlers.onPrev();
+          case "next":
+            return handlers.onNext();
+          case "play":
+            return handlers.onPlay();
+          case "reset":
+            return handlers.onReset();
+          default:
+            if (btn.dataset.action != null) handlers.onAction(Number(btn.dataset.action));
+        }
+      });
+      const scrub = this.el.querySelector("[data-scrub]");
+      scrub.addEventListener("input", () => handlers.onSeek(Number(scrub.value)));
+    }
+    sync(ctx) {
+      this.update(ctx);
+    }
+    setActiveSize(scale) {
+      this.el.querySelectorAll(".cl-mv-textsize button").forEach((b) => {
+        b.classList.toggle("is-active", Number(b.dataset.size) === scale);
+      });
+    }
+    setDerived(derived, onJump) {
+      const depth = this.el.querySelector(".cl-mv-depth");
+      const marks = this.el.querySelector("[data-marks]");
+      const total = derived.callDepth.length;
+      depth.textContent = "";
+      marks.textContent = "";
+      if (total > 0) {
+        const maxDepth = Math.max(1, ...derived.callDepth);
+        const points = derived.callDepth.map((d, i) => {
+          const x = stepPercent(i, total);
+          const y = 90 - Math.max(0, d) / maxDepth * 75;
+          return `${x},${y}`;
+        }).join(" ");
+        const line = document.createElementNS(SVG_NS4, "polyline");
+        line.setAttribute("points", points);
+        line.setAttribute("fill", "none");
+        line.setAttribute("vector-effect", "non-scaling-stroke");
+        depth.appendChild(line);
+      }
+      derived.notables.forEach((notable) => {
+        const label = notableLabel(notable.kind);
+        const mark = document.createElement("button");
+        mark.type = "button";
+        mark.className = `cl-mv-mark is-${notable.kind}`;
+        mark.style.left = `${stepPercent(notable.step, total)}%`;
+        mark.setAttribute("aria-label", `Jump to ${label} at step ${notable.step}`);
+        mark.title = `Jump to ${label} at step ${notable.step}`;
+        mark.addEventListener("click", () => onJump(notable.step));
+        marks.appendChild(mark);
+      });
+    }
+    update(state) {
+      this.el.querySelector('[data-c="prev"]').disabled = state.atStart;
+      const next2 = this.el.querySelector('[data-c="next"]');
+      if (state.atEnd && this.nextHref) {
+        next2.disabled = false;
+        next2.textContent = this.nextLabel;
+      } else {
+        next2.disabled = state.atEnd;
+        next2.textContent = this.labels.next;
+      }
+      const scrub = this.el.querySelector("[data-scrub]");
+      scrub.max = String(Math.max(0, state.total - 1));
+      scrub.value = String(state.index);
+    }
+    setPlaying(playing) {
+      this.el.querySelector('[data-c="play"]').textContent = playing ? this.labels.pause : this.labels.play;
+    }
+    resetActions() {
+      this.el.querySelectorAll("button.cl-mv-action").forEach((b) => b.disabled = false);
+    }
+    disableAction(index) {
+      const btn = this.el.querySelector(`button[data-action="${index}"]`);
+      if (btn) btn.disabled = true;
+    }
+  };
+
+  // src/dom/memory-viz.ts
+  var instanceSeq = 0;
+  var WORDS_PER_MINUTE = 300;
+  var MIN_STEP_MS = 2600;
+  var MemoryViz = class _MemoryViz {
+    constructor(host, config) {
+      this.panels = [];
+      this.controls = null;
+      this.scale = 1;
+      this.panelFactories = {
+        board: (_spec, ctx) => new BoardView(ctx.uid),
+        die: (spec, ctx) => new MemoryDieView(ctx.uid, ctx.code, ctx.labels, spec.regions ?? ctx.regions, ctx.zoomTab, ctx.regionTags),
+        code: (_spec, ctx) => new CodePanel(ctx.code),
+        vartable: () => new VarTableView(),
+        callstack: () => new CallStackView(),
+        heapcards: (_spec, ctx) => new HeapCardsView(ctx.uid),
+        narration: (_spec, ctx) => new NarrationView(ctx.vizLabels),
+        console: () => new ConsoleView(),
+        agent: (spec, ctx) => new AgentView(spec.fan, ctx.vizLabels),
+        agentloop: () => new AgentLoopView(),
+        memoryshelf: () => new MemoryShelfView(),
+        toolrack: (_spec, ctx) => new ToolRackView(ctx.vizLabels),
+        transcript: (_spec, ctx) => new TranscriptView(ctx.vizLabels),
+        retrieval: () => new RetrievalView(),
+        planboard: () => new PlanboardView(),
+        repo: () => new RepoView(),
+        controls: (_spec, ctx) => this.controls = new VizControls(ctx.actions, ctx.handlers, ctx.nextHref, ctx.legend, ctx.nextLabel, ctx.vizLabels)
+      };
+      this.onResize = () => {
+        this.relayout();
+      };
+      const uid = instanceSeq++;
+      const scene = config.scene ?? {};
+      const regions = scene.regions ?? ALL_REGIONS;
+      const showBoard = scene.board !== false;
+      const zoomTab = scene.zoomTab !== false;
+      this.actions = config.actions ?? [];
+      this.nextHref = config.nextHref;
+      this.nextLabel = config.nextLabel;
+      this.onXpChange = config.onXpChange;
+      this.onStep = config.onStep;
+      this.progress = new ProgressStore(
+        config.xpKey ?? "codelab_xp",
+        config.awardedKey,
+        typeof config.awardAmount === "number" ? config.awardAmount : 20
+      );
+      this.deriveRefs = config.deriveRefs !== false;
+      this.autoDim = config.autoDim !== false;
+      this.steps = config.steps ?? [];
+      this.player = new VizPlayer(this.steps, {
+        deriveRefs: this.deriveRefs,
+        autoDim: this.autoDim
+      });
+      this.autoplay = new Autoplay({
+        stepMs: () => this.stepDurationMs(),
+        atEnd: () => this.player.state.atEnd,
+        advance: () => this.step(this.player.next()),
+        onStop: () => this.controls?.setPlaying(false)
+      });
+      this.scale = config.fontScale ?? 1;
+      this.handlers = {
+        onPrev: () => this.step(this.player.prev(), false),
+        onNext: () => {
+          if (this.player.state.atEnd && this.nextHref) {
+            window.location.href = this.nextHref;
+            return;
+          }
+          this.step(this.player.next());
+        },
+        onReset: () => {
+          this.stop();
+          this.step(this.player.reset(), false);
+        },
+        onPlay: () => this.autoplay.isPlaying ? this.stop() : this.play(),
+        onAction: (i) => this.runAction(i),
+        onFontSize: (s) => this.setFont(s),
+        onSeek: (i) => {
+          this.stop();
+          this.step(this.player.goTo(i), false);
+        }
+      };
+      const vizLabels = { ...DEFAULT_VIZ_LABELS, ...config.labels };
+      this.buildCtx = {
+        uid,
+        code: config.code ?? [],
+        labels: {
+          chipName: config.chipName ?? "LPDDR5 RAM",
+          chipAddr: config.chipAddr ?? "address space  0x0000 \u2192 0xFFFF"
+        },
+        regions,
+        zoomTab,
+        actions: this.actions,
+        handlers: this.handlers,
+        regionTags: config.regionTags ?? {},
+        legend: config.legend,
+        nextHref: this.nextHref,
+        nextLabel: this.nextLabel ?? vizLabels.nextLesson,
+        vizLabels
+      };
+      this.layout = config.layout ?? {
+        visual: [
+          ...showBoard ? [{ type: "board" }] : [],
+          { type: "die", regions }
+        ],
+        aside: [{ type: "narration" }, { type: "controls" }]
+      };
+      this.root = document.createElement("div");
+      this.root.className = "cl-mv";
+      this.root.style.setProperty("--mv-fs", String(this.scale));
+      if (config.background) this.root.style.setProperty("--mv-bg", config.background);
+      this.visualCol = document.createElement("div");
+      this.visualCol.className = "cl-mv-visual";
+      this.asideCol = document.createElement("div");
+      this.asideCol.className = "cl-mv-aside";
+      this.root.append(this.visualCol);
+      this.buildPanels();
+      host.appendChild(this.root);
+      this.wireControls();
+      window.addEventListener("resize", this.onResize);
+      this.refreshXp();
+      this.step(this.player.state, false);
+    }
+    /** Replace the scene without tearing the widget down: rebuild the player and
+     *  the panels in place, and (by default) hold the current step index so a
+     *  level toggle does not send the learner back to the first step. `code` and
+     *  `layout` override the code lines and the panel arrangement when given. */
+    setSteps(steps, opts = {}) {
+      if (steps.length === 0) throw new Error("MemoryViz.setSteps needs at least one step");
+      this.stop();
+      const keepIndex = opts.preserveIndex !== false ? this.player.state.index : 0;
+      this.steps = steps;
+      if (opts.code) this.buildCtx.code = opts.code;
+      if (opts.layout) this.layout = opts.layout;
+      this.player = new VizPlayer(steps, { deriveRefs: this.deriveRefs, autoDim: this.autoDim });
+      this.buildPanels();
+      this.wireControls();
+      this.step(this.player.goTo(Math.min(keepIndex, steps.length - 1)), false);
+    }
+    /** (Re)build the visual + aside panels from the current layout into the two
+     *  columns. Clears any prior panels first, so it is safe to call repeatedly. */
+    buildPanels() {
+      this.controls = null;
+      this.panels.length = 0;
+      this.visualCol.textContent = "";
+      this.asideCol.textContent = "";
+      (this.layout.visual ?? []).forEach((spec) => {
+        const p = this.makePanel(spec, this.buildCtx);
+        this.panels.push(p);
+        this.visualCol.appendChild(p.el);
+      });
+      (this.layout.aside ?? []).forEach((spec) => {
+        const p = this.makePanel(spec, this.buildCtx);
+        this.panels.push(p);
+        this.asideCol.appendChild(p.el);
+      });
+      if (this.asideCol.childElementCount > 0) {
+        if (!this.asideCol.parentNode) this.root.append(this.asideCol);
+        this.root.classList.remove("cl-mv-single");
+      } else {
+        if (this.asideCol.parentNode) this.asideCol.remove();
+        this.root.classList.add("cl-mv-single");
+      }
+    }
+    /** Feed the freshly built controls panel the font size and the derived-trace
+     *  scrubber for the current steps. No-op when the layout has no controls. */
+    wireControls() {
+      if (!this.controls) return;
+      this.controls.setActiveSize(this.scale);
+      this.controls.setDerived(deriveTrace(this.steps), this.handlers.onSeek);
+    }
+    static create(host, config) {
+      return new _MemoryViz(host, config);
+    }
+    destroy() {
+      this.stop();
+      window.removeEventListener("resize", this.onResize);
+      this.root.remove();
+    }
+    // ---- composition ------------------------------------------------------
+    makePanel(spec, ctx) {
+      const build = this.panelFactories[spec.type];
+      if (!build) throw new Error("MemoryViz: unknown panel type " + String(spec.type));
+      return build(spec, ctx);
+    }
+    // ---- orchestration ----------------------------------------------------
+    step(state, animate = true) {
+      if (this.controls) this.controls.resetActions();
+      this.syncAll(state);
+      this.onStep?.({ pc: state.model.pc ?? -1, index: state.index, total: state.total });
+      if (animate) this.animateAll(state);
+      if (state.atEnd) {
+        this.stop();
+        this.markComplete();
+      }
+    }
+    /** Report the current tracked XP to the host, which owns any XP label. */
+    refreshXp() {
+      this.onXpChange?.(this.progress.xp());
+    }
+    /** Mark the lesson complete and grant XP once, when the last step is reached. */
+    markComplete() {
+      this.progress.awardOnce();
+      this.refreshXp();
+    }
+    runAction(index) {
+      const action = this.actions[index];
+      if (!action) return;
+      const state = this.player.applyAction(action);
+      this.syncAll(state);
+      this.animateAll(state);
+      if (action.once && this.controls) this.controls.disableAction(index);
+    }
+    syncAll(state) {
+      const ctx = {
+        model: state.model,
+        index: state.index,
+        total: state.total,
+        atStart: state.atStart,
+        atEnd: state.atEnd
+      };
+      for (const p of this.panels) p.sync(ctx);
+    }
+    animateAll(state) {
+      for (const p of this.panels) if (p.animate) void p.animate(state.model);
+    }
+    play() {
+      if (!this.controls) return;
+      if (this.player.state.atEnd) this.step(this.player.reset(), false);
+      this.controls.setPlaying(true);
+      this.autoplay.start();
+    }
+    /** Hold each step long enough to read its narration at ~300 words/minute. */
+    stepDurationMs() {
+      const words = (this.player.state.model.narr ?? "").trim().split(/\s+/).filter(Boolean).length;
+      const readMs = words / WORDS_PER_MINUTE * 6e4;
+      return Math.max(MIN_STEP_MS, Math.round(readMs) + 500);
+    }
+    stop() {
+      this.autoplay.stop();
+    }
+    setFont(scale) {
+      this.scale = scale;
+      this.root.style.setProperty("--mv-fs", String(scale));
+      if (this.controls) this.controls.setActiveSize(scale);
+      this.relayout();
+    }
+    relayout() {
+      const model = this.player.state.model;
+      for (const p of this.panels) if (p.onResize) p.onResize(model);
+    }
+  };
+
+  // src/core/exec-tracer-model.ts
+  function traceToSteps(trace) {
+    const src = trace.code ?? [];
+    const steps = collapseCallEntries(trace.steps ?? []);
+    const out = [];
+    let prevValues = /* @__PURE__ */ new Map();
+    let prevFields = /* @__PURE__ */ new Map();
+    let prevGlobals = /* @__PURE__ */ new Map();
+    let prevStdout = "";
+    steps.forEach((ts, i) => {
+      const values = /* @__PURE__ */ new Map();
+      const stack = (ts.frames ?? []).map(
+        (f) => frameToFrame(f, values, prevValues, i === 0)
+      );
+      const fields = /* @__PURE__ */ new Map();
+      const heap = (ts.heap ?? []).map(
+        (o) => objectToObject(o, fields, prevFields, i === 0)
+      );
+      const globalValues = /* @__PURE__ */ new Map();
+      const globals = globalSlots(ts.statics ?? [], globalValues, prevGlobals, i === 0);
+      const rodata = globalSlots(ts.consts ?? []);
+      const stdout = ts.stdout ?? "";
+      const printed = stdout.startsWith(prevStdout) ? stdout.slice(prevStdout.length) : stdout;
+      const prevFrames = i > 0 ? steps[i - 1].frames ?? [] : [];
+      const prevHeapIds = new Set((i > 0 ? steps[i - 1].heap ?? [] : []).map((o) => o.id));
+      const step = {
+        narr: describeStep(prevFrames, ts, stack, heap, prevHeapIds, globals, printed, src),
+        pc: typeof ts.line === "number" && ts.line > 0 ? ts.line - 1 : -1,
+        codeLive: true,
+        stack,
+        heap
+      };
+      if (globals.length) step.globals = globals;
+      if (rodata.length) step.rodata = rodata;
+      if (printed) step.printed = printed;
+      if (stdout) step.output = stdout;
+      out.push(step);
+      prevValues = values;
+      prevFields = fields;
+      prevGlobals = globalValues;
+      prevStdout = stdout;
+    });
+    const lastTs = steps[steps.length - 1];
+    if (lastTs) {
+      const values = /* @__PURE__ */ new Map();
+      const stack = (lastTs.frames ?? []).map(
+        (f) => frameToFrame(f, values, prevValues, false)
+      );
+      const fields = /* @__PURE__ */ new Map();
+      const heap = (lastTs.heap ?? []).map(
+        (o) => objectToObject(o, fields, prevFields, false)
+      );
+      const globals = globalSlots(lastTs.statics ?? [], /* @__PURE__ */ new Map(), prevGlobals, false);
+      const rodata = globalSlots(lastTs.consts ?? []);
+      const printedLines = prevStdout ? prevStdout.replace(/\n+$/, "").split("\n").length : 0;
+      const terminal = {
+        narr: trace.truncated ? "Stopped early - there were too many steps to show the rest." : printedLines > 0 ? `The program finished. It printed ${printedLines} line${printedLines === 1 ? "" : "s"}.` : "The program finished without printing anything.",
+        pc: -1,
+        codeLive: true,
+        stack,
+        heap
+      };
+      if (globals.length) terminal.globals = globals;
+      if (rodata.length) terminal.rodata = rodata;
+      if (prevStdout) terminal.output = prevStdout;
+      out.push(terminal);
+    }
+    return out;
+  }
+  function collapseCallEntries(steps) {
+    const drop = /* @__PURE__ */ new Set();
+    for (let i = 1; i + 1 < steps.length; i++) {
+      const prev2 = steps[i - 1];
+      const cur = steps[i];
+      const next2 = steps[i + 1];
+      const curLen = cur.frames?.length ?? 0;
+      const pushed = curLen > (prev2.frames?.length ?? 0);
+      if (!pushed) continue;
+      if (cur.line !== next2.line) continue;
+      if (curLen !== (next2.frames?.length ?? 0)) continue;
+      const curTop = cur.frames?.[curLen - 1];
+      const nextTop = next2.frames?.[curLen - 1];
+      if (!curTop || !nextTop || curTop.id !== nextTop.id) continue;
+      drop.add(i);
+    }
+    return drop.size ? steps.filter((_, i) => !drop.has(i)) : steps;
+  }
+  function frameToFrame(f, values, prevValues, firstStep) {
+    const vars = (f.vars ?? []).map((v) => {
+      const id = `${f.id}:${v.name}`;
+      const display = v.ref != null ? refDisplay(v) : v.value ?? "";
+      values.set(id, display);
+      const hot = !firstStep && prevValues.get(id) !== display;
+      const slot = { id, k: v.name, hot };
+      if (v.ref != null) slot.ref = v.ref;
+      else slot.v = v.value ?? "";
+      return slot;
+    });
+    const frame = { id: f.id, name: f.name, vars };
+    if (f.kind) frame.kind = f.kind;
+    if (f.recv) frame.recv = f.recv;
+    if (typeof f.line === "number") frame.line = f.line;
+    return frame;
+  }
+  function objectToObject(o, fields, prevFields, firstStep) {
+    const hotFields = [];
+    (o.fields ?? []).forEach(([name, value]) => {
+      const key = `${o.id}:${name}`;
+      fields.set(key, value);
+      if (!firstStep && prevFields.get(key) !== value) hotFields.push(name);
+    });
+    const obj = { id: o.id, type: o.type, fields: o.fields ?? [], hotFields };
+    if (typeof o.no === "number") obj.no = o.no;
+    return obj;
+  }
+  function globalSlots(globals, values, prevValues, firstStep = false) {
+    return (globals ?? []).map((g) => {
+      const owner = g.owner ?? "";
+      const id = `${owner}.${g.name}`;
+      const v = g.value ?? "";
+      values?.set(id, v);
+      const slot = {
+        id,
+        k: owner ? `${owner}.${g.name}` : g.name,
+        v
+      };
+      if (prevValues && !firstStep && prevValues.get(id) !== v) slot.hot = true;
+      return slot;
+    });
+  }
+  function refDisplay(v) {
+    return v.ref != null ? `\u2192${v.ref}` : v.value ?? "null";
+  }
+  function describeStep(prevFrames, ts, stack, heap, prevHeapIds, globals, printed, src) {
+    const curFrames = ts.frames ?? [];
+    const prevLen = prevFrames.length;
+    const curLen = curFrames.length;
+    if (curLen > prevLen) return callNarration(curFrames[curLen - 1]);
+    if (curLen < prevLen) return returnNarration(prevFrames[prevLen - 1], curFrames[curLen - 1]);
+    if (printed) return printedNarration(printed);
+    const topFrame = stack[stack.length - 1];
+    const hotSlot = topFrame ? topFrame.vars.find((v) => v.hot) : void 0;
+    const created = heap.find((o) => !prevHeapIds.has(o.id));
+    if (created && hotSlot && hotSlot.ref != null && hotSlot.ref === created.id) {
+      return "Set `" + hotSlot.k + "` to a new `" + created.type + "`";
+    }
+    if (created) {
+      const label = typeof created.no === "number" ? `${created.type} #${created.no}` : created.type;
+      return typeof created.no === "number" ? "Created a `" + created.type + "` (`" + label + "`)" : "Created a `" + created.type + "`";
+    }
+    if (hotSlot) {
+      if (hotSlot.ref != null) return "Pointed `" + hotSlot.k + "` at `" + heapLabel(hotSlot.ref, heap) + "`";
+      return "Set `" + hotSlot.k + "` to `" + (hotSlot.v ?? "") + "`";
+    }
+    const g = globals.find((s) => s.hot);
+    if (g) return "Set `" + g.k + "` to `" + g.v + "`";
+    return runningNarration(ts.line, src);
+  }
+  function callNarration(top) {
+    if (top.kind === "entry") return "Entered `" + (top.name || "Main") + "`";
+    if (top.kind === "ctor") {
+      const type = (top.name || "").replace(/^new\s+/, "") || "object";
+      return "Called the `" + type + "` constructor";
+    }
+    const m = methodLabel(top);
+    return top.recv ? "Called `" + m + "` on `" + top.recv + "`" : "Called `" + m + "`";
+  }
+  function returnNarration(left, back) {
+    const backName = back ? back.name : null;
+    if (left.kind === "ctor") {
+      const type = (left.name || "").replace(/^new\s+/, "") || "object";
+      return backName ? "The `" + type + "` constructor finished - back in `" + backName + "`" : "The `" + type + "` constructor finished";
+    }
+    const m = methodLabel(left);
+    return backName ? "`" + m + "` returned to `" + backName + "`" : "`" + m + "` returned";
+  }
+  function methodLabel(f) {
+    const name = f.name || "?";
+    return name.endsWith(")") ? name : name + "()";
+  }
+  function printedNarration(printed) {
+    const parts = printed.replace(/\n+$/, "").split("\n");
+    const first = (parts[0] ?? "").replace(/`/g, "");
+    if (first === "") return "Printed a blank line";
+    const shown = parts.length > 1 ? first + " \u2026" : first;
+    return "Printed `" + shown + "`";
+  }
+  function heapLabel(ref, heap) {
+    const o = heap.find((h) => h.id === ref);
+    if (!o) return "an object";
+    return typeof o.no === "number" ? `${o.type} #${o.no}` : o.type;
+  }
+  function runningNarration(line, src) {
+    const text = typeof line === "number" && line > 0 ? (src[line - 1] ?? "").trim() : "";
+    if (!text) return "Running the program.";
+    return "Running this line: `" + text + "`";
+  }
+
+  // src/dom/error-panel.ts
+  var DEFAULT_LABELS2 = {
+    heading: "Let's fix this first",
+    note: "Often a single early mistake (a missing or extra { } ( ) ;) is enough to confuse the rest. Fix the top one first, then run again.",
+    why: "Learn why",
+    hideWhy: "Hide why",
+    warningHeading: "It ran - but read this",
+    warningNote: "The compiler built this, so it is not an error. It is telling you these lines cannot be doing what they look like they do. Code that runs and is still wrong is the expensive kind."
+  };
+  function locText(e) {
+    if (e.line == null) return "";
+    return e.column != null ? `Line ${e.line}, col ${e.column}` : `Line ${e.line}`;
+  }
+  function renderErrorPanel(errors, labels = {}, options = {}) {
+    const l = { ...DEFAULT_LABELS2, ...labels };
+    const isWarning = options.kind === "warning";
+    const section = document.createElement("section");
+    section.className = isWarning ? "cl-errors cl-errors--warning" : "cl-errors";
+    const heading = document.createElement("h3");
+    heading.textContent = isWarning ? l.warningHeading : l.heading;
+    section.appendChild(heading);
+    const note = document.createElement("p");
+    note.className = "cl-errors-note";
+    note.textContent = isWarning ? l.warningNote : l.note;
+    section.appendChild(note);
+    const list = document.createElement("ul");
+    for (const e of errors) {
+      const li = document.createElement("li");
+      const loc = locText(e);
+      if (loc) {
+        const locEl = document.createElement("span");
+        locEl.className = "cl-error-loc";
+        locEl.textContent = loc;
+        li.appendChild(locEl);
+      }
+      if (e.friendly) {
+        const friendly = document.createElement("span");
+        friendly.className = "cl-error-friendly";
+        friendly.textContent = e.friendly;
+        li.appendChild(friendly);
+      }
+      const raw = document.createElement("span");
+      raw.className = "cl-error-raw";
+      raw.textContent = e.raw;
+      li.appendChild(raw);
+      if (e.why) {
+        const toggle = document.createElement("button");
+        toggle.type = "button";
+        toggle.className = "cl-error-why-toggle";
+        toggle.textContent = l.why;
+        toggle.setAttribute("aria-expanded", "false");
+        const why = document.createElement("p");
+        why.className = "cl-error-why";
+        why.textContent = e.why;
+        why.hidden = true;
+        toggle.addEventListener("click", () => {
+          why.hidden = !why.hidden;
+          toggle.textContent = why.hidden ? l.why : l.hideWhy;
+          toggle.setAttribute("aria-expanded", why.hidden ? "false" : "true");
+        });
+        li.appendChild(toggle);
+        li.appendChild(why);
+      }
+      list.appendChild(li);
+    }
+    section.appendChild(list);
+    return section;
+  }
+  function showErrorPanel(host, errors, labels, options) {
+    host.textContent = "";
+    if (!errors || errors.length === 0) {
+      host.hidden = true;
+      return false;
+    }
+    host.appendChild(renderErrorPanel(errors, labels, options));
+    host.hidden = false;
+    return true;
+  }
+
+  // src/dom/viz-lab.ts
+  function normalizeErrors(errors) {
+    return errors.map((e) => ({
+      line: e.line ?? void 0,
+      friendly: e.friendly ?? void 0,
+      raw: e.raw
+    }));
+  }
+  var DEFAULT_STARTER = [
+    "class Program",
+    "{",
+    "    static void Main()",
+    "    {",
+    "        int a = 3;",
+    "        int b = 4;",
+    "        int total = a + b;",
+    "        System.Console.WriteLine(total);",
+    "    }",
+    "}"
+  ].join("\n");
+  var VizLab = class _VizLab {
+    constructor(host, config) {
+      this.editor = new MonacoEditor();
+      this.lastTrace = null;
+      this.lastSteps = null;
+      this.viz = null;
+      this.ready = false;
+      this.legend = config.legend;
+      this.language = config.language ?? "csharp";
+      this.runner = new IframeRunner({
+        url: config.runnerUrl,
+        readyTimeout: config.readyTimeout ?? 18e4
+      });
+      this.root = document.createElement("div");
+      this.root.className = "cl-vl";
+      const editorPane = document.createElement("div");
+      editorPane.className = "cl-vl-editor";
+      const toolbar = document.createElement("div");
+      toolbar.className = "cl-vl-toolbar";
+      this.vizBtn = document.createElement("button");
+      this.vizBtn.type = "button";
+      this.vizBtn.className = "cl-btn cl-primary cl-vl-run";
+      this.vizBtn.textContent = "Preparing compiler...";
+      this.vizBtn.disabled = true;
+      this.vizBtn.setAttribute("data-viz", "");
+      this.vizBtn.addEventListener("click", () => void this.visualize());
+      this.statusEl = document.createElement("span");
+      this.statusEl.className = "cl-vl-status";
+      this.statusEl.setAttribute("role", "status");
+      this.statusEl.setAttribute("aria-live", "polite");
+      toolbar.append(this.vizBtn, this.statusEl);
+      this.editorHost = document.createElement("div");
+      this.editorHost.className = "cl-vl-monaco";
+      editorPane.append(toolbar, this.editorHost);
+      this.stage = document.createElement("div");
+      this.stage.className = "cl-vl-stage";
+      this.showHint("Write a small program, then press Visualize to watch it run.");
+      this.root.append(editorPane, this.stage);
+      host.appendChild(this.root);
+      void this.boot(config.starter ?? DEFAULT_STARTER);
+    }
+    static create(host, config) {
+      return new _VizLab(host, config);
+    }
+    async boot(starter) {
+      await loadMonaco();
+      await this.editor.mount(this.editorHost, {
+        value: starter,
+        language: this.language,
+        readOnly: false,
+        autoHeight: { minHeight: 220, maxHeight: 640 }
+      });
+      try {
+        await this.runner.warm();
+      } catch {
+      } finally {
+        this.ready = true;
+        this.vizBtn.disabled = false;
+        this.vizBtn.textContent = "Visualize";
+      }
+    }
+    async visualize() {
+      if (!this.ready) return;
+      const code = this.editor.getValue();
+      this.vizBtn.disabled = true;
+      this.vizBtn.textContent = "Tracing...";
+      this.setStatus("");
+      try {
+        const outcome = await this.runner.trace(code);
+        if (!outcome.compiled) {
+          const errors = normalizeErrors(outcome.errors);
+          this.showErrors(errors);
+          this.setStatus("Did not compile.");
+          if (this.editor.setMarkers) this.editor.setMarkers(errors);
+          return;
+        }
+        if (this.editor.setMarkers) this.editor.setMarkers([]);
+        if (!outcome.trace || outcome.trace.steps.length === 0) {
+          this.showHint("That program produced no steps to show. Add a statement or two inside Main.");
+          this.setStatus("Nothing to trace.");
+          return;
+        }
+        this.lastTrace = outcome.trace;
+        this.lastSteps = traceToSteps(outcome.trace);
+        this.render();
+        const n = Math.max(0, this.lastSteps.length - 1);
+        let msg = `Traced ${n} step${n === 1 ? "" : "s"}.`;
+        if (outcome.trace.truncated) msg += " Stopped early - the program ran too long.";
+        if (outcome.runtimeError) msg += ` It threw: ${outcome.runtimeError}`;
+        this.setStatus(msg);
+      } catch (err) {
+        this.showHint("The tracer took too long or could not load. Try again.");
+        this.setStatus(String(err.message || err));
+      } finally {
+        this.vizBtn.disabled = false;
+        this.vizBtn.textContent = "Visualize";
+      }
+    }
+    /** The one layout: the memory view (call stack + heap objects) in the wide
+     *  column, then narration, the console output, and the transport controls in
+     *  the reading rail. The console sits right under the narration so "this line
+     *  runs" and "this is what it printed" read together. */
+    memoryLayout() {
+      return {
+        visual: [{ type: "heapcards" }],
+        aside: [{ type: "narration" }, { type: "console" }, { type: "controls" }]
+      };
+    }
+    render() {
+      if (!this.lastTrace || !this.lastSteps) return;
+      const layout2 = this.memoryLayout();
+      if (this.viz) {
+        this.viz.setSteps(this.lastSteps, {
+          code: this.lastTrace.code,
+          layout: layout2,
+          preserveIndex: false
+        });
+        return;
+      }
+      this.stage.textContent = "";
+      this.viz = MemoryViz.create(this.stage, {
+        code: this.lastTrace.code,
+        steps: this.lastSteps,
+        layout: layout2,
+        legend: this.legend,
+        deriveRefs: true,
+        autoDim: true,
+        onStep: (info) => this.editor.highlightLine?.(info.pc)
+      });
+    }
+    showHint(text) {
+      this.editor.highlightLine?.(null);
+      this.teardownViz();
+      this.stage.textContent = "";
+      const hint = document.createElement("p");
+      hint.className = "cl-vl-hint";
+      hint.textContent = text;
+      this.stage.appendChild(hint);
+    }
+    showErrors(errors) {
+      this.editor.highlightLine?.(null);
+      this.teardownViz();
+      this.stage.textContent = "";
+      this.stage.appendChild(renderErrorPanel(errors));
+    }
+    teardownViz() {
+      this.viz?.destroy();
+      this.viz = null;
+      this.lastTrace = null;
+      this.lastSteps = null;
+    }
+    setStatus(text) {
+      this.statusEl.textContent = text;
+    }
+    destroy() {
+      this.teardownViz();
+      this.editor.destroy();
+      this.runner.destroy();
+      this.root.remove();
+    }
+  };
 
   // src/terminal/history.ts
   var DEFAULT_LIMIT = 100;

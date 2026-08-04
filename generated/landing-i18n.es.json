@@ -140,9 +140,57 @@
       "blurb": "Has usado List&lt;T&gt; - ahora escribe el tuyo. Construye un Box&lt;T&gt;, un método genérico y un Pair&lt;A, B&gt; que funcionen con cualquier tipo de valor.",
       "title": "Genéricos"
     },
+    "git-a-history-of-snapshots": {
+      "blurb": "Una fila de puntos no es una historia - lo son los enlaces. Mira cómo cada commit recuerda al anterior, y por qué esa cadena es lo que permite a git mirar atrás.",
+      "title": "Una historia de instantáneas"
+    },
     "git-first-commit": {
       "blurb": "Entrega una carpeta a git y guarda tus primeras versiones. Tres ejercicios cortos en un terminal de verdad: arranca el repositorio, elige qué archivos entran y guárdalos - el gráfico se dibuja solo mientras escribes.",
       "title": "Tu primer commit"
+    },
+    "git-fix-the-last-commit": {
+      "blurb": "Corrige el commit que acabas de hacer en vez de apilar un `oops` encima. Arregla un mensaje mal escrito, mete el archivo que se quedó fuera, y deja la historia con la misma longitud.",
+      "title": "Arreglar el último commit"
+    },
+    "git-how-merging-works": {
+      "blurb": "Fusionar no siempre es el mismo movimiento. Mira cómo git desliza un nombre hacia delante sin guardar nada nuevo, y luego cómo crea el único commit que apunta hacia atrás a dos padres.",
+      "title": "Cómo funciona fusionar"
+    },
+    "git-make-a-branch": {
+      "blurb": "Separa una línea de trabajo y haz commits ahí sin tocar `main`. Crea una rama, súbete a ella y mira cómo el grafo se bifurca mientras la línea anterior se queda quieta.",
+      "title": "Crear una rama y trabajar en ella"
+    },
+    "git-mark-a-version": {
+      "blurb": "Fija un nombre a un commit para poder encontrar esa versión exacta otra vez. Añade una etiqueta en `HEAD` y otra en un commit anterior.",
+      "title": "Marcar una versión con una etiqueta"
+    },
+    "git-merge-a-branch": {
+      "blurb": "Un solo comando trae una rama a casa - y hace dos cosas distintas. Ejecuta `git merge` cuando `main` se quedó quieta, y otra vez cuando no.",
+      "title": "Fusionar una rama de vuelta"
+    },
+    "git-point-at-a-commit": {
+      "blurb": "Nombra un commit sin su hash, y colócate en uno directamente. Cuenta hacia atrás con `main~2` y `HEAD~1`, pon una rama en un commit antiguo, y mira qué aspecto tiene un `HEAD` desacoplado.",
+      "title": "Apuntar a cualquier commit"
+    },
+    "git-settle-a-conflict": {
+      "blurb": "Dos ramas cambiaron `cat.txt`, así que la fusión se detuvo. Termínala marcando el archivo como resuelto y haciendo el commit - luego cancela otra sin dejar rastro.",
+      "title": "Resolver un conflicto"
+    },
+    "git-undo-with-reset": {
+      "blurb": "Mueve tu rama un commit hacia atrás y decide dónde deben caer sus archivos. Ejecuta `--soft`, `--mixed` y `--hard` sobre el mismo error y mira cómo responden las tres zonas.",
+      "title": "Deshacer con reset"
+    },
+    "git-what-a-branch-is": {
+      "blurb": "Una rama no es una copia de nada - es un nombre que apunta a un commit. Mira cómo el nombre avanza cuando haces commits, y para qué sirve `HEAD` en realidad.",
+      "title": "Qué es realmente una rama"
+    },
+    "git-what-reset-moves": {
+      "blurb": "`--soft`, `--mixed` y `--hard` mueven tu rama exactamente al mismo sitio. Mira dónde deja cada uno los archivos que guardaba el commit deshecho.",
+      "title": "Qué mueve realmente reset"
+    },
+    "git-when-changes-collide": {
+      "blurb": "Git une dos líneas por su cuenta hasta que los dos lados cambian el mismo archivo. Mira cómo la fusión se detiene sin guardar nada, y qué está esperando.",
+      "title": "Cuando dos cambios chocan"
     },
     "git-where-am-i": {
       "blurb": "Lee tu propio repositorio antes de cambiarlo. Pregúntale a git qué está esperando a guardarse y qué guardaste ya, y añade el siguiente commit sabiendo exactamente dónde estás.",
@@ -346,7 +394,10 @@
     "AI · Part one": "IA · Parte uno",
     "AI · Part three": "IA · Parte tres",
     "AI · Part two": "IA · Parte dos",
+    "Git · Part four": "Git · Parte cuatro",
     "Git · Part one": "Git · Parte uno",
+    "Git · Part three": "Git · Parte tres",
+    "Git · Part two": "Git · Parte dos",
     "Part five": "Parte cinco",
     "Part four": "Parte cuatro",
     "Part one": "Parte uno",
@@ -360,10 +411,13 @@
     "Theory · Part two": "Teoría · Parte dos"
   },
   "parts": {
+    "Branches": "Ramas",
+    "Bringing work back": "Reunir el trabajo",
     "Build with objects": "Construye con objetos",
     "Design for change": "Diseña para el cambio",
     "Everyday essentials": "Fundamentos del día a día",
     "First steps": "Primeros pasos",
+    "Fixing mistakes": "Arreglar errores",
     "Foundations of good code": "Fundamentos del buen código",
     "From idea to running code": "De la idea al código en marcha",
     "From model to agent": "Del modelo al agente",

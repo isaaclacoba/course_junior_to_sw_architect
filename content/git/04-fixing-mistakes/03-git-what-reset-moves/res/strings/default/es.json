@@ -1,0 +1,22 @@
+{
+  "card.title": "Qué mueve realmente reset",
+  "card.blurb": "`--soft`, `--mixed` y `--hard` mueven tu rama exactamente al mismo sitio. Mira dónde deja cada uno los archivos que guardaba el commit deshecho.",
+  "hero.eyebrow": "Git · Parte cuatro · Arreglar errores",
+  "hero.title": "Qué mueve realmente reset",
+  "intro.0": "Haces un commit que no querías hacer, y la palabra `reset` empieza a sonar como un comando que borra tu trabajo. Es más tranquilo que eso, y no tiene un resultado sino tres. Todo reset mueve el nombre de tu rama al commit que le indiques; lo que cambia es dónde acaban los archivos del commit deshecho - preparados todavía, de vuelta en la carpeta, o perdidos. Mira los tres a la vez, para poder elegir el que de verdad querías.",
+  "concept.gt-reset.term": "Reset",
+  "concept.gt-reset.def": "Mover el nombre de tu rama a otro commit, eligiendo qué pasa con los archivos que tenías preparados o editados.",
+  "step.0.narr": "Tres commits, y `main` sobre el más nuevo. Ese último es el error: guardó `draft.txt` antes de que el archivo estuviera listo, con el mensaje `oops`. El área de preparación y el árbol de trabajo están vacíos, porque todo está confirmado.",
+  "step.0.note": "`main` está sobre el commit que preferirías no haber hecho.",
+  "step.1.narr": "`git reset --soft HEAD~1` mueve `main` un commit hacia atrás, así que `oops` sale de la línea. Ahora mira el área de preparación: `draft.txt` sigue ahí, todavía elegido para el siguiente commit. **La instantánea se fue; tu trabajo no.**",
+  "step.1.note": "`--soft` - el nombre retrocedió, el archivo siguió preparado.",
+  "step.2.narr": "Ejecútalo otra vez con `--mixed` y `main` cae **exactamente en el mismo commit**. Solo cambia una zona: `draft.txt` vuelve a la carpeta, sin estar elegido para nada. Puedes decidir de nuevo qué entra en el próximo commit.",
+  "step.2.note": "`--mixed` - el mismo movimiento, el archivo espera en el árbol de trabajo.",
+  "step.3.narr": "`--hard` hace ese mismo movimiento una vez más, y esta vez no deja `draft.txt` en ningún sitio. Preparación vacía, carpeta vacía - lo que guardaba ese commit ya no está. Este es el que conviene leer dos veces antes de ejecutarlo.",
+  "step.3.note": "`--hard` - el mismo movimiento, el archivo se tira.",
+  "step.4.narr": "Así que el paso de la rama es idéntico en los tres, y lo que eliges en realidad es dónde caen los archivos. Por eso `--soft` viene bien: tu trabajo sigue preparado, así que un `git commit` más lo devuelve con el mensaje que querías.",
+  "step.4.note": "Reset mueve un nombre. El modo decide dónde van tus archivos.",
+  "legend.0": "un commit - una instantánea guardada",
+  "legend.1": "un nombre de rama",
+  "legend.2": "HEAD - dónde estás"
+}

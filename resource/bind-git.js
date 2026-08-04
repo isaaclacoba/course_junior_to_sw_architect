@@ -9,6 +9,7 @@
  *
  * Key schema:
  *   hero.eyebrow, hero.title, intro.N   -> the page hero (window.PAGE)
+ *   meta.label                          -> LESSON_CONFIG.metaLabel (breadcrumb)
  *   task.<n>.title                      -> tasks[n-1].title
  *   task.<n>.concept                    -> tasks[n-1].concept
  *   task.<n>.context                    -> tasks[n-1].context
@@ -55,6 +56,12 @@
   // start/target/solution (see the header).
   function applyTasks(cfg, R) {
     if (!cfg || !Array.isArray(cfg.tasks)) return;
+    // The breadcrumb above the card title ("Branches - Make a branch"). It is
+    // prose, so it localizes; it was the one visible English string left on a
+    // Spanish git lesson. Apply-if-present, like the hero, so a lesson with no
+    // key keeps whatever its data file inlined.
+    var label = R.get("meta.label");
+    if (label !== undefined) cfg.metaLabel = label;
     cfg.tasks.forEach(function (t, i) {
       var n = i + 1;
       t.title = str(R.get("task." + n + ".title"));

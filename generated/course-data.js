@@ -1255,6 +1255,19 @@
               "kind": "lesson"
             },
             {
+              "id": "git-a-history-of-snapshots",
+              "track": "git",
+              "part": "first-steps",
+              "href": "content/git/01-first-steps/02-git-a-history-of-snapshots/",
+              "key": "git_a_history_of_snapshots_awarded",
+              "total": 1,
+              "title": "A history of snapshots",
+              "blurb": "A row of dots is not a history - the links are. Watch each commit remember the one before it, and see why that chain is what makes git able to look back.",
+              "pill": "gentle",
+              "time": "8 min",
+              "kind": "lesson"
+            },
+            {
               "id": "git-where-am-i",
               "track": "git",
               "part": "first-steps",
@@ -1265,6 +1278,173 @@
               "blurb": "Read your own repository before you change it. Ask git what is waiting to be saved and what you have saved already, then add the next commit knowing exactly where you stand.",
               "pill": "gentle",
               "time": "15 min",
+              "kind": "lesson"
+            }
+          ]
+        },
+        {
+          "track": "git",
+          "id": "branches",
+          "title": "Branches",
+          "kicker": "Git · Part two",
+          "lessons": [
+            {
+              "id": "git-what-a-branch-is",
+              "track": "git",
+              "part": "branches",
+              "href": "content/git/02-branches/01-git-what-a-branch-is/",
+              "key": "git_what_a_branch_is_awarded",
+              "total": 1,
+              "title": "What a branch really is",
+              "blurb": "A branch is not a copy of anything - it is a name pointing at a commit. Watch the name move as you commit, and see what `HEAD` is really for.",
+              "pill": "gentle",
+              "time": "10 min",
+              "kind": "lesson"
+            },
+            {
+              "id": "git-make-a-branch",
+              "track": "git",
+              "part": "branches",
+              "href": "content/git/02-branches/02-git-make-a-branch/",
+              "key": "git_make_a_branch_awarded",
+              "total": 2,
+              "title": "Make a branch and work on it",
+              "blurb": "Split off a line of work and commit on it without touching `main`. Make a branch, step onto it, and watch the graph fork while the old line stays put.",
+              "pill": "gentle",
+              "time": "15 min",
+              "kind": "lesson"
+            },
+            {
+              "id": "git-mark-a-version",
+              "track": "git",
+              "part": "branches",
+              "href": "content/git/02-branches/03-git-mark-a-version/",
+              "key": "git_mark_a_version_awarded",
+              "total": 2,
+              "title": "Mark a version with a tag",
+              "blurb": "Pin a name to one commit so you can find that exact version again. Add one tag at `HEAD`, then one tag on an older commit.",
+              "pill": "gentle",
+              "time": "15 min",
+              "kind": "lesson"
+            }
+          ]
+        },
+        {
+          "track": "git",
+          "id": "bringing-work-back",
+          "title": "Bringing work back",
+          "kicker": "Git · Part three",
+          "lessons": [
+            {
+              "id": "git-how-merging-works",
+              "track": "git",
+              "part": "bringing-work-back",
+              "href": "content/git/03-bringing-work-back/01-git-how-merging-works/",
+              "key": "git_how_merging_works_awarded",
+              "total": 1,
+              "title": "How merging works",
+              "blurb": "Merging is not always the same move. Watch git slide a name forward without saving anything new, then watch it make the one commit that points back at two parents.",
+              "pill": "gentle",
+              "time": "10 min",
+              "kind": "lesson"
+            },
+            {
+              "id": "git-merge-a-branch",
+              "track": "git",
+              "part": "bringing-work-back",
+              "href": "content/git/03-bringing-work-back/02-git-merge-a-branch/",
+              "key": "git_merge_a_branch_awarded",
+              "total": 2,
+              "title": "Merge a branch back",
+              "blurb": "One command brings a branch home - and it does two different things. Run `git merge` when `main` stayed put, then again when it did not.",
+              "pill": "gentle",
+              "time": "15 min",
+              "kind": "lesson"
+            },
+            {
+              "id": "git-when-changes-collide",
+              "track": "git",
+              "part": "bringing-work-back",
+              "href": "content/git/03-bringing-work-back/03-git-when-changes-collide/",
+              "key": "git_when_changes_collide_awarded",
+              "total": 1,
+              "title": "When two changes collide",
+              "blurb": "Git joins two lines on its own until both sides changed the same file. Watch the merge stop with nothing saved, and see what it is waiting for.",
+              "pill": "gentle",
+              "time": "10 min",
+              "kind": "lesson"
+            },
+            {
+              "id": "git-settle-a-conflict",
+              "track": "git",
+              "part": "bringing-work-back",
+              "href": "content/git/03-bringing-work-back/04-git-settle-a-conflict/",
+              "key": "git_settle_a_conflict_awarded",
+              "total": 2,
+              "title": "Settle a conflict",
+              "blurb": "Two branches changed `cat.txt`, so the merge stopped. Finish it by marking the file settled and committing - then call one off and leave no trace.",
+              "pill": "gentle",
+              "time": "20 min",
+              "kind": "lesson"
+            }
+          ]
+        },
+        {
+          "track": "git",
+          "id": "fixing-mistakes",
+          "title": "Fixing mistakes",
+          "kicker": "Git · Part four",
+          "lessons": [
+            {
+              "id": "git-fix-the-last-commit",
+              "track": "git",
+              "part": "fixing-mistakes",
+              "href": "content/git/04-fixing-mistakes/01-git-fix-the-last-commit/",
+              "key": "git_fix_the_last_commit_awarded",
+              "total": 2,
+              "title": "Fix the last commit",
+              "blurb": "Correct the commit you just made instead of piling an `oops` on top. Fix a bad message, fold in a file you left out, and keep the history the same length.",
+              "pill": "gentle",
+              "time": "15 min",
+              "kind": "lesson"
+            },
+            {
+              "id": "git-point-at-a-commit",
+              "track": "git",
+              "part": "fixing-mistakes",
+              "href": "content/git/04-fixing-mistakes/02-git-point-at-a-commit/",
+              "key": "git_point_at_a_commit_awarded",
+              "total": 2,
+              "title": "Point at any commit",
+              "blurb": "Name a commit without its hash, and stand on one directly. Count backwards with `main~2` and `HEAD~1`, put a branch on an older commit, and see what a detached `HEAD` looks like.",
+              "pill": "gentle",
+              "time": "15 min",
+              "kind": "lesson"
+            },
+            {
+              "id": "git-what-reset-moves",
+              "track": "git",
+              "part": "fixing-mistakes",
+              "href": "content/git/04-fixing-mistakes/03-git-what-reset-moves/",
+              "key": "git_what_reset_moves_awarded",
+              "total": 1,
+              "title": "What reset actually moves",
+              "blurb": "`--soft`, `--mixed` and `--hard` move your branch to exactly the same place. Watch where each one leaves the files the undone commit was holding.",
+              "pill": "gentle",
+              "time": "10 min",
+              "kind": "lesson"
+            },
+            {
+              "id": "git-undo-with-reset",
+              "track": "git",
+              "part": "fixing-mistakes",
+              "href": "content/git/04-fixing-mistakes/04-git-undo-with-reset/",
+              "key": "git_undo_with_reset_awarded",
+              "total": 3,
+              "title": "Undo with reset",
+              "blurb": "Move your branch back one commit and say where its files should land. Run `--soft`, `--mixed` and `--hard` on the same mistake and watch the three zones answer differently.",
+              "pill": "gentle",
+              "time": "20 min",
               "kind": "lesson"
             }
           ]

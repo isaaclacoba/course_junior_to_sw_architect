@@ -29,5 +29,6 @@
   "task.3.summaryItems.3.text": "el código corto que nombra un commit, para poder señalar esa instantánea exacta más adelante.",
   "task.3.summaryClose": "Lo siguiente: las ramas - cómo dos líneas de trabajo crecen a la vez sin tocarse.",
   "concept.gt-hash.term": "Hash",
-  "concept.gt-hash.def": "El código corto que git le da a un commit como nombre, para que puedas señalar esa instantánea exacta."
+  "concept.gt-hash.def": "El código corto que git le da a un commit como nombre, para que puedas señalar esa instantánea exacta.",
+  "meta.label": "Primeros pasos · ¿Dónde estoy?"
 }

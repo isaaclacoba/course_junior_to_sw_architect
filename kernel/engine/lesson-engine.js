@@ -299,6 +299,15 @@
     }
 
     // ---- prose painters ----------------------------------------------------
+    // The goal list lives in its own <section class="coach">, which carries the
+    // "Goal" heading. Emptying the list is not enough - the heading would sit
+    // there over nothing - so the whole section is hidden on a card that has no
+    // goal, and shown again on one that does.
+    function hideGoalSection(hidden) {
+      if (!goal) return;
+      var section = goal.closest ? goal.closest("section") : null;
+      if (section) section.hidden = hidden;
+    }
     function paintGoal(task) {
       if (!goal) return;
       goal.innerHTML = "";
@@ -365,6 +374,13 @@
         if (result) result.hidden = true;
         if (summary) summary.hidden = false;
         if (plugin.deactivate) plugin.deactivate(surface, task);
+        // A recap has no goal, so the previous card's goal list must go with it.
+        // Leaving it behind showed the last exercise's steps under a "Goal"
+        // heading on the recap - and because setLocale only repaints the CURRENT
+        // card's prose, a language switch left that stale list in the old
+        // language while everything around it changed.
+        paintGoal(task);
+        hideGoalSection(true);
         paintSummaryProse(task);
         if (prevBtn) prevBtn.disabled = idx === 0;
         if (nextBtn) {
@@ -379,6 +395,7 @@
       if (result) result.hidden = true;
       lastResult = null;
       paintGoal(task);
+      hideGoalSection(false);
       plugin.renderCard(surface, task, idx);
       if (prevBtn) prevBtn.disabled = idx === 0;
       if (nextBtn) {

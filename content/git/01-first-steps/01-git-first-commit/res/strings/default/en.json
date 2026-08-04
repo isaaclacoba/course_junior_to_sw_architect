@@ -40,5 +40,6 @@
   "concept.gt-staging-area.term": "Staging area",
   "concept.gt-staging-area.def": "The short list of files you have picked for the next commit, so you choose what goes in instead of saving everything.",
   "concept.gt-commit.term": "Commit",
-  "concept.gt-commit.def": "A saved snapshot of the files you picked, with a short message saying what the change was."
+  "concept.gt-commit.def": "A saved snapshot of the files you picked, with a short message saying what the change was.",
+  "meta.label": "First steps · Your first commit"
 }

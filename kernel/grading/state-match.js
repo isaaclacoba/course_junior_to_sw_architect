@@ -73,11 +73,37 @@
     var out = new Map();
     if (!D || !D.makeSigner || !state || !state.commits) return out;
     var sign = D.makeSigner(state.commits, orderedParents);
+    // Only commits you can still REACH from a ref or a detached HEAD count. A
+    // `commit --amend` leaves the replaced commit dangling with the same message
+    // and the same parents - so the same signature - and indexing it would let
+    // the grader compare the learner against the very commit they just threw
+    // away. Symptom: an amend that changes only the file list can never pass.
+    var reachable = collectReachable(state);
     state.commits.forEach(function (commit, id) {
+      if (!reachable.has(id)) return;
       var s = sign(id);
       if (s !== null && !out.has(s)) out.set(s, commit);
     });
     return out;
+  }
+
+  // The commit ids walkable from every ref plus a detached HEAD. Mirrors what
+  // dag-match's reachableSigs walks, but keeps ids rather than signatures,
+  // because this module compares the commits themselves.
+  function collectReachable(state) {
+    var seen = new Set();
+    var stack = [];
+    if (state.refs && state.refs.forEach) state.refs.forEach(function (h) { stack.push(h); });
+    if (state.head && state.head.kind === "detached") stack.push(state.head.commit);
+    while (stack.length) {
+      var h = stack.pop();
+      if (h == null || seen.has(h)) continue;
+      seen.add(h);
+      var c = state.commits && state.commits.get ? state.commits.get(h) : null;
+      var parents = c && Array.isArray(c.parents) ? c.parents : [];
+      for (var i = 0; i < parents.length; i++) stack.push(parents[i]);
+    }
+    return seen;
   }
 
   // REPOSITORY: same commit shape is already guaranteed by dag-match; here we ask

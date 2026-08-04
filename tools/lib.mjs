@@ -7,6 +7,7 @@
  * Only Node built-ins.
  */
 import fs from "node:fs";
+import { loadCodeLab } from "./lib/codelab-sandbox.mjs";
 import vm from "node:vm";
 
 // Run a course IIFE that assigns `window.<name>` and hand back that global
@@ -27,7 +28,22 @@ export function loadBrowserGlobal(file, name) {
 // window.LESSON_CONFIG / LESSON_META without knowing which.
 export function loadWindowBag(file) {
   const code = fs.readFileSync(file, "utf8");
+  // The PAGE loads the vendored code-lab bundle before a lesson's data file (see
+  // any generated index.html), so a data file is entitled to use it - a git viz
+  // builds its steps by replaying real commands through CodeLab.gitRun, which is
+  // what keeps the theory picture and the practical board on one engine. A bag
+  // without CodeLab would reject those lessons for a difference between the
+  // checker and the browser, not a fault in the lesson. Loaded lazily so files
+  // that never touch it pay nothing.
   const sandbox = { window: {} };
+  let codeLab;
+  Object.defineProperty(sandbox.window, "CodeLab", {
+    configurable: true,
+    get() {
+      if (!codeLab) codeLab = loadCodeLab();
+      return codeLab;
+    },
+  });
   vm.createContext(sandbox);
   vm.runInContext(code, sandbox, { filename: file });
   return sandbox.window;

@@ -136,3 +136,32 @@ test("git-progress: ghosting and divergence are untouched by the new check", () 
   assert.equal(p.diverged.length, 0, "a learner mid-exercise is NOT diverged");
   assert.equal(p.solved, false);
 });
+
+// --- a replaced commit must not be graded against ---------------------------
+// `commit --amend` does not edit a commit, it makes a new one and leaves the old
+// one dangling. The old one keeps the same message and the same parents, so it
+// signs IDENTICALLY - and while every commit was indexed, the grader could pair
+// the target against the commit the learner had just thrown away. An amend that
+// changed only the file list was therefore unpassable.
+test("an amended-away commit is ignored, so the amend is graded on what remains", () => {
+  const root = { id: "r", parents: [], message: "add cat", paths: ["cat.txt"] };
+  // "before" is the pre-amend commit: same message, same parent, fewer files.
+  const before = { id: "b", parents: ["r"], message: "add the rest", paths: ["dog.txt"] };
+  const after = { id: "a", parents: ["r"], message: "add the rest", paths: ["dog.txt", "bird.txt"] };
+
+  const learner = {
+    commits: new Map([["r", root], ["b", before], ["a", after]]),
+    refs: new Map([["refs/heads/main", "a"]]),   // only `a` is reachable
+    head: { kind: "branch", name: "refs/heads/main" },
+    index: new Map(), worktree: new Map(),
+  };
+  const want = {
+    commits: new Map([["r", root], ["a", after]]),
+    refs: new Map([["refs/heads/main", "a"]]),
+    head: { kind: "branch", name: "refs/heads/main" },
+    index: new Map(), worktree: new Map(),
+  };
+
+  const v = stateMatch({ actual: learner, target: want });
+  assert.equal(v.ok, true, v.reason);
+});

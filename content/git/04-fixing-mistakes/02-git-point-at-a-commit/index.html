@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Point at any commit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../../../../styles.css" />
+    <script src="../../../../theme-registry.js"></script>
+    <script src="../../../../theme-switch.js"></script>
+    <link rel="stylesheet" href="../../../../vendor/code-lab/code-lab.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <section class="hero" id="pageHero"></section>
+    </main>
+
+    <script>
+      window.PAGE = {
+        hero: {
+          eyebrow: "Git · Part four · Fixing mistakes",
+          title: "Point at any commit",
+          intro: ["Every command so far has meant `where I am now`. To reach an older commit the obvious move is to copy its hash out of `git log` - seven characters to read carefully and retype without slipping. Git will count backwards for you instead: `HEAD~1` is one step back, `main~2` is two. Here you use those names to put a branch further back, and to stand on an older commit yourself."],
+          links: [{ href: "../../../../index.html", label: "Back to the course" }],
+        },
+        archetype: "git",
+        prefix: "gpc",
+      };
+    </script>
+
+    <script src="../../../../vendor/code-lab/code-lab.global.js"></script>
+    <script src="../../../../generated/course-data.js"></script>
+    <script src="../../../../generated/concept-index.js"></script>
+    <script src="meta.js"></script>
+    <script src="data.js"></script>
+    <script src="../../../../resource/resolver.js"></script>
+    <script src="../../../../resource/store.js"></script>
+    <script src="../../../../resource/manager.js"></script>
+    <script src="../../../../resource/settings.js"></script>
+    <script src="../../../../resource/preference.js"></script>
+    <script src="../../../../resource/theme-section.js"></script>
+    <script src="../../../../resource/voice-section.js"></script>
+    <script src="../../../../resource/lang-section.js"></script>
+    <script src="../../../../resource/concept-i18n.js"></script>
+    <script src="../../../../resource/bind-git.js"></script>
+    <script
+      src="../../../../resource/kernel-controller.js"
+      data-page-shell="../../../../page-shell.js"
+      data-res-base="res/strings"
+      data-res-lang="en"
+      data-res-langs="en,es"
+      data-res-voices="default"
+    ></script>
+  </body>
+</html>

@@ -54,6 +54,16 @@ export function makeWindow() {
 export function loadInWindow(file) {
   const src = fs.readFileSync(file, "utf8");
   const win = makeWindow();
+  // A generated page loads the vendored bundle BEFORE the lesson data file, so a
+  // data file may use CodeLab - a git viz builds each step by replaying real
+  // commands through CodeLab.gitRun, which is what stops the theory picture and
+  // the practical board drifting apart. Without this the checker would reject
+  // such a lesson for a difference between itself and the browser. Lazy, so a
+  // file that never touches it pays nothing.
+  Object.defineProperty(win, "CodeLab", {
+    configurable: true,
+    get() { return loadCodeLab(); },
+  });
   vm.createContext(win);
   vm.runInContext(src, win, { filename: file, timeout: 10000 });
   return win;

@@ -35,7 +35,11 @@ function makeEl(id) {
       contains(cls) { return classes.has(cls); },
     },
     appendChild(child) { (this.children = this.children || []).push(child); return child; },
-    closest() { return null; },
+    // The core hides the goal SECTION (the element carrying the "Goal" heading),
+    // not just the list, so a fake that always returns null would make any test
+    // of that behaviour pass without exercising it. This walks a real parent.
+    parentSection: null,
+    closest(sel) { return sel === "section" ? this.parentSection : null; },
     addEventListener(type, fn) { (listeners[type] = listeners[type] || []).push(fn); },
     click() { (listeners.click || []).forEach((fn) => fn({})); },
   };
@@ -55,6 +59,11 @@ function makeDom(prefix) {
   const registry = {};
   ids.forEach((id) => { registry[id] = makeEl(id); });
   registry["courseXpLabel"] = makeEl("courseXpLabel");
+  // The goal <ul> sits inside its own <section class="coach">; give the fake the
+  // same shape so hiding the section can actually be observed.
+  const goalSection = makeEl(prefix + "GoalSection");
+  registry[prefix + "Goal"].parentSection = goalSection;
+  registry[prefix + "GoalSection"] = goalSection;
   return {
     _get: (id) => registry[id] || null,
     getElementById(id) { return registry[id] || null; },
@@ -353,5 +362,42 @@ test("Next on a widget lesson advances to the next lesson", async () => {
 
     dom.getElementById("ttNext").click();
     assert.equal(hrefBox.href, "next-lesson.html");
+  });
+});
+
+// A recap card has no goal of its own. Before this was fixed the previous card's
+// goal list stayed on screen under a "Goal" heading - and because setLocale only
+// repaints the CURRENT card's prose, switching language left that stale list in
+// the old language while the rest of the page changed. Reported from the live
+// Spanish build of a git lesson.
+test("a summary card clears AND hides the previous card's goal section", async () => {
+  await withDom("tt", async (dom) => {
+    const fake = makeFakePlugin("fake-g");
+    LessonEngine.register(fake.plugin);
+    const cfg = twoTaskConfig("fake-g");
+    cfg.tasks[0].goal = ["do the first thing", "then the second"];
+    cfg.tasks.push({
+      summary: true,
+      title: "Recap",
+      summaryIntro: "You learned:",
+      summaryItems: [{ title: "A", text: "did a" }],
+      summaryClose: "Onward.",
+    });
+    const controller = LessonEngine.create(cfg);
+    await controller.boot();
+
+    const goal = dom.getElementById("ttGoal");
+    const goalSection = dom.getElementById("ttGoalSection");
+    assert.equal(goalSection.hidden, false, "a practice card shows its goal");
+    assert.equal((goal.children || []).length, 2, "and paints its goal lines");
+
+    dom.getElementById("ttNext").click(); // -> card 2
+    dom.getElementById("ttNext").click(); // -> summary
+    assert.equal(goalSection.hidden, true, "the recap hides the goal heading");
+    assert.equal(goal.innerHTML, "", "and leaves no stale goal lines behind");
+
+    // stepping back must bring it back, or the goal is gone for the rest of the lesson
+    dom.getElementById("ttPrev").click();
+    assert.equal(goalSection.hidden, false, "a practice card shows it again");
   });
 });

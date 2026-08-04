@@ -29,5 +29,6 @@
   "task.3.summaryItems.3.text": "the short code naming one commit, so you can point at that exact snapshot later.",
   "task.3.summaryClose": "Next: branches - how two lines of work grow side by side without touching each other.",
   "concept.gt-hash.term": "Hash",
-  "concept.gt-hash.def": "The short code git gives a commit as its name, so you can point at that exact snapshot."
+  "concept.gt-hash.def": "The short code git gives a commit as its name, so you can point at that exact snapshot.",
+  "meta.label": "First steps · Where am I?"
 }

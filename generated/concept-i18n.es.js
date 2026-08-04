@@ -195,21 +195,77 @@
       "def": "El contexto que el modelo lee ahora mismo - el borrador de la tarea entre manos, y lo primero que desaparece a medida que avanza el chat.",
       "term": "Memoria de trabajo"
     },
+    "gt-abort": {
+      "def": "Dejar sin efecto una fusión detenida y volver a como estaban las cosas antes de empezarla.",
+      "term": "Cancelar una fusión"
+    },
+    "gt-amend": {
+      "def": "Reemplazar el commit que acabas de hacer por uno corregido, en vez de dejar el fallo en la historia.",
+      "term": "Enmendar un commit"
+    },
+    "gt-branch": {
+      "def": "Un nombre que apunta a un commit y avanza contigo cuando haces commits, para que dos líneas de trabajo puedan crecer a la vez.",
+      "term": "Rama"
+    },
     "gt-commit": {
       "def": "Una instantánea guardada de los archivos que elegiste, con un mensaje corto que dice cuál fue el cambio.",
       "term": "Commit"
+    },
+    "gt-conflict": {
+      "def": "Cuando las dos ramas cambiaron el mismo archivo, git se detiene y te pide que decidas qué resultado es el correcto.",
+      "term": "Conflicto"
+    },
+    "gt-detached-head": {
+      "def": "Estar en un commit directamente en vez de en una rama, así que un commit hecho ahí no tiene ningún nombre de rama que lo sujete.",
+      "term": "HEAD desacoplado"
+    },
+    "gt-fast-forward": {
+      "def": "Cuando tu rama no ha añadido nada desde la separación, git solo desliza su nombre hacia delante y no crea ningún commit.",
+      "term": "Avance rápido"
     },
     "gt-hash": {
       "def": "El código corto que git le da a un commit como nombre, para que puedas señalar esa instantánea exacta.",
       "term": "Hash"
     },
+    "gt-head": {
+      "def": "El marcador de dónde estás - la rama en la que estás, y el commit sobre el que se construirá el siguiente.",
+      "term": "HEAD"
+    },
+    "gt-history": {
+      "def": "La cadena de commits que hay detrás de donde estás ahora, cada uno apuntando a su padre.",
+      "term": "Historia"
+    },
+    "gt-merge": {
+      "def": "Traer los commits de otra rama a la que estás, para que dos líneas pasen a ser una.",
+      "term": "Fusión"
+    },
+    "gt-merge-commit": {
+      "def": "El commit que crea una fusión cuando las dos partes avanzaron - el único commit con dos padres.",
+      "term": "Commit de fusión"
+    },
+    "gt-parent": {
+      "def": "El commit que vino justo antes de este - el enlace que convierte instantáneas sueltas en una historia.",
+      "term": "Padre"
+    },
     "gt-repository": {
       "def": "La carpeta que git vigila, junto con todas las instantáneas que has guardado en ella.",
       "term": "Repositorio"
     },
+    "gt-reset": {
+      "def": "Mover el nombre de tu rama a otro commit, eligiendo qué pasa con los archivos que tenías preparados o editados.",
+      "term": "Reset"
+    },
+    "gt-revision": {
+      "def": "Una forma de nombrar un commit sin su hash - `HEAD`, el nombre de una rama, o un paso atrás desde uno de ellos como `HEAD~1`.",
+      "term": "Revisión"
+    },
     "gt-staging-area": {
       "def": "La lista corta de archivos que has elegido para el próximo commit, para que decidas qué entra en vez de guardarlo todo.",
       "term": "Área de preparación"
+    },
+    "gt-tag": {
+      "def": "Un nombre fijado a un commit que nunca se mueve, para marcar una versión que merece poder encontrarse otra vez.",
+      "term": "Etiqueta"
     },
     "gt-working-tree": {
       "def": "Tus archivos tal y como están ahora mismo, antes de que le hayas hablado a git de ellos.",

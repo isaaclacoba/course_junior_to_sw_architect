@@ -40,5 +40,6 @@
   "concept.gt-staging-area.def": "La lista corta de archivos que has elegido para el próximo commit, para que decidas qué entra en vez de guardarlo todo.",
   "concept.gt-staging-area.term": "Área de preparación",
   "concept.gt-commit.def": "Una instantánea guardada de los archivos que elegiste, con un mensaje corto que dice cuál fue el cambio.",
-  "concept.gt-commit.term": "Commit"
+  "concept.gt-commit.term": "Commit",
+  "meta.label": "Primeros pasos · Tu primer commit"
 }
