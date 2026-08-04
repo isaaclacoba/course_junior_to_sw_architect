@@ -342,6 +342,31 @@ The list lives in `TeachingWarningIds` in
 `SHOWN_WARNING_IDS` in `tools/lib/lesson-validators.mjs`. **Change one and you must
 change the other**, or the tool will pass content the runtime then complains about.
 
+### Adding a diagnostic the learner can see
+
+Three tables in `CompilerService.cs` describe a diagnostic, and a diagnostic is only
+finished when it appears in the right ones:
+
+| Table | Answers | Required |
+|---|---|---|
+| `TeachingWarningIds` | should we show this warning at all? | warnings only |
+| `FriendlyHint` | what is wrong, in plain words | **always** |
+| `WhyHint` | the idea behind it, behind "Learn why" | **always** |
+
+Miss `WhyHint` and nothing breaks loudly - the panel just renders with no "Learn why"
+link, which reads as "this feature is not built" rather than "this entry is
+incomplete". That is precisely how ten of the most common errors a beginner hits
+(missing `;`, missing `}`, unknown name) shipped with no explanation at all.
+`code-lab/test/compiler-hints.test.ts` now fails on any table that drifts out of step.
+
+Write `FriendlyHint` as the sentence you would say pointing at the screen. Write
+`WhyHint` as the reason the rule exists - the concept, never the fix. The learner
+opens it because they want to understand, not because they want the answer pasted in.
+Both are course prose: plain, warm, spaced hyphen ` - `, no compiler jargon left
+unexplained. Note that this text comes from the C# host and is **English only** - it
+does not pass through `self.t()`, so the panel's headings translate but the
+per-diagnostic text does not.
+
 One id is deliberately in the host list but NOT in the tool's: **CS8618**
 (uninitialised non-nullable field). `dotnet new console` enables nullable reference
 types and the browser host does not, so the verifier sees CS8618 on code the

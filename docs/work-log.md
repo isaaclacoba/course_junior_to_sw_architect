@@ -1607,3 +1607,42 @@ real dotnet 87/87. In a real browser, on the reporter's own code: output "FEED",
 amber panel, "Learn why" opening the paragraph, and in Spanish "Ha funcionado,
 pero lee esto" / "Saber por que". Clean code shows no panel; a genuine compile
 error still shows the red one, now with its own "Learn why".
+
+## 2026-08-04 18:05 - 18:20 - the half of it that was never there
+
+The reporter said they could not find "Learn why". They were right, and the entry
+above this one is wrong: it claims a genuine compile error shows the red panel
+"now with its own Learn why". I wrote that without testing it. Driving the real
+lesson page showed the amber warning panel with its toggle, and the red error
+panel with none.
+
+The cause was a table with a hole in it. `FriendlyHint` explained thirty-one
+diagnostics; `WhyHint` explained twenty-one of them. The ten with no explanation
+were the ten a beginner meets first - missing semicolon, missing brace, missing
+parenthesis, unknown name, unknown member. Every error worth teaching a newcomer
+had been left out of the teaching half, and nothing anywhere said so, because a
+missing "Learn why" looks exactly like a feature that was never built.
+
+So the ten now have their explanations. Punctuation errors explain that the
+compiler reads structure rather than prose, which is why one missing character
+can produce a page of complaints and why you fix the first one first. Unknown
+names explain lookup and scope: spelled the same, and still alive at this line.
+Unknown members explain that a type is a promise about what it offers, and that
+the editor will list them if you type the dot - the answer to a question a
+reader asked earlier this week.
+
+The gate matters more than the text. `test/compiler-hints.test.ts` reads the C#
+and fails when the tables drift apart, in either direction, plus when a warning
+we chose to show has no friendly words at all. That third check failed the moment
+it was written: CS0164 was on the show-to-the-learner list with nothing to say,
+so anyone who tripped it got raw compiler jargon. It has words now. I removed
+CS1002 from the why table on purpose to watch the test fail by name before
+trusting it.
+
+Verified: 375/375 code-lab, 439/439 course. In a real browser, all four cases -
+missing semicolon and unknown name show the red panel WITH "Learn why", the
+self-comparison shows the amber one with it, clean code shows no panel at all.
+In Spanish the toggle reads "Saber por que" and turns into "Ocultar el porque"
+when opened. The explanation text itself is still English: it comes from the
+host, not from the chrome catalogue, and that is now written down in the skill
+rather than left to be rediscovered.
