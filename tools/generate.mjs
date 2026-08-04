@@ -513,19 +513,19 @@ function renderIndexHtml(m, variants) {
     if (meta.resources) {
       // runtime:"kernel" swaps the reload-on-change bootstrap for the live-swap
       // kernel controller; it supersedes the plain resource tail (never both).
-      const controller = meta.runtime === "kernel" ? "kernel-controller" : "bootstrap";
+      const controller = "kernel-controller";
       html = applyResourceTail(html, meta.resources, enginePath, m.id, controller);
     }
   } else if (archetype === "viz" && meta.resources) {
     // A viz lesson's teaching prose (hero + step narrations + legend labels) can
     // live in res/strings too; the binder is bind-viz and there is no engine.
-    const controller = meta.runtime === "kernel" ? "kernel-controller" : "bootstrap";
+    const controller = "kernel-controller";
     html = applyResourceTailViz(html, meta.resources, m.id, controller);
   } else if (archetype === "checkpoint" && meta.resources) {
     // A checkpoint lesson's prose (hero + quiz title/intro + question stems,
     // options and explanations) can live in res/strings; the binder is
     // bind-checkpoint and there is no engine (the Quiz is a code-lab widget).
-    const controller = meta.runtime === "kernel" ? "kernel-controller" : "bootstrap";
+    const controller = "kernel-controller";
     html = applyResourceTailCheckpoint(html, meta.resources, m.id, controller);
   }
 
@@ -536,7 +536,7 @@ function renderIndexHtml(m, variants) {
 // tail. page-shell.js and the engine are no longer loaded statically; the
 // bootstrap injects them after applying the chosen voice's strings, so both
 // engines stay byte-for-byte the files the flat pages use.
-function applyResourceTail(html, resources, enginePath, lessonId, controllerModule = "bootstrap") {
+function applyResourceTail(html, resources, enginePath, lessonId, controllerModule = "kernel-controller") {
   const base = resources.base || "res/strings";
   const lang = resources.lang || "en";
   const langs = (resources.langs && resources.langs.length ? resources.langs : [lang]).join(",");
@@ -559,7 +559,6 @@ function applyResourceTail(html, resources, enginePath, lessonId, controllerModu
     '    <script\n' +
     '      src="../../../../resource/' + controllerModule + '.js"\n' +
     '      data-page-shell="../../../../page-shell.js"\n' +
-    '      data-engine="' + enginePath + '"\n' +
     '      data-res-base="' + base + '"\n' +
     '      data-res-lang="' + lang + '"\n' +
     '      data-res-langs="' + langs + '"\n' +
@@ -574,7 +573,7 @@ function applyResourceTail(html, resources, enginePath, lessonId, controllerModu
 // swap only the trailing static page-shell.js load for the resource modules (with
 // bind-viz, not bind-build) + the controller; the controller injects page-shell
 // after binding. No data-engine.
-function applyResourceTailViz(html, resources, lessonId, controllerModule = "bootstrap") {
+function applyResourceTailViz(html, resources, lessonId, controllerModule = "kernel-controller") {
   const base = resources.base || "res/strings";
   const lang = resources.lang || "en";
   const langs = (resources.langs && resources.langs.length ? resources.langs : [lang]).join(",");
@@ -607,7 +606,7 @@ function applyResourceTailViz(html, resources, lessonId, controllerModule = "boo
 // with no engine. data.js is already loaded ahead of the tail, so we swap only
 // the trailing static page-shell.js load for the resource modules (with
 // bind-checkpoint) + the controller, which injects page-shell after binding.
-function applyResourceTailCheckpoint(html, resources, lessonId, controllerModule = "bootstrap") {
+function applyResourceTailCheckpoint(html, resources, lessonId, controllerModule = "kernel-controller") {
   const base = resources.base || "res/strings";
   const lang = resources.lang || "en";
   const langs = (resources.langs && resources.langs.length ? resources.langs : [lang]).join(",");

@@ -27,7 +27,9 @@
   function trim(s) { return s.trim(); }
 
   var pageShellSrc = attr("data-page-shell", "../../../../page-shell.js");
-  var engineSrc = attr("data-engine", "../../../../build-engine.js");
+  // The repo-root base for the engine assets is derived from this controller's own
+  // URL (it lives at <root>/resource/kernel-controller.js), so no page attr is needed.
+  var repoBase = (self && self.src || "").replace(/resource\/kernel-controller\.js.*$/, "");
   var base = attr("data-res-base", "res/strings");
   var defaultLang = attr("data-res-lang", "en");
   var langs = attr("data-res-langs", defaultLang).split(",").map(trim).filter(Boolean);
@@ -208,15 +210,14 @@
       var archetype = global.LESSON_META && global.LESSON_META.archetype;
       if (!cfg || !archetype) return;
       cfg.archetype = archetype;
-      var base = engineSrc.replace(/[^/]*$/, "");
       var chain = Promise.resolve();
       // A practice plugin grades through a kernel/grading module; load it first.
       if (archetype === "build") {
-        chain = chain.then(function () { return injectScript(base + "kernel/grading/output-match.js"); });
+        chain = chain.then(function () { return injectScript(repoBase + "kernel/grading/output-match.js"); });
       }
       return chain
-        .then(function () { return injectScript(base + "kernel/engine/lesson-engine.js", { "data-manual": "" }); })
-        .then(function () { return injectScript(base + "kernel/engine/plugins/" + archetype + "-plugin.js"); })
+        .then(function () { return injectScript(repoBase + "kernel/engine/lesson-engine.js", { "data-manual": "" }); })
+        .then(function () { return injectScript(repoBase + "kernel/engine/plugins/" + archetype + "-plugin.js"); })
         .then(function () {
           if (global.LessonEngine) {
             var widget = global.LessonEngine.create(cfg);
