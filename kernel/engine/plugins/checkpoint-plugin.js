@@ -5,7 +5,7 @@
  * A checkpoint lesson has no graded tasks of the core's kind: its whole body is one
  * self-contained CodeLab.Quiz assessment that scores itself and awards its own XP.
  * This plugin is therefore the archetype-specific MIDDLE of page-shell.js's
- * QUIZ_CONFIG block and nothing else - the Quiz mount, the quiz.* chrome-label
+ * LESSON_CONFIG block and nothing else - the Quiz mount, the quiz.* chrome-label
  * application, and the destroy + re-create on a language change
  * (PageShellCheckpoint.setLocale). Everything the core owns (header, the final
  * "Next lesson" step, the setLocale fan-out) is deliberately absent; the core marks
@@ -13,10 +13,10 @@
  * panel / task nav for it.
  *
  * This is a faithful extraction of page-shell.js's `applyQuizLabels` closure +
- * `window.CodeLab.Quiz.create(host, QUIZ_CONFIG)` + the `PageShellCheckpoint`
+ * `window.CodeLab.Quiz.create(host, LESSON_CONFIG)` + the `PageShellCheckpoint`
  * setLocale that destroys the old controller and re-creates it so the new-language
  * strings paint. The behaviour is byte-identical; only the seam differs (the core
- * hands the plugin ctx instead of page-shell reaching for window.QUIZ_CONFIG).
+ * hands the plugin ctx instead of page-shell reaching for window.LESSON_CONFIG).
  *
  * Loaded two ways with no bundler (same UMD shape as build-plugin.js):
  *   - browser: a <script> loads it after lesson-engine.js; it registers itself on

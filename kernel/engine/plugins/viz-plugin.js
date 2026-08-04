@@ -5,7 +5,7 @@
  * A viz lesson has no graded tasks: its whole body is one self-contained
  * CodeLab.MemoryViz visual that tracks its own progress and awards its own XP when
  * the last step is reached. This plugin is therefore the archetype-specific MIDDLE
- * of page-shell.js's LESSON_VIZ block and nothing else - the MemoryViz mount, the
+ * of page-shell.js's LESSON_CONFIG block and nothing else - the MemoryViz mount, the
  * viz.* chrome-label application, the awardedKey derivation, and the destroy +
  * re-create on a language change (PageShellViz.setLocale). Everything the core owns
  * (header, the final "Next lesson" step, the setLocale fan-out) is deliberately
@@ -13,10 +13,10 @@
  * all card chrome / result panel / task nav for it.
  *
  * This is a faithful extraction of page-shell.js's `applyVizLabels` closure +
- * `window.CodeLab.MemoryViz.create(host, LESSON_VIZ)` + the `PageShellViz`
+ * `window.CodeLab.MemoryViz.create(host, LESSON_CONFIG)` + the `PageShellViz`
  * setLocale that destroys the old controller and re-creates it so the new-language
  * strings paint. The behaviour is byte-identical; only the seam differs (the core
- * hands the plugin ctx instead of page-shell reaching for window.LESSON_VIZ).
+ * hands the plugin ctx instead of page-shell reaching for window.LESSON_CONFIG).
  *
  * Loaded two ways with no bundler (same UMD shape as build-plugin.js):
  *   - browser: a <script> loads it after lesson-engine.js; it registers itself on

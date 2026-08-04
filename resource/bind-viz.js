@@ -3,7 +3,7 @@
  *
  * The viz counterpart of resource/bind-build.js. It knows the viz key schema
  * (intro.N, hero.title/eyebrow, legend.i, step.i.narr) and writes the resolved
- * strings onto window.PAGE (hero) and window.LESSON_VIZ (legend labels + step
+ * strings onto window.PAGE (hero) and window.LESSON_CONFIG (legend labels + step
  * narrations) before page-shell.js mounts the MemoryViz visual.
  *
  * Apply-if-present: a key is only overridden when the resolved bundle supplies

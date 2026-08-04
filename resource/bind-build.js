@@ -4,7 +4,7 @@
  * This is the course/engine-specific half of the resource system: it knows the
  * lesson key schema (intro.N, task.N.title/concept/context/goal.i, and the recap's
  * summaryIntro/summaryItems.i.title|text/summaryClose) and writes the resolved
- * strings onto window.PAGE (hero intro) and window.BUILD_CONFIG (task prose) before
+ * strings onto window.PAGE (hero intro) and window.LESSON_CONFIG (task prose) before
  * build-engine.js renders. A different engine (a drill lesson) would be a sibling
  * binder with its own schema; the generic resolver/store/manager stay unchanged.
  *

@@ -3,13 +3,13 @@
  *
  * The checkpoint counterpart of resource/bind-viz.js. It knows the checkpoint
  * key schema and writes resolved strings onto window.PAGE (hero) and
- * window.QUIZ_CONFIG (the code-lab Quiz config) before page-shell.js mounts the
+ * window.LESSON_CONFIG (the code-lab Quiz config) before page-shell.js mounts the
  * Quiz. Question order and option order are preserved, so the `correct` index
  * (which points into the original options array) stays valid after translation.
  *
  * Key schema:
  *   hero.eyebrow, hero.title, intro.N          -> the page hero (window.PAGE)
- *   quiz.title, quiz.intro, quiz.metaLabel     -> QUIZ_CONFIG display strings
+ *   quiz.title, quiz.intro, quiz.metaLabel     -> LESSON_CONFIG display strings
  *   question.<n>.stem                          -> questions[n-1].stem
  *   question.<n>.concept                       -> questions[n-1].concept
  *   question.<n>.why                           -> questions[n-1].why
