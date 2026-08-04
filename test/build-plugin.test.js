@@ -419,3 +419,26 @@ test("Show Solution lights the whole blueprint", async () => {
     assert.equal((html.match(/bp-box is-met/g) || []).length, 2, "the authored solution must satisfy its own blueprint");
   });
 });
+
+// Card 2 and card 7 in the real SOLID lesson author a null gate: their last
+// goals are about OUTPUT, which only a run can settle. Those lines must not
+// grow a checkbox, because a checkbox that never fills reads as "you got this
+// wrong" for a learner who in fact got it right.
+test("a goal with no structural test shows a spacer, never an unfillable box", async () => {
+  const cfg = trackerConfig();
+  cfg.tasks[0].goalCheck = [{ type: "Cat", member: "IsHungry" }, null, { absent: "CheckAndSign" }];
+  await withDom("bd", [], async (dom, codeLab) => {
+    await LessonEngine.create(cfg).boot();
+    const items = dom.getElementById("bdGoal").children;
+    codeLab._editor._type(WHOLE);
+
+    assert.match(items[1].innerHTML, /tracker-tick--none/, "the untracked goal keeps its indent");
+    assert.doesNotMatch(items[1].innerHTML, /\u2713/, "the untracked goal shows no tick");
+    assert.equal(items[1].classList.contains("is-met"), false);
+    assert.match(items[1].innerHTML, /FeedingSign/, "and it keeps its prose");
+
+    // Its neighbours still behave.
+    assert.equal(items[0].classList.contains("is-met"), true);
+    assert.match(items[0].innerHTML, /\u2713/);
+  });
+});

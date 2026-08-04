@@ -1227,6 +1227,36 @@
           ]
         }
       ]
+    },
+    {
+      "id": "git",
+      "name": "Git",
+      "kicker": "Version control",
+      "blurb": "Never used git or a terminal? Type real commands and watch the repository draw itself - commits, branches, merges, and how to undo a mistake.",
+      "partPrefix": "Git · Part ",
+      "parts": [
+        {
+          "track": "git",
+          "id": "first-steps",
+          "title": "First steps",
+          "kicker": "Git · Part one",
+          "lessons": [
+            {
+              "id": "git-first-commit",
+              "track": "git",
+              "part": "first-steps",
+              "href": "content/git/01-first-steps/01-git-first-commit/",
+              "key": "git_first_commit_awarded",
+              "total": 3,
+              "title": "Your first commit",
+              "blurb": "Hand a folder to git and save your first versions of it. Three short exercises in a real terminal: start the repository, choose which files go in, and save them - the graph draws itself as you type.",
+              "pill": "gentle",
+              "time": "20 min",
+              "kind": "lesson"
+            }
+          ]
+        }
+      ]
     }
   ]
 };

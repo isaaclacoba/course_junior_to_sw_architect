@@ -42,8 +42,15 @@ function literalAfter(text, declaration) {
 
 const deps = () => literalAfter(src(), "var ARCHETYPE_DEPS =");
 
-test("build keeps exactly the grader it has always loaded", () => {
-  assert.deepEqual(deps().build, ["kernel/grading/output-match.js"]);
+// The grader decides whether a RUN passed; the structure policy decides what the
+// live goal tracker shows while the learner types. Both must be on the page
+// before the build plugin boots - and a missing structure-match is invisible
+// rather than loud (the tracker just never draws), so it is pinned here.
+test("build loads its grader AND the structure policy the tracker reads", () => {
+  assert.deepEqual(deps().build, [
+    "kernel/grading/output-match.js",
+    "kernel/grading/structure-match.js",
+  ]);
 });
 
 test("git loads its grader AND the shared progress module, in that order", () => {

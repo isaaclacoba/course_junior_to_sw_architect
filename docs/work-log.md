@@ -1232,3 +1232,55 @@ asked for. Probe against the old bundle: Console. -> [], d. -> [Name,Dog,Bark].
 After the fix: Console. -> [WriteLine,Write,ReadLine,ToString], d. ->
 [Name,Bark,ToString]. Two regression tests added; both verified to fail with
 the fix reverted. 239/239 code-lab, 241/241 course.
+
+## 2026-08-04 11:02 - SOLID: make the goal visible, and make the pain arrive first
+
+Start. Two complaints, one lesson. A learner could not tell what a
+`FeedingSign` was without opening the solution, and SOLID reads as
+overengineering to anyone who has not yet been billed for skipping it.
+Rebuilding the lesson around both: a live goal tracker that shows the shape the
+card is asking for, and a three-card arc on S that charges the learner for the
+naive shape before selling them the fix.
+
+## 2026-08-04 12:47 - SOLID rebuilt, and the tracker was loading on no page at all
+
+End. The lesson is 7 graded cards + a recap (was 5). S gets three of them,
+because the argument for SOLID is counterfactual and only lands on the SECOND
+change: card 1 writes the obvious `CheckAndSign` and it works; card 2 makes the
+vet change the rule to four hours, with the rule living in two places, so the
+edit costs two sites and going wrong costs nothing - no crash, just a count
+that quietly disagrees with the cards; card 3 splits `Cat`/`FeedingSign`/
+`FrontDesk` and makes the SAME change again for one edit and identical output.
+O/L/I/D keep their verified C# and gain subgoal labels, a blueprint and gates.
+
+The tracker is a guide, never a grade - XP still comes only from a real run,
+and a test pins that a fully lit tracker awards nothing. Two views of one
+question: a blueprint panel listing target types with member SIGNATURES
+("bool IsHungry()"), dashed until declared, which says what to write without
+writing it; and a tick against each goal line that carries a gate.
+
+Three bugs found, none of which a test would have caught on its own:
+
+1. The blueprint never rendered on any real page. `ARCHETYPE_DEPS.build` in
+   resource/kernel-controller.js listed only the grader, so
+   kernel/grading/structure-match.js was never injected, `window.KernelStructure`
+   stayed undefined, and syncTracker returned early - silently. Every unit test
+   passed the whole time because they load the module directly. Only the
+   headless render caught it. Fixed, pinned in kernel-controller-deps.test.js,
+   and the early return now warns once instead of vanishing.
+2. A goal with no structural test ("the output is FEED" - only a run can settle
+   that) was authored as a null gate, and `evaluate` mapped null to false. That
+   paints a checkbox that can never fill, which reads as "you got this wrong" to
+   someone who got it right, and made the validator report 8 unfixable failures.
+   evaluate now returns three states; null renders an invisible spacer that
+   keeps the goal indented with its neighbours.
+3. Rewriting the lesson's en.json/es.json wholesale dropped every
+   `concept.*.term/.def` key and the Spanish landing card, which silently
+   emptied four concept entries in generated/concept-index.js. Restored; the
+   generated diff is now only the intended lines.
+
+Verified: 360/360 tests; validate 0 errors; check-i18n PASS; verify-lesson with
+real dotnet compiles all 7 solutions, matches expected output, passes every
+requireSource and every hidden probe, and asserts every blueprint member and
+gate actually lights up on the authored solution; headless render clean in en
+and es with card 3 showing three dashed boxes and no leaked answer.

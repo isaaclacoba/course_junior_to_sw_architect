@@ -47,7 +47,7 @@
   // repo-root-relative and get the derived repoBase prefix. An archetype with no
   // row (drill, viz, checkpoint) simply has none.
   var ARCHETYPE_DEPS = {
-    build: ["kernel/grading/output-match.js"],
+    build: ["kernel/grading/output-match.js", "kernel/grading/structure-match.js"],
     git: ["kernel/grading/dag-match.js", "kernel/engine/git-progress.js"]
   };
 

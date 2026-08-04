@@ -195,6 +195,22 @@
       "def": "El contexto que el modelo lee ahora mismo - el borrador de la tarea entre manos, y lo primero que desaparece a medida que avanza el chat.",
       "term": "Memoria de trabajo"
     },
+    "gt-commit": {
+      "def": "Una instantánea guardada de los archivos que elegiste, con un mensaje corto que dice cuál fue el cambio.",
+      "term": "Commit"
+    },
+    "gt-repository": {
+      "def": "La carpeta que git vigila, junto con todas las instantáneas que has guardado en ella.",
+      "term": "Repositorio"
+    },
+    "gt-staging-area": {
+      "def": "La lista corta de archivos que has elegido para el próximo commit, para que decidas qué entra en vez de guardarlo todo.",
+      "term": "Área de preparación"
+    },
+    "gt-working-tree": {
+      "def": "Tus archivos tal y como están ahora mismo, antes de que le hayas hablado a git de ellos.",
+      "term": "Árbol de trabajo"
+    },
     "pr-abstract-type": {
       "def": "Una base que describe una forma que sus subtipos deben rellenar y que no se puede crear con new por sí misma.",
       "term": "Tipo abstracto"

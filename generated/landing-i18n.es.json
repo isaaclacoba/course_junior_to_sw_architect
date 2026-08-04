@@ -140,6 +140,10 @@
       "blurb": "Has usado List&lt;T&gt; - ahora escribe el tuyo. Construye un Box&lt;T&gt;, un método genérico y un Pair&lt;A, B&gt; que funcionen con cualquier tipo de valor.",
       "title": "Genéricos"
     },
+    "git-first-commit": {
+      "blurb": "Entrega una carpeta a git y guarda tus primeras versiones. Tres ejercicios cortos en un terminal de verdad: arranca el repositorio, elige qué archivos entran y guárdalos - el gráfico se dibuja solo mientras escribes.",
+      "title": "Tu primer commit"
+    },
     "good-code-check": {
       "blurb": "El checkpoint de la Parte cinco: buenos nombres, sin duplicación, un trabajo por función, legibilidad y comentarios. Supéralo para cerrar los fundamentos del buen código.",
       "title": "Checkpoint de fundamentos del buen código"
@@ -338,6 +342,7 @@
     "AI · Part one": "IA · Parte uno",
     "AI · Part three": "IA · Parte tres",
     "AI · Part two": "IA · Parte dos",
+    "Git · Part one": "Git · Parte uno",
     "Part five": "Parte cinco",
     "Part four": "Parte cuatro",
     "Part one": "Parte uno",
@@ -354,6 +359,7 @@
     "Build with objects": "Construye con objetos",
     "Design for change": "Diseña para el cambio",
     "Everyday essentials": "Fundamentos del día a día",
+    "First steps": "Primeros pasos",
     "Foundations of good code": "Fundamentos del buen código",
     "From idea to running code": "De la idea al código en marcha",
     "From model to agent": "Del modelo al agente",
@@ -372,6 +378,11 @@
       "blurb": "Un primer vistazo a cómo funcionan de verdad los LLM y los agentes de IA - tokens, contexto, memoria, herramientas, planificación y cómo mantener un agente de fiar.",
       "kicker": "Agentes desde cero",
       "name": "IA"
+    },
+    "git": {
+      "blurb": "¿Nunca has usado git ni un terminal? Escribe comandos de verdad y mira cómo se dibuja el repositorio - commits, ramas, fusiones y cómo deshacer un error.",
+      "kicker": "Control de versiones",
+      "name": "Git"
     },
     "practical": {
       "blurb": "Aprende C# escribiendo y ejecutando código de verdad, victoria a victoria, hasta el diseño SOLID.",

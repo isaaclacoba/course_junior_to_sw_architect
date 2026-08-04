@@ -54,6 +54,7 @@
     }
     return null;
   }
+  var warnedNoStructure = false;
   function structure() {
     var g = typeof globalThis !== "undefined" ? globalThis : null;
     if (g && g.KernelStructure) return g.KernelStructure;
@@ -122,7 +123,15 @@
     }
   }
 
+  // Three states, matching S.evaluate: true ticks, false shows an empty circle
+  // waiting to be filled, and null - a goal with no structural test - shows an
+  // invisible spacer. The spacer keeps every goal line indented to the same
+  // margin, so an untracked goal reads as part of the list rather than as a
+  // checkbox the learner can never satisfy.
   function tick(on) {
+    if (on === null || on === undefined) {
+      return '<span class="tracker-tick tracker-tick--none" aria-hidden="true"></span>';
+    }
     return '<span class="tracker-tick" aria-hidden="true">' + (on ? "\u2713" : "") + "</span>";
   }
 
@@ -166,7 +175,19 @@
     var ctx = surface.ctx;
     var task = surface.task;
     var S = structure();
-    if (!task || !S) return;
+    if (!task) return;
+    // A task that ASKED for a tracker and got no policy module is a wiring bug
+    // (kernel/grading/structure-match.js missing from ARCHETYPE_DEPS.build), and
+    // it fails invisibly - the panel simply never draws. Say so once.
+    if (!S) {
+      if (!warnedNoStructure && (task.blueprint || task.goalCheck)) {
+        warnedNoStructure = true;
+        if (typeof console !== "undefined" && console.warn) {
+          console.warn("[build] goal tracker disabled: window.KernelStructure was never loaded");
+        }
+      }
+      return;
+    }
 
     var wrap = ctx.hosts.blueprintWrap;
     var boxes = ctx.hosts.blueprint;
@@ -216,7 +237,7 @@
       var li = items[i];
       if (!li) continue;
       li.innerHTML = tick(met[i]) + (base[i] || "");
-      if (li.classList) li.classList.toggle("is-met", met[i]);
+      if (li.classList) li.classList.toggle("is-met", met[i] === true);
     }
     surface.goalMet = met;
   }

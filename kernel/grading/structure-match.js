@@ -106,17 +106,27 @@
     return ident ? ident[1] : "";
   }
 
-  // The tracker's whole payload: one boolean per gate, in the authored order,
+  // The tracker's whole payload: one verdict per gate, in the authored order,
   // so a caller can zip it straight onto the localized goal list.
+  //
+  // THREE verdicts, not two. A goal line may have no structural test at all -
+  // "run it and the output is FEED" is a claim about behaviour that only the
+  // compiler can settle - and its gate is authored as null. Those must not
+  // collapse into `false`, or a learner gets a tick that can never turn green
+  // and a validator gets a failure it cannot fix. null means UNTRACKED; false
+  // still means the shape is genuinely not there yet.
   function evaluate(types, gates) {
     if (!Array.isArray(gates)) return [];
-    return gates.map(function (gate) { return meets(types, gate); });
+    return gates.map(function (gate) {
+      return gate === null || gate === undefined ? null : meets(types, gate);
+    });
   }
 
   // Describe a gate for a validator's failure message. Not shown to learners -
   // their copy is the localized goal text this gate sits beside.
   function describe(gate) {
-    if (!gate || typeof gate !== "object") return "(not a gate)";
+    if (gate === null || gate === undefined) return "(no structural test)";
+    if (typeof gate !== "object") return "(not a gate)";
     var parts = [];
     if (gate.kind) parts.push(gate.kind);
     if (gate.type) parts.push(gate.type);

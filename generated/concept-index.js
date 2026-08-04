@@ -325,6 +325,26 @@
       "revisitedBy": [],
       "usedBy": []
     },
+    "gt-commit": {
+      "introducedBy": "git-first-commit",
+      "revisitedBy": [],
+      "usedBy": []
+    },
+    "gt-repository": {
+      "introducedBy": "git-first-commit",
+      "revisitedBy": [],
+      "usedBy": []
+    },
+    "gt-staging-area": {
+      "introducedBy": "git-first-commit",
+      "revisitedBy": [],
+      "usedBy": []
+    },
+    "gt-working-tree": {
+      "introducedBy": "git-first-commit",
+      "revisitedBy": [],
+      "usedBy": []
+    },
     "pr-abstract-type": {
       "introducedBy": "type-system",
       "revisitedBy": [
@@ -2066,6 +2086,16 @@
         "pr-class"
       ]
     },
+    "git-first-commit": {
+      "introduces": [
+        "gt-repository",
+        "gt-working-tree",
+        "gt-staging-area",
+        "gt-commit"
+      ],
+      "revisits": [],
+      "uses": []
+    },
     "good-code-check": {
       "introduces": [],
       "revisits": [
@@ -2978,6 +3008,22 @@
     "ai-working-memory": {
       "term": "Working memory",
       "def": "The context the model reads right now - the scratchpad for the task in hand, and the first thing to vanish as the chat rolls on."
+    },
+    "gt-commit": {
+      "term": "Commit",
+      "def": "A saved snapshot of the files you picked, with a short message saying what the change was."
+    },
+    "gt-repository": {
+      "term": "Repository",
+      "def": "The folder git is watching, together with every snapshot you have saved in it."
+    },
+    "gt-staging-area": {
+      "term": "Staging area",
+      "def": "The short list of files you have picked for the next commit, so you choose what goes in instead of saving everything."
+    },
+    "gt-working-tree": {
+      "term": "Working tree",
+      "def": "Your files as they are right now, before you have told git about them."
     },
     "pr-abstract-type": {
       "term": "Abstract type",

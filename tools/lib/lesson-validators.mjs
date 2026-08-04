@@ -24,6 +24,9 @@
  */
 import { CONFIG_GLOBALS, lessonBody } from "../lib.mjs";
 import { checkGitTask, gitRuntimeFrom } from "./git-validate.mjs";
+import { createRequire } from "node:module";
+
+const structure = createRequire(import.meta.url)("../../kernel/grading/structure-match.js");
 
 // Scene-panel roots a viz lesson may mount.
 export const PANEL_CLASSES = ["cl-tx", "cl-al", "cl-rg", "cl-pb", "cl-mv", "cl-ms", "cl-tr", "cl-ag"];
@@ -94,6 +97,7 @@ export function createValidators(deps) {
         if (re.test(t.solution)) ok(`${label} requireSource /${re.source}/ matches solution`);
         else { bad(`${label} requireSource /${re.source}/ does NOT match solution`); allOk = false; }
       }
+      checkTracker(t, label, () => { allOk = false; });
       if (t.verify && t.verify.main) {
         const probe = compileRun(buildProbe(t.solution, t.verify.main));
         if (!probe.built) { bad(`${label} verify probe did not compile\n${firstError(probe.errors)}`); allOk = false; }
@@ -104,6 +108,65 @@ export function createValidators(deps) {
       }
     });
     return allOk;
+  }
+
+  // The live goal tracker must be able to LIGHT UP. Every blueprint member and
+  // every goal gate is asserted against the authored solution, because a gate
+  // that can never be met is the worst kind of bug this repo keeps producing: a
+  // check that simply goes quiet. A learner would see a box that stays dashed no
+  // matter what they write, and conclude their correct answer was wrong.
+  function checkTracker(t, label, fail) {
+    const blueprint = t.blueprint || [];
+    const gates = t.goalCheck || [];
+    if (!blueprint.length && !gates.length) return;
+
+    const CL = deps.codeLab();
+    if (!CL || typeof CL.scanCSharp !== "function") {
+      bad(`${label} has a goal tracker but the vendored bundle exports no scanCSharp - re-vendor vendor/code-lab/code-lab.global.js`);
+      fail();
+      return;
+    }
+    const types = CL.scanCSharp(t.solution || "").types || [];
+
+    for (const want of blueprint) {
+      if (!structure.meets(types, { type: want.name, kind: want.kind })) {
+        bad(`${label} blueprint wants ${want.kind || "class"} ${want.name}, which the solution never declares`);
+        fail();
+        continue;
+      }
+      for (const base of want.bases || []) {
+        if (!structure.meets(types, { type: want.name, base })) {
+          bad(`${label} blueprint wants ${want.name} : ${base}, which the solution does not declare`);
+          fail();
+        }
+      }
+      for (const member of want.members || []) {
+        if (!structure.meets(types, { type: want.name, member: structure.symbolName(member) })) {
+          bad(`${label} blueprint wants ${want.name}.${structure.symbolName(member)} ("${member}"), which the solution does not declare`);
+          fail();
+        }
+      }
+    }
+
+    // A gate is index-aligned with the localized goal prose it ticks, so a
+    // count mismatch silently attaches ticks to the wrong sentences.
+    const goals = (t.goal || []).length;
+    if (gates.length && goals && gates.length !== goals) {
+      bad(`${label} has ${gates.length} goalCheck gate(s) for ${goals} goal line(s) - they are index-aligned, so the counts must match`);
+      fail();
+    }
+    // null is authored on purpose: that goal line is a claim about OUTPUT, not
+    // about shape, so only the compiler can settle it. Anything else must light
+    // up on the solution or it is a checklist item nobody can ever complete.
+    structure.evaluate(types, gates).forEach((met, i) => {
+      if (met === false) {
+        bad(`${label} goalCheck[${i}] (${structure.describe(gates[i])}) is NOT met by the solution - it could never tick`);
+        fail();
+      }
+    });
+    if (blueprint.length || gates.length) {
+      ok(`${label} goal tracker lights up fully on the solution (${blueprint.length} box(es), ${gates.length} gate(s))`);
+    }
   }
 
   // A practice lesson fills a card title from its config.

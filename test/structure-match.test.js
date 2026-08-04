@@ -175,3 +175,27 @@ public class Cat : IAnimal { public string Speak() { return "Meow"; } }`;
   assert.equal(S.meets(types, { type: "Cat", base: "IAnimal", member: "Speak" }), true);
   assert.equal(S.meets(types, { type: "Cat", kind: "interface" }), false);
 });
+
+// A goal line like "run it and the output is FEED" has no shape to test - only
+// the compiler can settle it - so its gate is authored as null. null must stay
+// distinct from false all the way through, or the UI paints a tick that can
+// never turn green and the validator reports a failure nobody can fix.
+test("a null gate is UNTRACKED, not unmet", () => {
+  const types = CodeLab.scanCSharp(SPLIT).types;
+  assert.deepEqual(
+    Array.from(S.evaluate(types, [{ type: "Cat" }, null, undefined, { type: "Nope" }])),
+    [true, null, null, false]
+  );
+});
+
+test("a malformed gate is still unmet, not untracked", () => {
+  const types = CodeLab.scanCSharp(SPLIT).types;
+  assert.deepEqual(Array.from(S.evaluate(types, ["Cat", 7, {}])), [false, false, false]);
+});
+
+test("describe tells an authored null apart from a broken gate", () => {
+  assert.equal(S.describe(null), "(no structural test)");
+  assert.equal(S.describe(undefined), "(no structural test)");
+  assert.equal(S.describe("Cat"), "(not a gate)");
+  assert.equal(S.describe({}), "(empty gate)");
+});
