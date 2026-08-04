@@ -3,11 +3,11 @@ name: lesson-authoring
 description: >-
   Author or edit a lesson in the C# junior-to-architect course (this repo).
   USE FOR: adding a new theory/drill/build/checkpoint lesson; editing lesson
-  prose (intro, concept, context, goal, quiz, summary); wiring a lesson card into
-  index.html; choosing the right archetype and engine; getting XP/data-total and
-  prefix conventions right; verifying a lesson compiles and renders. DO NOT USE
-  FOR: changing the engines themselves (drill-engine/build-engine/page-shell) or
-  the Roslyn/Blazor host (that is engine work, see copilot-instructions);
+  prose (intro, concept, context, goal, quiz, summary); choosing the right
+  archetype (build/drill/viz/checkpoint); getting XP/total and prefix conventions
+  right; verifying a lesson compiles and renders. DO NOT USE FOR: changing the
+  engine itself (the generic `kernel/engine/` core + its plugins, or page-shell)
+  or the Roslyn/Blazor host (that is engine work, see copilot-instructions);
   auditing existing content (use the course-audit skill).
 ---
 
@@ -27,20 +27,18 @@ runner, editor, or page controller. If you think you need one, re-read
 3. `AGENTS.md` (root) - the prose voice rules. Non-negotiable, and iterated: when
    your prose misses the author's voice, expect the author to sharpen `AGENTS.md`
    and ask you to regenerate.
-4. `.github/copilot-instructions.md` - architecture and the generated
-   "How to add a lesson" flow. (The legacy flat-flow config shapes and load
-   orders live in this skill's "Legacy flow" section below, not there.)
+4. `.github/copilot-instructions.md` - architecture (the one generic engine +
+   archetype plugins) and the generated "How to add a lesson" flow.
 5. `.github/instructions/code-editor.instructions.md` - Monaco-only, reuse-first.
 6. `docs/audit/README.md` - what already exists, so you slot in without
    duplicating or contradicting a neighbour, and so you avoid the known traps.
 
 ## Procedure
 
-The course is migrating to a generated, per-directory layout
-(`content/<track>/<NN-part>/<NN-lesson>/`). New and migrated lessons MUST use the
-generated flow. The old flat `<name>.js` + `<name>.html` flow is **legacy** -
-still valid for the many not-yet-migrated lessons, but do NOT author a new flat
-lesson.
+Every lesson lives in the generated, per-directory layout
+(`content/<track>/<NN-part>/<NN-lesson>/`) - all 83 are migrated. Author only
+through the generated flow below; the old flat `<name>.js` + `<name>.html` layout
+and the per-archetype engines it loaded are gone.
 
 1. **Log start** in `docs/work-log.md` with a real `date` timestamp.
 2. **Place the lesson**: which track (Practical / Theory) and which Part. Find its
@@ -48,10 +46,10 @@ lesson.
    `docs/audit/<track>/` so the new rung follows from the previous one and uses
    only concepts at or above its ledger row.
 3. **Pick the archetype** from the SPECS table. For a practical lesson prefer
-   `build` (real code, Run) over `drill` - `build` is the only archetype with live
-   instances under `content/`, so `drill`/`checkpoint` are scaffoldable but
-   unproven in the generated pipeline. Copy the closest existing lesson's data
-   as the structural starting point.
+   `build` (real code, Run) over `drill`. `build`, `viz`, and `checkpoint` all
+   have live instances under `content/` and run through the generic engine + their
+   plugin; `drill` is scaffoldable but has no live instance yet. Copy the closest
+   existing lesson's data as the structural starting point.
 
 ### Target flow (generated) — for new or migrated lessons
 
@@ -117,68 +115,6 @@ lesson.
    itself, so there is nothing to delete.
 10. **Log end** in `docs/work-log.md` with a real `date` timestamp.
 
-### Legacy flow (flat files) — only for not-yet-migrated lessons
-
-The cadence invariants are the same; only the file split and the hand-written
-page differ. Do NOT author a new flat lesson - this is only for editing one that
-has not migrated yet.
-
-**Quiz + fill-in-the-blank (theory or runnable drills) - `drill-engine`:**
-
-1. `<name>.js` sets `window.DRILL_CONFIG`:
-   - `prefix`, `metaLabel`, `progressNoun`, `awardedKey`, `awardAmount`,
-     `drills: [...]`.
-   - Each drill: `{ title, concept, context, snippet (with {{1}} blanks), points[],
-     blanks[{ id, label, answer, accept?[], hints[], explain[{ text, highlight }] }] }`.
-   - Optional per-card `quiz: { question, options[{ text, correct }], answerWhy }`
-     (the right option is also required to award XP).
-   - Optional final `{ summary: true, summaryIntro, summaryItems[{title,text}],
-     summaryClose, blanks: [] }` recap card (excluded from the progress count).
-   - For runnable drills, add `runnablePrograms` (index-aligned, complete programs)
-     plus `runnerUrl`, `xpKey`. Pure-theory lessons omit these (no Run button).
-2. `<name>.html` (copy `control-flow.html` for theory, `collections.html` for
-   runnable) sets `window.PAGE` (`archetype: "drill"`, matching `prefix`). Load
-   order: Prism (3 tags) -> `vendor/code-lab/code-lab.global.js` -> `page-shell.js`
-   -> `<name>.js` -> `drill-engine.js`.
-
-**Write-from-scratch - `build-engine`:**
-
-1. `<name>.js` sets `window.BUILD_CONFIG` (`prefix`, `tasks[]`, `runnerUrl`,
-   `xpKey`, `awardedKey`, `awardAmount`).
-   - Each task: `{ title, concept, context, example?, goal[], expected,
-     requireSource?[{ pattern, message }], verify?{ main, expected, message },
-     starter, solution }`.
-   - `expected`: a string (any output line equals it) or an array (the non-empty
-     lines must equal that exact sequence).
-   - `verify.main` MUST start with `class Program` - the engine replaces the
-     learner's source from `class Program` onward with it to re-run hidden inputs.
-2. `<name>.html` (copy `first-builds.html`) `archetype: "build"`. Load order:
-   `vendor/code-lab/code-lab.global.js` -> `page-shell.js` -> `<name>.js` ->
-   `build-engine.js`. No Prism, no separate Monaco loader - `code-lab` ships Monaco
-   via `CodeLab.loadMonaco()`.
-
-**Wire the card** into the right Part stage in `index.html`:
-
-```html
-<li class="c-step">
-  <a class="c-card" href="<name>.html" data-key="<name>_awarded" data-total="<N>">
-    <span class="c-node" aria-hidden="true"></span>
-    <div class="c-card-top">
-      <h3 class="c-card-title">Title</h3>
-      <span class="c-status">Not started</span>
-    </div>
-    <p class="c-card-blurb">One or two plain sentences.</p>
-    <div class="c-card-meta">
-      <span class="c-pill c-pill--gentle">Gentle</span>
-      <span class="c-meta-time">20 min</span>
-    </div>
-  </a>
-</li>
-```
-
-`data-total` = XP-awarding cards (exclude the recap summary card). `data-key`
-must match the lesson's `awardedKey`. Pills: `gentle` / `steady` / `challenging`.
-
 ## Preflight checklist (run before calling it done)
 
 - [ ] Every concept and token used is at or above this lesson's ledger row.
@@ -204,24 +140,7 @@ scenes)".)
 
 Under the generated flow a viz lesson is `archetype: viz`; its scene data lives
 in the lesson dir's `viz.js` (`window.LESSON_CONFIG`) and its `index.html` is
-generated. The two-file mechanics below are the **legacy** flat layout, still
-valid for not-yet-migrated `ai-N.*` / `theory-N.viz.js` lessons.
-
-Two files, same split as the other archetypes:
-
-- `ai-N.html` - sets `window.PAGE` (hero `eyebrow`/`title`/`intro`, a unique
-  `prefix` like `ai14`, a `links` back-to-course). Load order:
-  `vendor/code-lab/code-lab.global.js` -> `ai-N.viz.js` -> `page-shell.js`.
-  No Prism, no Monaco, no `archetype` key.
-- `ai-N.viz.js` - data only:
-  `window.LESSON_VIZ = { code:[], legend:[...], layout:{ visual:[{type}],
-  aside:[{type:"narration"},{type:"controls"}] }, steps:[{ narr, <field>:{...} }] }`.
-
-`page-shell` derives the rest from the filename - do NOT set these in the viz
-file: `awardedKey` (`ai-14.html` -> `ai_14_awarded`), `xpKey`, and `nextHref`
-(from the `THEORY`/`PRACTICAL` arrays in `page-shell.js`). When you add a viz
-lesson you MUST add its filename to the right array in `page-shell.js` in reading
-order, or the next-lesson button skips it.
+generated.
 
 **One visual per lesson.** `layout.visual` is a single panel type for the whole
 lesson; you cannot switch panels between steps. Each step re-states its scene
