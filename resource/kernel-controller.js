@@ -68,6 +68,22 @@
   var settings = null;
   var surfaces = []; // the Localizable surfaces, in order: [hero, buildWidget].
 
+  // Register a Localizable surface. Fails loudly if the object lacks setLocale -
+  // a silent skip would leave part of the page in English with no diagnostic.
+  // Non-fatal (console.error, not throw) because a thrown error would blank the
+  // learner's page - loud but survivable is the right trade-off for a student.
+  function registerSurface(name, surface) {
+    if (!surface) return;
+    if (typeof surface.setLocale !== "function") {
+      console.error(
+        "[kernel-controller] Localizable contract violated: surface \"" + name +
+        "\" was registered but lacks a setLocale() method. The language swap will skip it."
+      );
+      return;
+    }
+    surfaces.push(surface);
+  }
+
   var voicePref = global.ResourcePreference.create({
     storageKey: "course_lesson_voice", values: voices, defaultValue: defaultVoice,
     onChange: relocalize
@@ -173,7 +189,16 @@
       bind(arr[0]); // refresh PAGE.hero.intro + LESSON_CONFIG once, before the fan-out
       buildConceptSource(langPref.get()); // gen-guarded: never sets a stale source
       surfaces.forEach(function (s) {
-        if (s && typeof s.setLocale === "function") s.setLocale();
+        if (s && typeof s.setLocale === "function") {
+          s.setLocale();
+        } else {
+          // Should never reach here if registerSurface is the only insertion path,
+          // but guard against direct .push() regressions.
+          console.error(
+            "[kernel-controller] relocalize: surface in array lacks setLocale():",
+            s
+          );
+        }
       });
     });
   }
@@ -193,11 +218,11 @@
     })
     .then(function () {
       mountSettings();
-      if (global.PageShellHero) surfaces.push(global.PageShellHero);
-      if (global.PageShellChrome) surfaces.push(global.PageShellChrome);
+      registerSurface("PageShellHero", global.PageShellHero);
+      registerSurface("PageShellChrome", global.PageShellChrome);
       // The concept panel + agenda are page-shell content; hold PageShellConcepts
       // as a Localizable surface so a language swap re-localizes them.
-      if (global.PageShellConcepts) surfaces.push(global.PageShellConcepts);
+      registerSurface("PageShellConcepts", global.PageShellConcepts);
 
       // Every archetype now boots the ONE generic lesson engine + its plugin.
       // page-shell renders only the hero, the concept agenda, and - for build - the
@@ -208,7 +233,14 @@
       // setLocale } shape the controller holds as a Localizable surface.
       var cfg = global.LESSON_CONFIG;
       var archetype = global.LESSON_META && global.LESSON_META.archetype;
-      if (!cfg || !archetype) return;
+      if (!cfg || !archetype) {
+        console.error(
+          "[kernel-controller] Cannot boot lesson widget: " +
+          (!cfg ? "LESSON_CONFIG is missing" : "LESSON_META.archetype is missing") +
+          ". The lesson body will not render."
+        );
+        return;
+      }
       cfg.archetype = archetype;
       var chain = Promise.resolve();
       // A practice plugin grades through a kernel/grading module; load it first.
@@ -221,7 +253,7 @@
         .then(function () {
           if (global.LessonEngine) {
             var widget = global.LessonEngine.create(cfg);
-            surfaces.push(widget);
+            registerSurface("LessonEngine(" + archetype + ")", widget);
             return widget.boot();
           }
         });

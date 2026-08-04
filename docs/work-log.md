@@ -1126,3 +1126,23 @@ lessons carry a valid meta.js today, so this was latent, not live. Measured: wit
 Now it fails outright. It does not guess: build and drill share the `tasks` body
 field, so a data.js sniff cannot tell them apart, and mis-verifying is worse than
 refusing. Two regression guards added (2/2 mutations caught); suite 235/235.
+
+## 2026-08-04 09:45 - enforce the Localizable role, and a report format for the owner
+The language-swap contract was duck-typed and failed silently: kernel-controller
+fanned setLocale() over its surfaces with `if (typeof s.setLocale === "function")`,
+so a surface registered WITHOUT the method was skipped without a word - that part
+of the page just stayed English and nothing reported it. Same bug class as the
+empty-lesson gap: a check that goes quiet when something is missing. Now a
+`registerSurface(name, surface)` helper names each surface and console.errors a
+contract violation, and the `!cfg || !archetype` early return says which one is
+missing instead of returning mute. Deliberately console.error, NOT throw: this runs
+in a learner's browser and a throw would blank a working lesson.
+NEW test/localizable-contract.test.js (7 assertions): every plugin exposes
+setLocale, no raw surfaces.push outside the helper, both guards stay loud. These
+are SOURCE guards - kernel-controller is a browser IIFE and cannot be imported -
+and they strip comments first so a commented-out guard cannot pass. Mutation-checked
+independently of the authoring agent (silence the error / restore a raw push): 2/2
+caught. Suite 241/241, validate 0 errors, 3 lessons render + swap EN/ES.
+Also: recorded the owner's preferred report format (short plain tables, bold
+verdicts, state what was NOT verified) in .github/copilot-instructions.md so
+future agents default to it.

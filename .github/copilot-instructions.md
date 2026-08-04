@@ -246,3 +246,20 @@ Two parallel tracks are planned, chosen from `index.html`:
   arc — what a computer is, how code runs, foundations of good code, then design.
   It reuses the same `drill-engine` quiz + fill-blank, with blanks filled in prose
   rather than code.
+
+## Reporting back to the owner
+
+The owner reads fast and finds long prose tiring. Report in **short tables, plain
+language, no jargon**. This applies to agents and subagents alike.
+
+- Lead with **one plain sentence**: what was asked, what happened.
+- Then a table. Two columns is usually enough: `What` / `Result`. **Bold the verdict**
+  word (**Yes** / **No** / **False** / **Zero**), so it is readable at a glance.
+- Findings go in their own table: `What` / `Why it matters` / `Fixed?`.
+- Explain in everyday words. Not "vacuous pass" but "said passed without checking".
+- End with a short numbered pick-list of what could happen next. Let the owner choose;
+  do not start a long job unasked.
+- **Say what you did not verify.** A gap stated plainly is worth more than a clean
+  summary that hides it. If a check was a source-text guard rather than a real
+  behavioural test, say so. Never imply something passed when it was not run.
+- No emojis, no marketing language, no filler praise.
