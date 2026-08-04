@@ -9,8 +9,8 @@
 
   const tasks = [
     {
-      example: "int a = 6;\nint b = 4;\nConsole.WriteLine(a + b);   // 10\nConsole.WriteLine(a * b);   // 24",
-      expected: "12",
+      example: "int a = 14;\nint b = 4;\nConsole.WriteLine(a / b);   // 3  - whole times b fits\nConsole.WriteLine(a % b);   // 2  - what is left over",
+      expected: ["12", "2"],
       requireSource: [
         {
           pattern: /int\s+apples\s*=\s*3\s*;/,
@@ -23,10 +23,18 @@
         {
           pattern: /apples\s*\*\s*baskets|baskets\s*\*\s*apples/,
           message: "Multiply the two variables: `apples * baskets`."
+        },
+        {
+          pattern: /int\s+treats\s*=\s*14\s*;/,
+          message: "Declare `int treats = 14;`."
+        },
+        {
+          pattern: /treats\s*%\s*baskets/,
+          message: "Use the remainder operator: `treats % baskets`."
         }
       ],
-      starter: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        // TODO: int apples = 3, int baskets = 4, then print apples * baskets\n    }\n}\n",
-      solution: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int apples = 3;\n        int baskets = 4;\n        Console.WriteLine(apples * baskets);\n    }\n}\n"
+      starter: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        // TODO: int apples = 3, int baskets = 4, then print apples * baskets\n        // TODO: int treats = 14, then print treats % baskets\n    }\n}\n",
+      solution: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int apples = 3;\n        int baskets = 4;\n        Console.WriteLine(apples * baskets);\n\n        int treats = 14;\n        Console.WriteLine(treats % baskets);\n    }\n}\n"
     },
     {
       example: "string first = \"Ada\";\nConsole.WriteLine(\"Hello, \" + first);   // Hello, Ada",

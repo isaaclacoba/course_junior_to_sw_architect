@@ -2989,7 +2989,7 @@
     },
     "pr-arithmetic": {
       "term": "Arithmetic",
-      "def": "Computing a new value from existing ones with + - * /."
+      "def": "Computing a new value from existing ones with + - * / %."
     },
     "pr-array": {
       "term": "Array",

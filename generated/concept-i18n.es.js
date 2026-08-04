@@ -204,7 +204,7 @@
       "term": "Modificador de acceso"
     },
     "pr-arithmetic": {
-      "def": "Calcular un valor nuevo a partir de otros con + - * /.",
+      "def": "Calcular un valor nuevo a partir de otros con + - * / %.",
       "term": "Aritmética"
     },
     "pr-array": {

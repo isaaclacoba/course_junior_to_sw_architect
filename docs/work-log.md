@@ -1171,3 +1171,22 @@ vars [rex:Dog], `rex.` -> [Name,Bark], unknown receiver -> null.
 Submodule commit 01096d0 (also on branch monaco-user-symbols so the detached
 HEAD cannot orphan it); it descends from the other session's dbe28d0, so the
 pointer bump carries their git-cli work forward rather than dropping it.
+
+## 2026-08-04 10:34 - the course never taught `%`, and `**` does not exist
+
+Owner asked where `**` (power) and `%` are taught. Answer: nowhere. Checked
+with the real compiler first rather than from memory - `2 ** 10` is CS0193, C#
+has no power operator at all, and `%` is the remainder, not a percentage (the
+question itself carried that confusion, so the prose now says it outright).
+Extended task 1 "Arithmetic" of practice-the-basics instead of adding a task:
+new `treats = 14`, `treats % baskets` -> 2 beat, `expected` promoted from a
+string to the ordered array ["12","2"], two new requireSource gates, plus a
+one-line `Math.Pow(2, 10)` note so the power question is answered where it is
+asked. EN and ES both, so Spanish does not regress.
+The first mutation canary silently did not apply - `int treats = 14;` occurs
+twice (solution AND its requireSource message) and the count assert caught it.
+Retargeted at the solution alone: 15 % 4 = 3 correctly FAILS both the output
+check and the gate, so the new second output line is genuinely graded.
+validate 0 errors, check-i18n PASS, check-literals PASS, 241/241, verify-lesson
+5/5 with real dotnet, headless EN+ES show the bullet, the goal and the note with
+0 undefined. No index.html regeneration needed - the page embeds no task prose.
