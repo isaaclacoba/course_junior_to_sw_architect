@@ -440,6 +440,7 @@ ${result.runtimeError}`.trim(),
   var TextareaEditor = class {
     constructor(highlighter) {
       this.language = "csharp";
+      this.listeners = [];
       this.highlighter = highlighter ?? defaultHighlighter();
     }
     mount(host, opts) {
@@ -471,6 +472,18 @@ ${result.runtimeError}`.trim(),
       const text = this.textarea.value;
       this.code.innerHTML = this.highlighter.highlight(text + "\n", this.language);
       this.syncScroll();
+      this.emit(text);
+    }
+    // Every path that changes the buffer funnels through sync(), so notifying
+    // here covers typing AND setValue - the same events Monaco reports.
+    emit(value) {
+      for (const listener of this.listeners.slice()) listener(value);
+    }
+    onChange(listener) {
+      this.listeners.push(listener);
+      return () => {
+        this.listeners = this.listeners.filter((l) => l !== listener);
+      };
     }
     syncScroll() {
       if (!this.pre || !this.textarea) return;
@@ -490,6 +503,7 @@ ${result.runtimeError}`.trim(),
       if (this.textarea) this.textarea.readOnly = readOnly;
     }
     destroy() {
+      this.listeners = [];
       this.wrap?.remove();
       this.wrap = void 0;
       this.pre = void 0;
@@ -556,6 +570,15 @@ ${result.runtimeError}`.trim(),
     }
     getValue() {
       return this.editor ? this.editor.getValue() : "";
+    }
+    // Notify on every buffer edit, including setValue, so a host can mirror the
+    // source without polling. Monaco's disposable is handed back as a plain
+    // unsubscribe function, keeping monaco's types out of the adapter contract.
+    onChange(listener) {
+      if (!this.editor) return () => {
+      };
+      const sub = this.editor.onDidChangeModelContent(() => listener(this.getValue()));
+      return () => sub.dispose();
     }
     setValue(value) {
       if (this.editor) this.editor.setValue(value);
@@ -881,6 +904,13 @@ ${result.runtimeError}`.trim(),
   function isIdent(s) {
     return /^[A-Za-z_][A-Za-z0-9_]*$/.test(s);
   }
+  function baseList(segment) {
+    const noParams = segment.replace(/\([^)]*\)/g, "");
+    const noWhere = noParams.split(/\bwhere\b/)[0];
+    const colon = noWhere.indexOf(":");
+    if (colon === -1) return [];
+    return noWhere.slice(colon + 1).split(",").map((part) => bareType(part)).filter(isIdent);
+  }
   function bareType(raw) {
     return raw.replace(/<.*>/, "").replace(/\[[\s,]*\]/g, "").replace(/\?$/, "").trim();
   }
@@ -977,6 +1007,9 @@ ${result.runtimeError}`.trim(),
       const after = src.slice(m.index + m[0].length);
       const positional = after.match(/^\s*\(([^)]*)\)/);
       const open = src.indexOf("{", m.index + m[0].length);
+      const semi = src.indexOf(";", m.index + m[0].length);
+      const declEnd = open === -1 ? semi === -1 ? src.length : semi : semi === -1 ? open : Math.min(open, semi);
+      const bases = baseList(src.slice(m.index + m[0].length, declEnd));
       let members = [];
       if (positional) {
         members = positional[1].split(",").map((p) => p.trim()).filter(Boolean).map((p) => {
@@ -999,7 +1032,7 @@ ${result.runtimeError}`.trim(),
           }
         }
       }
-      if (isIdent(name) && !types.some((t) => t.name === name)) types.push({ name, kind, members });
+      if (isIdent(name) && !types.some((t) => t.name === name)) types.push({ name, kind, members, bases });
     }
     const seenVar = /* @__PURE__ */ new Set();
     const varRe = /\bvar\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*new\s+([A-Za-z_][A-Za-z0-9_<>,.\[\]]*)/g;

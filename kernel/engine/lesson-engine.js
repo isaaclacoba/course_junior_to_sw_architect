@@ -96,6 +96,8 @@
     example: "Example",
     expected: "Expected",
     goal: "Goal",
+    blueprint: "Blueprint",
+    blueprintWrap: "BlueprintWrap",
     points: "Points",
     quiz: "Quiz",
     output: "Output",

@@ -16,11 +16,27 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 
+const fs = require("node:fs");
+const path = require("node:path");
+const vm = require("node:vm");
+
 const LessonCommon = require("../kernel/page-shell/lesson-common.js");
 const KernelGrading = require("../kernel/grading/output-match.js");
 const LessonEngine = require("../kernel/engine/lesson-engine.js");
 // Requiring the plugin registers it on the core it require()s (same cached module).
 const BuildPlugin = require("../kernel/engine/plugins/build-plugin.js");
+const KernelStructure = require("../kernel/grading/structure-match.js");
+
+// The vendored bundle, evaluated once, for its real scanCSharp.
+const realScanCSharp = (() => {
+  const file = path.join(__dirname, "..", "vendor", "code-lab", "code-lab.global.js");
+  const sandbox = { window: {}, console };
+  sandbox.globalThis = sandbox;
+  vm.createContext(sandbox);
+  vm.runInContext(fs.readFileSync(file, "utf8"), sandbox);
+  const CL = sandbox.CodeLab || sandbox.window.CodeLab;
+  return CL.scanCSharp;
+})();
 
 // ---- minimal fake DOM ------------------------------------------------------
 function makeEl(id) {
@@ -57,6 +73,7 @@ function makeDom(prefix) {
     // build host roles
     "Editor", "Example", "Expected", "Output", "Errors",
     "Run", "Solution", "Reset",
+    "Blueprint", "BlueprintWrap",
   ].map((s) => prefix + s);
   const registry = {};
   ids.forEach((id) => { registry[id] = makeEl(id); });
@@ -71,11 +88,15 @@ function makeDom(prefix) {
 // Roslyn runner whose run() returns a SCRIPTED result queue (or a default).
 function makeCodeLab(runQueue) {
   let buffer = "";
+  const watchers = [];
   const editor = {
     mount(host, opts) { buffer = (opts && opts.value) || ""; return Promise.resolve(); },
     getValue() { return buffer; },
-    setValue(v) { buffer = v; },
+    setValue(v) { buffer = v; watchers.forEach((w) => w(v)); },
     setMarkers() {},
+    onChange(fn) { watchers.push(fn); return () => watchers.splice(watchers.indexOf(fn), 1); },
+    // Simulate typing, which is the only way the tracker updates mid-card.
+    _type(v) { this.setValue(v); },
   };
   const runner = {
     warmed: false,
@@ -89,6 +110,9 @@ function makeCodeLab(runQueue) {
     loadMonaco() { return Promise.resolve(); },
     MonacoEditor: function () { return editor; },
     RoslynIframeRunner: function () { return runner; },
+    // The REAL scanner from the vendored bundle, so the tracker is tested
+    // against the same code that drives it in the browser.
+    scanCSharp: realScanCSharp,
     _editor: editor,
     _runner: runner,
   };
@@ -97,7 +121,7 @@ function makeCodeLab(runQueue) {
 // Install fake browser globals for the length of fn, then restore.
 async function withDom(prefix, runQueue, fn) {
   const saved = {};
-  ["document", "window", "history", "location", "LessonCommon", "KernelGrading", "CodeLab"].forEach((k) => {
+  ["document", "window", "history", "location", "LessonCommon", "KernelGrading", "KernelStructure", "CodeLab"].forEach((k) => {
     saved[k] = { had: Object.prototype.hasOwnProperty.call(globalThis, k), val: globalThis[k] };
   });
   const dom = makeDom(prefix);
@@ -110,6 +134,7 @@ async function withDom(prefix, runQueue, fn) {
   globalThis.LessonCommon = LessonCommon;
   globalThis.KernelGrading = KernelGrading; // the REAL grader
   globalThis.CodeLab = codeLab;
+  globalThis.KernelStructure = KernelStructure; // the REAL structure policy
   try {
     return await fn(dom, codeLab);
   } finally {
@@ -240,5 +265,157 @@ test("Reset restores the starter", async () => {
     codeLab._editor.setValue("garbage the learner typed");
     dom.getElementById("bdReset").click();
     assert.match(codeLab._editor.getValue(), /TODO/);
+  });
+});
+
+// ---- the live goal tracker -------------------------------------------------
+// The blueprint and the goal ticks read the learner's buffer through the REAL
+// scanner and the REAL structure policy, so these prove the whole chain, not a
+// mock of it. The tracker is a guide: it must never award anything.
+
+// A task whose shape is the split Cat/FeedingSign - the SRP move the lesson
+// teaches - so the tracker has something to light up one piece at a time.
+function trackerConfig() {
+  const cfg = buildConfig();
+  cfg.tasks[0].goal = ["give `Cat` an `IsHungry()`", "write a `FeedingSign`", "no method does both"];
+  cfg.tasks[0].blueprint = [
+    { name: "Cat", kind: "class", members: ["bool IsHungry()"] },
+    { name: "FeedingSign", kind: "class", members: ["string Format(bool hungry)"] },
+  ];
+  cfg.tasks[0].goalCheck = [
+    { type: "Cat", member: "IsHungry" },
+    { type: "FeedingSign", member: "Format" },
+    { absent: "CheckAndSign" },
+  ];
+  return cfg;
+}
+
+const HALF = "public class Cat { public bool IsHungry() { return true; } }";
+const WHOLE =
+  HALF + '\npublic class FeedingSign { public string Format(bool hungry) { return hungry ? "FEED" : "FULL"; } }';
+
+test("the blueprint is shown for a task that declares one, and hidden otherwise", async () => {
+  await withDom("bd", [], async (dom) => {
+    await LessonEngine.create(trackerConfig()).boot();
+    assert.equal(dom.getElementById("bdBlueprintWrap").hidden, false);
+    assert.match(dom.getElementById("bdBlueprint").innerHTML, /Cat/);
+  });
+  await withDom("bd", [], async (dom) => {
+    await LessonEngine.create(buildConfig()).boot(); // no blueprint authored
+    assert.equal(dom.getElementById("bdBlueprintWrap").hidden, true);
+  });
+});
+
+test("a blueprint box lights up only once its own members are declared", async () => {
+  await withDom("bd", [], async (dom, codeLab) => {
+    await LessonEngine.create(trackerConfig()).boot();
+    const html = () => dom.getElementById("bdBlueprint").innerHTML;
+    // Match only a box's own opening tag - bp-box-head and bp-chip also carry
+    // an is-met class, so a substring search would read the wrong element.
+    const boxes = () => [...html().matchAll(/<div class="bp-box( is-met)?">/g)].map((m) => !!m[1]);
+
+    // The starter declares neither type: both boxes are ghosts.
+    assert.deepEqual(boxes(), [false, false], "nothing should be met on the starter");
+
+    codeLab._editor._type(HALF);
+    assert.deepEqual(boxes(), [true, false], "Cat is declared, FeedingSign is not");
+
+    codeLab._editor._type(WHOLE);
+    assert.deepEqual(boxes(), [true, true]);
+  });
+});
+
+test("the member signature is shown as the hint, and lights per member", async () => {
+  await withDom("bd", [], async (dom, codeLab) => {
+    await LessonEngine.create(trackerConfig()).boot();
+    const html = () => dom.getElementById("bdBlueprint").innerHTML;
+    // The signature is the help: it says what to write without writing it.
+    assert.match(html(), /bool IsHungry\(\)/);
+    assert.match(html(), /string Format\(bool hungry\)/);
+    assert.equal(/<li class="bp-chip is-met">bool IsHungry\(\)/.test(html()), false);
+
+    codeLab._editor._type(HALF);
+    assert.equal(/<li class="bp-chip is-met">bool IsHungry\(\)/.test(html()), true);
+  });
+});
+
+test("a declared type with a missing member stays unmet", async () => {
+  await withDom("bd", [], async (dom, codeLab) => {
+    await LessonEngine.create(trackerConfig()).boot();
+    codeLab._editor._type("public class Cat { }");
+    const html = dom.getElementById("bdBlueprint").innerHTML;
+    const boxes = [...html.matchAll(/<div class="bp-box( is-met)?">/g)].map((m) => !!m[1]);
+    assert.deepEqual(boxes, [false, false], "an empty Cat is not the shape asked for");
+  });
+});
+
+test("goal items get a tick as their gate is met, and keep their prose", async () => {
+  await withDom("bd", [], async (dom, codeLab) => {
+    await LessonEngine.create(trackerConfig()).boot();
+    const items = dom.getElementById("bdGoal").children;
+    assert.equal(items.length, 3);
+
+    // The starter has no CheckAndSign, so gate 3 is met from the start.
+    assert.equal(items[2].classList.contains("is-met"), true);
+    assert.equal(items[0].classList.contains("is-met"), false);
+
+    codeLab._editor._type(WHOLE);
+    assert.equal(items[0].classList.contains("is-met"), true);
+    assert.equal(items[1].classList.contains("is-met"), true);
+    // The localized prose the core painted survives the tick.
+    assert.match(items[0].innerHTML, /IsHungry/);
+    assert.match(items[1].innerHTML, /FeedingSign/);
+  });
+});
+
+test("ticks do not accumulate when the same goal is repainted many times", async () => {
+  await withDom("bd", [], async (dom, codeLab) => {
+    await LessonEngine.create(trackerConfig()).boot();
+    const li = dom.getElementById("bdGoal").children[0];
+    for (let i = 0; i < 5; i++) {
+      codeLab._editor._type(WHOLE);
+      codeLab._editor._type("");
+    }
+    codeLab._editor._type(WHOLE);
+    const ticks = (li.innerHTML.match(/tracker-tick/g) || []).length;
+    assert.equal(ticks, 1, `goal item grew ${ticks} ticks`);
+  });
+});
+
+test("a met tracker awards nothing on its own - only a real run can pass a card", async () => {
+  await withDom("bd", [], async (dom, codeLab) => {
+    await LessonEngine.create(trackerConfig()).boot();
+    codeLab._editor._type(WHOLE); // every gate met
+    assert.equal(dom.getElementById("bdResult").hidden, true);
+    assert.match(dom.getElementById("courseXpLabel").textContent, /\b0\b/);
+  });
+});
+
+test("the tracker survives an editor that cannot report changes", async () => {
+  await withDom("bd", [], async (dom, codeLab) => {
+    delete codeLab._editor.onChange;
+    await LessonEngine.create(trackerConfig()).boot();
+    // Still painted once from the starter; simply not live.
+    assert.equal(dom.getElementById("bdBlueprintWrap").hidden, false);
+    assert.match(dom.getElementById("bdBlueprint").innerHTML, /Cat/);
+  });
+});
+
+test("the blueprint stays hidden when the bundle has no scanner", async () => {
+  await withDom("bd", [], async (dom, codeLab) => {
+    delete codeLab.scanCSharp;
+    await LessonEngine.create(trackerConfig()).boot();
+    assert.equal(dom.getElementById("bdBlueprintWrap").hidden, true, "a panel that can never light up must not show");
+  });
+});
+
+test("Show Solution lights the whole blueprint", async () => {
+  await withDom("bd", [], async (dom) => {
+    const cfg = trackerConfig();
+    cfg.tasks[0].solution = WHOLE + "\nclass Program { static void Main() { } }";
+    await LessonEngine.create(cfg).boot();
+    dom.getElementById("bdSolution").click();
+    const html = dom.getElementById("bdBlueprint").innerHTML;
+    assert.equal((html.match(/bp-box is-met/g) || []).length, 2, "the authored solution must satisfy its own blueprint");
   });
 });

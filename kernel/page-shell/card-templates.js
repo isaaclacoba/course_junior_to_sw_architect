@@ -122,6 +122,12 @@
           </p>
         </section>
 
+        <section id="${p}BlueprintWrap" class="blueprint" hidden>
+          <h3${tAttr("card.blueprint")}>${tHtml("card.blueprint", "The shape to build")}</h3>
+          <p class="context"${tAttr("card.blueprintHint")}>${tHtml("card.blueprintHint", "Dashed means your code has not declared it yet. It fills in as you type - it is read from your own code, and it is not the answer.")}</p>
+          <div id="${p}Blueprint" class="bp-boxes"></div>
+        </section>
+
         <section class="fill-section">
           <h3${tAttr("card.yourcode")}>${tHtml("card.yourcode", "Your Code")}</h3>
           <div id="${p}Editor" class="code-editor-host"></div>

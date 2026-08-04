@@ -11,6 +11,8 @@
 
   "card.pattern": "Here's the pattern",
   "card.goal": "Goal",
+  "card.blueprint": "The shape to build",
+  "card.blueprintHint": "Dashed means your code has not declared it yet. It fills in as you type - this is read from your own code, and it is not the answer.",
   "card.yourcode": "Your Code",
   "card.expected": "Expected output:",
   "card.recap": "Recap",

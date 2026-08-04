@@ -11,6 +11,8 @@
 
   "card.pattern": "Este es el patrón",
   "card.goal": "Objetivo",
+  "card.blueprint": "La forma que vas a construir",
+  "card.blueprintHint": "Discontinuo significa que tu código aún no lo ha declarado. Se va rellenando mientras escribes - se lee de tu propio código, y no es la solución.",
   "card.yourcode": "Tu código",
   "card.expected": "Salida esperada:",
   "card.recap": "Repaso",

@@ -54,6 +54,14 @@
     }
     return null;
   }
+  function structure() {
+    var g = typeof globalThis !== "undefined" ? globalThis : null;
+    if (g && g.KernelStructure) return g.KernelStructure;
+    if (typeof require === "function") {
+      try { return require("../../grading/structure-match.js"); } catch (e) {}
+    }
+    return null;
+  }
 
   // ---- example / expected painters (archetype chrome) ----------------------
   // The "here's the pattern" example is highlighted with Monaco (the same engine
@@ -82,6 +90,148 @@
     expected.textContent = Array.isArray(task.expected)
       ? task.expected.join("\n")
       : (task.expected || "");
+  }
+
+  // ---- the live goal tracker ----------------------------------------------
+  // Two views of ONE question - what shape does the learner's code have RIGHT
+  // NOW - answered by the shipped scanner (CodeLab.scanCSharp) and the pure
+  // policy in kernel/grading/structure-match.js:
+  //
+  //   * the blueprint - the target types and their member SIGNATURES, ghosted
+  //     until the learner's own code declares them. A signature says what to
+  //     write without writing it, which is the gap that made a goal like
+  //     "write a FeedingSign with string Format(bool hungry)" unreadable until
+  //     you opened the solution.
+  //   * the goal list - the very prose the core already painted and localized,
+  //     with a tick on each goal that carries a gate.
+  //
+  // It is a GUIDE, never a grade. XP still comes only from a real run against
+  // the real compiler; nothing here can pass a card. Every part is optional and
+  // degrades quietly: no blueprint host, no scanner, or no onChange on the
+  // editor simply means the card renders exactly as it did before.
+  function scanTypes(source) {
+    var CL = typeof CodeLab !== "undefined" ? CodeLab : null;
+    if (!CL || typeof CL.scanCSharp !== "function") return null;
+    try {
+      var found = CL.scanCSharp(source || "");
+      return (found && found.types) || [];
+    } catch (e) {
+      // A scanner is a heuristic over half-typed code; if it ever throws, the
+      // lesson keeps working without the tracker.
+      return null;
+    }
+  }
+
+  function tick(on) {
+    return '<span class="tracker-tick" aria-hidden="true">' + (on ? "\u2713" : "") + "</span>";
+  }
+
+  // One blueprint box: the declaration line, then a chip per base and per
+  // member, each lit on its own so a learner sees WHICH piece is still missing.
+  function blueprintBox(ctx, S, types, want) {
+    var esc = ctx.helpers.escapeHtml;
+    var bases = want.bases || [];
+    var members = want.members || [];
+    var kind = want.kind || "class";
+    var hasType = S.meets(types, { type: want.name, kind: want.kind });
+    var baseHtml = bases.map(function (b) {
+      var on = hasType && S.meets(types, { type: want.name, base: b });
+      return '<li class="bp-chip bp-chip--base' + (on ? " is-met" : "") + '">: ' + esc(b) + "</li>";
+    });
+    var memberHtml = members.map(function (m) {
+      var on = hasType && S.meets(types, { type: want.name, member: S.symbolName(m) });
+      var label = typeof m === "string" ? m : (m.sig || m.name || "");
+      return '<li class="bp-chip' + (on ? " is-met" : "") + '">' + esc(label) + "</li>";
+    });
+    var chips = baseHtml.concat(memberHtml);
+    var whole =
+      hasType &&
+      bases.every(function (b) { return S.meets(types, { type: want.name, base: b }); }) &&
+      members.every(function (m) { return S.meets(types, { type: want.name, member: S.symbolName(m) }); });
+    return (
+      '<div class="bp-box' + (whole ? " is-met" : "") + '">' +
+      '<div class="bp-box-head">' + tick(whole) +
+      '<span class="bp-kind">' + esc(kind) + "</span>" +
+      '<span class="bp-name">' + esc(want.name) + "</span>" +
+      "</div>" +
+      (chips.length ? '<ul class="bp-chips">' + chips.join("") + "</ul>" : "") +
+      "</div>"
+    );
+  }
+
+  // Repaint both views. Cheap enough to run on every keystroke, but the DOM is
+  // only touched when something actually changed, so typing stays smooth and a
+  // half-typed identifier does not make the panel flicker.
+  function syncTracker(surface) {
+    var ctx = surface.ctx;
+    var task = surface.task;
+    var S = structure();
+    if (!task || !S) return;
+
+    var wrap = ctx.hosts.blueprintWrap;
+    var boxes = ctx.hosts.blueprint;
+    var blueprint = task.blueprint || [];
+    var gates = task.goalCheck || [];
+    if (!blueprint.length && !gates.length) {
+      if (wrap) wrap.hidden = true;
+      return;
+    }
+
+    var types = scanTypes(surface.editor ? surface.editor.getValue() : "");
+    // No scanner: leave the blueprint hidden rather than show a panel that can
+    // never light up. A check that goes quiet is worse than no check.
+    if (!types) {
+      if (wrap) wrap.hidden = true;
+      return;
+    }
+
+    if (boxes && blueprint.length) {
+      if (wrap) wrap.hidden = false;
+      var html = blueprint.map(function (want) { return blueprintBox(ctx, S, types, want); }).join("");
+      if (html !== surface.blueprintHtml) {
+        surface.blueprintHtml = html;
+        boxes.innerHTML = html;
+      }
+    } else if (wrap) {
+      wrap.hidden = true;
+    }
+
+    paintGoalTicks(surface, S.evaluate(types, gates));
+  }
+
+  // Decorate the goal list the CORE painted. The original prose is snapshotted
+  // once per render so a tick can be re-applied without re-running renderInline
+  // and without the markup accumulating ticks on every keystroke.
+  function paintGoalTicks(surface, met) {
+    var list = surface.ctx.hosts.goal;
+    if (!list || !met.length) return;
+    var items = list.children;
+    if (!items || !items.length) return;
+    // No snapshot yet means the prose has not been read; writing a tick now
+    // would replace the goal text with an empty string.
+    if (!surface.goalHtml) return;
+    var base = surface.goalHtml;
+    for (var i = 0; i < met.length && i < items.length; i++) {
+      if (surface.goalMet && surface.goalMet[i] === met[i]) continue;
+      var li = items[i];
+      if (!li) continue;
+      li.innerHTML = tick(met[i]) + (base[i] || "");
+      if (li.classList) li.classList.toggle("is-met", met[i]);
+    }
+    surface.goalMet = met;
+  }
+
+  // Snapshot the freshly painted (and freshly localized) goal prose, and forget
+  // any previous tick state so the next sync repaints from scratch.
+  function captureGoals(surface) {
+    var list = surface.ctx.hosts.goal;
+    surface.goalHtml = [];
+    surface.goalMet = null;
+    surface.blueprintHtml = null;
+    if (!list || !list.children) return;
+    for (var i = 0; i < list.children.length; i++) {
+      surface.goalHtml.push(list.children[i].innerHTML || "");
+    }
   }
 
   // Output mismatch is the one result message that embeds lesson data (the
@@ -215,6 +365,13 @@
           });
         })
         .then(function () {
+          // The live half of the goal tracker. onChange is OPTIONAL on the
+          // editor contract, so an editor that cannot report edits leaves the
+          // tracker painted at its last known state instead of being polled.
+          if (typeof editor.onChange === "function") {
+            surface.unwatch = editor.onChange(function () { syncTracker(surface); });
+          }
+          syncTracker(surface);
           warm(surface);
           return surface;
         });
@@ -226,12 +383,17 @@
       surface.task = task;
       surface.taskIndex = i;
       var editor = surface.editor;
+      // The core has just painted this card's goal list. Snapshot it BEFORE
+      // touching the editor: setValue reports as a change, so the tracker can
+      // run mid-render, and it must never capture its own ticks as the prose.
+      captureGoals(surface);
       editor.setValue(task.starter || "");
       if (editor.setMarkers) editor.setMarkers([]);
       colorizeExample(surface.ctx, task);
       paintExpected(surface.ctx, task);
       surface.outputPanel.hideOutput();
       surface.outputPanel.clearErrors();
+      syncTracker(surface);
     },
 
     // Run the learner source and grade it. Returns { ok, reason, message } for the
@@ -325,6 +487,7 @@
       if (!t) return;
       surface.code = t.solution;
       surface.editor.setValue(t.solution || "");
+      syncTracker(surface);
     },
 
     // Restore the starter and clear the run/result surfaces.
@@ -337,6 +500,7 @@
       surface.outputPanel.hideOutput();
       surface.outputPanel.clearErrors();
       if (surface.ctx.hosts.result) surface.ctx.hosts.result.hidden = true;
+      syncTracker(surface);
     },
 
     // The core's applyChrome re-localizes XP + Next only; the Run label and the
@@ -348,6 +512,10 @@
       var runBtn = ctx.hosts.run;
       if (runBtn && !surface.running) runBtn.textContent = ctx.tr("nav.run", "Run");
       paintExpected(ctx, task);
+      // The core repainted the goal list in the new language, so the snapshot
+      // the ticks are rebuilt from has to be retaken before they go back on.
+      captureGoals(surface);
+      syncTracker(surface);
     },
   };
 
