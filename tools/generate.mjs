@@ -512,10 +512,14 @@ function prefixFromData(dir) {
 //                  the element-id prefix the engine addresses its cards by.
 //   resourceTail : which tail rewrite applies when meta.resources opts the lesson
 //                  into the voice/language layer.
+//   binder       : the resource/bind-*.js module that tail should load, when the
+//                  shared tail is used by more than one archetype. Omitted = the
+//                  tail's own default (bind-build for applyResourceTail; the viz
+//                  and checkpoint tails hard-wire their single binder).
 export const ARCHETYPE_RENDER = {
   build: { prefix: true, resourceTail: applyResourceTail },
   drill: { prefix: true, resourceTail: applyResourceTail },
-  git: { prefix: true, resourceTail: applyResourceTail },
+  git: { prefix: true, resourceTail: applyResourceTail, binder: "bind-git" },
   viz: { prefix: false, resourceTail: applyResourceTailViz },
   checkpoint: { prefix: false, resourceTail: applyResourceTailCheckpoint }
 };
@@ -563,7 +567,7 @@ function renderIndexHtml(m, variants) {
   // controller, which applies the selected voice's strings onto the lesson global
   // and then injects page-shell + the generic engine.
   if (meta.resources) {
-    html = spec.resourceTail(html, meta.resources, m.id, "kernel-controller");
+    html = spec.resourceTail(html, meta.resources, m.id, "kernel-controller", spec.binder);
   }
 
   return html;
@@ -574,7 +578,10 @@ function renderIndexHtml(m, variants) {
 // page-shell.js is no longer loaded statically; the kernel controller injects it
 // (and the generic engine) after applying the chosen voice's strings onto
 // window.LESSON_CONFIG.
-function applyResourceTail(html, resources, lessonId, controllerModule = "kernel-controller") {
+// `binder` is the archetype's key-schema mapper: build and drill share the build
+// binder (same card prose schema), git needs bind-git, which localizes the same
+// prose but must never touch the git command lists.
+function applyResourceTail(html, resources, lessonId, controllerModule = "kernel-controller", binder = "bind-build") {
   const base = resources.base || "res/strings";
   const lang = resources.lang || "en";
   const langs = (resources.langs && resources.langs.length ? resources.langs : [lang]).join(",");
@@ -587,7 +594,7 @@ function applyResourceTail(html, resources, lessonId, controllerModule = "kernel
     throw new Error("resource wiring: could not find the static engine tail for " + lessonId);
   }
 
-  const modules = ["resolver", "store", "manager", "settings", "preference", "theme-section", "voice-section", "lang-section", "concept-i18n", "bind-build"]
+  const modules = ["resolver", "store", "manager", "settings", "preference", "theme-section", "voice-section", "lang-section", "concept-i18n", binder]
     .map((mod) => '    <script src="../../../../resource/' + mod + '.js"></script>')
     .join("\n");
   const resourceTail =

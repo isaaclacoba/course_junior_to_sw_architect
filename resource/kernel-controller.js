@@ -135,6 +135,8 @@
     if (!cfg || !arch) return;
     if (arch === "build" && global.ResourceBindBuild) {
       global.ResourceBindBuild.apply(R, { page: global.PAGE, config: cfg });
+    } else if (arch === "git" && global.ResourceBindGit) {
+      global.ResourceBindGit.apply(R, { page: global.PAGE, config: cfg });
     } else if (arch === "viz" && global.ResourceBindViz) {
       global.ResourceBindViz.apply(R, { page: global.PAGE, viz: cfg });
     } else if (arch === "checkpoint" && global.ResourceBindCheckpoint) {
