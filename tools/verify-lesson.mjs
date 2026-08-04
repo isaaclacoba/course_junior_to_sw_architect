@@ -19,6 +19,11 @@
  *   2b. viz lessons   - loads the vendored code-lab resolvers and runs
  *       resolveTranscript / resolveRetrieval / resolvePlan against EVERY step's
  *       scene, catching bad scene data a first-step render misses.
+ *   2c. git lessons   - REPLAYS each task through the vendored code-lab git
+ *       runtime: build the start state from its commands, run the authored
+ *       `solution`, and demand kernel/engine/git-progress.js report solved with
+ *       zero off-plan commits. A solution that does not reach its own target -
+ *       or a card that is already solved before the learner types - fails.
  *   3. headless render - serves the repo over http and renders the lesson page
  *       with system Chrome in EN and ES (the language is injected as
  *       localStorage before the page scripts run), asserting the DOM carries no
@@ -46,7 +51,8 @@ import vm from "node:vm";
 import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import KernelGrading from "../kernel/grading/output-match.js";
-import { lessonBody } from "./lib.mjs";
+import { loadInWindow, loadCodeLab } from "./lib/codelab-sandbox.mjs";
+import { createValidators, resolveBody, PANEL_CLASSES } from "./lib/lesson-validators.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
@@ -61,53 +67,7 @@ const say = (s = "") => { if (!QUIET) process.stdout.write(s + "\n"); };
 const ok = (m) => say(`  ${C.green}PASS${C.reset} ${m}`);
 const bad = (m) => say(`  ${C.red}FAIL${C.reset} ${m}`);
 const skip = (m) => say(`  ${C.dim}SKIP ${m}${C.reset}`);
-
-// ---------------------------------------------------------------------------
-// load a lesson data file (or the vendored bundle) in a bare-window sandbox
-// ---------------------------------------------------------------------------
-function makeWindow() {
-  const noop = () => {};
-  const elFactory = () => ({
-    style: {}, dataset: {}, classList: { add: noop, remove: noop, toggle: noop, contains: () => false },
-    appendChild: noop, setAttribute: noop, addEventListener: noop, remove: noop,
-    querySelector: () => null, querySelectorAll: () => [], insertAdjacentHTML: noop,
-    getContext: () => ({}), children: [], set innerHTML(_) {}, get innerHTML() { return ""; },
-  });
-  const win = {
-    console, setTimeout: noop, clearTimeout: noop, setInterval: noop, clearInterval: noop,
-    requestAnimationFrame: noop, cancelAnimationFrame: noop, matchMedia: () => ({ matches: false, addEventListener: noop }),
-    navigator: { userAgent: "node", language: "en" }, location: { search: "", href: "" },
-    localStorage: { getItem: () => null, setItem: noop, removeItem: noop },
-    document: {
-      createElement: elFactory, createElementNS: elFactory, createTextNode: () => ({}),
-      getElementById: () => null, querySelector: () => null, querySelectorAll: () => [],
-      addEventListener: noop, body: elFactory(), head: elFactory(), documentElement: elFactory(),
-    },
-    addEventListener: noop,
-  };
-  win.window = win; win.self = win; win.globalThis = win; win.top = win;
-  return win;
-}
-
-function loadInWindow(file) {
-  const src = fs.readFileSync(file, "utf8");
-  const win = makeWindow();
-  vm.createContext(win);
-  vm.runInContext(src, win, { filename: file, timeout: 10000 });
-  return win;
-}
-
-let _codelab = null;
-function loadCodeLab() {
-  if (_codelab) return _codelab;
-  const bundle = path.join(root, "vendor", "code-lab", "code-lab.global.js");
-  const win = makeWindow();
-  vm.createContext(win);
-  try { vm.runInContext(fs.readFileSync(bundle, "utf8"), win, { filename: bundle, timeout: 15000 }); }
-  catch (e) { /* the bundle touches browser APIs after defining exports; ignore */ }
-  _codelab = win.CodeLab || (win.window && win.window.CodeLab) || {};
-  return _codelab;
-}
+const note = (m) => say(`    ${C.yellow}note${C.reset} ${m}`);
 
 // ---------------------------------------------------------------------------
 // grading rule - the SAME shared policy the build plugin uses
@@ -189,9 +149,21 @@ function renderDom(url) {
 }
 
 // ---------------------------------------------------------------------------
+// the archetype validators - dispatch is a registry lookup, not a branch.
+// Every collaborator they need is injected here: the reporters, the dotnet
+// runner, the shared grading policy, and the loaded code-lab bundle (which
+// carries both the viz scene resolvers and the git model + CLI).
+// ---------------------------------------------------------------------------
+const VALIDATORS = createValidators({
+  report: { ok, bad, skip, note },
+  dotnet: { available: dotnetAvailable, compileRun },
+  grading: { matches, buildProbe },
+  codeLab: loadCodeLab,
+});
+
+// ---------------------------------------------------------------------------
 // per-lesson checks
 // ---------------------------------------------------------------------------
-const PANEL_CLASSES = ["cl-tx", "cl-al", "cl-rg", "cl-pb", "cl-mv", "cl-ms", "cl-tr", "cl-ag"];
 
 function nodeCheck(files) {
   let allOk = true;
@@ -203,78 +175,17 @@ function nodeCheck(files) {
   return allOk;
 }
 
-function verifyBuild(cfg, opts) {
-  if (opts.noDotnet) { skip("dotnet compile (--no-dotnet)"); return true; }
-  if (!dotnetAvailable()) { skip("dotnet compile (no dotnet on PATH)"); return true; }
-  let allOk = true;
-  const tasks = (cfg.tasks || []).filter((t) => !t.summary);
-  tasks.forEach((t, i) => {
-    const label = `task ${i + 1} "${(t.title || "").slice(0, 40)}"`;
-    if (!t.solution) { skip(`${label} - no solution`); return; }
-    const run = compileRun(t.solution);
-    if (!run.built) { bad(`${label} solution did not compile\n${firstError(run.errors)}`); allOk = false; return; }
-    if (!matches((run.output || "").trim(), t.expected)) {
-      bad(`${label} output != expected\n    expected: ${JSON.stringify(t.expected)}\n    got: ${JSON.stringify((run.output || "").trim())}`);
-      allOk = false;
-    } else ok(`${label} solution runs and matches expected`);
-    if (run.warnings) say(`    ${C.yellow}note${C.reset} solution compiled with ${run.warnings} warning(s)`);
-
-    for (const req of t.requireSource || []) {
-      const re = req.pattern instanceof RegExp ? req.pattern : new RegExp(req.pattern);
-      if (re.test(t.solution)) ok(`${label} requireSource /${re.source}/ matches solution`);
-      else { bad(`${label} requireSource /${re.source}/ does NOT match solution`); allOk = false; }
-    }
-    if (t.verify && t.verify.main) {
-      const probe = compileRun(buildProbe(t.solution, t.verify.main));
-      if (!probe.built) { bad(`${label} verify probe did not compile\n${firstError(probe.errors)}`); allOk = false; }
-      else if (!matches((probe.output || "").trim(), t.verify.expected)) {
-        bad(`${label} verify probe output != verify.expected (${JSON.stringify(t.verify.expected)}); got ${JSON.stringify((probe.output || "").trim())}`);
-        allOk = false;
-      } else ok(`${label} hidden verify probe passes`);
-    }
-  });
-  return allOk;
-}
-
-function firstError(errs) {
-  const line = (errs.split(/\r?\n/).find((l) => /error [A-Z]{2}\d+/.test(l)) || errs.split(/\r?\n/)[0] || "").trim();
-  return "    " + line.slice(0, 200);
-}
-
-function verifyViz(win, opts) {
-  if (opts.noViz) { skip("viz resolvers (--no-viz)"); return true; }
-  const viz = win.LESSON_CONFIG;
-  const steps = (viz && viz.steps) || [];
-  const CL = loadCodeLab();
-  const resolvers = { transcript: CL.resolveTranscript, retrieval: CL.resolveRetrieval, plan: CL.resolvePlan };
-  let allOk = true, ran = 0;
-  steps.forEach((step, i) => {
-    for (const [field, fn] of Object.entries(resolvers)) {
-      if (!step[field]) continue;
-      if (typeof fn !== "function") { skip(`step ${i + 1} ${field}: no resolver in bundle`); continue; }
-      try { const out = fn(step[field]); if (!out || typeof out !== "object") throw new Error("resolver returned non-object"); ran++; }
-      catch (e) { bad(`step ${i + 1} ${field} resolver threw: ${e.message}`); allOk = false; }
-    }
-  });
-  if (ran) ok(`${ran} scene(s) resolved cleanly across ${steps.length} step(s)`);
-  else skip(`no transcript/retrieval/plan scenes to resolve (${steps.length} step(s))`);
-  return allOk;
-}
-
 // Does the rendered DOM show a lesson BODY, not just the page furniture? The hero
 // and the card scaffold come from meta.js + page-shell, so they paint even when
 // the lesson's own config never arrives - which is why "no hero/title" and the
 // 500-byte floor both pass a blank lesson (measured: 11KB of empty scaffold).
-// The discriminator is per archetype: a practice lesson fills a card title from
-// its config, a widget lesson mounts its widget.
+// The discriminator is per archetype and is owned by that archetype's validator:
+// a practice lesson fills a card title from its config, a widget lesson mounts
+// its widget, a git lesson mounts a terminal and a graph.
 function hasBody(dom, archetype) {
-  if (archetype === "build" || archetype === "drill") {
-    const titles = [...dom.matchAll(/id="[^"]*Title"[^>]*>([^<]*)</g)].map((m) => m[1]);
-    return titles.some((t) => t.trim());
-  }
-  if (archetype === "viz") return PANEL_CLASSES.some((c) => dom.includes(c));
-  if (archetype === "checkpoint") return dom.includes("cl-quiz");
-  return true; // unreachable for "unknown": verifyLesson fails that case outright
+  const v = VALIDATORS.get(archetype);
+  // unreachable for "unknown": verifyLesson fails that case outright
+  return v ? v.rendered(dom) : true;
 }
 
 async function verifyRender(lessonDir, archetype, server, opts) {
@@ -423,9 +334,9 @@ async function verifyLesson(dir, server, opts) {
     catch (e) { bad(`loading ${path.basename(dataFile)} in sandbox: ${e.message}`); allOk = false; }
   }
 
-  // A missing config used to be coerced to {}, so verifyBuild looped over zero
-  // tasks and reported a pass. Resolve it properly and FAIL when there is no body
-  // - an empty lesson is the one thing a verifier must never call verified.
+  // A missing config used to be coerced to {}, so the build check looped over
+  // zero tasks and reported a pass. Resolve it properly and FAIL when there is no
+  // body - an empty lesson is the one thing a verifier must never call verified.
   // An unclassifiable lesson is the original bug in miniature: we cannot pick a
   // body field, so we assert nothing, so we pass. Refuse instead. This fires when
   // meta.js is missing/malformed AND data.js names no legacy config global.
@@ -433,10 +344,12 @@ async function verifyLesson(dir, server, opts) {
     bad("cannot classify this lesson - meta.js declares no archetype and data.js names no known config global; refusing to report it verified");
     allOk = false;
   } else if (win) {
-    const body = lessonBody(win, archetype);
+    // Registry lookup, not a branch: an archetype with no validator has no body
+    // field either, so resolveBody refuses it with the same wording lib.mjs uses.
+    const validator = VALIDATORS.get(archetype);
+    const body = resolveBody(win, archetype, validator);
     if (!body.ok) { bad(`no lesson body to verify - ${body.reason}`); allOk = false; }
-    else if (archetype === "build" || archetype === "drill") allOk = verifyBuild(body.config, opts) && allOk;
-    else if (archetype === "viz") allOk = verifyViz({ LESSON_CONFIG: body.config }, opts) && allOk;
+    else allOk = validator.verify({ config: body.config, opts }) && allOk;
   }
 
   allOk = (await verifyRender(dir, archetype, server, opts)) && allOk;

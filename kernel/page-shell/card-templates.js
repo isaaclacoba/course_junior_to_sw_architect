@@ -1,5 +1,8 @@
-// The two archetype card scaffolds. drillCard is dormant (no live lesson uses
+// The archetype card scaffolds. drillCard is dormant (no live lesson uses
 // the drill engine today) but is kept as the base for a future exam track.
+//
+// Markup only: a template returns a string of empty, prefixed hosts and the
+// matching engine plugin fills them. No behaviour, no state, no widget mounting.
 //
 // A self-contained module: window.PageShellCards in the browser, module.exports in Node
 // so a unit test can require() it without loading the whole page shell.
@@ -151,5 +154,60 @@
       </section>`;
   }
 
-  return { drillCard: drillCard, buildCard: buildCard };
+  // The git practice scaffold. Ratified layout (docs/architecture/git-track.md,
+  // "Practical page UX", 2026-08-04): the graph and its working area are one
+  // full-width widget host, the terminal sits UNDER it, and the action row is
+  // Reset + Show solution. Two deliberate absences: there is NO Check button
+  // (every Enter in the terminal re-checks the goal), and no "Show whole target"
+  // button - git-plugin.js creates that one into the Actions host itself, since
+  // it owns the toggled label.
+  function gitCard(p) {
+    return `
+      <section class="card" aria-live="polite">
+        <header class="challenge-head">
+          <div>
+            <p id="${p}Meta" class="meta"></p>
+            <h2 id="${p}Title"></h2>
+            <div id="${p}Context" class="context"></div>
+          </div>
+          <div class="badge-group">
+            <span id="${p}Concept" class="badge"></span>
+            <span id="${p}Progress" class="badge ghost"></span>
+          </div>
+        </header>
+
+        <section class="coach">
+          <h3${tAttr("card.goal")}>${tHtml("card.goal", "Goal")}</h3>
+          <ul id="${p}Goal" class="coach-list"></ul>
+        </section>
+
+        <section class="git-stage">
+          <div id="${p}Graph" class="git-graph-host"></div>
+          <div id="${p}Terminal" class="git-terminal-host"></div>
+        </section>
+
+        <section id="${p}Actions" class="actions">
+          <button id="${p}Reset" class="btn" type="button"${tAttr("nav.reset")}>${tHtml("nav.reset", "Reset")}</button>
+          <button id="${p}Solution" class="btn danger" type="button"${tAttr("nav.solution")}>${tHtml("nav.solution", "Show Solution")}</button>
+        </section>
+
+        <section id="${p}Result" class="result-panel" hidden>
+          <h3 id="${p}ResultTitle"></h3>
+          <p id="${p}ResultBody"></p>
+        </section>
+
+        <section id="${p}Summary" class="summary-section" hidden>
+          <p id="${p}SummaryIntro" class="context"></p>
+          <ul id="${p}SummaryList" class="summary-list"></ul>
+          <p id="${p}SummaryClose" class="summary-close"></p>
+        </section>
+
+        <footer class="nav-row">
+          <button id="${p}Prev" class="btn" type="button"${tAttr("nav.prev")}>${tHtml("nav.prev", "Previous")}</button>
+          <button id="${p}Next" class="btn primary" type="button">${tHtml("nav.next", "Next")}</button>
+        </footer>
+      </section>`;
+  }
+
+  return { drillCard: drillCard, buildCard: buildCard, gitCard: gitCard };
 });

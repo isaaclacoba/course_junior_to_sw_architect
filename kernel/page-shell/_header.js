@@ -12,10 +12,10 @@
 //     intro: Array<string | { html: string, class?: string }>,
 //     links: Array<{ href: string, label: string }>,
 //   },
-//   archetype?: "drill" | "build",   // omit for pages with a bespoke body
+//   archetype?: "drill" | "build" | "git",  // omit for pages with a bespoke body
 //   prefix?: string,                 // id prefix used by the matching engine
 // }
 //
-// The hero is rendered into <section class="hero" id="pageHero">. For the drill
-// and build archetypes the matching card scaffold is inserted right after it,
-// so drill-engine.js / build-engine.js find their prefixed element ids.
+// The hero is rendered into <section class="hero" id="pageHero">. For the drill,
+// build and git archetypes the matching card scaffold is inserted right after
+// it, so the engine plugin for that archetype finds its prefixed element ids.

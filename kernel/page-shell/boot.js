@@ -35,5 +35,9 @@
     hero.insertAdjacentHTML("afterend", drillCard(page.prefix));
   } else if (page.archetype === "build") {
     hero.insertAdjacentHTML("afterend", buildCard(page.prefix));
+  } else if (page.archetype === "git") {
+    // gitCard has no bare-name alias in the concatenation, so it is reached
+    // through the module's export object.
+    hero.insertAdjacentHTML("afterend", window.PageShellCards.gitCard(page.prefix));
   }
 

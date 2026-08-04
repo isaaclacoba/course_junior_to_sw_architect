@@ -91,7 +91,16 @@ test("rejects a body that is not an array", async () => {
 
 test("rejects an archetype it does not know", async () => {
   const { lessonBody } = await load();
-  assert.equal(lessonBody({ LESSON_CONFIG: { tasks: [1] } }, "git").ok, false);
+  assert.equal(lessonBody({ LESSON_CONFIG: { tasks: [1] } }, "not-an-archetype").ok, false);
+});
+
+// git is a real archetype now (the git track), so the shared gates must see its
+// body - otherwise validate and the i18n round-trip pass it vacuously.
+test("accepts a git lesson's tasks", async () => {
+  const { lessonBody } = await load();
+  const r = lessonBody({ LESSON_CONFIG: { tasks: [1, 2] } }, "git");
+  assert.equal(r.ok, true);
+  assert.equal(r.count, 2);
 });
 
 test("does not throw on an empty window bag", async () => {

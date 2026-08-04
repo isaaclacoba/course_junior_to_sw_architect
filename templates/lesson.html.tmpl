@@ -1,9 +1,7 @@
 <!--
-  templates/lesson.html.tmpl - DORMANT Phase-0 scaffolding. Not rendered by
-  anything yet; it has zero runtime impact on the live site.
-
-  Purpose: one template, FOUR archetype variants, from which a generator will one
-  day emit content/<track>/<NN-part>/<NN-lesson>/index.html for each lesson.
+  templates/lesson.html.tmpl - the source of every generated lesson page.
+  tools/generate.mjs emits content/<track>/<NN-part>/<NN-lesson>/index.html for
+  each migrated lesson from the matching variant below.
 
   RELATIVE PREFIX (critical): a generated page lives four directories below the
   repo root -
@@ -13,17 +11,26 @@
 
   so every shared asset that lives at the repo root is reached with the fixed
   prefix "../../../../". CDN links (Google Fonts, Prism) are absolute URLs and
-  keep no prefix. The four variants below already use "../../../../".
+  keep no prefix. Every variant below already uses "../../../../".
 
-  THE FOUR VARIANTS (no engine is loaded statically - the kernel controller
-  injects the generic engine + the archetype's plugin at runtime)
+  HOW A VARIANT IS FOUND: each block is introduced by a marker comment carrying
+  its archetype name - "@variant <name>" - and the generator maps the
+  doctype..&lt;/html&gt; block that follows to that name. Nothing depends on the
+  ORDER of the blocks, so adding an archetype is one marked block here plus one
+  row in the generator's ARCHETYPE_RENDER map.
+
+  THE VARIANTS (no engine is loaded statically - the kernel controller injects
+  the generic engine + the archetype's plugin at runtime)
     - build      : Monaco write-and-run lessons. No Prism.
     - drill      : fill-in-the-blank / quiz lessons. Prism.
     - viz        : theory pages with a visual scene. <name>.viz.js. Prism.
     - checkpoint : end-of-part quiz. quiz data + page-shell.js only.
                    no Prism JS (the Prism theme CSS is linked but unused, matching
                    the current theory-check-*.html pages).
-  All four load the lesson's meta.js and page-shell.js.
+    - git        : type-real-git-commands lessons (terminal + graph, both from
+                   code-lab). Same shape as build - a card scaffold driven by
+                   data.js - so no Prism and no Monaco loader.
+  Every variant loads the lesson's meta.js and page-shell.js.
 
   PLACEHOLDER TOKENS (a generator substitutes these)
     {{DOC_TITLE}}   - text for <title>.
@@ -31,7 +38,8 @@
     {{TITLE}}       - hero title.
     {{INTRO}}       - hero intro; a JS array literal of string | {html,class}.
     {{META_SRC}}    - path to this lesson's meta.js (sets window.LESSON_META).
-    {{DATA_SRC}}    - path to the lesson data file (<name>.js) - build/drill/checkpoint.
+    {{DATA_SRC}}    - path to the lesson data file (<name>.js) - every archetype
+                      except viz.
     {{VIZ_SRC}}     - path to <name>.viz.js - viz only.
     {{PRISM_BLOCK}} - the three Prism <script> tags - drill and viz only.
 
@@ -43,7 +51,7 @@
 
 
 <!-- ============================================================= -->
-<!-- VARIANT 1 of 4: BUILD  (Monaco write-and-run) -->
+<!-- @variant build  (Monaco write-and-run) -->
 <!-- ============================================================= -->
 <!doctype html>
 <html lang="en">
@@ -90,7 +98,7 @@
 
 
 <!-- ============================================================= -->
-<!-- VARIANT 2 of 4: DRILL  (fill-in-the-blank / quiz; Prism) -->
+<!-- @variant drill  (fill-in-the-blank / quiz; Prism) -->
 <!-- ============================================================= -->
 <!doctype html>
 <html lang="en">
@@ -145,7 +153,7 @@
 
 
 <!-- ============================================================= -->
-<!-- VARIANT 3 of 4: VIZ  (theory scene; <name>.viz.js; Prism; no engine) -->
+<!-- @variant viz  (theory scene; <name>.viz.js; Prism) -->
 <!-- ============================================================= -->
 <!doctype html>
 <html lang="en">
@@ -199,7 +207,7 @@
 
 
 <!-- ============================================================= -->
-<!-- VARIANT 4 of 4: CHECKPOINT  (quiz data + page-shell; no engine, no Prism JS) -->
+<!-- @variant checkpoint  (quiz data + page-shell; no Prism JS) -->
 <!-- ============================================================= -->
 <!doctype html>
 <html lang="en">
@@ -244,5 +252,52 @@
     <script src="../../../../generated/concept-index.js"></script>
     <script src="{{META_SRC}}"></script>
     <script src="../../../../page-shell.js"></script>
+  </body>
+</html>
+
+
+<!-- ============================================================= -->
+<!-- @variant git  (type real git commands: terminal + graph) -->
+<!-- ============================================================= -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{DOC_TITLE}}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../../../../styles.css" />
+    <script src="../../../../theme-registry.js"></script>
+    <script src="../../../../theme-switch.js"></script>
+    <link rel="stylesheet" href="../../../../vendor/code-lab/code-lab.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <section class="hero" id="pageHero"></section>
+    </main>
+
+    <script>
+      window.PAGE = {
+        hero: {
+          eyebrow: "{{EYEBROW}}",
+          title: "{{TITLE}}",
+          intro: {{INTRO}},
+          links: [{ href: "../../../../index.html", label: "Back to the course" }],
+        },
+        archetype: "git",
+      };
+    </script>
+
+    <script src="../../../../vendor/code-lab/code-lab.global.js"></script>
+    <script src="../../../../generated/course-data.js"></script>
+    <script src="../../../../generated/concept-index.js"></script>
+    <script src="{{META_SRC}}"></script>
+    <script src="../../../../page-shell.js"></script>
+    <script src="{{DATA_SRC}}"></script>
   </body>
 </html>

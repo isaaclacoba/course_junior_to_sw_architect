@@ -41,6 +41,16 @@
   // up (it is not one of the page's own <script> tags).
   var bindOriginSrc = attr("data-bind-origin", (self && self.src || "").replace(/[^/]*$/, "bind-origin.js"));
 
+  // Repo-root scripts an archetype's plugin needs loaded BEFORE it: its grader,
+  // plus any shared engine module it delegates to. Declarative on purpose - a new
+  // archetype is a row here, not another branch in the boot chain. Paths are
+  // repo-root-relative and get the derived repoBase prefix. An archetype with no
+  // row (drill, viz, checkpoint) simply has none.
+  var ARCHETYPE_DEPS = {
+    build: ["kernel/grading/output-match.js"],
+    git: ["kernel/grading/dag-match.js", "kernel/engine/git-progress.js"]
+  };
+
   function injectScript(src, attrs) {
     return new Promise(function (resolve, reject) {
       var s = document.createElement("script");
@@ -225,12 +235,13 @@
       registerSurface("PageShellConcepts", global.PageShellConcepts);
 
       // Every archetype now boots the ONE generic lesson engine + its plugin.
-      // page-shell renders only the hero, the concept agenda, and - for build - the
-      // card scaffold; it no longer mounts the viz/checkpoint widgets. Dispatch by
-      // which lesson global is present, inject the archetype-blind core (manual mode,
-      // so its self-boot footer stands down) + the matching plugin (+ a practice
-      // grader), then create + boot it. LessonEngine.create returns the { boot,
-      // setLocale } shape the controller holds as a Localizable surface.
+      // page-shell renders only the hero, the concept agenda, and - for the card
+      // archetypes - the card scaffold; it no longer mounts the viz/checkpoint
+      // widgets. Dispatch by LESSON_META.archetype: load whatever that archetype
+      // declares in ARCHETYPE_DEPS, then the archetype-blind core (manual mode, so
+      // its self-boot footer stands down) + the matching plugin, then create + boot
+      // it. LessonEngine.create returns the { boot, setLocale } shape the
+      // controller holds as a Localizable surface.
       var cfg = global.LESSON_CONFIG;
       var archetype = global.LESSON_META && global.LESSON_META.archetype;
       if (!cfg || !archetype) {
@@ -242,11 +253,12 @@
         return;
       }
       cfg.archetype = archetype;
-      var chain = Promise.resolve();
-      // A practice plugin grades through a kernel/grading module; load it first.
-      if (archetype === "build") {
-        chain = chain.then(function () { return injectScript(repoBase + "kernel/grading/output-match.js"); });
-      }
+      // The archetype's declared dependencies load first, in order (a grading
+      // module, and for git the shared progress module the plugin delegates to),
+      // then the core and the plugin.
+      var chain = (ARCHETYPE_DEPS[archetype] || []).reduce(function (p, dep) {
+        return p.then(function () { return injectScript(repoBase + dep); });
+      }, Promise.resolve());
       return chain
         .then(function () { return injectScript(repoBase + "kernel/engine/lesson-engine.js", { "data-manual": "" }); })
         .then(function () { return injectScript(repoBase + "kernel/engine/plugins/" + archetype + "-plugin.js"); })

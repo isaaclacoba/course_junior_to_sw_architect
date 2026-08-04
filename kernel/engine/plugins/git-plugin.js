@@ -155,8 +155,8 @@
   // English-only by design); the result-panel sentence is the localized one.
   function offPlanEnglish(n) {
     return n === 1
-      ? "One commit here is not part of this exercise, so the goal cannot pass. Undo it, or press Reset to start the exercise over."
-      : n + " commits here are not part of this exercise, so the goal cannot pass. Undo them, or press Reset to start the exercise over.";
+      ? "One commit here is not part of this exercise, so this card cannot pass. Undo it, or press Reset to start the exercise over."
+      : n + " commits here are not part of this exercise, so this card cannot pass. Undo them, or press Reset to start the exercise over.";
   }
   function statusLine(p) {
     if (p.diverged.length) return offPlanEnglish(p.diverged.length);

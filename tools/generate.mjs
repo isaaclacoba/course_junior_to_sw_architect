@@ -459,15 +459,45 @@ function jsInner(s) {
   return String(s).replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g, "\\n");
 }
 
-// The four template variants, in file order: build, drill, viz, checkpoint.
-function loadTemplateVariants() {
-  const tmpl = fs.readFileSync(templatePath, "utf8");
-  const blocks = tmpl.match(/<!doctype html>[\s\S]*?<\/html>/gi);
-  if (!blocks || blocks.length < 4) throw new Error("Expected 4 variants in lesson.html.tmpl");
-  return { build: blocks[0], drill: blocks[1], viz: blocks[2], checkpoint: blocks[3] };
+// The marker comment that introduces each block in templates/lesson.html.tmpl.
+// The NAME it carries is the archetype - block order is irrelevant.
+const VARIANT_MARKER = /<!--\s*@variant\s+([a-z][a-z0-9-]*)/gi;
+
+// Parse the template into { <archetype>: <html> }. Keyed by the marker's name,
+// never by array position, so a new variant can be appended anywhere in the file.
+export function parseTemplateVariants(tmpl) {
+  const marks = [];
+  VARIANT_MARKER.lastIndex = 0;
+  let m;
+  while ((m = VARIANT_MARKER.exec(tmpl)) !== null) {
+    marks.push({ name: m[1].toLowerCase(), at: m.index + m[0].length });
+  }
+  if (!marks.length) {
+    throw new Error("lesson.html.tmpl: no '@variant <name>' marker comments found");
+  }
+  const variants = {};
+  marks.forEach(function (mark, i) {
+    if (variants[mark.name]) {
+      throw new Error("lesson.html.tmpl: duplicate variant '" + mark.name + "'");
+    }
+    // Bound the search at the NEXT marker so a variant with no document block
+    // fails loudly instead of silently swallowing its neighbour's.
+    const end = i + 1 < marks.length ? marks[i + 1].at : tmpl.length;
+    const block = tmpl.slice(mark.at, end).match(/<!doctype html>[\s\S]*?<\/html>/i);
+    if (!block) {
+      throw new Error("lesson.html.tmpl: variant '" + mark.name +
+        "' has no <!doctype html>...</html> block");
+    }
+    variants[mark.name] = block[0];
+  });
+  return variants;
 }
 
-// Read a build/drill lesson's element-id prefix from its data.js config global.
+function loadTemplateVariants() {
+  return parseTemplateVariants(fs.readFileSync(templatePath, "utf8"));
+}
+
+// Read a lesson's element-id prefix from its data.js config global.
 function prefixFromData(dir) {
   const bag = loadWindowBag(path.join(dir, "data.js"));
   const cfg = bag.LESSON_CONFIG;
@@ -475,12 +505,35 @@ function prefixFromData(dir) {
   return cfg.prefix;
 }
 
+// How each archetype's page is finished - the ONE place an archetype is
+// described, so adding a sixth is a row here plus a marked block in
+// lesson.html.tmpl, not another branch.
+//   prefix       : the page carries a data.js card scaffold, so window.PAGE needs
+//                  the element-id prefix the engine addresses its cards by.
+//   resourceTail : which tail rewrite applies when meta.resources opts the lesson
+//                  into the voice/language layer.
+export const ARCHETYPE_RENDER = {
+  build: { prefix: true, resourceTail: applyResourceTail },
+  drill: { prefix: true, resourceTail: applyResourceTail },
+  git: { prefix: true, resourceTail: applyResourceTail },
+  viz: { prefix: false, resourceTail: applyResourceTailViz },
+  checkpoint: { prefix: false, resourceTail: applyResourceTailCheckpoint }
+};
+
 // Render a migrated lesson's index.html from the matching template variant.
 function renderIndexHtml(m, variants) {
   const meta = m.meta;
   const archetype = meta.archetype;
+  const spec = ARCHETYPE_RENDER[archetype];
+  if (!spec) {
+    throw new Error("Unknown archetype '" + archetype + "' for lesson " + m.id +
+      " (known: " + Object.keys(ARCHETYPE_RENDER).join(", ") + ")");
+  }
   let html = variants[archetype];
-  if (!html) throw new Error("Unknown archetype '" + archetype + "' for lesson " + m.id);
+  if (!html) {
+    throw new Error("lesson.html.tmpl has no '@variant " + archetype +
+      "' block (needed by lesson " + m.id + ")");
+  }
 
   html = html
     .replace(/\{\{DOC_TITLE\}\}/g, htmlEscape(meta.docTitle))
@@ -491,7 +544,7 @@ function renderIndexHtml(m, variants) {
     .replace(/\{\{DATA_SRC\}\}/g, "data.js")
     .replace(/\{\{VIZ_SRC\}\}/g, m.id + ".viz.js");
 
-  if (archetype === "build" || archetype === "drill") {
+  if (spec.prefix) {
     // The card scaffold needs the same element-id prefix the engine reads from
     // its config; page-shell picks it up from window.PAGE.prefix. Match the real
     // `archetype:` property line (leading newline + its own indentation) and add
@@ -502,27 +555,15 @@ function renderIndexHtml(m, variants) {
       new RegExp('(\\n([ \\t]*)archetype: "' + archetype + '",)'),
       '$1\n$2prefix: ' + JSON.stringify(prefix) + ','
     );
+  }
 
-    // Opt-in resource layer: when meta.resources is set, the lesson's teaching
-    // prose lives in res/strings/<voice>/<lang>.json instead of inline in
-    // data.js. Swap the static page-shell tail for the resource modules + the
-    // kernel controller, which applies the selected voice's strings onto
-    // window.LESSON_CONFIG and then injects page-shell + the generic engine.
-    if (meta.resources) {
-      const controller = "kernel-controller";
-      html = applyResourceTail(html, meta.resources, m.id, controller);
-    }
-  } else if (archetype === "viz" && meta.resources) {
-    // A viz lesson's teaching prose (hero + step narrations + legend labels) can
-    // live in res/strings too; the binder is bind-viz and there is no engine.
-    const controller = "kernel-controller";
-    html = applyResourceTailViz(html, meta.resources, m.id, controller);
-  } else if (archetype === "checkpoint" && meta.resources) {
-    // A checkpoint lesson's prose (hero + quiz title/intro + question stems,
-    // options and explanations) can live in res/strings; the binder is
-    // bind-checkpoint and there is no engine (the Quiz is a code-lab widget).
-    const controller = "kernel-controller";
-    html = applyResourceTailCheckpoint(html, meta.resources, m.id, controller);
+  // Opt-in resource layer: when meta.resources is set, the lesson's teaching
+  // prose lives in res/strings/<voice>/<lang>.json instead of inline in its data
+  // file. Swap the static page-shell tail for the resource modules + the kernel
+  // controller, which applies the selected voice's strings onto the lesson global
+  // and then injects page-shell + the generic engine.
+  if (meta.resources) {
+    html = spec.resourceTail(html, meta.resources, m.id, "kernel-controller");
   }
 
   return html;
@@ -704,4 +745,9 @@ function main() {
   console.log(`Lessons: ${lessonCount} across ${data.tracks.length} tracks; migrated: ${migrated.length}`);
 }
 
-main();
+// Run only when invoked as the CLI. Importing this module (the unit tests do,
+// for the pure variant/archetype maps) must not write anything.
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main();
+}
+
