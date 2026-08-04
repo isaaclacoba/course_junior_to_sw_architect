@@ -140,6 +140,22 @@ test("the excluded list explains itself", async () => {
   }
 });
 
+// An exclusion for a file that no longer exists is worse than useless: it is a
+// silent no-op that still suppresses anything sharing that basename. This bit -
+// the drill-engine.js entry outlived the file when the lesson engine deleted it,
+// and nothing noticed.
+test("every excluded file actually exists", async () => {
+  const { EXCLUDED } = await load();
+  const fs = require("node:fs");
+  const repo = path.dirname(__dirname);
+  for (const file of Object.keys(EXCLUDED)) {
+    assert.ok(
+      fs.existsSync(path.join(repo, file)),
+      `EXCLUDED names "${file}", which no longer exists - drop the entry instead of leaving a dead exclusion`
+    );
+  }
+});
+
 test("a parse error is reported, not swallowed", async () => {
   const { scanJs } = await load();
   assert.throws(() => scanJs("function ( {", "bad.js"), /parse error/);

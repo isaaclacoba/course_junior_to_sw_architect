@@ -47,13 +47,13 @@ export const JS_ROOTS = ["."];
 export const JS_DIRS = ["kernel/page-shell", "kernel/grading", "kernel/engine", "kernel/engine/plugins"];
 export const HTML_FILES = ["index.html"];
 
-// Superseded 2026-08-03: drill-engine.js is dead (0 pages load it, 0 lessons set
-// DRILL_CONFIG) and is scheduled to be replaced by a drill plugin on
-// kernel/engine/lesson-engine.js. Its hardcoded chrome will be correct by
-// construction there, so patching the God-module first would be throwaway work.
-// REMOVE THIS ENTRY when the drill plugin lands.
+// Files this linter deliberately does not read. Keep this list SHORT and keep it
+// HONEST: an entry naming a file that no longer exists is a silent no-op that
+// still suppresses anything matching that basename, so the accompanying test
+// asserts every entry points at a real file. (The drill-engine.js entry lived
+// here while that module was dead-but-present; it was removed when the lesson
+// engine deleted the file.)
 export const EXCLUDED = {
-  "drill-engine.js": "superseded 2026-08-03 - pending migration to a lesson-engine drill plugin",
   "page-shell.js": "generated artefact - kernel/page-shell/* is checked instead",
 };
 

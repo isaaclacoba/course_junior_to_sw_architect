@@ -1097,3 +1097,21 @@ mirrored into the session todo list.
   checkpoint now boot the generic engine live). The assertions hold on both the old
   and the new engine, which is the point: they check what the learner sees, not
   which engine drew it.
+
+## 2026-08-04 09:02 - a dead exclusion is worse than no exclusion
+- The lesson engine's step 7 deleted drill-engine.js, which left check-literals
+  holding an EXCLUDED entry for a file that no longer exists. EXCLUDED matches by
+  BASENAME as well as path, so a dead entry is not harmless - it silently
+  suppresses any future file of that name anywhere in the scanned tree. The entry's
+  own comment said "REMOVE THIS ENTRY when the drill plugin lands"; nothing
+  enforced that, so it outlived the file.
+- Removed it, and added a test asserting every EXCLUDED key names a file that
+  actually exists - the class of bug, not just this instance. Mutation-checked:
+  re-adding the dead entry fails the test. Linter green over 24 files, 21/21.
+- Also grounded the overnight state: the concurrent session landed steps 5, 6a, 6b
+  and 7, so all 83 lessons are now on window.LESSON_CONFIG and both old engines are
+  deleted. The non-emptiness gates written yesterday were built to accept BOTH
+  spellings, and that paid off - validate is 0 errors across all 83 migrated
+  lessons with no change needed, and it still CATCHES an empty lesson after the
+  migration (mutating LESSON_CONFIG to an unknown name fails it). The gate followed
+  the migration forward instead of having to be disabled for it.
