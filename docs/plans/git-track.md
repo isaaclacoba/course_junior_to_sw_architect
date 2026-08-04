@@ -29,13 +29,13 @@ Phase 1 - GitGraph widget (code-lab)
 Phase 2 - engine + grader + page
 8. [x] git-cli parser (v1 command set) - verify: parser unit tests.
 9. [x] kernel/grading/dag-match.js (browser+node) - verify: grader tests.
-10. [ ] Export the git runtime from code-lab `src/index.ts` (model ops + `git-cli.run`) and
-    re-vendor - TODAY the bundle can render a graph but cannot RUN a command - verify: the
-    vendored IIFE exposes them.
-11. [ ] GitGraph ghost model: `setState(state, { ghost, diverged })` + next-step-only ghosting
-    + "Show whole target" - verify: unit tests + headless render of the 5 stress cases.
-12. [ ] `CodeLab.LineTerminal` widget (dep-free line console, command history) - verify: code-lab tests.
-13. [ ] git-plugin on the generic engine (terminal + GitGraph + parser + dag-match, continuous
+10. [x] Export the git runtime from code-lab `src/index.ts` (model ops + `git-cli.run`) and
+    re-vendor - verify: the vendored IIFE exposes them (done, verified in a browser).
+11. [x] GitGraph ghost model: `setState(state, { ghost, diverged })` + next-step-only ghosting
+    (in `kernel/engine/git-progress.js`) + `{all:true}` for "Show whole target" - verify: 11 widget
+    tests + 18 progress tests + a live browser render of ghost/diverged/edge-ghost.
+12. [x] `CodeLab.LineTerminal` widget (dep-free line console, ArrowUp/Down history) - verify: 19 tests.
+13. [ ] git-plugin on the generic engine (terminal + GitGraph + parser + git-progress, continuous
     grading, Reset + Show solution, multi-card) - verify: a git lesson reaches its goal headlessly.
 14. [ ] verify-lesson git-validator (tsx runs the parser) + the validator registry - verify: verify-lesson --all.
 Phase 3 - content
@@ -46,6 +46,7 @@ Phase 3 - content
 ## Progress
 - 2026-08-03 Design round + independent red-team done. Scope cut to a local-git core (defer rebase/cherry-pick/stash/reflog/remotes to the real-git track); minimal file/index model added; conflicts modeled; hashes display-only + DAG-structural grading. Build deferred until after WoW-enforcement.
 - 2026-08-04 Phase 1 + the model half of phase 2 are LANDED (git-model, git-layout, GitGraph vendored, git-cli, dag-match). Practical-page UX ratified via a stress-test mockup: one canvas laid out from the target (ghost/diverged tagging), no Check button, terminal under the widget, next-step ghosting + "Show whole target", off-plan blocks the pass, multi-card. Found: the vendored bundle exports GitGraph + gitLayout only, so it cannot yet RUN a command.
+- 2026-08-04 Steps 10-12 landed in parallel (code-lab `feat(git)`, course `f737c1e`): git runtime exported + re-vendored, GitGraph ghost/diverged model, CodeLab.LineTerminal, and `kernel/engine/git-progress.js` (ghost/diverged/solved/union/nextStep). Verified end-to-end in a real browser: the solution reaches solved with 0 ghosts, an off-plan commit blocks the pass, and ghost/diverged render correctly. Next: the git-plugin.
 
 ## Open (build-time)
 - DAG equivalence strictness for merge parents; hash preimage + collision guard; conflict-resolution UX with no file contents.
