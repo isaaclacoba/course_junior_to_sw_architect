@@ -53,9 +53,13 @@ test("build loads its grader AND the structure policy the tracker reads", () => 
   ]);
 });
 
-test("git loads its grader AND the shared progress module, in that order", () => {
+test("git loads its graders AND the shared progress module, in that order", () => {
+  // git grades in two dimensions: the commit DAG (shape) and the three-area end
+  // state (which files a commit touched, what is staged, what is modified). Both
+  // must load before git-progress, which composes them.
   assert.deepEqual(deps().git, [
     "kernel/grading/dag-match.js",
+    "kernel/grading/state-match.js",
     "kernel/engine/git-progress.js",
   ]);
 });

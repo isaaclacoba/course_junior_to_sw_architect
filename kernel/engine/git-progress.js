@@ -56,6 +56,20 @@
     return !!(s && s.commits && s.commits.get && s.refs && s.refs.forEach && s.head);
   }
 
+  // The three-area end-state grader (kernel/grading/state-match.js). Resolved the same
+  // lazy way as dag-match, and OPTIONAL: if a page has not loaded it, grading falls back
+  // to the commit shape alone rather than throwing.
+  var STATE = null;
+  function stateMatcher() {
+    if (STATE) return STATE;
+    var g = typeof globalThis !== "undefined" ? globalThis : null;
+    if (g && g.KernelStateMatch) { STATE = g.KernelStateMatch; return STATE; }
+    if (typeof require === "function") {
+      try { STATE = require("../grading/state-match.js"); } catch (e) { STATE = null; }
+    }
+    return STATE;
+  }
+
   // Commit ids reachable from every ref plus a detached HEAD, returned in the
   // commits Map's insertion order so every downstream choice is deterministic.
   function reachableIds(state) {
@@ -382,8 +396,26 @@
       nextStep = { kind: "diverged", ids: diverged };
     }
 
-    var solved = D.dagMatch(actual, target, { orderedParents: orderedParents }).ok && diverged.length === 0;
+    // "Solved" means the learner reached the target in ALL THREE areas the widget
+    // shows - Repository, Staging, Working tree - not just the commit shape. The DAG
+    // answers the shape; state-match answers the rest (which files a commit touched,
+    // what is staged, what is modified). It runs AFTER identity is settled, so it can
+    // never disturb ghosting or divergence.
+    var shapeOk = D.dagMatch(actual, target, { orderedParents: orderedParents }).ok;
+    var state = { ok: true, area: null, reason: "" };
+    var S = stateMatcher();
+    if (shapeOk && diverged.length === 0 && S) {
+      state = S.stateMatch({ actual: actual, target: target }, {
+        orderedParents: orderedParents,
+        expected: opts && opts.expected,
+        areas: opts && opts.areas
+      });
+    }
+    var solved = shapeOk && diverged.length === 0 && state.ok;
     if (solved) nextStep = null;
+    else if (shapeOk && diverged.length === 0 && !state.ok) {
+      nextStep = { kind: "state", area: state.area, detail: state.reason };
+    }
 
     return {
       solved: solved,
@@ -391,7 +423,7 @@
       ghost: ghost,
       diverged: diverged,
       nextStep: nextStep,
-      reason: describe(nextStep)
+      reason: state.ok ? describe(nextStep) : state.reason
     };
   }
 
