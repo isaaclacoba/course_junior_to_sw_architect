@@ -956,10 +956,36 @@ ${result.runtimeError}`.trim(),
     }
     return members;
   }
-  function takeDeclaration(stmt, push, blockFollows) {
+  function expressionBodyArrow(text) {
+    let depth = 0;
+    for (let i = 0; i < text.length - 1; i++) {
+      const c = text[i];
+      if (c === "(" || c === "[") {
+        depth++;
+        continue;
+      }
+      if (c === ")" || c === "]") {
+        depth = Math.max(0, depth - 1);
+        continue;
+      }
+      if (depth > 0) continue;
+      if (c !== "=") continue;
+      if (text[i + 1] === ">") return i;
+      const prev2 = text[i - 1];
+      if (text[i + 1] === "=" || prev2 === "=" || prev2 === "!" || prev2 === "<" || prev2 === ">") continue;
+      return -1;
+    }
+    return -1;
+  }
+  function takeDeclaration(stmt, push, blockFollows, exprBody = false) {
     const text = stmt.replace(/\s+/g, " ").trim();
     if (!text) return;
     if (/^\[/.test(text)) return;
+    const arrow = expressionBodyArrow(text);
+    if (arrow > 0) {
+      takeDeclaration(text.slice(0, arrow), push, true, true);
+      return;
+    }
     const isStatic = /\bstatic\b/.test(text);
     const method = text.match(/([A-Za-z_][A-Za-z0-9_<>,.\[\]\?]*)\s+([A-Za-z_][A-Za-z0-9_]*)\s*(<[^>]*>)?\s*\(([^)]*)\)\s*$/);
     if (method) {
@@ -989,7 +1015,8 @@ ${result.runtimeError}`.trim(),
         const name = prop[2];
         if (!NOT_A_DECLARATION.has(name) && !MODIFIERS.has(name) && !TYPE_KEYWORDS.has(name)) {
           const t = bareType(prop[1]);
-          push({ name, kind: "property", type: t, isStatic, detail: `${t} ${name} { get; set; }` });
+          const accessors = exprBody ? "{ get; }" : "{ get; set; }";
+          push({ name, kind: "property", type: t, isStatic, detail: `${t} ${name} ${accessors}` });
         }
       }
       return;

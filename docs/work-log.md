@@ -1471,3 +1471,46 @@ passes; and CDP in a real browser confirms all three rows of the `Cat` box plus
 `FeedingSign` tick from typing expression-bodied members alone, no Run.
 
 Submodule commits BEFORE the parent pointer bump when this is committed.
+
+## 2026-08-04 16:01 - step rows for method-body work, and a check that had gone quiet
+
+Reported: on card 3 of the SOLID lesson a correct `FrontDesk` never ticked, and
+rewriting `Main` was one undivided leap with no guidance.
+
+Two real bugs behind it.
+
+1. The `FrontDesk` goal was authored `gate: null` - run-gated - on the belief
+   that no structural gate could see a change of PARAMETER type. It can:
+   `writes` scopes a source probe to the class's own body, so
+   `{ type: "FrontDesk", member: "HungryCount", writes: "List<Cat>" }` ticks the
+   moment the signature takes cats instead of ints. `HungryCount` alone was never
+   enough, because the starter declares it too.
+
+2. Nothing in `Main` declares a symbol, so no member lookup could ever track the
+   rewiring. Added STEP ROWS: a row may now be `{ row, writes }` / `{ row, gone }`
+   and carry its own source probe. Card 3's `Main` is four visible subtasks
+   instead of one cliff.
+
+Also collapsed a two-layer verdict into one. `evaluate` was the gate alone while
+the renderer separately ANDed the rows, so a test written against `evaluate`
+disagreed with the screen. `S.verdicts(types, goals, source)` is now the only
+answer to "is this goal done?", and the renderer, the tests and the validator all
+read it.
+
+And the recurring bug of this repo, again: `checkTracker` was called from inside
+the dotnet compile loop, so `--no-dotnet` skipped every goal-tracker assertion in
+the course and still printed PASS. The tracker check is pure and static; hoisted
+it to always run. Proved it by planting a broken step row - it now names the
+exact row.
+
+`SKILL.md` had no section on the goal tracker at all, which is why the
+granularity kept coming out thin. Added one: the `goals` shape, the gate table,
+the mandatory granularity rule (every added member a row, every method-body move
+a step row), and the two invariants (start red, move the gate when you move the
+code it watches).
+
+Verified: 375/375 course tests (18 new); validate 0 errors; verify-lesson --all
+now actually runs the tracker on all 84 lessons, 84 pass; real-dotnet run of the
+SOLID lesson passes; es round-trip clean; and CDP confirms in a real browser that
+the reporter's own source turns `FrontDesk` green from typing alone, with the two
+`Main` steps they had not done still correctly grey.

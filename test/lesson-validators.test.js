@@ -285,3 +285,69 @@ test("a starter the scanner cannot read FAILS instead of skipping granularity", 
   assert.match(lines.bad.join("\n"), /granularity was not checked/);
   assert.match(lines.bad.join("\n"), /scanner blew up/, "must say WHY");
 });
+
+// --- the tracker check must not ride inside the dotnet path -----------------
+//
+// REGRESSION. checkTracker used to be called from inside the compile loop, so
+// `--no-dotnet` - and every machine with no dotnet on PATH, which includes CI
+// for a docs-only change - skipped every goal-tracker assertion in the repo and
+// still printed PASS. The tracker is a pure static check on the solution's
+// shape; it needs no compiler and must always run.
+const TRACKER_TASK = {
+  title: "shape",
+  starter: "public class Cat { }",
+  solution: "public class Cat { public bool IsHungry() { return true; } }",
+  goals: [{ code: ["class Cat", "bool IsHungry()"], gate: { type: "Cat", member: "IsHungry" } }],
+};
+
+function trackerDeps(scan) {
+  return recorder({ codeLab: () => ({ scanCSharp: scan }) });
+}
+
+const REAL_SCAN = (src) => {
+  const types = [];
+  for (const m of src.matchAll(/class\s+(\w+)\s*\{([\s\S]*?)\}\s*$/g)) {
+    types.push({
+      name: m[1], kind: "class", bases: [],
+      members: [...m[2].matchAll(/(\w+)\s*\(/g)].map((x) => ({ name: x[1], kind: "method" })),
+    });
+  }
+  return { types };
+};
+
+for (const archetype of ["build", "drill"]) {
+  test(`${archetype}: the goal tracker is checked even with --no-dotnet`, async () => {
+    const { createValidators } = await load();
+    const { lines, deps } = trackerDeps(REAL_SCAN);
+    const v = createValidators(deps).get(archetype);
+    const passed = v.verify({ config: { tasks: [TRACKER_TASK] }, opts: { noDotnet: true } });
+    assert.equal(passed, true);
+    assert.ok(lines.ok.some((m) => /goal tracker lights up/.test(m)),
+      `tracker was never checked without dotnet: ${JSON.stringify(lines)}`);
+  });
+
+  test(`${archetype}: a dead gate FAILS without dotnet instead of going quiet`, async () => {
+    const { createValidators } = await load();
+    const { lines, deps } = trackerDeps(REAL_SCAN);
+    const dead = { ...TRACKER_TASK, goals: [{ gate: { type: "Cat", member: "Ghost" } }] };
+    const v = createValidators(deps).get(archetype);
+    const passed = v.verify({ config: { tasks: [dead] }, opts: { noDotnet: true } });
+    assert.equal(passed, false, "a gate the solution can never meet must fail the run");
+    assert.ok(lines.bad.some((m) => /could never tick/.test(m)), JSON.stringify(lines.bad));
+  });
+}
+
+test("a step row whose source probe is absent from the solution fails validation", async () => {
+  const { createValidators } = await load();
+  const { lines, deps } = trackerDeps(REAL_SCAN);
+  const task = {
+    ...TRACKER_TASK,
+    goals: [{
+      code: ["class Cat", { row: "builds the list", writes: "new List<Cat>" }],
+      gate: { type: "Cat", member: "IsHungry" },
+    }],
+  };
+  const v = createValidators(deps).get("build");
+  assert.equal(v.verify({ config: { tasks: [task] }, opts: { noDotnet: true } }), false);
+  assert.ok(lines.bad.some((m) => /step row watching for/.test(m)), JSON.stringify(lines.bad));
+});

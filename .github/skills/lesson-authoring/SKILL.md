@@ -134,10 +134,92 @@ and the per-archetype engines it loaded are gone.
       `solution`, `verify.main` and `example` alike. The only bad code allowed is
       the specific flaw a card exists to fix, and its `solution` is still clean.
 - [ ] Build tasks have a technique gate AND a hidden `verify` probe.
+- [ ] **The goal tracker is granular**: every member the solution adds has its
+      own row, every move inside a method body has its own step row, and every
+      goal starts RED on the starter. See "The live goal tracker".
 - [ ] SOLID letter stated if this is a design/testing/refactor lesson.
 - [ ] One example family for the Part; difficulty rises one rung.
 - [ ] `awardedKey == data-key`; `data-total` excludes the recap; unique `prefix`.
 - [ ] Ledger updated; work-log start and end logged.
+
+## The live goal tracker - `goals`
+
+A build card's `goals` array is what the learner watches while they type. It is
+rendered as UML class boxes, and it is the single biggest driver of whether a
+student feels guided or lost. Index-aligned with the localized `task.N.goal.M`
+prose, which becomes the caption inside each box.
+
+```js
+goals: [
+  {
+    code: ["class Cat", "int _hoursSinceMeal", "Cat(int hoursSinceMeal)", "bool IsHungry()"],
+    gate: { type: "Cat", member: "IsHungry" }
+  },
+  { gate: { absent: "CheckAndSign" } },   // a removal - struck-through box
+  { gate: null }                          // behaviour: only a passing Run ticks it
+]
+```
+
+**`code` decides box-vs-row. `gate` decides how it ticks.** A goal with `code` is
+always a box: `code[0]` is the header, `code[1..n]` are the rows inside it. The
+box goes green only when the gate AND every row under it is green.
+
+### Granularity is MANDATORY, and it is the thing authors get wrong
+
+A box listing nothing but `class Cat` passes every mechanical check while telling
+the learner nothing, and its tick jumps grey-to-green in one step with no sense
+of progress. So:
+
+1. **Every member the solution adds gets its own row.** Each field, the
+   constructor, each method that is in the `solution` but not in the `starter`.
+   `checkGranularity` in `tools/lib/lesson-validators.mjs` fails the build
+   otherwise, and it names the field you forgot.
+2. **Every move inside a method body gets a STEP row.** Building a list, newing
+   up the new collaborator, changing which argument gets passed - none of that
+   declares a symbol, so a member lookup can never see it and the row would sit
+   grey while the student does exactly the right thing. A step row carries its
+   own source probe instead:
+
+   ```js
+   {
+     code: [
+       "class Program",
+       { row: "var cats = new List<Cat> { ... }", writes: "new List<Cat>" },
+       { row: "var sign = new FeedingSign()",     writes: "new FeedingSign" },
+       { row: "sign.Format(cat.IsHungry())",      writes: ".Format(" },
+       { row: "desk.HungryCount(cats)",           writes: "HungryCount(cats)" }
+     ],
+     gate: { type: "Program", member: "Main" }
+   }
+   ```
+
+   `row` is the label shown; `writes` is a source fragment looked for inside that
+   type's body (comment-stripped, whitespace-insensitive). Use `gone` for the
+   mirror case - a row that ticks when something disappears.
+
+   Rewriting `Main` is exactly this case. "Refactor `Main`" as a single row is a
+   cliff; four step rows are a staircase. **Assume the student needs help with
+   every step** - this course teaches design, not C# recall, so never make them
+   guess the mechanics.
+
+### Two rules that keep the tracker honest
+
+- **Every goal must start RED on the untouched starter.** A goal that is already
+  green teaches nothing. Pinned by a test; check with `S.verdicts`, never
+  `S.evaluate` - `evaluate` is an intermediate value that ignores the rows.
+- **When you change code a gate watches, move the gate with it.** Renaming a
+  literal to a `const` breaks any `writes`/`gone` that named the literal, plus the
+  `requireSource` regexes and their EN+ES messages. This repo's worst recurring
+  bug is a check that goes quiet.
+
+Pick the tick source deliberately:
+
+| gate | ticks when | use for |
+| --- | --- | --- |
+| `{ type, member }` | that member exists on that type | a class the student must add |
+| `{ type, member, writes }` | ...and the source fragment appears in that type's body | a signature change a member lookup cannot see |
+| `{ absent: "X" }` | `X` is gone from the file | a removal |
+| `null` | the Run passes | a claim about OUTPUT, not shape |
 
 ## Every line of C# you ship is a worked example - MANDATORY
 
