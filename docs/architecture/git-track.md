@@ -68,6 +68,26 @@ model (this track) and real-git-WASM (next track) share one visual, `RepoState` 
   dot + both incoming edges (no full re-layout); the HEAD pill glides to its commit;
   honour `prefers-reduced-motion` (instant for those users).
 
+## Practical page UX (owner-ratified 2026-08-04, via a 5-case stress-test mockup)
+- **No Check button.** Pressing Enter runs the command AND re-checks the goal, like a real
+  terminal. The verdict appears inline (a terminal status line + a slim status strip).
+  Buttons are **Reset** (restore the card's start state + clear the terminal) and **Show
+  solution** (print the commands). A general hint system is separate cross-widget work.
+  SUPERSEDES the earlier "explicit Check button" decision.
+- **Layout: terminal UNDER the widget**, keeping graph + working-area together and full
+  width. No separate target panel is needed (see below), which removes the alignment problem.
+- **The target is drawn IN PLACE - one canvas laid out from the target.** Commits the learner
+  has are solid; commits still missing are **ghosted** in the slot they will occupy;
+  commits the learner made that the target does not contain are **flagged** (red dashed).
+  Progress = ghosts turning solid.
+  Rejected alternative (mockup-proven): stacking two graphs. It breaks on divergence (labels
+  collide), on lane disagreement (a CORRECT answer looks wrong), on merges (ghost edges sweep
+  across live nodes), and it duplicates the three-zone working area.
+- **Ghost depth: only the NEXT missing step** by default, plus a **"Show whole target"**
+  button - so the finished shape is not copyable from second zero.
+- **Off-plan commits block the pass** until the learner fixes them or resets.
+- **Cards: multi-card**, each card with its own start state, `Exercise n / N` + Prev/Next.
+
 ## Contracts
 1. **git-model** (code-lab `src/core/git-model.ts`, DOM-free): `RepoState` + pure ops
    `RepoState -> { state, effect }` (effect drives animation): `commit, add, branch,
@@ -83,8 +103,13 @@ model (this track) and real-git-WASM (next track) share one visual, `RepoState` 
    on("inspect")`. v1 interactivity: click a commit/chip to inspect. Animation honesty:
    slide-in for new commits + fast-forward, a drawn merge node; no rebase/cross-pane
    tween in v1 (those ops are deferred anyway).
-4. **git-engine** (course `git-engine.js` + `window.GIT_CONFIG`): terminal + GitGraph +
-   model, mounted by page-shell (mirrors build-engine). Goal:
+   NEW (ghost model): `setState(state, { ghost:[id...], diverged:[id...] })` - the state
+   passed is the TARGET-derived union so there is one layout; listed commits render ghosted
+   or flagged. Each node already carries `data-commit=<id>`, which is the tagging hook.
+4. **git-plugin** (course `kernel/engine/plugins/git-plugin.js`, a PRACTICE plugin on the
+   generic lesson engine): terminal + GitGraph + model over one `window.LESSON_CONFIG`
+   (`archetype: "git"`), dispatched by `LESSON_META.archetype` like every other archetype.
+   Grading runs after EVERY command (no Check button). Goal:
    `{type:"dag",target} | {type:"output",expected} | {type:"both"}`.
 5. **DAG grader** (NEW shared `kernel/grading/dag-match.js`, browser + node - like
    `output-match.js`): equivalence = refs matched by name; HEAD checked; commits matched
@@ -92,13 +117,20 @@ model (this track) and real-git-WASM (next track) share one visual, `RepoState` 
    merge parents order-insensitive by default (per-lesson strict opt-in). Wired into
    `tools/verify-lesson.mjs` via a NEW headless parser path (neither exists today).
 6. **Theory viz**: GitGraph stepped mode (one `RepoState` + narration per step, like
-   MemoryViz). NEW `GIT_CONFIG`/stepped-GitGraph branch in `resource/kernel-controller.js`
-   + `page-shell.js`, surviving the relocalize destroy/re-create cycle.
+   MemoryViz) - a WIDGET plugin on the generic engine (`archetype: "gitviz"` or the viz
+   plugin with a git scene), reading `window.LESSON_CONFIG` and surviving the relocalize
+   destroy/re-create cycle.
+
+## Missing runtime exports (found 2026-08-04)
+`code-lab/src/index.ts` exports only `GitGraph` + `gitLayout`, so the vendored bundle can
+RENDER a graph but cannot RUN a command. Before the plugin can work it must also export the
+git-model ops and `git-cli.run` (the types are already exported, the runtime functions are not).
 
 ## Where it lives
 code-lab `src/core` (git-model, git-cli, git-layout + `test/`), `src/dom`
-(git-graph-view), `src/index.ts` (export `CodeLab.GitGraph`), `src/code-lab.css`
-(`.cl-git`). Course: `git-engine.js`, a page-shell git mount, `kernel/grading/dag-match.js`,
+(git-graph-view, line-terminal), `src/index.ts` (export `CodeLab.GitGraph`,
+`CodeLab.LineTerminal`, the git-model ops and `git-cli.run`), `src/code-lab.css`
+(`.cl-git`). Course: `kernel/engine/plugins/git-plugin.js`, `kernel/grading/dag-match.js`,
 re-vendored `vendor/code-lab`. Content: `content/git/<part>/<lesson>/` + a `git` track
 in `course-registry.js`.
 
