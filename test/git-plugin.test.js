@@ -304,9 +304,14 @@ test("typing the solution drives the graph and reports a pass, so the core award
     assert.deepEqual(codeLab._graph.lastOverlay().diverged, []);
     assert.equal(codeLab._graph.lastState().commits.size, 2);
 
-    // the runtime's own output and an English status line reached the terminal
+    // The terminal shows what the COMMAND printed and nothing else - the
+    // verdict belongs to the result panel, not to the scrollback.
     assert.match(codeLab._terminal.text(), /add readme/);
-    assert.equal(codeLab._terminal.lines[codeLab._terminal.lines.length - 1].kind, "good");
+    assert.equal(
+      codeLab._terminal.lines.some((l) => l.kind === "good" || l.kind === "warn"),
+      false,
+      "the plugin must not narrate the verdict into the terminal",
+    );
 
     // and the core did its half
     assert.equal(xpNow(), 20, "core awarded XP on pass");

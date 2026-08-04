@@ -149,3 +149,36 @@ test("works against a scripted runtime with no bundle at all", async () => {
   assert.equal(checkGitTask({ ...task, solution: ["c"] }, fake, grade).code, "not-solved");
   assert.equal(checkGitTask({ ...task, solution: ["boom"] }, fake, grade).code, "solution-failed");
 });
+
+// --- what the folder holds -------------------------------------------------
+// The git model refuses to add a file that is not there, so every card needs a
+// folder. Making authors list it by hand would be busywork AND a silent trap, so
+// it is inferred from the card's own commands; `files` only covers what the card
+// shows but never adds.
+test("a card's files are inferred from the paths its own commands add", async () => {
+  const task = {
+    start: ["git add cat.txt", 'git commit -m "one"'],
+    target: ["git add dog.txt"],
+    solution: ["git add bird.txt"],
+  };
+  const { filesOf } = await loadGit();
+  assert.deepEqual(filesOf(task).sort(), ["bird.txt", "cat.txt", "dog.txt"]);
+});
+
+test("declared files are added to the inferred ones, without duplicates", async () => {
+  const { filesOf } = await loadGit();
+  const task = { files: ["notes.md", "cat.txt"], target: ["git add cat.txt"] };
+  assert.deepEqual(filesOf(task).sort(), ["cat.txt", "notes.md"]);
+});
+
+test("flags and whole-folder pathspecs are not filenames", async () => {
+  const { filesOf } = await loadGit();
+  const task = { target: ["git add .", "git add -A", "git add cat.txt"] };
+  assert.deepEqual(filesOf(task), ["cat.txt"]);
+});
+
+test("a card with no commands and no files declares an empty folder", async () => {
+  const { filesOf } = await loadGit();
+  assert.deepEqual(filesOf({}), []);
+  assert.deepEqual(filesOf(null), []);
+});

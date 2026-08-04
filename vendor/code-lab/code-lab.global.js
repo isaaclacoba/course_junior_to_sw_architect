@@ -40,6 +40,7 @@ var CodeLab = (() => {
     Quiz: () => Quiz,
     ReadOnlyView: () => ReadOnlyView,
     RoslynIframeRunner: () => RoslynIframeRunner,
+    Shell: () => Shell,
     TextareaEditor: () => TextareaEditor,
     Tour: () => Tour,
     VizLab: () => VizLab,
@@ -52,11 +53,13 @@ var CodeLab = (() => {
     computeLineFlags: () => computeLineFlags,
     conceptResults: () => conceptResults,
     counterLabel: () => counterLabel,
+    createGitCommand: () => createGitCommand,
     defaultHighlighter: () => defaultHighlighter,
     deriveRefs: () => deriveRefs,
     drawQuiz: () => drawQuiz,
     firstUnanswered: () => firstUnanswered,
     formatToolSignature: () => formatToolSignature,
+    gitAddFiles: () => addFiles,
     gitBranch: () => branch,
     gitCheckout: () => checkout,
     gitCommit: () => commit,
@@ -70,8 +73,8 @@ var CodeLab = (() => {
     gitRevParse: () => revParse,
     gitRun: () => run,
     gitStage: () => stage,
+    gitSubcommands: () => gitSubcommands,
     gitTag: () => tag,
-    gitTokenize: () => tokenize,
     goTo: () => goTo,
     loadMonaco: () => loadMonaco,
     makeTour: () => makeTour,
@@ -96,6 +99,8 @@ var CodeLab = (() => {
     scoreQuiz: () => scoreQuiz,
     selectRunCode: () => selectRunCode,
     shelfStores: () => shelfStores,
+    shellTokenize: () => tokenize,
+    shellTokenizeLine: () => tokenizeLine,
     showErrorPanel: () => showErrorPanel,
     shuffleQuiz: () => shuffle,
     spansForLine: () => spansForLine,
@@ -912,7 +917,7 @@ ${result.runtimeError}`.trim(),
     return noWhere.slice(colon + 1).split(",").map((part) => bareType(part)).filter(isIdent);
   }
   function bareType(raw) {
-    return raw.replace(/<.*>/, "").replace(/\[[\s,]*\]/g, "").replace(/\?$/, "").trim();
+    return raw.replace(/<[\s\S]*$/, "").replace(/\[[\s,]*\]/g, "").replace(/\?$/, "").trim();
   }
   function scanMembers(body) {
     const members = [];
@@ -967,7 +972,17 @@ ${result.runtimeError}`.trim(),
       }
     }
     const ctor = text.match(/^(?:[a-z]+\s+)*([A-Z][A-Za-z0-9_]*)\s*\(([^)]*)\)\s*$/);
-    if (ctor && blockFollows) return;
+    if (ctor && blockFollows) {
+      const cname = ctor[1];
+      push({
+        name: cname,
+        kind: "constructor",
+        type: cname,
+        isStatic: false,
+        detail: `${cname}(${ctor[2].trim()})`
+      });
+      return;
+    }
     if (blockFollows) {
       const prop = text.match(/([A-Za-z_][A-Za-z0-9_<>,.\[\]\?]*)\s+([A-Za-z_][A-Za-z0-9_]*)\s*$/);
       if (prop) {
@@ -1035,7 +1050,7 @@ ${result.runtimeError}`.trim(),
       if (isIdent(name) && !types.some((t) => t.name === name)) types.push({ name, kind, members, bases });
     }
     const seenVar = /* @__PURE__ */ new Set();
-    const varRe = /\bvar\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*new\s+([A-Za-z_][A-Za-z0-9_<>,.\[\]]*)/g;
+    const varRe = /\bvar\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*new\s+([A-Za-z_][A-Za-z0-9_<>,.\s]*?)\s*[({[]/g;
     while ((m = varRe.exec(src)) !== null) {
       if (!seenVar.has(m[1])) {
         seenVar.add(m[1]);
@@ -1077,18 +1092,56 @@ ${result.runtimeError}`.trim(),
     if (/[.\]]\s*$/.test(before)) return null;
     return m[1];
   }
+  var BUILTIN_MEMBERS = {
+    List: [
+      { name: "Add", kind: "method", type: "void", isStatic: false, detail: "void Add(T item)" },
+      { name: "Count", kind: "property", type: "int", isStatic: false, detail: "int Count" },
+      { name: "Remove", kind: "method", type: "bool", isStatic: false, detail: "bool Remove(T item)" },
+      { name: "RemoveAt", kind: "method", type: "void", isStatic: false, detail: "void RemoveAt(int index)" },
+      { name: "Contains", kind: "method", type: "bool", isStatic: false, detail: "bool Contains(T item)" },
+      { name: "IndexOf", kind: "method", type: "int", isStatic: false, detail: "int IndexOf(T item)" },
+      { name: "Insert", kind: "method", type: "void", isStatic: false, detail: "void Insert(int index, T item)" },
+      { name: "Clear", kind: "method", type: "void", isStatic: false, detail: "void Clear()" },
+      { name: "Sort", kind: "method", type: "void", isStatic: false, detail: "void Sort()" }
+    ],
+    Dictionary: [
+      { name: "Add", kind: "method", type: "void", isStatic: false, detail: "void Add(TKey key, TValue value)" },
+      { name: "Count", kind: "property", type: "int", isStatic: false, detail: "int Count" },
+      { name: "ContainsKey", kind: "method", type: "bool", isStatic: false, detail: "bool ContainsKey(TKey key)" },
+      { name: "TryGetValue", kind: "method", type: "bool", isStatic: false, detail: "bool TryGetValue(TKey key, out TValue value)" },
+      { name: "Remove", kind: "method", type: "bool", isStatic: false, detail: "bool Remove(TKey key)" },
+      { name: "Keys", kind: "property", isStatic: false, detail: "KeyCollection Keys" },
+      { name: "Values", kind: "property", isStatic: false, detail: "ValueCollection Values" }
+    ],
+    string: [
+      { name: "Length", kind: "property", type: "int", isStatic: false, detail: "int Length" },
+      { name: "ToUpper", kind: "method", type: "string", isStatic: false, detail: "string ToUpper()" },
+      { name: "ToLower", kind: "method", type: "string", isStatic: false, detail: "string ToLower()" },
+      { name: "Trim", kind: "method", type: "string", isStatic: false, detail: "string Trim()" },
+      { name: "Split", kind: "method", type: "string[]", isStatic: false, detail: "string[] Split(char separator)" },
+      { name: "Contains", kind: "method", type: "bool", isStatic: false, detail: "bool Contains(string value)" },
+      { name: "Replace", kind: "method", type: "string", isStatic: false, detail: "string Replace(string old, string New)" },
+      { name: "StartsWith", kind: "method", type: "bool", isStatic: false, detail: "bool StartsWith(string value)" },
+      { name: "EndsWith", kind: "method", type: "bool", isStatic: false, detail: "bool EndsWith(string value)" },
+      { name: "Substring", kind: "method", type: "string", isStatic: false, detail: "string Substring(int startIndex)" }
+    ]
+  };
   function membersOf(symbols, receiver) {
     if (!receiver) return null;
     const asType = symbols.types.find((t2) => t2.name === receiver);
     if (asType) {
-      const statics = asType.members.filter((mm) => mm.isStatic || mm.kind === "enumMember");
+      const statics = asType.members.filter(
+        (mm) => mm.kind !== "constructor" && (mm.isStatic || mm.kind === "enumMember")
+      );
       return statics.length ? statics : null;
     }
     const v = symbols.vars.find((x) => x.name === receiver);
     if (!v || !v.type) return null;
     const t = symbols.types.find((x) => x.name === v.type);
-    if (!t) return null;
-    const instance = t.members.filter((mm) => !mm.isStatic && mm.kind !== "enumMember");
+    if (!t) return BUILTIN_MEMBERS[v.type] ?? null;
+    const instance = t.members.filter(
+      (mm) => !mm.isStatic && mm.kind !== "enumMember" && mm.kind !== "constructor"
+    );
     return instance.length ? instance : null;
   }
 
@@ -1205,7 +1258,22 @@ ${result.runtimeError}`.trim(),
       { label: "ctor", insert: "public ${1:Type}()\n{\n    $0\n}", doc: "Constructor" },
       { label: "method", insert: "public ${1:void} ${2:Name}()\n{\n    $0\n}", doc: "Method" },
       { label: "prop", insert: "public ${1:string} ${2:Name} { get; set; }", doc: "Auto property" },
-      { label: "foreach", insert: "foreach (var ${1:item} in ${2:items})\n{\n    $0\n}", doc: "Foreach loop" }
+      { label: "foreach", insert: "foreach (var ${1:item} in ${2:items})\n{\n    $0\n}", doc: "Foreach loop" },
+      // The course teaches design, not syntax recall. A learner who knows exactly
+      // which shape they want should never be stuck on how to spell it, so every
+      // control-flow construct the course uses has a skeleton here.
+      { label: "if", insert: "if (${1:condition})\n{\n    $0\n}", doc: "If statement" },
+      { label: "ifelse", insert: "if (${1:condition})\n{\n    $1\n}\nelse\n{\n    $0\n}", doc: "If / else" },
+      { label: "else", insert: "else\n{\n    $0\n}", doc: "Else block" },
+      { label: "elseif", insert: "else if (${1:condition})\n{\n    $0\n}", doc: "Else if" },
+      { label: "switch", insert: "switch (${1:value})\n{\n    case ${2:option}:\n        $0\n        break;\n    default:\n        break;\n}", doc: "Switch statement" },
+      { label: "case", insert: "case ${1:option}:\n    $0\n    break;", doc: "Switch case" },
+      { label: "for", insert: "for (int ${1:i} = 0; ${1:i} < ${2:count}; ${1:i}++)\n{\n    $0\n}", doc: "For loop" },
+      { label: "while", insert: "while (${1:condition})\n{\n    $0\n}", doc: "While loop" },
+      { label: "ternary", insert: "${1:condition} ? ${2:whenTrue} : ${0:whenFalse}", doc: "Conditional expression" },
+      { label: "trycatch", insert: "try\n{\n    $1\n}\ncatch (${2:Exception} ex)\n{\n    $0\n}", doc: "Try / catch" },
+      { label: "list", insert: "var ${1:items} = new List<${2:string}>();", doc: "New list" },
+      { label: "dict", insert: "var ${1:map} = new Dictionary<${2:string}, ${3:int}>();", doc: "New dictionary" }
     ];
     monaco.languages.registerCompletionItemProvider("csharp", {
       // `.` so member completions appear as soon as the learner types a dot,
@@ -4498,26 +4566,28 @@ ${result.runtimeError}`.trim(),
       return arrow;
     }
     renderZones(state, animate) {
-      const tree = [...state.worktree.keys()].sort();
+      const tree = [...state.worktree.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([path, status]) => ({ path, status }));
       const staged = [...state.index.keys()].sort();
       const committed = this.reachablePaths(state);
-      for (const p of tree) committed.delete(p);
+      for (const f of tree) committed.delete(f.path);
       for (const p of staged) committed.delete(p);
       const repo = [...committed].sort();
       const nextZoneOf = /* @__PURE__ */ new Map();
       this.fillZone("tree", tree, nextZoneOf, animate);
-      this.fillZone("index", staged, nextZoneOf, animate);
-      this.fillZone("repo", repo, nextZoneOf, animate);
+      this.fillZone("index", staged.map((path) => ({ path })), nextZoneOf, animate);
+      this.fillZone("repo", repo.map((path) => ({ path })), nextZoneOf, animate);
       this.prevZoneOf = nextZoneOf;
     }
-    fillZone(zone, paths, nextZoneOf, animate) {
+    fillZone(zone, files, nextZoneOf, animate) {
       const body = this.zoneBodies[zone];
       body.replaceChildren();
-      for (const path of paths) {
+      for (const { path, status } of files) {
         nextZoneOf.set(path, zone);
         const moved = animate && this.prevZoneOf.get(path) !== zone;
         const row = document.createElement("div");
-        row.className = moved ? "cl-git-file is-moved" : "cl-git-file";
+        row.className = "cl-git-file";
+        if (status) row.classList.add(`is-${status}`);
+        if (moved) row.classList.add("is-moved");
         const dot = document.createElement("span");
         dot.className = "cl-git-fdot";
         const name = document.createElement("span");
@@ -4678,11 +4748,32 @@ ${result.runtimeError}`.trim(),
       seq: 0
     };
   }
+  function addFiles(state, paths) {
+    const s = cloneState(state);
+    for (const p of paths) {
+      if (s.index.has(p) || s.worktree.has(p)) continue;
+      s.worktree.set(p, "untracked");
+    }
+    return { state: s, effect: { kind: "none" } };
+  }
   function stage(state, paths) {
     const s = cloneState(state);
     for (const p of paths) {
+      if (!s.worktree.has(p) && !s.index.has(p)) {
+        throw new GitError(`fatal: pathspec '${p}' did not match any files`);
+      }
       s.index.set(p, "staged");
       s.worktree.delete(p);
+    }
+    return { state: s, effect: { kind: "none" } };
+  }
+  function unstage(state, paths) {
+    const s = cloneState(state);
+    const tracked = trackedPaths(s, headCommit3(s));
+    for (const p of paths) {
+      if (!s.index.has(p)) continue;
+      s.index.delete(p);
+      s.worktree.set(p, tracked.has(p) ? "modified" : "untracked");
     }
     return { state: s, effect: { kind: "none" } };
   }
@@ -4803,16 +4894,33 @@ ${result.runtimeError}`.trim(),
   }
   function reset(state, mode, targetRev) {
     const s = cloneState(state);
+    const before = headCommit3(s);
     const target = revParse(s, targetRev);
     moveHead(s, target);
-    if (mode === "mixed") {
-      for (const p of s.index.keys()) s.worktree.set(p, "modified");
+    const tracked = trackedPaths(s, target);
+    const undone = before ? changedPaths(s, before, target) : /* @__PURE__ */ new Set();
+    const restingStatus = (p) => tracked.has(p) ? "modified" : "untracked";
+    if (mode === "soft") {
+      for (const p of undone) s.index.set(p, "staged");
+    } else if (mode === "mixed") {
+      for (const p of s.index.keys()) s.worktree.set(p, restingStatus(p));
       s.index.clear();
+      for (const p of undone) s.worktree.set(p, restingStatus(p));
     } else if (mode === "hard") {
+      const staged = [...s.index.keys()];
       s.index.clear();
-      s.worktree.clear();
+      for (const [path, status] of [...s.worktree]) {
+        if (status !== "untracked") s.worktree.delete(path);
+      }
+      for (const path of staged) {
+        if (!tracked.has(path)) s.worktree.set(path, "untracked");
+      }
+      for (const path of undone) if (!tracked.has(path)) s.worktree.delete(path);
     }
     return { state: s, effect: { kind: "reset", mode, to: target } };
+  }
+  function trackedPaths(s, tip) {
+    return tip ? changedPaths(s, tip, null) : /* @__PURE__ */ new Set();
   }
   function revParse(state, rev) {
     const m = rev.match(/^([^~^]+)(.*)$/);
@@ -4870,8 +4978,16 @@ ${result.runtimeError}`.trim(),
     return [...state.commits.keys()].filter((h) => set.has(h)).reverse();
   }
 
-  // src/core/git-cli.ts
+  // src/terminal/shell.ts
+  var BUILTINS = [
+    { name: "clear", summary: "Clear the terminal screen." },
+    { name: "help", summary: "List the commands, or explain one: help <name>." }
+  ];
+  var SUGGEST_MAX_DISTANCE = 2;
   function tokenize(line) {
+    return tokenizeLine(line).tokens;
+  }
+  function tokenizeLine(line) {
     const tokens = [];
     let cur = "";
     let quoted = false;
@@ -4902,7 +5018,225 @@ ${result.runtimeError}`.trim(),
       }
     }
     if (cur !== "" || quoted) tokens.push(cur);
-    return tokens;
+    if (inDouble || inSingle) {
+      const mark = inDouble ? '"' : "'";
+      return {
+        tokens,
+        error: `unexpected EOF while looking for matching ${mark}
+(the ${mark} you opened is never closed)`
+      };
+    }
+    return { tokens };
+  }
+  function editDistance(a, b) {
+    if (a === b) return 0;
+    if (a === "") return b.length;
+    if (b === "") return a.length;
+    let prev2 = Array.from({ length: b.length + 1 }, (_, i) => i);
+    let row = new Array(b.length + 1);
+    for (let i = 1; i <= a.length; i++) {
+      row[0] = i;
+      for (let j = 1; j <= b.length; j++) {
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        row[j] = Math.min(row[j - 1] + 1, (prev2[j] ?? 0) + 1, (prev2[j - 1] ?? 0) + cost);
+      }
+      const swap = prev2;
+      prev2 = row;
+      row = swap;
+    }
+    return prev2[b.length] ?? 0;
+  }
+  var Shell = class {
+    constructor() {
+      this.registry = /* @__PURE__ */ new Map();
+    }
+    /** Add a command set. Registering a name twice replaces the first. The
+     *  built-ins (`help`, `clear`) always win at dispatch time. */
+    register(cmd) {
+      this.registry.set(cmd.name, cmd);
+      return this;
+    }
+    /** The registered commands, sorted by name. Built-ins are not in here - they
+     *  belong to the shell, not to a command set. */
+    commands() {
+      return [...this.registry.values()].sort((a, b) => a.name.localeCompare(b.name));
+    }
+    /** Run one typed line. Never throws. */
+    run(line, state) {
+      const { tokens: argv, error: syntax } = tokenizeLine(line);
+      if (syntax) return { state, output: syntax, error: true };
+      const name = argv[0];
+      if (name === void 0) return { state, output: "" };
+      const rest = argv.slice(1);
+      if (name === "clear") return { state, output: "", effect: { kind: "clear" } };
+      if (name === "help") return { state, output: this.helpText(rest), error: this.helpMissing(rest) };
+      const cmd = this.registry.get(name);
+      if (!cmd) return { state, output: this.notFound(name), error: true };
+      try {
+        return cmd.run(rest, state);
+      } catch (err) {
+        return { state, output: err instanceof Error ? err.message : String(err), error: true };
+      }
+    }
+    // --- built-ins ---------------------------------------------------------
+    /** Every name the shell answers to, with its one-line summary, sorted. A
+     *  built-in's summary wins over a registered command of the same name,
+     *  because the built-in is what actually runs. */
+    catalogue() {
+      const byName = /* @__PURE__ */ new Map();
+      for (const cmd of this.registry.values()) byName.set(cmd.name, cmd.summary);
+      for (const b of BUILTINS) byName.set(b.name, b.summary);
+      return [...byName.entries()].map(([name, summary]) => ({ name, summary })).sort((a, b) => a.name.localeCompare(b.name));
+    }
+    helpText(argv) {
+      const wanted = argv[0];
+      if (wanted === void 0) {
+        const all = this.catalogue();
+        const width = all.reduce((w, c) => Math.max(w, c.name.length), 0);
+        return all.map((c) => `${c.name.padEnd(width)}  ${c.summary}`).join("\n");
+      }
+      const builtin = BUILTINS.find((b) => b.name === wanted);
+      if (builtin) return builtin.summary;
+      const cmd = this.registry.get(wanted);
+      if (!cmd) return `help: no such command: ${wanted}`;
+      return cmd.help ? cmd.help(argv.slice(1)) : cmd.summary;
+    }
+    helpMissing(argv) {
+      const wanted = argv[0];
+      if (wanted === void 0) return void 0;
+      if (BUILTINS.some((b) => b.name === wanted)) return void 0;
+      return this.registry.has(wanted) ? void 0 : true;
+    }
+    notFound(name) {
+      const near = this.suggest(name);
+      return `${name}: command not found` + (near ? `  Did you mean '${near}'?` : "");
+    }
+    /** The closest known name within `SUGGEST_MAX_DISTANCE` edits, ties broken
+     *  alphabetically so the message is stable. */
+    suggest(name) {
+      let best = null;
+      let bestDistance = SUGGEST_MAX_DISTANCE + 1;
+      for (const { name: candidate } of this.catalogue()) {
+        const d = editDistance(name, candidate);
+        if (d < bestDistance) {
+          best = candidate;
+          bestDistance = d;
+        }
+      }
+      return bestDistance <= SUGGEST_MAX_DISTANCE ? best : null;
+    }
+  };
+
+  // src/terminal/commands/git.ts
+  var SUBCOMMANDS = [
+    {
+      name: "init",
+      summary: "Start a new, empty repository.",
+      usage: ["init"]
+    },
+    {
+      name: "status",
+      summary: "Show what is staged, changed, and untracked.",
+      usage: ["status"]
+    },
+    {
+      name: "add",
+      summary: "Stage a path for the next commit, or mark a conflict resolved.",
+      usage: ["add <path>...", "add ."]
+    },
+    {
+      name: "commit",
+      summary: "Record the staged changes as a new commit.",
+      usage: ["commit -m <message>", "commit --amend [-m <message>]"]
+    },
+    {
+      name: "log",
+      summary: "Show the history behind HEAD, newest first.",
+      usage: ["log [--oneline]"]
+    },
+    {
+      name: "branch",
+      summary: "List the branches, or create one.",
+      usage: ["branch", "branch <name> [<start-point>]"]
+    },
+    {
+      name: "switch",
+      summary: "Move HEAD to another branch.",
+      usage: ["switch <branch>", "switch -c <new-branch>"]
+    },
+    {
+      name: "checkout",
+      summary: "Move HEAD to a branch, or straight to a commit (detached HEAD).",
+      usage: ["checkout <branch>", "checkout <commit>", "checkout -b <new-branch>"]
+    },
+    {
+      name: "merge",
+      summary: "Join another branch into the current one.",
+      usage: ["merge <branch>", "merge --abort"]
+    },
+    {
+      name: "reset",
+      summary: "Move the current branch to another commit.",
+      usage: ["reset [--soft | --mixed | --hard] [<commit>]"]
+    },
+    {
+      name: "tag",
+      summary: "List the tags, or put a name on a commit.",
+      usage: ["tag", "tag <name> [<commit>]"]
+    },
+    {
+      name: "rev-parse",
+      summary: "Print the commit a revision resolves to.",
+      usage: ["rev-parse <revision>"]
+    },
+    {
+      name: "rev-list",
+      summary: "List the commits in a range.",
+      usage: ["rev-list <revision>", "rev-list <a>..<b>", "rev-list <a>...<b>", "rev-list --all"]
+    },
+    {
+      name: "help",
+      summary: "List these commands, or explain one.",
+      usage: ["help [<command>]"]
+    }
+  ];
+  var DOC_BY_NAME = new Map(SUBCOMMANDS.map((d) => [d.name, d]));
+  var SUGGEST_MAX_DISTANCE2 = 2;
+  function helpList() {
+    const width = SUBCOMMANDS.reduce((w, d) => Math.max(w, d.name.length), 0);
+    return [
+      "usage: git <command> [<args>]",
+      "",
+      "These are the git commands this course supports:",
+      "",
+      ...SUBCOMMANDS.map((d) => `   ${d.name.padEnd(width)}   ${d.summary}`),
+      "",
+      "Run 'git help <command>' to see one command's usage."
+    ].join("\n");
+  }
+  function helpFor(doc) {
+    const lines = doc.usage.map((u, i) => `${i === 0 ? "usage:" : "   or:"} git ${u}`);
+    return lines.join("\n") + "\n\n" + doc.summary;
+  }
+  function suggest(name) {
+    let best = null;
+    let bestDistance = SUGGEST_MAX_DISTANCE2 + 1;
+    for (const { name: candidate } of SUBCOMMANDS) {
+      const d = editDistance(name, candidate);
+      if (d < bestDistance) {
+        best = candidate;
+        bestDistance = d;
+      }
+    }
+    return bestDistance <= SUGGEST_MAX_DISTANCE2 ? best : null;
+  }
+  function unknownText(sub) {
+    const near = suggest(sub);
+    const head = `git: '${sub}' is not a git command. See 'git help'.`;
+    return near ? `${head}
+
+The most similar command is
+	${near}` : head;
   }
   function headCommit4(s) {
     if (s.head.kind === "detached") return s.head.commit;
@@ -4980,39 +5314,68 @@ ${result.runtimeError}`.trim(),
     parts.push(...branches.sort(), ...tags.sort());
     return parts.length ? ` (${parts.join(", ")})` : "";
   }
+  function worktreeOf(s) {
+    return s.worktree;
+  }
   function statusText(s) {
-    const lines = [];
+    const blocks = [];
+    const header = [];
     if (s.head.kind === "branch") {
-      lines.push(`On branch ${s.head.name.replace("refs/heads/", "")}`);
-      if (headCommit4(s) === null) lines.push("No commits yet");
+      header.push(`On branch ${s.head.name.replace("refs/heads/", "")}`);
+      if (headCommit4(s) === null) header.push("No commits yet");
     } else {
-      lines.push(`HEAD detached at ${s.head.commit}`);
+      header.push(`HEAD detached at ${s.head.commit}`);
     }
+    blocks.push(header);
     if (s.merge && s.merge.conflicted.length > 0) {
-      lines.push("You have unmerged paths.");
-      lines.push('  (fix conflicts and run "git commit")');
-      lines.push("Unmerged paths:");
-      lines.push('  (use "git add <file>..." to mark resolution)');
-      for (const p of [...s.merge.conflicted].sort()) {
-        lines.push(`	both modified:   ${p}`);
-      }
+      const block = [
+        "You have unmerged paths.",
+        '  (fix conflicts and run "git commit")',
+        "Unmerged paths:",
+        '  (use "git add <file>..." to mark resolution)'
+      ];
+      for (const p of [...s.merge.conflicted].sort()) block.push(`	both modified:   ${p}`);
+      blocks.push(block);
     }
     const staged = [...s.index.keys()].sort();
     if (staged.length > 0) {
-      lines.push("Changes to be committed:");
-      lines.push('  (use "git restore --staged <file>..." to unstage)');
-      for (const p of staged) lines.push(`	modified:   ${p}`);
+      const block = [
+        "Changes to be committed:",
+        '  (use "git reset <file>..." to unstage)'
+      ];
+      for (const p of staged) block.push(`	modified:   ${p}`);
+      blocks.push(block);
     }
-    const modified = [...s.worktree.keys()].sort();
+    const modified = [];
+    const untracked = [];
+    for (const [path, kind] of worktreeOf(s)) {
+      if (kind === "untracked") untracked.push(path);
+      else modified.push(path);
+    }
+    modified.sort();
+    untracked.sort();
     if (modified.length > 0) {
-      lines.push("Changes not staged for commit:");
-      lines.push('  (use "git add <file>..." to update what will be committed)');
-      for (const p of modified) lines.push(`	modified:   ${p}`);
+      const block = [
+        "Changes not staged for commit:",
+        '  (use "git add <file>..." to update what will be committed)'
+      ];
+      for (const p of modified) block.push(`	modified:   ${p}`);
+      blocks.push(block);
+    }
+    if (untracked.length > 0) {
+      const block = [
+        "Untracked files:",
+        '  (use "git add <file>..." to include in what will be committed)'
+      ];
+      for (const p of untracked) block.push(`	${p}`);
+      blocks.push(block);
     }
     if (!s.merge && staged.length === 0 && modified.length === 0) {
-      lines.push("nothing to commit, working tree clean");
+      blocks.push([
+        untracked.length > 0 ? 'nothing added to commit but untracked files present (use "git add" to track)' : "nothing to commit, working tree clean"
+      ]);
     }
-    return lines.join("\n");
+    return blocks.map((b) => b.join("\n")).join("\n\n");
   }
   function logText(s, oneline) {
     const ids = revList(s, "HEAD");
@@ -5026,57 +5389,54 @@ ${result.runtimeError}`.trim(),
     ${c.message}`;
     }).join("\n\n");
   }
-  var KNOWN = /* @__PURE__ */ new Set([
-    "init",
-    "add",
-    "status",
-    "commit",
-    "branch",
-    "switch",
-    "checkout",
-    "merge",
-    "reset",
-    "tag",
-    "log",
-    "rev-parse",
-    "rev-list"
-  ]);
   function ok(state, output, effect) {
     return { state, output, effect };
   }
-  function unknown(state, sub) {
-    const msg = `git: '${sub}' is not a git command. See 'git --help'.`;
-    return { state, output: msg, effect: { kind: "none" }, error: msg };
+  function fail(state, output, message = output) {
+    return { state, output, effect: { kind: "none" }, error: message };
   }
-  function run(line, state) {
-    let tokens = tokenize(line);
-    if (tokens.length && tokens[0] === "git") tokens = tokens.slice(1);
-    if (tokens.length === 0) {
-      return ok(state, "", { kind: "none" });
-    }
+  function wantsHelp(args) {
+    return args.includes("--help") || args.includes("-h");
+  }
+  function runGit(argv, state) {
+    const tokens = argv[0] === "git" ? argv.slice(1) : argv;
+    if (tokens.length === 0) return ok(state, helpList(), { kind: "none" });
     const sub = tokens[0];
     const args = tokens.slice(1);
+    if (sub === "help" || sub === "--help" || sub === "-h") {
+      const wanted = args.find((a) => !a.startsWith("-"));
+      if (wanted === void 0) return ok(state, helpList(), { kind: "none" });
+      const doc2 = DOC_BY_NAME.get(wanted);
+      return doc2 ? ok(state, helpFor(doc2), { kind: "none" }) : fail(state, unknownText(wanted));
+    }
+    const doc = DOC_BY_NAME.get(sub);
+    if (!doc) return fail(state, unknownText(sub));
+    if (wantsHelp(args)) return ok(state, helpFor(doc), { kind: "none" });
     try {
       switch (sub) {
         case "init": {
-          return ok(init(), "Initialized empty Git repository", { kind: "none" });
+          if (state.commits.size > 0 || state.refs.size > 0) {
+            return ok(state, "Reinitialized existing Git repository", { kind: "none" });
+          }
+          const fresh = init();
+          return ok(
+            { ...fresh, index: new Map(state.index), worktree: new Map(state.worktree) },
+            "Initialized empty Git repository",
+            { kind: "none" }
+          );
         }
         case "add": {
           if (state.merge) {
             const paths2 = args.includes(".") ? [...state.merge.conflicted] : args;
-            if (paths2.length === 0) {
-              return { state, output: "Nothing specified, nothing added.", effect: { kind: "none" }, error: "Nothing specified, nothing added." };
-            }
+            if (paths2.length === 0) return fail(state, "Nothing specified, nothing added.");
             const r2 = resolvePaths(state, paths2);
             return ok(r2.state, "", r2.effect);
           }
+          if (args.length === 0) return fail(state, "Nothing specified, nothing added.");
           const paths = [];
           for (const a of args) {
             if (a === ".") paths.push(...state.worktree.keys());
             else paths.push(a);
-          }
-          if (args.length === 0) {
-            return { state, output: "Nothing specified, nothing added.", effect: { kind: "none" }, error: "Nothing specified, nothing added." };
           }
           const r = stage(state, paths);
           return ok(r.state, "", r.effect);
@@ -5093,8 +5453,7 @@ ${result.runtimeError}`.trim(),
             return ok(r2.state, commitLine(r2.state, r2.effect.id), r2.effect);
           }
           if (message === void 0 || message === "") {
-            const msg = "Aborting commit due to empty commit message.";
-            return { state, output: msg, effect: { kind: "none" }, error: msg };
+            return fail(state, "Aborting commit due to empty commit message.");
           }
           const r = commit(state, message);
           const id = r.effect.id;
@@ -5116,8 +5475,11 @@ ${result.runtimeError}`.trim(),
           const create = args.includes("-c") || args.includes("-b");
           const positional = args.filter((a) => !a.startsWith("-"));
           if (positional.length === 0) {
-            const msg = "fatal: missing branch or commit argument";
-            return { state, output: msg, effect: { kind: "none" }, error: "missing branch or commit argument" };
+            return fail(
+              state,
+              "fatal: missing branch or commit argument",
+              "missing branch or commit argument"
+            );
           }
           const target = positional[0];
           const r = checkout(state, target, { create });
@@ -5139,8 +5501,11 @@ ${result.runtimeError}`.trim(),
           }
           const rev = args.find((a) => !a.startsWith("-"));
           if (rev === void 0) {
-            const msg = "fatal: No commit specified and merge.defaultToUpstream not set.";
-            return { state, output: msg, effect: { kind: "none" }, error: "No commit specified" };
+            return fail(
+              state,
+              "fatal: No commit specified and merge.defaultToUpstream not set.",
+              "No commit specified"
+            );
           }
           const r = merge(state, rev);
           let out;
@@ -5168,7 +5533,20 @@ Fast-forward`;
           if (args.includes("--soft")) mode = "soft";
           else if (args.includes("--hard")) mode = "hard";
           else if (args.includes("--mixed")) mode = "mixed";
-          const rev = args.find((a) => !a.startsWith("-")) ?? "HEAD";
+          const positional = args.filter((a) => !a.startsWith("-"));
+          const looksLikeRev = (name) => {
+            try {
+              revParse(state, name);
+              return true;
+            } catch {
+              return false;
+            }
+          };
+          if (positional.length > 0 && !positional.some(looksLikeRev)) {
+            const r2 = unstage(state, positional);
+            return ok(r2.state, "", r2.effect);
+          }
+          const rev = positional[0] ?? "HEAD";
           const r = reset(state, mode, rev);
           let out = "";
           if (mode === "hard") {
@@ -5193,35 +5571,60 @@ Fast-forward`;
         case "rev-parse": {
           const rev = args.find((a) => !a.startsWith("-"));
           if (rev === void 0) {
-            const msg = "fatal: rev-parse: no revision given";
-            return { state, output: msg, effect: { kind: "none" }, error: "no revision given" };
+            return fail(state, "fatal: rev-parse: no revision given", "no revision given");
           }
           return ok(state, revParse(state, rev), { kind: "none" });
         }
         case "rev-list": {
           const range = args.find((a) => a === "--all" || !a.startsWith("-"));
           if (range === void 0) {
-            const msg = "fatal: rev-list: no revision given";
-            return { state, output: msg, effect: { kind: "none" }, error: "no revision given" };
+            return fail(state, "fatal: rev-list: no revision given", "no revision given");
           }
           return ok(state, revList(state, range).join("\n"), { kind: "none" });
         }
         default:
-          if (KNOWN.has(sub)) {
-            return unknown(state, sub);
-          }
-          return unknown(state, sub);
+          return fail(state, unknownText(sub));
       }
     } catch (e) {
-      if (e instanceof GitError) {
-        return { state, output: e.message, effect: { kind: "none" }, error: e.message };
-      }
+      if (e instanceof GitError) return fail(state, e.message);
       const msg = e instanceof Error ? e.message : String(e);
-      return { state, output: `fatal: ${msg}`, effect: { kind: "none" }, error: msg };
+      return fail(state, `fatal: ${msg}`, msg);
     }
   }
+  function gitSubcommands() {
+    return SUBCOMMANDS.map((d) => d.name);
+  }
+  function createGitCommand() {
+    return {
+      name: "git",
+      summary: "Run a git command against the lesson's repository.",
+      run(argv, state) {
+        const r = runGit(argv, state);
+        return {
+          state: r.state,
+          output: r.output,
+          error: r.error === void 0 ? void 0 : true,
+          effect: r.effect
+        };
+      },
+      help(argv) {
+        const wanted = argv.find((a) => !a.startsWith("-"));
+        if (wanted === void 0) return helpList();
+        const doc = DOC_BY_NAME.get(wanted);
+        return doc ? helpFor(doc) : unknownText(wanted);
+      }
+    };
+  }
 
-  // src/core/terminal-history.ts
+  // src/core/git-cli.ts
+  function run(line, state) {
+    const { tokens, error } = tokenizeLine(line);
+    if (error) return { state, output: error, error, effect: { kind: "none" } };
+    if (tokens.length === 0) return { state, output: "", effect: { kind: "none" } };
+    return runGit(tokens, state);
+  }
+
+  // src/terminal/history.ts
   var DEFAULT_LIMIT = 100;
   var CommandHistory = class {
     constructor(limit = DEFAULT_LIMIT) {
@@ -5267,7 +5670,7 @@ Fast-forward`;
     }
   };
 
-  // src/dom/line-terminal.ts
+  // src/terminal/line-terminal.ts
   var DEFAULT_PROMPT = "$";
   var LineTerminal = class {
     constructor() {
@@ -5276,6 +5679,8 @@ Fast-forward`;
       this.input = null;
       this.prompt = DEFAULT_PROMPT;
       this.onCommand = null;
+      this.shell = null;
+      this.onState = null;
       this.history = new CommandHistory();
       // --- input -------------------------------------------------------------
       this.onKeyDown = (ev) => {
@@ -5308,7 +5713,10 @@ Fast-forward`;
     // --- lifecycle ---------------------------------------------------------
     mount(host, opts) {
       this.prompt = opts.prompt ?? DEFAULT_PROMPT;
-      this.onCommand = opts.onCommand;
+      this.onCommand = opts.onCommand ?? null;
+      this.shell = opts.shell ?? null;
+      this.state = opts.state;
+      this.onState = opts.onState ?? null;
       const root = document.createElement("div");
       root.className = "cl-term";
       const scroll = document.createElement("div");
@@ -5345,6 +5753,8 @@ Fast-forward`;
       this.scroll = null;
       this.input = null;
       this.onCommand = null;
+      this.shell = null;
+      this.onState = null;
       this.history.reset();
     }
     // --- public API --------------------------------------------------------
@@ -5372,7 +5782,19 @@ Fast-forward`;
       if (this.input) this.input.value = "";
       this.echo(line);
       this.history.push(line);
-      if (line !== "") this.onCommand?.(line);
+      if (line === "") return;
+      this.onCommand?.(line);
+      this.dispatch(line);
+    }
+    /** Run the line through the shell, if there is one, and show what came back. */
+    dispatch(line) {
+      const shell = this.shell;
+      if (!shell) return;
+      const result = shell.run(line, this.state);
+      if (isClear(result.effect)) this.clear();
+      if (result.output !== "") this.write(result.output, result.error ? "err" : "out");
+      this.state = result.state;
+      this.onState?.(result.state, result);
     }
     /** Put a recalled entry on the live line, caret at the end. `null` means the
      *  walk hit an end, so the line stays as it is. */
@@ -5406,6 +5828,9 @@ Fast-forward`;
       if (this.scroll) this.scroll.scrollTop = this.scroll.scrollHeight;
     }
   };
+  function isClear(effect) {
+    return typeof effect === "object" && effect !== null && effect.kind === "clear";
+  }
 
   // src/core/quiz-model.ts
   function shuffle(arr, rng = Math.random) {

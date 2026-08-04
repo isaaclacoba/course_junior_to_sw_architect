@@ -1991,3 +1991,10 @@ input.almost {
 .concept-panel-def { color: var(--ink-soft); margin: 0 0 0.6rem; line-height: 1.45; font-size: 0.92rem; }
 .concept-panel-link { margin: 0; font-size: 0.82rem; }
 .concept-panel-link a { color: var(--primary); }
+
+/* Git lesson stage - the commit graph plus the terminal the learner types into.
+   The graph's HEAD/main badges sit flush against its top edge, so without this
+   they touch the Goal box above. Same 1rem every other card section gets. */
+.git-stage {
+  margin-top: 1rem;
+}

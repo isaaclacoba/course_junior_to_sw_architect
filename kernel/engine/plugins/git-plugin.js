@@ -100,8 +100,16 @@
   // Replay a list of git lines through the runtime the learner types into. A
   // line that errors is an authoring bug, not a learner mistake, so it is
   // reported loudly and the replay continues (the graph then shows the shortfall).
-  function replay(CL, commands) {
+  // `files` are the paths the card says the folder holds: they are seeded as
+  // UNTRACKED before anything runs, so the learner can see what there is to add,
+  // `git status` tells the truth, and `git add nope.txt` fails like real git.
+  // Start and target are seeded identically - otherwise the end-state grader
+  // would read the seed itself as a difference.
+  function replay(CL, commands, files) {
     var state = CL.gitInit();
+    if (files && files.length && typeof CL.gitAddFiles === "function") {
+      state = CL.gitAddFiles(state, files).state;
+    }
     for (var i = 0; i < commands.length; i++) {
       var res = CL.gitRun(commands[i], state);
       if (res && res.error) {
@@ -114,10 +122,61 @@
   function isRepoState(s) {
     return !!(s && s.commits && s.commits.get && s.refs && s.refs.forEach && s.head);
   }
-  function toState(CL, spec) {
-    if (Array.isArray(spec)) return replay(CL, spec);
+  function toState(CL, spec, files) {
+    if (Array.isArray(spec)) return replay(CL, spec, files);
     if (isRepoState(spec)) return spec;
-    return CL.gitInit();
+    return replay(CL, [], files);
+  }
+
+  // Which files the card's folder holds. Two sources, unioned:
+  //  - inferred: any path the card itself adds (start, target or solution). If a
+  //    card says `git add cat.txt`, then cat.txt obviously exists.
+  //  - declared `files`: the override, for files that must be VISIBLE but never
+  //    added - the `notes.md` a learner is asked to leave out.
+  // Anything else still fails like real git, so `git add nope.txt` is an error.
+  function filesOf(task) {
+    if (!task) return [];
+    var seen = Object.create(null);
+    var out = [];
+    function take(paths) {
+      for (var i = 0; i < paths.length; i++) {
+        if (seen[paths[i]]) continue;
+        seen[paths[i]] = true;
+        out.push(paths[i]);
+      }
+    }
+    take(task.files || []);
+    var lists = [startOf(task) || [], targetOf(task) || [], solutionOf(task)];
+    for (var j = 0; j < lists.length; j++) {
+      if (!Array.isArray(lists[j])) continue;
+      for (var k = 0; k < lists[j].length; k++) take(addedPaths(lists[j][k]));
+    }
+    return out;
+  }
+
+  // The paths one `git add` line names. Flags and pathspecs like `.` or `-A` are
+  // not filenames, so they seed nothing.
+  function addedPaths(line) {
+    var words = String(line || "").trim().split(/\s+/);
+    if (words[0] !== "git" || words[1] !== "add") return [];
+    var out = [];
+    for (var i = 2; i < words.length; i++) {
+      var w = words[i];
+      if (!w || w.charAt(0) === "-" || w === "." || w === "*") continue;
+      out.push(w);
+    }
+    return out;
+  }
+
+  // The terminal the learner types into. A lesson may inject its own shell (one
+  // with extra commands); otherwise the default knows `git` plus the built-ins.
+  // If the bundle is too old to carry a Shell we fall back to running git
+  // directly, which costs `help` and typo hints but still teaches the lesson.
+  function makeShell(CL, ctx) {
+    var injected = ctx && ctx.cfg && ctx.cfg.shell;
+    if (injected) return injected;
+    if (!CL.Shell || typeof CL.createGitCommand !== "function") return null;
+    return new CL.Shell().register(CL.createGitCommand());
   }
   function startOf(task) { return task && (task.start || task.commands); }
   function targetOf(task) { return task && (task.target || task.targetCommands); }
@@ -157,10 +216,6 @@
     return n === 1
       ? "One commit here is not part of this exercise, so this card cannot pass. Undo it, or press Reset to start the exercise over."
       : n + " commits here are not part of this exercise, so this card cannot pass. Undo them, or press Reset to start the exercise over.";
-  }
-  function statusLine(p) {
-    if (p.diverged.length) return offPlanEnglish(p.diverged.length);
-    return p.solved ? "Goal reached." : "Not there yet - " + p.reason + ".";
   }
   function messageFor(ctx, p) {
     var tr = ctx.tr;
@@ -236,6 +291,7 @@
       };
 
       if (hosts.terminal) {
+        surface.shell = makeShell(CL, ctx);
         surface.terminal = new CL.LineTerminal();
         surface.terminal.mount(hosts.terminal, {
           prompt: (ctx.cfg && ctx.cfg.prompt) || "$",
@@ -274,8 +330,9 @@
       surface.task = task;
       surface.taskIndex = i;
       surface.showAll = false;
-      surface.start = toState(CL, startOf(task));
-      surface.target = toState(CL, targetOf(task));
+      var files = filesOf(task);
+      surface.start = toState(CL, startOf(task), files);
+      surface.target = toState(CL, targetOf(task), files);
       surface.state = surface.start;
       if (surface.terminal) surface.terminal.clear();
       labelTarget(surface);
@@ -289,16 +346,21 @@
       var CL = codeLab();
       var res;
       try {
-        res = CL.gitRun(line, surface.state);
+        res = surface.shell
+          ? surface.shell.run(line, surface.state)
+          : CL.gitRun(line, surface.state);
       } catch (err) {
         res = { state: surface.state, output: (err && err.message) || String(err), error: true };
       }
       if (res && res.state) surface.state = res.state;
+      // `clear` wipes the scrollback: the shell decides, the view carries it out.
+      if (res && res.effect && res.effect.kind === "clear" && surface.terminal) {
+        surface.terminal.clear();
+      }
       if (surface.terminal && res && res.output) {
         surface.terminal.write(res.output, res.error ? "err" : "out");
       }
       var p = paint(surface, true);
-      if (surface.terminal) surface.terminal.write(statusLine(p), p.solved ? "good" : "warn");
       surface.ctx.report({
         ok: p.solved,
         reason: p.reason,
@@ -326,7 +388,7 @@
       if (surface.inert) return;
       var t = task || surface.task;
       if (!t) return;
-      surface.state = surface.start || toState(codeLab(), startOf(t));
+      surface.state = surface.start || toState(codeLab(), startOf(t), filesOf(t));
       if (surface.terminal) {
         surface.terminal.clear();
         surface.terminal.focus();

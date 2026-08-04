@@ -22,6 +22,7 @@
         "Put `cat.txt` on the list with `git add cat.txt`.",
         "Save it with `git commit -m \"add cat\"` - the message is checked, so type it exactly."
       ],
+      files: ["cat.txt"],
       start: [],
       target: [
         "git add cat.txt",
@@ -42,6 +43,7 @@
         "Stage `cat.txt` and `dog.txt`, and leave `notes.md` out.",
         "Save them as one commit with `git commit -m \"add the pets\"`."
       ],
+      files: ["cat.txt", "dog.txt", "notes.md"],
       start: [],
       target: [
         "git add cat.txt",
@@ -62,6 +64,7 @@
         "Stage `dog.txt` and save it with `git commit -m \"add dog\"`.",
         "Leave the `add cat` commit alone - the new one goes on top of it."
       ],
+      files: ["cat.txt", "dog.txt"],
       start: [
         "git add cat.txt",
         "git commit -m \"add cat\""

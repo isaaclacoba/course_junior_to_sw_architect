@@ -44,15 +44,22 @@ export function solutionOf(task) {
 export function gitRuntimeFrom(CodeLab) {
   if (!CodeLab || typeof CodeLab.gitInit !== "function" || typeof CodeLab.gitRun !== "function") return null;
   return {
-    init: () => CodeLab.gitInit(),
+    // `files` seeds the folder the card starts with, exactly as the plugin does.
+    // Without it `git add cat.txt` fails - which is the point: a card must say
+    // what it holds.
+    init: (files) => {
+      const state = CodeLab.gitInit();
+      if (!files || !files.length || typeof CodeLab.gitAddFiles !== "function") return state;
+      return CodeLab.gitAddFiles(state, files).state;
+    },
     run: (line, state) => CodeLab.gitRun(line, state),
   };
 }
 
 // Run a command list through the runtime. A command that errors is an authoring
 // bug (the page only console.warns about it), so it is surfaced, not swallowed.
-export function replay(git, commands, state) {
-  let s = state || git.init();
+export function replay(git, commands, state, files) {
+  let s = state || git.init(files);
   for (const line of commands) {
     let res;
     try { res = git.run(line, s); }
@@ -63,10 +70,29 @@ export function replay(git, commands, state) {
   return { state: s, failed: null };
 }
 
-function toState(git, spec) {
+function toState(git, spec, files) {
   if (isRepoState(spec)) return { state: spec, failed: null };
-  if (Array.isArray(spec)) return replay(git, spec);
-  return { state: git.init(), failed: null };
+  if (Array.isArray(spec)) return replay(git, spec, null, files);
+  return { state: git.init(files), failed: null };
+}
+
+// Mirrors the plugin's filesOf: declared `files` plus every path the card's own
+// commands add. Kept in step with kernel/engine/plugins/git-plugin.js, the same
+// way startOf/targetOf/solutionOf above are.
+export function filesOf(task) {
+  if (!task) return [];
+  const out = new Set(task.files || []);
+  for (const list of [startOf(task), targetOf(task), solutionOf(task)]) {
+    if (!Array.isArray(list)) continue;
+    for (const line of list) for (const path of addedPaths(line)) out.add(path);
+  }
+  return [...out];
+}
+
+function addedPaths(line) {
+  const words = String(line || "").trim().split(/\s+/);
+  if (words[0] !== "git" || words[1] !== "add") return [];
+  return words.slice(2).filter((w) => w && !w.startsWith("-") && w !== "." && w !== "*");
 }
 
 function fail(code, reason) { return { ok: false, code, reason }; }
@@ -101,9 +127,10 @@ export function checkGitTask(task, git, progress = KernelGitProgress.progress) {
     return fail("malformed", "`solution` must be a non-empty array of git command strings");
   }
 
-  const s0 = toState(git, start);
+  const files = filesOf(task);
+  const s0 = toState(git, start, files);
   if (s0.failed) return fail("start-failed", `start command failed - '${s0.failed.line}': ${s0.failed.output}`);
-  const t = toState(git, target);
+  const t = toState(git, target, files);
   if (t.failed) return fail("target-failed", `target command failed - '${t.failed.line}': ${t.failed.output}`);
 
   // A card whose start ALREADY matches its target passes without the learner

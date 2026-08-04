@@ -103,12 +103,18 @@
     return bad;
   }
 
+  // A noun may be empty ("you have staged X, but the card asks for nothing"),
+  // so the parts are joined rather than concatenated with fixed spaces.
+  function phrase(noun, paths) {
+    return noun ? noun + " " + list(paths) : list(paths);
+  }
+
   function checkArea(area, gotPaths, wantPaths, nounGot, nounWant) {
     if (same(gotPaths, wantPaths)) return null;
     return {
       ok: false,
       area: area,
-      reason: nounGot + " " + list(gotPaths) + ", but the card asks for " + nounWant + " " + list(wantPaths),
+      reason: phrase(nounGot, gotPaths) + ", but the card asks for " + phrase(nounWant, wantPaths),
     };
   }
 
