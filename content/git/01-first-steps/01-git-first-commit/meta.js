@@ -6,7 +6,7 @@ window.LESSON_META = {
   eyebrow: "Git · Part one · First steps",
   title: "Your first commit",
   intro: [
-    "You have a folder of files, and the version in it works right now. How do you keep it? Copying the whole folder and calling it `backup-final-2` is where most people start, and it holds up for about a week - by the third copy nobody remembers which one was good. Git does the same job from inside the folder: you choose what to keep, save it with a short note about what changed, and every save stays there for you to go back to. Here you will hand a folder to git and make your first saves, watching each one appear on the graph as you type."
+    "Your folder works right now. How do you keep this version? Most people copy the whole folder and call it `backup-final-2` - which holds up until about the third copy. Git does that job from inside the folder: you choose what to keep, save it with a short note, and every save stays. Here you make your first ones."
   ],
   blurb: "Hand a folder to git and save your first versions of it. Three short exercises in a real terminal: start the repository, choose which files go in, and save them - the graph draws itself as you type.",
   links: [{ href: "index.html", label: "Back to the course" }],

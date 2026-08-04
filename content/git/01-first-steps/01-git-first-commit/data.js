@@ -16,7 +16,7 @@
       title: "Start a repository and save something in it",
       concept: "Repository",
       context:
-        "`git init` tells git to start watching this folder. From then on nothing is saved by accident - you say which files to keep, and git keeps them.\n\nIt takes two steps. `git add` puts a file on the short list for the next save, so it shows up under Staging on the board. `git commit -m` saves everything on that list as one snapshot with a message, and it moves across to Repository. Type the three commands and watch `cat.txt` cross the board.",
+        "`git init` tells git to watch this folder. After that nothing is saved by accident - you choose what to keep.\n\nSaving takes two steps. `git add` puts a file on the list for the next save, under Staging. `git commit -m` saves that list as one snapshot, and it moves to Repository.",
       goal: [
         "Start the repository with `git init`.",
         "Put `cat.txt` on the list with `git add cat.txt`.",
@@ -37,7 +37,7 @@
       title: "Pick what goes in",
       concept: "Staging is a choice",
       context:
-        "This folder holds three files: `cat.txt`, `dog.txt`, and `notes.md`, which is half finished and not ready for anyone else to read.\n\nStaging is where you choose. `git add` names the files that belong in this save, and anything you do not name stays out of it. You can name more than one at a time - `git add cat.txt dog.txt` puts both on the list, and the commit that follows holds the two of them together.",
+        "The folder holds `cat.txt`, `dog.txt` and `notes.md` - and `notes.md` is half finished.\n\nStaging is where you choose. `git add` names the files that belong in this save; anything you leave out stays out. You can name several at once: `git add cat.txt dog.txt`.",
       goal: [
         "Stage `cat.txt` and `dog.txt`, and leave `notes.md` out.",
         "Save them as one commit with `git commit -m \"add the pets\"`."
@@ -57,7 +57,7 @@
       title: "Save a second version on top",
       concept: "History is a chain",
       context:
-        "This repository already has one commit in it - `add cat`, the same one you made a moment ago.\n\nSaving `dog.txt` now does not replace it. The new commit points back at the old one, and the graph draws the link between them. That is all a history is: each snapshot remembering the one it came from, so you can follow the line back as far as you like.",
+        "This repository already holds one commit - `add cat`.\n\nSaving `dog.txt` does not replace it. The new commit points back at the old one, and the graph draws the link. That is all a history is: each snapshot remembering the one before it.",
       goal: [
         "Stage `dog.txt` and save it with `git commit -m \"add dog\"`.",
         "Leave the `add cat` commit alone - the new one goes on top of it."
