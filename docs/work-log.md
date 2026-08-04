@@ -1146,3 +1146,28 @@ caught. Suite 241/241, validate 0 errors, 3 lessons render + swap EN/ES.
 Also: recorded the owner's preferred report format (short plain tables, bold
 verdicts, state what was NOT verified) in .github/copilot-instructions.md so
 future agents default to it.
+
+## 2026-08-04 10:35 - the code editor now completes the learner's own symbols
+Owner report: "if I create my own class, the class name does not appear in the
+options when I type new code." True, and by construction - the C# completion
+provider in code-lab served a FIXED list (52 keywords, 7 Console-ish members, 6
+snippets) and never read the buffer. Static hosting has no C# language server,
+so the fix is text analysis, not a real one.
+NEW code-lab/src/core/csharp-symbols.ts: scanCSharp() finds declared types
+(class/interface/record/struct/enum) with methods, properties, fields, enum
+members and positional record parameters, plus locals and their types;
+receiverBefore()+membersOf() give member completion after a dot (instance members
+for a variable, statics for a type name). The learner's symbols sort above the
+curated list. Deliberately quiet when unsure: an unresolved receiver returns null
+rather than dumping keywords after a dot, and comments/strings are blanked first.
+17 unit tests - but TWO initially passed for the wrong reason: the control-flow
+case is caught by brace depth and never reaches the keyword guard, so emptying
+that guard changed nothing. Probed it differentially, found the guard IS
+load-bearing (`using System;` otherwise offers a bogus `System` variable, and
+that line opens nearly every file), and added the test that actually fails.
+3/3 mutations caught. code-lab 237/237, course 241/241, 2 lessons render EN/ES,
+verified in a real browser against the vendored bundle: types [Dog,Program],
+vars [rex:Dog], `rex.` -> [Name,Bark], unknown receiver -> null.
+Submodule commit 01096d0 (also on branch monaco-user-symbols so the detached
+HEAD cannot orphan it); it descends from the other session's dbe28d0, so the
+pointer bump carries their git-cli work forward rather than dropping it.

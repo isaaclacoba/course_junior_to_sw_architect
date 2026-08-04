@@ -59,12 +59,14 @@ var CodeLab = (() => {
     loadMonaco: () => loadMonaco,
     makeTour: () => makeTour,
     markedLineHtml: () => markedLineHtml,
+    membersOf: () => membersOf,
     neededToPass: () => neededToPass,
     next: () => next,
     normalizeLines: () => normalizeLines,
     planProgress: () => planProgress,
     presentRun: () => presentRun,
     prev: () => prev,
+    receiverBefore: () => receiverBefore,
     referencedIds: () => referencedIds,
     renderErrorPanel: () => renderErrorPanel,
     resolveMarks: () => resolveMarks,
@@ -73,6 +75,7 @@ var CodeLab = (() => {
     resolveRackTools: () => resolveRackTools,
     resolveRetrieval: () => resolveRetrieval,
     resolveTranscript: () => resolveTranscript,
+    scanCSharp: () => scanCSharp,
     scoreQuiz: () => scoreQuiz,
     selectRunCode: () => selectRunCode,
     shelfStores: () => shelfStores,
@@ -80,6 +83,7 @@ var CodeLab = (() => {
     shuffleQuiz: () => shuffle,
     spansForLine: () => spansForLine,
     splitCodeLines: () => splitCodeLines,
+    stripCommentsAndStrings: () => stripCommentsAndStrings,
     toolRackRows: () => toolRackRows,
     traceToSteps: () => traceToSteps
   });
@@ -714,6 +718,329 @@ ${result.runtimeError}`.trim(),
     }
   };
 
+  // src/core/csharp-symbols.ts
+  var NOT_A_DECLARATION = /* @__PURE__ */ new Set([
+    "if",
+    "else",
+    "for",
+    "foreach",
+    "while",
+    "do",
+    "switch",
+    "case",
+    "catch",
+    "try",
+    "finally",
+    "using",
+    "lock",
+    "return",
+    "throw",
+    "new",
+    "in",
+    "is",
+    "as",
+    "and",
+    "or",
+    "not",
+    "when",
+    "where",
+    "select",
+    "from",
+    "let",
+    "yield",
+    "checked",
+    "unchecked",
+    "fixed",
+    "unsafe",
+    "default",
+    "sizeof",
+    "typeof",
+    "nameof",
+    "await",
+    "base",
+    "this",
+    "get",
+    "set",
+    "add",
+    "remove",
+    "value"
+  ]);
+  var MODIFIERS = /* @__PURE__ */ new Set([
+    "public",
+    "private",
+    "protected",
+    "internal",
+    "static",
+    "abstract",
+    "virtual",
+    "override",
+    "sealed",
+    "readonly",
+    "const",
+    "extern",
+    "partial",
+    "async",
+    "unsafe",
+    "volatile",
+    "new",
+    "required",
+    "file"
+  ]);
+  var TYPE_KEYWORDS = /* @__PURE__ */ new Set(["class", "interface", "record", "struct", "enum"]);
+  function stripCommentsAndStrings(src) {
+    const out = src.split("");
+    const n = src.length;
+    let i = 0;
+    const blank = (from, to) => {
+      for (let k = from; k < to && k < n; k++) if (out[k] !== "\n") out[k] = " ";
+    };
+    while (i < n) {
+      const c = src[i];
+      const d = src[i + 1];
+      if (c === "/" && d === "/") {
+        let j = i;
+        while (j < n && src[j] !== "\n") j++;
+        blank(i, j);
+        i = j;
+        continue;
+      }
+      if (c === "/" && d === "*") {
+        let j = i + 2;
+        while (j < n && !(src[j] === "*" && src[j + 1] === "/")) j++;
+        blank(i, Math.min(j + 2, n));
+        i = j + 2;
+        continue;
+      }
+      if (c === "@" && d === '"') {
+        let j = i + 2;
+        while (j < n) {
+          if (src[j] === '"' && src[j + 1] === '"') {
+            j += 2;
+            continue;
+          }
+          if (src[j] === '"') {
+            j++;
+            break;
+          }
+          j++;
+        }
+        blank(i, j);
+        i = j;
+        continue;
+      }
+      if (c === '"' || c === "'") {
+        let j = i + 1;
+        while (j < n) {
+          if (src[j] === "\\") {
+            j += 2;
+            continue;
+          }
+          if (src[j] === c) {
+            j++;
+            break;
+          }
+          if (src[j] === "\n") break;
+          j++;
+        }
+        blank(i, j);
+        i = j;
+        continue;
+      }
+      i++;
+    }
+    return out.join("");
+  }
+  function matchBrace(src, open) {
+    let depth = 0;
+    for (let i = open; i < src.length; i++) {
+      if (src[i] === "{") depth++;
+      else if (src[i] === "}") {
+        depth--;
+        if (depth === 0) return i;
+      }
+    }
+    return -1;
+  }
+  function isIdent(s) {
+    return /^[A-Za-z_][A-Za-z0-9_]*$/.test(s);
+  }
+  function bareType(raw) {
+    return raw.replace(/<.*>/, "").replace(/\[[\s,]*\]/g, "").replace(/\?$/, "").trim();
+  }
+  function scanMembers(body) {
+    const members = [];
+    const seen = /* @__PURE__ */ new Set();
+    const push = (m) => {
+      const key = m.kind + ":" + m.name;
+      if (m.name && isIdent(m.name) && !seen.has(key)) {
+        seen.add(key);
+        members.push(m);
+      }
+    };
+    let depth = 0;
+    let stmt = "";
+    for (let i = 0; i < body.length; i++) {
+      const c = body[i];
+      if (c === "{") {
+        if (depth === 0) {
+          takeDeclaration(stmt, push, true);
+          stmt = "";
+        }
+        depth++;
+        continue;
+      }
+      if (c === "}") {
+        depth = Math.max(0, depth - 1);
+        if (depth === 0) stmt = "";
+        continue;
+      }
+      if (depth > 0) continue;
+      if (c === ";") {
+        takeDeclaration(stmt, push, false);
+        stmt = "";
+        continue;
+      }
+      stmt += c;
+    }
+    return members;
+  }
+  function takeDeclaration(stmt, push, blockFollows) {
+    const text = stmt.replace(/\s+/g, " ").trim();
+    if (!text) return;
+    if (/^\[/.test(text)) return;
+    const isStatic = /\bstatic\b/.test(text);
+    const method = text.match(/([A-Za-z_][A-Za-z0-9_<>,.\[\]\?]*)\s+([A-Za-z_][A-Za-z0-9_]*)\s*(<[^>]*>)?\s*\(([^)]*)\)\s*$/);
+    if (method) {
+      const name = method[2];
+      if (!NOT_A_DECLARATION.has(name) && !MODIFIERS.has(name)) {
+        const ret = bareType(method[1]);
+        push({ name, kind: "method", type: ret, isStatic, detail: `${ret} ${name}(${method[4].trim()})` });
+        return;
+      }
+    }
+    const ctor = text.match(/^(?:[a-z]+\s+)*([A-Z][A-Za-z0-9_]*)\s*\(([^)]*)\)\s*$/);
+    if (ctor && blockFollows) return;
+    if (blockFollows) {
+      const prop = text.match(/([A-Za-z_][A-Za-z0-9_<>,.\[\]\?]*)\s+([A-Za-z_][A-Za-z0-9_]*)\s*$/);
+      if (prop) {
+        const name = prop[2];
+        if (!NOT_A_DECLARATION.has(name) && !MODIFIERS.has(name) && !TYPE_KEYWORDS.has(name)) {
+          const t = bareType(prop[1]);
+          push({ name, kind: "property", type: t, isStatic, detail: `${t} ${name} { get; set; }` });
+        }
+      }
+      return;
+    }
+    const field = text.match(/([A-Za-z_][A-Za-z0-9_<>,.\[\]\?]*)\s+([A-Za-z_][A-Za-z0-9_]*)\s*(=.*)?$/);
+    if (field) {
+      const name = field[2];
+      if (NOT_A_DECLARATION.has(name) || MODIFIERS.has(name)) return;
+      const t = bareType(field[1]);
+      if (TYPE_KEYWORDS.has(t) || NOT_A_DECLARATION.has(t)) return;
+      push({ name, kind: "field", type: t, isStatic, detail: `${t} ${name}` });
+    }
+  }
+  function scanCSharp(source) {
+    const types = [];
+    const vars = [];
+    if (!source) return { types, vars };
+    let src;
+    try {
+      src = stripCommentsAndStrings(source);
+    } catch {
+      return { types, vars };
+    }
+    const declRe = /\b(class|interface|record|struct|enum)\s+([A-Za-z_][A-Za-z0-9_]*)/g;
+    const claimed = [];
+    let m;
+    while ((m = declRe.exec(src)) !== null) {
+      const kind = m[1];
+      const name = m[2];
+      const after = src.slice(m.index + m[0].length);
+      const positional = after.match(/^\s*\(([^)]*)\)/);
+      const open = src.indexOf("{", m.index + m[0].length);
+      let members = [];
+      if (positional) {
+        members = positional[1].split(",").map((p) => p.trim()).filter(Boolean).map((p) => {
+          const parts = p.split(/\s+/);
+          const nm = parts[parts.length - 1];
+          const t = bareType(parts.slice(0, -1).join(" ")) || "object";
+          return { name: nm, kind: "property", type: t, isStatic: false, detail: `${t} ${nm}` };
+        }).filter((p) => isIdent(p.name));
+      }
+      if (open !== -1) {
+        const close = matchBrace(src, open);
+        const body = close === -1 ? src.slice(open + 1) : src.slice(open + 1, close);
+        const between = src.slice(m.index + m[0].length, open);
+        if (!/[;}]/.test(between)) {
+          claimed.push([open, close === -1 ? src.length : close]);
+          if (kind === "enum") {
+            members = body.split(",").map((s) => s.split("=")[0].trim()).filter(isIdent).map((nm) => ({ name: nm, kind: "enumMember", isStatic: true, detail: `${name}.${nm}` }));
+          } else {
+            members = members.concat(scanMembers(body));
+          }
+        }
+      }
+      if (isIdent(name) && !types.some((t) => t.name === name)) types.push({ name, kind, members });
+    }
+    const seenVar = /* @__PURE__ */ new Set();
+    const varRe = /\bvar\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*new\s+([A-Za-z_][A-Za-z0-9_<>,.\[\]]*)/g;
+    while ((m = varRe.exec(src)) !== null) {
+      if (!seenVar.has(m[1])) {
+        seenVar.add(m[1]);
+        vars.push({ name: m[1], type: bareType(m[2]) });
+      }
+    }
+    const typedRe = /(?:^|[;{}()]|\bfor\s*\(|\bforeach\s*\()\s*([A-Za-z_][A-Za-z0-9_<>,.\[\]\?]*)\s+([A-Za-z_][A-Za-z0-9_]*)\s*(?:=[^=]|;|\bin\b)/g;
+    while ((m = typedRe.exec(src)) !== null) {
+      const t = bareType(m[1]);
+      const name = m[2];
+      if (!isIdent(t) || NOT_A_DECLARATION.has(t) || MODIFIERS.has(t) || TYPE_KEYWORDS.has(t)) continue;
+      if (NOT_A_DECLARATION.has(name) || MODIFIERS.has(name)) continue;
+      if (t === "var") {
+        if (!seenVar.has(name)) {
+          seenVar.add(name);
+          vars.push({ name });
+        }
+        continue;
+      }
+      if (!seenVar.has(name)) {
+        seenVar.add(name);
+        vars.push({ name, type: t });
+      }
+    }
+    for (const t of types) {
+      for (const mem of t.members) {
+        if (mem.kind === "field" && !seenVar.has(mem.name)) {
+          seenVar.add(mem.name);
+          vars.push({ name: mem.name, type: mem.type });
+        }
+      }
+    }
+    return { types, vars };
+  }
+  function receiverBefore(lineUpToCursor) {
+    const m = lineUpToCursor.match(/([A-Za-z_][A-Za-z0-9_]*)\s*\.\s*[A-Za-z0-9_]*$/);
+    if (!m) return null;
+    const before = lineUpToCursor.slice(0, lineUpToCursor.lastIndexOf(m[1]));
+    if (/[.\]]\s*$/.test(before)) return null;
+    return m[1];
+  }
+  function membersOf(symbols, receiver) {
+    if (!receiver) return null;
+    const asType = symbols.types.find((t2) => t2.name === receiver);
+    if (asType) {
+      const statics = asType.members.filter((mm) => mm.isStatic || mm.kind === "enumMember");
+      return statics.length ? statics : null;
+    }
+    const v = symbols.vars.find((x) => x.name === receiver);
+    if (!v || !v.type) return null;
+    const t = symbols.types.find((x) => x.name === v.type);
+    if (!t) return null;
+    const instance = t.members.filter((mm) => !mm.isStatic && mm.kind !== "enumMember");
+    return instance.length ? instance : null;
+  }
+
   // src/editors/load-monaco.ts
   var MONACO_VERSION = "0.52.2";
   var DEFAULT_BASE = `https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/${MONACO_VERSION}/min/vs`;
@@ -830,6 +1157,9 @@ ${result.runtimeError}`.trim(),
       { label: "foreach", insert: "foreach (var ${1:item} in ${2:items})\n{\n    $0\n}", doc: "Foreach loop" }
     ];
     monaco.languages.registerCompletionItemProvider("csharp", {
+      // `.` so member completions appear as soon as the learner types a dot,
+      // instead of only after the next letter.
+      triggerCharacters: ["."],
       provideCompletionItems(model, position) {
         const word = model.getWordUntilPosition(position);
         const range = {
@@ -840,7 +1170,56 @@ ${result.runtimeError}`.trim(),
         };
         const K = monaco.languages.CompletionItemKind;
         const R = monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet;
+        let scanned = { types: [], vars: [] };
+        let lineUpToCursor = "";
+        try {
+          scanned = scanCSharp(model.getValue());
+          lineUpToCursor = model.getValueInRange({
+            startLineNumber: position.lineNumber,
+            startColumn: 1,
+            endLineNumber: position.lineNumber,
+            endColumn: position.column
+          });
+        } catch {
+        }
+        const memberKind = (m) => m.kind === "method" ? K.Method : m.kind === "property" ? K.Property : m.kind === "enumMember" ? K.EnumMember : K.Field;
+        const receiver = receiverBefore(lineUpToCursor);
+        if (receiver) {
+          const own = membersOf(scanned, receiver);
+          if (!own) return { suggestions: [] };
+          return {
+            suggestions: own.map((m) => ({
+              label: m.name,
+              kind: memberKind(m),
+              detail: m.detail,
+              insertText: m.kind === "method" ? `${m.name}($0)` : m.name,
+              insertTextRules: m.kind === "method" ? R : void 0,
+              range
+            }))
+          };
+        }
         const suggestions = [];
+        const typeKind = (t) => t.kind === "interface" ? K.Interface : t.kind === "enum" ? K.Enum : t.kind === "struct" ? K.Struct : K.Class;
+        for (const t of scanned.types) {
+          suggestions.push({
+            label: t.name,
+            kind: typeKind(t),
+            detail: `${t.kind} ${t.name} (yours)`,
+            insertText: t.name,
+            sortText: "0" + t.name,
+            range
+          });
+        }
+        for (const v of scanned.vars) {
+          suggestions.push({
+            label: v.name,
+            kind: K.Variable,
+            detail: v.type ? `${v.type} ${v.name}` : v.name,
+            insertText: v.name,
+            sortText: "0" + v.name,
+            range
+          });
+        }
         for (const kw of keywords) {
           suggestions.push({ label: kw, kind: K.Keyword, insertText: kw, range });
         }
