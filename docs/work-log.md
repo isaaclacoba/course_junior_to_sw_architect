@@ -2,6 +2,9 @@
 
 # Work Log
 
+- Start: 2026-08-03 14:37:37 | Task: Build a git command-line parser (Contract 2, git-cli) for the code-lab submodule: NEW code-lab/src/core/git-cli.ts (`run(line,state)`) + code-lab/test/git-cli.test.ts. Tokenize honouring quotes, dispatch to git-model ops, mimic real-git terminal output + Effect, never throw. No commit, no build/vendor.
+- End: 2026-08-03 14:46:08 | Result: DONE. Created git-cli.ts (exports `run`, `tokenize`, `RunResult`) covering init/add/status/commit(-m,--amend)/branch/switch/checkout(-b,-c)/merge(ff,3-way,conflict,--abort)/reset(soft|mixed|hard)/tag/log(--oneline)/rev-parse/rev-list, unknown+GitError -> state unchanged + git-like error + `error` set. Implemented `--amend` in the CLI (git-model has none): pure replace of the HEAD commit keeping parents, folding staged paths, moving the branch, old commit left dangling; reused the model's FNV-1a preimage for a native-looking id. git-cli.test.ts = 41 tests (tokenizer, every command, full conflict flow, reset modes via status, log newest-first, never-throws on garbage). `npm run typecheck` PASS; full `npm test` 220/220 pass (0 fail), no regressions. NOT committed, NOT vendored (per request). NOTE: shared bash terminals had a rogue process injecting commands; ran via `npm --prefix` to avoid cwd loss.
+
 - Start: 2026-07-30 14:06:25 | Task: Full-site Spanish (i18n rollout). Owner wants the ENTIRE course in Spanish - every lesson (practical/theory/AI), heroes, content, AND chrome (buttons/headings/labels/Settings/landing). Decisions: pilot one page fully first; agent machine-translates + owner reviews (native ES); capstone deferred; this is the priority (parked kernel phases stay parked). Analysis: 75 lessons (29 build / 42 viz / 4 checkpoint), only reading-objects i18n-ready, chrome hardcoded in the shared engines. Plan of record: docs/i18n-rollout-plan.md. Executing T0 (pilot: reading-objects 100% Spanish incl. chrome + live swap; English byte-identical elsewhere). Also this turn: parked kernel Phases 2-6 in the kernel doc, and set reading-objects to default-voice-only (meta.resources.voices=["default"]) so the Reading-voice picker hides - the active-voices toggle.
 - End: 2026-07-30 14:57:28 | Result: T0 pilot COMPLETE (6/6), committed local (NOT pushed). reading-objects is now 100% Spanish at lang=es - hero + all lesson content + CHROME (buttons/headings/labels). (2) Hero i18n: hero.title/eyebrow/intro.0 in en+es bundles, bind-build.applyHero, page-shell repaintHero. (3) Chrome-i18n capability: LessonCommon.t(key,fallback) + template helpers tHtml/tAttr/tSlot (emit data-t ONLY when a catalog is active, so non-i18n pages stay byte-identical) + window.PageShellChrome (a [data-t] re-targeter). (4) Wired page-shell buildCard + build-engine (Run/Next/XP/result/run-state via tr(), re-applied on setLocale); authored res/chrome/en.json + es.json (lang-only, namespaced nav.*/card.*/result.*/run.*); kernel-controller loads the catalog into window.ChromeText before page-shell and on swap, registers PageShellChrome as a surface. (5) Acceptance ALL GREEN: es fully Spanish (Objetivo/Ejecutar/XP del curso:/Este es el patron/Salida esperada:/Tu codigo), 0 leftover English on the card; the other 74 pages byte-safe (control-flow/type-conversion/index/ai-21 = 0 data-t, 0 undefined); LIVE en->es swap flips chrome+hero+content with NO reload, Monaco buffer + card index preserved. code-lab boundary decided (course is the localization authority; widgets get labels/setLabels extensions in T2/T3). Deferred to T1: Settings/agenda labels, the interpolated describeExpected message, progressNoun (per-lesson data). Also earlier this session: parked kernel Phases 2-6, reading-objects default-voice-only (commit 6f2ab81).
 
@@ -987,6 +990,12 @@ mirrored into the session todo list.
   Also documented why buildCard leaves Run/Next unmarked (build-engine owns those
   labels, nav.next -> nav.nextLesson on the last card).
 
+## 2026-08-03 15:44 - lesson-engine core + registry (step 1)
+- NEW: kernel/engine/lesson-engine.js (window.LessonEngine core + plugin registry, archetype-blind chrome).
+- NEW: test/lesson-engine.test.js (fake-plugin unit tests over a minimal fake DOM).
+- No changes to build-engine.js / drill-engine.js / page-shell.js or any lesson.
+- node --check clean; node --test test/lesson-engine.test.js 9/9; full suite 167/167.
+
 ## 2026-08-03 17:00 - localized the mismatch message, and made the i18n round-trip parallel
 - Item 4 (i18n rollout plan, T1): the output-mismatch verdict was the last
   hardcoded English string a learner could actually hit. `LessonCommon.fill()`
@@ -1190,3 +1199,36 @@ check and the gate, so the new second output line is genuinely graded.
 validate 0 errors, check-i18n PASS, check-literals PASS, 241/241, verify-lesson
 5/5 with real dotnet, headless EN+ES show the bullet, the goal and the note with
 0 undefined. No index.html regeneration needed - the page embeds no task prose.
+
+## 2026-08-04 10:55
+
+Fixed the GitHub Pages deploy, which had been red for 8 consecutive pushes over
+17 hours. Every failure was the same: actions/checkout died at 16s because the
+code-lab submodule pointer named 01096d0, a commit that had never been pushed
+to the submodule remote. Three commits were stranded locally - two from the
+parallel session (GitGraph, git-cli) and one mine. The submodule remote had
+also diverged with a pre-commit gate commit, so a force-push would have
+destroyed it; merged instead and pushed a fast-forward. All four commits are
+now reachable, so the pinned SHA resolves.
+
+Caught a second, latent CI failure before pushing: the remainder-operator
+change edited a concept definition, which feeds generated/, and I had not
+regenerated. The workflow's drift gate (git diff --exit-code generated/) would
+have failed on the very next step. Regenerated and amended; drift now exits 0.
+
+Code review of the Monaco completion work found two real bugs, both reproduced
+against the shipped bundle with a stub-Monaco probe driving the real provider.
+A constructor with a modifier - public Dog(string name) - also matches the
+method shape, with "public" in the return-type slot, so it was registered as an
+instance method: d. offered Dog and accepting wrote d.Dog(), which does not
+compile. The guard meant to prevent that sat after the method branch and was
+unreachable dead code. Testing the constructor shape first is NOT the fix,
+since void Bark() matches that shape too; the discriminator is that a real
+method's return type is never a modifier. Second, registering "." as a trigger
+character while returning an empty list for any unresolved receiver meant
+typing the dot suppressed every curated dotted entry - Console.WriteLine,
+Console.Write, Console.ReadLine, string.IsNullOrEmpty all vanished exactly when
+asked for. Probe against the old bundle: Console. -> [], d. -> [Name,Dog,Bark].
+After the fix: Console. -> [WriteLine,Write,ReadLine,ToString], d. ->
+[Name,Bark,ToString]. Two regression tests added; both verified to fail with
+the fix reverted. 239/239 code-lab, 241/241 course.

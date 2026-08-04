@@ -912,7 +912,8 @@ ${result.runtimeError}`.trim(),
     const method = text.match(/([A-Za-z_][A-Za-z0-9_<>,.\[\]\?]*)\s+([A-Za-z_][A-Za-z0-9_]*)\s*(<[^>]*>)?\s*\(([^)]*)\)\s*$/);
     if (method) {
       const name = method[2];
-      if (!NOT_A_DECLARATION.has(name) && !MODIFIERS.has(name)) {
+      const looksLikeCtor = MODIFIERS.has(method[1]);
+      if (!looksLikeCtor && !NOT_A_DECLARATION.has(name) && !MODIFIERS.has(name)) {
         const ret = bareType(method[1]);
         push({ name, kind: "method", type: ret, isStatic, detail: `${ret} ${name}(${method[4].trim()})` });
         return;
@@ -1185,18 +1186,37 @@ ${result.runtimeError}`.trim(),
         const memberKind = (m) => m.kind === "method" ? K.Method : m.kind === "property" ? K.Property : m.kind === "enumMember" ? K.EnumMember : K.Field;
         const receiver = receiverBefore(lineUpToCursor);
         if (receiver) {
-          const own = membersOf(scanned, receiver);
-          if (!own) return { suggestions: [] };
-          return {
-            suggestions: own.map((m) => ({
-              label: m.name,
-              kind: memberKind(m),
-              detail: m.detail,
-              insertText: m.kind === "method" ? `${m.name}($0)` : m.name,
-              insertTextRules: m.kind === "method" ? R : void 0,
-              range
-            }))
+          const toStringItem = {
+            label: "ToString",
+            kind: K.Method,
+            detail: "string ToString()",
+            insertText: "ToString()",
+            insertTextRules: void 0,
+            range
           };
+          const own = membersOf(scanned, receiver);
+          if (own) {
+            return {
+              suggestions: own.map((m) => ({
+                label: m.name,
+                kind: memberKind(m),
+                detail: m.detail,
+                insertText: m.kind === "method" ? `${m.name}($0)` : m.name,
+                insertTextRules: m.kind === "method" ? R : void 0,
+                range
+              })).concat([toStringItem])
+            };
+          }
+          const prefix = `${receiver}.`;
+          const curated = members.filter((m) => m.label.startsWith(prefix)).map((m) => ({
+            label: m.label.slice(prefix.length),
+            kind: K.Method,
+            detail: m.doc,
+            insertText: m.insert.startsWith(prefix) ? m.insert.slice(prefix.length) : m.insert,
+            insertTextRules: R,
+            range
+          }));
+          return { suggestions: curated.concat([toStringItem]) };
         }
         const suggestions = [];
         const typeKind = (t) => t.kind === "interface" ? K.Interface : t.kind === "enum" ? K.Enum : t.kind === "struct" ? K.Struct : K.Class;
