@@ -9,7 +9,7 @@ from.
 
 - Per-lesson reports: [Practical index](practical/index.md) -
   [Theory index](theory/index.md).
-- Shared engines and page scaffold: [infrastructure.md](infrastructure.md).
+- Shared engines + page scaffold (ARCHIVED - superseded by the generic lesson engine, `kernel/engine/`): [archived/infrastructure.md](archived/infrastructure.md).
 - Report shape: [TEMPLATE.md](TEMPLATE.md). Coverage tracker:
   `./check-progress.sh` (50 / 50 lesson reports present).
 - Source-of-truth list of required reports: `manifest.txt`.

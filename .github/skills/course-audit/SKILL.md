@@ -78,7 +78,7 @@ yourself to confirm the batch.
 
 ## Aggregate deliverables
 
-After the per-lesson reports: `docs/audit/infrastructure.md` (shared engines),
+After the per-lesson reports: `docs/audit/archived/infrastructure.md` (shared engines - ARCHIVED, superseded by kernel/engine/),
 `docs/audit/<track>/index.md` (TOC + one-liners per Part), and
 `docs/audit/README.md` (covered / not covered / close cycle 1 / start cycle 2,
 each track independently). Reconcile with prior audits: state which past gaps are

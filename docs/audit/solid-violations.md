@@ -5,7 +5,7 @@ responsibility, Open/closed, Liskov, Interface segregation, Dependency
 inversion). Four areas were reviewed; each has its own section. The concrete,
 low-risk violations have since been fixed (see "Fixes applied" below).
 
-- [Shared JS engines](solid/engines.md) - `build-engine.js`, `drill-engine.js`, `page-shell.js`
+- [Shared JS engines](archived/engines.md) - `build-engine.js`, `drill-engine.js`, `page-shell.js`
 - [C# capstone exercise](solid/capstone-csharp.md) - `level3-exercise/*.cs`
 - [Lesson example code](solid/lesson-examples.md) - content check, not a source-code fix target
 - [code-lab component (TypeScript)](solid/code-lab.md) - `code-lab/src/`
@@ -50,7 +50,7 @@ check is a content review and is kept out of the fix list below.
   now live once in `page-shell.js` (`window.LessonCommon`); both engines delegate
   to it, so no engine touches `localStorage` or the error panel directly. The
   DOM-free `createProgress` / `createOutputPanel` are unit-tested
-  (`test/lesson-common.test.js`). See [engines.md](solid/engines.md).
+  (`test/lesson-common.test.js`). See [engines.md](archived/engines.md).
 - **DIP (engines).** XP/award progression reads and writes through an injectable
   `LessonCommon.storage` seam (default `localStorage`, in-memory fallback), so
   the logic is testable with a fake store.

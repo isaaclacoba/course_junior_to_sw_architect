@@ -3,7 +3,7 @@
 Every lesson in the Theory track, in live `index.html` path order, grouped by
 Part. Each row links to its full audit report and gives a one-line summary. See
 [README.md](README.md) for the cross-track findings and cycle plan, and
-[infrastructure.md](infrastructure.md) for the shared engines.
+[../archived/infrastructure.md](../archived/infrastructure.md) for the shared engines.
 
 Every shipped `theory-N.html` loads the `theory-N.viz.js` visual widget. The
 sibling `theory-N.js` drill files are on disk but not loaded - see each report
