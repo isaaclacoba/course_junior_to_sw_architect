@@ -35,18 +35,25 @@ Phase 2 - engine + grader + page
     (in `kernel/engine/git-progress.js`) + `{all:true}` for "Show whole target" - verify: 11 widget
     tests + 18 progress tests + a live browser render of ghost/diverged/edge-ghost.
 12. [x] `CodeLab.LineTerminal` widget (dep-free line console, ArrowUp/Down history) - verify: 19 tests.
-13. [ ] git-plugin on the generic engine (terminal + GitGraph + parser + git-progress, continuous
-    grading, Reset + Show solution, multi-card) - verify: a git lesson reaches its goal headlessly.
-14. [ ] verify-lesson git-validator (tsx runs the parser) + the validator registry - verify: verify-lesson --all.
+13. [x] git-plugin on the generic engine (terminal + GitGraph + parser + git-progress, continuous
+    grading, Reset + Show solution, multi-card) - verify: 10 tests + a real page rendered.
+14. [x] Make the archetype renderable: git card scaffold in page-shell, `@variant git` in the
+    template + `ARCHETYPE_RENDER` map in the generator, `ARCHETYPE_DEPS` in the controller,
+    six git chrome keys EN+ES, `git` registered in `tools/lib.mjs` - verify: a git lesson
+    renders (graph + zones + terminal, one ghost, no Check) with 0 undefined in EN and ES.
+15. [x] verify-lesson validator REGISTRY (injected deps) + the git validator: replays each task's
+    solution through the vendored bundle and fails unless it reaches the target with zero
+    off-plan commits - verify: 22 tests; build/viz/checkpoint unchanged.
 Phase 3 - content
-15. [ ] Theory lessons (stepped GitGraph, narration localized) - verify: verify-lesson + i18n round-trip.
-16. [ ] Practical lessons (CLI + goal DAG) - verify: reach-goal checks pass.
-17. [ ] Wire git track into course-registry + generate - verify: node tools/validate.mjs clean.
+16. [ ] Theory lessons (stepped GitGraph, narration localized) - verify: verify-lesson + i18n round-trip.
+17. [ ] Practical lessons (CLI + goal DAG) - verify: reach-goal checks pass.
+18. [ ] Wire the git track into course-registry + generate - verify: node tools/validate.mjs clean.
 
 ## Progress
 - 2026-08-03 Design round + independent red-team done. Scope cut to a local-git core (defer rebase/cherry-pick/stash/reflog/remotes to the real-git track); minimal file/index model added; conflicts modeled; hashes display-only + DAG-structural grading. Build deferred until after WoW-enforcement.
 - 2026-08-04 Phase 1 + the model half of phase 2 are LANDED (git-model, git-layout, GitGraph vendored, git-cli, dag-match). Practical-page UX ratified via a stress-test mockup: one canvas laid out from the target (ghost/diverged tagging), no Check button, terminal under the widget, next-step ghosting + "Show whole target", off-plan blocks the pass, multi-card. Found: the vendored bundle exports GitGraph + gitLayout only, so it cannot yet RUN a command.
-- 2026-08-04 Steps 10-12 landed in parallel (code-lab `feat(git)`, course `f737c1e`): git runtime exported + re-vendored, GitGraph ghost/diverged model, CodeLab.LineTerminal, and `kernel/engine/git-progress.js` (ghost/diverged/solved/union/nextStep). Verified end-to-end in a real browser: the solution reaches solved with 0 ghosts, an off-plan commit blocks the pass, and ghost/diverged render correctly. Next: the git-plugin.
+- 2026-08-04 Steps 10-12 landed in parallel (code-lab `feat(git)`, course `f737c1e`): git runtime exported + re-vendored, GitGraph ghost/diverged model, CodeLab.LineTerminal, and `kernel/engine/git-progress.js` (ghost/diverged/solved/union/nextStep). Verified end-to-end in a real browser: the solution reaches solved with 0 ghosts, an off-plan commit blocks the pass, and ghost/diverged render correctly.
+- 2026-08-04 Steps 13-15 landed: the git-plugin plus all the plumbing that makes the archetype renderable (page-shell git card, generator variant-by-name + ARCHETYPE_RENDER, controller ARCHETYPE_DEPS, chrome keys, validator registry + git validator). PROVEN with a throwaway lesson: the page mounts graph + zones + terminal, shows one ghosted next step, has no Check button, renders 0 undefined EN+ES, and the validator confirms the solution reaches the target. Zero drift on the 83 existing lessons. **The engine work is done - what remains is CONTENT.**
 
 ## Open (build-time)
 - DAG equivalence strictness for merge parents; hash preimage + collision guard; conflict-resolution UX with no file contents.
