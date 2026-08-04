@@ -1115,3 +1115,14 @@ mirrored into the session todo list.
   lessons with no change needed, and it still CATCHES an empty lesson after the
   migration (mutating LESSON_CONFIG to an unknown name fails it). The gate followed
   the migration forward instead of having to be disabled for it.
+
+## 2026-08-04 09:17 - verify-lesson: refuse to pass a lesson it cannot classify
+The empty-lesson fix left one instance of its own bug in the fallback path. When
+`detectArchetype` could not classify a lesson - meta.js missing or malformed, and
+data.js naming no legacy config global - the verifier skipped the body check and
+`hasBody()` returned true, so it reported a pass having asserted nothing. All 83
+lessons carry a valid meta.js today, so this was latent, not live. Measured: with
+`archetype` stripped from one lesson's meta.js the old verifier said "1 passed".
+Now it fails outright. It does not guess: build and drill share the `tasks` body
+field, so a data.js sniff cannot tell them apart, and mis-verifying is worse than
+refusing. Two regression guards added (2/2 mutations caught); suite 235/235.

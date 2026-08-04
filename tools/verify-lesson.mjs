@@ -274,7 +274,7 @@ function hasBody(dom, archetype) {
   }
   if (archetype === "viz") return PANEL_CLASSES.some((c) => dom.includes(c));
   if (archetype === "checkpoint") return dom.includes("cl-quiz");
-  return true; // unknown archetype: nothing to assert, the caller already warned
+  return true; // unreachable for "unknown": verifyLesson fails that case outright
 }
 
 async function verifyRender(lessonDir, archetype, server, opts) {
@@ -426,7 +426,13 @@ async function verifyLesson(dir, server, opts) {
   // A missing config used to be coerced to {}, so verifyBuild looped over zero
   // tasks and reported a pass. Resolve it properly and FAIL when there is no body
   // - an empty lesson is the one thing a verifier must never call verified.
-  if (win && archetype !== "unknown") {
+  // An unclassifiable lesson is the original bug in miniature: we cannot pick a
+  // body field, so we assert nothing, so we pass. Refuse instead. This fires when
+  // meta.js is missing/malformed AND data.js names no legacy config global.
+  if (archetype === "unknown") {
+    bad("cannot classify this lesson - meta.js declares no archetype and data.js names no known config global; refusing to report it verified");
+    allOk = false;
+  } else if (win) {
     const body = lessonBody(win, archetype);
     if (!body.ok) { bad(`no lesson body to verify - ${body.reason}`); allOk = false; }
     else if (archetype === "build" || archetype === "drill") allOk = verifyBuild(body.config, opts) && allOk;

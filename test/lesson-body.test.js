@@ -17,7 +17,10 @@ const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const path = require("node:path");
 
+const fs = require("node:fs");
 const LIB = path.join(path.dirname(__dirname), "tools", "lib.mjs");
+const VERIFY_SRC = () =>
+  fs.readFileSync(path.join(path.dirname(__dirname), "tools", "verify-lesson.mjs"), "utf8");
 const load = () => import(LIB);
 
 // --- the shapes that are genuinely fine ------------------------------------
@@ -112,4 +115,34 @@ test("every archetype in CONFIG_GLOBALS has a body field, and vice versa", async
   for (const names of Object.values(CONFIG_GLOBALS)) {
     assert.equal(names[0], "LESSON_CONFIG", "the unified global must be accepted first for every archetype");
   }
+});
+
+// ---------------------------------------------------------------------------
+// The "unknown archetype" trap.
+//
+// verify-lesson picks the body field from the archetype. When it cannot classify
+// a lesson it used to skip the body check AND return true from hasBody() - i.e.
+// assert nothing, then report a pass. That is the very bug this file exists to
+// prevent, hiding in the fallback path: measured, a lesson whose meta.js lost its
+// `archetype` field passed the old verifier while nothing about it was verified.
+//
+// These are SOURCE guards, not behavioural tests: tools/verify-lesson.mjs calls
+// main() at import time, so it cannot be loaded into a test process. They exist
+// to fail loudly if the loud-failure is ever deleted.
+test("verify-lesson refuses to pass a lesson it cannot classify", () => {
+  const src = VERIFY_SRC();
+  const branch = src.match(/if \(archetype === "unknown"\) \{[\s\S]*?\n  \}/);
+  assert.ok(branch, 'verify-lesson must branch on archetype === "unknown"');
+  assert.match(branch[0], /bad\(/, "the unknown branch must report the failure");
+  assert.match(branch[0], /allOk = false/, "the unknown branch must FAIL, not warn");
+});
+
+test("verify-lesson never guesses between build and drill", async () => {
+  const { BODY_FIELD } = await load();
+  // build and drill share the same body field ("tasks"), so a data.js sniff
+  // cannot tell them apart. Guessing would mis-verify; refusing is correct.
+  assert.equal(BODY_FIELD.build, BODY_FIELD.drill);
+  const src = VERIFY_SRC();
+  assert.ok(!/LESSON_CONFIG/.test(src.split("function detectArchetype")[1].split("\n}")[0]),
+    "detectArchetype must not sniff LESSON_CONFIG - it cannot distinguish build from drill");
 });
