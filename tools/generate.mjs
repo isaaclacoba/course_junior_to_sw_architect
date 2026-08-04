@@ -470,7 +470,7 @@ function loadTemplateVariants() {
 // Read a build/drill lesson's element-id prefix from its data.js config global.
 function prefixFromData(dir) {
   const bag = loadWindowBag(path.join(dir, "data.js"));
-  const cfg = bag.LESSON_CONFIG || bag.BUILD_CONFIG || bag.DRILL_CONFIG;
+  const cfg = bag.LESSON_CONFIG;
   if (!cfg || !cfg.prefix) throw new Error("data.js in " + dir + " has no LESSON_CONFIG prefix");
   return cfg.prefix;
 }
@@ -492,8 +492,6 @@ function renderIndexHtml(m, variants) {
     .replace(/\{\{VIZ_SRC\}\}/g, m.id + ".viz.js");
 
   if (archetype === "build" || archetype === "drill") {
-    const enginePath = "../../../../" + (meta.engine === "drill" ? "drill-engine.js" : "build-engine.js");
-    html = html.replace(/\{\{ENGINE_SRC\}\}/g, enginePath);
     // The card scaffold needs the same element-id prefix the engine reads from
     // its config; page-shell picks it up from window.PAGE.prefix. Match the real
     // `archetype:` property line (leading newline + its own indentation) and add
@@ -507,14 +505,12 @@ function renderIndexHtml(m, variants) {
 
     // Opt-in resource layer: when meta.resources is set, the lesson's teaching
     // prose lives in res/strings/<voice>/<lang>.json instead of inline in
-    // data.js. Swap the static `page-shell + engine` tail for the resource
-    // modules + bootstrap, which apply the selected voice's strings onto the
-    // lesson globals and then inject the (unchanged) page-shell and engine.
+    // data.js. Swap the static page-shell tail for the resource modules + the
+    // kernel controller, which applies the selected voice's strings onto
+    // window.LESSON_CONFIG and then injects page-shell + the generic engine.
     if (meta.resources) {
-      // runtime:"kernel" swaps the reload-on-change bootstrap for the live-swap
-      // kernel controller; it supersedes the plain resource tail (never both).
       const controller = "kernel-controller";
-      html = applyResourceTail(html, meta.resources, enginePath, m.id, controller);
+      html = applyResourceTail(html, meta.resources, m.id, controller);
     }
   } else if (archetype === "viz" && meta.resources) {
     // A viz lesson's teaching prose (hero + step narrations + legend labels) can
@@ -533,10 +529,11 @@ function renderIndexHtml(m, variants) {
 }
 
 // Rewrite the static `page-shell + data + engine` tail into the resource-gated
-// tail. page-shell.js and the engine are no longer loaded statically; the
-// bootstrap injects them after applying the chosen voice's strings, so both
-// engines stay byte-for-byte the files the flat pages use.
-function applyResourceTail(html, resources, enginePath, lessonId, controllerModule = "kernel-controller") {
+// Rewrite the static `page-shell + data` tail into the resource-gated tail.
+// page-shell.js is no longer loaded statically; the kernel controller injects it
+// (and the generic engine) after applying the chosen voice's strings onto
+// window.LESSON_CONFIG.
+function applyResourceTail(html, resources, lessonId, controllerModule = "kernel-controller") {
   const base = resources.base || "res/strings";
   const lang = resources.lang || "en";
   const langs = (resources.langs && resources.langs.length ? resources.langs : [lang]).join(",");
@@ -544,8 +541,7 @@ function applyResourceTail(html, resources, enginePath, lessonId, controllerModu
 
   const staticTail =
     '    <script src="../../../../page-shell.js"></script>\n' +
-    '    <script src="data.js"></script>\n' +
-    '    <script src="' + enginePath + '"></script>';
+    '    <script src="data.js"></script>';
   if (html.indexOf(staticTail) === -1) {
     throw new Error("resource wiring: could not find the static engine tail for " + lessonId);
   }
@@ -568,8 +564,9 @@ function applyResourceTail(html, resources, enginePath, lessonId, controllerModu
   return html.replace(staticTail, resourceTail);
 }
 
-// Viz variant of the resource tail. A viz page has no data.js and no engine: its
-// visual (window.LESSON_VIZ, set by <id>.viz.js) is mounted by page-shell. So we
+// Viz variant of the resource tail. A viz page has no data.js: its visual
+// (window.LESSON_CONFIG, set by <id>.viz.js) is mounted by the viz plugin (the
+// controller injects it). So we
 // swap only the trailing static page-shell.js load for the resource modules (with
 // bind-viz, not bind-build) + the controller; the controller injects page-shell
 // after binding. No data-engine.
@@ -602,9 +599,10 @@ function applyResourceTailViz(html, resources, lessonId, controllerModule = "ker
 }
 
 // Checkpoint variant of the resource tail. Like viz, a checkpoint page mounts its
-// widget (the code-lab Quiz, from window.QUIZ_CONFIG in data.js) via page-shell,
-// with no engine. data.js is already loaded ahead of the tail, so we swap only
-// the trailing static page-shell.js load for the resource modules (with
+// widget (the code-lab Quiz, from window.LESSON_CONFIG in data.js) via the
+// checkpoint plugin (the controller injects it). data.js is already loaded ahead
+// of the tail, so we swap only the trailing static page-shell.js load for the
+// resource modules (with
 // bind-checkpoint) + the controller, which injects page-shell after binding.
 function applyResourceTailCheckpoint(html, resources, lessonId, controllerModule = "kernel-controller") {
   const base = resources.base || "res/strings";

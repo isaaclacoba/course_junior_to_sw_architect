@@ -15,11 +15,12 @@
   prefix "../../../../". CDN links (Google Fonts, Prism) are absolute URLs and
   keep no prefix. The four variants below already use "../../../../".
 
-  THE FOUR VARIANTS
-    - build      : Monaco write-and-run lessons. build-engine.js. No Prism.
-    - drill      : fill-in-the-blank / quiz lessons. drill-engine.js. Prism.
-    - viz        : theory pages with a visual scene. <name>.viz.js. Prism. No engine.
-    - checkpoint : end-of-part quiz. quiz data + page-shell.js only. No engine,
+  THE FOUR VARIANTS (no engine is loaded statically - the kernel controller
+  injects the generic engine + the archetype's plugin at runtime)
+    - build      : Monaco write-and-run lessons. No Prism.
+    - drill      : fill-in-the-blank / quiz lessons. Prism.
+    - viz        : theory pages with a visual scene. <name>.viz.js. Prism.
+    - checkpoint : end-of-part quiz. quiz data + page-shell.js only.
                    no Prism JS (the Prism theme CSS is linked but unused, matching
                    the current theory-check-*.html pages).
   All four load the lesson's meta.js and page-shell.js.
@@ -31,19 +32,18 @@
     {{INTRO}}       - hero intro; a JS array literal of string | {html,class}.
     {{META_SRC}}    - path to this lesson's meta.js (sets window.LESSON_META).
     {{DATA_SRC}}    - path to the lesson data file (<name>.js) - build/drill/checkpoint.
-    {{ENGINE_SRC}}  - "build-engine.js" (build) or "drill-engine.js" (drill).
     {{VIZ_SRC}}     - path to <name>.viz.js - viz only.
     {{PRISM_BLOCK}} - the three Prism <script> tags - drill and viz only.
 
   Each src token is expected to already include the "../../../../" prefix when it
-  points at a repo-root asset (e.g. "../../../../build-engine.js"); meta.js and the
+  points at a repo-root asset (e.g. "../../../../page-shell.js"); meta.js and the
   lesson data file will live next to index.html, so they resolve as bare
   "meta.js" / "<name>.js".
 -->
 
 
 <!-- ============================================================= -->
-<!-- VARIANT 1 of 4: BUILD  (Monaco write-and-run; build-engine.js) -->
+<!-- VARIANT 1 of 4: BUILD  (Monaco write-and-run) -->
 <!-- ============================================================= -->
 <!doctype html>
 <html lang="en">
@@ -85,13 +85,12 @@
     <script src="{{META_SRC}}"></script>
     <script src="../../../../page-shell.js"></script>
     <script src="{{DATA_SRC}}"></script>
-    <script src="{{ENGINE_SRC}}"></script>
   </body>
 </html>
 
 
 <!-- ============================================================= -->
-<!-- VARIANT 2 of 4: DRILL  (fill-in-the-blank / quiz; drill-engine.js; Prism) -->
+<!-- VARIANT 2 of 4: DRILL  (fill-in-the-blank / quiz; Prism) -->
 <!-- ============================================================= -->
 <!doctype html>
 <html lang="en">
@@ -141,7 +140,6 @@
     <script src="{{META_SRC}}"></script>
     <script src="../../../../page-shell.js"></script>
     <script src="{{DATA_SRC}}"></script>
-    <script src="{{ENGINE_SRC}}"></script>
   </body>
 </html>
 

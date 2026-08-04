@@ -24,7 +24,7 @@ export function loadBrowserGlobal(file, name) {
 
 // Run a lesson data/meta IIFE (a pure script that assigns one or more window.*
 // globals) and hand back the whole window bag, so a caller can probe for
-// BUILD_CONFIG / DRILL_CONFIG / QUIZ_CONFIG / LESSON_META without knowing which.
+// window.LESSON_CONFIG / LESSON_META without knowing which.
 export function loadWindowBag(file) {
   const code = fs.readFileSync(file, "utf8");
   const sandbox = { window: {} };
@@ -70,16 +70,14 @@ export function conceptsLiteral(concepts) {
 // So emptiness has to be asserted, not inferred. Each gate calls lessonBody()
 // and refuses to pass a lesson that yielded nothing.
 //
-// The name list is deliberately FORWARD-compatible: the generic lesson engine
-// collapses all four globals into one window.LESSON_CONFIG, so both spellings
-// are accepted. That turns this check into the thing that PROVES that migration
-// (a half-migrated lesson resolves to neither name and fails loudly) instead of
-// something the migration has to fight.
+// The lesson-engine migration is complete: every archetype sets ONE
+// window.LESSON_CONFIG. The old per-archetype globals are gone, so this check now
+// ENFORCES the unified name - a lesson that resolves to no config fails loudly.
 export const CONFIG_GLOBALS = {
-  build: ["LESSON_CONFIG", "BUILD_CONFIG"],
-  drill: ["LESSON_CONFIG", "DRILL_CONFIG"],
-  viz: ["LESSON_CONFIG", "LESSON_VIZ"],
-  checkpoint: ["LESSON_CONFIG", "QUIZ_CONFIG", "CHECKPOINT_CONFIG"],
+  build: ["LESSON_CONFIG"],
+  drill: ["LESSON_CONFIG"],
+  viz: ["LESSON_CONFIG"],
+  checkpoint: ["LESSON_CONFIG"],
 };
 
 // The array that IS the lesson's body, per archetype.

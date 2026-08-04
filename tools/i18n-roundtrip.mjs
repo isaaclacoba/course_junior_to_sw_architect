@@ -250,9 +250,9 @@ function staticRoundTrip(dir) {
 
   const page = { hero: heroFromMeta(meta) };
   const ctx = { page };
-  if (arch === "viz") ctx.viz = win.LESSON_CONFIG || win.LESSON_VIZ;
-  else if (arch === "build") ctx.config = win.LESSON_CONFIG || win.BUILD_CONFIG;
-  else if (arch === "checkpoint") ctx.quiz = win.LESSON_CONFIG || win.QUIZ_CONFIG || win.CHECKPOINT_CONFIG;
+  if (arch === "viz") ctx.viz = win.LESSON_CONFIG;
+  else if (arch === "build") ctx.config = win.LESSON_CONFIG;
+  else if (arch === "checkpoint") ctx.quiz = win.LESSON_CONFIG;
 
   const { dflt, nondefault } = lessonLangs(dir);
   const en = bundleResolver(dir, dflt);

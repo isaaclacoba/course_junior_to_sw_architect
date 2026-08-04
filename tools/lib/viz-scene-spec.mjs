@@ -64,18 +64,15 @@ export function getPath(obj, p) {
   return cur;
 }
 
-// Load a viz.js (or any `window.<GLOBAL> = {...}` data file) and return the named
-// global (default window.LESSON_VIZ).
-export function loadWindowGlobal(file, name = "LESSON_VIZ") {
+// Load a viz.js data file and return its window.LESSON_CONFIG.
+export function loadWindowGlobal(file) {
   const src = fs.readFileSync(file, "utf8");
   const sandbox = { window: {} };
   vm.runInNewContext(src, sandbox, { filename: file });
-  // The unified engine collapses all archetype globals into window.LESSON_CONFIG;
-  // prefer it, falling back to the legacy per-archetype name.
-  return sandbox.window.LESSON_CONFIG !== undefined ? sandbox.window.LESSON_CONFIG : sandbox.window[name];
+  return sandbox.window.LESSON_CONFIG;
 }
 
-// Extract [key, english] scene entries for a lesson's viz (window.LESSON_VIZ).
+// Extract [key, english] scene entries for a lesson's viz (window.LESSON_CONFIG).
 export function extractSceneEntries(viz) {
   const entries = [];
   const steps = (viz && viz.steps) || [];

@@ -15,7 +15,7 @@
  *   - rewrites data.js to mechanics only: each task keeps example/expected/
  *     requireSource/verify/starter/solution and the `summary: true` flag; the
  *     voiced fields (title, concept, context, goal, summaryIntro, summaryItems,
- *     summaryClose) are removed. The window.BUILD_CONFIG wrapper and the file
+ *     summaryClose) are removed. The window.LESSON_CONFIG wrapper and the file
  *     header comment are preserved.
  *   - adds meta.resources = { base, lang, voices } to meta.js if absent.
  *   - for each non-default voice, writes an empty stub bundle {} (falls back to
@@ -124,7 +124,7 @@ function stripTask(t) {
 }
 
 // Reconstruct data.js: preserved header comment + IIFE wrapper + stripped tasks +
-// the BUILD_CONFIG wrapper (tasks referenced by the const, other keys verbatim).
+// the LESSON_CONFIG wrapper (tasks referenced by the const, other keys verbatim).
 export function buildMechanicsDataJs(rawDataJs, config, strippedTasks) {
   const iifeIdx = rawDataJs.indexOf("(function");
   const header = iifeIdx > 0 ? rawDataJs.slice(0, iifeIdx).replace(/\s+$/, "") : "";
@@ -185,8 +185,7 @@ export function planExtraction(lessonDir, opts) {
     throw new Error(`extract-res only handles build lessons; ${lessonDir} archetype is ${JSON.stringify(meta.archetype)}`);
   }
 
-  const dataBag = loadWindowBag(dataPath);
-  const config = dataBag.LESSON_CONFIG || dataBag.BUILD_CONFIG;
+  const config = loadWindowBag(dataPath).LESSON_CONFIG;
   if (!config || !Array.isArray(config.tasks)) {
     throw new Error(`data.js in ${lessonDir} has no window.LESSON_CONFIG.tasks`);
   }

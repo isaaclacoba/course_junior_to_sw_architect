@@ -10,7 +10,7 @@
  * For every lesson it is given it runs, in order:
  *   1. node --check   - every JS file in the lesson dir parses.
  *   2a. build lessons - real-dotnet compile+run each task's `solution`; the
- *       stdout must match `expected` with the SAME rule build-engine.js uses
+ *       stdout must match `expected` with the SAME rule the build plugin uses
  *       (string: any line equals it; array: the non-empty lines equal that exact
  *       sequence). When a task has a hidden `verify`, it rebuilds the probe the
  *       identical way the engine does (source up to `class Program` + verify.main)
@@ -110,7 +110,7 @@ function loadCodeLab() {
 }
 
 // ---------------------------------------------------------------------------
-// grading rule - the SAME shared policy build-engine.js uses
+// grading rule - the SAME shared policy the build plugin uses
 // (kernel/grading/output-match.js), so the verifier cannot certify behavior the
 // engine has dropped. No local copy to drift.
 // ---------------------------------------------------------------------------
@@ -243,7 +243,7 @@ function firstError(errs) {
 
 function verifyViz(win, opts) {
   if (opts.noViz) { skip("viz resolvers (--no-viz)"); return true; }
-  const viz = win.LESSON_VIZ;
+  const viz = win.LESSON_CONFIG;
   const steps = (viz && viz.steps) || [];
   const CL = loadCodeLab();
   const resolvers = { transcript: CL.resolveTranscript, retrieval: CL.resolveRetrieval, plan: CL.resolvePlan };
@@ -341,11 +341,11 @@ function detectArchetype(dir) {
     try {
       const meta = loadInWindow(metaFile).LESSON_META;
       if (meta && meta.archetype) return { archetype: meta.archetype, dataFile };
-    } catch { /* fall through to the sniff below */ }
+    } catch { /* fall through */ }
   }
-  const src = fs.readFileSync(dataFile, "utf8");
-  if (/window\.BUILD_CONFIG/.test(src)) return { archetype: "build", dataFile };
-  if (/window\.DRILL_CONFIG/.test(src)) return { archetype: "drill", dataFile };
+  // No sniff on the data global: every archetype now sets one unified config
+  // global, which cannot distinguish build from drill. Classification is
+  // meta.archetype only; an unclassifiable lesson is reported, never guessed.
   return { archetype: "unknown", dataFile };
 }
 
@@ -436,7 +436,7 @@ async function verifyLesson(dir, server, opts) {
     const body = lessonBody(win, archetype);
     if (!body.ok) { bad(`no lesson body to verify - ${body.reason}`); allOk = false; }
     else if (archetype === "build" || archetype === "drill") allOk = verifyBuild(body.config, opts) && allOk;
-    else if (archetype === "viz") allOk = verifyViz({ LESSON_VIZ: body.config }, opts) && allOk;
+    else if (archetype === "viz") allOk = verifyViz({ LESSON_CONFIG: body.config }, opts) && allOk;
   }
 
   allOk = (await verifyRender(dir, archetype, server, opts)) && allOk;

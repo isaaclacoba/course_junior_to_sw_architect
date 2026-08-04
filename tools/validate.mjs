@@ -17,7 +17,7 @@
  *   4. Migrated-lesson coherence - meta.id == dir lesson id == registry id (ERROR);
  *      meta.total is a number on a build/drill lesson (ERROR).
  *   5. Checkpoint concept tags - each theory-check-* question's conceptId (in its
- *      data.js QUIZ_CONFIG) must resolve to an introduced concept (ERROR); an
+ *      data.js LESSON_CONFIG) must resolve to an introduced concept (ERROR); an
  *      untagged question is a WARN.
  *   5b. In-prose mentions - a [[concept:id|label]] marker in a migrated data.js
  *      must reference an introduced concept id (ERROR); a typo would otherwise
@@ -207,7 +207,7 @@ export function checkLessonBodies(migrated, rootDir, report) {
   }
 }
 
-// Check 5: checkpoint concept tags. Every question in a checkpoint's QUIZ_CONFIG
+// Check 5: checkpoint concept tags. Every question in a checkpoint's LESSON_CONFIG
 // should carry a conceptId that resolves to an introduced concept, so the
 // evaluation features (Phase 4) can score per concept.
 //   quizzes: [{ lessonId, questions: [{ conceptId }] }]
@@ -443,7 +443,7 @@ export function loadMigrated(registry, rootDir) {
   return out;
 }
 
-// Load window.QUIZ_CONFIG.questions for every migrated checkpoint lesson.
+// Load window.LESSON_CONFIG.questions for every migrated checkpoint lesson.
 export function loadCheckpointQuizzes(migrated, rootDir) {
   const out = [];
   for (const m of migrated) {
@@ -524,7 +524,7 @@ export function scanResourceBundles(baseDir) {
 }
 
 // Load the resource-arity inputs for every migrated build lesson that has a
-// resource layer (meta.resources): BUILD_CONFIG.tasks (the schema arity) and the
+// resource layer (meta.resources): LESSON_CONFIG.tasks (the schema arity) and the
 // key set of every res/strings/<voice>/<lang>.json bundle.
 export function loadResourceBundles(migrated, rootDir) {
   const out = [];

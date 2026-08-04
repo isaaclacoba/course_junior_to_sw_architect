@@ -14,8 +14,8 @@
  *                 `git show :<path>`, not the working tree - so it validates
  *                 exactly what is being committed).
  *   Tests         `node --test test/` when any staged path is under test/ or
- *                 resource/, or is a root engine (build-engine.js, drill-engine.js,
- *                 page-shell.js).
+ *                 resource/, or is a shared engine file (kernel/engine/,
+ *                 kernel/grading/, page-shell.js).
  *   Validate+drift  `node tools/validate.mjs` AND a generator drift check
  *                 (`node tools/generate.mjs --out <tmp>` then a byte-diff of the
  *                 tmp mirror against the committed generated/ + content/.../index.html)
@@ -273,7 +273,10 @@ function checkI18nBrowser(fanOutAll, voicedDirs) {
 // ---------------------------------------------------------------------------
 // orchestration
 // ---------------------------------------------------------------------------
-const ROOT_ENGINES = new Set(["build-engine.js", "drill-engine.js", "page-shell.js"]);
+const ROOT_ENGINES = new Set(["page-shell.js"]);
+// The generic lesson engine + its plugins + the graders live under kernel/engine
+// and kernel/grading; a change to any of them affects every lesson, like page-shell.
+const isEngineFile = (p) => p.startsWith("kernel/engine/") || p.startsWith("kernel/grading/") || ROOT_ENGINES.has(p);
 const isBinder = (p) => /^resource\/bind-[^/]+\.js$/.test(p);
 const isVoicedFile = (p) => /^content\/.+\/(meta\.js|data\.js|[^/]+\.viz\.js|res\/strings\/.+)$/.test(p);
 
@@ -281,7 +284,7 @@ function planStaged(staged) {
   const jsLike = staged.filter((p) => /\.(js|mjs)$/.test(p));
   checkParseStaged(jsLike);
 
-  if (staged.some((p) => p.startsWith("test/") || p.startsWith("resource/") || ROOT_ENGINES.has(p))) {
+  if (staged.some((p) => p.startsWith("test/") || p.startsWith("resource/") || isEngineFile(p))) {
     checkTests();
   }
   if (staged.some((p) => p.startsWith("content/") || p === "course-registry.js" || p === "tools/generate.mjs"

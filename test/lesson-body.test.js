@@ -11,8 +11,8 @@
 // "1 passed" having graded zero tasks.
 //
 // So the interesting cases here are the ones that must FAIL. A check that cannot
-// fail is worth nothing, and this one guards a migration (the lesson engine's
-// unified LESSON_CONFIG) that rewrites all 83 data.js files at once.
+// fail is worth nothing, and this one now ENFORCES the lesson engine's unified
+// window.LESSON_CONFIG - a lesson under a legacy per-archetype global fails loudly.
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const path = require("node:path");
@@ -24,13 +24,13 @@ const VERIFY_SRC = () =>
 const load = () => import(LIB);
 
 // --- the shapes that are genuinely fine ------------------------------------
-test("accepts each archetype's real body field", async () => {
+test("accepts each archetype's real body field under LESSON_CONFIG", async () => {
   const { lessonBody } = await load();
   const cases = [
-    ["build", { BUILD_CONFIG: { tasks: [1, 2, 3] } }, 3],
-    ["drill", { DRILL_CONFIG: { tasks: [1] } }, 1],
-    ["viz", { LESSON_VIZ: { steps: [1, 2] } }, 2],
-    ["checkpoint", { QUIZ_CONFIG: { questions: [1, 2, 3, 4] } }, 4],
+    ["build", { LESSON_CONFIG: { tasks: [1, 2, 3] } }, 3],
+    ["drill", { LESSON_CONFIG: { tasks: [1] } }, 1],
+    ["viz", { LESSON_CONFIG: { steps: [1, 2] } }, 2],
+    ["checkpoint", { LESSON_CONFIG: { questions: [1, 2, 3, 4] } }, 4],
   ];
   for (const [arch, win, count] of cases) {
     const r = lessonBody(win, arch);
@@ -39,9 +39,12 @@ test("accepts each archetype's real body field", async () => {
   }
 });
 
-test("checkpoint still accepts the legacy CHECKPOINT_CONFIG spelling", async () => {
+test("rejects a legacy per-archetype global (migration is enforced, not tolerated)", async () => {
   const { lessonBody } = await load();
-  assert.equal(lessonBody({ CHECKPOINT_CONFIG: { questions: [1] } }, "checkpoint").ok, true);
+  assert.equal(lessonBody({ BUILD_CONFIG: { tasks: [1] } }, "build").ok, false);
+  assert.equal(lessonBody({ DRILL_CONFIG: { tasks: [1] } }, "drill").ok, false);
+  assert.equal(lessonBody({ LESSON_VIZ: { steps: [1] } }, "viz").ok, false);
+  assert.equal(lessonBody({ QUIZ_CONFIG: { questions: [1] } }, "checkpoint").ok, false);
 });
 
 // --- forward compatibility with the lesson-engine migration -----------------
@@ -58,48 +61,37 @@ test("accepts the unified LESSON_CONFIG for every archetype", async () => {
 });
 
 // --- the failures that matter ----------------------------------------------
-test("rejects a lesson whose config global was renamed away", async () => {
+test("rejects a lesson whose config global is not LESSON_CONFIG", async () => {
   const { lessonBody } = await load();
   const r = lessonBody({ NONSENSE_CONFIG: { tasks: [1, 2] } }, "build");
   assert.equal(r.ok, false);
-  // the message must name what it looked for, so a rename is diagnosable from
+  // the message names what it looked for, so a bad global is diagnosable from
   // the gate output alone
   assert.match(r.reason, /LESSON_CONFIG/);
-  assert.match(r.reason, /BUILD_CONFIG/);
 });
 
 test("rejects a config with an empty body array", async () => {
   const { lessonBody } = await load();
-  assert.equal(lessonBody({ BUILD_CONFIG: { tasks: [] } }, "build").ok, false);
-  assert.equal(lessonBody({ LESSON_VIZ: { steps: [] } }, "viz").ok, false);
-  assert.equal(lessonBody({ QUIZ_CONFIG: { questions: [] } }, "checkpoint").ok, false);
+  assert.equal(lessonBody({ LESSON_CONFIG: { tasks: [] } }, "build").ok, false);
+  assert.equal(lessonBody({ LESSON_CONFIG: { steps: [] } }, "viz").ok, false);
+  assert.equal(lessonBody({ LESSON_CONFIG: { questions: [] } }, "checkpoint").ok, false);
 });
 
 test("rejects a config that is missing its body field entirely", async () => {
   const { lessonBody } = await load();
-  const r = lessonBody({ BUILD_CONFIG: { prefix: "l1c" } }, "build");
+  const r = lessonBody({ LESSON_CONFIG: { prefix: "l1c" } }, "build");
   assert.equal(r.ok, false);
   assert.match(r.reason, /missing/);
 });
 
 test("rejects a body that is not an array", async () => {
   const { lessonBody } = await load();
-  assert.equal(lessonBody({ BUILD_CONFIG: { tasks: 5 } }, "build").ok, false);
-});
-
-// A half-migrated lesson - the rewrite script wrote the new global but left the
-// old one - is the likeliest way the migration goes wrong, and the one state
-// where "some config exists" is NOT good enough.
-test("rejects a half-migrated lesson carrying both globals", async () => {
-  const { lessonBody } = await load();
-  const r = lessonBody({ LESSON_CONFIG: { tasks: [1] }, BUILD_CONFIG: { tasks: [1] } }, "build");
-  assert.equal(r.ok, false);
-  assert.match(r.reason, /ambiguous/);
+  assert.equal(lessonBody({ LESSON_CONFIG: { tasks: 5 } }, "build").ok, false);
 });
 
 test("rejects an archetype it does not know", async () => {
   const { lessonBody } = await load();
-  assert.equal(lessonBody({ BUILD_CONFIG: { tasks: [1] } }, "git").ok, false);
+  assert.equal(lessonBody({ LESSON_CONFIG: { tasks: [1] } }, "git").ok, false);
 });
 
 test("does not throw on an empty window bag", async () => {
