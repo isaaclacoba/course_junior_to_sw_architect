@@ -41,6 +41,19 @@
       t.concept = str(R.get("task." + n + ".concept"));
       t.context = str(R.get("task." + n + ".context"));
       t.goal = global.ResourceOrigin.collect(R, "task." + n + ".goal.");
+      // Localize requireSource[].message and verify.message (fall back to literal).
+      if (Array.isArray(t.requireSource)) {
+        t.requireSource.forEach(function (req, ri) {
+          var key = "task." + n + ".require." + ri;
+          var val = R.get(key);
+          if (val !== undefined) req.message = val;
+        });
+      }
+      if (t.verify && t.verify.message) {
+        var vkey = "task." + n + ".verify";
+        var vval = R.get(vkey);
+        if (vval !== undefined) t.verify.message = vval;
+      }
       if (t.summary) {
         t.summaryIntro = str(R.get("task." + n + ".summaryIntro"));
         t.summaryClose = str(R.get("task." + n + ".summaryClose"));

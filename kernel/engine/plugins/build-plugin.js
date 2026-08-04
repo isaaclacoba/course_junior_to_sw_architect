@@ -93,23 +93,15 @@
       : (task.expected || "");
   }
 
-  // ---- the live goal tracker ----------------------------------------------
-  // Two views of ONE question - what shape does the learner's code have RIGHT
-  // NOW - answered by the shipped scanner (CodeLab.scanCSharp) and the pure
-  // policy in kernel/grading/structure-match.js:
+  // ---- the live goal tracker (UML class boxes) -----------------------------
+  // ONE panel that IS the goal list: structural goals render as UML-style class
+  // boxes (a header with the type name and one row per member), behaviour goals
+  // (gate: null) are short lines below the boxes with a run marker, and removal
+  // goals (gate.absent) are struck-through ghosted boxes. Each element ticks
+  // independently as the learner types, so the learner sees exactly which piece
+  // is still missing.
   //
-  //   * the blueprint - the target types and their member SIGNATURES, ghosted
-  //     until the learner's own code declares them. A signature says what to
-  //     write without writing it, which is the gap that made a goal like
-  //     "write a FeedingSign with string Format(bool hungry)" unreadable until
-  //     you opened the solution.
-  //   * the goal list - the very prose the core already painted and localized,
-  //     with a tick on each goal that carries a gate.
-  //
-  // It is a GUIDE, never a grade. XP still comes only from a real run against
-  // the real compiler; nothing here can pass a card. Every part is optional and
-  // degrades quietly: no blueprint host, no scanner, or no onChange on the
-  // editor simply means the card renders exactly as it did before.
+  // The tracker is a GUIDE, never a grade. XP comes ONLY from a real run.
   function scanTypes(source) {
     var CL = typeof CodeLab !== "undefined" ? CodeLab : null;
     if (!CL || typeof CL.scanCSharp !== "function") return null;
@@ -117,70 +109,124 @@
       var found = CL.scanCSharp(source || "");
       return (found && found.types) || [];
     } catch (e) {
-      // A scanner is a heuristic over half-typed code; if it ever throws, the
-      // lesson keeps working without the tracker.
       return null;
     }
   }
 
-  // Three states, matching S.evaluate: true ticks, false shows an empty circle
-  // waiting to be filled, and null - a goal with no structural test - shows an
-  // invisible spacer. The spacer keeps every goal line indented to the same
-  // margin, so an untracked goal reads as part of the list rather than as a
-  // checkbox the learner can never satisfy.
-  function tick(on) {
-    if (on === null || on === undefined) {
-      return '<span class="tracker-tick tracker-tick--none" aria-hidden="true"></span>';
+  // Build the UML box HTML for the entire goal panel. Three kinds of goal:
+  //   - structural (gate.type): a class box with header + member rows
+  //   - absent (gate.absent): a struck-through removal line
+  //   - run-gated (gate: null): a behaviour line with ▶ marker
+  //
+  // The box renders the CODE field as the visual, and the localized prose as a
+  // caption INSIDE the box (not repeated beside it). Each row ticks independently.
+  function buildTrackerHtml(surface, met, types, source) {
+    var goals = surface.task.goals || [];
+    var proseList = surface.goalHtml || [];
+    var esc = surface.ctx.helpers.escapeHtml;
+    var S = structure();
+    var boxes = [];
+    var behaviours = [];
+
+    // One member row = one subtask. Row 0 is the type header, rows 1..n are its
+    // members; each carries its own tick so a learner sees which piece is still
+    // missing rather than one box that stays grey until the last keystroke.
+    function memberRows(codeArr, gate, boxMet) {
+      var verdicts = (S && S.rows) ? S.rows(types || [], gate, codeArr, source) : [];
+      return codeArr.slice(1).map(function (m, k) {
+        var ok = verdicts.length ? verdicts[k + 1] === true : boxMet === true;
+        return '<code class="goal-code goal-member' + (ok ? " is-met" : "") + '">' +
+          '<span class="goal-member-tick" aria-hidden="true">' + (ok ? "\u2713" : "") + "</span>" +
+          esc(S && S.rowLabel ? S.rowLabel(m) : m) + "</code>";
+      }).join("");
     }
-    return '<span class="tracker-tick" aria-hidden="true">' + (on ? "\u2713" : "") + "</span>";
+
+    for (var i = 0; i < goals.length; i++) {
+      var g = goals[i];
+      var gate = g && g.gate !== undefined ? g.gate : undefined;
+      var prose = proseList[i] || "";
+      var isMet = met[i];
+
+      var codes0 = g && g.code;
+      var hasBlueprint = !!codes0 && (!Array.isArray(codes0) || codes0.length > 0);
+
+      if (hasBlueprint && (gate === null || gate === undefined)) {
+        // A blueprint the learner already has on screen (an empty method to fill,
+        // a class to edit). The BOX is the help - it shows the shape being aimed
+        // at - but the tick has to come from a passing run, because "the
+        // signature exists" is not the same as "it works".
+        var rCodes = Array.isArray(codes0) ? codes0 : [codes0];
+        boxes.push(
+          '<li class="goal-box goal-box--run' + (isMet === true ? " is-met" : "") + '">' +
+          '<span class="tracker-tick tracker-tick--run" aria-hidden="true">' +
+          (isMet === true ? "\u2713" : "\u25B6") + "</span>" +
+          '<div class="goal-box-inner">' +
+          '<div class="goal-box-header"><code class="goal-code">' +
+          esc(S && S.rowLabel ? S.rowLabel(rCodes[0]) : rCodes[0]) + "</code></div>" +
+          (rCodes.length > 1 ? '<div class="goal-box-members">' +
+            memberRows(rCodes, null, isMet) + "</div>" : "") +
+          '<div class="goal-box-caption">' + prose + "</div>" +
+          "</div></li>"
+        );
+      } else if (gate === null || gate === undefined) {
+        // Behaviour / run-gated goal
+        behaviours.push(
+          '<li class="goal-behaviour' + (isMet === true ? " is-met" : "") + '">' +
+          '<span class="tracker-tick tracker-tick--run" aria-hidden="true">' +
+          (isMet === true ? "\u2713" : "\u25B6") + "</span>" +
+          '<span class="goal-prose">' + prose + "</span></li>"
+        );
+      } else if (gate.absent && !gate.type) {
+        // Removal goal (absent-only gate) - struck-through box
+        boxes.push(
+          '<li class="goal-box goal-box--absent' + (isMet === true ? " is-met" : "") + '">' +
+          '<span class="tracker-tick" aria-hidden="true">' + (isMet === true ? "\u2713" : "") + "</span>" +
+          '<div class="goal-box-inner">' +
+          '<div class="goal-box-header goal-box-header--absent">' +
+          '<del><code class="goal-code">' + esc(gate.absent) + "</code></del></div>" +
+          '<div class="goal-box-caption">' + prose + "</div>" +
+          "</div></li>"
+        );
+      } else if (gate.type) {
+        // Structural goal - UML class box
+        var codes = g.code;
+        var codeArr = !codes ? [] : (Array.isArray(codes) ? codes : [codes]);
+        var header = codeArr.length > 0
+          ? (S && S.rowLabel ? S.rowLabel(codeArr[0]) : codeArr[0])
+          : (gate.kind ? gate.kind + " " : "class ") + gate.type;
+        var members = codeArr.length > 1 ? codeArr.slice(1) : [];
+
+        boxes.push(
+          '<li class="goal-box' + (isMet === true ? " is-met" : "") + '">' +
+          '<span class="tracker-tick" aria-hidden="true">' + (isMet === true ? "\u2713" : "") + "</span>" +
+          '<div class="goal-box-inner">' +
+          '<div class="goal-box-header"><code class="goal-code">' + esc(header) + "</code></div>" +
+          (members.length ? '<div class="goal-box-members">' +
+            memberRows(codeArr, gate, isMet) + "</div>" : "") +
+          '<div class="goal-box-caption">' + prose + "</div>" +
+          "</div></li>"
+        );
+      } else {
+        // Fallback: just a prose line
+        behaviours.push(
+          '<li class="goal-behaviour">' +
+          '<span class="goal-prose">' + prose + "</span></li>"
+        );
+      }
+    }
+
+    return boxes.join("") + behaviours.join("");
   }
 
-  // One blueprint box: the declaration line, then a chip per base and per
-  // member, each lit on its own so a learner sees WHICH piece is still missing.
-  function blueprintBox(ctx, S, types, want) {
-    var esc = ctx.helpers.escapeHtml;
-    var bases = want.bases || [];
-    var members = want.members || [];
-    var kind = want.kind || "class";
-    var hasType = S.meets(types, { type: want.name, kind: want.kind });
-    var baseHtml = bases.map(function (b) {
-      var on = hasType && S.meets(types, { type: want.name, base: b });
-      return '<li class="bp-chip bp-chip--base' + (on ? " is-met" : "") + '">: ' + esc(b) + "</li>";
-    });
-    var memberHtml = members.map(function (m) {
-      var on = hasType && S.meets(types, { type: want.name, member: S.symbolName(m) });
-      var label = typeof m === "string" ? m : (m.sig || m.name || "");
-      return '<li class="bp-chip' + (on ? " is-met" : "") + '">' + esc(label) + "</li>";
-    });
-    var chips = baseHtml.concat(memberHtml);
-    var whole =
-      hasType &&
-      bases.every(function (b) { return S.meets(types, { type: want.name, base: b }); }) &&
-      members.every(function (m) { return S.meets(types, { type: want.name, member: S.symbolName(m) }); });
-    return (
-      '<div class="bp-box' + (whole ? " is-met" : "") + '">' +
-      '<div class="bp-box-head">' + tick(whole) +
-      '<span class="bp-kind">' + esc(kind) + "</span>" +
-      '<span class="bp-name">' + esc(want.name) + "</span>" +
-      "</div>" +
-      (chips.length ? '<ul class="bp-chips">' + chips.join("") + "</ul>" : "") +
-      "</div>"
-    );
-  }
-
-  // Repaint both views. Cheap enough to run on every keystroke, but the DOM is
-  // only touched when something actually changed, so typing stays smooth and a
-  // half-typed identifier does not make the panel flicker.
+  // Repaint the goal panel. Cheap enough to run on every keystroke - DOM is only
+  // touched when something actually changed (diffed by the HTML string).
   function syncTracker(surface) {
     var ctx = surface.ctx;
     var task = surface.task;
     var S = structure();
     if (!task) return;
-    // A task that ASKED for a tracker and got no policy module is a wiring bug
-    // (kernel/grading/structure-match.js missing from ARCHETYPE_DEPS.build), and
-    // it fails invisibly - the panel simply never draws. Say so once.
     if (!S) {
-      if (!warnedNoStructure && (task.blueprint || task.goalCheck)) {
+      if (!warnedNoStructure && (task.goals && task.goals.length)) {
         warnedNoStructure = true;
         if (typeof console !== "undefined" && console.warn) {
           console.warn("[build] goal tracker disabled: window.KernelStructure was never loaded");
@@ -189,66 +235,54 @@
       return;
     }
 
-    var wrap = ctx.hosts.blueprintWrap;
-    var boxes = ctx.hosts.blueprint;
-    var blueprint = task.blueprint || [];
-    var gates = task.goalCheck || [];
-    if (!blueprint.length && !gates.length) {
-      if (wrap) wrap.hidden = true;
-      return;
-    }
+    var goals = task.goals || [];
+    if (!goals.length) return;
 
-    var types = scanTypes(surface.editor ? surface.editor.getValue() : "");
-    // No scanner: leave the blueprint hidden rather than show a panel that can
-    // never light up. A check that goes quiet is worse than no check.
-    if (!types) {
-      if (wrap) wrap.hidden = true;
-      return;
-    }
+    var gates = goals.map(function (g) { return g && g.gate !== undefined ? g.gate : undefined; });
+    var source = surface.editor ? surface.editor.getValue() : "";
+    var types = scanTypes(source);
+    if (!types) return;
 
-    if (boxes && blueprint.length) {
-      if (wrap) wrap.hidden = false;
-      var html = blueprint.map(function (want) { return blueprintBox(ctx, S, types, want); }).join("");
-      if (html !== surface.blueprintHtml) {
-        surface.blueprintHtml = html;
-        boxes.innerHTML = html;
-      }
-    } else if (wrap) {
-      wrap.hidden = true;
+    // S.verdicts is the one place that decides what a learner sees: the gate AND
+    // every row under it. Reading S.evaluate here instead would let this view
+    // drift from the tests and the validator.
+    var met = S.verdicts
+      ? S.verdicts(types, goals, source)
+      : S.evaluate(types, gates, source);
+    // Layer in run-gated state: a null gate is ticked by a passing run.
+    for (var i = 0; i < met.length; i++) {
+      if (met[i] === null && surface.runPassed) met[i] = true;
     }
-
-    paintGoalTicks(surface, S.evaluate(types, gates));
+    paintGoalTicks(surface, met, types, source);
   }
 
-  // Decorate the goal list the CORE painted. The original prose is snapshotted
-  // once per render so a tick can be re-applied without re-running renderInline
-  // and without the markup accumulating ticks on every keystroke.
-  function paintGoalTicks(surface, met) {
+  // Render the UML goal panel. Only touches the DOM when the HTML actually changed.
+  function paintGoalTicks(surface, met, types, source) {
     var list = surface.ctx.hosts.goal;
     if (!list || !met.length) return;
-    var items = list.children;
-    if (!items || !items.length) return;
-    // No snapshot yet means the prose has not been read; writing a tick now
-    // would replace the goal text with an empty string.
     if (!surface.goalHtml) return;
-    var base = surface.goalHtml;
-    for (var i = 0; i < met.length && i < items.length; i++) {
-      if (surface.goalMet && surface.goalMet[i] === met[i]) continue;
-      var li = items[i];
-      if (!li) continue;
-      li.innerHTML = tick(met[i]) + (base[i] || "");
-      if (li.classList) li.classList.toggle("is-met", met[i] === true);
-    }
+
+    // The rendered HTML is the only honest diff: a member row can change while
+    // the box-level verdict does not, so comparing the met array would swallow
+    // the repaint.
     surface.goalMet = met;
+    var html = buildTrackerHtml(surface, met, types, source);
+    if (list.innerHTML !== html) {
+      list.innerHTML = html;
+      // The tracker replaces each bullet with its own tick, so the list drops
+      // the marker and the indent. It is opt-IN: `coach-list` is shared with the
+      // drill Points list and the git goal list, which still want plain bullets.
+      list.classList.add("has-tracker");
+    }
   }
 
-  // Snapshot the freshly painted (and freshly localized) goal prose, and forget
-  // any previous tick state so the next sync repaints from scratch.
+  // Snapshot the freshly painted (and freshly localized) goal prose so the tracker
+  // can rebuild the UML boxes with the correct localized captions on each sync.
   function captureGoals(surface) {
     var list = surface.ctx.hosts.goal;
+    var task = surface.task;
     surface.goalHtml = [];
     surface.goalMet = null;
-    surface.blueprintHtml = null;
     if (!list || !list.children) return;
     for (var i = 0; i < list.children.length; i++) {
       surface.goalHtml.push(list.children[i].innerHTML || "");
@@ -390,7 +424,7 @@
           // editor contract, so an editor that cannot report edits leaves the
           // tracker painted at its last known state instead of being polled.
           if (typeof editor.onChange === "function") {
-            surface.unwatch = editor.onChange(function () { syncTracker(surface); });
+            surface.unwatch = editor.onChange(function () { surface.runPassed = false; syncTracker(surface); });
           }
           syncTracker(surface);
           warm(surface);
@@ -403,6 +437,7 @@
     renderCard: function (surface, task, i) {
       surface.task = task;
       surface.taskIndex = i;
+      surface.runPassed = false;
       var editor = surface.editor;
       // The core has just painted this card's goal list. Snapshot it BEFORE
       // touching the editor: setValue reports as a change, so the tracker can
@@ -477,6 +512,8 @@
               { run: function (src) { return runner.run(src); } }
             )
           ).then(function (result) {
+            surface.runPassed = result.ok;
+            syncTracker(surface);
             return {
               ok: result.ok,
               reason: result.reason,
@@ -516,6 +553,7 @@
       var t = task || surface.task;
       if (!t) return;
       surface.code = t.starter;
+      surface.runPassed = false;
       surface.editor.setValue(t.starter || "");
       if (surface.editor.setMarkers) surface.editor.setMarkers([]);
       surface.outputPanel.hideOutput();

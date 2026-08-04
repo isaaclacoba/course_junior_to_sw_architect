@@ -158,3 +158,130 @@ test("viz skips resolvers under --no-viz", async () => {
   assert.equal(createValidators(deps).get("viz").verify({ config: { steps: [{}] }, opts: { noViz: true } }), true);
   assert.match(lines.skip[0], /--no-viz/);
 });
+
+// --- goal tracker granularity ----------------------------------------------
+// A blueprint box that lists only its class header passes every "does it light
+// up" check while showing the learner nothing and ticking in a single jump. The
+// gate below is what forces a box to name each field, constructor and method
+// the learner has to add, so the tracker reads as subtasks rather than a lamp.
+
+// A tiny stand-in for the real scanner: enough shape for the granularity rule
+// without dragging the vendored bundle into a unit test.
+function fakeScanner(byName) {
+  return {
+    scanCSharp: (src) => ({ types: byName[String(src).trim()] || [] }),
+  };
+}
+const CAT_SOLUTION = "SOLUTION";
+const CAT_STARTER = "STARTER";
+function catScanner(starterMembers = []) {
+  return fakeScanner({
+    [CAT_SOLUTION]: [{
+      name: "Cat", kind: "class", bases: [], members: [
+        { name: "_hoursSinceMeal", kind: "field", detail: "int _hoursSinceMeal" },
+        { name: "Cat", kind: "constructor", detail: "Cat(int hoursSinceMeal)" },
+        { name: "IsHungry", kind: "method", detail: "bool IsHungry()" },
+      ],
+    }],
+    [CAT_STARTER]: starterMembers.length
+      ? [{ name: "Cat", kind: "class", bases: [], members: starterMembers }] : [],
+  });
+}
+function runBuild(codeRows, scanner) {
+  const { lines, deps } = recorder({
+    codeLab: () => scanner,
+    dotnet: { available: () => true, compileRun: () => ({ built: true, output: "", errors: "" }) },
+    grading: { matches: () => true, buildProbe: () => "" },
+  });
+  const config = { tasks: [{
+    title: "Cat", solution: CAT_SOLUTION, starter: CAT_STARTER,
+    goal: ["one"], goals: [{ code: codeRows, gate: null }],
+  }] };
+  return { lines, deps, config };
+}
+
+test("a blueprint box that hides the learner's work FAILS the tracker gate", async () => {
+  const { createValidators } = await load();
+  const { lines, deps, config } = runBuild(["class Cat"], catScanner());
+  const v = createValidators(deps).get("build");
+  const passed = v.verify({ config, opts: {} });
+  assert.equal(passed, false, "a header-only box must not pass");
+  const msg = lines.bad.join("\n");
+  assert.match(msg, /hides work the learner must do/);
+  assert.match(msg, /field int _hoursSinceMeal/, "must name the missing field");
+  assert.match(msg, /constructor Cat\(int hoursSinceMeal\)/, "must name the missing constructor");
+  assert.match(msg, /method bool IsHungry\(\)/, "must name the missing method");
+});
+
+test("a box naming every added member PASSES", async () => {
+  const { createValidators } = await load();
+  const { lines, deps, config } = runBuild(
+    ["class Cat", "int _hoursSinceMeal", "Cat(int hoursSinceMeal)", "bool IsHungry()"],
+    catScanner());
+  const v = createValidators(deps).get("build");
+  assert.equal(v.verify({ config, opts: {} }), true, lines.bad.join("\n"));
+});
+
+test("a member the STARTER already provides needs no row", async () => {
+  // Cards where the learner only fills a body must not be forced to list
+  // machinery that was handed to them - that would be noise, not a subtask.
+  const { createValidators } = await load();
+  const starter = [
+    { name: "_hoursSinceMeal", kind: "field", detail: "int _hoursSinceMeal" },
+    { name: "Cat", kind: "constructor", detail: "Cat(int hoursSinceMeal)" },
+  ];
+  const { lines, deps, config } = runBuild(["class Cat", "bool IsHungry()"], catScanner(starter));
+  const v = createValidators(deps).get("build");
+  assert.equal(v.verify({ config, opts: {} }), true, lines.bad.join("\n"));
+});
+
+// --- the tracker summary must not contradict the failures above it ---------
+// The "lights up fully" line used to print unconditionally, so a run could show
+// four rows that can never tick and then announce success directly underneath.
+// verify() returned false either way, but a human reading the log saw a green
+// line and stopped looking.
+
+test("a tracker with a failing row does NOT also claim it lights up fully", async () => {
+  const { createValidators } = await load();
+  // The box names a member the solution does not have, so its row cannot tick.
+  const { lines, deps, config } = runBuild(
+    ["class Cat", "int _hoursSinceMeal", "Cat(int hoursSinceMeal)", "bool IsHungry()", "void Nope()"],
+    catScanner(),
+  );
+  const v = createValidators(deps).get("build");
+  assert.equal(v.verify({ config, opts: {} }), false);
+  assert.match(lines.bad.join("\n"), /could never tick/);
+  assert.equal(
+    lines.ok.some((m) => /lights up fully/.test(m)),
+    false,
+    "the summary line must be silent when the tracker failed",
+  );
+});
+
+test("a tracker with nothing wrong still says it lights up fully", async () => {
+  const { createValidators } = await load();
+  const { lines, deps, config } = runBuild(
+    ["class Cat", "int _hoursSinceMeal", "Cat(int hoursSinceMeal)", "bool IsHungry()"],
+    catScanner(),
+  );
+  const v = createValidators(deps).get("build");
+  assert.equal(v.verify({ config, opts: {} }), true);
+  assert.equal(lines.ok.some((m) => /lights up fully/.test(m)), true);
+});
+
+test("a starter the scanner cannot read FAILS instead of skipping granularity", async () => {
+  const { createValidators } = await load();
+  // The granularity check used to `catch { return; }`, abandoning itself with no
+  // signal - the exact "check that goes quiet" this validator exists to catch.
+  const exploding = {
+    scanCSharp: (src) => {
+      if (String(src).trim() === CAT_STARTER) throw new Error("scanner blew up");
+      return { types: catScanner().scanCSharp(src).types };
+    },
+  };
+  const { lines, deps, config } = runBuild(["class Cat"], exploding);
+  const v = createValidators(deps).get("build");
+  assert.equal(v.verify({ config, opts: {} }), false, "an unreadable starter must fail");
+  assert.match(lines.bad.join("\n"), /granularity was not checked/);
+  assert.match(lines.bad.join("\n"), /scanner blew up/, "must say WHY");
+});

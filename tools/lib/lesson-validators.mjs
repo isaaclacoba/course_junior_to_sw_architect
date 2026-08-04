@@ -97,7 +97,6 @@ export function createValidators(deps) {
         if (re.test(t.solution)) ok(`${label} requireSource /${re.source}/ matches solution`);
         else { bad(`${label} requireSource /${re.source}/ does NOT match solution`); allOk = false; }
       }
-      checkTracker(t, label, () => { allOk = false; });
       if (t.verify && t.verify.main) {
         const probe = compileRun(buildProbe(t.solution, t.verify.main));
         if (!probe.built) { bad(`${label} verify probe did not compile\n${firstError(probe.errors)}`); allOk = false; }
@@ -116,57 +115,127 @@ export function createValidators(deps) {
   // check that simply goes quiet. A learner would see a box that stays dashed no
   // matter what they write, and conclude their correct answer was wrong.
   function checkTracker(t, label, fail) {
-    const blueprint = t.blueprint || [];
-    const gates = t.goalCheck || [];
-    if (!blueprint.length && !gates.length) return;
+    // Local record of whether anything in THIS tracker failed. `fail` reports
+    // upward but tells us nothing, so without this the summary line below would
+    // print "lights up fully" straight under a list of rows that never tick.
+    let trackerOk = true;
+    const note = () => { trackerOk = false; fail(); };
+    const goals = t.goals || [];
+    const gates = goals.map((g) => g && g.gate !== undefined ? g.gate : undefined);
+    if (!gates.length) return;
 
     const CL = deps.codeLab();
     if (!CL || typeof CL.scanCSharp !== "function") {
       bad(`${label} has a goal tracker but the vendored bundle exports no scanCSharp - re-vendor vendor/code-lab/code-lab.global.js`);
-      fail();
+      note();
       return;
     }
     const types = CL.scanCSharp(t.solution || "").types || [];
 
-    for (const want of blueprint) {
-      if (!structure.meets(types, { type: want.name, kind: want.kind })) {
-        bad(`${label} blueprint wants ${want.kind || "class"} ${want.name}, which the solution never declares`);
-        fail();
-        continue;
+    // A goals array is index-aligned with the localized goal prose it ticks,
+    // so a count mismatch silently attaches ticks to the wrong sentences.
+    const proseCount = (t.goal || []).length;
+    if (gates.length && proseCount && gates.length !== proseCount) {
+      bad(`${label} has ${gates.length} goals entry/entries for ${proseCount} goal line(s) - they are index-aligned, so the counts must match`);
+      note();
+    }
+    // null gate = run-gated (about OUTPUT, not shape). Any non-null gate must
+    // light up on the solution or it is a checklist item nobody can ever satisfy.
+    structure.evaluate(types, gates, t.solution || "").forEach((met, i) => {
+      if (met === false) {
+        bad(`${label} goals[${i}].gate (${structure.describe(gates[i])}) is NOT met by the solution - it could never tick`);
+        note();
       }
-      for (const base of want.bases || []) {
-        if (!structure.meets(types, { type: want.name, base })) {
-          bad(`${label} blueprint wants ${want.name} : ${base}, which the solution does not declare`);
-          fail();
+    });
+    // Every MEMBER ROW is a subtask with its own tick, so each one has to light
+    // up too. A row naming a member the solution never declares - a renamed
+    // field, a constructor signature that drifted - would sit grey forever and
+    // read as "your correct answer is wrong".
+    let rowCount = 0;
+    if (typeof structure.rows === "function") {
+      goals.forEach((g, i) => {
+        const code = g && g.code;
+        if (!code) return;
+        const list = Array.isArray(code) ? code : [code];
+        // A run-gated blueprint box has no gate, but its rows are still claims
+        // about the solution's shape and a typo in one is just as invisible.
+        // Derive the type from the header ("class Cat", "Cat : IAnimal").
+        let gate = gates[i];
+        if (gate === null || gate === undefined) {
+          const head = String(structure.rowLabel ? structure.rowLabel(list[0]) : list[0] || "")
+            .split(":")[0].trim().split(/\s+/).pop();
+          if (!head) return;
+          gate = { type: head };
         }
-      }
-      for (const member of want.members || []) {
-        if (!structure.meets(types, { type: want.name, member: structure.symbolName(member) })) {
-          bad(`${label} blueprint wants ${want.name}.${structure.symbolName(member)} ("${member}"), which the solution does not declare`);
-          fail();
-        }
-      }
+        const verdicts = structure.rows(types, gate, list, t.solution || "");
+        verdicts.forEach((met, r) => {
+          rowCount++;
+          if (met !== true) {
+            const shown = structure.rowLabel ? structure.rowLabel(list[r]) : list[r];
+            const how = list[r] && typeof list[r] === "object"
+              ? ` (step row watching for \`${list[r].writes || list[r].gone}\`)` : "";
+            bad(`${label} goals[${i}].code[${r}] ("${shown}")${how} is NOT found in the solution - that subtask row could never tick`);
+            note();
+          }
+        });
+      });
+    }
+    checkGranularity(t, label, types, note);
+    if (trackerOk) {
+      ok(`${label} goal tracker lights up fully on the solution (${gates.length} gate(s), ${rowCount} row(s))`);
+    }
+  }
+
+  // Rows that LIGHT UP are only half the contract. The other half is that the
+  // box actually SHOWS the work: a blueprint listing nothing but `class Cat`
+  // passes every check above while telling the learner nothing, and its single
+  // tick flips from grey to green in one jump with no sense of progress.
+  //
+  // So every member the learner has to ADD - each field, the constructor, each
+  // method present in the solution but not in the starter - must have its own
+  // row. That is what makes the tracker a set of subtasks instead of a
+  // pass/fail lamp, and it is the piece an author forgets first.
+  function checkGranularity(t, label, solTypes, fail) {
+    const CL = deps.codeLab();
+    let starterTypes = [];
+    try {
+      starterTypes = CL.scanCSharp(t.starter || "").types || [];
+    } catch (err) {
+      // Swallowing this would abandon the whole granularity check with no
+      // signal - the precise "check that simply goes quiet" failure this file
+      // exists to catch. Say so and fail.
+      bad(`${label} starter could not be scanned, so granularity was not checked: ${err && err.message ? err.message : err}`);
+      fail();
+      return;
     }
 
-    // A gate is index-aligned with the localized goal prose it ticks, so a
-    // count mismatch silently attaches ticks to the wrong sentences.
-    const goals = (t.goal || []).length;
-    if (gates.length && goals && gates.length !== goals) {
-      bad(`${label} has ${gates.length} goalCheck gate(s) for ${goals} goal line(s) - they are index-aligned, so the counts must match`);
-      fail();
-    }
-    // null is authored on purpose: that goal line is a claim about OUTPUT, not
-    // about shape, so only the compiler can settle it. Anything else must light
-    // up on the solution or it is a checklist item nobody can ever complete.
-    structure.evaluate(types, gates).forEach((met, i) => {
-      if (met === false) {
-        bad(`${label} goalCheck[${i}] (${structure.describe(gates[i])}) is NOT met by the solution - it could never tick`);
+    (t.goals || []).forEach((g, i) => {
+      const code = g && g.code;
+      if (!code) return;
+      const list = Array.isArray(code) ? code : [code];
+      // "class Cat", "Cat : IAnimal" and "interface ILog" all name their type last.
+      const head = String(structure.rowLabel ? structure.rowLabel(list[0]) : list[0] || "")
+        .split(":")[0].trim().split(/\s+/).pop();
+      const solType = solTypes.find((x) => x.name === head);
+      if (!solType) return; // the row check above already reports an unknown type
+
+      const starterType = starterTypes.find((x) => x.name === head);
+      const alreadyThere = new Set(((starterType && starterType.members) || []).map((m) => m.name));
+      // Step rows watch statements, not declarations, so they name no member and
+      // cannot discharge the granularity duty for one.
+      const rowNames = new Set(list.slice(1)
+        .filter((r) => !(r && typeof r === "object"))
+        .map((r) => structure.symbolName(r)).filter(Boolean));
+
+      const unlisted = (solType.members || [])
+        .filter((m) => !alreadyThere.has(m.name) && !rowNames.has(m.name));
+      if (unlisted.length) {
+        const what = unlisted.map((m) => `${m.kind} ${m.detail || m.name}`).join(", ");
+        bad(`${label} goals[${i}] box "${list[0]}" hides work the learner must do: ${what}. ` +
+          `Every field, constructor and method the solution adds needs its own row, or the box ticks in one jump instead of tracking each piece.`);
         fail();
       }
     });
-    if (blueprint.length || gates.length) {
-      ok(`${label} goal tracker lights up fully on the solution (${blueprint.length} box(es), ${gates.length} gate(s))`);
-    }
   }
 
   // A practice lesson fills a card title from its config.
@@ -213,9 +282,32 @@ export function createValidators(deps) {
     return allOk;
   }
 
+  // The goal tracker is a PURE STATIC check - it reads the solution's shape, not
+  // its output - so it must never ride along inside the dotnet path. It used to,
+  // and `--no-dotnet` (and any machine without dotnet on PATH) silently skipped
+  // every tracker assertion in the repo. A check that goes quiet is worse than
+  // no check: it reports PASS.
+  function verifyTracker({ config }) {
+    let allOk = true;
+    (config.tasks || []).filter((t) => !t.summary).forEach((t, i) => {
+      if (!(t.goals || []).length) return;
+      checkTracker(t, `task ${i + 1} "${(t.title || "").slice(0, 40)}"`,
+        () => { allOk = false; });
+    });
+    return allOk;
+  }
+
+  function verifyTasks(args) {
+    // Both run, and both verdicts count - `&&` would short-circuit the tracker
+    // report away the moment a compile failed.
+    const tracker = verifyTracker(args);
+    const compiled = verifyCompiled(args);
+    return tracker && compiled;
+  }
+
   const list = [
-    { archetype: "build", bodyField: "tasks", verify: verifyCompiled, rendered: renderedTitle },
-    { archetype: "drill", bodyField: "tasks", verify: verifyCompiled, rendered: renderedTitle },
+    { archetype: "build", bodyField: "tasks", verify: verifyTasks, rendered: renderedTitle },
+    { archetype: "drill", bodyField: "tasks", verify: verifyTasks, rendered: renderedTitle },
     { archetype: "viz", bodyField: "steps", verify: verifyViz, rendered: (dom) => PANEL_CLASSES.some((c) => dom.includes(c)) },
     { archetype: "checkpoint", bodyField: "questions", verify: () => true, rendered: (dom) => dom.includes("cl-quiz") },
     // The git body is the terminal the learner types into plus the graph it

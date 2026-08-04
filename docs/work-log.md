@@ -1284,3 +1284,190 @@ real dotnet compiles all 7 solutions, matches expected output, passes every
 requireSource and every hidden probe, and asserts every blueprint member and
 gate actually lights up on the authored solution; headless render clean in en
 and es with card 3 showing three dashed boxes and no leaked answer.
+
+## 2026-08-04 14:54 CEST - live goal ticking on the two cards that change no shape
+
+Cards 1 and 2 of the SOLID lesson sat completely inert until Run. The tracker
+looked broken, and it was: both cards ask the learner to change LOGIC INSIDE a
+method that already exists, and the scanner only sees declarations, so there was
+nothing structural to watch. Every goal on those cards was run-gated.
+
+Rather than guess, this was proved in a real headless Chrome over CDP, typing
+through the Monaco model so `onDidChangeModelContent` actually fires: card 3
+ticked from typing alone, card 1 never moved. That separated "the live tracker
+is broken" from "these two cards have nothing to track".
+
+Added two source-scoped gate fields to kernel/grading/structure-match.js:
+
+- `writes: ['"FEED"', '"FULL"']` - met once those literals really appear.
+- `gone: ">= 6"` - met once the duplicated rule disappears.
+
+Both read only the gate's own type body, so card 2's two boxes tick one at a
+time - fixing the Cat lights the Cat and leaves the FrontDesk grey, which is the
+entire point of that card. Comments are stripped first, so a TODO naming FEED
+earns nothing, and matching is whitespace-insensitive so `>=6` and `>= 6` are the
+same edit. A source condition is a header prerequisite: while it is unmet every
+member row under it stays unmet, so nothing is green before the learner types.
+
+These fields are a "has the work visibly started" signal, never "is it correct".
+Correctness still comes from expected output and the hidden verify probe.
+
+Three things worth remembering:
+
+1. A source-conditioned gate given no source used to return true. That fails
+   OPEN - a caller that forgot the argument would show an unearned tick. It now
+   returns false, and a test pins it. The suite caught this, not review.
+2. The first browser run reported the old markup and sent me chasing a renderer
+   bug that did not exist; the page was cached. `Network.setCacheDisabled` plus
+   a hard reload before trusting any headless reading.
+3. The starter-side assertion ("no goal is met on the untouched starter for any
+   card") is the one that found the fail-open. Checking that things light up is
+   half a test; checking that they stay dark is the other half.
+
+Verified: 347/347 tests (git-* excluded, parallel session); validate 0 errors;
+check-i18n PASS; es round-trip PASS; verify-lesson with real dotnet passes all 7
+solutions, every requireSource, every hidden probe, and lights every gate and
+member row (2/4/8/6/6/8/8 rows); CDP proves card 1 green from typing alone and
+card 2 ticking one class at a time, both with no Run.
+
+## 2026-08-04 15:11 CEST - the course's own code must obey the course's own rules
+
+Reported: the SOLID lesson - the one whose whole subject is "one rule, one
+place" - shipped `int n = 0;`, `foreach (int h in hours)` and a bare `>= 6`
+compared in two classes. A student copies what they see, so a lesson whose code
+contradicts its prose is broken content, not a style nit.
+
+Root cause was not the lesson. It was that NO rule existed: grep for "naming",
+"magic number" or "quality" across SKILL.md, AGENTS.md and SPECS.md returned
+nothing. Authors were never told, so "proper coding guidelines" meant whatever
+each agent assumed. Fixed in three layers:
+
+1. `.github/skills/lesson-authoring/SKILL.md` - a new MANDATORY section that
+   defines the standard concretely (8 numbered rules: no single letters, named
+   constants, one rule in one place, one job per method, depend on abstractions,
+   private fields, no dead code, uniform formatting) rather than gesturing at
+   "good practice". It covers `starter`, `solution`, `verify.main`, `example`
+   and every runnable program.
+
+   It also carves out the ONE exception this course genuinely needs: a card may
+   ship bad code when repairing it IS the lesson. That exception is narrow and
+   stated as such - the flaw must be the card's subject, everything else in the
+   starter still meets the standard, and the `solution` is always exemplary. The
+   worked before/after is the real `HungryCount` bug, so the next author sees
+   exactly which parts were the lesson and which were just sloppiness.
+
+2. `tools/validate.mjs` - `checkExemplaryCode` gates the mechanical half:
+   single-letter locals, and a literal compared in 2+ places (a duplicated rule
+   wearing a number). WARN not error, matching the verbosity precedent: 20
+   existing lessons predate the rule, 130 hits. New content treats it as a
+   blocker.
+
+3. The lesson itself, now 0 warnings. `n` -> `hungryCount`, `h` ->
+   `hoursSinceMeal`, `c` -> `cat`, `hours` -> `hoursPerCat`, braces on every
+   `if`, and the threshold named `HoursUntilHungry`. The DUPLICATION deliberately
+   stays - it is what cards 2 and 3 teach - but it is now two named constants
+   rather than two anonymous 6s, which makes the point better: the rule is
+   duplicated even when it has a name.
+
+Naming the constant moved the thing the gates watch, so they moved with it:
+`gone: ">= 6"` became `gone: "HoursUntilHungry = 6"`, both `requireSource`
+no-`>= 6` regexes were rewritten, and the learner-facing message was updated in
+EN and ES. Editing the code without editing these would have left a gate that
+can never fail - the "check that goes quiet" this repo keeps producing.
+
+Also fixed `IMover a` / `IMover b` in card 5's hidden probe. Worth noting the
+gate did NOT catch those: the regex only knows builtin types, so a single-letter
+local of a lesson-defined type still slips through. Deliberate for now - the
+gate is a floor, not the bar, and the skill says so.
+
+Verified: 356/357 tests (the 1 failure is the parallel session's new
+`git-task.js` dep, `build:` untouched); validate 0 errors and 0 exemplary-code
+warnings for this lesson; check-i18n PASS; es round-trip PASS; verify-lesson with
+real dotnet passes all 7 solutions, every requireSource and every hidden probe;
+all 7 starters still light NOTHING; CDP confirms card 2 still ticks one class at
+a time from typing alone.
+
+## 2026-08-04 15:26 CEST - reverted a prose "trim" that destroyed the voice
+
+I compressed `task.<n>.context` in 7 lessons to satisfy the 75-word verbosity
+warning I had added earlier in the session. That was wrong, and the author was
+right to stop it hard.
+
+The SOLID lesson lost the most: card 3 went from 198 words to 64 and stopped
+making its argument. What it became -
+
+  "Two edits, two classes, one decision by the vet. Change only one and nothing
+   goes red: two `FEED` cards beside a tally reading `1`."
+
+- is note form, not concise prose, and it breaks AGENTS.md outright: a verb-less
+fragment (rule 5), the tricolon rhythm (rule 7), and compression no colleague
+would say aloud (rule 9). The original spent four sentences on the COST of the
+bad shape, which is the whole point of that card. Longer was correct.
+
+Reverted, and checked the blast radius rather than assuming: 7 lessons touched,
+not 84. Six of them (`foundations`, `reuse-without-regret`, `class-members`,
+`null-safety`, `test-doubles`, `refactor-moves`) had prose-only edits and were
+restored wholesale after confirming their key sets were unchanged. `foundations`
+had also lost real teaching content - bit widths, IEEE 754, the terms "signed
+integer" and "floating-point" - which is exactly the substance a word cap should
+never touch. SOLID was restored key-by-key so the 35 new `require`/`verify`
+localization keys survived. Two Spanish edits I was never asked to make went back
+too, including a gender change to `summaryIntro` that was probably a regression
+(`principios` is masculine).
+
+Exactly ONE existing string is now intentionally different from the commit:
+`task.1.goal.0` said "Write the method", but the starter has always shipped that
+method with an empty body, so it now says "Fill in the logic". That is a factual
+correction, not a rewrite.
+
+The rule that caused this is fixed, because the rule was the bug. The word budget
+in the lesson-authoring skill now opens by deferring to AGENTS.md, reframes the
+warning as "is any of this restating the goals or the code?" rather than a target,
+and carries this exact failure as a worked before/after so the next agent sees
+that the 198-word version was the good one. `tools/validate.mjs` says so too, in
+the warning text and in the comment above the check. Added a preflight checkbox
+for the read-aloud test.
+
+Lesson for next time: a measured distribution is a description, not a target. I
+turned an observation about existing prose into an instruction to rewrite it, and
+never re-read the result as a reader.
+
+Verified: 357/357 tests; validate 0 errors; check-i18n PASS; es round-trip PASS;
+verify-lesson with real dotnet passes all 7 cards and renders clean in en and es;
+`git status` confirms only the SOLID lesson's 3 files remain modified.
+
+## 2026-08-04 15:34 CEST - the scanner could not read expression-bodied members
+
+Reported: a learner wrote `public Cat(int hoursSinceMeal) => _hoursSinceMeal =
+hoursSinceMeal;` and the tracker row stayed grey. Correct code, called wrong -
+the failure the tracker exists to prevent.
+
+Checked before touching anything, and it was worse than the report. The scanner
+in `code-lab/src/core/csharp-symbols.ts` splits members on `{` and `;`, so any
+member with an `=>` body never matched:
+
+- expression-bodied METHOD  -> not found at all
+- expression-bodied CTOR    -> not found at all
+- expression-bodied PROPERTY-> found, but filed as a FIELD
+
+Fix: `expressionBodyArrow()` locates the `=>` that opens an expression body,
+`takeDeclaration` slices it off and re-reads the head, which then looks exactly
+like the braced form. One helper, no second parser.
+
+The trap worth naming is telling that arrow apart from a LAMBDA in a field
+initializer. `Func<int, int> twice = value => value * 2;` is a field, not a
+method. A top-level `=` reached before the arrow means initializer, so we stop
+and let the field branch have it. The nastiest case is `Action Run = () =>` -
+the head ends in `)`, so any "does it end in a paren" test reads it as a method.
+Both are pinned by tests. Comparison operators (`==`, `!=`, `<=`, `>=`) are
+skipped so `Ok => a >= b` still parses.
+
+Also: a `=>` property is read-only, so its detail now says `{ get; }` rather
+than claiming a setter it does not have.
+
+Verified: code-lab typecheck clean, 359/359 tests (7 new), rebuilt and
+re-vendored; course 357/357; validate 0 errors; verify-lesson with real dotnet
+passes; and CDP in a real browser confirms all three rows of the `Cat` box plus
+`FeedingSign` tick from typing expression-bodied members alone, no Run.
+
+Submodule commits BEFORE the parent pointer bump when this is committed.

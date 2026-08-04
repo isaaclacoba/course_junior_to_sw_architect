@@ -5,7 +5,9 @@ description: >-
   USE FOR: adding a new theory/drill/build/checkpoint lesson; editing lesson
   prose (intro, concept, context, goal, quiz, summary); choosing the right
   archetype (build/drill/viz/checkpoint); getting XP/total and prefix conventions
-  right; verifying a lesson compiles and renders. DO NOT USE FOR: changing the
+  right; writing the lesson's C# to the course's mandatory exemplary-code
+  standard (naming, no magic numbers, SOLID); verifying a lesson compiles and
+  renders. DO NOT USE FOR: changing the
   engine itself (the generic `kernel/engine/` core + its plugins, or page-shell)
   or the Roslyn/Blazor host (that is engine work, see copilot-instructions);
   auditing existing content (use the course-audit skill).
@@ -120,14 +122,217 @@ and the per-archetype engines it loaded are gone.
 - [ ] Every concept and token used is at or above this lesson's ledger row.
 - [ ] No C#-only sugar used before its ledger row (`=>`, `var`, `$"..."`, records).
 - [ ] One idea per card; a recap closes a multi-card lesson.
+- [ ] **Prose reads like a person wrote it**: full sentences, no fragments, no
+      `**Term:** definition` headers replacing prose. Re-read `AGENTS.md` and
+      apply the read-aloud test. Existing prose that already passes was NOT
+      rewritten to hit a word count.
 - [ ] Prose is formatted: lists use `- ` bullets (never comma-packed), distinct
       points use blank-line paragraphs, `**bold**` for the new term, `code` in backticks.
 - [ ] Runnable if it produces visible output.
+- [ ] **Every C# line is exemplary**: no single-letter names, no magic numbers,
+      one rule in one place, private fields, uniform formatting - in `starter`,
+      `solution`, `verify.main` and `example` alike. The only bad code allowed is
+      the specific flaw a card exists to fix, and its `solution` is still clean.
 - [ ] Build tasks have a technique gate AND a hidden `verify` probe.
 - [ ] SOLID letter stated if this is a design/testing/refactor lesson.
 - [ ] One example family for the Part; difficulty rises one rung.
 - [ ] `awardedKey == data-key`; `data-total` excludes the recap; unique `prefix`.
 - [ ] Ledger updated; work-log start and end logged.
+
+## Every line of C# you ship is a worked example - MANDATORY
+
+This course teaches people to write maintainable code. **Every C# line in a
+lesson is therefore a worked example of the standard being taught**, and that
+includes the parts that feel like scaffolding: `starter`, `solution`,
+`verify.main`, `example`, and every runnable program. A student copies what they
+see. Ship a sloppy `Main` and you have taught sloppiness, whatever the prose says.
+
+This is not a style preference. A lesson whose own code breaks the rules it is
+teaching is **broken content** and must not ship.
+
+### What "proper coding guidelines" means here - concretely
+
+Do not guess at this list. It is the whole rule.
+
+1. **Names say what the thing IS.** No single letters, no abbreviations.
+   `hoursSinceMeal`, not `h`. `hungryCount`, not `n`. `cat`, not `c`.
+   The ONLY accepted single letter is a generic type parameter (`T`).
+2. **No magic numbers or magic strings.** A literal that carries meaning gets a
+   named constant: `const int HoursUntilHungry = 6;`. A bare `>= 6` in two places
+   is exactly the duplication this course spends a whole Part teaching people to
+   remove. Loop seeds (`0`), identity values (`1`) and array sizes are fine.
+3. **One rule lives in ONE place.** No copy-pasted condition, no parallel
+   `if`-chain repeating a decision another type already owns.
+4. **A method does one job**, and its name says which. If the name needs "and",
+   split it.
+5. **Depend on the abstraction** once the lesson has introduced interfaces: take
+   `ILog`, do not `new ConsoleLog()` inside the class that uses it.
+6. **Fields are `private`**, exposed through a method or property when needed.
+7. **No dead code, no commented-out code, no `TODO` left in a `solution`.**
+8. **Formatting is uniform**: Allman braces, four spaces, braces even on a
+   one-line `if` body, one statement per line, `PascalCase` for types/methods,
+   `camelCase` for locals/parameters, `_camelCase` for private fields.
+
+### The one deliberate exception
+
+A lesson often has to SHOW bad code in order to fix it - that is the entire
+pedagogy of the SOLID Part. That is allowed in exactly one place: the `starter`
+of a card whose stated job is to repair it, and the flaw must be the one the
+card is about.
+
+That exception is narrow, and it is not a licence to be sloppy elsewhere:
+
+- The flaw is **the lesson's subject**, never incidental. A card about removing
+  a duplicated rule may ship the duplicated rule. It may NOT also ship `n` and
+  `h` as variable names - that is unrelated sloppiness riding along.
+- **Everything else in that starter still meets the full standard.** Good names,
+  named constants, clean formatting - so the flaw stands out instead of drowning
+  in noise.
+- **The `solution` is always exemplary.** No exceptions. It is the last thing the
+  student reads and the thing they will copy.
+- Mark it for the reader (`// The desk repeats the rule the Cat already owns.`)
+  so nobody mistakes the flaw for the house style.
+
+### Worked example - the real bug this rule was written for
+
+The SOLID lesson taught "one rule, one place" while its own code read:
+
+```csharp
+public int HungryCount(List<int> hours)
+{
+    int n = 0;
+    foreach (int h in hours)
+    {
+        if (h >= 6) n++;      // magic number, single-letter names, no braces
+    }
+    return n;
+}
+```
+
+Three violations the card never intended to teach: `n`, `h`, and a bare `6`. The
+card's actual subject was the duplicated `>= 6` rule. Corrected - the duplication
+stays (it IS the lesson), everything else meets the standard:
+
+```csharp
+public int HungryCount(List<Cat> cats)
+{
+    // The desk repeats the rule the Cat already owns - card 2 removes this.
+    const int HoursUntilHungry = 6;
+    int hungryCount = 0;
+    foreach (Cat cat in cats)
+    {
+        if (cat.HoursSinceMeal() >= HoursUntilHungry)
+        {
+            hungryCount++;
+        }
+    }
+    return hungryCount;
+}
+```
+
+`tools/validate.mjs` gates the mechanical half of this (single-letter names,
+magic numbers). The rest is your judgement - the gate is a floor, not the bar.
+
+## Word budget for build-task context
+
+**Read the next section first.** The budget below is subordinate to the voice
+rules in `AGENTS.md`, and shortening prose is never worth losing them.
+
+A build card's `task.<n>.context` (the prose above the editor) is the first
+thing a student reads, so every word should earn its place. The measured course
+distribution is:
+
+- Median ~47 words, 75th percentile ~60, 90th percentile ~76.
+- **Aim for 45-60 words when the card is a straightforward "here is the
+  technique, now use it".**
+
+`tools/validate.mjs` emits a WARN above 75 words. Treat that warning as a
+**question, not a command**: "is any of this restating the goals or the code?"
+If yes, cut that. If no, the card is allowed to be long, and you leave it alone.
+
+### NEVER trim prose into note form - the failure this rule exists to stop
+
+A previous agent read the cap as a target and rewrote all seven SOLID cards down
+to ~55 words each. Card 3 went from 198 words to 64 and lost the entire argument
+the lesson was making. It became this:
+
+> Two edits, two classes, one decision by the vet. Change only one and nothing
+> goes red: two `FEED` cards beside a tally reading `1`.
+>
+> That is the **S**. `Cat` had two jobs - deciding *and* wording - and the
+> deciding was sealed behind words, so the desk copied it.
+
+That is not concise writing, it is **note form**, and it breaks the voice rules
+outright: a verb-less fragment opening (`AGENTS.md` rule 5), the tricolon rhythm
+(rule 7), and telegraphic compression no colleague would say aloud (rule 9). The
+original said the same things in full sentences that a human could follow:
+
+> Count what that change touched: two edits, in two classes, for one decision by
+> the vet. And if you had changed only one of them, nothing would have gone red.
+> The program would have printed two `FEED` cards next to a tally reading `1`,
+> and nobody would have known until a cat went hungry.
+
+Longer, and better - because the point of that card is the *cost* of the shape,
+and the cost needs a sentence to land.
+
+Concretely:
+
+- **Never rewrite existing prose to hit the number.** The budget guides prose
+  you are writing now. Prose that already works and reads like a person wrote it
+  is not a defect, whatever it counts.
+- **A card that motivates, tells a story, or explains a cost is allowed to run
+  long.** The SOLID cards, and any card that opens a Part, routinely should.
+- **Cut restatement, not substance.** Delete a sentence that repeats the goal
+  list or narrates the code. Never delete the setup, the motivation, or the
+  concrete consequence.
+- **Every sentence stays a sentence.** No fragments, no `**Term:** definition`
+  headers standing in for prose, no dropped subjects.
+- **If you cannot shorten it without losing the argument, stop.** Leave it and
+  move on. The warning is not a build failure.
+
+### What context is for
+
+Set the scene, state the change, stop. Three moves:
+
+1. Name the problem or concept (one or two sentences).
+2. Show the C# syntax or pattern.
+3. If there is a worked example above the editor, point to it briefly.
+
+Do not restate what the goal list already says. Do not restate what the code
+already shows.
+
+### Goal lines
+
+Each goal is one short sentence. It names the type, the method, and the
+visible effect. The student should be able to read the goals alone and know
+what to build.
+
+### Before / after example
+
+**Before** (107 words - null-safety, task 1):
+
+> Sometimes a value is simply **absent** - a name nobody filled in, a lookup
+> that found nothing. In C# an absent value is `null`. Ask for its length and
+> the program crashes.
+>
+> The safe move is to supply a fallback: *use this value, or that default when
+> there is nothing*. C# writes it with `??` - `given ?? "stray"` means
+> "`given`, unless it is `null`, in which case `"stray"`".
+>
+> Write a `Shelter` whose `NameOr(string? given)` returns the name it is
+> handed, or `"stray"` when that name is `null`.
+
+**After** (45 words):
+
+> Sometimes a value is simply **absent** - a name nobody filled in, a lookup
+> that found nothing. In C# that is `null` - ask for its length and the
+> program crashes.
+>
+> `??` supplies a fallback: `given ?? "stray"` means "`given`, unless it is
+> `null`, in which case `"stray"`".
+
+What changed: the last paragraph restated the goal list and was cut. The
+"safe move" sentence rephrased what `??` already explains - also cut.
 
 ## Visual (viz) lessons - the third archetype
 

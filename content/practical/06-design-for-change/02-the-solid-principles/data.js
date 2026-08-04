@@ -10,14 +10,15 @@
 // where it lives in one. O, L, I and D then each get a single card, because by
 // then the argument has been won and only the move is new.
 //
-// Every task carries the data behind the LIVE GOAL TRACKER:
-//   blueprint - the target types and member SIGNATURES the card's panel shows,
-//               ghosted until the learner's own code declares them;
-//   goalCheck - one gate per goal line, index-aligned with the localized goal
-//               prose, or null for a goal that has no structural test.
+// Every task carries the data behind the LIVE GOAL TRACKER, one `goals` entry
+// per goal line, index-aligned with the localized goal prose:
+//   code - the member SIGNATURES the box lists, each its own row, ghosted until
+//          the learner's code declares them;
+//   gate - the structural test that ticks the whole box, or null for a goal with
+//          no structural test (a run-gated one, about output rather than shape).
 // Both are guides. Grading is still output + requireSource + the hidden verify
-// probe, and tools/validate.mjs asserts that every gate lights up on the
-// authored solution, so a box can never sit dashed forever.
+// probe, and tools/lib/lesson-validators.mjs asserts that every gate and every
+// row lights up on the authored solution, so a box can never sit dashed forever.
 //
 // Data only: window.LESSON_CONFIG (the build plugin reads it, loaded after).
 (function () {
@@ -28,22 +29,18 @@
     {
       example: "public class Door\n{\n    public string CheckAndLabel(bool locked)\n    {\n        return locked ? \"SHUT\" : \"OPEN\";\n    }\n}",
       expected: "FEED",
-      blueprint: [
-        { name: "Cat", kind: "class", members: ["string CheckAndSign(int hoursSinceMeal)"] }
-      ],
-      goalCheck: [
-        { type: "Cat", member: "CheckAndSign" },
-        null,
-        null
+      goals: [
+        {
+          code: ["class Cat", "string CheckAndSign(int hoursSinceMeal)"],
+          gate: { type: "Cat", member: "CheckAndSign", writes: ['"FEED"', '"FULL"'] }
+        },
+        { gate: null },
+        { gate: null }
       ],
       requireSource: [
         {
           pattern: /string\s+CheckAndSign\s*\(\s*int/,
           message: "Give `Cat` a `string CheckAndSign(int hoursSinceMeal)` method."
-        },
-        {
-          pattern: /hoursSinceMeal\s*>=\s*6|6\s*<=\s*hoursSinceMeal/,
-          message: "Decide from the hours you were given: six or more means the cat needs feeding."
         }
       ],
       verify: {
@@ -51,8 +48,8 @@
         expected: "FULL",
         message: "The card has to be decided from the hours passed in, not fixed. A cat that ate two hours ago should read FULL."
       },
-      starter: "using System;\n\npublic class Cat\n{\n    // TODO: six or more hours since the last meal means the card reads FEED.\n    // Anything less reads FULL.\n    public string CheckAndSign(int hoursSinceMeal)\n    {\n        return \"\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var whiskers = new Cat();\n        Console.WriteLine(whiskers.CheckAndSign(7));\n    }\n}\n",
-      solution: "using System;\n\npublic class Cat\n{\n    public string CheckAndSign(int hoursSinceMeal)\n    {\n        return hoursSinceMeal >= 6 ? \"FEED\" : \"FULL\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var whiskers = new Cat();\n        Console.WriteLine(whiskers.CheckAndSign(7));\n    }\n}\n"
+      starter: "using System;\n\npublic class Cat\n{\n    private const int HoursUntilHungry = 6;\n\n    // TODO: HoursUntilHungry or more hours since the last meal means the card\n    // reads FEED. Anything less reads FULL.\n    public string CheckAndSign(int hoursSinceMeal)\n    {\n        return \"\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var whiskers = new Cat();\n        Console.WriteLine(whiskers.CheckAndSign(7));\n    }\n}\n",
+      solution: "using System;\n\npublic class Cat\n{\n    private const int HoursUntilHungry = 6;\n\n    public string CheckAndSign(int hoursSinceMeal)\n    {\n        return hoursSinceMeal >= HoursUntilHungry ? \"FEED\" : \"FULL\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var whiskers = new Cat();\n        Console.WriteLine(whiskers.CheckAndSign(7));\n    }\n}\n"
     },
 
     // ---- S, card 2 of 3: the change arrives, and the rule is in two places --
@@ -63,27 +60,29 @@
         "FULL",
         "2 need feeding"
       ],
-      blueprint: [
-        { name: "Cat", kind: "class", members: ["string CheckAndSign(int hoursSinceMeal)"] },
-        { name: "FrontDesk", kind: "class", members: ["int HungryCount(List<int> hours)"] }
-      ],
-      goalCheck: [
-        null,
-        null,
-        null
+      goals: [
+        {
+          code: ["class Cat", "string CheckAndSign(int hoursSinceMeal)"],
+          gate: { type: "Cat", member: "CheckAndSign", gone: "HoursUntilHungry = 6" }
+        },
+        {
+          code: ["class FrontDesk", "int HungryCount(List<int> hoursPerCat)"],
+          gate: { type: "FrontDesk", member: "HungryCount", gone: "HoursUntilHungry = 6" }
+        },
+        { gate: null }
       ],
       requireSource: [
         {
-          pattern: /^(?![\s\S]*>=\s*6)[\s\S]*$/,
-          message: "There is still a `>= 6` in the file. The vet said four hours - and the rule is written in more than one place."
+          pattern: /^(?![\s\S]*HoursUntilHungry\s*=\s*6)[\s\S]*$/,
+          message: "There is still a `HoursUntilHungry = 6` in the file. The vet said four hours - and the rule is written in more than one place."
         },
         {
           pattern: /class\s+FrontDesk/,
           message: "Keep the `FrontDesk` - the point of this card is that both places have to agree."
         }
       ],
-      starter: "using System;\nusing System.Collections.Generic;\n\npublic class Cat\n{\n    public string CheckAndSign(int hoursSinceMeal)\n    {\n        return hoursSinceMeal >= 6 ? \"FEED\" : \"FULL\";\n    }\n}\n\npublic class FrontDesk\n{\n    // The desk needs a NUMBER, and CheckAndSign only hands out words,\n    // so the rule got written out a second time.\n    public int HungryCount(List<int> hours)\n    {\n        int n = 0;\n        foreach (int h in hours)\n        {\n            if (h >= 6) n++;\n        }\n        return n;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var cat = new Cat();\n        var desk = new FrontDesk();\n        var hours = new List<int> { 7, 5, 2 };\n\n        foreach (int h in hours)\n        {\n            Console.WriteLine(cat.CheckAndSign(h));\n        }\n        Console.WriteLine(desk.HungryCount(hours) + \" need feeding\");\n    }\n}\n",
-      solution: "using System;\nusing System.Collections.Generic;\n\npublic class Cat\n{\n    public string CheckAndSign(int hoursSinceMeal)\n    {\n        return hoursSinceMeal >= 4 ? \"FEED\" : \"FULL\";\n    }\n}\n\npublic class FrontDesk\n{\n    public int HungryCount(List<int> hours)\n    {\n        int n = 0;\n        foreach (int h in hours)\n        {\n            if (h >= 4) n++;\n        }\n        return n;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var cat = new Cat();\n        var desk = new FrontDesk();\n        var hours = new List<int> { 7, 5, 2 };\n\n        foreach (int h in hours)\n        {\n            Console.WriteLine(cat.CheckAndSign(h));\n        }\n        Console.WriteLine(desk.HungryCount(hours) + \" need feeding\");\n    }\n}\n"
+      starter: "using System;\nusing System.Collections.Generic;\n\npublic class Cat\n{\n    private const int HoursUntilHungry = 6;\n\n    public string CheckAndSign(int hoursSinceMeal)\n    {\n        return hoursSinceMeal >= HoursUntilHungry ? \"FEED\" : \"FULL\";\n    }\n}\n\npublic class FrontDesk\n{\n    // The desk needs a NUMBER, and CheckAndSign only hands out words, so the\n    // rule got written out a second time. Card 3 removes this copy.\n    private const int HoursUntilHungry = 6;\n\n    public int HungryCount(List<int> hoursPerCat)\n    {\n        int hungryCount = 0;\n        foreach (int hoursSinceMeal in hoursPerCat)\n        {\n            if (hoursSinceMeal >= HoursUntilHungry)\n            {\n                hungryCount++;\n            }\n        }\n        return hungryCount;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var whiskers = new Cat();\n        var desk = new FrontDesk();\n        var hoursPerCat = new List<int> { 7, 5, 2 };\n\n        foreach (int hoursSinceMeal in hoursPerCat)\n        {\n            Console.WriteLine(whiskers.CheckAndSign(hoursSinceMeal));\n        }\n        Console.WriteLine(desk.HungryCount(hoursPerCat) + \" need feeding\");\n    }\n}\n",
+      solution: "using System;\nusing System.Collections.Generic;\n\npublic class Cat\n{\n    private const int HoursUntilHungry = 4;\n\n    public string CheckAndSign(int hoursSinceMeal)\n    {\n        return hoursSinceMeal >= HoursUntilHungry ? \"FEED\" : \"FULL\";\n    }\n}\n\npublic class FrontDesk\n{\n    // Still a second copy of the rule - card 3 removes it.\n    private const int HoursUntilHungry = 4;\n\n    public int HungryCount(List<int> hoursPerCat)\n    {\n        int hungryCount = 0;\n        foreach (int hoursSinceMeal in hoursPerCat)\n        {\n            if (hoursSinceMeal >= HoursUntilHungry)\n            {\n                hungryCount++;\n            }\n        }\n        return hungryCount;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var whiskers = new Cat();\n        var desk = new FrontDesk();\n        var hoursPerCat = new List<int> { 7, 5, 2 };\n\n        foreach (int hoursSinceMeal in hoursPerCat)\n        {\n            Console.WriteLine(whiskers.CheckAndSign(hoursSinceMeal));\n        }\n        Console.WriteLine(desk.HungryCount(hoursPerCat) + \" need feeding\");\n    }\n}\n"
     },
 
     // ---- S, card 3 of 3: the same change, in a shape that only says it once -
@@ -95,17 +94,33 @@
         "FULL",
         "2 need feeding"
       ],
-      blueprint: [
-        { name: "Cat", kind: "class", members: ["bool IsHungry()"] },
-        { name: "FeedingSign", kind: "class", members: ["string Format(bool hungry)"] },
-        { name: "FrontDesk", kind: "class", members: ["int HungryCount(List<Cat> cats)"] }
-      ],
-      goalCheck: [
-        { type: "Cat", member: "IsHungry" },
-        { type: "FeedingSign", member: "Format" },
-        { type: "FrontDesk", member: "HungryCount" },
-        { absent: "CheckAndSign" },
-        null
+      goals: [
+        { code: ["class Cat", "int _hoursSinceMeal", "Cat(int hoursSinceMeal)", "bool IsHungry()"], gate: { type: "Cat", member: "IsHungry" } },
+        { code: ["class FeedingSign", "string Format(bool hungry)"], gate: { type: "FeedingSign", member: "Format" } },
+        // The desk's change is its PARAMETER type, which the member lookup alone
+        // cannot see - `HungryCount` exists in the starter too. `writes` scopes a
+        // source probe to this class's body, so the box ticks the moment the
+        // signature takes cats instead of ints.
+        {
+          code: ["class FrontDesk", "int HungryCount(List<Cat> cats)"],
+          gate: { type: "FrontDesk", member: "HungryCount", writes: "List<Cat>" }
+        },
+        // `Main` is where the three new pieces get wired together, and none of
+        // that work declares a symbol - it is all statements inside one method.
+        // So each line is a STEP row with its own source probe, and the learner
+        // watches the rewiring tick off one move at a time.
+        {
+          code: [
+            "class Program",
+            { row: "var cats = new List<Cat> { ... }", writes: "new List<Cat>" },
+            { row: "var sign = new FeedingSign()", writes: "new FeedingSign" },
+            { row: "sign.Format(cat.IsHungry())", writes: ".Format(" },
+            { row: "desk.HungryCount(cats)", writes: "HungryCount(cats)" }
+          ],
+          gate: { type: "Program", member: "Main" }
+        },
+        { gate: { absent: "CheckAndSign" } },
+        { gate: null }
       ],
       requireSource: [
         {
@@ -129,7 +144,7 @@
           message: "`CheckAndSign` did two jobs at once. Nothing should be left that both decides and writes."
         },
         {
-          pattern: /^(?![\s\S]*>=\s*6)[\s\S]*$/,
+          pattern: /^(?![\s\S]*HoursUntilHungry\s*=\s*6)[\s\S]*$/,
           message: "Four hours, not six - and this time there should be only one line to change."
         }
       ],
@@ -142,25 +157,20 @@
         ],
         message: "Every cat has to answer from its own hours. Given a cat at nine hours and one at one hour, the cards should read FEED then FULL, and the desk should count one."
       },
-      starter: "using System;\nusing System.Collections.Generic;\n\npublic class Cat\n{\n    // TODO: remember the hours since this cat's last meal, and answer\n    // IsHungry() from them. Four or more hours means hungry.\n}\n\npublic class FeedingSign\n{\n    // TODO: turn a yes-or-no into the card's word: \"FEED\" or \"FULL\".\n}\n\npublic class FrontDesk\n{\n    // TODO: count how many of these cats say they are hungry.\n    // Ask each cat - do not repeat the rule here.\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var cats = new List<Cat> { new Cat(7), new Cat(5), new Cat(2) };\n        var sign = new FeedingSign();\n        var desk = new FrontDesk();\n\n        foreach (Cat c in cats)\n        {\n            Console.WriteLine(sign.Format(c.IsHungry()));\n        }\n        Console.WriteLine(desk.HungryCount(cats) + \" need feeding\");\n    }\n}\n",
-      solution: "using System;\nusing System.Collections.Generic;\n\npublic class Cat\n{\n    private int _hoursSinceMeal;\n\n    public Cat(int hoursSinceMeal)\n    {\n        _hoursSinceMeal = hoursSinceMeal;\n    }\n\n    public bool IsHungry()\n    {\n        return _hoursSinceMeal >= 4;\n    }\n}\n\npublic class FeedingSign\n{\n    public string Format(bool hungry)\n    {\n        return hungry ? \"FEED\" : \"FULL\";\n    }\n}\n\npublic class FrontDesk\n{\n    public int HungryCount(List<Cat> cats)\n    {\n        int n = 0;\n        foreach (Cat c in cats)\n        {\n            if (c.IsHungry()) n++;\n        }\n        return n;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var cats = new List<Cat> { new Cat(7), new Cat(5), new Cat(2) };\n        var sign = new FeedingSign();\n        var desk = new FrontDesk();\n\n        foreach (Cat c in cats)\n        {\n            Console.WriteLine(sign.Format(c.IsHungry()));\n        }\n        Console.WriteLine(desk.HungryCount(cats) + \" need feeding\");\n    }\n}\n"
+      starter: "using System;\nusing System.Collections.Generic;\n\npublic class Cat\n{\n    private const int HoursUntilHungry = 4;\n\n    public string CheckAndSign(int hoursSinceMeal)\n    {\n        return hoursSinceMeal >= HoursUntilHungry ? \"FEED\" : \"FULL\";\n    }\n}\n\npublic class FrontDesk\n{\n    // Still a second copy of the rule - card 3 removes it.\n    private const int HoursUntilHungry = 4;\n\n    public int HungryCount(List<int> hoursPerCat)\n    {\n        int hungryCount = 0;\n        foreach (int hoursSinceMeal in hoursPerCat)\n        {\n            if (hoursSinceMeal >= HoursUntilHungry)\n            {\n                hungryCount++;\n            }\n        }\n        return hungryCount;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var whiskers = new Cat();\n        var desk = new FrontDesk();\n        var hoursPerCat = new List<int> { 7, 5, 2 };\n\n        foreach (int hoursSinceMeal in hoursPerCat)\n        {\n            Console.WriteLine(whiskers.CheckAndSign(hoursSinceMeal));\n        }\n        Console.WriteLine(desk.HungryCount(hoursPerCat) + \" need feeding\");\n    }\n}\n",
+      solution: "using System;\nusing System.Collections.Generic;\n\npublic class Cat\n{\n    private const int HoursUntilHungry = 4;\n\n    private int _hoursSinceMeal;\n\n    public Cat(int hoursSinceMeal)\n    {\n        _hoursSinceMeal = hoursSinceMeal;\n    }\n\n    public bool IsHungry()\n    {\n        return _hoursSinceMeal >= HoursUntilHungry;\n    }\n}\n\npublic class FeedingSign\n{\n    public string Format(bool hungry)\n    {\n        return hungry ? \"FEED\" : \"FULL\";\n    }\n}\n\npublic class FrontDesk\n{\n    public int HungryCount(List<Cat> cats)\n    {\n        int hungryCount = 0;\n        foreach (Cat cat in cats)\n        {\n            if (cat.IsHungry())\n            {\n                hungryCount++;\n            }\n        }\n        return hungryCount;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var cats = new List<Cat> { new Cat(7), new Cat(5), new Cat(2) };\n        var sign = new FeedingSign();\n        var desk = new FrontDesk();\n\n        foreach (Cat cat in cats)\n        {\n            Console.WriteLine(sign.Format(cat.IsHungry()));\n        }\n        Console.WriteLine(desk.HungryCount(cats) + \" need feeding\");\n    }\n}\n"
     },
 
     // ---- O: add an animal without reopening what works ---------------------
     {
       example: "public interface IGreeting\n{\n    string Say();\n}\n\npublic class Hello : IGreeting\n{\n    public string Say()\n    {\n        return \"hi\";\n    }\n}\n\npublic class Bye : IGreeting\n{\n    public string Say()\n    {\n        return \"later\";\n    }\n}",
       expected: "Meow",
-      blueprint: [
-        { name: "IAnimal", kind: "interface", members: ["string Speak()"] },
-        { name: "Cat", kind: "class", bases: ["IAnimal"], members: ["string Speak()"] },
-        { name: "Dog", kind: "class", bases: ["IAnimal"], members: ["string Speak()"] }
-      ],
-      goalCheck: [
-        { type: "IAnimal", kind: "interface", member: "Speak" },
-        { type: "Cat", base: "IAnimal", member: "Speak" },
-        { type: "Dog", base: "IAnimal", member: "Speak" },
-        { absent: "AnimalVoice" },
-        null
+      goals: [
+        { code: ["interface IAnimal", "string Speak()"], gate: { type: "IAnimal", kind: "interface", member: "Speak" } },
+        { code: ["Cat : IAnimal", "string Speak()"], gate: { type: "Cat", base: "IAnimal", member: "Speak" } },
+        { code: ["Dog : IAnimal", "string Speak()"], gate: { type: "Dog", base: "IAnimal", member: "Speak" } },
+        { gate: { absent: "AnimalVoice" } },
+        { gate: null }
       ],
       requireSource: [
         {
@@ -197,17 +207,12 @@
     {
       example: "public interface IReadable\n{\n    string Read();\n}\n\npublic class Book : IReadable\n{\n    public string Read()\n    {\n        return \"Words\";\n    }\n}\n\npublic class BlankPage : IReadable\n{\n    public string Read()\n    {\n        return \"Empty\";\n    }\n}",
       expected: "Swim",
-      blueprint: [
-        { name: "IMover", kind: "interface", members: ["string Move()"] },
-        { name: "Sparrow", kind: "class", bases: ["IMover"], members: ["string Move()"] },
-        { name: "Penguin", kind: "class", bases: ["IMover"], members: ["string Move()"] }
-      ],
-      goalCheck: [
-        { type: "IMover", kind: "interface", member: "Move" },
-        { type: "Sparrow", base: "IMover", member: "Move" },
-        { type: "Penguin", base: "IMover", member: "Move" },
-        { absent: "Bird" },
-        null
+      goals: [
+        { code: ["interface IMover", "string Move()"], gate: { type: "IMover", kind: "interface", member: "Move" } },
+        { code: ["Sparrow : IMover", "string Move()"], gate: { type: "Sparrow", base: "IMover", member: "Move" } },
+        { code: ["Penguin : IMover", "string Move()"], gate: { type: "Penguin", base: "IMover", member: "Move" } },
+        { gate: { absent: "Bird" } },
+        { gate: null }
       ],
       requireSource: [
         {
@@ -232,7 +237,7 @@
         }
       ],
       verify: {
-        main: "class Program\n{\n    static void Main()\n    {\n        IMover a = new Sparrow();\n        IMover b = new Penguin();\n        System.Console.WriteLine(a.Move());\n        System.Console.WriteLine(b.Move());\n    }\n}\n",
+        main: "class Program\n{\n    static void Main()\n    {\n        IMover sparrow = new Sparrow();\n        IMover penguin = new Penguin();\n        System.Console.WriteLine(sparrow.Move());\n        System.Console.WriteLine(penguin.Move());\n    }\n}\n",
         expected: [
           "Fly",
           "Swim"
@@ -247,19 +252,13 @@
     {
       example: "public interface IWasher\n{\n    string Wash();\n}\n\npublic interface IDryer\n{\n    string Dry();\n}\n\npublic class HandTowel : IDryer\n{\n    public string Dry()\n    {\n        return \"dry\";\n    }\n}",
       expected: "swim",
-      blueprint: [
-        { name: "IWalker", kind: "interface", members: ["string Walk()"] },
-        { name: "ISwimmer", kind: "interface", members: ["string Swim()"] },
-        { name: "IFlyer", kind: "interface", members: ["string Fly()"] },
-        { name: "Fish", kind: "class", bases: ["ISwimmer"], members: ["string Swim()"] }
-      ],
-      goalCheck: [
-        { type: "IWalker", kind: "interface", member: "Walk" },
-        { type: "ISwimmer", kind: "interface", member: "Swim" },
-        { type: "IFlyer", kind: "interface", member: "Fly" },
-        { type: "Fish", base: "ISwimmer", member: "Swim" },
-        { absent: "IAnimalActions" },
-        null
+      goals: [
+        { code: ["interface IWalker", "string Walk()"], gate: { type: "IWalker", kind: "interface", member: "Walk" } },
+        { code: ["interface ISwimmer", "string Swim()"], gate: { type: "ISwimmer", kind: "interface", member: "Swim" } },
+        { code: ["interface IFlyer", "string Fly()"], gate: { type: "IFlyer", kind: "interface", member: "Fly" } },
+        { code: ["Fish : ISwimmer", "string Swim()"], gate: { type: "Fish", base: "ISwimmer", member: "Swim" } },
+        { gate: { absent: "IAnimalActions" } },
+        { gate: null }
       ],
       requireSource: [
         {
@@ -300,17 +299,12 @@
     {
       example: "public interface IClock\n{\n    int Hour();\n}\n\npublic class Alarm\n{\n    private readonly IClock _clock;\n\n    public Alarm(IClock clock)\n    {\n        _clock = clock;\n    }\n}",
       expected: "cat fed",
-      blueprint: [
-        { name: "ILog", kind: "interface", members: ["void Write(string message)"] },
-        { name: "ConsoleLog", kind: "class", bases: ["ILog"], members: ["void Write(string message)"] },
-        { name: "Keeper", kind: "class", members: ["void Feed()"] }
-      ],
-      goalCheck: [
-        { type: "ILog", kind: "interface", member: "Write" },
-        { type: "ConsoleLog", base: "ILog", member: "Write" },
-        null,
-        null,
-        null
+      goals: [
+        { code: ["interface ILog", "void Write(string message)"], gate: { type: "ILog", kind: "interface", member: "Write" } },
+        { code: ["ConsoleLog : ILog", "void Write(string message)"], gate: { type: "ConsoleLog", base: "ILog", member: "Write" } },
+        { code: ["class Keeper", "ILog _log", "Keeper(ILog log)", "void Feed()"], gate: { type: "Keeper", member: "Keeper" } },
+        { gate: null },
+        { gate: null }
       ],
       requireSource: [
         {

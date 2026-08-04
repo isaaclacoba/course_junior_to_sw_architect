@@ -61,6 +61,28 @@ function makeEl(id) {
   };
 }
 
+// Parse innerHTML-set <li> elements into fake child objects for assertion.
+// The UML box tracker sets list.innerHTML = html; the fake DOM needs to turn
+// that into children with classList and innerHTML so tests can check ticks.
+function parseLiChildren(html) {
+  const items = [];
+  const re = /<li\s+class="([^"]*)">([\s\S]*?)<\/li>/g;
+  let m;
+  while ((m = re.exec(html)) !== null) {
+    const classes = new Set(m[1].split(/\s+/).filter(Boolean));
+    items.push({
+      innerHTML: m[2],
+      classList: {
+        contains(cls) { return classes.has(cls); },
+        toggle(cls, on) { if (on) classes.add(cls); else classes.delete(cls); },
+        add(cls) { classes.add(cls); },
+        remove(cls) { classes.delete(cls); },
+      },
+    });
+  }
+  return items;
+}
+
 // Build a document whose getElementById serves the ids the core AND the build
 // plugin query for a given prefix, plus the global courseXpLabel.
 function makeDom(prefix) {
@@ -73,10 +95,27 @@ function makeDom(prefix) {
     // build host roles
     "Editor", "Example", "Expected", "Output", "Errors",
     "Run", "Solution", "Reset",
-    "Blueprint", "BlueprintWrap",
   ].map((s) => prefix + s);
   const registry = {};
-  ids.forEach((id) => { registry[id] = makeEl(id); });
+  ids.forEach((id) => {
+    const el = makeEl(id);
+    // The Goal host uses innerHTML-based rendering; its children are parsed from HTML.
+    if (id.endsWith("Goal")) {
+      // The core paints goals with appendChild; the tracker then replaces the
+      // list wholesale via innerHTML. Read children from whichever happened
+      // last, so the getter cannot fight appendChild's assignment.
+      var appended = [];
+      Object.defineProperty(el, "children", {
+        get() {
+          const parsed = parseLiChildren(el.innerHTML || "");
+          return parsed.length ? parsed : appended;
+        },
+        set(v) { appended = v || []; },
+        configurable: true,
+      });
+    }
+    registry[id] = el;
+  });
   registry["courseXpLabel"] = makeEl("courseXpLabel");
   return {
     getElementById(id) { return registry[id] || null; },
@@ -273,98 +312,106 @@ test("Reset restores the starter", async () => {
 // scanner and the REAL structure policy, so these prove the whole chain, not a
 // mock of it. The tracker is a guide: it must never award anything.
 
+// The fixture's starter DECLARES CheckAndSign, so the removal goal has real work
+// to do. A goal that is green on an untouched starter teaches nothing.
+const TRACKER_STARTER =
+  'public class Cat { public string CheckAndSign(int h) { return h >= 6 ? "FEED" : "FULL"; } }';
+
 // A task whose shape is the split Cat/FeedingSign - the SRP move the lesson
 // teaches - so the tracker has something to light up one piece at a time.
 function trackerConfig() {
   const cfg = buildConfig();
   cfg.tasks[0].goal = ["give `Cat` an `IsHungry()`", "write a `FeedingSign`", "no method does both"];
-  cfg.tasks[0].blueprint = [
-    { name: "Cat", kind: "class", members: ["bool IsHungry()"] },
-    { name: "FeedingSign", kind: "class", members: ["string Format(bool hungry)"] },
+  cfg.tasks[0].goals = [
+    { code: ["class Cat", "bool IsHungry()"], gate: { type: "Cat", member: "IsHungry" } },
+    { code: ["class FeedingSign", "string Format(bool hungry)"], gate: { type: "FeedingSign", member: "Format" } },
+    { gate: { absent: "CheckAndSign" } },
   ];
-  cfg.tasks[0].goalCheck = [
-    { type: "Cat", member: "IsHungry" },
-    { type: "FeedingSign", member: "Format" },
-    { absent: "CheckAndSign" },
-  ];
+  cfg.tasks[0].starter = TRACKER_STARTER;
   return cfg;
+}
+
+// The panel groups goals: boxes (structural + removal) first, run-gated
+// behaviour lines after. Authored order is NOT render order, so tests select by
+// role instead of by index.
+const boxesOf = (items) => [...items].filter((li) => li.classList.contains("goal-box"));
+const runGatedOf = (items) => [...items].find((li) => li.classList.contains("goal-behaviour"));
+const absentOf = (items) => [...items].find((li) => li.classList.contains("goal-box--absent"));
+
+// Member rows live inside a box's innerHTML, below the fake DOM's <li> parsing,
+// so read them straight out of the rendered markup.
+function memberRowsOf(dom) {
+  const html = dom.getElementById("bdGoal").innerHTML;
+  const out = [];
+  const re = /<code class="goal-code goal-member( is-met)?">([\s\S]*?)<\/code>/g;
+  let m;
+  while ((m = re.exec(html)) !== null) {
+    out.push({ met: !!m[1], text: m[2].replace(/<[^>]*>/g, "").trim() });
+  }
+  return out;
 }
 
 const HALF = "public class Cat { public bool IsHungry() { return true; } }";
 const WHOLE =
   HALF + '\npublic class FeedingSign { public string Format(bool hungry) { return hungry ? "FEED" : "FULL"; } }';
 
-test("the blueprint is shown for a task that declares one, and hidden otherwise", async () => {
-  await withDom("bd", [], async (dom) => {
-    await LessonEngine.create(trackerConfig()).boot();
-    assert.equal(dom.getElementById("bdBlueprintWrap").hidden, false);
-    assert.match(dom.getElementById("bdBlueprint").innerHTML, /Cat/);
-  });
-  await withDom("bd", [], async (dom) => {
-    await LessonEngine.create(buildConfig()).boot(); // no blueprint authored
-    assert.equal(dom.getElementById("bdBlueprintWrap").hidden, true);
-  });
-});
-
-test("a blueprint box lights up only once its own members are declared", async () => {
-  await withDom("bd", [], async (dom, codeLab) => {
-    await LessonEngine.create(trackerConfig()).boot();
-    const html = () => dom.getElementById("bdBlueprint").innerHTML;
-    // Match only a box's own opening tag - bp-box-head and bp-chip also carry
-    // an is-met class, so a substring search would read the wrong element.
-    const boxes = () => [...html().matchAll(/<div class="bp-box( is-met)?">/g)].map((m) => !!m[1]);
-
-    // The starter declares neither type: both boxes are ghosts.
-    assert.deepEqual(boxes(), [false, false], "nothing should be met on the starter");
-
-    codeLab._editor._type(HALF);
-    assert.deepEqual(boxes(), [true, false], "Cat is declared, FeedingSign is not");
-
-    codeLab._editor._type(WHOLE);
-    assert.deepEqual(boxes(), [true, true]);
-  });
-});
-
-test("the member signature is shown as the hint, and lights per member", async () => {
-  await withDom("bd", [], async (dom, codeLab) => {
-    await LessonEngine.create(trackerConfig()).boot();
-    const html = () => dom.getElementById("bdBlueprint").innerHTML;
-    // The signature is the help: it says what to write without writing it.
-    assert.match(html(), /bool IsHungry\(\)/);
-    assert.match(html(), /string Format\(bool hungry\)/);
-    assert.equal(/<li class="bp-chip is-met">bool IsHungry\(\)/.test(html()), false);
-
-    codeLab._editor._type(HALF);
-    assert.equal(/<li class="bp-chip is-met">bool IsHungry\(\)/.test(html()), true);
-  });
-});
-
-test("a declared type with a missing member stays unmet", async () => {
-  await withDom("bd", [], async (dom, codeLab) => {
-    await LessonEngine.create(trackerConfig()).boot();
-    codeLab._editor._type("public class Cat { }");
-    const html = dom.getElementById("bdBlueprint").innerHTML;
-    const boxes = [...html.matchAll(/<div class="bp-box( is-met)?">/g)].map((m) => !!m[1]);
-    assert.deepEqual(boxes, [false, false], "an empty Cat is not the shape asked for");
-  });
-});
-
-test("goal items get a tick as their gate is met, and keep their prose", async () => {
+test("goal items get a tick and code chips as their gate is met", async () => {
   await withDom("bd", [], async (dom, codeLab) => {
     await LessonEngine.create(trackerConfig()).boot();
     const items = dom.getElementById("bdGoal").children;
     assert.equal(items.length, 3);
 
-    // The starter has no CheckAndSign, so gate 3 is met from the start.
-    assert.equal(items[2].classList.contains("is-met"), true);
+    // NOTHING may be green before the learner types. The starter declares
+    // CheckAndSign, so even the removal goal starts unmet.
+    assert.equal(items[2].classList.contains("is-met"), false);
     assert.equal(items[0].classList.contains("is-met"), false);
 
     codeLab._editor._type(WHOLE);
-    assert.equal(items[0].classList.contains("is-met"), true);
-    assert.equal(items[1].classList.contains("is-met"), true);
+    // Re-read: each access re-parses the freshly painted innerHTML.
+    const lit = dom.getElementById("bdGoal").children;
+    assert.equal(lit[0].classList.contains("is-met"), true);
+    assert.equal(lit[1].classList.contains("is-met"), true);
+    // WHOLE drops CheckAndSign, so the removal goal is satisfied too.
+    assert.equal(absentOf(lit).classList.contains("is-met"), true);
+    // Code chips are rendered inline.
+    assert.match(lit[0].innerHTML, /goal-code/);
+    assert.match(lit[0].innerHTML, /bool IsHungry/);
     // The localized prose the core painted survives the tick.
-    assert.match(items[0].innerHTML, /IsHungry/);
-    assert.match(items[1].innerHTML, /FeedingSign/);
+    assert.match(lit[0].innerHTML, /IsHungry/);
+    assert.match(lit[1].innerHTML, /FeedingSign/);
+  });
+});
+
+test("code chips show the authored signatures as monospace labels", async () => {
+  await withDom("bd", [], async (dom, codeLab) => {
+    await LessonEngine.create(trackerConfig()).boot();
+    codeLab._editor._type(WHOLE);
+    const items = dom.getElementById("bdGoal").children;
+    // First goal has two chips: "class Cat" and "bool IsHungry()"
+    const chips = items[0].innerHTML.match(/goal-code/g) || [];
+    assert.equal(chips.length, 2, "two code chips for Cat");
+    assert.match(items[0].innerHTML, /class Cat/);
+    // Second goal also has two chips
+    const chips2 = items[1].innerHTML.match(/goal-code/g) || [];
+    assert.equal(chips2.length, 2, "two code chips for FeedingSign");
+    // A removal goal names the symbol being retired, struck through, so it
+    // carries exactly one chip - the thing that has to disappear.
+    const removal = absentOf(items);
+    const chips3 = removal.innerHTML.match(/goal-code/g) || [];
+    assert.equal(chips3.length, 1, "the retired symbol is named");
+    assert.match(removal.innerHTML, /goal-box-header--absent/);
+    assert.match(removal.innerHTML, /<del>/);
+    assert.match(removal.innerHTML, /CheckAndSign/);
+  });
+});
+
+test("a declared type with a missing member stays unmet in the goal list", async () => {
+  await withDom("bd", [], async (dom, codeLab) => {
+    await LessonEngine.create(trackerConfig()).boot();
+    codeLab._editor._type("public class Cat { }");
+    const items = dom.getElementById("bdGoal").children;
+    assert.equal(items[0].classList.contains("is-met"), false, "an empty Cat is not the shape asked for");
+    assert.equal(items[1].classList.contains("is-met"), false);
   });
 });
 
@@ -395,50 +442,237 @@ test("the tracker survives an editor that cannot report changes", async () => {
   await withDom("bd", [], async (dom, codeLab) => {
     delete codeLab._editor.onChange;
     await LessonEngine.create(trackerConfig()).boot();
-    // Still painted once from the starter; simply not live.
-    assert.equal(dom.getElementById("bdBlueprintWrap").hidden, false);
-    assert.match(dom.getElementById("bdBlueprint").innerHTML, /Cat/);
+    // Still painted once from the starter, but no live updates.
+    const items = dom.getElementById("bdGoal").children;
+    assert.equal(items.length, 3);
   });
 });
 
-test("the blueprint stays hidden when the bundle has no scanner", async () => {
+test("the tracker stays inert when the bundle has no scanner", async () => {
   await withDom("bd", [], async (dom, codeLab) => {
     delete codeLab.scanCSharp;
     await LessonEngine.create(trackerConfig()).boot();
-    assert.equal(dom.getElementById("bdBlueprintWrap").hidden, true, "a panel that can never light up must not show");
+    // No ticks, no error - just the plain goal prose.
+    const items = dom.getElementById("bdGoal").children;
+    assert.equal(items.length, 3);
+    assert.equal(items[0].classList.contains("is-met"), false);
   });
 });
 
-test("Show Solution lights the whole blueprint", async () => {
+test("Show Solution lights every goal gate", async () => {
   await withDom("bd", [], async (dom) => {
     const cfg = trackerConfig();
     cfg.tasks[0].solution = WHOLE + "\nclass Program { static void Main() { } }";
     await LessonEngine.create(cfg).boot();
     dom.getElementById("bdSolution").click();
-    const html = dom.getElementById("bdBlueprint").innerHTML;
-    assert.equal((html.match(/bp-box is-met/g) || []).length, 2, "the authored solution must satisfy its own blueprint");
+    const items = dom.getElementById("bdGoal").children;
+    assert.equal(items[0].classList.contains("is-met"), true);
+    assert.equal(items[1].classList.contains("is-met"), true);
+    assert.equal(items[2].classList.contains("is-met"), true, "the authored solution must satisfy its own goals");
   });
 });
 
-// Card 2 and card 7 in the real SOLID lesson author a null gate: their last
-// goals are about OUTPUT, which only a run can settle. Those lines must not
-// grow a checkbox, because a checkbox that never fills reads as "you got this
-// wrong" for a learner who in fact got it right.
-test("a goal with no structural test shows a spacer, never an unfillable box", async () => {
+// A run-gated goal (gate: null) shows a play-button marker that ticks when a
+// run passes. It must NOT show as permanently unfillable.
+test("a run-gated goal shows a play marker, not an unfillable box", async () => {
   const cfg = trackerConfig();
-  cfg.tasks[0].goalCheck = [{ type: "Cat", member: "IsHungry" }, null, { absent: "CheckAndSign" }];
+  cfg.tasks[0].goals = [
+    { code: ["class Cat", "bool IsHungry()"], gate: { type: "Cat", member: "IsHungry" } },
+    { gate: null },
+    { gate: { absent: "CheckAndSign" } },
+  ];
+  await withDom("bd", [], async (dom, codeLab) => {
+    await LessonEngine.create(cfg).boot();
+    codeLab._editor._type(WHOLE);
+    const items = dom.getElementById("bdGoal").children;
+
+    assert.match(runGatedOf(items).innerHTML, /tracker-tick--run/, "the run-gated goal has a play marker");
+    assert.doesNotMatch(runGatedOf(items).innerHTML, /\u2713/, "the run-gated goal shows no tick before a run");
+    assert.equal(runGatedOf(items).classList.contains("is-met"), false);
+    assert.match(runGatedOf(items).innerHTML, /FeedingSign/, "and it keeps its prose");
+
+    // Its neighbours still behave.
+    assert.equal(boxesOf(items)[0].classList.contains("is-met"), true);
+    assert.match(boxesOf(items)[0].innerHTML, /\u2713/);
+  });
+});
+
+// A goal that carries `code` is ALWAYS a box, even when its gate is null. The
+// box is the blueprint - the visual help that tells the learner what shape to
+// build - so it must never collapse into a plain prose row.
+test("a blueprint goal stays a UML box even when its tick is run-gated", async () => {
+  const cfg = trackerConfig();
+  cfg.tasks[0].goals = [
+    { code: ["class Cat", "string CheckAndSign(int hoursSinceMeal)"], gate: null },
+    { gate: null },
+  ];
   await withDom("bd", [], async (dom, codeLab) => {
     await LessonEngine.create(cfg).boot();
     const items = dom.getElementById("bdGoal").children;
+    const boxes = boxesOf(items);
+
+    assert.equal(boxes.length, 1, "the blueprint renders as a box, not a prose row");
+    const box = boxes[0];
+    assert.equal(box.classList.contains("goal-box--run"), true, "and it is marked run-gated");
+    assert.match(box.innerHTML, /class Cat/);
+    assert.match(box.innerHTML, /CheckAndSign\(int hoursSinceMeal\)/, "the signature is on show");
+    // The tick is a play marker, and the box is NOT green just because the
+    // starter already declares that exact signature.
+    assert.match(box.innerHTML, /tracker-tick--run/);
+    assert.equal(box.classList.contains("is-met"), false, "an existing signature is not a pass");
+  });
+});
+
+// ...and it goes green once a run passes.
+test("a blueprint box ticks when the run passes", async () => {
+  const cfg = trackerConfig();
+  cfg.tasks[0].goals = [
+    { code: ["class Cat", "string CheckAndSign(int hoursSinceMeal)"], gate: null },
+  ];
+  await withDom("bd", [{ output: "Woof\n" }], async (dom, codeLab) => {
+    await LessonEngine.create(cfg).boot();
     codeLab._editor._type(WHOLE);
+    dom.getElementById("bdRun").click();
+    await flush();
+    const box = boxesOf(dom.getElementById("bdGoal").children)[0];
+    assert.equal(box.classList.contains("is-met"), true, "a passing run lights the blueprint");
+    assert.match(box.innerHTML, /\u2713/);
+  });
+});
 
-    assert.match(items[1].innerHTML, /tracker-tick--none/, "the untracked goal keeps its indent");
-    assert.doesNotMatch(items[1].innerHTML, /\u2713/, "the untracked goal shows no tick");
-    assert.equal(items[1].classList.contains("is-met"), false);
-    assert.match(items[1].innerHTML, /FeedingSign/, "and it keeps its prose");
+// A run-gated goal ticks when a run passes (grade returns ok: true).
+test("a run-gated goal ticks when the run passes", async () => {
+  const cfg = trackerConfig();
+  cfg.tasks[0].goals = [
+    { code: ["class Cat", "bool IsHungry()"], gate: { type: "Cat", member: "IsHungry" } },
+    { gate: null },
+    { gate: { absent: "CheckAndSign" } },
+  ];
+  await withDom("bd", [{ output: "Woof\n" }], async (dom, codeLab) => {
+    await LessonEngine.create(cfg).boot();
+    codeLab._editor._type(WHOLE);
+    dom.getElementById("bdRun").click();
+    await flush();
+    const items = dom.getElementById("bdGoal").children;
+    assert.equal(runGatedOf(items).classList.contains("is-met"), true, "run-gated ticks on pass");
+    assert.match(runGatedOf(items).innerHTML, /\u2713/);
+  });
+});
 
-    // Its neighbours still behave.
-    assert.equal(items[0].classList.contains("is-met"), true);
-    assert.match(items[0].innerHTML, /\u2713/);
+// Editing after a pass clears the run-gated tick.
+test("editing after a pass clears the run-gated tick", async () => {
+  const cfg = trackerConfig();
+  cfg.tasks[0].goals = [
+    { code: ["class Cat", "bool IsHungry()"], gate: { type: "Cat", member: "IsHungry" } },
+    { gate: null },
+    { gate: { absent: "CheckAndSign" } },
+  ];
+  await withDom("bd", [{ output: "Woof\n" }], async (dom, codeLab) => {
+    await LessonEngine.create(cfg).boot();
+    codeLab._editor._type(WHOLE);
+    dom.getElementById("bdRun").click();
+    await flush();
+    const items = dom.getElementById("bdGoal").children;
+    assert.equal(runGatedOf(items).classList.contains("is-met"), true, "run-gated ticks on pass");
+    // Now edit
+    codeLab._editor._type(WHOLE + "// changed");
+    assert.equal(runGatedOf(dom.getElementById("bdGoal").children).classList.contains("is-met"), false, "editing clears run-gated tick");
+  });
+});
+
+// ---- the SOLID lesson's own data: no goal starts green --------------------
+// A goal that starts green before the learner types teaches nothing. This pins
+// every card's starter against every card's goals.
+test("no goal is met on the untouched starter for any SOLID card", () => {
+  const vm = require("node:vm");
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const dataFile = path.join(__dirname, "..", "content", "practical",
+    "06-design-for-change", "02-the-solid-principles", "data.js");
+  const sandbox = { window: {}, console };
+  sandbox.globalThis = sandbox;
+  vm.createContext(sandbox);
+  vm.runInContext(fs.readFileSync(dataFile, "utf8"), sandbox);
+  const tasks = sandbox.window.LESSON_CONFIG.tasks.filter((t) => !t.summary);
+  const S = KernelStructure;
+  tasks.forEach((t, i) => {
+    const goals = t.goals || [];
+    if (!goals.length) return;
+    const gates = goals.map((g) => g && g.gate !== undefined ? g.gate : undefined);
+    const types = realScanCSharp(t.starter || "").types || [];
+    // S.verdicts, not S.evaluate: assert what the learner actually sees. A box
+    // whose gate is met but whose rows are not is still red on screen, and a
+    // test reading the intermediate value would fail on correct content.
+    const met = Array.from(S.verdicts(types, goals, t.starter || ""));
+    met.forEach((v, gi) => {
+      if (v === null) return; // run-gated, not structural
+      assert.equal(v, false,
+        `card ${i + 1} goal ${gi} (${S.describe(gates[gi])}) is already met on the starter - it must start red`);
+    });
+  });
+});
+
+// --- per-member subtasks inside a box ---------------------------------------
+
+const GRANULAR = [
+  {
+    code: ["class Cat", "int _hoursSinceMeal", "Cat(int hoursSinceMeal)", "bool IsHungry()"],
+    gate: { type: "Cat", member: "IsHungry" },
+  },
+];
+
+// Each member row carries its own tick, so a learner who has added the field
+// but not the constructor can SEE which piece is still missing.
+test("member rows tick one at a time as each piece lands", async () => {
+  const cfg = trackerConfig();
+  cfg.tasks[0].goals = GRANULAR;
+  await withDom("bd", [], async (dom, codeLab) => {
+    await LessonEngine.create(cfg).boot();
+
+    // Only the method exists: header ticks, field and constructor do not.
+    codeLab._editor._type("public class Cat { public bool IsHungry() { return true; } }");
+    let rows = memberRowsOf(dom);
+    assert.deepEqual(rows.map((r) => r.met), [false, false, true], "field and ctor still missing");
+    assert.equal(boxesOf(dom.getElementById("bdGoal").children)[0].classList.contains("is-met"), false,
+      "the box is NOT green while a row is missing");
+
+    // Add the field: that row alone turns green.
+    codeLab._editor._type("public class Cat { private int _hoursSinceMeal; public bool IsHungry() { return true; } }");
+    rows = memberRowsOf(dom);
+    assert.deepEqual(rows.map((r) => r.met), [true, false, true], "the field row ticked on its own");
+
+    // Add the constructor: now everything, and only now is the box green.
+    codeLab._editor._type(
+      "public class Cat { private int _hoursSinceMeal; public Cat(int hoursSinceMeal) { _hoursSinceMeal = hoursSinceMeal; }" +
+      " public bool IsHungry() { return _hoursSinceMeal >= 6; } }");
+    rows = memberRowsOf(dom);
+    assert.deepEqual(rows.map((r) => r.met), [true, true, true]);
+    assert.equal(boxesOf(dom.getElementById("bdGoal").children)[0].classList.contains("is-met"), true,
+      "every row met, so the box is green");
+  });
+});
+
+// The regression this exists to stop: a gate naming ONE member used to light the
+// whole class while its constructor and fields were still missing.
+test("a gate that is met cannot green a box whose rows are not", async () => {
+  const cfg = trackerConfig();
+  cfg.tasks[0].goals = GRANULAR;
+  await withDom("bd", [], async (dom, codeLab) => {
+    await LessonEngine.create(cfg).boot();
+    // The gate ({ type: Cat, member: IsHungry }) is fully satisfied here...
+    codeLab._editor._type("public class Cat { public bool IsHungry() { return true; } }");
+    const box = boxesOf(dom.getElementById("bdGoal").children)[0];
+    assert.equal(box.classList.contains("is-met"), false, "...but two rows are missing, so no green");
+  });
+});
+
+test("member rows show the authored signature next to their tick", async () => {
+  const cfg = trackerConfig();
+  cfg.tasks[0].goals = GRANULAR;
+  await withDom("bd", [], async (dom, codeLab) => {
+    await LessonEngine.create(cfg).boot();
+    codeLab._editor._type("public class Cat { }");
+    const labels = memberRowsOf(dom).map((r) => r.text);
+    assert.deepEqual(labels, ["int _hoursSinceMeal", "Cat(int hoursSinceMeal)", "bool IsHungry()"]);
   });
 });

@@ -591,6 +591,95 @@ export function knownConceptIds(migrated) {
   return set;
 }
 
+// Check (context verbosity): a task.<n>.context much over ~75 words is worth a
+// second look - but this is a QUESTION, not an instruction to cut.
+//
+// An agent once read this warning as a target and rewrote all seven SOLID cards
+// into note form, losing the argument each card was making (198 words -> 64 on
+// the card whose whole job is to show what the bad shape COSTS). Prose that
+// motivates or tells a story is allowed to run long. Only restatement of the
+// goal list or the code should ever be cut, and never at the price of the voice
+// rules in AGENTS.md.
+const CONTEXT_WORD_CAP = 75;
+
+export function checkContextVerbosity(migrated, rootDir, report) {
+  const CTX = /^task\.\d+\.context$/;
+  for (const m of migrated) {
+    if (m.meta.archetype !== "build") continue;
+    const base = (m.meta.resources && m.meta.resources.base) || "res/strings";
+    const enPath = path.join(rootDir, m.path, base, "default", "en.json");
+    if (!fs.existsSync(enPath)) continue;
+    let obj;
+    try { obj = JSON.parse(fs.readFileSync(enPath, "utf8")); } catch { continue; }
+    for (const [k, v] of Object.entries(obj)) {
+      if (!CTX.test(k) || typeof v !== "string") continue;
+      const wc = v.split(/\s+/).filter(Boolean).length;
+      if (wc > CONTEXT_WORD_CAP) {
+        report.warn(`Verbosity: "${m.registryId}" ${k} is ${wc} words (over ${CONTEXT_WORD_CAP}) - check for restatement of the goals or code; do NOT compress prose into note form`);
+      }
+    }
+  }
+}
+
+// Check (exemplary code): every C# line a lesson ships is a worked example of
+// the standard this course teaches, so the lesson's own code must not break the
+// rules its prose is selling. The full standard is judgement (see the
+// lesson-authoring skill); these are the two halves a machine can see:
+//
+//   - single-letter locals (`int n`, `foreach (int h in ...)`)
+//   - a meaningful number repeated in comparisons, which is the duplicated rule
+//     the SOLID Part exists to remove
+//
+// WARN, not error: 20 existing lessons predate the rule. New content should
+// treat any hit as a blocker.
+const CODE_FIELDS = ["starter", "solution", "example"];
+
+export function checkExemplaryCode(migrated, rootDir, report) {
+  // `foreach (int h in hours)` and `int n = 0;` - a declared local of one char.
+  const SHORT = /\b(?:int|var|string|bool|double|long|float|decimal|char)\s+([a-z])\s*[=;)]|foreach\s*\(\s*[\w<>,\[\]]+\s+([a-z])\s+in\b/g;
+  // A literal used in a COMPARISON carries a rule. 0 and 1 are loop seeds and
+  // identity values, not policy.
+  const MAGIC = /[<>]=?\s*(\d+)|==\s*(\d+)/g;
+
+  for (const m of migrated) {
+    const dataPath = path.join(rootDir, m.path, "data.js");
+    if (!fs.existsSync(dataPath)) continue;
+    let cfg;
+    try { cfg = loadBrowserGlobal(dataPath, "LESSON_CONFIG"); } catch { continue; }
+    if (!cfg) continue;
+
+    const bodies = [...(cfg.tasks || []), ...(cfg.drills || [])];
+    bodies.forEach((t, i) => {
+      const sources = [];
+      for (const f of CODE_FIELDS) if (typeof t[f] === "string") sources.push([f, t[f]]);
+      if (t.verify && typeof t.verify.main === "string") sources.push(["verify.main", t.verify.main]);
+      (t.runnablePrograms || []).forEach((p, k) => { if (typeof p === "string") sources.push([`runnablePrograms[${k}]`, p]); });
+
+      for (const [field, src] of sources) {
+        const names = new Set();
+        let hit;
+        SHORT.lastIndex = 0;
+        while ((hit = SHORT.exec(src))) names.add(hit[1] || hit[2]);
+        if (names.size) {
+          report.warn(`Exemplary code: "${m.registryId}" task ${i + 1} ${field} uses single-letter name(s) ${[...names].map((n) => `\`${n}\``).join(", ")} - name what the value IS`);
+        }
+        const counts = new Map();
+        MAGIC.lastIndex = 0;
+        while ((hit = MAGIC.exec(src))) {
+          const v = hit[1] || hit[2];
+          if (v === "0" || v === "1") continue;
+          counts.set(v, (counts.get(v) || 0) + 1);
+        }
+        for (const [v, n] of counts) {
+          if (n > 1) {
+            report.warn(`Exemplary code: "${m.registryId}" task ${i + 1} ${field} compares against ${v} in ${n} places - that is a duplicated rule; name it (const)`);
+          }
+        }
+      }
+    });
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Entry point
 // ---------------------------------------------------------------------------
@@ -618,6 +707,8 @@ function main() {
   checkCheckpointConcepts(loadCheckpointQuizzes(migrated, root), knownIds, report);
   checkProseMentions(loadProseMentions(migrated, root), knownIds, report);
   checkResourceArity(loadResourceBundles(migrated, root), report);
+  checkContextVerbosity(migrated, root, report);
+  checkExemplaryCode(migrated, root, report);
   checkConceptCoverage(
     loadConceptBundles(migrated, root),
     { introducedIds: introducedConceptIds(migrated), ownerByConcept: conceptOwners(migrated) },
