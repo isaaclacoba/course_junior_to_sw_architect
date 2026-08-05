@@ -137,16 +137,36 @@ function startServer(port) {
 function renderDom(url) {
   // Must be async (spawn, not spawnSync): a synchronous child would block the
   // event loop and starve the in-process static server that Chrome fetches from.
+  //
+  // stderr is CAPTURED, not discarded, because that is where the page's console
+  // goes. A lesson whose controller throws still renders its inlined fallback
+  // prose - a title, no "undefined", a body - so every check here passed while
+  // eight lessons were visibly broken. The console was the only witness.
   return new Promise((resolve) => {
     const child = spawn(CHROME, [
       "--headless=new", "--no-sandbox", "--disable-gpu", "--disable-dev-shm-usage",
+      "--enable-logging=stderr", "--log-level=0",
       "--virtual-time-budget=6000", "--run-all-compositor-stages-before-draw", "--dump-dom", url,
-    ], { stdio: ["ignore", "pipe", "ignore"] });
+    ], { stdio: ["ignore", "pipe", "pipe"] });
     let out = "";
+    let err = "";
+    const done = () => {
+      clearTimeout(timer);
+      // Chrome writes plenty of its own noise to stderr (GPU, sandbox, fonts).
+      // Only page console messages carry ":CONSOLE:", and a healthy lesson emits
+      // none at all - measured across every archetype - so any of them is a
+      // finding rather than something to threshold.
+      const consoleLines = err
+        .split("\n")
+        .filter((l) => l.includes(":CONSOLE:"))
+        .map((l) => l.replace(/^\[[^\]]*\]\s*/, "").trim());
+      resolve({ dom: out, console: consoleLines });
+    };
     const timer = setTimeout(() => { try { child.kill("SIGKILL"); } catch { /* noop */ } }, 60000);
     child.stdout.on("data", (d) => { out += d; });
-    child.on("close", () => { clearTimeout(timer); resolve(out); });
-    child.on("error", () => { clearTimeout(timer); resolve(out); });
+    child.stderr.on("data", (d) => { err += d; });
+    child.on("close", done);
+    child.on("error", done);
   });
 }
 
@@ -197,7 +217,7 @@ async function verifyRender(lessonDir, archetype, server, opts) {
   let allOk = true;
   for (const lang of langs) {
     const url = `http://127.0.0.1:${server.port}/${relHtml.split(path.sep).join("/")}?vlang=${lang}`;
-    const dom = await renderDom(url);
+    const { dom, console: consoleLines } = await renderDom(url);
     if (dom.length < 500) { bad(`render[${lang}] produced almost no DOM (${dom.length} bytes)`); allOk = false; continue; }
     const undef = (dom.match(/undefined/g) || []).length;
     const hasTitle = /class="[^"]*hero[^"]*"|<h1/i.test(dom);
@@ -207,7 +227,12 @@ async function verifyRender(lessonDir, archetype, server, opts) {
     if (!hasTitle) { bad(`render[${lang}] no hero/title rendered`); localOk = false; }
     if (!hasBody(dom, archetype)) { bad(`render[${lang}] the page furniture rendered but the ${archetype} body did not - empty lesson`); localOk = false; }
     if (archetype === "viz" && !hasPanel) { bad(`render[${lang}] no scene panel class present`); localOk = false; }
-    if (localOk) ok(`render[${lang}] clean (0 undefined, title present${archetype === "viz" ? ", panel present" : ""})`);
+    if (consoleLines.length > 0) {
+      bad(`render[${lang}] the page logged ${consoleLines.length} console message(s):`);
+      for (const line of consoleLines.slice(0, 3)) note(`    ${line}`);
+      localOk = false;
+    }
+    if (localOk) ok(`render[${lang}] clean (0 undefined, title present, console silent${archetype === "viz" ? ", panel present" : ""})`);
     allOk = allOk && localOk;
   }
   return allOk;

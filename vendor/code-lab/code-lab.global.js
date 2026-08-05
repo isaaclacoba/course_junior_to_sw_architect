@@ -3982,7 +3982,10 @@ ${result.runtimeError}`.trim(),
     }
     if (conflicted.length > 0) {
       s.merge = { mergeHead: o, conflicted };
-      for (const [p, text] of markedText) s.worktree.set(p, { status: "modified", text });
+      for (const p of conflicted) {
+        const text = markedText.get(p) ?? fileAt(s, h, p) ?? s.worktree.get(p)?.text ?? "";
+        s.worktree.set(p, { status: "modified", text });
+      }
       return { state: s, effect: { kind: "conflict", paths: conflicted } };
     }
     const message = `Merge ${otherRev}`;
@@ -4002,6 +4005,10 @@ ${result.runtimeError}`.trim(),
   function mergeAbort(state) {
     const s = cloneState(state);
     if (!s.merge) throw new GitError("no merge in progress");
+    const head = headCommit2(s);
+    for (const p of s.merge.conflicted) {
+      if (fileAt(s, head, p) !== null) s.worktree.delete(p);
+    }
     s.merge = void 0;
     return { state: s, effect: { kind: "none" } };
   }
