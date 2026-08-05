@@ -56,11 +56,11 @@
         "Finish with `git commit -m \"merge fix\"` - it lands with two parents."
       ],
       goals: [
-        { code: ["git merge fix", { row: "still on main", head: "main" }, { row: "cat.txt needs settling", worktree: ["cat.txt"] }],
+        { code: ["git merge fix", { row: "HEAD -> main", head: "main" }, { row: "worktree: cat.txt", worktree: ["cat.txt"] }],
           gate: { ran: "git merge fix" } },
-        { code: ["rewrite cat.txt", "markers gone"], gate: { ran: "echo" } },
+        { code: ['echo -e "..." > cat.txt'], gate: { ran: "echo" } },
         { code: ["git add cat.txt"], gate: { ran: "git add cat.txt" } },
-        { code: ["commit `merge fix`", "two parents"], gate: { commit: "merge fix", parents: 2 } }
+        { code: ['git commit -m "merge fix"', "parents: 2"], gate: { commit: "merge fix", parents: 2 } }
       ],
       files: [
         { path: "dog.txt", text: "Rex, collie, 2 years old." },

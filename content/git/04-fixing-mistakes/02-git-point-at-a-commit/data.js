@@ -50,6 +50,12 @@
         "Check the count with `git rev-parse main~<n>` before you use it.",
         "Put a branch called `old` on that commit with `git branch old main~<n>`, and stay on `main`."
       ],
+      goals: [
+        { code: ["git log --oneline"], gate: { ran: "git log --oneline" } },
+        { code: ["git rev-parse main~2"], gate: { ran: "git rev-parse main~2" } },
+        { code: ["git branch old main~2", { row: "old -> add dog", branch: "old", at: "add dog" }, { row: "HEAD -> main", head: "main", detached: false }],
+          gate: { branch: "old", at: "add dog" } }
+      ],
       files: petFiles(),
       start: fourCommits,
       target: fourCommits.concat(["git branch old main~2"]),
@@ -68,6 +74,13 @@
         "Read `git log --oneline` and find the commit whose message is `add bird`.",
         "Count the steps back from the tip and step onto it with `git checkout HEAD~<n>`.",
         "Read `git status` - it should say `HEAD detached`. `main` does not move."
+      ],
+      goals: [
+        { code: ["git log --oneline"], gate: { ran: "git log --oneline" } },
+        { code: ["git checkout HEAD~1", { row: "HEAD -> add bird", at: "add bird" }],
+          gate: { detached: true } },
+        { code: ["git status", { row: "HEAD detached", detached: true }, { row: "main -> add fish", branch: "main", at: "add fish" }],
+          gate: { ran: "git status" } }
       ],
       files: petFiles(),
       start: fourCommits,

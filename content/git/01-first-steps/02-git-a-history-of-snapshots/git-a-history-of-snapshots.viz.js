@@ -1,21 +1,41 @@
 // Visual for git-a-history-of-snapshots - a DATA-ONLY file, `repo` panel.
 //
-// Lesson 1 left three dots on the board. This lesson is about the LINE between
-// them: a commit remembers the one it was built on, and that single backward
-// link is the whole reason git can look back at all.
+// The lesson answers one question the practical track cannot: does a commit
+// store the CHANGE you made, or the whole folder? The message you type names a
+// change, so "a commit is a diff" is the guess almost every learner arrives
+// with, and a board of dots does nothing to dislodge it.
 //
-// The states are built by replaying real git commands through the same runtime
-// the practical lessons use, so the picture here and the picture the learner
-// types into next are produced by one engine - they cannot drift apart.
+// The file panel can, because the model carries file CONTENTS. Two things are
+// shown that only contents make visible:
+//   1. commit 2 was about `dog.txt`, yet reading `cat.txt` at that commit finds
+//      it there, whole - so the commit is not the file you added;
+//   2. checking out the parent rebuilds the folder from that snapshot, and
+//      `cat.txt` reads its older text again - so the commit is not a list of
+//      edits replayed backwards.
+//
+// `cat.txt` sorts first, so the panel opens on it with no click; the steps that
+// need `dog.txt` say so in the narration.
+//
+// File contents are names and times on purpose: `bind-viz` does not localize
+// `files` or `commands`, so anything with English words in it would stay English
+// after a language switch.
+//
+// States are replayed through the git runtime the practical lessons type into,
+// so this picture and the board in `git-first-commit` cannot drift apart.
 (function () {
   "use strict";
 
+  var FILES = [
+    { path: "cat.txt", text: "Mia\n07:00" },
+    { path: "dog.txt", text: "Rex\n07:30" },
+  ];
 
-  var FILES = ["cat.txt", "dog.txt", "bird.txt"];
-
-  var ONE = ['git add cat.txt', 'git commit -m "add cat"'];
-  var TWO = ONE.concat(['git add dog.txt', 'git commit -m "add dog"']);
-  var THREE = TWO.concat(['git add bird.txt', 'git commit -m "add bird"']);
+  var CAT = ['git add cat.txt', 'git commit -m "feeding time for Mia"'];
+  var DOG = CAT.concat(['git add dog.txt', 'git commit -m "feeding time for Rex"']);
+  var EDITED = DOG.concat(['echo -e "Mia\\n07:00\\n18:00" > cat.txt']);
+  var SAVED = EDITED.concat(['git add cat.txt', 'git commit -m "evening meal for Mia"']);
+  var BACK = SAVED.concat(['git checkout HEAD~1']);
+  var FORWARD = BACK.concat(['git switch main']);
 
   window.LESSON_CONFIG = {
     // Without this the visual falls back to MemoryViz's default legend, which
@@ -31,43 +51,57 @@
     },
     steps: [
       {
-        narr: "Here is the repository right after your first commit. One dot. It holds `cat.txt`, and it points at nothing - there was nothing before it. Git calls this the **root commit**.",
+        narr: "The folder holds two files. Only `cat.txt` was staged, so the first commit holds only that one, with the two lines it had at that moment. `dog.txt` is still sitting in the working tree, unsaved.",
         repo: {
           files: FILES,
-          commands: ONE,
-          note: "One commit. Nothing behind it yet.",
+          commands: CAT,
+          ran: 2,
+          note: "One commit. It holds `cat.txt` and nothing else.",
         },
       },
       {
-        narr: "Commit `dog.txt` and a second dot appears - joined to the first. That line is the important part. The new commit records which commit it was built on, and that commit is its **parent**.",
+        narr: "Stage `dog.txt` and commit. The message names one file, and one file was staged. Now read `cat.txt` in the panel below: `Last commit` is this new dot, and `cat.txt` is in it. Git wrote down the whole folder - every file it was tracking - and `cat.txt` came along.",
         repo: {
           files: FILES,
-          commands: TWO,
-          note: "The second commit remembers the first. That link is its parent.",
+          commands: DOG,
+          ran: 2,
+          note: "This commit was about `dog.txt`. It holds `cat.txt` as well.",
         },
       },
       {
-        narr: "A third commit, a third link. Notice the direction: each commit points **backwards**, at the one before it. None of them knows what comes next - a commit is finished the moment you make it, so it can only ever look back.",
+        narr: "Change one line: Mia gets an evening meal. The panel compares the folder's copy with the last commit's and marks a single added row. That row is everything you changed. Watch what git keeps when you save it.",
         repo: {
           files: FILES,
-          commands: THREE,
-          note: "Every arrow points back. Nothing points forward.",
+          commands: EDITED,
+          ran: 1,
+          note: "One added line, in one file.",
         },
       },
       {
-        narr: "That backwards chain is what `git log` walks. Start where you are, follow the parent, follow its parent, and you have the **history** - every snapshot behind you, in order, without git storing an order anywhere.",
+        narr: "Stage and commit. One file staged, one line different, and the new dot holds both files again in full. Click `dog.txt` in the panel: `Rex` and his time are written down a second time, unchanged, by a commit that had nothing to do with him.",
         repo: {
           files: FILES,
-          commands: THREE,
-          note: "`git log` starts at the tip and follows the parents back.",
+          commands: SAVED,
+          ran: 2,
+          note: "The whole folder, saved again - `dog.txt` included.",
         },
       },
       {
-        narr: "A history is not a list git keeps somewhere. It is what you get by following the links back from where you stand. Every commit you make from now on joins the chain the same way, remembering exactly one thing: what came before it.",
+        narr: "`HEAD~1` means one commit back - the **parent** of the one you are on. Check it out and git rebuilds the folder from that snapshot; the board reads `HEAD detached` because you are standing on a commit itself, which a later lesson picks up. Click `cat.txt`: two lines again. Nothing was undone edit by edit - a whole picture was copied back over the folder.",
         repo: {
           files: FILES,
-          commands: THREE,
-          note: "A history is the chain behind where you stand.",
+          commands: BACK,
+          ran: 1,
+          note: "The parent's snapshot, restored whole.",
+        },
+      },
+      {
+        narr: "Switch back to the newest commit. Behind you is a chain of complete folders, each one linked to the parent it was built on, and that chain is the **history**. Git can hand you any moment in it because it kept the whole moment.",
+        repo: {
+          files: FILES,
+          commands: FORWARD,
+          ran: 1,
+          note: "Three commits. Three complete folders.",
         },
       },
     ],

@@ -212,7 +212,7 @@
       "term": "Commit"
     },
     "gt-conflict": {
-      "def": "Cuando las dos ramas cambiaron el mismo archivo, git se detiene y te pide que decidas qué resultado es el correcto.",
+      "def": "Cuando dos ramas reescribieron las mismas líneas, git se detiene y te devuelve el archivo para que decidas tú.",
       "term": "Conflicto"
     },
     "gt-detached-head": {
@@ -260,7 +260,7 @@
       "term": "Revisión"
     },
     "gt-staging-area": {
-      "def": "La lista corta de archivos que has elegido para el próximo commit, para que decidas qué entra en vez de guardarlo todo.",
+      "def": "Las copias de los archivos que elegiste para el próximo commit, tomadas en el momento en que los añadiste y guardadas ahí mientras tú sigues editando.",
       "term": "Área de preparación"
     },
     "gt-tag": {
@@ -268,7 +268,7 @@
       "term": "Etiqueta"
     },
     "gt-working-tree": {
-      "def": "Tus archivos tal y como están ahora mismo, antes de que le hayas hablado a git de ellos.",
+      "def": "Tus archivos en la carpeta tal y como están ahora mismo, incluidos los cambios que aún no le has contado a git.",
       "term": "Árbol de trabajo"
     },
     "pr-abstract-type": {

@@ -49,6 +49,14 @@
         },
         { path: "dog.txt", text: "Rex, collie, 2 years old." }
       ],
+      goals: [
+        { code: ["git branch"], gate: { ran: "git branch" } },
+        { code: ["git log --oneline"], gate: { ran: "git log --oneline" } },
+        { code: ["git merge fix", { row: "HEAD -> main", head: "main" }, { row: "main -> add dog", branch: "main", at: "add dog" }],
+          gate: { ran: "git merge fix", head: "main", branch: "main", at: "add dog" } },
+        { code: ["main -> add dog", { row: "fix -> add dog", branch: "fix", at: "add dog" }, { row: "parents: 1", commit: "add dog", parents: 1 }],
+          gate: { branch: "main", at: "add dog" } }
+      ],
       start: SPLIT,
       target: SPLIT.concat(["git merge fix"]),
       solution: [
@@ -76,6 +84,16 @@
         },
         { path: "dog.txt", text: "Rex, collie, 2 years old." },
         { path: "feeder.txt", text: "Feeder filled at 7am and 6pm." }
+      ],
+      goals: [
+        { code: ["git log --oneline", { row: "git switch fix", ran: "git switch fix" }, { row: "HEAD -> fix", head: "fix" }],
+          gate: { ran: "git log --oneline" } },
+        { code: ["git switch main", { row: "git merge fix", ran: "git merge fix" }, { row: "HEAD -> main", head: "main" }],
+          gate: { ran: "git switch main", head: "main" } },
+        { code: ["main -> Merge fix", { row: "fix -> add dog", branch: "fix", at: "add dog" }],
+          gate: { commit: "Merge fix", on: "main" } },
+        { code: ["parents: 2", { row: "main -> Merge fix", branch: "main", at: "Merge fix" }],
+          gate: { commit: "Merge fix", parents: 2 } }
       ],
       start: BOTH_MOVED,
       target: BOTH_MOVED.concat(["git merge fix"]),

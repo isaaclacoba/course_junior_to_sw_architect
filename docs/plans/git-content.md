@@ -47,8 +47,8 @@ and `git` (terminal + live graph, English). Track id `git`, name `Git`, concept 
 | id | Term | def | Introduced by |
 |---|---|---|---|
 | `gt-repository` | Repository | The folder git is watching, together with every snapshot you have saved in it. | 1 |
-| `gt-working-tree` | Working tree | Your files as they are right now, before you have told git about them. | 1 |
-| `gt-staging-area` | Staging area | The short list of files you have picked for the next commit, so you choose what goes in instead of saving everything. | 1 |
+| `gt-working-tree` | Working tree | Your files in the folder as they are right now, including the edits you have not told git about yet. | the-three-areas |
+| `gt-staging-area` | Staging area | The copies of the files you picked for the next commit, taken the moment you added them and kept while you carry on editing. | the-three-areas |
 | `gt-commit` | Commit | A saved snapshot of the files you picked, with a short message saying what the change was. | 1 |
 | `gt-parent` | Parent | The commit that came just before this one - the link that turns loose snapshots into a history. | 2 |
 | `gt-history` | History | The chain of commits behind where you stand now, each pointing back at its parent. | 2 |
@@ -66,9 +66,10 @@ and `git` (terminal + live graph, English). Track id `git`, name `Git`, concept 
 | `gt-detached-head` | Detached HEAD | Standing on a commit directly instead of on a branch, so a commit made there has no branch name holding on to it. | 12 |
 | `gt-reset` | Reset | Moving your branch's name to another commit, with a choice of what happens to the files you had staged or edited. | 13 |
 
-Revisits: 2 -> `gt-commit`; 4 -> `gt-history`; 5 -> `gt-branch`,`gt-head`; 8 -> `gt-merge`,
-`gt-fast-forward`,`gt-merge-commit`; 10 -> `gt-conflict`; 12 -> `gt-hash`; 14 -> `gt-reset`,
-`gt-staging-area`,`gt-working-tree`.
+Revisits: 1 -> `gt-working-tree`,`gt-staging-area`; 2 -> `gt-commit`; 4 -> `gt-history`;
+5 -> `gt-branch`,`gt-head`; 8 -> `gt-merge`,`gt-fast-forward`,`gt-merge-commit`;
+10 -> `gt-conflict`; 12 -> `gt-hash`; 14 -> `gt-reset`,`gt-staging-area`,`gt-working-tree`.
+Numbers = original 14-lesson order; three-areas was added second in part one.
 
 ## 4. Practical exercise sketches
 

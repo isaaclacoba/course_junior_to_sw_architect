@@ -66,7 +66,7 @@ them a read that changes what comes next)
       (table in the design doc).
 
 **P5 - the two missing lessons**
-- [ ] 20. Three-areas lesson; it TAKES `gt-working-tree` + `gt-staging-area` and
+- [x] 20. Three-areas lesson; it TAKES `gt-working-tree` + `gt-staging-area` and
       lesson 1 drops to `revisits`.
 - [ ] 21. `reflog`: model support + lesson, placed BEFORE the reset pair. Not
       gated on P2.

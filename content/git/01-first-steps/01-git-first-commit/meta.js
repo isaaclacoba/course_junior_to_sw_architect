@@ -27,16 +27,17 @@ window.LESSON_META = {
         "id": "gt-repository"
       },
       {
+        "id": "gt-commit"
+      }
+    ],
+    "revisits": [
+      {
         "id": "gt-working-tree"
       },
       {
         "id": "gt-staging-area"
-      },
-      {
-        "id": "gt-commit"
       }
     ],
-    "revisits": [],
     "uses": []
   },
 };

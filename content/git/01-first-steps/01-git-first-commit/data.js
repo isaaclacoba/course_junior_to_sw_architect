@@ -28,6 +28,14 @@
         { path: "dog-notes.txt", text: "Rex, collie, 2 years old.\nBarks at the postman." },
         { path: "feeder.md", text: "# Feeder\n\nTODO: work out the schedule." }
       ],
+      goals: [
+        { code: ["git init"], gate: { ran: "git init" } },
+        { code: ["git status"], gate: { ran: "git status" } },
+        { code: ["git add cat-notes.txt", { row: "staged: cat-notes.txt", staged: ["cat-notes.txt"] }],
+          gate: { staged: ["cat-notes.txt"] } },
+        { code: ['git commit -m "add cat"', { row: "holds: cat-notes.txt", commit: "add cat", paths: ["cat-notes.txt"] }],
+          gate: { commit: "add cat" } }
+      ],
       start: [],
       target: [
         "git add cat-notes.txt",
@@ -54,6 +62,13 @@
         { path: "cat.txt", text: "Mia, tabby, 4 years old." },
         { path: "dog.txt", text: "Rex, collie, 2 years old." },
         { path: "notes.md", text: "# Pets\n\nTODO: half of this is missing" }
+      ],
+      goals: [
+        { code: ["git status"], gate: { ran: "git status" } },
+        { code: ["git add cat.txt dog.txt", { row: "staged: cat.txt, dog.txt", staged: ["cat.txt", "dog.txt"] }],
+          gate: { staged: ["cat.txt", "dog.txt"] } },
+        { code: ['git commit -m "add the pets"', { row: "holds: cat.txt, dog.txt", commit: "add the pets", paths: ["cat.txt", "dog.txt"] }],
+          gate: { commit: "add the pets" } }
       ],
       start: [],
       target: [
@@ -83,6 +98,15 @@
         { path: "dog.txt", text: "Rex, collie, 2 years old." },
         { path: "dog-bowl.txt", text: "Steel bowl, chipped.\nBelongs to Rex." },
         { path: "bird.txt", text: "Pip, budgie, loud at 6am." }
+      ],
+      goals: [
+        { code: ["git status"], gate: { ran: "git status" } },
+        { code: ["git add dog.txt dog-bowl.txt", { row: "staged: dog.txt, dog-bowl.txt", staged: ["dog.txt", "dog-bowl.txt"] }],
+          gate: { staged: ["dog.txt", "dog-bowl.txt"] } },
+        { code: ['git commit -m "add dog"', { row: "holds: dog.txt, dog-bowl.txt", commit: "add dog", paths: ["dog.txt", "dog-bowl.txt"] }],
+          gate: { commit: "add dog" } },
+        { code: ["add cat <- add dog", { row: "parents: 1", commit: "add dog", parents: 1 }],
+          gate: { commit: "add cat" } }
       ],
       start: [
         "git add cat.txt",

@@ -29,6 +29,13 @@
         { path: "bird.txt", text: "Pip, budgie, loud at 6am." },
         { path: "feeder.txt", text: "Feeder: 8am and 6pm.\nThe timer ran an hour late - corrected." }
       ],
+      goals: [
+        { code: ["git log --oneline"], gate: { ran: "git log --oneline" } },
+        { code: ["git branch feature HEAD~2", { row: "feature -> add dog", branch: "feature", at: "add dog" }],
+          gate: { branch: "feature", at: "add dog" } },
+        { code: ["git branch", { row: "HEAD -> main", head: "main" }],
+          gate: { ran: "git branch", head: "main", branch: "feature", at: "add dog" } }
+      ],
       start: [
         "git add cat.txt",
         "git commit -m \"add cat\"",
@@ -71,6 +78,16 @@
         { path: "cat.txt", text: "Mia, tabby, 4 years old." },
         { path: "readme.md", text: "# Pet notes\n\nOne file per animal." },
         { path: "dog.txt", text: "Rex, collie, 2 years old." }
+      ],
+      goals: [
+        { code: ["git branch", { row: "HEAD -> docs", head: "docs" }],
+          gate: { ran: "git branch", head: "docs" } },
+        { code: ["git switch main", { row: "HEAD -> main", head: "main" }],
+          gate: { ran: "git switch main", head: "main" } },
+        { code: ["git switch -c feature", { row: "HEAD -> feature", head: "feature" }, { row: "feature -> add cat", branch: "feature", at: "add cat" }],
+          gate: { ran: "git switch -c feature", branch: "feature", head: "feature" } },
+        { code: ["git add dog.txt", 'git commit -m "add dog"', { row: "feature -> add dog", branch: "feature", at: "add dog" }, { row: "holds: dog.txt", commit: "add dog", paths: ["dog.txt"], on: "feature" }],
+          gate: { commit: "add dog", on: "feature" } }
       ],
       start: [
         "git add cat.txt",

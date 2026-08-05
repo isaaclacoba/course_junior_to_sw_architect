@@ -352,6 +352,7 @@
     "gt-commit": {
       "introducedBy": "git-first-commit",
       "revisitedBy": [
+        "git-the-three-areas",
         "git-a-history-of-snapshots",
         "git-where-am-i",
         "git-what-a-branch-is",
@@ -446,6 +447,7 @@
     "gt-repository": {
       "introducedBy": "git-first-commit",
       "revisitedBy": [
+        "git-the-three-areas",
         "git-where-am-i"
       ],
       "usedBy": [
@@ -470,8 +472,9 @@
       "usedBy": []
     },
     "gt-staging-area": {
-      "introducedBy": "git-first-commit",
+      "introducedBy": "git-the-three-areas",
       "revisitedBy": [
+        "git-first-commit",
         "git-what-reset-moves",
         "git-undo-with-reset"
       ],
@@ -488,8 +491,9 @@
       ]
     },
     "gt-working-tree": {
-      "introducedBy": "git-first-commit",
+      "introducedBy": "git-the-three-areas",
       "revisitedBy": [
+        "git-first-commit",
         "git-what-reset-moves",
         "git-undo-with-reset"
       ],
@@ -2254,11 +2258,12 @@
     "git-first-commit": {
       "introduces": [
         "gt-repository",
-        "gt-working-tree",
-        "gt-staging-area",
         "gt-commit"
       ],
-      "revisits": [],
+      "revisits": [
+        "gt-working-tree",
+        "gt-staging-area"
+      ],
       "uses": []
     },
     "git-fix-the-last-commit": {
@@ -2355,6 +2360,17 @@
         "gt-merge-commit",
         "gt-tag"
       ]
+    },
+    "git-the-three-areas": {
+      "introduces": [
+        "gt-working-tree",
+        "gt-staging-area"
+      ],
+      "revisits": [
+        "gt-repository",
+        "gt-commit"
+      ],
+      "uses": []
     },
     "git-undo-with-reset": {
       "introduces": [],
@@ -3349,7 +3365,7 @@
     },
     "gt-conflict": {
       "term": "Conflict",
-      "def": "When both branches changed the same file, git stops and asks you to decide which result is right."
+      "def": "When two branches rewrote the same lines, git stops and hands the file back for you to decide."
     },
     "gt-detached-head": {
       "term": "Detached HEAD",
@@ -3397,7 +3413,7 @@
     },
     "gt-staging-area": {
       "term": "Staging area",
-      "def": "The short list of files you have picked for the next commit, so you choose what goes in instead of saving everything."
+      "def": "The copies of the files you picked for the next commit, taken the moment you added them and kept while you carry on editing."
     },
     "gt-tag": {
       "term": "Tag",
@@ -3405,7 +3421,7 @@
     },
     "gt-working-tree": {
       "term": "Working tree",
-      "def": "Your files as they are right now, before you have told git about them."
+      "def": "Your files in the folder as they are right now, including the edits you have not told git about yet."
     },
     "pr-abstract-type": {
       "term": "Abstract type",

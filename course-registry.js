@@ -171,6 +171,7 @@
 
     // ---- git / first-steps ----
     { track: "git", part: "first-steps", id: "git-first-commit", href: "content/git/01-first-steps/01-git-first-commit/", kind: "lesson", path: "content/git/01-first-steps/01-git-first-commit" },
+    { track: "git", part: "first-steps", id: "git-the-three-areas", href: "content/git/01-first-steps/04-git-the-three-areas/", kind: "lesson", path: "content/git/01-first-steps/04-git-the-three-areas" },
     { track: "git", part: "first-steps", id: "git-a-history-of-snapshots", href: "content/git/01-first-steps/02-git-a-history-of-snapshots/", kind: "lesson", path: "content/git/01-first-steps/02-git-a-history-of-snapshots" },
     { track: "git", part: "first-steps", id: "git-where-am-i", href: "content/git/01-first-steps/03-git-where-am-i/", kind: "lesson", path: "content/git/01-first-steps/03-git-where-am-i" },
     { track: "git", part: "branches", id: "git-what-a-branch-is", href: "content/git/02-branches/01-git-what-a-branch-is/", kind: "lesson", path: "content/git/02-branches/01-git-what-a-branch-is" },

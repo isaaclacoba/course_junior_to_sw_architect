@@ -141,7 +141,7 @@
       "title": "Genéricos"
     },
     "git-a-history-of-snapshots": {
-      "blurb": "Una fila de puntos no es una historia - lo son los enlaces. Mira cómo cada commit recuerda al anterior, y por qué esa cadena es lo que permite a git mirar atrás.",
+      "blurb": "Un commit guarda una copia de la carpeta entera, todos los archivos de golpe. Cambia una línea, guárdala, y luego retrocede un commit para ver volver la versión anterior.",
       "title": "Una historia de instantáneas"
     },
     "git-first-commit": {
@@ -176,12 +176,16 @@
       "blurb": "Dos ramas cambiaron `cat.txt`, así que la fusión se detuvo. Termínala marcando el archivo como resuelto y haciendo el commit - luego cancela otra sin dejar rastro.",
       "title": "Resolver un conflicto"
     },
+    "git-the-three-areas": {
+      "blurb": "¿Por qué hay un paso intermedio entre editar un archivo y guardarlo? Mira cómo un mismo archivo acaba con tres versiones distintas a la vez, una en cada área de git, y cuál de ellas escribe `git commit`.",
+      "title": "Las tres áreas"
+    },
     "git-undo-with-reset": {
       "blurb": "Mueve tu rama un commit hacia atrás y decide dónde deben caer sus archivos. Ejecuta `--soft`, `--mixed` y `--hard` sobre el mismo error y mira cómo responden las tres zonas.",
       "title": "Deshacer con reset"
     },
     "git-what-a-branch-is": {
-      "blurb": "Una rama no es una copia de nada - es un nombre que apunta a un commit. Mira cómo el nombre avanza cuando haces commits, y para qué sirve `HEAD` en realidad.",
+      "blurb": "Una rama es un nombre que apunta a un commit. Guarda texto distinto en dos ramas, salta de una a otra, y mira cómo cambia el mismo archivo en tu carpeta.",
       "title": "Qué es realmente una rama"
     },
     "git-what-reset-moves": {
@@ -189,7 +193,7 @@
       "title": "Qué mueve realmente reset"
     },
     "git-when-changes-collide": {
-      "blurb": "Git une dos líneas por su cuenta hasta que los dos lados cambian el mismo archivo. Mira cómo la fusión se detiene sin guardar nada, y qué está esperando.",
+      "blurb": "Dos ramas editan un mismo archivo y git lo fusiona sin preguntar. Mueve una de esas ediciones encima de la otra y la misma fusión se detiene - mira las dos, y lee lo que git deja dentro del archivo.",
       "title": "Cuando dos cambios chocan"
     },
     "git-where-am-i": {

@@ -26,6 +26,16 @@
         { path: "notes.md", text: "# Notes\n\nTODO: the vet's number goes here" },
         { path: "cat.txt", text: "Mia, tabby, 4 years old." }
       ],
+      goals: [
+        { code: ["git status"], gate: { ran: "git status" } },
+        { code: ["git diff"], gate: { ran: "git diff" } },
+        { code: ["git add cat.txt", { row: "staged: cat.txt", staged: ["cat.txt"] }],
+          gate: { staged: ["cat.txt"] } },
+        { code: ["git diff --staged", { row: "staged: cat.txt", staged: ["cat.txt"] }],
+          gate: { ran: "git diff --staged", staged: ["cat.txt"] } },
+        { code: ['git commit -m "note where the cat sleeps"', { row: "holds: cat.txt", commit: "note where the cat sleeps", paths: ["cat.txt"] }],
+          gate: { commit: "note where the cat sleeps" } }
+      ],
       start: [
         "git add cat.txt",
         "git commit -m \"add cat\"",
@@ -60,6 +70,11 @@
         { path: "cat.txt", text: "Mia, tabby, 4 years old." },
         { path: "dog.txt", text: "Rex, collie, 2 years old." },
         { path: "bird.txt", text: "Pip, budgie, loud at 6am." }
+      ],
+      goals: [
+        { code: ["git log --oneline"], gate: { ran: "git log --oneline" } },
+        { code: ["git add feeder.txt", 'git commit -m "fix the feeder"', { row: "holds: feeder.txt", commit: "fix the feeder", paths: ["feeder.txt"] }],
+          gate: { commit: "fix the feeder" } }
       ],
       start: [
         "git add cat.txt",

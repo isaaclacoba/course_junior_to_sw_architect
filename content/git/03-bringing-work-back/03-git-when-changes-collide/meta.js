@@ -6,9 +6,9 @@ window.LESSON_META = {
   eyebrow: "Git · Part three · Bringing work back",
   title: "When two changes collide",
   intro: [
-    "The first time git says `CONFLICT` it reads like an accident - as if the merge failed and your work is somewhere in pieces. That reading is the expensive one: it is what makes people undo things at random and lose work they still had. Nothing failed. Git combined every file it could, reached one it cannot decide for you, and stopped there on purpose. Here you watch that moment happen, so you can tell a stopped merge from a broken one."
+    "The first time git says `CONFLICT` it looks like an accident - as if the merge failed and your work is in pieces somewhere. Nothing failed, and git is not confused about which files you touched. It is reading the lines. Two branches can rewrite the same file all afternoon and git will merge it without asking you anything; what stops it is two edits landing on top of each other. Here you watch both, on one file, so you can see the one difference that decides it."
   ],
-  blurb: "Git joins two lines on its own until both sides changed the same file. Watch the merge stop with nothing saved, and see what it is waiting for.",
+  blurb: "Two branches edit one file and git merges it without asking. Move one of those edits onto the other's line and the same merge stops - watch both, and read what git leaves behind in the file.",
   links: [{ href: "index.html", label: "Back to the course" }],
   pill: "gentle",
   time: "10 min",

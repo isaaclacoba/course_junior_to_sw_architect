@@ -52,6 +52,16 @@
         "`draft.txt` should end up staged, ready to go straight back in.",
         "Read `git diff --staged` - it prints the lines that commit was holding, still there."
       ],
+      goals: [
+        { code: ["git log --oneline", { row: "main -> oops", branch: "main", at: "oops" }],
+          gate: { ran: "git log --oneline" } },
+        { code: ["git reset --soft HEAD~1", { row: "main -> add dog", branch: "main", at: "add dog" }, { row: "oops -> unreachable", absent: { commit: "oops" } }],
+          gate: { branch: "main", at: "add dog", absent: { commit: "oops" } } },
+        { code: ["git status", { row: "staged: draft.txt", staged: ["draft.txt"] }],
+          gate: { ran: "git status", staged: ["draft.txt"] } },
+        { code: ["git diff --staged", { row: "staged: draft.txt", staged: ["draft.txt"] }],
+          gate: { ran: "git diff --staged", staged: ["draft.txt"] } }
+      ],
       files: files(),
       start: THREE_COMMITS,
       target: THREE_COMMITS.concat(["git reset --soft HEAD~1"]),
@@ -72,6 +82,14 @@
         "Move `main` there with a `git reset` that leaves nothing staged.",
         "`draft.txt` should sit in the working tree when you are done."
       ],
+      goals: [
+        { code: ["git log --oneline", { row: "main -> oops", branch: "main", at: "oops" }],
+          gate: { ran: "git log --oneline" } },
+        { code: ["git reset --mixed HEAD~1", { row: "main -> add dog", branch: "main", at: "add dog" }, { row: "staged: []", staged: [] }, { row: "oops -> unreachable", absent: { commit: "oops" } }],
+          gate: { branch: "main", at: "add dog", staged: [], absent: { commit: "oops" } } },
+        { code: ["git status", { row: "worktree: draft.txt", worktree: ["draft.txt"] }],
+          gate: { ran: "git status", worktree: ["draft.txt"] } }
+      ],
       files: files(),
       start: THREE_COMMITS,
       target: THREE_COMMITS.concat(["git reset --mixed HEAD~1"]),
@@ -90,6 +108,14 @@
         "Read `git log --oneline` and count back to `add dog` one more time.",
         "Move `main` there and keep nothing - nothing staged, and no `draft.txt` in the folder.",
         "`git status` should show nothing waiting in either zone."
+      ],
+      goals: [
+        { code: ["git log --oneline", { row: "main -> oops", branch: "main", at: "oops" }],
+          gate: { ran: "git log --oneline" } },
+        { code: ["git reset --hard HEAD~1", { row: "main -> add dog", branch: "main", at: "add dog" }, { row: "oops -> unreachable", absent: { commit: "oops" } }],
+          gate: { branch: "main", at: "add dog", absent: { commit: "oops" } } },
+        { code: ["git status", { row: "staged: []", staged: [] }, { row: "worktree: []", worktree: [] }],
+          gate: { ran: "git status", staged: [], worktree: [] } }
       ],
       files: files(),
       start: THREE_COMMITS,

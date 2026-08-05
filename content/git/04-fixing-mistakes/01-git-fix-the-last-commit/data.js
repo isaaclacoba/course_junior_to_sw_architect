@@ -39,6 +39,14 @@
         { path: "cat.txt", text: "Mia, tabby, 4 years old." },
         { path: "dog.txt", text: "Rex, collie, 2 years old." }
       ],
+      goals: [
+        { code: ["git log --oneline", { row: "main -> add dgo", branch: "main", at: "add dgo" }],
+          gate: { ran: "git log --oneline" } },
+        { code: ['git commit --amend -m "add dog"', { row: "main -> add dog", branch: "main", at: "add dog" }, { row: "add dgo -> unreachable", absent: { commit: "add dgo" } }],
+          gate: { commit: "add dog", absent: { commit: "add dgo" } } },
+        { code: ["git log --oneline", { row: "add ct -> reachable", commit: "add ct" }, { row: "parents: 1", commit: "add dog", parents: 1 }],
+          gate: { commit: "add ct", absent: { commit: "add dgo" } } }
+      ],
       start: [
         "git add cat.txt",
         "git commit -m \"add ct\"",
@@ -73,6 +81,16 @@
         { path: "feeder.txt", text: "Dry food, refilled on Sundays." },
         { path: "bowl.txt", text: "Water bowl, sits next to the feeder." },
         { path: "notes.txt", text: "TODO: book Mia in with the vet." }
+      ],
+      goals: [
+        { code: ["git status", { row: "worktree: bowl.txt, notes.txt", worktree: ["bowl.txt", "notes.txt"] }],
+          gate: { ran: "git status" } },
+        { code: ["git add bowl.txt", { row: "staged: bowl.txt", staged: ["bowl.txt"] }],
+          gate: { staged: ["bowl.txt"] } },
+        { code: ["git diff --staged", { row: "staged: bowl.txt", staged: ["bowl.txt"] }],
+          gate: { ran: "git diff --staged", staged: ["bowl.txt"] } },
+        { code: ['git commit --amend -m "set up the feeder"', { row: "holds: feeder.txt, bowl.txt", commit: "set up the feeder", paths: ["feeder.txt", "bowl.txt"] }, { row: "worktree: notes.txt", worktree: ["notes.txt"] }, { row: "add the feeder -> unreachable", absent: { commit: "add the feeder" } }],
+          gate: { commit: "set up the feeder", absent: { commit: "add the feeder" } } }
       ],
       start: [
         "git add cat.txt",

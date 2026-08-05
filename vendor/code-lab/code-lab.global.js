@@ -4036,6 +4036,13 @@ ${result.runtimeError}`.trim(),
   function resolvePaths(state, paths) {
     const s = cloneState(state);
     if (!s.merge) throw new GitError("no merge in progress");
+    for (const p of paths) {
+      const entry = s.worktree.get(p);
+      if (entry) {
+        s.index.set(p, entry.text);
+        s.worktree.delete(p);
+      }
+    }
     const remaining = s.merge.conflicted.filter((p) => !paths.includes(p));
     s.merge = { mergeHead: s.merge.mergeHead, conflicted: remaining };
     return { state: s, effect: { kind: "none" } };
@@ -4231,7 +4238,8 @@ ${result.runtimeError}`.trim(),
       z.differs = z.present && prev3 !== null && prev3.text !== z.text;
     }
     const wanted = selected && zones.some((z) => z.zone === selected && z.present) ? selected : null;
-    const sel = wanted ?? (zones.find((z) => z.present)?.zone ?? "tree");
+    const interesting = zones.find((z) => z.present && z.differs)?.zone;
+    const sel = wanted ?? interesting ?? (zones.find((z) => z.present)?.zone ?? "tree");
     const selCopy = zones.find((z) => z.zone === sel);
     const prev2 = behind(zones, sel);
     const showDiff = selCopy.present && prev2 !== null && prev2.text !== selCopy.text;
@@ -4290,7 +4298,6 @@ ${result.runtimeError}`.trim(),
       }
       this.el.hidden = false;
       this.path = p.path;
-      this.zone = p.selected;
       const chips = p.files.map(
         (f) => `<button type="button" class="cl-git-fp-tab" data-file="${escapeHtml4(f)}" aria-selected="${f === p.path}">${escapeHtml4(f)}</button>`
       ).join("");

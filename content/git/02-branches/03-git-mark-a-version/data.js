@@ -24,6 +24,13 @@
         { path: "bowl.txt", text: "The water bowl leaked when full.\nFixed - fill only to the line." },
         { path: "timer.txt", text: "Timer, new in v2.\nSkips the evening meal at weekends." }
       ],
+      goals: [
+        { code: ["git tag"], gate: { ran: "git tag" } },
+        { code: ["git log --oneline"], gate: { ran: "git log --oneline" } },
+        { code: ["git tag v2", { row: "v2 -> release: feeder v2", tag: "v2", at: "release: feeder v2" }],
+          gate: { tag: "v2", at: "release: feeder v2" } },
+        { gate: { tag: "v2", at: "HEAD", head: "main" } }
+      ],
       start: [
         "git add cat.txt",
         "git commit -m \"add cat\"",
@@ -69,6 +76,15 @@
         { path: "dog.txt", text: "Rex, collie, 2 years old." },
         { path: "feeder.txt", text: "Feeder v1: two meals a day, 8am and 6pm." },
         { path: "bowl.txt", text: "# Water bowl\n\nTODO: nothing built yet." }
+      ],
+      goals: [
+        { code: ["git log --oneline"], gate: { ran: "git log --oneline" } },
+        { code: ["git tag v1 HEAD~1", { row: "v1 -> release: feeder v1", tag: "v1", at: "release: feeder v1" }],
+          gate: { tag: "v1", at: "release: feeder v1" } },
+        { code: ["git tag v0 HEAD~3", { row: "v0 -> add cat", tag: "v0", at: "add cat" }],
+          gate: { tag: "v0", at: "add cat" } },
+        { code: ["HEAD -> main", { row: "main -> start the water bowl", branch: "main", at: "start the water bowl" }],
+          gate: { tag: "v0", at: "add cat", head: "main" } }
       ],
       start: [
         "git add cat.txt",

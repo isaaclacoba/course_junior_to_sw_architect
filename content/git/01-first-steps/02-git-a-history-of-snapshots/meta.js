@@ -6,9 +6,9 @@ window.LESSON_META = {
   eyebrow: "Git · Part one · First steps",
   title: "A history of snapshots",
   intro: [
-    "You made three commits and three dots appeared. But a row of dots is not yet a history - what makes it one is the line between them. Each commit remembers the one it was built on, and that single link is why git can show you what changed, when, and in what order. Watch the chain form, one commit at a time."
+    "Ask what a commit stores and most people say: the change I made. It is a fair guess - the message you type describes a change, and every tool hands you a list of them. What git actually writes down is a copy of every file it was tracking at that moment. Here you change one line, save it, and step back to the commit before to watch the whole folder come back."
   ],
-  blurb: "A row of dots is not a history - the links are. Watch each commit remember the one before it, and see why that chain is what makes git able to look back.",
+  blurb: "A commit holds a copy of the whole folder, every file at once. Change one line, save it, then step back a commit and watch the older version come back.",
   links: [{ href: "index.html", label: "Back to the course" }],
   pill: "gentle",
   time: "8 min",
