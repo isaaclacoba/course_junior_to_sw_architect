@@ -205,3 +205,32 @@ test("the generator loads bind-git on a git page and leaves the other tails alon
     assert.doesNotMatch(out, /resource\/bind-git\.js/, k + " must not load bind-git");
   });
 });
+
+test("a file's contents localize, but its path does not", () => {
+  const bind = loadBindGit();
+  const cfg = {
+    tasks: [gitTask({
+      files: [{ path: "cat.txt", text: "Mia, tabby, 4 years old." }, "bare.txt"],
+    })],
+  };
+  bind.apply(fakeR({ "task.1.files.0.text": "Mia, atigrada, 4 anos." }), { config: cfg });
+
+  assert.equal(plain(cfg.tasks[0].files[0]).path, "cat.txt", "a path is a git argument - never translated");
+  assert.equal(plain(cfg.tasks[0].files[0]).text, "Mia, atigrada, 4 anos.");
+  assert.equal(cfg.tasks[0].files[1], "bare.txt", "a bare path entry is left alone");
+});
+
+test("a file with no text key keeps what the data file inlined", () => {
+  const bind = loadBindGit();
+  const cfg = { tasks: [gitTask({ files: [{ path: "cat.txt", text: "the original" }] })] };
+  bind.apply(fakeR({}), { config: cfg });
+  assert.equal(plain(cfg.tasks[0].files[0]).text, "the original", "apply-if-present, not overwrite-with-empty");
+});
+
+test("localizing contents never touches the command lists", () => {
+  const bind = loadBindGit();
+  const cfg = { tasks: [gitTask({ files: [{ path: "cat.txt", text: "before" }] })] };
+  bind.apply(fakeR({ "task.1.files.0.text": "despues" }), { config: cfg });
+  assert.deepEqual(plain(cfg.tasks[0].solution), ["git branch fix"], "solution stays English");
+  assert.deepEqual(plain(cfg.tasks[0].target), ['git commit -m "init"', "git branch fix"]);
+});

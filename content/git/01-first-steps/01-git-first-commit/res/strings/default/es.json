@@ -45,5 +45,15 @@
   "concept.gt-staging-area.term": "Área de preparación",
   "concept.gt-commit.def": "Una instantánea guardada de los archivos que elegiste, con un mensaje corto que dice cuál fue el cambio.",
   "concept.gt-commit.term": "Commit",
-  "meta.label": "Primeros pasos · Tu primer commit"
+  "meta.label": "Primeros pasos · Tu primer commit",
+  "task.1.files.0.text": "Mia, atigrada, 4 años.\nDuerme sobre el portátil caliente.",
+  "task.1.files.1.text": "Rex, border collie, 2 años.\nLadra al cartero.",
+  "task.1.files.2.text": "# Comedero\n\nPENDIENTE: definir el horario.",
+  "task.2.files.0.text": "Mia, atigrada, 4 años.",
+  "task.2.files.1.text": "Rex, border collie, 2 años.",
+  "task.2.files.2.text": "# Mascotas\n\nPENDIENTE: falta la mitad",
+  "task.3.files.0.text": "Mia, atigrada, 4 años.",
+  "task.3.files.1.text": "Rex, border collie, 2 años.",
+  "task.3.files.2.text": "Cuenco de acero, desportillado.\nEs de Rex.",
+  "task.3.files.3.text": "Pip, periquito, ruidoso a las 6."
 }

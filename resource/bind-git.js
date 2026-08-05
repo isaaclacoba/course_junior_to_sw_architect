@@ -68,6 +68,18 @@
       t.concept = str(R.get("task." + n + ".concept"));
       t.context = str(R.get("task." + n + ".context"));
       t.goal = global.ResourceOrigin.collect(R, "task." + n + ".goal.");
+      // A file's CONTENTS are prose the learner reads, so they localize; its
+      // PATH is an argument to a git command, so it does not. Apply-if-present,
+      // so a card that declares no text key keeps whatever its data file
+      // inlined - and a card that does declare one must declare it in every
+      // language, or switching back leaves the file stuck in the other one.
+      if (Array.isArray(t.files)) {
+        t.files.forEach(function (f, k) {
+          if (!f || typeof f !== "object") return;
+          var text = R.get("task." + n + ".files." + k + ".text");
+          if (text !== undefined) f.text = text;
+        });
+      }
       if (t.summary) {
         t.summaryIntro = str(R.get("task." + n + ".summaryIntro"));
         t.summaryClose = str(R.get("task." + n + ".summaryClose"));

@@ -45,5 +45,15 @@
   "concept.gt-staging-area.def": "The short list of files you have picked for the next commit, so you choose what goes in instead of saving everything.",
   "concept.gt-commit.term": "Commit",
   "concept.gt-commit.def": "A saved snapshot of the files you picked, with a short message saying what the change was.",
-  "meta.label": "First steps · Your first commit"
+  "meta.label": "First steps · Your first commit",
+  "task.1.files.0.text": "Mia, tabby, 4 years old.\nSleeps on the warm laptop.",
+  "task.1.files.1.text": "Rex, collie, 2 years old.\nBarks at the postman.",
+  "task.1.files.2.text": "# Feeder\n\nTODO: work out the schedule.",
+  "task.2.files.0.text": "Mia, tabby, 4 years old.",
+  "task.2.files.1.text": "Rex, collie, 2 years old.",
+  "task.2.files.2.text": "# Pets\n\nTODO: half of this is missing",
+  "task.3.files.0.text": "Mia, tabby, 4 years old.",
+  "task.3.files.1.text": "Rex, collie, 2 years old.",
+  "task.3.files.2.text": "Steel bowl, chipped.\nBelongs to Rex.",
+  "task.3.files.3.text": "Pip, budgie, loud at 6am."
 }
