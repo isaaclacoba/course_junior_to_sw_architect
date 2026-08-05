@@ -66,13 +66,10 @@ These are MODEL limits, not authoring misses. `Commit` is
 
 ## Order
 
-1. **The factual error in `git-undo-with-reset`.** One string. Do it first.
-2. **The eight decision-deepening edits.** Data only, no engine, no risk.
-3. **Model phase 1** (contents, LCS, 3-way merge, diff3 markers) - see
-   `docs/plans/git-track-depth.md`.
-4. **The three-areas lesson**, once contents exist to show.
-5. **The conflict pair rewrite.**
-6. **`reflog`**, paired with the reset lessons.
+The end-to-end plan lives in
+[docs/plans/git-track-rebuild.md](../../plans/git-track-rebuild.md) - seven phases,
+each shippable on its own, with a definition of done and a verification step.
+Phases 0 and 1 need no engine work and fix what a learner would notice today.
 
 ## What the audit did NOT check
 
