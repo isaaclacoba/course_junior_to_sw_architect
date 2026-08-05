@@ -1861,3 +1861,40 @@ cancels its own `blazor.boot.json` when the length is not declared. I came very
 close to reporting a course defect that did not exist. When a finding only
 appears under the harness, suspect the harness.
 
+
+## 2026-08-05 10:44 - the first real sweep, and three rules that were lying
+
+Ran the auditor across all 98 pages. 901 findings, which is not a result, it is a
+smell. Three of them were mine.
+
+`focusable-invisible` fired 803 times, on every page - and zero times when I ran
+a single page on its own. That difference is the whole diagnosis: under a
+parallel sweep the machine is loaded, the hero is still fading in when the
+animation cap expires, and every link inside it reads as transparent. Waiting
+longer would have been the wrong fix, because the cap can always be beaten by a
+slower machine. Time was the wrong thing to trust. The probe now asks the element
+whether an animation is running on it, and an element that is transparent
+*because it is animating* is not a defect at any point in time.
+
+That left 98 - one per page - the theme switcher, which sits inside a
+`display: none` wrapper at narrow widths. Which is not a defect either, and this
+is the part I had genuinely got wrong: `display: none` and `visibility: hidden`
+both remove an element *and its whole subtree* from sequential focus navigation,
+so neither can trap focus. My fixture's "defect" was a `visibility: hidden`
+button, so the rule was proving itself against something that was never a bug.
+What does stay focusable is `opacity: 0` and a zero-size box - drawn, tabbable,
+unseeable. Rule and fixture both rewritten around that.
+
+Two survivors, both real: the jump bar and the back-to-top button on the landing
+page fade out with `opacity: 0` and stay in the tab order. Fixed by adding
+`visibility` to both states, which leaves the fade intact and takes them out of
+the tab order.
+
+Then contrast, 123 findings, nearly all "pale mint on white". The pale mint sits
+on a dark gradient card. `background-color` is not "what is painted" - a gradient
+paints too, and reading only the colour walks straight past it up to the body.
+The backdrop walk now collects a gradient's colour stops and judges the text
+against the worst of them.
+
+901 -> 73. Everything left is contrast inside the code-lab viz widgets, and as
+far as I can tell all of it is real.

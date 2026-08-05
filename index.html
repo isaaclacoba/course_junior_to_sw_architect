@@ -308,14 +308,14 @@
       }
       .c-jumpbar {
         position: fixed; top: 0; left: 0; right: 0; z-index: 50;
-        transform: translateY(-105%); opacity: 0;
-        transition: transform 0.42s cubic-bezier(0.2,0.8,0.2,1), opacity 0.3s ease;
+        transform: translateY(-105%); opacity: 0; visibility: hidden;
+        transition: transform 0.42s cubic-bezier(0.2,0.8,0.2,1), opacity 0.3s ease, visibility 0.3s;
         background: rgba(var(--bg-1-rgb), 0.72);
         -webkit-backdrop-filter: blur(16px) saturate(1.7);
         backdrop-filter: blur(16px) saturate(1.7);
         border-bottom: 1px solid rgba(var(--shade-rgb), 0.06);
       }
-      .c-jumpbar.is-visible { transform: none; opacity: 1; }
+      .c-jumpbar.is-visible { transform: none; opacity: 1; visibility: visible; }
       .c-jb-inner { max-width: 900px; margin: 0 auto; display: flex; align-items: center; gap: 14px; padding: 9px 24px; }
       .c-jb-nav { position: relative; flex: 1; min-width: 0; }
       .c-jb-scroll { position: relative; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; cursor: grab; }
@@ -397,9 +397,13 @@
         -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
         box-shadow: 0 8px 24px rgba(var(--shade-rgb), 0.12); cursor: pointer; display: grid; place-items: center;
         color: var(--ink); opacity: 0; transform: translateY(10px) scale(0.9); pointer-events: none;
-        transition: opacity 0.3s, transform 0.3s; z-index: 55;
+        /* opacity alone leaves the button in the tab order, so a keyboard user
+           tabs onto a control nobody can see. visibility does remove it, and it
+           still transitions because it is a discrete step at the end. */
+        visibility: hidden;
+        transition: opacity 0.3s, transform 0.3s, visibility 0.3s; z-index: 55;
       }
-      .c-totop.is-visible { opacity: 1; transform: none; pointer-events: auto; }
+      .c-totop.is-visible { opacity: 1; transform: none; pointer-events: auto; visibility: visible; }
       .c-totop:hover { transform: translateY(-2px); }
 
     </style>

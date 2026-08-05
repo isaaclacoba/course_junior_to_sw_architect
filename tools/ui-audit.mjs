@@ -178,6 +178,21 @@ async function probeFn(families, settleMs) {
     return true;
   }
 
+  // The settle above waits for animations, but it is capped, and under a
+  // parallel sweep a loaded machine can still be mid-fade when the cap expires.
+  // Time is the wrong thing to trust here: ask the element instead. An element
+  // that is transparent *because an animation is currently running on it* is not
+  // a defect, at any point in time. Without this the hero reported every link
+  // and chip inside it as invisible on all 98 pages - and on a single page,
+  // where nothing was contended, reported nothing at all.
+  function animating(el) {
+    if (!el.getAnimations) return false;
+    for (let n = el; n && n.nodeType === 1; n = n.parentElement) {
+      if (n.getAnimations().some((a) => a.playState === "running")) return true;
+    }
+    return false;
+  }
+
   // -------------------------------------------------------------------------
   // runtime: controls that never finish
   // -------------------------------------------------------------------------
@@ -361,12 +376,31 @@ async function probeFn(families, settleMs) {
       return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b);
     };
     // The first ancestor that actually paints something behind this text.
+    //
+    // background-color alone is not "what is painted". A gradient paints too,
+    // and reading only the colour walks straight past it to the body - which
+    // reported pale mint text on a dark gradient card as 1.29:1 against white,
+    // 123 times, when the real contrast is fine. So collect every colour stop a
+    // gradient declares and judge the text against the WORST of them: if the
+    // text is readable over the hardest stop, it is readable over all of it.
+    const stopsOf = (image) => {
+      if (!image || image === "none") return [];
+      const out = [];
+      for (const m of image.matchAll(/rgba?\([^)]*\)/g)) {
+        const c = parse(m[0]);
+        if (c && c.a > 0.95) out.push(c);
+      }
+      return out;
+    };
     const backdrop = (el) => {
       for (let n = el; n && n.nodeType === 1; n = n.parentElement) {
-        const c = parse(getComputedStyle(n).backgroundColor);
-        if (c && c.a > 0.95) return c;
+        const st = getComputedStyle(n);
+        const stops = stopsOf(st.backgroundImage);
+        if (stops.length) return stops;
+        const c = parse(st.backgroundColor);
+        if (c && c.a > 0.95) return [c];
       }
-      return { r: 255, g: 255, b: 255, a: 1 };
+      return [{ r: 255, g: 255, b: 255, a: 1 }];
     };
     const seen = new Set();
     for (const el of document.querySelectorAll("body *")) {
@@ -377,9 +411,14 @@ async function probeFn(families, settleMs) {
       const s = getComputedStyle(el);
       const fg = parse(s.color);
       if (!fg || fg.a < 0.95) continue;
-      const bg = backdrop(el);
-      const L1 = lum(fg), L2 = lum(bg);
-      const ratio = (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+      const bgs = backdrop(el);
+      const L1 = lum(fg);
+      let ratio = Infinity, bg = bgs[0];
+      for (const cand of bgs) {
+        const L2 = lum(cand);
+        const r = (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+        if (r < ratio) { ratio = r; bg = cand; }
+      }
       const px = parseFloat(s.fontSize) || 16;
       const bold = (parseInt(s.fontWeight, 10) || 400) >= 700;
       const large = px >= 24 || (px >= 18.66 && bold);
@@ -432,14 +471,29 @@ async function probeFn(families, settleMs) {
           cssPath(el));
       }
 
-      // Visually gone but still reachable: focus lands where nothing is drawn.
-      // display:none and [hidden] already remove an element from the tab order,
-      // so those are not defects - visibility and zero-size boxes are.
-      if (!visible && ti !== "-1" && !el.disabled && !el.closest("[hidden]") &&
-          getComputedStyle(el).display !== "none") {
-        add("a11y", "focusable-invisible",
-          "is focusable but is not drawn - keyboard focus can land on nothing",
-          cssPath(el));
+      // Not drawn, but still reachable: focus lands where the user sees nothing.
+      // The subtlety is which of those actually leaves the element focusable.
+      // display:none, visibility:hidden and [hidden] all remove an element from
+      // sequential focus navigation - including everything inside them - so they
+      // cannot trap focus and are not defects. The theme switcher lives in a
+      // display:none wrapper at narrow widths and was reported on all 98 pages
+      // for exactly this reason. What does stay focusable is opacity:0 and a
+      // zero-size box: drawn, tabbable, and completely unseeable.
+      if (ti !== "-1" && !el.disabled && !el.closest("[hidden]") && !animating(el)) {
+        let untabbable = false, transparent = false;
+        for (let n = el; n && n.nodeType === 1; n = n.parentElement) {
+          const cs = getComputedStyle(n);
+          if (cs.display === "none" || cs.visibility === "hidden" || n.hidden) { untabbable = true; break; }
+          if (Number(cs.opacity) === 0) transparent = true;
+        }
+        const box = el.getBoundingClientRect();
+        if (!untabbable && (transparent || box.width < 0.5 || box.height < 0.5)) {
+          add("a11y", "focusable-invisible",
+            transparent
+              ? "is focusable but fully transparent - keyboard focus can land on nothing"
+              : "is focusable but has a zero-size box - keyboard focus can land on nothing",
+            cssPath(el));
+        }
       }
     }
   }
@@ -622,9 +676,16 @@ async function main() {
           findings = [{ family: "runtime", rule: "audit-failed", detail: e.message, where: "" }];
         }
         report.push({ page: pagePath, findings });
+        const n = findings.length;
         if (args.verbose) {
-          const n = findings.length;
           say(`  ${n ? C.red + "FAIL" + C.reset : C.green + "PASS" + C.reset} ${pagePath}${n ? ` (${n})` : ""}`);
+        } else if (!args.json) {
+          // A sweep is minutes long and the report only prints at the end. Silence
+          // for that long is indistinguishable from a hang - the same defect this
+          // tool exists to catch. Progress goes to stderr so piping stdout to a
+          // report stays clean.
+          process.stderr.write(`\r  audited ${report.length}/${pages.length}   `);
+          if (report.length === pages.length) process.stderr.write("\n");
         }
       }
     }));

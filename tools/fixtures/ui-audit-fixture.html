@@ -67,8 +67,9 @@
     <!-- a11y/focusable-hidden: aria-hidden does not remove it from the tab order. -->
     <div aria-hidden="true"><button type="button">Hidden from screen readers, still tabbable</button></div>
 
-    <!-- a11y/focusable-invisible: visibility:hidden, but still reachable. -->
-    <button type="button" style="visibility: hidden">Focus lands on nothing</button>
+    <!-- a11y/focusable-invisible: opacity:0 keeps it in the tab order, unlike
+         display:none or visibility:hidden, so focus really can land on nothing. -->
+    <button type="button" style="opacity: 0">Focus lands on nothing</button>
   </main>
 
   <script>
