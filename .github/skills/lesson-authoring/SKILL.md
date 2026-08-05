@@ -39,115 +39,53 @@ runner, editor, or page controller. If you think you need one, re-read
 
 ## Procedure
 
-Every lesson lives in the generated, per-directory layout
-(`content/<track>/<NN-part>/<NN-lesson>/`) - all 83 are migrated. Author only
-through the generated flow below; the old flat `<name>.js` + `<name>.html` layout
-and the per-archetype engines it loaded are gone.
+`.github/copilot-instructions.md` already carries the generated flow (scaffold ->
+`meta.js` -> `data.js` -> `generate` -> `validate`) and the rule that a lesson's
+`index.html` is generated. It is always loaded, so it is not repeated here. What
+follows is only what that flow does NOT tell you.
 
-1. **Log start** in `docs/work-log.md` with a real `date` timestamp.
-2. **Place the lesson**: which track (Practical / Theory) and which Part. Find its
-   row in `docs/concept-ledger.md`; read the neighbours' reports in
-   `docs/audit/<track>/` so the new rung follows from the previous one and uses
-   only concepts at or above its ledger row.
-3. **Pick the archetype** from the SPECS table. For a practical lesson prefer
-   `build` (real code, Run) over `drill`. `build`, `viz`, and `checkpoint` all
-   have live instances under `content/` and run through the generic engine + their
-   plugin; `drill` is scaffoldable but has no live instance yet. Copy the closest
-   existing lesson's data as the structural starting point.
+**Before you write.** Find the lesson's row in `docs/concept-ledger.md` and read
+the neighbours' reports in `docs/audit/<track>/`; you may use only concepts at or
+above that row. Then pick the archetype from the SPECS table - for a practical
+lesson prefer `build` over `drill` - and copy the closest existing lesson as your
+structural starting point.
 
-### Target flow (generated) — for new or migrated lessons
+**The traps.**
 
-4. **Scaffold** with `node tools/new-lesson.mjs --new --track <t> --part
-   <NN-part> --id <id> --archetype <build|drill|viz|checkpoint> --title "..."`, or
-   migrate a flat lesson with `node tools/new-lesson.mjs --from <name>.js`. This
-   creates `content/<track>/<NN-part>/<NN-lesson>/` and appends one line to
-   `course-registry.js`.
-5. **Fill `meta.js`** (`window.LESSON_META`): `id`, `key`, `total`, hero fields
-   (`docTitle`, `eyebrow`, `title`, `intro`, `blurb`), `pill`, `time`,
-   `archetype`, and the `concepts` graph
-   `{ introduces:[{id,term,def}], revisits:[{id}], uses:[{id}] }`. A concept's
-   `def` lives ONLY in the one lesson that introduces it.
-   - `--new` does NOT seed `concepts` (only `--from` does) - fill them by hand: the
-     `introduces`/`revisits`/`uses` ids + edges go in this `meta.js`, and each
-     introduced concept's `term`/`def` go in this lesson's
-     `res/strings/default/en.json` as `concept.<id>.term` / `concept.<id>.def` (with
-     the `es.json` translation beside it). If this lesson is the sole introducer of a
-     concept, its `introduces` entry MUST stay, or `validate.mjs` fails downstream
-     where another lesson revisits/uses it.
-6. **Fill `data.js`** with the lesson content (`window.LESSON_CONFIG` - the one
-   global for every archetype; a viz lesson sets it in `viz.js`) to the config
-   shape in SPECS. Honour the principles and cadence invariants (below).
-   Do NOT put `nextHref`/`nextLabel` in the data file; nav derives from the
-   registry.
-   - A build `starter` may intentionally NOT compile when the objective is to
-     WRITE a type/inheritance/member - the compile error is the teaching signal.
-     Keep a stub compiling only when the learner fills a body, not when they must
-     declare the shape.
-7. **Generate and validate**: `node tools/generate.mjs` writes
-   `generated/course-data.js`, `generated/concept-index.js`, and the lesson's
-   `content/.../index.html`; then `node tools/validate.mjs` checks alignment.
-   - The lesson's `index.html` is GENERATED - never hand-edit it.
-   - Order comes from `course-registry.js` array order, not filenames; the `NN-`
-     dir prefixes are cosmetic.
-   - Do NOT hand-wire a card into the root `index.html`; the card data comes from
-     `meta.js` via `generated/course-data.js`.
-   - **Localize the card (lesson-owned).** The lesson's own bundle carries its
-     card text: for every target language the site ships (currently `es`), add
-     `card.title` and `card.blurb` to `res/strings/default/<lang>.json`, alongside
-     `hero.title` and the rest. The generator collects these into
-     `generated/landing-i18n.<lang>.json` (what the index reads); there is NO
-     central `res/landing` file any more. A card left untranslated renders English
-     on the path while the lesson inside is Spanish - so `check-i18n` and
-     `verify-lesson` (step 9) fail if you forget, the same as any other key. Match
-     the neighbours' voice and the lesson's own `hero.title`.
-   - **If this lesson opens a NEW Part**, translate the Part chrome in
-     `course-registry.js`: add `i18n: { es: { title } }` to the part, and (for a new
-     track) `i18n: { es: { name, kicker, blurb, partPrefix } }` to the track, next to
-     the English. The part kicker ("Parte cinco") is DERIVED from `partPrefix` + a
-     localized ordinal - do not hand-write it. The landing gate fails on any track or
-     part missing its i18n block.
-8. **Update `docs/concept-ledger.md`** in this same change: add or move the
-   lesson's row and any concept/surface it introduces.
-9. **Verify** with the one-command harness: `node tools/verify-lesson.mjs
-   <lesson-dir>`. It runs the whole SPECS recipe - `node --check`; real-`dotnet`
-   compile of every runnable program and the rebuilt `verify` probe; viz
-   scene-resolver checks on every step; headless EN+ES render with no
-   `undefined`; and a global landing-chrome gate (every track + part in
-   `course-registry.js` must carry a full i18n block for each language a lesson
-   targets; cards are covered by the per-lesson check) - and exits non-zero on
-   failure. Add `--no-dotnet` / `--en-only` to iterate faster. It cleans up after
-   itself, so there is nothing to delete.
-10. **Log end** in `docs/work-log.md` with a real `date` timestamp.
+- `--new` does NOT seed `concepts`; only `--from` does. Fill them by hand, and
+  remember the split: `meta.js` carries the ids and edges, the lesson's
+  `res/strings/default/<lang>.json` carries each introduced concept's
+  `concept.<id>.term` / `.def`. Put prose in `meta.js` and the chip renders
+  `undefined`. Drop an `introduces` entry and `validate.mjs` fails wherever
+  another lesson revisits it.
+- A build `starter` may intentionally NOT compile when the objective is to WRITE
+  a type or a member - the compile error is the teaching signal. Keep a stub
+  compiling only when the learner fills a body.
+- The card text is lesson-owned: `card.title` and `card.blurb` go in the lesson's
+  own bundle for every language the site ships. Miss them and the path shows
+  English beside a Spanish lesson.
+- If the lesson opens a NEW Part, add the part's `i18n: { es: { title } }` in
+  `course-registry.js` (and a track's full block for a new track). The kicker is
+  DERIVED from `partPrefix` - never hand-write it.
+- Update `docs/concept-ledger.md` in the same change.
 
 ## Preflight checklist (run before calling it done)
 
-- [ ] Every concept and token used is at or above this lesson's ledger row.
-- [ ] No C#-only sugar used before its ledger row (`=>`, `var`, `$"..."`, records).
+- [ ] Every concept and token is at or above this lesson's ledger row, and no
+      C#-only sugar arrives early (`=>`, `var`, `$"..."`, records).
 - [ ] One idea per card; a recap closes a multi-card lesson.
-- [ ] **Prose reads like a person wrote it**: full sentences, no fragments, no
-      `**Term:** definition` headers replacing prose. Re-read `AGENTS.md` and
-      apply the read-aloud test. Existing prose that already passes was NOT
-      rewritten to hit a word count.
-- [ ] Prose is formatted: lists use `- ` bullets (never comma-packed), distinct
-      points use blank-line paragraphs, `**bold**` for the new term, `code` in backticks.
+- [ ] Prose passes `AGENTS.md`'s read-aloud test - full sentences, no fragments,
+      no `**Term:** definition` standing in for prose.
+- [ ] Every C# line meets `.github/skills/exemplary-lesson-code/SKILL.md`, and
+      every `solution` compiles warning-free. A warning on the answer we call
+      correct is broken content.
+- [ ] Build tasks have a technique gate AND a hidden `verify` probe, and the
+      probe uses an input the visible run does not - otherwise code that merely
+      looks right passes.
+- [ ] The goal tracker is granular and every goal starts RED (see below).
 - [ ] Runnable if it produces visible output.
-- [ ] **Every C# line is exemplary**: no single-letter names, no magic numbers,
-      one rule in one place, private fields, uniform formatting - in `starter`,
-      `solution`, `verify.main` and `example` alike. The only bad code allowed is
-      the specific flaw a card exists to fix, and its `solution` is still clean.
-- [ ] **Every `solution` compiles warning-free.** `verify-lesson` fails on the
-      warnings the learner is shown (CS1718, CS0219, CS0162, ...) and notes
-      CS8618. A warning on the answer we call correct is broken content.
-- [ ] Build tasks have a technique gate AND a hidden `verify` probe, and the probe
-      passes an input the visible run does NOT use - otherwise code that only
-      looks right can pass the card.
-- [ ] **The goal tracker is granular**: every member the solution adds has its
-      own row, every move inside a method body has its own step row, and every
-      goal starts RED on the starter. See "The live goal tracker".
-- [ ] SOLID letter stated if this is a design/testing/refactor lesson.
-- [ ] One example family for the Part; difficulty rises one rung.
 - [ ] `awardedKey == data-key`; `data-total` excludes the recap; unique `prefix`.
-- [ ] Ledger updated; work-log start and end logged.
+- [ ] `node tools/verify-lesson.mjs <dir>` passes; ledger and work-log updated.
 
 ## The live goal tracker - `goals`
 
@@ -257,85 +195,38 @@ lesson code is held to the standard the lesson teaches.
 
 ## Word budget for build-task context
 
-**Read the next section first.** The budget below is subordinate to the voice
-rules in `AGENTS.md`, and shortening prose is never worth losing them.
+A build card's `task.<n>.context` is the first thing a student reads. The course
+measures ~47 words median, ~76 at the 90th percentile; **aim for 45-60** on a
+straightforward "here is the technique, now use it" card. `validate.mjs` WARNs
+above 75.
 
-A build card's `task.<n>.context` (the prose above the editor) is the first
-thing a student reads, so every word should earn its place. The measured course
-distribution is:
+Treat that warning as a **question, not a command**: is any of this restating the
+goals or narrating the code? Cut that. If not, the card is allowed to be long.
 
-- Median ~47 words, 75th percentile ~60, 90th percentile ~76.
-- **Aim for 45-60 words when the card is a straightforward "here is the
-  technique, now use it".**
+**The budget is subordinate to `AGENTS.md`.** Shortening is never worth losing
+the voice, and this rule exists because it was broken: an agent read the cap as a
+target and cut all seven SOLID cards to ~55 words. Card 3 went 198 -> 64 and lost
+its whole argument, becoming verb-less fragments no colleague would say aloud -
+`AGENTS.md` rules 5, 7 and 9 in one edit. The point of that card was the COST of
+a bad shape, and a cost needs a sentence to land.
 
-`tools/validate.mjs` emits a WARN above 75 words. Treat that warning as a
-**question, not a command**: "is any of this restating the goals or the code?"
-If yes, cut that. If no, the card is allowed to be long, and you leave it alone.
+So:
 
-### NEVER trim prose into note form - the failure this rule exists to stop
-
-A previous agent read the cap as a target and rewrote all seven SOLID cards down
-to ~55 words each. Card 3 went from 198 words to 64 and lost the entire argument
-the lesson was making. It became this:
-
-> Two edits, two classes, one decision by the vet. Change only one and nothing
-> goes red: two `FEED` cards beside a tally reading `1`.
->
-> That is the **S**. `Cat` had two jobs - deciding *and* wording - and the
-> deciding was sealed behind words, so the desk copied it.
-
-That is not concise writing, it is **note form**, and it breaks the voice rules
-outright: a verb-less fragment opening (`AGENTS.md` rule 5), the tricolon rhythm
-(rule 7), and telegraphic compression no colleague would say aloud (rule 9). The
-original said the same things in full sentences that a human could follow:
-
-> Count what that change touched: two edits, in two classes, for one decision by
-> the vet. And if you had changed only one of them, nothing would have gone red.
-> The program would have printed two `FEED` cards next to a tally reading `1`,
-> and nobody would have known until a cat went hungry.
-
-Longer, and better - because the point of that card is the *cost* of the shape,
-and the cost needs a sentence to land.
-
-Concretely:
-
-- **Never rewrite existing prose to hit the number.** The budget guides prose
-  you are writing now. Prose that already works and reads like a person wrote it
-  is not a defect, whatever it counts.
-- **A card that motivates, tells a story, or explains a cost is allowed to run
-  long.** The SOLID cards, and any card that opens a Part, routinely should.
-- **Cut restatement, not substance.** Delete a sentence that repeats the goal
-  list or narrates the code. Never delete the setup, the motivation, or the
-  concrete consequence.
+- **Never rewrite working prose to hit the number.** The budget guides prose you
+  are writing now.
+- **Cut restatement, not substance.** Delete what repeats the goals or narrates
+  the code; never the setup, the motivation, or the consequence.
+- **A card that motivates or explains a cost may run long** - Part openers and
+  the SOLID cards routinely should.
 - **Every sentence stays a sentence.** No fragments, no `**Term:** definition`
-  headers standing in for prose, no dropped subjects.
-- **If you cannot shorten it without losing the argument, stop.** Leave it and
-  move on. The warning is not a build failure.
+  headers standing in for prose.
+- **If you cannot shorten it without losing the argument, stop.** The warning is
+  not a build failure.
 
-### What context is for
-
-Set the scene, state the change, stop. Three moves:
-
-1. Name the problem or concept (one or two sentences).
-2. Show the C# syntax or pattern.
-3. If there is a worked example above the editor, point to it briefly.
-
-Do not restate what the goal list already says. Do not restate what the code
-already shows.
-
-### Goal lines
-
-Each goal is one short sentence. It names the type, the method, and the
-visible effect. The student should be able to read the goals alone and know
-what to build.
-
-### Before / after example
-
-The rewrite that matters is cutting RESTATEMENT, not sentences. A 107-word
-null-safety card lost 40 words by deleting the paragraph that narrated the
-code the learner could already see - and kept every sentence that set up the
-problem. That is the shape of a good trim: shorter because something was
-redundant, never shorter because a number said so.
+Context does three things and then stops: name the problem, show the syntax,
+point at the worked example if there is one. Each goal line is one short sentence
+naming the type, the method, and the visible effect - a student who reads only
+the goals should know what to build.
 
 ## Visual (viz) lessons - the third archetype
 
