@@ -75,9 +75,18 @@
     // an empty "here's the pattern" frame. Nothing ever turned it back on, so
     // every example authored into lesson data has been invisible - the data was
     // read, colourised, and written into an element nobody could see.
+    //
+    // A card with a live goal tracker shows no pattern at all. Both describe the
+    // same shape - the pattern as a finished still life in some other domain,
+    // the tracker as the learner's own code ticking off piece by piece - and
+    // they sit stacked in the same narrow column saying it twice. The still one
+    // is the taller, so it pushes the tracker out of line with the editor beside
+    // it and, on the longer cards, off the bottom of the screen entirely. When
+    // something live is guiding, the picture goes.
+    var show = !!task.example && !(task.goals && task.goals.length);
     var wrap = ctx.hosts.exampleWrap;
-    if (wrap) wrap.hidden = !task.example;
-    if (task.example) {
+    if (wrap) wrap.hidden = !show;
+    if (show) {
       if (typeof window !== "undefined" && window.monaco && monaco.editor && monaco.editor.colorize) {
         example.textContent = task.example;
         monaco.editor

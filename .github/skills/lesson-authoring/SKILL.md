@@ -231,6 +231,15 @@ point at the worked example if there is one. Each goal line is one short sentenc
 naming the type, the method, and the visible effect - a student who reads only
 the goals should know what to build.
 
+**A task with `goals` shows no "Here's the pattern".** The two say the same thing
+twice - the pattern as a finished still life in another domain, the live tracker
+as the learner's own code ticking off piece by piece - and they stack in the same
+narrow column, where the taller static one pushes the tracker out of line with
+the editor and off the bottom of the screen. `build-plugin.colorizeExample` drops
+the example whenever the task has goals, so authoring both is not an error, it is
+just wasted words. Write an `example` for a task with no tracker; write `goals`
+and let them carry it for a task that has one.
+
 ## Visual (viz) lessons - the third archetype
 
 Beside `drill` and `build` there is a narrated, stepped **visual** with no code

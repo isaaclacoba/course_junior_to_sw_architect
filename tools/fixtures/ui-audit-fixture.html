@@ -33,6 +33,26 @@
 
     /* a11y/contrast: light grey on white is about 1.6:1, well under 4.5. */
     .low-contrast { color: #d8d8d8; background: #ffffff; }
+
+    /* -----------------------------------------------------------------------
+       CONTROLS. Everything below is CORRECT and must stay unreported. Each one
+       is a false positive the auditor actually shipped, kept here so it cannot
+       come back. A checker that cries wolf on good markup gets switched off.
+       ----------------------------------------------------------------------- */
+
+    /* Chrome hands back "color(srgb 0.13 0.34 0.29)" for a color-mix, which an
+       rgb() regex does not match - read as white on white, 1.00:1. */
+    #ok-colormix { background: color-mix(in srgb, #2f7d6b 70%, #000); color: #fff; padding: 4px; }
+
+    /* A gradient paints. A backdrop walk that reads only background-color goes
+       straight past this card to the white body and calls the text unreadable. */
+    #ok-gradient { background-image: linear-gradient(160deg, #123, #1d3b4a); padding: 8px; }
+    #ok-gradient p { color: #cfe6dd; margin: 0; }
+
+    /* Both of these DO leave the tab order, subtree and all, so neither can
+       trap focus - the invisible-focus rule must ignore them. */
+    #ok-vis-hidden { visibility: hidden; }
+    #ok-display-none { display: none; }
   </style>
 </head>
 <body>
@@ -53,7 +73,7 @@
     <p class="low-contrast">Pale grey text on a white background.</p>
 
     <p>Interpolation that never happened: {{learnerName}}</p>
-    <p>A value that was never set: undefined</p>
+    <p id="leak-slot">undefined</p>
 
     <!-- runtime/stuck-control: disabled forever, with no reason given. -->
     <button id="stuckBtn" type="button" disabled>Preparing something...</button>
@@ -70,6 +90,16 @@
     <!-- a11y/focusable-invisible: opacity:0 keeps it in the tab order, unlike
          display:none or visibility:hidden, so focus really can land on nothing. -->
     <button type="button" style="opacity: 0">Focus lands on nothing</button>
+
+    <!-- Controls: correct markup that used to be reported. Nothing whose CSS
+         path starts with #ok- may appear in the findings. -->
+    <p id="ok-prose-null">This course explains what null means and when a value is undefined - prose about the keywords, not a hole where a value should be.</p>
+    <button id="ok-chip-null" class="agenda-chip" type="button">null</button>
+
+    <p id="ok-colormix">White on a mixed colour, about 9:1.</p>
+    <div id="ok-gradient"><p>Pale mint on a dark gradient card, about 8:1.</p></div>
+    <div id="ok-vis-hidden"><button type="button">Not in the tab order</button></div>
+    <div id="ok-display-none"><button type="button">Not in the tab order either</button></div>
   </main>
 
   <script>

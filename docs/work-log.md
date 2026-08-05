@@ -1928,3 +1928,93 @@ pointed straight at the app.
 
 Also folded `monaco-user-symbols` into the submodule's `master` and deleted it.
 It was a fast-forward, so nothing was lost. Work belongs on master.
+
+## 2026-08-05 11:38 CEST - two git lessons deepened so each card demands a decision
+
+`mark-a-version` and `merge-a-branch` were the two thinnest cards in the track:
+one command each, and nothing in the repository you had to look at first. Both
+now start from a state that hides the answer.
+
+In `mark-a-version`, card 1 puts a tag on `HEAD` - but the version number is
+already partly used up, so `git tag` has to be read before you know whether you
+are writing `v1`, `v2` or `v3`. Card 2 has four commits and no tags; the release
+is named in a commit message, not by position, so `git log --oneline` is the only
+way to know that `v1` belongs on `HEAD~1`.
+
+In `merge-a-branch`, `main` now has two candidate branches. `docs` is already
+contained in `main` and shows up decorated in its log; `fix` does not appear
+there at all, which is what makes it the one holding work. Card 2 keeps the
+both-sides-moved case, and the learner reads both logs to see that each side
+holds a commit the other has never seen.
+
+Everything was replayed through the vendored git runtime rather than eyeballed:
+all four cards grade `solved`, none is trivial, and merging the decoy branch or
+tagging the wrong commit is rejected. `meta.js` and the generated `index.html`
+were deliberately left alone, so nothing regenerates.
+
+## 2026-08-05 11:45-11:59 CEST - two more git lessons deepened so each card demands a decision
+
+`git-first-commit` cards 1 and 3 and both cards of `git-make-a-branch` could be
+typed straight from the goal without looking at the repository. Each now starts
+from a state that hides the answer.
+
+In `git-first-commit`, card 1 no longer names the file: the folder holds
+`cat-notes.txt`, `dog-notes.txt` and `feeder.md`, the goal asks for the cat's
+file, and `git status` is the only place the exact spelling comes from - guessing
+`cat.txt` gets a real `fatal: pathspec` back. Card 3 keeps the chain idea and
+adds the rule "one commit, one job": three files are waiting, two of them are the
+dog's, and the learner has to read which is which before staging.
+
+In `git-make-a-branch`, card 1 names its commit by MESSAGE only, so
+`git log --oneline` is what turns `add dog` into `HEAD~2` across a four-commit
+history; the branch still gets made without moving onto it. Card 2 starts with
+`HEAD` on `docs` rather than `main`, so `git switch -c feature` typed straight
+away branches from the wrong place - `git branch` and its `*` is what stops that.
+
+Everything was replayed through the vendored git runtime: all five graded cards
+grade `solved`, none is trivial, and each has a negative test that is rejected
+(staging everything, staging only half the job, branching at `HEAD`, branching
+off `docs`). EN/ES key sets match, `data.js` equals `en.json` character for
+character, `check-voice` is at zero flags on both, `verify-lesson` passes both
+including the headless EN+ES render, and the full 442-test suite passes.
+`meta.js` and the generated `index.html` were left alone, so nothing regenerates.
+
+## 2026-08-05 12:11 - the pattern gives way to the tracker, and an auditor that cries wolf
+
+Isaac read the goal tracker on the SOLID card, saw `interface IMover` ticked
+green, and did not believe it. Fair - but the tracker was right. The interface
+was declared on line 3, five lines above the top of his scrolled editor, and the
+two goals sitting grey were grey for good reasons: `public Sparrow: IMover` is
+missing the `class` keyword, so the scanner never finds a `Sparrow` at all, and
+`Penguin` implements a method called `Mover`, not `Move`. Ran the real matcher
+over the exact source to be sure rather than argue from the screenshot.
+
+What he was actually right about is the layout. "Here's the pattern" and the
+live tracker describe the same shape - one a finished still life in another
+domain, the other the learner's own code ticking off piece by piece - and they
+were stacked in the same narrow column. The still one is taller, so it pushed
+the tracker out of line with the editor and, on the longer cards, off the
+bottom of the screen. The example now yields to the tracker: a task with goals
+shows no pattern, and Goal lines up with Your Code to the pixel. The 27 lessons
+that have an example and no tracker are untouched - nothing was guiding them.
+
+Then the auditor. Teaching it about `color(srgb ...)`, which is what Chrome
+hands back for a `color-mix`, removed the last 11 phantom contrast findings.
+But the deeper problem was that its self-test only ever asked whether a rule
+FIRES. Every false positive this tool has shipped - 803 focus findings, 123
+contrast, 11 on a color-mix, 5 on the word `null`, which is a thing this course
+teaches - passed that test in silence. The fixture now carries controls too:
+correct markup, `id="ok-..."`, one per false positive that really shipped, and
+the run fails if a rule reports any of them. Broke each fix once to watch the
+control fail, because an assertion nobody has seen fail is decoration.
+
+The sweep is at 44 findings across 98 pages, all contrast, none below 3:1 -
+the band Isaac chose to defer.
+
+Last one, found by the sweep and worth more than it looks: five checkpoint
+lessons declared English in `meta.resources.langs` and shipped no `en.json`.
+They rendered perfectly, because the page falls back to the inline prose, and
+404d on every single load. `check-i18n` had said PASS for as long as they
+existed - it only ever compared the bundles it could find. It now asserts that
+every declared language has a file behind it, and the five bundles were
+generated from the inline English, value for value.

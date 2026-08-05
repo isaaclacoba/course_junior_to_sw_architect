@@ -150,7 +150,16 @@ function checkLesson(dir) {
   const voices = res.voices || ["default"];
   const { englishSource, ref, base, baseLang } = referenceFor(dir, meta);
   const targetLangs = langs.filter((l) => l !== baseLang);
-  if (targetLangs.length === 0 || ref.size === 0) return null;
+
+  // A language declared with no bundle behind it. This check used to compare
+  // only the bundles it could find, so a lesson that listed "en" and shipped no
+  // en.json read as fully covered - the page falls back to the inline prose and
+  // looks perfect, while the browser 404s on every single load. Five lessons sat
+  // like that until a headless run noticed the failed request. Missing files are
+  // as much a coverage hole as missing keys, and cost nothing to check.
+  const absent = langs.filter((l) => !fs.existsSync(path.join(dir, base, "default", l + ".json")));
+
+  if ((targetLangs.length === 0 && !absent.length) || (ref.size === 0 && !absent.length)) return null;
 
   const bundle = (voice, lang) => readJson(path.join(dir, base, voice, lang + ".json")) || {};
   const findings = [];
@@ -178,7 +187,7 @@ function checkLesson(dir) {
       }
     }
   }
-  return { dir, refSize: ref.size, findings };
+  return { dir, refSize: ref.size, findings, absent };
 }
 
 // --- CLI ---
@@ -201,7 +210,7 @@ const report = [];
 for (const { path: dir } of lessons) {
   const r = checkLesson(dir);
   if (!r) continue;
-  let reqHere = 0;
+  let reqHere = (r.absent || []).filter((l) => !langFilter || l === langFilter).length;
   let advisoryHere = 0;
   const shown = [];
   for (const f of r.findings) {
@@ -210,11 +219,11 @@ for (const { path: dir } of lessons) {
     advisoryHere += f.missingTerm.length + f.identical.length;
     shown.push(f);
   }
-  if (shown.length === 0) { checked += 1; continue; }
+  if (shown.length === 0 && !reqHere) { checked += 1; continue; }
   checked += 1;
   if (reqHere) failLessons += 1;
   else if (advisoryHere) warnLessons += 1;
-  report.push({ dir: r.dir, refSize: r.refSize, findings: shown });
+  report.push({ dir: r.dir, refSize: r.refSize, findings: shown, absent: r.absent || [] });
 }
 
 const landing = checkLanding(langFilter);
@@ -225,6 +234,10 @@ if (asJson) {
 } else {
   const fmt = (arr) => arr.slice(0, MAX_LIST).join(", ") + (arr.length > MAX_LIST ? ", ..." : "");
   for (const r of report) {
+    for (const l of (r.absent || [])) {
+      if (langFilter && l !== langFilter) continue;
+      console.log(`FAIL  ${r.dir}  [default/${l}]  declared in meta.resources.langs but res/strings/default/${l}.json does not exist (404 on every load)`);
+    }
     for (const f of r.findings) {
       if (f.missingReq.length) {
         console.log(`FAIL  ${r.dir}  [${f.voice}/${f.lang}]  missing ${f.missingReq.length}/${r.refSize} keys: ${fmt(f.missingReq)}`);

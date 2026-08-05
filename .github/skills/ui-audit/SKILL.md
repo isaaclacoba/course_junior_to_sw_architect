@@ -89,6 +89,28 @@ firing, because the check required the element to be invisible and `aria-hidden`
 elements are drawn - they are hidden only from assistive technology. That rule
 would have shipped reporting a clean result forever.
 
+### Every rule needs a control as well as a defect
+
+Firing is only half of correct. A rule also has to stay **quiet** on markup that
+is fine, and nothing in the self-test used to ask that. Every false positive this
+tool has shipped passed the self-test without a murmur:
+
+| False positive | What it flagged | Count |
+|---|---|---|
+| `focusable-invisible` | `visibility: hidden`, which leaves the tab order anyway | 803 |
+| `contrast` | pale text on a dark gradient, judged against the white body | 123 |
+| `contrast` | a `color-mix()` background Chrome serialises as `color(srgb ...)` | 11 |
+| `placeholder-text` | the word `null` - a thing this course *teaches* | 5 |
+
+So the fixture carries **controls** as well as defects: correct markup, each one
+`id="ok-..."`, each one a false positive that actually shipped. The self-test
+fails if any finding's `where` contains `#ok-`. When you add a rule, add both:
+the defect it must catch and the near-miss it must not. Then break your own fix
+once and watch the control fail - an assertion you have never seen fail is
+decoration.
+
+Fixing a false positive by loosening the fixture is backwards. Fix the rule.
+
 ### Write in-page code as a function, never as a template literal
 
 The probe is a real `async function probeFn(...)` that is stringified at the call

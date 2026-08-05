@@ -241,13 +241,25 @@ async function probeFn(families, settleMs) {
   // runtime: placeholder text that escaped into the page
   // -------------------------------------------------------------------------
   if (on("runtime")) {
+    // `null`, `NaN` and `undefined` are three of the things this course TEACHES.
+    // Matched as words inside prose they flag a lesson subtitle promising to
+    // explain "what null means", and an agenda chip whose whole job is to say
+    // `null`. A value that failed to render is not a word in a sentence: it IS
+    // the slot, alone. So the two C#/JS keywords must own the element's entire
+    // text before they count. `[object Object]` and a live {{token}} are never
+    // anybody's content, so those still match anywhere.
     const LEAKS = [
-      [/\bundefined\b/, "undefined"],
-      [/\[object [A-Z]\w+\]/, "[object Object]"],
-      [/\{\{[^}]+\}\}/, "an unsubstituted {{token}}"],
-      [/\bNaN\b/, "NaN"],
-      [/\bnull\b/, "null"],
+      [/\[object [A-Z]\w+\]/, "[object Object]", false],
+      [/\{\{[^}]+\}\}/, "an unsubstituted {{token}}", false],
+      [/^undefined$/, "undefined", true],
+      [/^NaN$/, "NaN", true],
+      [/^null$/, "null", true],
     ];
+    // A label whose entire text is a keyword is a keyword label, not a failed
+    // render - a concept chip reading `null` looks structurally identical to a
+    // hole where a value should be, and only the element it sits in tells them
+    // apart.
+    const LABELISH = "code, kbd, samp, [class*=chip], [class*=badge], [class*=token], [class*=tag], [class*=pill], [class*=keyword]";
     const SKIP = "pre, code, .monaco-editor, .cl-editor, script, style, textarea";
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     const seen = new Set();
@@ -256,8 +268,9 @@ async function probeFn(families, settleMs) {
       if (!el || el.closest(SKIP) || !shown(el)) continue;
       const t = (n.nodeValue || "").trim();
       if (!t) continue;
-      for (const [re, name] of LEAKS) {
+      for (const [re, name, wholeOnly] of LEAKS) {
         if (!re.test(t)) continue;
+        if (wholeOnly && el.closest(LABELISH)) continue;
         const key = name + "|" + cssPath(el);
         if (seen.has(key)) continue;
         seen.add(key);
@@ -365,11 +378,30 @@ async function probeFn(families, settleMs) {
   // a11y: contrast of the text actually painted
   // -------------------------------------------------------------------------
   if (on("a11y")) {
+    // Numbers out of a colour function's argument list, in any of the shapes
+    // Chrome serialises: "1, 2, 3", "1 2 3 / 0.5", "50% 20% 10%".
+    const toks = (body) => String(body).split(/[\s,/]+/).filter(Boolean)
+      .map((t) => ({ v: parseFloat(t), pct: t.endsWith("%") }));
     const parse = (c) => {
-      const m = /rgba?\(([^)]+)\)/.exec(c || "");
+      const s = String(c || "").trim();
+      // color-mix() is not a thing getComputedStyle ever hands back - Chrome
+      // resolves it to "color(srgb 0.13 0.34 0.29)", 0-1 floats in a function
+      // an rgb() regex does not match at all. Unparsed it fell back to white,
+      // so the branch chips (a color-mix background) were read as white text on
+      // white and reported at 1.00:1 eleven times. Parse it.
+      const cs = /color\(\s*srgb\s+([^)]+)\)/i.exec(s);
+      if (cs) {
+        const p = toks(cs[1]);
+        if (p.length < 3) return null;
+        const ch = (t) => (t.pct ? t.v / 100 : t.v) * 255;
+        return { r: ch(p[0]), g: ch(p[1]), b: ch(p[2]), a: p.length > 3 ? (p[3].pct ? p[3].v / 100 : p[3].v) : 1 };
+      }
+      const m = /rgba?\(([^)]+)\)/i.exec(s);
       if (!m) return null;
-      const p = m[1].split(",").map((n) => parseFloat(n));
-      return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+      const p = toks(m[1]);
+      if (p.length < 3) return null;
+      const ch = (t) => (t.pct ? t.v / 100 * 255 : t.v);
+      return { r: ch(p[0]), g: ch(p[1]), b: ch(p[2]), a: p.length > 3 ? (p[3].pct ? p[3].v / 100 : p[3].v) : 1 };
     };
     const lum = (c) => {
       const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
@@ -386,7 +418,7 @@ async function probeFn(families, settleMs) {
     const stopsOf = (image) => {
       if (!image || image === "none") return [];
       const out = [];
-      for (const m of image.matchAll(/rgba?\([^)]*\)/g)) {
+      for (const m of image.matchAll(/(?:rgba?|color)\([^)]*\)/g)) {
         const c = parse(m[0]);
         if (c && c.a > 0.95) out.push(c);
       }
@@ -627,11 +659,25 @@ async function selfTest(args) {
   const missing = RULES.filter((r) => !fired.has(r));
   const unexpected = [...fired].filter((r) => !RULES.includes(r));
 
+  // Firing is only half of correct. Every false positive this tool has shipped
+  // - 803 invisible-focus hits, 123 contrast hits on gradients, 11 on a
+  // color-mix - passed the fires-on-the-fixture test without a murmur, because
+  // that test only ever asked whether a rule was awake. The fixture also carries
+  // CORRECT markup marked #ok-, and a rule that reports any of it is broken:
+  // an auditor that cries wolf on good markup is one people learn to ignore.
+  const cried = findings.filter((f) => String(f.where || "").includes("#ok-"));
+
   say("");
   for (const r of RULES) say(`  ${fired.has(r) ? C.green + "fires" : C.red + "QUIET"}${C.reset}  ${r}`);
   for (const r of unexpected) say(`  ${C.yellow}extra${C.reset}  ${r} (not in RULES - add it, with a defect in the fixture)`);
+  for (const f of cried) say(`  ${C.red}CRIES${C.reset}  ${f.family}/${f.rule} on ${f.where} - ${trunc(f.detail, 90)}`);
   say("");
 
+  if (cried.length) {
+    say(`${C.red}FAIL${C.reset} ${cried.length} finding(s) against markup that is correct.`);
+    say(`${C.dim}Those controls are false positives this tool already shipped once. Fix the rule, not the fixture.${C.reset}`);
+    process.exit(1);
+  }
   if (missing.length) {
     say(`${C.red}FAIL${C.reset} ${missing.length} rule(s) did not fire on a fixture built to trip them: ${missing.join(", ")}`);
     say(`${C.dim}A rule that cannot fire is worse than no rule - it reads as a clean bill of health.${C.reset}`);

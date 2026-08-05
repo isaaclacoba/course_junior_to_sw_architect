@@ -212,6 +212,19 @@ driving Chrome over CDP through `tools/lib/browser.mjs`.
   and a zero-size box do not - those stay tabbable, and those are the defects. A
   control that fades out with `opacity` alone needs `visibility` too.
 
+- **A checker must be proved quiet as well as loud.** Every false positive
+  `ui-audit` has shipped - 803 focus findings, 123 contrast findings, 11 more on a
+  `color-mix`, 5 on the word `null` - passed a self-test that only ever asked
+  whether a rule was awake. Give the fixture **controls**: correct markup, named
+  `id="ok-..."`, one per false positive that actually shipped, and fail the run if
+  any finding names one. Then break your own fix once and watch the control fail.
+
+- **The words this course teaches are not placeholders.** `null`, `undefined` and
+  `NaN` are lesson topics here, so matching them anywhere in text flags a subtitle
+  promising to explain "what null means". A value that failed to render is not a
+  word in a sentence - it IS the slot, alone. Require the whole text, and skip
+  code and chip/badge/pill labels, where a bare keyword is the content.
+
 ## i18n
 
 - **Re-localize every dynamically-painted surface, not just render-time prose.**
@@ -220,6 +233,12 @@ driving Chrome over CDP through `tools/lib/browser.mjs`.
   run result, run errors - or it keeps the old language after a switch. Store that
   event-time text as a re-derivable thunk and re-paint it in `setLocale`, gated on the
   panel being visible so a stale thunk never shows.
+- **A declared language needs a file behind it.** `meta.resources.langs` listing
+  `en` while `res/strings/default/en.json` is absent renders perfectly - the page
+  falls back to the inline prose - and 404s on every single load. Five lessons sat
+  like that because `check-i18n` compared only the bundles it could find; it now
+  asserts every declared lang has a `default/<lang>.json`. A missing file is as
+  much a coverage hole as a missing key.
 - **Only build/viz/checkpoint lessons localize; runnable drills are English-only.**
   `kernel-controller.bind()` handles `BUILD_CONFIG`/`LESSON_VIZ`/`QUIZ_CONFIG` but has
   no `DRILL_CONFIG` branch, and legacy flat drill pages carry no `LESSON_META`, so they
