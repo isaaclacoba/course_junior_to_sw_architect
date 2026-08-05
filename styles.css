@@ -924,6 +924,10 @@ h4 {
   .goal-box-inner {
     transition: none;
   }
+
+  .btn-boot-fill {
+    transition: none;
+  }
 }
 
 
@@ -1217,6 +1221,49 @@ input.almost {
   background: var(--danger-bg-2);
   color: var(--danger);
   border-color: var(--danger-line-2);
+}
+
+/* A disabled button had no disabled look: it still lifted on hover and still
+   showed a pointer, so the compiler warm-up presented a button that invited a
+   click it would ignore. */
+.btn:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+
+.btn:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Boot progress, drawn inside the Run button. The compiler is a ~30MB
+   WebAssembly runtime - a wait long enough that a fixed label reads as a hang.
+   The min-width holds the button steady as the phase text changes underneath. */
+.btn-boot {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 11.5rem;
+}
+
+.btn-boot-label {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.btn-boot-bar {
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 26%, transparent);
+  overflow: hidden;
+}
+
+.btn-boot-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  background: currentColor;
+  transition: width 0.25s ease;
 }
 
 .result-panel {

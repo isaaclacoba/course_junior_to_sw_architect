@@ -1420,6 +1420,7 @@ ${result.runtimeError}`.trim(),
       this.readyTimeout = config.readyTimeout ?? 12e4;
       this.runTimeout = config.runTimeout ?? 6e4;
       this.warmProgram = config.warmProgram ?? DEFAULT_WARM_PROGRAM;
+      this.onProgress = config.onProgress;
       if (config.autoWarm ?? true) {
         void this.warm().catch(() => {
         });
@@ -1448,16 +1449,31 @@ ${result.runtimeError}`.trim(),
       document.body.appendChild(this.iframe);
       this.readyPromise = new Promise((resolve, reject) => {
         const timer = setTimeout(() => {
+          window.removeEventListener("message", boot);
           reject(new Error("The code runner took too long to load."));
         }, this.readyTimeout);
-        const ready = (event) => {
+        const boot = (event) => {
           if (event.origin !== window.location.origin) return;
-          if ((event.data || {}).type !== "coderunner:ready") return;
-          window.removeEventListener("message", ready);
+          const data = event.data || {};
+          if (data.type === "coderunner:progress") {
+            this.onProgress?.({
+              phase: data.phase === "start" ? "start" : "download",
+              percent: typeof data.percent === "number" ? data.percent : 0
+            });
+            return;
+          }
+          if (data.type === "coderunner:failed") {
+            window.removeEventListener("message", boot);
+            clearTimeout(timer);
+            reject(new Error(data.message || "The code runner failed to load."));
+            return;
+          }
+          if (data.type !== "coderunner:ready") return;
+          window.removeEventListener("message", boot);
           clearTimeout(timer);
           resolve();
         };
-        window.addEventListener("message", ready);
+        window.addEventListener("message", boot);
       });
       return this.readyPromise;
     }
@@ -1470,6 +1486,7 @@ ${result.runtimeError}`.trim(),
       if (this.warmPromise) return this.warmPromise;
       this.warmPromise = (async () => {
         await this.ensureFrame();
+        this.onProgress?.({ phase: "warm", percent: 100 });
         await this.run(this.warmProgram);
       })();
       return this.warmPromise;

@@ -32,6 +32,11 @@
   "run.running": "Ejecutando...",
   "run.compiling": "Compilando y ejecutando...",
   "run.preparing": "Preparando el compilador...",
+  "run.bootDownload": "Descargando el compilador... {percent}%",
+  "run.bootStart": "Arrancando el compilador...",
+  "run.bootWarm": "Calentando...",
+  "run.bootFailed": "Compilador no disponible",
+  "run.bootFailedHelp": "El compilador no pudo arrancar. Recarga la p\u00e1gina (Ctrl+Shift+R, o Cmd+Shift+R en Mac) para volver a descargarlo.",
   "run.noOutput": "(sin salida)",
   "run.couldNotRun": "No se pudo ejecutar el código.",
 

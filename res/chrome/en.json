@@ -32,6 +32,11 @@
   "run.running": "Running...",
   "run.compiling": "Compiling and running...",
   "run.preparing": "Preparing compiler...",
+  "run.bootDownload": "Downloading compiler... {percent}%",
+  "run.bootStart": "Starting compiler...",
+  "run.bootWarm": "Warming up...",
+  "run.bootFailed": "Compiler unavailable",
+  "run.bootFailedHelp": "The compiler could not start. Reload the page (Ctrl+Shift+R, or Cmd+Shift+R on a Mac) to fetch it again.",
   "run.noOutput": "(no output)",
   "run.couldNotRun": "Could not run the code.",
 

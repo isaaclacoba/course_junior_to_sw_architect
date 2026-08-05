@@ -135,6 +135,28 @@ grows into a procedure, promote it to a skill and leave a pointer here.
   driving the widgets to later steps, WCAG-checking new pairs, and screenshotting
   the default for no regression.
 
+## Waiting and failing (UX)
+
+- **A wait longer than a second must report what it is doing, and a wait that can
+  fail must say so.** The Run button showed one frozen "Preparing compiler..." for
+  the whole 5-60s WebAssembly boot, so a slow connection and a dead boot looked
+  identical. Report named PHASES, not just a percentage - "downloading" vs
+  "starting" vs "warming up" is what actually answers "is it stuck?", and the
+  phase with no measurable progress is usually the longest one.
+- **Never `.catch(function () {})` around something a control depends on.** That
+  line enabled the Run button and labelled it "Run" after the compiler had failed
+  to boot, handing the learner a button that could not work and no reason why. If
+  a failure leaves a control unusable, disable it, name the failure, and say the
+  one thing that fixes it (a hard reload, for a stale cached runtime).
+- **Own the message the learner reads.** A rejection's own text is developer
+  English written at the throw site (`"The code runner took too long to load."` in
+  `code-lab`), outside the course's string files. Translate at the DISPLAY site
+  from `res/chrome/*.json`; never paint a raw `error.message`.
+- **A `tr()` fallback must be the shipped string, character for character.**
+  `tr("run.bootDownload", "Downloading compiler...")` silently dropped the
+  `{percent}` placeholder that `en.json` carried, so every path without loaded
+  strings - including the tests - showed a label with no number in it.
+
 ## i18n
 
 - **Re-localize every dynamically-painted surface, not just render-time prose.**

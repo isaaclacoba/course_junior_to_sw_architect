@@ -1765,3 +1765,53 @@ than `i`, and a rule with no exceptions is the one that actually gets followed.
 
 440 tests pass, validate is at 0 errors and 144 warnings - down 20, all of them
 the example ones.
+
+## 2026-08-05 09:10 - 09:50 - a button that finally says what it is waiting for
+
+The compiler is a thirty megabyte WebAssembly runtime. That is five seconds on a
+good connection and a minute on a bad one, and for all of it the Run button said
+"Preparing compiler..." and nothing else. There was no way to tell a slow
+download from a dead one. A learner on hotel wifi and a learner whose browser
+was serving a stale runtime saw exactly the same screen.
+
+The stale runtime is not hypothetical - it is what turned up in the console log
+that started this. Two hundred lines of SRI integrity failures, which look
+alarming and are not: the browser had a cached `blazor.boot.json` from before I
+republished and was checking new assemblies against old hashes. I checked the
+publish three ways before believing that - every file on disk against the
+manifest, then the bytes actually served over HTTP - and all three agreed. Only
+the browser disagreed. A hard reload clears it.
+
+But the console was the small half. The real bug is that the boot had already
+failed and the page did not say so. It sat on a two minute timeout still showing
+"preparing", and then the failure was swallowed by a bare `.catch(function () {})`
+that enabled the button and labelled it "Run". A button that cannot work, with
+no explanation. That line was the worst thing in the file.
+
+So the host page now reports where it is - Blazor already tracks the download for
+its own spinner, it just never left the iframe - and the button paints the phase
+over a fill bar. Downloading with a real percentage, then starting, then warming
+up. The phases matter more than the number: on my machine the download is under a
+second and "starting the runtime" is nearly three, and that is the stretch that
+used to look like a hang. A failed boot now says "Compiler unavailable" within
+two seconds and tells you to reload, in your language, instead of two minutes of
+silence followed by a lie.
+
+Naming the warm phase honestly took two goes. I first announced it after the
+throwaway compile finished, which is a fine place to put a label nobody sees -
+back-to-back `.then`s are the same tick. It belongs where it is actually known,
+in the runner, the moment the runtime says it is up and before the compile
+starts.
+
+Both new behaviours have tests, and I planted both old bugs back to watch them
+fail before trusting them. The fake button in the test harness grew
+`setAttribute` and `querySelector` rather than the plugin growing guards - the
+thing on the page is a real element and the stub should look like one.
+
+One quiet trap on the way: `tr("run.bootDownload", "Downloading compiler...")`
+had a fallback without the `{percent}` placeholder the real string carries. Every
+path that has not loaded strings yet, tests included, showed a label with no
+number in it. A fallback that is not the shipped string is a lie waiting for a
+slow network.
+
+442 tests pass, validate unchanged at 0 errors and 144 warnings.

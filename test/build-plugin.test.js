@@ -42,7 +42,12 @@ const realScanCSharp = (() => {
 function makeEl(id) {
   const classes = new Set();
   const listeners = {};
-  return {
+  const attrs = {};
+  // Stubs for elements written into this one via innerHTML, looked up by class
+  // selector. The Run button paints boot progress that way, and a stub without
+  // querySelector would let that whole path go untested.
+  const inner = {};
+  const el = {
     id,
     textContent: "",
     innerHTML: "",
@@ -54,11 +59,40 @@ function makeEl(id) {
       remove(cls) { classes.delete(cls); },
       contains(cls) { return classes.has(cls); },
     },
+    setAttribute(name, value) { attrs[name] = String(value); },
+    getAttribute(name) { return Object.prototype.hasOwnProperty.call(attrs, name) ? attrs[name] : null; },
+    removeAttribute(name) { delete attrs[name]; },
+    hasAttribute(name) { return Object.prototype.hasOwnProperty.call(attrs, name); },
+    querySelector(sel) {
+      const cls = sel.charAt(0) === "." ? sel.slice(1) : sel;
+      if (!(el.innerHTML || "").includes('class="' + cls + '"')) return null;
+      if (!inner[cls]) {
+        const child = makeEl(id + "/" + cls);
+        child.style = {};
+        // A real button reports its descendants' text, which is what the boot
+        // label writes into and what a test reads back off the button.
+        Object.defineProperty(child, "textContent", {
+          get() { return child._text || ""; },
+          set(v) { child._text = v; el.textContent = v; },
+          configurable: true,
+        });
+        inner[cls] = child;
+      }
+      return inner[cls];
+    },
     appendChild(child) { (this.children = this.children || []).push(child); return child; },
     closest() { return null; },
     addEventListener(type, fn) { (listeners[type] = listeners[type] || []).push(fn); },
     click() { (listeners.click || []).forEach((fn) => fn({})); },
   };
+  // innerHTML replaces the children, so cached lookups must not survive it.
+  let html = "";
+  Object.defineProperty(el, "innerHTML", {
+    get() { return html; },
+    set(v) { html = v == null ? "" : String(v); Object.keys(inner).forEach((k) => delete inner[k]); },
+    configurable: true,
+  });
+  return el;
 }
 
 // Parse innerHTML-set <li> elements into fake child objects for assertion.
@@ -139,7 +173,18 @@ function makeCodeLab(runQueue) {
   };
   const runner = {
     warmed: false,
-    warm() { this.warmed = true; return Promise.resolve(); },
+    // Set by a test to make the boot fail the way a stale cached runtime does.
+    warmError: null,
+    // Set by a test to hold the boot open, so the phases the button paints
+    // during the wait can be observed rather than raced past.
+    holdWarm: false,
+    releaseWarm: null,
+    warm() {
+      this.warmed = true;
+      if (this.warmError) return Promise.reject(this.warmError);
+      if (!this.holdWarm) return Promise.resolve();
+      return new Promise((resolve) => { this.releaseWarm = resolve; });
+    },
     run(_src) {
       const next = runQueue.length ? runQueue.shift() : { output: "" };
       return Promise.resolve(next);
@@ -148,7 +193,9 @@ function makeCodeLab(runQueue) {
   return {
     loadMonaco() { return Promise.resolve(); },
     MonacoEditor: function () { return editor; },
-    RoslynIframeRunner: function () { return runner; },
+    // Keep the config: the boot progress callback lives on it, and that is the
+    // only way a test can drive the phases the button paints.
+    RoslynIframeRunner: function (cfg) { runner.config = cfg || {}; return runner; },
     // The REAL scanner from the vendored bundle, so the tracker is tested
     // against the same code that drives it in the browser.
     scanCSharp: realScanCSharp,
@@ -230,6 +277,59 @@ test("mount loads Monaco, seeds the editor, and warms the runner", async () => {
     assert.match(dom.getElementById("bdExample").textContent, /Hi/);
     // runner warmed
     assert.equal(codeLab._runner.warmed, true);
+  });
+});
+
+// The compiler is a ~30MB WebAssembly runtime, so the wait before the first run
+// is 5 seconds on a good connection and a minute on a bad one. It used to show
+// one frozen label for all of it, which reads as a hang.
+test("the Run button reports each boot phase while the compiler loads", async () => {
+  await withDom("bd", [], async (dom, codeLab) => {
+    const controller = LessonEngine.create(buildConfig());
+    codeLab._runner.holdWarm = true;
+    await controller.boot();
+    const runBtn = dom.getElementById("bdRun");
+    const onProgress = codeLab._runner.config.onProgress;
+    assert.equal(typeof onProgress, "function", "the runner must be given a progress callback");
+
+    onProgress({ phase: "download", percent: 42 });
+    assert.match(runBtn.textContent, /42%/);
+    assert.equal(runBtn.querySelector(".btn-boot-fill").style.width, "42%");
+
+    // The download percentage stops meaning anything once every file is in, so
+    // the bar stays full and the label carries the phase.
+    onProgress({ phase: "start", percent: 100 });
+    assert.match(runBtn.textContent, /Starting/);
+    assert.equal(runBtn.querySelector(".btn-boot-fill").style.width, "100%");
+
+    onProgress({ phase: "warm", percent: 100 });
+    assert.match(runBtn.textContent, /Warming/);
+
+    codeLab._runner.releaseWarm();
+    await flush();
+    assert.equal(runBtn.textContent, "Run");
+    assert.equal(runBtn.disabled, false);
+    // Progress arriving late must not drag a ready button back into the wait.
+    onProgress({ phase: "download", percent: 10 });
+    assert.equal(runBtn.textContent, "Run");
+  });
+});
+
+test("a boot that fails says so instead of handing over a Run button that cannot work", async () => {
+  await withDom("bd", [], async (dom, codeLab) => {
+    const controller = LessonEngine.create(buildConfig());
+    codeLab._runner.warmError = new Error("The code runner took too long to load.");
+    await controller.boot();
+    await flush();
+    await flush();
+    const runBtn = dom.getElementById("bdRun");
+    const errors = dom.getElementById("bdErrors");
+    assert.equal(runBtn.disabled, true, "a dead compiler must not offer a live Run button");
+    assert.match(runBtn.textContent, /unavailable/i);
+    assert.equal(errors.hidden, false);
+    assert.match(errors.textContent, /Reload/i);
+    // The raw runner error is English-only; the learner must never see it.
+    assert.doesNotMatch(errors.textContent, /took too long/);
   });
 });
 

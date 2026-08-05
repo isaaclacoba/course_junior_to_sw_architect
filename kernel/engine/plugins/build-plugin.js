@@ -339,22 +339,99 @@
     }
   }
 
-  // Best-effort warm-up: the runner warms on construction; reflect it in the Run
-  // button so the learner knows the first run is being prepared.
+  // Paints boot progress inside the Run button itself: a phase label over a fill
+  // bar. The compiler is a ~30MB WebAssembly runtime, so this wait is 5 seconds
+  // on a good day and a minute on a bad one; a single frozen "preparing" label
+  // for that long reads as broken.
+  function renderBootProgress(runBtn, tr, phase, percent) {
+    if (!runBtn) return;
+    var pct = Math.max(0, Math.min(100, Math.round(percent || 0)));
+    var label = phase === "download"
+      ? tr("run.bootDownload", "Downloading compiler... {percent}%").replace("{percent}", String(pct))
+      : phase === "start"
+        ? tr("run.bootStart", "Starting compiler...")
+        : tr("run.bootWarm", "Warming up...");
+    // The bar only tells the truth during the download; the two phases after it
+    // have no measurable progress, so it stays full and the label carries the
+    // meaning rather than inventing a percentage.
+    var fill = phase === "download" ? pct : 100;
+
+    var bar = runBtn.querySelector(".btn-boot-fill");
+    var text = runBtn.querySelector(".btn-boot-label");
+    if (!bar || !text) {
+      runBtn.innerHTML =
+        '<span class="btn-boot">' +
+        '<span class="btn-boot-label"></span>' +
+        '<span class="btn-boot-bar"><span class="btn-boot-fill"></span></span>' +
+        "</span>";
+      bar = runBtn.querySelector(".btn-boot-fill");
+      text = runBtn.querySelector(".btn-boot-label");
+    }
+    text.textContent = label;
+    bar.style.width = fill + "%";
+    if (phase === "download") {
+      runBtn.setAttribute("aria-valuenow", String(pct));
+    } else {
+      runBtn.removeAttribute("aria-valuenow");
+    }
+  }
+
+  // Warm-up: the runner warms on construction; reflect its real phases in the Run
+  // button so the learner knows what the wait is for.
   function warm(surface) {
     var ctx = surface.ctx;
     var runBtn = ctx.hosts.run;
     var tr = ctx.tr;
+    var boot = surface.boot;
+
     if (runBtn) {
       runBtn.disabled = true;
-      runBtn.textContent = tr("run.preparing", "Preparing compiler...");
+      runBtn.setAttribute("aria-busy", "true");
+      renderBootProgress(runBtn, tr, "download", 0);
     }
+
+    // The runner starts posting progress the moment it is constructed, which is
+    // before this runs, so pick up whatever it already reported.
+    if (boot) {
+      boot.render = function (progress) {
+        renderBootProgress(runBtn, tr, progress.phase, progress.percent);
+      };
+      if (boot.last) boot.render(boot.last);
+    }
+
+    function done() {
+      if (boot) boot.render = null;
+      if (runBtn) {
+        runBtn.removeAttribute("aria-busy");
+        runBtn.removeAttribute("aria-valuenow");
+      }
+    }
+
     return Promise.resolve(surface.runner.warm ? surface.runner.warm() : null)
-      .catch(function () {})
       .then(function () {
+        done();
         if (runBtn) {
           runBtn.disabled = false;
           runBtn.textContent = tr("nav.run", "Run");
+        }
+      })
+      .catch(function () {
+        // A failed boot used to be swallowed: the button was enabled and said
+        // "Run", so the learner got a button that could not work and no reason
+        // why. Say it plainly, and say what fixes it - a stale cached runtime is
+        // the common cause and a hard reload clears it.
+        done();
+        if (runBtn) {
+          runBtn.disabled = true;
+          runBtn.textContent = tr("run.bootFailed", "Compiler unavailable");
+        }
+        var errors = ctx.hosts.errors;
+        if (errors) {
+          errors.hidden = false;
+          errors.textContent = tr(
+            "run.bootFailedHelp",
+            "The compiler could not start. Reload the page (Ctrl+Shift+R, or Cmd+Shift+R on a Mac) to fetch it again.",
+          );
         }
       });
   }
@@ -379,7 +456,16 @@
           : "";
       var runnerUrl =
         (ctx.cfg && ctx.cfg.runnerUrl) || rootPrefix + "level3-app/index.html?runner=1";
-      var runner = new CodeLab.RoslynIframeRunner({ url: runnerUrl });
+      // The runner boots as soon as it exists, well before warm() attaches the
+      // button renderer, so progress lands here first and is held for it.
+      var boot = { render: null, last: null };
+      var runner = new CodeLab.RoslynIframeRunner({
+        url: runnerUrl,
+        onProgress: function (progress) {
+          boot.last = progress;
+          if (boot.render) boot.render(progress);
+        },
+      });
 
       var outputPanel = ctx.helpers.createOutputPanel({
         output: hosts.output,
@@ -390,6 +476,7 @@
         ctx: ctx,
         editor: editor,
         runner: runner,
+        boot: boot,
         outputPanel: outputPanel,
         task: null,
         taskIndex: 0,
