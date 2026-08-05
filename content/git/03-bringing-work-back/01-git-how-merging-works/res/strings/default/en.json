@@ -10,7 +10,7 @@
   "concept.gt-fast-forward.def": "When your branch has added nothing since the split, git just slides its name forward and makes no new commit.",
   "concept.gt-merge-commit.term": "Merge commit",
   "concept.gt-merge-commit.def": "The commit a merge makes when both sides moved on - the one commit with two parents.",
-  "step.0.narr": "One commit, then `fix` split off and saved `add dog`. You have switched back, so `HEAD` says `main`. Merging means bringing another branch's commits into the one you are standing on - you name `fix`, and `main` is the name that changes.",
+  "step.0.narr": "`main` has one commit, `add cat`. `fix` split off from it and saved `add dog` of its own, so `fix` is one commit ahead.\n\nYou are standing on `main` - that is what `HEAD` says. To merge, you name the branch you want to bring IN: `git merge fix`. The branch you are standing on is the one that moves.",
   "step.0.note": "`fix` is one commit ahead. `main` has not moved.",
   "step.1.narr": "Before running anything, look at where `main` sits: still on `add cat`, the exact commit `fix` grew out of. `main` has added nothing since the split. So there are not really two lines here - there is one line, and `main` is standing behind on it.",
   "step.1.note": "Nothing to combine - `main` is simply behind.",

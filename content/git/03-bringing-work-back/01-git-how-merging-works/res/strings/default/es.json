@@ -10,7 +10,7 @@
   "concept.gt-fast-forward.def": "Cuando tu rama no ha añadido nada desde la separación, git solo desliza su nombre hacia delante y no crea ningún commit.",
   "concept.gt-merge-commit.term": "Commit de fusión",
   "concept.gt-merge-commit.def": "El commit que crea una fusión cuando las dos partes avanzaron - el único commit con dos padres.",
-  "step.0.narr": "Un commit, y luego `fix` se separó y guardó `add dog`. Has vuelto, así que `HEAD` dice `main`. Fusionar significa traer los commits de otra rama a aquella en la que estás parado - tú nombras `fix`, y `main` es el nombre que cambia.",
+  "step.0.narr": "`main` tiene un commit, `add cat`. `fix` se separó de ahí y guardó `add dog` por su cuenta, así que `fix` va un commit por delante.\n\nEstás parado en `main` - eso es lo que dice `HEAD`. Para fusionar, nombras la rama que quieres traer: `git merge fix`. La rama en la que estás parado es la que se mueve.",
   "step.0.note": "`fix` va un commit por delante. `main` no se ha movido.",
   "step.1.narr": "Antes de ejecutar nada, mira dónde está `main`: sigue en `add cat`, el commit exacto del que salió `fix`. `main` no ha añadido nada desde la separación. Así que aquí no hay dos líneas de verdad - hay una línea, y `main` está más atrás en ella.",
   "step.1.note": "No hay nada que combinar - `main` simplemente va por detrás.",

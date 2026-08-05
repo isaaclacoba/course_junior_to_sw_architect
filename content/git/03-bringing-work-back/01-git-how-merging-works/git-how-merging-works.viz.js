@@ -38,7 +38,7 @@
     },
     steps: [
       {
-        narr: "One commit, then `fix` split off and saved `add dog`. You have switched back, so `HEAD` says `main`. Merging means bringing another branch's commits into the one you are standing on - you name `fix`, and `main` is the name that changes.",
+        narr: "`main` has one commit, `add cat`. `fix` split off from it and saved `add dog` of its own, so `fix` is one commit ahead.\n\nYou are standing on `main` - that is what `HEAD` says. To merge, you name the branch you want to bring IN: `git merge fix`. The branch you are standing on is the one that moves.",
         repo: { files: FILES, commands: SPLIT, note: "`fix` is one commit ahead. `main` has not moved." },
       },
       {
