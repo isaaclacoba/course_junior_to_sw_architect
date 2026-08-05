@@ -5,12 +5,12 @@
   "hero.title": "Where am I?",
   "intro.0": "You open a folder on Monday with no memory of how you left it. Did you save that change, or only start it? Git will tell you, but only if you ask - and asking is the habit that separates people who trust git from people who are a bit scared of it. Two questions cover most of it: what is going on right now, and what happened before. Here you learn to ask both, then commit with your eyes open.",
   "task.1.title": "Ask before you save",
-  "task.1.concept": "git status",
-  "task.1.context": "`git status` answers one question: what is going on in this folder right now. It lists what git is not tracking yet, and what you have staged for the next commit.\n\nThe folder holds `dog.txt` and `notes.md`. Only one of them belongs in this save - run `git status` and you will see both waiting.",
-  "task.1.goal.0": "Run `git status` to see what is waiting.",
-  "task.1.goal.1": "Stage only `dog.txt`, and leave `notes.md` where it is.",
-  "task.1.goal.2": "Run `git diff --staged` - it prints the lines you are about to save.",
-  "task.1.goal.3": "Commit them with `git commit -m \"add dog\"`.",
+  "task.1.concept": "git status and git diff",
+  "task.1.context": "`git status` answers one question: what is going on in this folder right now. It names the files - which are untracked, which you have changed, which are staged.\n\nIt does not tell you what changed INSIDE a file. `git diff` does that: the lines you took out, the lines you put in. Together they are the two halves of looking before you act - which file, and what in it.",
+  "task.1.goal.0": "Run `git status`. It says `cat.txt` is modified, and names two files git has never seen.",
+  "task.1.goal.1": "Run `git diff` to read the line you actually added to `cat.txt`.",
+  "task.1.goal.2": "Stage `cat.txt` only, and leave the other two where they are.",
+  "task.1.goal.3": "Run `git diff --staged` - the same lines, now from the staging area.",
   "task.1.files.0.text": "Rex, collie, 2 years old.\nWalks at seven, rain or shine.",
   "task.1.files.1.text": "# Notes\n\nTODO: the vet's number goes here",
   "task.1.files.2.text": "Mia, tabby, 4 years old.",
@@ -38,5 +38,6 @@
   "task.3.summaryClose": "Next: branches - how two lines of work grow side by side without touching each other.",
   "concept.gt-hash.term": "Hash",
   "concept.gt-hash.def": "The short code git gives a commit as its name, so you can point at that exact snapshot.",
-  "meta.label": "First steps · Where am I?"
+  "meta.label": "First steps · Where am I?",
+  "task.1.goal.4": "Commit with `git commit -m \"note where the cat sleeps\"`."
 }

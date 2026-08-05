@@ -53,6 +53,7 @@ var CodeLab = (() => {
     computeLineFlags: () => computeLineFlags,
     conceptResults: () => conceptResults,
     counterLabel: () => counterLabel,
+    createEchoCommand: () => echoCommand,
     createGitCommand: () => createGitCommand,
     defaultHighlighter: () => defaultHighlighter,
     deriveRefs: () => deriveRefs,
@@ -5268,11 +5269,65 @@ Fast-forward`;
     };
   }
 
+  // src/terminal/commands/echo.ts
+  function currentText(state, path) {
+    const inTree = state.worktree.get(path);
+    if (inTree) return inTree.text;
+    if (state.index.has(path)) return state.index.get(path);
+    return fileAt(state, headCommit2(state), path);
+  }
+  function echoCommand() {
+    return {
+      name: "echo",
+      summary: 'Print a line, or write it into a file: echo "text" > notes.md',
+      help() {
+        return [
+          "echo <text>              print it",
+          "echo -e <text>           turn \\n into a real line break",
+          "echo <text> > <file>     replace the file with it",
+          "echo <text> >> <file>    add it as a new line at the end",
+          "",
+          "Quote text that has spaces in it."
+        ].join("\n");
+      },
+      run(argv, state) {
+        const escapes = argv[0] === "-e";
+        if (escapes) argv = argv.slice(1);
+        const at = argv.findIndex((a) => a === ">" || a === ">>");
+        const expand = (t) => escapes ? t.replace(/\\n/g, "\n").replace(/\\t/g, "	").replace(/\\\\/g, "\\") : t;
+        if (at < 0) return { state, output: expand(argv.join(" ")) };
+        const path = argv[at + 1];
+        if (!path) {
+          return { state, output: `bash: syntax error near unexpected token 'newline'`, error: true };
+        }
+        if (argv.length > at + 2) {
+          return { state, output: `bash: ${argv[at + 2]}: ambiguous redirect`, error: true };
+        }
+        const written = expand(argv.slice(0, at).join(" "));
+        const append = argv[at] === ">>";
+        const before = currentText(state, path);
+        const text = append && before !== null && before !== "" ? `${before}
+${written}` : written;
+        return { state: edit(state, path, text).state, output: "" };
+      }
+    };
+  }
+
   // src/core/git-cli.ts
+  var ECHO = echoCommand();
   function run(line, state) {
     const { tokens, error } = tokenizeLine(line);
     if (error) return { state, output: error, error, effect: { kind: "none" } };
     if (tokens.length === 0) return { state, output: "", effect: { kind: "none" } };
+    if (tokens[0] === "echo") {
+      const r = ECHO.run(tokens.slice(1), state);
+      return {
+        state: r.state,
+        output: r.output,
+        error: r.error ? r.output : void 0,
+        effect: { kind: "none" }
+      };
+    }
     return runGit(tokens, state);
   }
 

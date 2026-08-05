@@ -5,12 +5,12 @@
   "hero.title": "¿Dónde estoy?",
   "intro.0": "Abres una carpeta un lunes sin acordarte de cómo la dejaste. ¿Guardaste ese cambio, o solo lo empezaste? Git te lo dice, pero solo si preguntas - y preguntar es el hábito que separa a quien confía en git de quien le tiene un poco de miedo. Dos preguntas cubren casi todo: qué está pasando ahora, y qué pasó antes. Aquí aprendes a hacer las dos, y luego haces un commit con los ojos abiertos.",
   "task.1.title": "Pregunta antes de guardar",
-  "task.1.concept": "git status",
-  "task.1.context": "`git status` responde a una pregunta: qué está pasando en esta carpeta ahora mismo. Enumera lo que git todavía no sigue, y lo que has preparado para el próximo commit.\n\nLa carpeta tiene `dog.txt` y `notes.md`. Solo uno de los dos entra en este guardado - ejecuta `git status` y verás los dos esperando.",
-  "task.1.goal.0": "Ejecuta `git status` para ver qué está esperando.",
-  "task.1.goal.1": "Prepara solo `dog.txt`, y deja `notes.md` donde está.",
-  "task.1.goal.2": "Ejecuta `git diff --staged` - imprime las líneas que estás a punto de guardar.",
-  "task.1.goal.3": "Guárdalas con `git commit -m \"add dog\"`.",
+  "task.1.concept": "git status y git diff",
+  "task.1.context": "`git status` responde a una pregunta: qué está pasando ahora mismo en esta carpeta. Nombra los archivos - cuáles no están seguidos, cuáles has cambiado, cuáles están preparados.\n\nLo que no dice es qué ha cambiado DENTRO de un archivo. Eso lo hace `git diff`: las líneas que quitaste, las que pusiste. Juntos son las dos mitades de mirar antes de actuar - qué archivo, y qué hay en él.",
+  "task.1.goal.0": "Ejecuta `git status`. Dice que `cat.txt` está modificado, y nombra dos archivos que git no ha visto nunca.",
+  "task.1.goal.1": "Ejecuta `git diff` para leer la línea que añadiste a `cat.txt`.",
+  "task.1.goal.2": "Prepara solo `cat.txt`, y deja los otros dos donde están.",
+  "task.1.goal.3": "Ejecuta `git diff --staged` - las mismas líneas, ahora desde el área de preparación.",
   "task.1.files.0.text": "Rex, collie, 2 años.\nPaseo a las siete, llueva o no.",
   "task.1.files.1.text": "# Notas\n\nPENDIENTE: aquí va el teléfono del veterinario",
   "task.1.files.2.text": "Mia, atigrada, 4 años.",
@@ -38,5 +38,6 @@
   "task.3.summaryClose": "Lo siguiente: las ramas - cómo dos líneas de trabajo crecen a la vez sin tocarse.",
   "concept.gt-hash.term": "Hash",
   "concept.gt-hash.def": "El código corto que git le da a un commit como nombre, para que puedas señalar esa instantánea exacta.",
-  "meta.label": "Primeros pasos · ¿Dónde estoy?"
+  "meta.label": "Primeros pasos · ¿Dónde estoy?",
+  "task.1.goal.4": "Haz el commit con `git commit -m \"note where the cat sleeps\"`."
 }

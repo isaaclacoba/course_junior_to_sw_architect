@@ -11,14 +11,15 @@
   const tasks = [
     {
       title: "Ask before you save",
-      concept: "git status",
+      concept: "git status and git diff",
       context:
-        "`git status` answers one question: what is going on in this folder right now. It lists what git is not tracking yet, and what you have staged for the next commit.\n\nThe folder holds `dog.txt` and `notes.md`. Only one of them belongs in this save - run `git status` and you will see both waiting.",
+        "`git status` answers one question: what is going on in this folder right now. It names the files - which are untracked, which you have changed, which are staged.\n\nIt does not tell you what changed INSIDE a file. `git diff` does that: the lines you took out, the lines you put in. Together they are the two halves of looking before you act - which file, and what in it.",
       goal: [
-        "Run `git status` to see what is waiting.",
-        "Stage only `dog.txt`, and leave `notes.md` where it is.",
-        "Run `git diff --staged` - it prints the lines you are about to save.",
-        "Commit them with `git commit -m \"add dog\"`."
+        "Run `git status`. It says `cat.txt` is modified, and names two files git has never seen.",
+        "Run `git diff` to read the line you actually added to `cat.txt`.",
+        "Stage `cat.txt` only, and leave the other two where they are.",
+        "Run `git diff --staged` - the same lines, now from the staging area.",
+        "Commit with `git commit -m \"note where the cat sleeps\"`."
       ],
       files: [
         { path: "dog.txt", text: "Rex, collie, 2 years old.\nWalks at seven, rain or shine." },
@@ -27,19 +28,22 @@
       ],
       start: [
         "git add cat.txt",
-        "git commit -m \"add cat\""
+        "git commit -m \"add cat\"",
+        "echo -e \"Mia, tabby, 4 years old.\\nSleeps on the warm laptop.\" > cat.txt"
       ],
       target: [
         "git add cat.txt",
         "git commit -m \"add cat\"",
-        "git add dog.txt",
-        "git commit -m \"add dog\""
+        "echo -e \"Mia, tabby, 4 years old.\\nSleeps on the warm laptop.\" > cat.txt",
+        "git add cat.txt",
+        "git commit -m \"note where the cat sleeps\""
       ],
       solution: [
         "git status",
-        "git add dog.txt",
+        "git diff",
+        "git add cat.txt",
         "git diff --staged",
-        "git commit -m \"add dog\""
+        "git commit -m \"note where the cat sleeps\""
       ]
     },
     {
