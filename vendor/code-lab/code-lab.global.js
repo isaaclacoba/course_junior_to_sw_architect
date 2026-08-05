@@ -63,8 +63,10 @@ var CodeLab = (() => {
     gitBranch: () => branch,
     gitCheckout: () => checkout,
     gitCommit: () => commit,
+    gitDiffLines: () => diffLines,
     gitEdit: () => edit,
     gitFileAt: () => fileAt,
+    gitFormatFileDiff: () => formatFileDiff,
     gitInit: () => init,
     gitJoinLines: () => joinLines,
     gitLayout: () => layout,
@@ -4598,6 +4600,67 @@ ${result.runtimeError}`.trim(),
     }
   };
 
+  // src/core/text-diff.ts
+  function diffLines(a, b) {
+    const out = [];
+    let ai = 0;
+    let bi = 0;
+    for (const m of lcsLines(a, b)) {
+      while (ai < m.ai) out.push({ kind: "-", text: a[ai++] });
+      while (bi < m.bi) out.push({ kind: "+", text: b[bi++] });
+      out.push({ kind: " ", text: a[m.ai] });
+      ai = m.ai + 1;
+      bi = m.bi + 1;
+    }
+    while (ai < a.length) out.push({ kind: "-", text: a[ai++] });
+    while (bi < b.length) out.push({ kind: "+", text: b[bi++] });
+    return out;
+  }
+  function hunksOf(lines, context) {
+    const changed = lines.map((l) => l.kind !== " ");
+    const keep = lines.map(
+      (_, i) => changed.slice(Math.max(0, i - context), i + context + 1).some(Boolean)
+    );
+    const hunks = [];
+    let ai = 0;
+    let bi = 0;
+    let current = null;
+    for (let i = 0; i < lines.length; i++) {
+      const l = lines[i];
+      if (keep[i]) {
+        if (!current) {
+          current = { aStart: ai + 1, aCount: 0, bStart: bi + 1, bCount: 0, lines: [] };
+          hunks.push(current);
+        }
+        current.lines.push(l);
+        if (l.kind !== "+") current.aCount++;
+        if (l.kind !== "-") current.bCount++;
+      } else {
+        current = null;
+      }
+      if (l.kind !== "+") ai++;
+      if (l.kind !== "-") bi++;
+    }
+    return hunks;
+  }
+  function formatFileDiff(path, oldText, newText, context = 3) {
+    if (oldText === newText) return "";
+    const a = splitLines(oldText);
+    const b = splitLines(newText);
+    const hunks = hunksOf(diffLines(a, b), context);
+    if (hunks.length === 0) return "";
+    const out = [
+      `diff --git a/${path} b/${path}`,
+      `--- a/${path}`,
+      `+++ b/${path}`
+    ];
+    for (const h of hunks) {
+      out.push(`@@ -${h.aCount === 0 ? 0 : h.aStart},${h.aCount} +${h.bCount === 0 ? 0 : h.bStart},${h.bCount} @@`);
+      for (const l of h.lines) out.push(l.kind + l.text);
+    }
+    return out.join("\n");
+  }
+
   // src/terminal/commands/git.ts
   var SUBCOMMANDS = [
     {
@@ -4609,6 +4672,11 @@ ${result.runtimeError}`.trim(),
       name: "status",
       summary: "Show what is staged, changed, and untracked.",
       usage: ["status"]
+    },
+    {
+      name: "diff",
+      summary: "Show what changed, line by line.",
+      usage: ["diff", "diff --staged", "diff <commit>"]
     },
     {
       name: "add",
@@ -4742,6 +4810,25 @@ The most similar command is
   function worktreeOf(s) {
     return new Map([...s.worktree].map(([p, e]) => [p, e.status]));
   }
+  function diffText(s, staged, rev) {
+    const head = headCommit3(s);
+    const chunks = [];
+    if (staged) {
+      for (const [path, text] of [...s.index].sort((a, b) => a[0].localeCompare(b[0]))) {
+        const d = formatFileDiff(path, fileAt(s, head, path) ?? "", text);
+        if (d) chunks.push(d);
+      }
+      return chunks.join("\n");
+    }
+    const against = rev ? revParse(s, rev) : head;
+    for (const [path, entry] of [...s.worktree].sort((a, b) => a[0].localeCompare(b[0]))) {
+      if (!rev && entry.status === "untracked") continue;
+      const before = !rev && s.index.has(path) ? s.index.get(path) : fileAt(s, against, path) ?? "";
+      const d = formatFileDiff(path, before, entry.text);
+      if (d) chunks.push(d);
+    }
+    return chunks.join("\n");
+  }
   function statusText(s) {
     const blocks = [];
     const header = [];
@@ -4868,6 +4955,11 @@ The most similar command is
         }
         case "status": {
           return ok(state, statusText(state), { kind: "none" });
+        }
+        case "diff": {
+          const staged = args.includes("--staged") || args.includes("--cached");
+          const rev = args.find((a) => !a.startsWith("-"));
+          return ok(state, diffText(state, staged, rev), { kind: "none" });
         }
         case "commit": {
           const amendFlag = args.includes("--amend");
