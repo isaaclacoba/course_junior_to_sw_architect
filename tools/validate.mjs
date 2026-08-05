@@ -44,6 +44,8 @@ import { createRequire } from "node:module";
 import { loadBrowserGlobal, idFromHref, loadWindowBag, lessonBody } from "./lib.mjs";
 
 const structure = createRequire(import.meta.url)("../kernel/grading/structure-match.js");
+import { loadCodeLab } from "./lib/codelab-sandbox.mjs";
+import { createValidators } from "./lib/lesson-validators.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
@@ -690,6 +692,59 @@ export function checkExemplaryCode(migrated, rootDir, report) {
 }
 
 // ---------------------------------------------------------------------------
+// Goal gates must be able to light up
+// ---------------------------------------------------------------------------
+//
+// The live tracker ticks a goal row when its `gate` matches the learner's code.
+// A gate with a typo in it - `Bird` for `Sparrow`, `Speak` for `Talk` - does not
+// throw and does not warn. The row simply stays grey FOREVER, and the learner
+// reads that as "I have not done it yet" while staring at a finished solution.
+// A tracker that can never tick is worse than no tracker.
+//
+// The assertion itself already exists, and is thorough: `verifyTracker` in
+// tools/lib/lesson-validators.mjs runs every gate and every member row against
+// the task's OWN authored solution. What it lacked was REACH - it was only
+// callable through tools/verify-lesson.mjs, a per-lesson tool somebody has to
+// remember to point at a directory. CI and the push gate run THIS file, so this
+// is where the course-wide sweep belongs. It is a call, not a copy: two
+// implementations of "is this gate dead" would drift apart, and the one that
+// drifts is the one that quietly stops catching anything.
+
+export function checkGoalGates(migrated, rootDir, scanCSharp, report) {
+  if (typeof scanCSharp !== "function") {
+    report.error("Goal gates: no C# scanner in vendor/code-lab/code-lab.global.js - every goal gate went unchecked");
+    return;
+  }
+
+  let currentLesson = "";
+  const validators = createValidators({
+    report: {
+      ok: () => {},
+      // The shared checker speaks in `task N "title"`; prefix the lesson so a
+      // course-wide sweep says WHICH lesson.
+      bad: (msg) => report.error(`Goal gates: ${currentLesson} ${msg}`),
+      skip: () => {},
+      note: () => {},
+    },
+    codeLab: () => ({ scanCSharp }),
+    // Never reached: verifyTracker is static by construction. Present because
+    // createValidators builds every archetype's validator up front.
+    dotnet: { available: () => false, compileRun: () => ({ built: false, output: "", errors: "" }) },
+    grading: { matches: () => true, buildProbe: () => "" },
+  });
+
+  for (const m of migrated) {
+    const dataPath = path.join(rootDir, m.path, "data.js");
+    if (!fs.existsSync(dataPath)) continue;
+    let cfg;
+    try { cfg = loadBrowserGlobal(dataPath, "LESSON_CONFIG"); } catch { continue; }
+    if (!cfg || !(cfg.tasks || []).some((t) => (t.goals || []).length)) continue;
+    currentLesson = `"${m.registryId}"`;
+    validators.tracker({ config: cfg });
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Entry point
 // ---------------------------------------------------------------------------
 
@@ -718,6 +773,7 @@ function main() {
   checkResourceArity(loadResourceBundles(migrated, root), report);
   checkContextVerbosity(migrated, root, report);
   checkExemplaryCode(migrated, root, report);
+  checkGoalGates(migrated, root, loadCodeLab().scanCSharp, report);
   checkConceptCoverage(
     loadConceptBundles(migrated, root),
     { introducedIds: introducedConceptIds(migrated), ownerByConcept: conceptOwners(migrated) },

@@ -2049,3 +2049,61 @@ their unfinished work into the course.
 Worth recording that the review paid for itself twice over - both auditor bugs
 were invisible by construction, and the second was introduced by the fix for the
 first.
+
+## 2026-08-05 13:13 - the goal tracker's safety net
+
+Isaac wants the live goal tracker in every practical lesson, and eventually in
+the git track too, so the first job was an audit: is it a component or is it
+hardcoded?
+
+Half of it is already right. `code-lab` contains no tracker code at all, so the
+Monaco widget is not carrying it - the fear was unfounded. The verdict policy is
+also cleanly separated in `kernel/grading/structure-match.js`, DOM-free and
+unit-tested. What is NOT a component is the render: about a hundred lines of
+HTML-string building private to `build-plugin.js`, styled by `.goal-box*` rules
+that live in the course-wide stylesheet and belong to nobody, mounted into the
+build card's own list. Three couplings, and each one blocks the git track from
+reusing any of it.
+
+Git can already produce the verdicts, incidentally - `git-progress.js` returns a
+`ghost` step that is exactly "the row that is not ticked yet". It just has
+nowhere to draw it as a checklist.
+
+The plan that came out of it puts a `CodeLab.GoalTracker` view beside the editor
+and the git graph, fed rows by whichever plugin owns the lesson, each computing
+verdicts with its own policy. That is dependency inversion, which is the thing
+the SOLID lesson teaches, applied to the course itself. Isaac chose to wait for
+the parallel session's `git-model.ts` work to land rather than build it in the
+course kernel and move it later, so that phase is parked.
+
+What is NOT parked is the safety net, and it had to come first anyway. There are
+166 practical tasks; seven have goals. Before authoring gates for the other 159,
+something has to guarantee a gate can actually light up, because a gate with a
+typo in it does not throw and does not warn - the row just stays grey forever
+and the learner concludes their correct answer was wrong.
+
+The interesting part is that the assertion already existed. `verifyTracker` in
+`lesson-validators.mjs` runs every gate and every member row against the task's
+own solution, and it is thorough - it also checks that the goals array is
+index-aligned with the localized prose, and derives a gate from the box header
+so run-gated blueprint rows get checked too. My first attempt reimplemented all
+of that in `validate.mjs` and was strictly worse. What was missing was never the
+logic, it was the REACH: `verifyTracker` was only callable through
+`verify-lesson.mjs`, a per-lesson tool somebody has to remember to point at a
+directory, while CI and the push gate run `validate.mjs`. So a dead gate could
+ship. The fix is a call, not a copy - a second implementation of "is this gate
+dead" would drift, and the copy that drifts is the one that stops catching.
+
+Deleting my duplicate also fixed a bug it had. `verdicts` folds a dead member
+row into the goal's own verdict, so reading it alone blamed the gate for a typo
+that was really in `code[2]`, sending an author hunting in the wrong place.
+Asking `meets` and `rows` separately names the piece that is actually broken.
+
+Proved it three ways, because a check that has never been seen failing is
+decoration: typo the gate's type and it reports the gate, typo a member row and
+it reports that row by name, comment out the wiring and three tests go red.
+Also fixed the labels, which read `task 2 ""` on every migrated lesson - titles
+are localized now, so the empty quotes were pure noise, and noise is what trains
+a reader to skim past real findings.
+
+448 tests, 0 validator errors. The 159 gates can now be authored safely.

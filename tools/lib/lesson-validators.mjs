@@ -72,6 +72,15 @@ export function resolveBody(win, archetype, validator) {
  */
 export function createValidators(deps) {
   const { ok, bad, skip, note } = deps.report;
+
+  // Task titles are LOCALIZED - they live in res/strings, not in data.js - so
+  // `t.title` is legitimately empty for every migrated lesson and the label used
+  // to read `task 2 ""`. Empty quotes read as a broken renderer, which is
+  // exactly the kind of noise that trains a reader to skim past real findings.
+  const taskLabel = (t, i) => {
+    const title = (t.title || "").slice(0, 40);
+    return title ? `task ${i + 1} "${title}"` : `task ${i + 1}`;
+  };
   const { matches, buildProbe } = deps.grading;
 
   // Mirrors TeachingWarningIds in the compiler host: the diagnostics the run
@@ -96,7 +105,7 @@ export function createValidators(deps) {
     let allOk = true;
     const tasks = (config.tasks || []).filter((t) => !t.summary);
     tasks.forEach((t, i) => {
-      const label = `task ${i + 1} "${(t.title || "").slice(0, 40)}"`;
+      const label = taskLabel(t, i);
       if (!t.solution) { skip(`${label} - no solution`); return; }
       const run = compileRun(t.solution);
       if (!run.built) { bad(`${label} solution did not compile\n${firstError(run.errors)}`); allOk = false; return; }
@@ -354,7 +363,7 @@ export function createValidators(deps) {
     let allOk = true;
     const tasks = (config.tasks || []).filter((t) => !t.summary);
     tasks.forEach((t, i) => {
-      const label = `task ${i + 1} "${(t.title || "").slice(0, 40)}"`;
+      const label = taskLabel(t, i);
       const r = checkGitTask(t, git);
       if (r.ok) ok(`${label} solution reaches the target (${r.commands} command(s))`);
       else { bad(`${label} ${r.reason} [${r.code}]`); allOk = false; }
@@ -371,7 +380,7 @@ export function createValidators(deps) {
     let allOk = true;
     (config.tasks || []).filter((t) => !t.summary).forEach((t, i) => {
       if (!(t.goals || []).length) return;
-      checkTracker(t, `task ${i + 1} "${(t.title || "").slice(0, 40)}"`,
+      checkTracker(t, taskLabel(t, i),
         () => { allOk = false; });
     });
     return allOk;
@@ -399,5 +408,13 @@ export function createValidators(deps) {
   return {
     get: (archetype) => byArchetype.get(archetype) || null,
     archetypes: () => [...byArchetype.keys()],
+    // Exposed on its own because it is PURE and STATIC: it reads the solution's
+    // shape, never its output, so it needs no dotnet and no browser. That lets
+    // tools/validate.mjs - the check that actually runs in CI and in the push
+    // gate - assert every goal gate in the course, instead of the gates only
+    // being checked by a per-lesson tool somebody has to remember to run.
+    // Reused rather than reimplemented: a second copy of "is this gate dead"
+    // would drift, and the copy that drifts is the one that stops catching.
+    tracker: verifyTracker,
   };
 }
