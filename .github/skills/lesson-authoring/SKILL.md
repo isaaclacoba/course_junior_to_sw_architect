@@ -4,7 +4,8 @@ description: >-
   Author or edit a lesson in the C# junior-to-architect course (this repo).
   USE FOR: adding a new theory/drill/build/checkpoint lesson; editing lesson
   prose (intro, concept, context, goal, quiz, summary); choosing the right
-  archetype (build/drill/viz/checkpoint); getting XP/total and prefix conventions
+  archetype (build/drill/viz/checkpoint/git); authoring the GIT track - its
+  interactive `git` lessons and its `repo`-scene theory lessons; getting XP/total and prefix conventions
   right; writing the lesson's C# to the course's mandatory exemplary-code
   standard (naming, no magic numbers, SOLID); verifying a lesson compiles and
   renders. DO NOT USE FOR: changing the
@@ -568,6 +569,83 @@ below are what it automates:
    agentloop, `cl-rg` retrieval, `cl-pb` planboard), and the counter reads `1 / N`.
 4. Render `index.html`: new cards resolve, new stage titles show, the AI-card
    count is data-driven (nothing to bump by hand).
+
+## The git track - two archetypes that must never mix
+
+The git track teaches with a pair of archetypes, and the split is a rule, not a
+preference:
+
+| Archetype | What it is | Used for |
+|---|---|---|
+| `git` | terminal + live graph, the learner types real commands | every PRACTICAL lesson |
+| `viz` with a `repo` scene | the same board, stepped and narrated, read-only | every THEORY lesson |
+
+**A practical lesson uses the interactive mode ONLY. A theory lesson uses the viz
+ONLY.** Do not put a stepped visual inside a practical lesson or a terminal
+inside a theory one.
+
+**Order is pedagogy, not decoration.** The syllabus
+(`docs/plans/git-content.md`) puts the visual immediately BEFORE the lesson that
+types the idea - 4 before 5, 7 before 8, 9 before 10, 13 before 14 - because a
+branch, a merge, a conflict and a reset are all pointer behaviour with no
+obvious surface. Building the practicals first and "adding the viz later"
+inverts the one thing the plan is most deliberate about. If the viz engine is
+missing, build it; do not route around the order.
+
+### Authoring a `git` (practical) lesson
+
+- `data.js` cards carry `start`, `target`, `solution` as arrays of REAL git
+  commands, plus `files: [...]` naming what the folder holds. Files are also
+  inferred from the card's own `git add` lines; `files` is the override for a
+  file the card SHOWS but never adds (the `notes.md` a learner must leave out).
+- **Grading is state-based**, so `git status` and `git log` cannot be graded on
+  their own. Every card must end in a state change, and the reading command is
+  what tells the learner WHICH change to make. A card solvable without looking
+  does not teach looking.
+- `metaLabel` is the breadcrumb; it MUST also exist in the bundles as
+  `meta.label`, or it stays English on a Spanish page.
+
+### Authoring a `viz` (theory) lesson with the `repo` scene
+
+Each step is `repo: { files, commands, ran, note }`:
+
+- `commands` are real git commands replayed through the SAME runtime the
+  practicals are graded against, so the picture and the exercise cannot drift.
+- `ran` is how many trailing commands are new at this step (default 1). The view
+  prints them above the board, which is what lets a learner see *what moved
+  `HEAD`*. Use `ran: 0` for a step that only re-explains the previous picture.
+- Set `legend` explicitly - three entries, copied from an existing git viz.
+  Without it the visual falls back to MemoryViz's default legend, which talks
+  about RAM and CPU cores from a different lesson.
+- A `RepoState` is full of `Map`s and the stepper deep-clones every step, which
+  is exactly why a step authors COMMANDS rather than a prebuilt state.
+
+### Rules that bit us, in the order they bit
+
+1. **Concept prose lives in the string bundles, never in `meta.js`.** `meta.js`
+   carries `{ "id": "gt-branch" }` and nothing else; the bundles carry
+   `concept.gt-branch.term` and `concept.gt-branch.def`. Put a `term`/`def` in
+   `meta.js` and the chip renders `undefined`.
+2. **Only the lesson that INTRODUCES a concept carries its prose.** Everyone
+   else lists the id under `revisits`/`uses`.
+3. **`en.json` and `es.json` must have exactly the same key set.** Check with a
+   symmetric difference, not by eye.
+4. **Never translate a git command.** `start`/`target`/`solution`, commit
+   messages and file names stay English in BOTH bundles - translating them
+   breaks the replay and the goal becomes unreachable. Only prose translates.
+5. **Read the runtime before authoring an exercise.** It is a teaching model,
+   not real git: `code-lab/src/core/git-model.ts` and
+   `code-lab/src/terminal/commands/git.ts`. A committed path leaves the folder,
+   so "both branches edit the same file" needs a deliberate setup.
+6. **Prove every card.** Replay its `solution` through the vendored runtime and
+   assert it reaches `target` - `tools/lib/git-validate.mjs`'s `checkGitTask`
+   does this, and also rejects a card whose start already solves it.
+7. **The scaffolder appends to the registry.** `new-lesson.mjs` numbers the
+   directory from the count of same-part rows, so a lesson inserted mid-syllabus
+   needs its directory renamed and its registry line moved - registry ARRAY
+   ORDER is the real order; the `NN-` prefixes are cosmetic.
+8. **`verify-lesson.mjs` needs `index.html`.** Run `node tools/generate.mjs`
+   first, or it prints "not a lesson" and checks nothing - while still exiting 0.
 
 ## Guardrails
 

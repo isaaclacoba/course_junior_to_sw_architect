@@ -556,7 +556,13 @@ ${result.runtimeError}`.trim(),
         tabSize: 4,
         insertSpaces: true,
         scrollBeyondLastLine: false,
-        bracketPairColorization: { enabled: true }
+        bracketPairColorization: { enabled: true },
+        // Breathing room so the first and last lines are not welded to the frame.
+        // This is Monaco's OWN padding, not CSS on the host: `getContentHeight`
+        // counts it, so an auto-height editor grows to include it. CSS padding on
+        // the host would leave the height unchanged and quietly clip the last
+        // line instead.
+        padding: { top: 12, bottom: 12 }
       });
       if (opts.autoHeight) this.enableAutoHeight(host, opts.autoHeight);
     }
@@ -3720,6 +3726,7 @@ ${result.runtimeError}`.trim(),
       this.headEl.hidden = false;
       this.headEl.dataset.ref = "HEAD";
       this.headEl.dataset.on = head.on ?? "";
+      this.headEl.textContent = head.on ? `HEAD \u2192 ${head.on}` : "HEAD detached";
       this.headEl.title = head.on ? `HEAD -> ${head.on}` : "HEAD (detached)";
       this.headEl.classList.toggle("is-detached", head.on === void 0);
       this.headEl.classList.toggle("cl-git-ghost", this.ghost.has(head.commit));
@@ -3821,10 +3828,13 @@ ${result.runtimeError}`.trim(),
   // src/core/repo-scene.ts
   function resolveRepo(scene) {
     if (!scene || !Array.isArray(scene.commands)) return null;
+    const commands = scene.commands.slice();
+    const want = scene.ran === void 0 ? 1 : Math.max(0, Math.min(scene.ran, commands.length));
     return {
       files: Array.isArray(scene.files) ? scene.files.slice() : [],
-      commands: scene.commands.slice(),
-      note: scene.note
+      commands,
+      note: scene.note,
+      ran: want === 0 ? [] : commands.slice(commands.length - want)
     };
   }
 
@@ -4815,7 +4825,9 @@ Fast-forward`;
       this.graphHost.className = "cl-rp-graph";
       this.noteEl = document.createElement("p");
       this.noteEl.className = "cl-rp-cap";
-      this.el.append(this.graphHost, this.noteEl);
+      this.ranEl = document.createElement("p");
+      this.ranEl.className = "cl-rp-ran";
+      this.el.append(this.ranEl, this.graphHost, this.noteEl);
     }
     /** Replay a step's commands into the repository it describes. A command that
      *  errors is an authoring bug, not a learner mistake: it is reported and the
@@ -4847,6 +4859,8 @@ Fast-forward`;
       }
       this.noteEl.innerHTML = scene.note ? escapeHtml4(scene.note) : "";
       this.noteEl.hidden = !scene.note;
+      this.ranEl.innerHTML = scene.ran.map((c) => `<code class="cl-rp-cmd">$ ${escapeHtml4(c)}</code>`).join("");
+      this.ranEl.hidden = scene.ran.length === 0;
     }
   };
 

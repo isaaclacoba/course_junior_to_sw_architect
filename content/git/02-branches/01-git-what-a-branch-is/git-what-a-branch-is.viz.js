@@ -42,7 +42,7 @@
       },
       {
         narr: "So if both names point at the same commit, which one does your next commit belong to? That is what `HEAD` answers. `HEAD` is the marker for **where you are**, and right now it says `main`.",
-        repo: { files: FILES, commands: BRANCHED, note: "`HEAD` decides which name moves next." },
+        repo: { files: FILES, commands: BRANCHED, ran: 0, note: "`HEAD` decides which name moves next." },
       },
       {
         narr: "`git switch feature` moves `HEAD` onto the other name. Still nothing copied - the commits have not changed at all. You have only said which name you are standing on.",
