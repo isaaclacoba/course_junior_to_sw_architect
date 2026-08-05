@@ -24,6 +24,16 @@
         message: "A Dog must be usable as an Animal - it is-a Animal, so it inherits Breathe() rather than redeclaring it."
       },
       starter: "using System;\n\npublic class Animal\n{\n    public void Breathe()\n    {\n        Console.WriteLine(\"...breathe...\");\n    }\n}\n\n// TODO: make Dog reuse Animal by inheriting from it, then give Dog its own\n// Fetch() method (the goal says what it should print).\npublic class Dog\n{\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Dog rex = new Dog();\n        rex.Breathe();\n        rex.Fetch();\n    }\n}\n",
+      goals: [
+        {
+          code: [
+            "Dog : Animal",
+            "void Fetch()"
+          ],
+          gate: { type: "Dog", member: "Fetch" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Animal\n{\n    public void Breathe()\n    {\n        Console.WriteLine(\"...breathe...\");\n    }\n}\n\npublic class Dog : Animal\n{\n    public void Fetch()\n    {\n        Console.WriteLine(\"fetches the stick\");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Dog rex = new Dog();\n        rex.Breathe();\n        rex.Fetch();\n    }\n}\n"
     },
     {
@@ -44,6 +54,16 @@
         }
       ],
       starter: "using System;\n\npublic class Voice\n{\n    private string _sound;\n\n    public Voice(string sound)\n    {\n        _sound = sound;\n    }\n\n    public string Speak()\n    {\n        return _sound;\n    }\n}\n\n// TODO: give Dog a Voice field it holds (has-a), set to new Voice(\"Woof\").\n// Make Bark() return what the voice says by calling the voice.Speak().\n// Do NOT inherit - Dog holds a Voice, it is not a kind of Voice.\npublic class Dog\n{\n    public string Bark()\n    {\n        return \"\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Dog rex = new Dog();\n        Console.WriteLine(rex.Bark());\n    }\n}\n",
+      goals: [
+        {
+          code: [
+            "class Dog",
+            "Voice _voice"
+          ],
+          gate: { type: "Dog", member: "_voice" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Voice\n{\n    private string _sound;\n\n    public Voice(string sound)\n    {\n        _sound = sound;\n    }\n\n    public string Speak()\n    {\n        return _sound;\n    }\n}\n\npublic class Dog\n{\n    private Voice _voice = new Voice(\"Woof\");\n\n    public string Bark()\n    {\n        return _voice.Speak();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Dog rex = new Dog();\n        Console.WriteLine(rex.Bark());\n    }\n}\n"
     },
     {
@@ -77,6 +97,16 @@
         message: "Each type must carry its own Speak() - the words should follow the array, not a fixed order."
       },
       starter: "using System;\n\npublic class Animal\n{\n    public virtual string Speak()\n    {\n        return \"...\";\n    }\n}\n\npublic class Dog : Animal\n{\n    public override string Speak()\n    {\n        return \"Woof\";\n    }\n}\n\n// TODO: add Cat and Cow the same way Dog is written above - each a kind of\n// Animal with its own Speak() (the goal says the words).\n\nclass Program\n{\n    static void Main()\n    {\n        Animal[] pen = new Animal[] { new Dog(), new Cat(), new Cow() };\n        foreach (Animal a in pen)\n        {\n            Console.WriteLine(a.Speak());\n        }\n    }\n}\n",
+      goals: [
+        {
+          code: [
+            "Cat : Animal",
+            "string Speak()"
+          ],
+          gate: { type: "Cat", base: "Animal", member: "Speak" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Animal\n{\n    public virtual string Speak()\n    {\n        return \"...\";\n    }\n}\n\npublic class Dog : Animal\n{\n    public override string Speak()\n    {\n        return \"Woof\";\n    }\n}\n\npublic class Cat : Animal\n{\n    public override string Speak()\n    {\n        return \"Meow\";\n    }\n}\n\npublic class Cow : Animal\n{\n    public override string Speak()\n    {\n        return \"Moo\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Animal[] pen = new Animal[] { new Dog(), new Cat(), new Cow() };\n        foreach (Animal a in pen)\n        {\n            Console.WriteLine(a.Speak());\n        }\n    }\n}\n"
     },
     {
@@ -116,6 +146,17 @@
         message: "Each ability must come from its own held part, so calling them in any order still works."
       },
       starter: "using System;\n\npublic class Swimming\n{\n    public string Go()\n    {\n        return \"swim\";\n    }\n}\n\npublic class Flying\n{\n    public string Go()\n    {\n        return \"fly\";\n    }\n}\n\n// TODO: give Duck a Swimming field and a Flying field it holds (has-a both).\n// Delegate Swim() to the swimming part and Fly() to the flying part.\n// Do NOT inherit - Duck holds its abilities as parts.\npublic class Duck\n{\n    public string Swim()\n    {\n        return \"\";\n    }\n\n    public string Fly()\n    {\n        return \"\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Duck duck = new Duck();\n        Console.WriteLine(duck.Swim());\n        Console.WriteLine(duck.Fly());\n    }\n}\n",
+      goals: [
+        {
+          code: [
+            "class Duck",
+            "Swimming _swim",
+            "Flying _fly"
+          ],
+          gate: { type: "Duck", member: "_swim" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Swimming\n{\n    public string Go()\n    {\n        return \"swim\";\n    }\n}\n\npublic class Flying\n{\n    public string Go()\n    {\n        return \"fly\";\n    }\n}\n\npublic class Duck\n{\n    private Swimming _swim = new Swimming();\n    private Flying _fly = new Flying();\n\n    public string Swim()\n    {\n        return _swim.Go();\n    }\n\n    public string Fly()\n    {\n        return _fly.Go();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Duck duck = new Duck();\n        Console.WriteLine(duck.Swim());\n        Console.WriteLine(duck.Fly());\n    }\n}\n"
     },
     {

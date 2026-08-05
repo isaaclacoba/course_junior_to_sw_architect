@@ -29,6 +29,17 @@
         }
       ],
       starter: "using System;\n\npublic class Dog\n{\n    public string Speak() { return \"Woof\"; }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        // TODO: Arrange a Dog, Act by calling Speak(), Assert it equals \"Woof\".\n        //       Print PASS if it matches, otherwise FAIL.\n    }\n}\n",
+      goals: [
+        {
+          code: [
+            "class Program",
+            { row: "string sound = dog.Speak();", writes: "dog.Speak()" },
+            { row: "Console.WriteLine(sound == \"Woof\" ? \"PASS\" : \"FAIL\");", writes: "\"PASS\"" },
+          ],
+          gate: { type: "Program", member: "Main" },
+        },
+        { gate: null },
+      ],
       solution: "using System;\n\npublic class Dog\n{\n    public string Speak() { return \"Woof\"; }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var dog = new Dog();                 // Arrange\n        string sound = dog.Speak();          // Act\n        Console.WriteLine(sound == \"Woof\" ? \"PASS\" : \"FAIL\");   // Assert\n    }\n}\n"
     },
     {
@@ -49,6 +60,17 @@
         }
       ],
       starter: "using System;\n\npublic class Adder\n{\n    public int Add(int left, int right) { return left + right; }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        // TODO: Act by calling Add(2, 3); assert it equals exactly 5.\n        //       Print PASS or FAIL.\n    }\n}\n",
+      goals: [
+        {
+          code: [
+            "class Program",
+            { row: "int result = adder.Add(2, 3);", writes: "adder.Add(2,3)" },
+            { row: "Console.WriteLine(result == 5 ? \"PASS\" : \"FAIL\");", writes: "\"PASS\"" },
+          ],
+          gate: { type: "Program", member: "Main" },
+        },
+        { gate: null },
+      ],
       solution: "using System;\n\npublic class Adder\n{\n    public int Add(int left, int right) { return left + right; }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var adder = new Adder();\n        int result = adder.Add(2, 3);\n        Console.WriteLine(result == 5 ? \"PASS\" : \"FAIL\");\n    }\n}\n"
     },
     {
@@ -65,6 +87,17 @@
         }
       ],
       starter: "using System;\n\npublic class Adder\n{\n    public int Add(int left, int right) { return left + right; }\n}\n\nclass Program\n{\n    // TODO: write an assert helper named AssertEqual taking (int actual, int expected)\n    //       that prints PASS on a match and FAIL otherwise.\n\n    static void Main()\n    {\n        var adder = new Adder();\n        // TODO: then call it with Add(2, 3) and 5.\n    }\n}\n",
+      goals: [
+        {
+          code: [
+            "class Program",
+            "void AssertEqual(int actual, int expected)",
+            { row: "AssertEqual(adder.Add(2, 3), 5);", writes: "AssertEqual(" },
+          ],
+          gate: { type: "Program", member: "AssertEqual" },
+        },
+        { gate: null },
+      ],
       solution: "using System;\n\npublic class Adder\n{\n    public int Add(int left, int right) { return left + right; }\n}\n\nclass Program\n{\n    static void AssertEqual(int actual, int expected)\n    {\n        Console.WriteLine(actual == expected ? \"PASS\" : \"FAIL\");\n    }\n\n    static void Main()\n    {\n        var adder = new Adder();\n        AssertEqual(adder.Add(2, 3), 5);\n    }\n}\n"
     },
     {
@@ -81,6 +114,17 @@
         }
       ],
       starter: "using System;\n\npublic class Gate\n{\n    public void Enter(int count)\n    {\n        if (count < 0) throw new ArgumentException(\"count cannot be negative\");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var gate = new Gate();\n        // TODO: call Enter(-1) in a try; PASS if it throws, FAIL if it does not.\n    }\n}\n",
+      goals: [
+        {
+          code: [
+            "class Program",
+            { row: "try { gate.Enter(-1); }", writes: "gate.Enter(-1)" },
+            { row: "catch (Exception) { Console.WriteLine(\"PASS\"); }", writes: "\"PASS\"" },
+          ],
+          gate: { type: "Program", member: "Main" },
+        },
+        { gate: null },
+      ],
       solution: "using System;\n\npublic class Gate\n{\n    public void Enter(int count)\n    {\n        if (count < 0) throw new ArgumentException(\"count cannot be negative\");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var gate = new Gate();\n        try\n        {\n            gate.Enter(-1);\n            Console.WriteLine(\"FAIL\");\n        }\n        catch (Exception)\n        {\n            Console.WriteLine(\"PASS\");\n        }\n    }\n}\n"
     },
     {

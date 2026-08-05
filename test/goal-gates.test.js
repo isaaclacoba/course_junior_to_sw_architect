@@ -42,7 +42,7 @@ function scanner(source) {
 
 const NO_SCANNER = Symbol("no scanner");
 
-async function errorsFor(task, scanArg) {
+async function errorsFor(task, scanArg, archetype = "build") {
   const scan = scanArg === NO_SCANNER ? null : (scanArg || scanner);
   const { checkGoalGates } = await load();
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "goal-gates-"));
@@ -53,7 +53,11 @@ async function errorsFor(task, scanArg) {
   const errors = [];
   const report = { error: (m) => errors.push(m), warn: () => {}, note: () => {} };
   try {
-    checkGoalGates([{ registryId: "fake", path: "lesson", meta: { archetype: "build" } }], dir, scan, report);
+    // The third argument is the whole vendored code-lab bundle, not just the C#
+    // scanner: a git lesson's gates are judged by replaying its solution through
+    // the git runtime that lives in the same bundle.
+    checkGoalGates([{ registryId: "fake", path: "lesson", meta: { archetype } }], dir,
+      scan ? { scanCSharp: scan } : null, report);
     return errors;
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 }
@@ -115,4 +119,31 @@ test("no scanner FAILS the run instead of passing on zero evidence", async () =>
 test("a lesson with no goals at all is not an error", async () => {
   const errors = await errorsFor({ solution: SOLUTION, goal: ["one"] });
   assert.deepEqual(errors, []);
+});
+
+// A git gate speaks a different vocabulary entirely - `ran`, `staged`, `commit`,
+// never `type`/`member`. Scanning one as C# finds no types, so EVERY git gate
+// reads as empty and gets condemned: 65 errors against content that was correct.
+// That is the worst kind of failure, because a checker that cries wolf on good
+// content is a checker somebody switches off. Dispatch is therefore on archetype.
+test("a git lesson is not judged by the C# scanner", async () => {
+  const errors = await errorsFor({
+    goal: ["start a repository"],
+    goals: [{ code: ["git init"], gate: { ran: "git init" } }],
+    start: [],
+    solution: ["git init"],
+  }, undefined, "git");
+  assert.deepEqual(errors.filter((e) => /empty gate/.test(e)), [], errors.join("\n"));
+});
+
+// ...and the git path must still be able to FAIL, or the dispatch above has
+// simply swapped a noisy checker for a silent one.
+test("a git gate the solution never satisfies is reported", async () => {
+  const errors = await errorsFor({
+    goal: ["start a repository"],
+    goals: [{ code: ["git init"], gate: { ran: "git nonesuch" } }],
+    start: [],
+    solution: ["git init"],
+  }, undefined, "git");
+  assert.ok(errors.length, "a dead git gate went unreported");
 });

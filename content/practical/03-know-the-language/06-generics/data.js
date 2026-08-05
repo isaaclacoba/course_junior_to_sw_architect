@@ -24,6 +24,13 @@
         message: "7 works for Box<int> only. Box<T> must hold whatever type T is - the hidden check uses a string."
       },
       starter: "using System;\n\n// TODO: define a generic class Box<T> that stores one T Value (set in the constructor)\n\nclass Program\n{\n    static void Main()\n    {\n        var box = new Box<int>(7);\n        Console.WriteLine(box.Value);\n    }\n}\n",
+      goals: [
+        {
+          code: ["class Box<T>", "public T Value { get; }", "public Box(T value)"],
+          gate: { type: "Box", member: "Value" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Box<T>\n{\n    public T Value { get; }\n    public Box(T value) { Value = value; }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var box = new Box<int>(7);\n        Console.WriteLine(box.Value);\n    }\n}\n"
     },
     {
@@ -41,6 +48,16 @@
         message: "3 works for the int array only. First<T> must return the first item of any array - the hidden check uses strings."
       },
       starter: "using System;\n\npublic class Picker\n{\n    // TODO: a generic method First<T> that returns the first item of a T[] array\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var picker = new Picker();\n        Console.WriteLine(picker.First(new int[] { 3, 4, 5 }));\n    }\n}\n",
+      goals: [
+        {
+          code: [
+            "class Picker",
+            "T First(T[] items)"
+          ],
+          gate: { type: "Picker", member: "First" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Picker\n{\n    public T First<T>(T[] items) => items[0];\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var picker = new Picker();\n        Console.WriteLine(picker.First(new int[] { 3, 4, 5 }));\n    }\n}\n"
     },
     {
@@ -58,6 +75,13 @@
         message: "age: 3 works for Pair<string, int> only. Pair<A, B> must hold whatever types A and B are."
       },
       starter: "using System;\n\n// TODO: define a generic class Pair<A, B> with First (A) and Second (B), set in the constructor\n\nclass Program\n{\n    static void Main()\n    {\n        var pair = new Pair<string, int>(\"age\", 3);\n        Console.WriteLine(pair.First + \": \" + pair.Second);\n    }\n}\n",
+      goals: [
+        {
+          code: ["class Pair<A, B>", "public A First { get; }", "public B Second { get; }", "public Pair(A first, B second)"],
+          gate: { type: "Pair", member: "First" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Pair<A, B>\n{\n    public A First { get; }\n    public B Second { get; }\n    public Pair(A first, B second) { First = first; Second = second; }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var pair = new Pair<string, int>(\"age\", 3);\n        Console.WriteLine(pair.First + \": \" + pair.Second);\n    }\n}\n"
     },
     {
@@ -75,6 +99,16 @@
         message: "5 works for an int only. Wrap<T> must wrap any type - the hidden check wraps a string."
       },
       starter: "using System;\n\npublic class Box<T>\n{\n    public T Value { get; }\n    public Box(T value) { Value = value; }\n}\n\npublic class Wrapper\n{\n    // TODO: a generic method Wrap<T> that returns a new Box<T> holding item\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var wrapper = new Wrapper();\n        Box<int> box = wrapper.Wrap(5);\n        Console.WriteLine(box.Value);\n    }\n}\n",
+      goals: [
+        {
+          code: [
+            "class Wrapper",
+            "Box Wrap(T item)"
+          ],
+          gate: { type: "Wrapper", member: "Wrap" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Box<T>\n{\n    public T Value { get; }\n    public Box(T value) { Value = value; }\n}\n\npublic class Wrapper\n{\n    public Box<T> Wrap<T>(T item) => new Box<T>(item);\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var wrapper = new Wrapper();\n        Box<int> box = wrapper.Wrap(5);\n        Console.WriteLine(box.Value);\n    }\n}\n"
     }
   ];

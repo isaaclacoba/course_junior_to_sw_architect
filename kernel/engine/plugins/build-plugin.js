@@ -63,6 +63,22 @@
     }
     return null;
   }
+  function trackerWidget() {
+    var g = typeof globalThis !== "undefined" ? globalThis : null;
+    if (g && g.KernelGoalTracker) return g.KernelGoalTracker;
+    if (typeof require === "function") {
+      try { return require("../widgets/goal-tracker.js"); } catch (e) {}
+    }
+    return null;
+  }
+  function csharpGoals() {
+    var g = typeof globalThis !== "undefined" ? globalThis : null;
+    if (g && g.KernelCSharpGoals) return g.KernelCSharpGoals;
+    if (typeof require === "function") {
+      try { return require("../widgets/csharp-goal-provider.js"); } catch (e) {}
+    }
+    return null;
+  }
 
   // ---- example / expected painters (archetype chrome) ----------------------
   // The "here's the pattern" example is highlighted with Monaco (the same engine
@@ -108,13 +124,11 @@
       : (task.expected || "");
   }
 
-  // ---- the live goal tracker (UML class boxes) -----------------------------
-  // ONE panel that IS the goal list: structural goals render as UML-style class
-  // boxes (a header with the type name and one row per member), behaviour goals
-  // (gate: null) are short lines below the boxes with a run marker, and removal
-  // goals (gate.absent) are struck-through ghosted boxes. Each element ticks
-  // independently as the learner types, so the learner sees exactly which piece
-  // is still missing.
+  // ---- the live goal tracker -----------------------------------------------
+  // The panel itself is kernel/engine/widgets/goal-tracker.js and the C# meaning
+  // of a goal is kernel/engine/widgets/csharp-goal-provider.js. This plugin only
+  // says WHEN to repaint and hands over the state the provider reads: the editor
+  // text, the scanned types, and whether the last run passed.
   //
   // The tracker is a GUIDE, never a grade. XP comes ONLY from a real run.
   function scanTypes(source) {
@@ -128,120 +142,42 @@
     }
   }
 
-  // Build the UML box HTML for the entire goal panel. Three kinds of goal:
-  //   - structural (gate.type): a class box with header + member rows
-  //   - absent (gate.absent): a struck-through removal line
-  //   - run-gated (gate: null): a behaviour line with ▶ marker
-  //
-  // The box renders the CODE field as the visual, and the localized prose as a
-  // caption INSIDE the box (not repeated beside it). Each row ticks independently.
-  function buildTrackerHtml(surface, met, types, source) {
-    var goals = surface.task.goals || [];
-    var proseList = surface.goalHtml || [];
-    var esc = surface.ctx.helpers.escapeHtml;
-    var S = structure();
-    var boxes = [];
-    var behaviours = [];
-
-    // One member row = one subtask. Row 0 is the type header, rows 1..n are its
-    // members; each carries its own tick so a learner sees which piece is still
-    // missing rather than one box that stays grey until the last keystroke.
-    function memberRows(codeArr, gate, boxMet) {
-      var verdicts = (S && S.rows) ? S.rows(types || [], gate, codeArr, source) : [];
-      return codeArr.slice(1).map(function (m, k) {
-        var ok = verdicts.length ? verdicts[k + 1] === true : boxMet === true;
-        return '<code class="goal-code goal-member' + (ok ? " is-met" : "") + '">' +
-          '<span class="goal-member-tick" aria-hidden="true">' + (ok ? "\u2713" : "") + "</span>" +
-          esc(S && S.rowLabel ? S.rowLabel(m) : m) + "</code>";
-      }).join("");
+  // Build the tracker lazily: hosts.goal is painted by the core, and the plugin
+  // must not hold a widget bound to a list that a later card replaced.
+  function tracker(surface) {
+    var W = trackerWidget();
+    var host = surface.ctx.hosts.goal;
+    if (!W || !host) return null;
+    if (!surface.tracker || surface.trackerHost !== host) {
+      surface.tracker = W.create({
+        host: host,
+        provider: csharpGoals(),
+        escapeHtml: surface.ctx.helpers.escapeHtml,
+      });
+      surface.trackerHost = host;
     }
-
-    for (var i = 0; i < goals.length; i++) {
-      var g = goals[i];
-      var gate = g && g.gate !== undefined ? g.gate : undefined;
-      var prose = proseList[i] || "";
-      var isMet = met[i];
-
-      var codes0 = g && g.code;
-      var hasBlueprint = !!codes0 && (!Array.isArray(codes0) || codes0.length > 0);
-
-      if (hasBlueprint && (gate === null || gate === undefined)) {
-        // A blueprint the learner already has on screen (an empty method to fill,
-        // a class to edit). The BOX is the help - it shows the shape being aimed
-        // at - but the tick has to come from a passing run, because "the
-        // signature exists" is not the same as "it works".
-        var rCodes = Array.isArray(codes0) ? codes0 : [codes0];
-        boxes.push(
-          '<li class="goal-box goal-box--run' + (isMet === true ? " is-met" : "") + '">' +
-          '<span class="tracker-tick tracker-tick--run" aria-hidden="true">' +
-          (isMet === true ? "\u2713" : "\u25B6") + "</span>" +
-          '<div class="goal-box-inner">' +
-          '<div class="goal-box-header"><code class="goal-code">' +
-          esc(S && S.rowLabel ? S.rowLabel(rCodes[0]) : rCodes[0]) + "</code></div>" +
-          (rCodes.length > 1 ? '<div class="goal-box-members">' +
-            memberRows(rCodes, null, isMet) + "</div>" : "") +
-          '<div class="goal-box-caption">' + prose + "</div>" +
-          "</div></li>"
-        );
-      } else if (gate === null || gate === undefined) {
-        // Behaviour / run-gated goal
-        behaviours.push(
-          '<li class="goal-behaviour' + (isMet === true ? " is-met" : "") + '">' +
-          '<span class="tracker-tick tracker-tick--run" aria-hidden="true">' +
-          (isMet === true ? "\u2713" : "\u25B6") + "</span>" +
-          '<span class="goal-prose">' + prose + "</span></li>"
-        );
-      } else if (gate.absent && !gate.type) {
-        // Removal goal (absent-only gate) - struck-through box
-        boxes.push(
-          '<li class="goal-box goal-box--absent' + (isMet === true ? " is-met" : "") + '">' +
-          '<span class="tracker-tick" aria-hidden="true">' + (isMet === true ? "\u2713" : "") + "</span>" +
-          '<div class="goal-box-inner">' +
-          '<div class="goal-box-header goal-box-header--absent">' +
-          '<del><code class="goal-code">' + esc(gate.absent) + "</code></del></div>" +
-          '<div class="goal-box-caption">' + prose + "</div>" +
-          "</div></li>"
-        );
-      } else if (gate.type) {
-        // Structural goal - UML class box
-        var codes = g.code;
-        var codeArr = !codes ? [] : (Array.isArray(codes) ? codes : [codes]);
-        var header = codeArr.length > 0
-          ? (S && S.rowLabel ? S.rowLabel(codeArr[0]) : codeArr[0])
-          : (gate.kind ? gate.kind + " " : "class ") + gate.type;
-        var members = codeArr.length > 1 ? codeArr.slice(1) : [];
-
-        boxes.push(
-          '<li class="goal-box' + (isMet === true ? " is-met" : "") + '">' +
-          '<span class="tracker-tick" aria-hidden="true">' + (isMet === true ? "\u2713" : "") + "</span>" +
-          '<div class="goal-box-inner">' +
-          '<div class="goal-box-header"><code class="goal-code">' + esc(header) + "</code></div>" +
-          (members.length ? '<div class="goal-box-members">' +
-            memberRows(codeArr, gate, isMet) + "</div>" : "") +
-          '<div class="goal-box-caption">' + prose + "</div>" +
-          "</div></li>"
-        );
-      } else {
-        // Fallback: just a prose line
-        behaviours.push(
-          '<li class="goal-behaviour">' +
-          '<span class="goal-prose">' + prose + "</span></li>"
-        );
-      }
-    }
-
-    return boxes.join("") + behaviours.join("");
+    return surface.tracker;
   }
 
-  // Repaint the goal panel. Cheap enough to run on every keystroke - DOM is only
-  // touched when something actually changed (diffed by the HTML string).
+  // Snapshot the freshly painted (and freshly localized) goal prose, then set the
+  // goals the tracker paints. Called on every render and every locale swap,
+  // BEFORE the first sync of that card.
+  function captureGoals(surface) {
+    var t = tracker(surface);
+    if (!t) return;
+    var goals = (surface.task && surface.task.goals) || [];
+    t.capture().setGoals(goals);
+    if (!goals.length) t.clear();
+  }
+
+  // Repaint the goal panel. Cheap enough to run on every keystroke - the widget
+  // only touches the DOM when the rendered HTML actually changed.
   function syncTracker(surface) {
-    var ctx = surface.ctx;
     var task = surface.task;
+    if (!task || !(task.goals && task.goals.length)) return;
     var S = structure();
-    if (!task) return;
     if (!S) {
-      if (!warnedNoStructure && (task.goals && task.goals.length)) {
+      if (!warnedNoStructure) {
         warnedNoStructure = true;
         if (typeof console !== "undefined" && console.warn) {
           console.warn("[build] goal tracker disabled: window.KernelStructure was never loaded");
@@ -249,59 +185,11 @@
       }
       return;
     }
-
-    var goals = task.goals || [];
-    if (!goals.length) return;
-
-    var gates = goals.map(function (g) { return g && g.gate !== undefined ? g.gate : undefined; });
+    var t = tracker(surface);
+    if (!t) return;
     var source = surface.editor ? surface.editor.getValue() : "";
-    var types = scanTypes(source);
-    if (!types) return;
-
-    // S.verdicts is the one place that decides what a learner sees: the gate AND
-    // every row under it. Reading S.evaluate here instead would let this view
-    // drift from the tests and the validator.
-    var met = S.verdicts
-      ? S.verdicts(types, goals, source)
-      : S.evaluate(types, gates, source);
-    // Layer in run-gated state: a null gate is ticked by a passing run.
-    for (var i = 0; i < met.length; i++) {
-      if (met[i] === null && surface.runPassed) met[i] = true;
-    }
-    paintGoalTicks(surface, met, types, source);
-  }
-
-  // Render the UML goal panel. Only touches the DOM when the HTML actually changed.
-  function paintGoalTicks(surface, met, types, source) {
-    var list = surface.ctx.hosts.goal;
-    if (!list || !met.length) return;
-    if (!surface.goalHtml) return;
-
-    // The rendered HTML is the only honest diff: a member row can change while
-    // the box-level verdict does not, so comparing the met array would swallow
-    // the repaint.
-    surface.goalMet = met;
-    var html = buildTrackerHtml(surface, met, types, source);
-    if (list.innerHTML !== html) {
-      list.innerHTML = html;
-      // The tracker replaces each bullet with its own tick, so the list drops
-      // the marker and the indent. It is opt-IN: `coach-list` is shared with the
-      // drill Points list and the git goal list, which still want plain bullets.
-      list.classList.add("has-tracker");
-    }
-  }
-
-  // Snapshot the freshly painted (and freshly localized) goal prose so the tracker
-  // can rebuild the UML boxes with the correct localized captions on each sync.
-  function captureGoals(surface) {
-    var list = surface.ctx.hosts.goal;
-    var task = surface.task;
-    surface.goalHtml = [];
-    surface.goalMet = null;
-    if (!list || !list.children) return;
-    for (var i = 0; i < list.children.length; i++) {
-      surface.goalHtml.push(list.children[i].innerHTML || "");
-    }
+    var met = t.sync({ source: source, types: scanTypes(source), passed: !!surface.runPassed });
+    if (met) surface.goalMet = met;
   }
 
   // Output mismatch is the one result message that embeds lesson data (the

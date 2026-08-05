@@ -20,6 +20,20 @@
         expected: "clean",
         message: "warn is right for this example only. Decide from the real error count, not a fixed word."
       },
+      goals: [
+        {
+          code: [
+            "class Triage",
+            { row: "if (errors >= 10)", writes: "errors >= 10" },
+            { row: 'return "critical";', writes: '"critical"' },
+            { row: "else if (errors >= 1)", writes: "errors >= 1" },
+            { row: 'return "warn";', writes: '"warn"' },
+            { row: 'return "clean";', writes: '"clean"' }
+          ],
+          gate: { type: "Triage", member: "Level" }
+        },
+        { gate: null }
+      ],
       starter: "using System;\n\npublic class Triage\n{\n    public string Level(int errors)\n    {\n        // TODO: \"critical\" when errors >= 10, \"warn\" when errors >= 1, otherwise \"clean\"\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var triage = new Triage();\n        Console.WriteLine(triage.Level(3));\n    }\n}\n",
       solution: "using System;\n\npublic class Triage\n{\n    public string Level(int errors)\n    {\n        if (errors >= 10)\n        {\n            return \"critical\";\n        }\n        else if (errors >= 1)\n        {\n            return \"warn\";\n        }\n        else\n        {\n            return \"clean\";\n        }\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var triage = new Triage();\n        Console.WriteLine(triage.Level(3));\n    }\n}\n"
     },
@@ -41,6 +55,19 @@
         expected: "deny",
         message: "allow is right for this example only. A banned user must be denied - combine the real flags."
       },
+      goals: [
+        {
+          code: [
+            "class AccessControl",
+            { row: "(member || age >= 18)", writes: "||" },
+            { row: "&& !banned", writes: "!banned" },
+            { row: 'return "allow";', writes: '"allow"' },
+            { row: 'return "deny";', writes: '"deny"' }
+          ],
+          gate: { type: "AccessControl", member: "Decide" }
+        },
+        { gate: null }
+      ],
       starter: "using System;\n\npublic class AccessControl\n{\n    public string Decide(bool member, int age, bool banned)\n    {\n        // TODO: \"allow\" when (member or age >= 18) and not banned, otherwise \"deny\"\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var gate = new AccessControl();\n        Console.WriteLine(gate.Decide(false, 20, false));\n    }\n}\n",
       solution: "using System;\n\npublic class AccessControl\n{\n    public string Decide(bool member, int age, bool banned)\n    {\n        if ((member || age >= 18) && !banned)\n        {\n            return \"allow\";\n        }\n        return \"deny\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var gate = new AccessControl();\n        Console.WriteLine(gate.Decide(false, 20, false));\n    }\n}\n"
     },
@@ -67,6 +94,19 @@
         ],
         message: "Those lines are right for this example only. Loop from whatever number you are given."
       },
+      goals: [
+        {
+          code: [
+            "class Countdown",
+            { row: "while (count >= 1)", writes: "while" },
+            { row: "Console.WriteLine(count);", writes: "WriteLine(count)" },
+            { row: "count--;", writes: "count--" },
+            { row: 'Console.WriteLine("liftoff");', writes: '"liftoff"' }
+          ],
+          gate: { type: "Countdown", member: "From" }
+        },
+        { gate: null }
+      ],
       starter: "using System;\n\npublic class Countdown\n{\n    public void From(int count)\n    {\n        // TODO: print count, then count - 1, ... down to 1, then \"liftoff\"\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        new Countdown().From(3);\n    }\n}\n",
       solution: "using System;\n\npublic class Countdown\n{\n    public void From(int count)\n    {\n        while (count >= 1)\n        {\n            Console.WriteLine(count);\n            count--;\n        }\n        Console.WriteLine(\"liftoff\");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        new Countdown().From(3);\n    }\n}\n"
     },
@@ -95,6 +135,18 @@
         ],
         message: "Right for this example only. Number whatever items you are given with the index."
       },
+      goals: [
+        {
+          code: [
+            "class Numbering",
+            { row: "for (int i = 0; i < items.Length; i++)", writes: "items.Length" },
+            { row: "(i + 1)", writes: "+ 1" },
+            { row: "items[i]", writes: "items[" }
+          ],
+          gate: { type: "Numbering", member: "List" }
+        },
+        { gate: null }
+      ],
       starter: "using System;\n\npublic class Numbering\n{\n    public void List(string[] items)\n    {\n        // TODO: print each item with its 1-based position, like \"1. login\"\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        string[] items = { \"login\", \"logout\" };\n        new Numbering().List(items);\n    }\n}\n",
       solution: "using System;\n\npublic class Numbering\n{\n    public void List(string[] items)\n    {\n        for (int i = 0; i < items.Length; i++)\n        {\n            Console.WriteLine((i + 1) + \". \" + items[i]);\n        }\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        string[] items = { \"login\", \"logout\" };\n        new Numbering().List(items);\n    }\n}\n"
     },
@@ -123,6 +175,19 @@
         expected: "x",
         message: "Right for this example only. Skip and stop based on the real step values."
       },
+      goals: [
+        {
+          code: [
+            "class Scanner",
+            { row: "foreach (string step in steps)", writes: "foreach" },
+            { row: 'if (step == "skip") { continue; }', writes: ['"skip"', "continue"] },
+            { row: 'if (step == "stop") { break; }', writes: ['"stop"', "break"] },
+            { row: "Console.WriteLine(step);", writes: "WriteLine(step)" }
+          ],
+          gate: { type: "Scanner", member: "Run" }
+        },
+        { gate: null }
+      ],
       starter: "using System;\n\npublic class Scanner\n{\n    public void Run(string[] steps)\n    {\n        // TODO: continue past \"skip\", break at \"stop\", otherwise print the step\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        string[] steps = { \"a\", \"skip\", \"b\", \"stop\", \"c\" };\n        new Scanner().Run(steps);\n    }\n}\n",
       solution: "using System;\n\npublic class Scanner\n{\n    public void Run(string[] steps)\n    {\n        foreach (string step in steps)\n        {\n            if (step == \"skip\")\n            {\n                continue;\n            }\n            if (step == \"stop\")\n            {\n                break;\n            }\n            Console.WriteLine(step);\n        }\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        string[] steps = { \"a\", \"skip\", \"b\", \"stop\", \"c\" };\n        new Scanner().Run(steps);\n    }\n}\n"
     },
@@ -151,6 +216,21 @@
         ],
         message: "Right for this example only. Switch on the real code values."
       },
+      goals: [
+        {
+          code: [
+            "class Labeler",
+            { row: "foreach (int code in codes)", writes: "foreach" },
+            { row: "switch (code)", writes: "switch" },
+            { row: 'case 1: Console.WriteLine("low"); break;', writes: ["case 1", '"low"', "break"] },
+            { row: 'case 2: Console.WriteLine("mid"); break;', writes: ["case 2", '"mid"'] },
+            { row: 'case 3: Console.WriteLine("high"); break;', writes: ["case 3", '"high"'] },
+            { row: 'default: Console.WriteLine("?"); break;', writes: ["default", '"?"'] }
+          ],
+          gate: { type: "Labeler", member: "Describe" }
+        },
+        { gate: null }
+      ],
       starter: "using System;\n\npublic class Labeler\n{\n    public void Describe(int[] codes)\n    {\n        // TODO: for each code, switch to a word: 1->\"low\", 2->\"mid\", 3->\"high\", else \"?\"\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        int[] codes = { 1, 3, 9 };\n        new Labeler().Describe(codes);\n    }\n}\n",
       solution: "using System;\n\npublic class Labeler\n{\n    public void Describe(int[] codes)\n    {\n        foreach (int code in codes)\n        {\n            switch (code)\n            {\n                case 1:\n                    Console.WriteLine(\"low\");\n                    break;\n                case 2:\n                    Console.WriteLine(\"mid\");\n                    break;\n                case 3:\n                    Console.WriteLine(\"high\");\n                    break;\n                default:\n                    Console.WriteLine(\"?\");\n                    break;\n            }\n        }\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        int[] codes = { 1, 3, 9 };\n        new Labeler().Describe(codes);\n    }\n}\n"
     }

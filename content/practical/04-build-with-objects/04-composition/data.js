@@ -20,6 +20,10 @@
         }
       ],
       starter: "using System;\n\npublic class Animal\n{\n    public string Breathe() { return \"breathing\"; }\n}\n\n// TODO: write a Dog that inherits Animal (: Animal)\n//       and adds its own Fetch() returning \"fetching\".\n\nclass Program\n{\n    static void Main()\n    {\n        var dog = new Dog();\n        Console.WriteLine(dog.Breathe());\n        Console.WriteLine(dog.Fetch());\n    }\n}\n",
+      goals: [
+        { code: ["Dog : Animal", "string Fetch()"], gate: { type: "Dog", base: "Animal", member: "Fetch" } },
+        { gate: null },
+      ],
       solution: "using System;\n\npublic class Animal\n{\n    public string Breathe() { return \"breathing\"; }\n}\n\npublic class Dog : Animal\n{\n    public string Fetch()\n    {\n        return \"fetching\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var dog = new Dog();\n        Console.WriteLine(dog.Breathe());\n        Console.WriteLine(dog.Fetch());\n    }\n}\n"
     },
     {
@@ -41,6 +45,19 @@
         message: "HELLO is right for that one word only. Talk must pass the real word to the megaphone."
       },
       starter: "using System;\n\npublic class Megaphone\n{\n    public string Boost(string text) { return text.ToUpper(); }\n}\n\n// TODO: write a Parrot that:\n//   - is given a word in its constructor (keep it in a private field)\n//   - holds a Megaphone part of its own\n//   - Talk(): returns the megaphone boosting that word\n\nclass Program\n{\n    static void Main()\n    {\n        var parrot = new Parrot(\"hello\");\n        Console.WriteLine(parrot.Talk());\n    }\n}\n",
+      goals: [
+        {
+          code: [
+            "class Parrot",
+            "string _word",
+            "Megaphone _mega",
+            "Parrot(string word)",
+            "string Talk()"
+          ],
+          gate: { type: "Parrot", member: "_word" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Megaphone\n{\n    public string Boost(string text) { return text.ToUpper(); }\n}\n\npublic class Parrot\n{\n    private readonly string _word;\n    private Megaphone _mega = new Megaphone();\n\n    public Parrot(string word)\n    {\n        _word = word;\n    }\n\n    public string Talk()\n    {\n        return _mega.Boost(_word);\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var parrot = new Parrot(\"hello\");\n        Console.WriteLine(parrot.Talk());\n    }\n}\n"
     },
     {
@@ -65,6 +82,19 @@
         }
       ],
       starter: "using System;\n\npublic class Wings { public string Fly() { return \"flying\"; } }\npublic class Fins  { public string Swim() { return \"swimming\"; } }\npublic class Paws  { public string Run() { return \"running\"; } }\n\n// TODO: write a Chimera that holds a Wings, a Fins and a Paws as parts,\n//       with a Go() that returns the wings' Fly().\n\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine(new Chimera().Go());\n    }\n}\n",
+      goals: [
+        {
+          code: [
+            "class Chimera",
+            "Wings _wings",
+            "Fins _fins",
+            "Paws _paws",
+            "string Go()"
+          ],
+          gate: { type: "Chimera", member: "_wings" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Wings { public string Fly() { return \"flying\"; } }\npublic class Fins  { public string Swim() { return \"swimming\"; } }\npublic class Paws  { public string Run() { return \"running\"; } }\n\npublic class Chimera\n{\n    private Wings _wings = new Wings();\n    private Fins _fins = new Fins();\n    private Paws _paws = new Paws();\n\n    public string Go()\n    {\n        return _wings.Fly();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine(new Chimera().Go());\n    }\n}\n"
     },
     {
@@ -89,6 +119,18 @@
         }
       ],
       starter: "using System;\n\npublic class Wings { public string Fly() { return \"flying\"; } }\npublic class Fins  { public string Swim() { return \"swimming\"; } }\npublic class Paws  { public string Run() { return \"running\"; } }\n\n// TODO: write a Chimera holding the three parts, with a Show() that returns\n//       all three moves joined as \"flying, swimming, running\".\n\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine(new Chimera().Show());\n    }\n}\n",
+      goals: [
+        {
+          code: [
+            "class Chimera",
+            "Wings _wings",
+            "Fins _fins",
+            "Paws _paws",
+            "string Show()"
+          ],
+          gate: { type: "Chimera", member: "_wings" }
+        }
+      ],
       solution: "using System;\n\npublic class Wings { public string Fly() { return \"flying\"; } }\npublic class Fins  { public string Swim() { return \"swimming\"; } }\npublic class Paws  { public string Run() { return \"running\"; } }\n\npublic class Chimera\n{\n    private Wings _wings = new Wings();\n    private Fins _fins = new Fins();\n    private Paws _paws = new Paws();\n\n    public string Show()\n    {\n        return _wings.Fly() + \", \" + _fins.Swim() + \", \" + _paws.Run();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine(new Chimera().Show());\n    }\n}\n"
     },
     {
@@ -106,6 +148,16 @@
         message: "The creature must use whatever legs it is handed. With DogLegs, Move should say running."
       },
       starter: "using System;\n\npublic interface ILegs\n{\n    string Run();\n}\n\npublic class DogLegs : ILegs\n{\n    public string Run() { return \"running\"; }\n}\n\npublic class Chimera\n{\n    private readonly ILegs _legs;\n    public Chimera(ILegs legs) { _legs = legs; }\n    public string Move() { return _legs.Run(); }\n}\n\n// TODO: write a CheetahLegs that keeps the ILegs promise\n//       and whose Run() returns \"sprinting\".\n\nclass Program\n{\n    static void Main()\n    {\n        var creature = new Chimera(new CheetahLegs());\n        Console.WriteLine(creature.Move());\n    }\n}\n",
+      goals: [
+        { gate: null },
+        {
+          code: [
+            "CheetahLegs : ILegs",
+            "string Run()"
+          ],
+          gate: { type: "CheetahLegs", member: "Run" }
+        }
+      ],
       solution: "using System;\n\npublic interface ILegs\n{\n    string Run();\n}\n\npublic class DogLegs : ILegs\n{\n    public string Run() { return \"running\"; }\n}\n\npublic class Chimera\n{\n    private readonly ILegs _legs;\n    public Chimera(ILegs legs) { _legs = legs; }\n    public string Move() { return _legs.Run(); }\n}\n\npublic class CheetahLegs : ILegs\n{\n    public string Run()\n    {\n        return \"sprinting\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var creature = new Chimera(new CheetahLegs());\n        Console.WriteLine(creature.Move());\n    }\n}\n"
     },
     {

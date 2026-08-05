@@ -34,6 +34,13 @@
         message: "Filter by the real leg count, not a fixed list of names."
       },
       starter: "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\npublic class Animal\n{\n    public string Name = \"\";\n    public int Legs;\n}\n\npublic class Safari\n{\n    // Return only the animals that have exactly 4 legs.\n    public IEnumerable<Animal> FourLegged(List<Animal> animals)\n    {\n        // TODO: use Where to keep the animals whose Legs equals 4\n        return animals;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        List<Animal> animals = new List<Animal>\n        {\n            new Animal { Name = \"Dog\", Legs = 4 },\n            new Animal { Name = \"Duck\", Legs = 2 },\n            new Animal { Name = \"Cat\", Legs = 4 },\n        };\n        Safari safari = new Safari();\n        foreach (Animal animal in safari.FourLegged(animals))\n            Console.WriteLine(animal.Name);\n    }\n}\n",
+      goals: [
+        {
+          code: ["class Safari", { row: "animals.Where(animal => animal.Legs == 4)", writes: ".Where(" }],
+          gate: { type: "Safari", member: "FourLegged" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\npublic class Animal\n{\n    public string Name = \"\";\n    public int Legs;\n}\n\npublic class Safari\n{\n    public IEnumerable<Animal> FourLegged(List<Animal> animals)\n    {\n        return animals.Where(animal => animal.Legs == 4);\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        List<Animal> animals = new List<Animal>\n        {\n            new Animal { Name = \"Dog\", Legs = 4 },\n            new Animal { Name = \"Duck\", Legs = 2 },\n            new Animal { Name = \"Cat\", Legs = 4 },\n        };\n        Safari safari = new Safari();\n        foreach (Animal animal in safari.FourLegged(animals))\n            Console.WriteLine(animal.Name);\n    }\n}\n"
     },
     {
@@ -51,6 +58,13 @@
         message: "Count from the real list, not a fixed number."
       },
       starter: "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\npublic class Animal\n{\n    public string Name = \"\";\n    public int Legs;\n}\n\npublic class Census\n{\n    // Return how many animals have exactly 4 legs.\n    public int FourLeggedCount(List<Animal> animals)\n    {\n        // TODO: use Count with a rule that matches Legs == 4\n        return 0;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        List<Animal> animals = new List<Animal>\n        {\n            new Animal { Name = \"Dog\", Legs = 4 },\n            new Animal { Name = \"Duck\", Legs = 2 },\n            new Animal { Name = \"Cat\", Legs = 4 },\n        };\n        Census census = new Census();\n        Console.WriteLine(census.FourLeggedCount(animals));\n    }\n}\n",
+      goals: [
+        {
+          code: ["class Census", { row: "animals.Count(animal => animal.Legs == 4)", writes: ".Count(" }],
+          gate: { type: "Census", member: "FourLeggedCount" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\npublic class Animal\n{\n    public string Name = \"\";\n    public int Legs;\n}\n\npublic class Census\n{\n    public int FourLeggedCount(List<Animal> animals)\n    {\n        return animals.Count(animal => animal.Legs == 4);\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        List<Animal> animals = new List<Animal>\n        {\n            new Animal { Name = \"Dog\", Legs = 4 },\n            new Animal { Name = \"Duck\", Legs = 2 },\n            new Animal { Name = \"Cat\", Legs = 4 },\n        };\n        Census census = new Census();\n        Console.WriteLine(census.FourLeggedCount(animals));\n    }\n}\n"
     },
     {
@@ -68,6 +82,13 @@
         message: "Decide from the real list; here no animal has two legs."
       },
       starter: "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\npublic class Animal\n{\n    public string Name = \"\";\n    public int Legs;\n}\n\npublic class Watch\n{\n    // Return whether at least one animal has exactly 2 legs.\n    public bool AnyTwoLegged(List<Animal> animals)\n    {\n        // TODO: use Any with a rule that matches Legs == 2\n        return false;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        List<Animal> animals = new List<Animal>\n        {\n            new Animal { Name = \"Dog\", Legs = 4 },\n            new Animal { Name = \"Duck\", Legs = 2 },\n            new Animal { Name = \"Cat\", Legs = 4 },\n        };\n        Watch watch = new Watch();\n        Console.WriteLine(watch.AnyTwoLegged(animals));\n    }\n}\n",
+      goals: [
+        {
+          code: ["class Watch", { row: "animals.Any(animal => animal.Legs == 2)", writes: ".Any(" }],
+          gate: { type: "Watch", member: "AnyTwoLegged" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\npublic class Animal\n{\n    public string Name = \"\";\n    public int Legs;\n}\n\npublic class Watch\n{\n    public bool AnyTwoLegged(List<Animal> animals)\n    {\n        return animals.Any(animal => animal.Legs == 2);\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        List<Animal> animals = new List<Animal>\n        {\n            new Animal { Name = \"Dog\", Legs = 4 },\n            new Animal { Name = \"Duck\", Legs = 2 },\n            new Animal { Name = \"Cat\", Legs = 4 },\n        };\n        Watch watch = new Watch();\n        Console.WriteLine(watch.AnyTwoLegged(animals));\n    }\n}\n"
     },
     {
@@ -85,6 +106,13 @@
         message: "One legless animal must make the answer False."
       },
       starter: "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\npublic class Animal\n{\n    public string Name = \"\";\n    public int Legs;\n}\n\npublic class Inspection\n{\n    // Return whether every animal has more than 0 legs.\n    public bool AllHaveLegs(List<Animal> animals)\n    {\n        // TODO: use All with the rule that every animal must pass: Legs > 0\n        return false;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        List<Animal> animals = new List<Animal>\n        {\n            new Animal { Name = \"Dog\", Legs = 4 },\n            new Animal { Name = \"Duck\", Legs = 2 },\n            new Animal { Name = \"Cat\", Legs = 4 },\n        };\n        Inspection inspection = new Inspection();\n        Console.WriteLine(inspection.AllHaveLegs(animals));\n    }\n}\n",
+      goals: [
+        {
+          code: ["class Inspection", { row: "animals.All(animal => animal.Legs > 0)", writes: ".All(" }],
+          gate: { type: "Inspection", member: "AllHaveLegs" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\npublic class Animal\n{\n    public string Name = \"\";\n    public int Legs;\n}\n\npublic class Inspection\n{\n    public bool AllHaveLegs(List<Animal> animals)\n    {\n        return animals.All(animal => animal.Legs > 0);\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        List<Animal> animals = new List<Animal>\n        {\n            new Animal { Name = \"Dog\", Legs = 4 },\n            new Animal { Name = \"Duck\", Legs = 2 },\n            new Animal { Name = \"Cat\", Legs = 4 },\n        };\n        Inspection inspection = new Inspection();\n        Console.WriteLine(inspection.AllHaveLegs(animals));\n    }\n}\n"
     },
     {
@@ -109,6 +137,13 @@
         message: "Project the real names, not a fixed list."
       },
       starter: "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\npublic class Animal\n{\n    public string Name = \"\";\n    public int Legs;\n}\n\npublic class Roster\n{\n    // Return each animal's name as a sequence of strings.\n    public IEnumerable<string> Names(List<Animal> animals)\n    {\n        // TODO: use Select to turn each animal into its Name\n        return new List<string>();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        List<Animal> animals = new List<Animal>\n        {\n            new Animal { Name = \"Dog\", Legs = 4 },\n            new Animal { Name = \"Duck\", Legs = 2 },\n            new Animal { Name = \"Cat\", Legs = 4 },\n        };\n        Roster roster = new Roster();\n        foreach (string name in roster.Names(animals))\n            Console.WriteLine(name);\n    }\n}\n",
+      goals: [
+        {
+          code: ["class Roster", { row: "animals.Select(animal => animal.Name)", writes: ".Select(" }],
+          gate: { type: "Roster", member: "Names" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\npublic class Animal\n{\n    public string Name = \"\";\n    public int Legs;\n}\n\npublic class Roster\n{\n    public IEnumerable<string> Names(List<Animal> animals)\n    {\n        return animals.Select(animal => animal.Name);\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        List<Animal> animals = new List<Animal>\n        {\n            new Animal { Name = \"Dog\", Legs = 4 },\n            new Animal { Name = \"Duck\", Legs = 2 },\n            new Animal { Name = \"Cat\", Legs = 4 },\n        };\n        Roster roster = new Roster();\n        foreach (string name in roster.Names(animals))\n            Console.WriteLine(name);\n    }\n}\n"
     },
     {
@@ -126,6 +161,13 @@
         message: "When nothing matches, FirstOrDefault should return the default so Main prints none."
       },
       starter: "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\npublic class Animal\n{\n    public string Name = \"\";\n    public int Legs;\n}\n\npublic class Finder\n{\n    // Return the first animal with exactly 2 legs, or the default if there is none.\n    public Animal? FirstTwoLegged(List<Animal> animals)\n    {\n        // TODO: use FirstOrDefault with a rule that matches Legs == 2\n        return null;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        List<Animal> animals = new List<Animal>\n        {\n            new Animal { Name = \"Dog\", Legs = 4 },\n            new Animal { Name = \"Duck\", Legs = 2 },\n            new Animal { Name = \"Cat\", Legs = 4 },\n        };\n        Finder finder = new Finder();\n        Animal? bird = finder.FirstTwoLegged(animals);\n        Console.WriteLine(bird == null ? \"none\" : bird.Name);\n    }\n}\n",
+      goals: [
+        {
+          code: ["class Finder", { row: "animals.FirstOrDefault(animal => animal.Legs == 2)", writes: ".FirstOrDefault(" }],
+          gate: { type: "Finder", member: "FirstTwoLegged" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\npublic class Animal\n{\n    public string Name = \"\";\n    public int Legs;\n}\n\npublic class Finder\n{\n    public Animal? FirstTwoLegged(List<Animal> animals)\n    {\n        return animals.FirstOrDefault(animal => animal.Legs == 2);\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        List<Animal> animals = new List<Animal>\n        {\n            new Animal { Name = \"Dog\", Legs = 4 },\n            new Animal { Name = \"Duck\", Legs = 2 },\n            new Animal { Name = \"Cat\", Legs = 4 },\n        };\n        Finder finder = new Finder();\n        Animal? bird = finder.FirstTwoLegged(animals);\n        Console.WriteLine(bird == null ? \"none\" : bird.Name);\n    }\n}\n"
     },
     {
@@ -151,6 +193,13 @@
         message: "Sort by the real names, not a fixed order."
       },
       starter: "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\npublic class Animal\n{\n    public string Name = \"\";\n    public int Legs;\n}\n\npublic class Lineup\n{\n    // Return the animals ordered alphabetically by Name.\n    public IEnumerable<Animal> ByName(List<Animal> animals)\n    {\n        // TODO: use OrderBy to sort the animals by Name\n        return animals;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        List<Animal> animals = new List<Animal>\n        {\n            new Animal { Name = \"Dog\", Legs = 4 },\n            new Animal { Name = \"Duck\", Legs = 2 },\n            new Animal { Name = \"Cat\", Legs = 4 },\n        };\n        Lineup lineup = new Lineup();\n        foreach (Animal animal in lineup.ByName(animals))\n            Console.WriteLine(animal.Name);\n    }\n}\n",
+      goals: [
+        {
+          code: ["class Lineup", { row: "animals.OrderBy(animal => animal.Name)", writes: ".OrderBy(" }],
+          gate: { type: "Lineup", member: "ByName" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\npublic class Animal\n{\n    public string Name = \"\";\n    public int Legs;\n}\n\npublic class Lineup\n{\n    public IEnumerable<Animal> ByName(List<Animal> animals)\n    {\n        return animals.OrderBy(animal => animal.Name);\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        List<Animal> animals = new List<Animal>\n        {\n            new Animal { Name = \"Dog\", Legs = 4 },\n            new Animal { Name = \"Duck\", Legs = 2 },\n            new Animal { Name = \"Cat\", Legs = 4 },\n        };\n        Lineup lineup = new Lineup();\n        foreach (Animal animal in lineup.ByName(animals))\n            Console.WriteLine(animal.Name);\n    }\n}\n"
     },
     {

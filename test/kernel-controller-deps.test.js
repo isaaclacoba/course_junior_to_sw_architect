@@ -50,6 +50,8 @@ test("build loads its grader AND the structure policy the tracker reads", () => 
   assert.deepEqual(deps().build, [
     "kernel/grading/output-match.js",
     "kernel/grading/structure-match.js",
+    "kernel/engine/widgets/goal-tracker.js",
+    "kernel/engine/widgets/csharp-goal-provider.js",
   ]);
 });
 
@@ -64,6 +66,12 @@ test("git loads its graders AND the shared progress module, in that order", () =
     "kernel/grading/dag-match.js",
     "kernel/grading/state-match.js",
     "kernel/engine/git-progress.js",
+    "kernel/engine/widgets/goal-tracker.js",
+    // The policy must precede the provider: the provider looks its policy up on
+    // the window, and with the order swapped the git tracker silently draws
+    // nothing at all rather than failing loudly.
+    "kernel/grading/git-goal-match.js",
+    "kernel/engine/widgets/git-goal-provider.js",
   ]);
 });
 

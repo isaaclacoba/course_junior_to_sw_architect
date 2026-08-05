@@ -44,6 +44,13 @@
         }
       ],
       starter: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        // TODO: store a lambda `addLeg` that gives back legs + 1,\n        //       then print it for 3 and for 4 on their own lines.\n\n    }\n}\n",
+      goals: [
+        {
+          code: ["class Program", { row: "var addLeg = (int legs) => legs + 1;", writes: "=>legs+1" }],
+          gate: { type: "Program", member: "Main" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        var addLeg = (int legs) => legs + 1;\n        Console.WriteLine(addLeg(3));\n        Console.WriteLine(addLeg(4));\n    }\n}\n"
     },
     {
@@ -68,6 +75,13 @@
         }
       ],
       starter: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int[] legs = { 2, 4, 8, 4 };\n        // TODO: store a lambda isFourLegged that tests a count == 4,\n        //       then loop over legs and print how many animals pass.\n\n    }\n}\n",
+      goals: [
+        {
+          code: ["class Program", { row: "var isFourLegged = (int count) => count == 4;", writes: "=>count==4" }],
+          gate: { type: "Program", member: "Main" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int[] legs = { 2, 4, 8, 4 };\n        var isFourLegged = (int count) => count == 4;\n        int total = 0;\n        foreach (int count in legs)\n        {\n            if (isFourLegged(count)) total++;\n        }\n        Console.WriteLine(total);\n    }\n}\n"
     },
     {
@@ -92,6 +106,13 @@
         }
       ],
       starter: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int minLegs = 4;\n        int[] legs = { 2, 4, 8, 4 };\n        // TODO: store a lambda enough that checks a count >= minLegs (reading minLegs),\n        //       then loop over legs and print how many reach minLegs.\n\n    }\n}\n",
+      goals: [
+        {
+          code: ["class Program", { row: "var enough = (int count) => count >= minLegs;", writes: ">=minLegs" }],
+          gate: { type: "Program", member: "Main" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int minLegs = 4;\n        int[] legs = { 2, 4, 8, 4 };\n        var enough = (int count) => count >= minLegs;\n        int total = 0;\n        foreach (int count in legs)\n        {\n            if (enough(count)) total++;\n        }\n        Console.WriteLine(total);\n    }\n}\n"
     },
     {
@@ -119,6 +140,13 @@
         }
       ],
       starter: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int bonus = 10;\n        int[] scores = { 5, 20 };\n        // TODO: store a lambda reward that adds bonus to a score (reading bonus),\n        //       then loop over scores and print each rewarded total.\n\n    }\n}\n",
+      goals: [
+        {
+          code: ["class Program", { row: "var reward = (int score) => score + bonus;", writes: "=>score+bonus" }],
+          gate: { type: "Program", member: "Main" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int bonus = 10;\n        int[] scores = { 5, 20 };\n        var reward = (int score) => score + bonus;\n        foreach (int score in scores)\n        {\n            Console.WriteLine(reward(score));\n        }\n    }\n}\n"
     },
     {

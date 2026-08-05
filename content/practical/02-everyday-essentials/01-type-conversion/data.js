@@ -25,6 +25,10 @@
         message: "`AgeNextYear` must parse the text it is given, not a fixed value - a kitten aged \"10\" should come back as 11."
       },
       starter: "using System;\n\npublic class Kitten\n{\n    public int AgeNextYear(string ageText)\n    {\n        // TODO: parse ageText into a number, then return it plus 1\n        return 0;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var k = new Kitten();\n        Console.WriteLine(k.AgeNextYear(\"3\"));\n    }\n}\n",
+      goals: [
+        { code: ["class Kitten", { row: "int age = int.Parse(ageText)", writes: "int.Parse(" }, { row: "return age + 1", writes: "age + 1" }], gate: { type: "Kitten", member: "AgeNextYear" } },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Kitten\n{\n    public int AgeNextYear(string ageText)\n    {\n        int age = int.Parse(ageText);\n        return age + 1;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var k = new Kitten();\n        Console.WriteLine(k.AgeNextYear(\"3\"));\n    }\n}\n"
     },
     {
@@ -46,6 +50,10 @@
         message: "`Code` must use the number it is given - `3` should read `C3`, not a fixed `C7`."
       },
       starter: "using System;\n\npublic class Chip\n{\n    public string Code(int n)\n    {\n        // TODO: return \"C\" followed by n as text\n        return \"\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var chip = new Chip();\n        Console.WriteLine(chip.Code(7));\n    }\n}\n",
+      goals: [
+        { code: ["class Chip", { row: "\"C\" + n.ToString()", writes: ".ToString(" }], gate: { type: "Chip", member: "Code" } },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Chip\n{\n    public string Code(int n)\n    {\n        return \"C\" + n.ToString();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var chip = new Chip();\n        Console.WriteLine(chip.Code(7));\n    }\n}\n"
     },
     {
@@ -67,6 +75,10 @@
         message: "`Whole` must truncate the value it is given - `7.8` should come back as `7`."
       },
       starter: "using System;\n\npublic class Scale\n{\n    public int Whole(double kg)\n    {\n        // TODO: return kg with the decimals dropped\n        return 0;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var scale = new Scale();\n        Console.WriteLine(scale.Whole(3.9));\n    }\n}\n",
+      goals: [
+        { code: ["class Scale", { row: "return (int)kg", writes: "(int)kg" }], gate: { type: "Scale", member: "Whole" } },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Scale\n{\n    public int Whole(double kg)\n    {\n        return (int)kg;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var scale = new Scale();\n        Console.WriteLine(scale.Whole(3.9));\n    }\n}\n"
     },
     {
@@ -88,6 +100,10 @@
         message: "`IsNumber` must test the text it is given - `\"5\"` is a number, so it should read `True`."
       },
       starter: "using System;\n\npublic class Gate\n{\n    public bool IsNumber(string text)\n    {\n        // TODO: return whether text is a whole number, using int.TryParse\n        return false;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var gate = new Gate();\n        Console.WriteLine(gate.IsNumber(\"cat\"));\n    }\n}\n",
+      goals: [
+        { code: ["class Gate", { row: "return int.TryParse(text, out int n)", writes: "int.TryParse(" }], gate: { type: "Gate", member: "IsNumber" } },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Gate\n{\n    public bool IsNumber(string text)\n    {\n        return int.TryParse(text, out int n);\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var gate = new Gate();\n        Console.WriteLine(gate.IsNumber(\"cat\"));\n    }\n}\n"
     },
     {

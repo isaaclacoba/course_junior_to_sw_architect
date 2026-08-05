@@ -26,6 +26,18 @@
         expected: "Good afternoon",
         message: "Good morning is right for a 9 o'clock clock only. Decide from the hour the clock reports, not a fixed word.",
       },
+      goals: [
+        {
+          code: [
+            "class Greeter",
+            { row: "int hour = clock.Hour()", writes: "clock.Hour(" },
+            { row: "if (hour < 12)", writes: "<12" },
+            { row: "return both greetings", writes: ['"Good morning"', '"Good afternoon"'] }
+          ],
+          gate: { type: "Greeter", member: "Greet" }
+        },
+        { gate: null }
+      ],
       starter:
         'using System;\n\npublic class Clock\n{\n    private int _hour;\n\n    public Clock(int hour)\n    {\n        _hour = hour;\n    }\n\n    public int Hour()\n    {\n        return _hour;\n    }\n}\n\npublic class Greeter\n{\n    public string Greet(Clock clock)\n    {\n        // TODO: ask the clock for the hour; return "Good morning" before 12, otherwise "Good afternoon"\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Greeter greeter = new Greeter();\n        Clock clock = new Clock(9);\n        Console.WriteLine(greeter.Greet(clock));\n    }\n}\n',
       solution:
@@ -46,6 +58,18 @@
         expected: "10",
         message: "30 is right for 3 books only. Ask the price list for the real item and multiply by the real quantity.",
       },
+      goals: [
+        {
+          code: [
+            "class Cart",
+            { row: "_prices = prices", writes: "_prices=prices" },
+            { row: "_prices.PriceOf(item)", writes: ".PriceOf(" },
+            { row: "* qty", writes: "*" }
+          ],
+          gate: { type: "Cart", member: "Total" }
+        },
+        { gate: null }
+      ],
       starter:
         'using System;\n\npublic class PriceList\n{\n    public int PriceOf(string item)\n    {\n        if (item == "book")\n        {\n            return 10;\n        }\n        return 5;\n    }\n}\n\npublic class Cart\n{\n    private PriceList _prices;\n\n    public Cart(PriceList prices)\n    {\n        // TODO: keep the price list that was handed in\n    }\n\n    public int Total(string item, int qty)\n    {\n        // TODO: ask the price list for the item\'s price, times qty\n        return 0;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Cart cart = new Cart(new PriceList());\n        Console.WriteLine(cart.Total("book", 3));\n    }\n}\n',
       solution:
@@ -64,6 +88,16 @@
         expected: "21",
         message: "20 is right for 4 by 5 only. Compute from the two sides you are given.",
       },
+      goals: [
+        {
+          code: [
+            "class Rectangle",
+            { row: "return width * height", writes: "width*height" }
+          ],
+          gate: { type: "Rectangle", member: "Area" }
+        },
+        { gate: null }
+      ],
       starter:
         'using System;\n\npublic class Rectangle\n{\n    public int Area(int width, int height)\n    {\n        // TODO: return the area - width times height\n        return 0;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Rectangle rectangle = new Rectangle();\n        Console.WriteLine(rectangle.Area(4, 5));\n    }\n}\n',
       solution:
@@ -86,6 +120,16 @@
       },
       starter:
         'using System;\n\n// ReceiptFormatter should own the wording job - turning a number into text.\npublic class ReceiptFormatter\n{\n    // TODO: add a Format(int total) method that returns "Total: " + total\n}\n\npublic class Checkout\n{\n    public string Pay(int price, int qty)\n    {\n        int total = price * qty;\n        // TODO: build a ReceiptFormatter and ask it to format the total\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Checkout checkout = new Checkout();\n        Console.WriteLine(checkout.Pay(10, 2));\n    }\n}\n',
+      goals: [
+        {
+          code: [
+            "class ReceiptFormatter",
+            "string Format(int total)"
+          ],
+          gate: { type: "ReceiptFormatter", member: "Format" }
+        },
+        { gate: null }
+      ],
       solution:
         'using System;\n\npublic class ReceiptFormatter\n{\n    public string Format(int total)\n    {\n        return "Total: " + total;\n    }\n}\n\npublic class Checkout\n{\n    public string Pay(int price, int qty)\n    {\n        int total = price * qty;\n        ReceiptFormatter formatter = new ReceiptFormatter();\n        return formatter.Format(total);\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Checkout checkout = new Checkout();\n        Console.WriteLine(checkout.Pay(10, 2));\n    }\n}\n',
     },
@@ -103,6 +147,18 @@
         expected: "sent: hello Mo",
         message: "sent: hello Sam is right for Sam only. Use the name you are handed, sent through the outbox.",
       },
+      goals: [
+        {
+          code: [
+            "class Mailer",
+            { row: "_outbox = outbox", writes: "_outbox=outbox" },
+            { row: '"hello " + who', writes: '"hello "' },
+            { row: "_outbox.Send(...)", writes: "_outbox.Send(" }
+          ],
+          gate: { type: "Mailer", member: "Notify" }
+        },
+        { gate: null }
+      ],
       starter:
         'using System;\n\npublic class Outbox\n{\n    public string Send(string message)\n    {\n        return "sent: " + message;\n    }\n}\n\npublic class Mailer\n{\n    private Outbox _outbox;\n\n    public Mailer(Outbox outbox)\n    {\n        // TODO: keep the outbox that was handed in - do not build a new one\n    }\n\n    public string Notify(string who)\n    {\n        // TODO: send "hello " + who through the outbox\n        return "";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Outbox outbox = new Outbox();\n        Mailer mailer = new Mailer(outbox);\n        Console.WriteLine(mailer.Notify("Sam"));\n    }\n}\n',
       solution:
@@ -122,6 +178,17 @@
         expected: "shipped",
         message: "work done is right for that one call only. Write whatever status you are given through the log.",
       },
+      goals: [
+        {
+          code: [
+            "class Worker",
+            { row: "_log = log", writes: "_log=log" },
+            { row: "_log.Write(status)", writes: "_log.Write(" }
+          ],
+          gate: { type: "Worker", member: "Report" }
+        },
+        { gate: null }
+      ],
       starter:
         'using System;\n\npublic class ConsoleLog\n{\n    public void Write(string message)\n    {\n        Console.WriteLine(message);\n    }\n}\n\npublic class Worker\n{\n    private ConsoleLog _log;\n\n    public Worker(ConsoleLog log)\n    {\n        // TODO: keep the log that was handed in\n    }\n\n    public void Report(string status)\n    {\n        // TODO: write the status through the log\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        ConsoleLog log = new ConsoleLog();\n        Worker worker = new Worker(log);\n        worker.Report("work done");\n    }\n}\n',
       solution:

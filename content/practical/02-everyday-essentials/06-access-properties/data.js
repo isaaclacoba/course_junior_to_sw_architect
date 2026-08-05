@@ -32,6 +32,17 @@
         expected: "7",
         message: "`Lives` must return the field the cat was built with - a cat made with 7 lives should read 7, not a fixed 9."
       },
+      goals: [
+        { gate: null },
+        {
+          code: [
+            "class Cat",
+            { row: "return `_lives` from the `get`", writes: "return _lives", gone: "return 0" }
+          ],
+          gate: { type: "Cat", member: "Lives" }
+        },
+        { gate: null }
+      ],
       starter: "using System;\n\npublic class Cat\n{\n    private int _lives;\n\n    public Cat(int lives)\n    {\n        _lives = lives;\n    }\n\n    // TODO: return _lives instead of 0 so the hidden field can be read\n    public int Lives\n    {\n        get { return 0; }\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var cat = new Cat(9);\n        Console.WriteLine(cat.Lives);\n    }\n}\n",
       solution: "using System;\n\npublic class Cat\n{\n    private int _lives;\n\n    public Cat(int lives)\n    {\n        _lives = lives;\n    }\n\n    public int Lives\n    {\n        get { return _lives; }\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var cat = new Cat(9);\n        Console.WriteLine(cat.Lives);\n    }\n}\n"
     },
@@ -49,6 +60,16 @@
         expected: "Bella",
         message: "`Name` must hold whatever is set on it - after setting it to \"Bella\" it should read `Bella`, not a fixed value."
       },
+      goals: [
+        {
+          code: [
+            "class Pet",
+            { row: "public string Name { get; set; } = \"\";", writes: ["get; set;", "= \"\""], gone: "public string Name =" }
+          ],
+          gate: { type: "Pet", member: "Name" }
+        },
+        { gate: null }
+      ],
       starter: "using System;\n\npublic class Pet\n{\n    // TODO: make Name an auto-property with get and set, defaulted to \"\"\n    public string Name = \"\";\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var pet = new Pet();\n        pet.Name = \"Rex\";\n        Console.WriteLine(pet.Name);\n    }\n}\n",
       solution: "using System;\n\npublic class Pet\n{\n    public string Name { get; set; } = \"\";\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var pet = new Pet();\n        pet.Name = \"Rex\";\n        Console.WriteLine(pet.Name);\n    }\n}\n"
     },
@@ -70,6 +91,17 @@
         expected: "cat:Zoe",
         message: "`Label` must be built from the current `Name` - after setting `Name` to \"Zoe\" it should read `cat:Zoe`."
       },
+      goals: [
+        { gate: null },
+        {
+          code: [
+            "class Tag",
+            { row: "public string Label => \"cat:\" + Name;", writes: "\"cat:\" + Name", gone: "Label => \"\"" }
+          ],
+          gate: { type: "Tag", member: "Label" }
+        },
+        { gate: null }
+      ],
       starter: "using System;\n\npublic class Tag\n{\n    public string Name { get; set; } = \"\";\n\n    // TODO: make Label an expression-bodied property that returns \"cat:\" + Name\n    public string Label => \"\";\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var tag = new Tag();\n        tag.Name = \"Milo\";\n        Console.WriteLine(tag.Label);\n    }\n}\n",
       solution: "using System;\n\npublic class Tag\n{\n    public string Name { get; set; } = \"\";\n\n    public string Label => \"cat:\" + Name;\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var tag = new Tag();\n        tag.Name = \"Milo\";\n        Console.WriteLine(tag.Label);\n    }\n}\n"
     },
@@ -87,6 +119,17 @@
         expected: "Sky",
         message: "`Name` must keep whatever the constructor was given - a badge built with \"Sky\" should read `Sky`."
       },
+      goals: [
+        { gate: null },
+        {
+          code: [
+            "class Badge",
+            { row: "Name = name;", writes: "= name" }
+          ],
+          gate: { type: "Badge", member: "Badge" }
+        },
+        { gate: null }
+      ],
       starter: "using System;\n\npublic class Badge\n{\n    public string Name { get; init; } = \"\";\n\n    public Badge(string name)\n    {\n        // TODO: store name in Name (init can be set here, inside the constructor)\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var badge = new Badge(\"Rex\");\n        Console.WriteLine(badge.Name);\n    }\n}\n",
       solution: "using System;\n\npublic class Badge\n{\n    public string Name { get; init; } = \"\";\n\n    public Badge(string name)\n    {\n        Name = name;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var badge = new Badge(\"Rex\");\n        Console.WriteLine(badge.Name);\n    }\n}\n"
     },

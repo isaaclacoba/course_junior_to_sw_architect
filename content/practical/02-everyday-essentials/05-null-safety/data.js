@@ -30,6 +30,16 @@
         ],
         message: "`NameOr` must use the name when there is one and fall back only when it is `null` - `\"Rex\"` should stay `Rex`, and `null` should become `stray`."
       },
+      goals: [
+        {
+          code: [
+            "class Shelter",
+            { row: "return the fallback with `??`", writes: "??" }
+          ],
+          gate: { type: "Shelter", member: "NameOr" }
+        },
+        { gate: null }
+      ],
       starter: "using System;\n\npublic class Shelter\n{\n    public string NameOr(string? given)\n    {\n        // TODO: return given, but use \"stray\" instead when given is null\n        return \"\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var shelter = new Shelter();\n        Console.WriteLine(shelter.NameOr(null));\n    }\n}\n",
       solution: "using System;\n\npublic class Shelter\n{\n    public string NameOr(string? given)\n    {\n        return given ?? \"stray\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var shelter = new Shelter();\n        Console.WriteLine(shelter.NameOr(null));\n    }\n}\n"
     },
@@ -54,6 +64,17 @@
         ],
         message: "`Greet` must read the real pet's name when there is one, and only fall back for `null` - `Milo` should come back, `null` should read `nobody`."
       },
+      goals: [
+        {
+          code: [
+            "class Tag",
+            { row: "pet?.Name", writes: "?." },
+            { row: "return the fallback with `??`", writes: "??" }
+          ],
+          gate: { type: "Tag", member: "Greet" }
+        },
+        { gate: null }
+      ],
       starter: "using System;\n\npublic class Pet\n{\n    public string Name = \"\";\n}\n\npublic class Tag\n{\n    public string Greet(Pet? pet)\n    {\n        // TODO: return the pet's Name, but \"nobody\" when the pet itself is null\n        return \"\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var tag = new Tag();\n        Console.WriteLine(tag.Greet(null));\n    }\n}\n",
       solution: "using System;\n\npublic class Pet\n{\n    public string Name = \"\";\n}\n\npublic class Tag\n{\n    public string Greet(Pet? pet)\n    {\n        return pet?.Name ?? \"nobody\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var tag = new Tag();\n        Console.WriteLine(tag.Greet(null));\n    }\n}\n"
     },
@@ -78,6 +99,24 @@
         ],
         message: "`Describe` must report the real number when there is one and only say `unknown` for `null` - `4` should read `age 4`, `null` should read `unknown`."
       },
+      goals: [
+        {
+          code: [
+            "class Vet",
+            { row: "if (age == null)", writes: ["if", "null"] },
+            { row: "return `\"unknown\"`", writes: "\"unknown\"" }
+          ],
+          gate: { type: "Vet", member: "Describe" }
+        },
+        {
+          code: [
+            "class Vet",
+            { row: "read the number with `.Value`", writes: ".Value" }
+          ],
+          gate: { type: "Vet", member: "Describe" }
+        },
+        { gate: null }
+      ],
       starter: "using System;\n\npublic class Vet\n{\n    public string Describe(int? age)\n    {\n        // TODO: return \"unknown\" when age is null, else \"age \" + the number\n        return \"age 0\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var vet = new Vet();\n        Console.WriteLine(vet.Describe(null));\n    }\n}\n",
       solution: "using System;\n\npublic class Vet\n{\n    public string Describe(int? age)\n    {\n        if (age == null)\n        {\n            return \"unknown\";\n        }\n        return \"age \" + age.Value;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var vet = new Vet();\n        Console.WriteLine(vet.Describe(null));\n    }\n}\n"
     },
@@ -102,6 +141,24 @@
         ],
         message: "`CheckIn` must keep a real occupant and only fill in the default for `null` - `\"Rex\"` should stay `Rex`, and `null` should become `guest`."
       },
+      goals: [
+        {
+          code: [
+            "class Kennel",
+            { row: "occupant = given;", writes: "occupant = given" }
+          ],
+          gate: { type: "Kennel", member: "CheckIn" }
+        },
+        {
+          code: [
+            "class Kennel",
+            { row: "default with `??=`", writes: "??=" },
+            { row: "return `occupant`", writes: "return occupant" }
+          ],
+          gate: { type: "Kennel", member: "CheckIn" }
+        },
+        { gate: null }
+      ],
       starter: "using System;\n\npublic class Kennel\n{\n    private string? occupant;\n\n    public string CheckIn(string? given)\n    {\n        occupant = given;\n        // TODO: when occupant is null, make it \"guest\", then return occupant\n        return \"\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var kennel = new Kennel();\n        Console.WriteLine(kennel.CheckIn(null));\n    }\n}\n",
       solution: "using System;\n\npublic class Kennel\n{\n    private string? occupant;\n\n    public string CheckIn(string? given)\n    {\n        occupant = given;\n        occupant ??= \"guest\";\n        return occupant;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var kennel = new Kennel();\n        Console.WriteLine(kennel.CheckIn(null));\n    }\n}\n"
     },

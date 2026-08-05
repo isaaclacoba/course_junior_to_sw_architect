@@ -36,6 +36,28 @@
         expected: "ROOM",
         message: "`IsFull` should answer from the cage's own data. With room to spare (2 of 5) it should read ROOM."
       },
+      goals: [
+        {
+          code: [
+            "class Cage",
+            "int _animals",
+            "int _capacity",
+            "Cage(int animals, int capacity)",
+            "bool IsFull()"
+          ],
+          gate: { type: "Cage", member: "Cage" }
+        },
+        { gate: { type: "Cage", member: "IsFull" } },
+        {
+          code: [
+            "class Program",
+            { row: "new Cage(3, 3)", writes: "new Cage(" },
+            { row: "cage.IsFull()", writes: ".IsFull()" },
+            { row: "drop static IsFull(Cage)", gone: "static bool IsFull" }
+          ],
+          gate: { type: "Program", member: "Main" }
+        }
+      ],
       starter: "using System;\n\npublic class Cage\n{\n    public int Animals;\n    public int Capacity;\n}\n\nclass Program\n{\n    // the rule sits outside the data it works on\n    static bool IsFull(Cage cage)\n    {\n        return cage.Animals >= cage.Capacity;\n    }\n\n    static void Main()\n    {\n        var cage = new Cage { Animals = 3, Capacity = 3 };\n        Console.WriteLine(IsFull(cage) ? \"FULL\" : \"ROOM\");\n    }\n}\n",
       solution: "using System;\n\npublic class Cage\n{\n    private readonly int _animals;\n    private readonly int _capacity;\n\n    public Cage(int animals, int capacity)\n    {\n        _animals = animals;\n        _capacity = capacity;\n    }\n\n    public bool IsFull()\n    {\n        return _animals >= _capacity;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var cage = new Cage(3, 3);\n        Console.WriteLine(cage.IsFull() ? \"FULL\" : \"ROOM\");\n    }\n}\n"
     },
@@ -61,6 +83,18 @@
         expected: "COUGH",
         message: "Your `Vet` is still tied to `Dog`. Depend on `IPet` so any patient - even a parrot - can be handed in."
       },
+      goals: [
+        { code: ["interface IPet", "string Checkup()"], gate: { type: "IPet", kind: "interface", member: "Checkup" } },
+        { code: ["Dog : IPet", "string Checkup()"], gate: { type: "Dog", base: "IPet", member: "Checkup" } },
+        {
+          code: [
+            "class Vet",
+            { row: "IPet _patient", writes: "IPet _patient", gone: "Dog _patient" },
+            { row: "Vet(IPet patient)", writes: "Vet(IPet", gone: "Vet(Dog" }
+          ],
+          gate: { type: "Vet", member: "Vet" }
+        }
+      ],
       starter: "using System;\n\npublic class Dog\n{\n    public string Checkup() { return \"HEALTHY\"; }\n}\n\npublic class Vet\n{\n    // works directly with Dog - no other patient fits\n    private readonly Dog _patient;\n\n    public Vet(Dog patient)\n    {\n        _patient = patient;\n    }\n\n    public string Visit()\n    {\n        return _patient.Checkup();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var vet = new Vet(new Dog());\n        Console.WriteLine(vet.Visit());\n    }\n}\n",
       solution: "using System;\n\npublic interface IPet\n{\n    string Checkup();\n}\n\npublic class Dog : IPet\n{\n    public string Checkup() { return \"HEALTHY\"; }\n}\n\npublic class Vet\n{\n    private readonly IPet _patient;\n\n    public Vet(IPet patient)\n    {\n        _patient = patient;\n    }\n\n    public string Visit()\n    {\n        return _patient.Checkup();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var vet = new Vet(new Dog());\n        Console.WriteLine(vet.Visit());\n    }\n}\n"
     },
@@ -78,6 +112,23 @@
         expected: "shut",
         message: "Your `Coop` still builds its own clock, so it ignores the one handed in. Store the injected `IClock` and use it in `Door`."
       },
+      goals: [
+        {
+          code: [
+            "class Coop",
+            "Coop(IClock clock)",
+            { row: "_clock = clock", writes: "_clock = clock", gone: "new SunClock()" }
+          ],
+          gate: { type: "Coop", member: "Coop" }
+        },
+        {
+          code: [
+            "class Program",
+            { row: "new Coop(new SunClock())", writes: "new Coop(new SunClock())" }
+          ],
+          gate: { type: "Program", member: "Main" }
+        }
+      ],
       starter: "using System;\n\npublic interface IClock { int Hour(); }\n\npublic class SunClock : IClock\n{\n    public int Hour() { return 9; }\n}\n\npublic class Coop\n{\n    // builds its own clock, so a test cannot swap it\n    private readonly IClock _clock = new SunClock();\n\n    public string Door()\n    {\n        return _clock.Hour() < 18 ? \"open\" : \"shut\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var coop = new Coop();\n        Console.WriteLine(coop.Door());\n    }\n}\n",
       solution: "using System;\n\npublic interface IClock { int Hour(); }\n\npublic class SunClock : IClock\n{\n    public int Hour() { return 9; }\n}\n\npublic class Coop\n{\n    private readonly IClock _clock;\n\n    public Coop(IClock clock)\n    {\n        _clock = clock;\n    }\n\n    public string Door()\n    {\n        return _clock.Hour() < 18 ? \"open\" : \"shut\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var coop = new Coop(new SunClock());\n        Console.WriteLine(coop.Door());\n    }\n}\n"
     },
@@ -126,6 +177,27 @@
         expected: "Tweet",
         message: "A `Zoo` that holds `IAnimal` should take an animal it has never seen. Add a new kind and it should speak too, with no change to `Zoo`."
       },
+      goals: [
+        { code: ["interface IAnimal", "string Speak()"], gate: { type: "IAnimal", kind: "interface", member: "Speak" } },
+        {
+          code: [
+            "class Zoo",
+            "List<IAnimal> _animals",
+            { row: "Add(IAnimal animal)", writes: "Add(IAnimal" },
+            { row: "animal.Speak()", writes: ".Speak()" },
+            { row: "if (kind == \"cat\")", gone: "kind ==" }
+          ],
+          gate: { type: "Zoo", member: "_animals" }
+        },
+        {
+          code: [
+            "class Program",
+            { row: "zoo.Add(new Cat())", writes: "new Cat()" },
+            { row: "zoo.Add(new Dog())", writes: "new Dog()" }
+          ],
+          gate: { type: "Program", member: "Main" }
+        }
+      ],
       starter: "using System;\nusing System.Collections.Generic;\n\npublic class Zoo\n{\n    private readonly List<string> _kinds = new List<string>();\n\n    public void Add(string kind) { _kinds.Add(kind); }\n\n    // one loop that must know every animal\n    public void SpeakAll()\n    {\n        foreach (var kind in _kinds)\n        {\n            if (kind == \"cat\") Console.WriteLine(\"Meow\");\n            else if (kind == \"dog\") Console.WriteLine(\"Woof\");\n        }\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var zoo = new Zoo();\n        zoo.Add(\"cat\");\n        zoo.Add(\"dog\");\n        zoo.SpeakAll();\n    }\n}\n",
       solution: "using System;\nusing System.Collections.Generic;\n\npublic interface IAnimal\n{\n    string Speak();\n}\n\npublic class Cat : IAnimal\n{\n    public string Speak() { return \"Meow\"; }\n}\n\npublic class Dog : IAnimal\n{\n    public string Speak() { return \"Woof\"; }\n}\n\npublic class Zoo\n{\n    private readonly List<IAnimal> _animals = new List<IAnimal>();\n\n    public void Add(IAnimal animal) { _animals.Add(animal); }\n\n    public void SpeakAll()\n    {\n        foreach (var animal in _animals)\n        {\n            Console.WriteLine(animal.Speak());\n        }\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var zoo = new Zoo();\n        zoo.Add(new Cat());\n        zoo.Add(new Dog());\n        zoo.SpeakAll();\n    }\n}\n"
     },
@@ -171,6 +243,19 @@
         expected: "BAD DOG",
         message: "Route `PetShow` through the `Judge` and `Announcer` so any counts give the right call - more faults than tricks should read BAD DOG."
       },
+      goals: [
+        { code: ["class Judge", "bool Score(int tricks, int faults)"], gate: { type: "Judge", member: "Score" } },
+        { code: ["class Announcer", "string Announce(bool won)"], gate: { type: "Announcer", member: "Announce" } },
+        {
+          code: [
+            "class Program",
+            { row: "new Judge()", writes: "new Judge()" },
+            { row: "new Announcer()", writes: "new Announcer()" },
+            { row: "new PetShow(new Judge(), new Announcer())", writes: "new PetShow(", gone: "new PetShow()" }
+          ],
+          gate: { type: "Program", member: "Main" }
+        }
+      ],
       starter: "using System;\n\npublic class PetShow\n{\n    // does two jobs: scores the tricks AND announces the result\n    public string Run(int tricks, int faults)\n    {\n        bool won = tricks > faults;                // the scoring\n        return won ? \"GOOD DOG\" : \"BAD DOG\";       // the announcing\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var show = new PetShow();\n        Console.WriteLine(show.Run(5, 2));\n    }\n}\n",
       solution: "using System;\n\npublic class Judge\n{\n    public bool Score(int tricks, int faults)\n    {\n        return tricks > faults;\n    }\n}\n\npublic class Announcer\n{\n    public string Announce(bool won)\n    {\n        return won ? \"GOOD DOG\" : \"BAD DOG\";\n    }\n}\n\npublic class PetShow\n{\n    private readonly Judge _judge;\n    private readonly Announcer _announcer;\n\n    public PetShow(Judge judge, Announcer announcer)\n    {\n        _judge = judge;\n        _announcer = announcer;\n    }\n\n    public string Run(int tricks, int faults)\n    {\n        bool won = _judge.Score(tricks, faults);\n        return _announcer.Announce(won);\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var show = new PetShow(new Judge(), new Announcer());\n        Console.WriteLine(show.Run(5, 2));\n    }\n}\n"
     },

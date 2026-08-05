@@ -29,6 +29,10 @@
         message: "`Double` must work off the number it is given - `5` should come back as `10`, not a fixed `6`."
       },
       starter: "using System;\n\npublic class Zoo\n{\n    // TODO: make Double a static method (so it can be called as Zoo.Double(n)),\n    // and return n added to itself\n    public int Double(int n)\n    {\n        return n;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var zoo = new Zoo();\n        Console.WriteLine(zoo.Double(3));\n    }\n}\n",
+      goals: [
+        { code: ["class Zoo", { row: "make Double static and return n + n", writes: "n+n" }], gate: { type: "Zoo", member: "Double" } },
+        { code: ["class Program", { row: "call Zoo.Double(3) directly on the type", writes: "Zoo.Double(" }], gate: null }
+      ],
       solution: "using System;\n\npublic class Zoo\n{\n    public static int Double(int n)\n    {\n        return n + n;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine(Zoo.Double(3));\n    }\n}\n"
     },
     {
@@ -50,6 +54,17 @@
         message: "`Legs` must use the count it is given - `5` cows have `20` legs, not a fixed `12`."
       },
       starter: "using System;\n\npublic class Herd\n{\n    // TODO: declare a const int LegsPerCow = 4\n\n    public int Legs(int cows)\n    {\n        // TODO: return cows multiplied by LegsPerCow\n        return 0;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var herd = new Herd();\n        Console.WriteLine(herd.Legs(3));\n    }\n}\n",
+      goals: [
+        {
+          code: [
+            "class Herd",
+            "int LegsPerCow"
+          ],
+          gate: { type: "Herd", member: "LegsPerCow" }
+        },
+        { gate: null },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Herd\n{\n    public const int LegsPerCow = 4;\n\n    public int Legs(int cows)\n    {\n        return cows * LegsPerCow;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var herd = new Herd();\n        Console.WriteLine(herd.Legs(3));\n    }\n}\n"
     },
     {
@@ -71,6 +86,12 @@
         message: "`Name` must return the name the cat was built with - a cat made as \"Whiskers\" should read `Whiskers`, not a fixed `Milo`."
       },
       starter: "using System;\n\npublic class Cat\n{\n    // TODO: add a private readonly string _name field\n    private string _name = \"\";\n\n    public Cat(string name)\n    {\n        // TODO: store name in the readonly field\n    }\n\n    public string Name()\n    {\n        return _name;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var cat = new Cat(\"Milo\");\n        Console.WriteLine(cat.Name());\n    }\n}\n",
+      goals: [
+        { code: ["class Cat", { row: "private readonly string _name;", writes: "readonly" }], gate: { type: "Cat", member: "_name" } },
+        { code: ["class Cat", { row: "_name = name;", writes: "_name=name" }], gate: { type: "Cat", member: "_name" } },
+        { gate: null },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Cat\n{\n    private readonly string _name;\n\n    public Cat(string name)\n    {\n        _name = name;\n    }\n\n    public string Name()\n    {\n        return _name;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var cat = new Cat(\"Milo\");\n        Console.WriteLine(cat.Name());\n    }\n}\n"
     },
     {
@@ -92,6 +113,12 @@
         message: "The counter must rise with each sheep built - three sheep should read `3`, not a fixed `2`."
       },
       starter: "using System;\n\npublic class Sheep\n{\n    private static int _count = 0;\n\n    public Sheep()\n    {\n        // TODO: add one to the shared _count\n    }\n\n    public static int Count()\n    {\n        // TODO: return the shared _count\n        return 0;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        new Sheep();\n        new Sheep();\n        Console.WriteLine(Sheep.Count());\n    }\n}\n",
+      goals: [
+        { gate: null },
+        { code: ["class Sheep", { row: "_count = _count + 1;", writes: "_count+1" }], gate: { type: "Sheep", member: "Sheep" } },
+        { code: ["class Sheep", { row: "return _count from Count()", writes: "return_count" }], gate: { type: "Sheep", member: "Count" } },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Sheep\n{\n    private static int _count = 0;\n\n    public Sheep()\n    {\n        _count = _count + 1;\n    }\n\n    public static int Count()\n    {\n        return _count;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        new Sheep();\n        new Sheep();\n        Console.WriteLine(Sheep.Count());\n    }\n}\n"
     },
     {

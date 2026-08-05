@@ -710,7 +710,8 @@ export function checkExemplaryCode(migrated, rootDir, report) {
 // implementations of "is this gate dead" would drift apart, and the one that
 // drifts is the one that quietly stops catching anything.
 
-export function checkGoalGates(migrated, rootDir, scanCSharp, report) {
+export function checkGoalGates(migrated, rootDir, codeLab, report) {
+  const scanCSharp = codeLab && codeLab.scanCSharp;
   if (typeof scanCSharp !== "function") {
     report.error("Goal gates: no C# scanner in vendor/code-lab/code-lab.global.js - every goal gate went unchecked");
     return;
@@ -726,7 +727,9 @@ export function checkGoalGates(migrated, rootDir, scanCSharp, report) {
       skip: () => {},
       note: () => {},
     },
-    codeLab: () => ({ scanCSharp }),
+    // The WHOLE bundle, not just the scanner: git lessons are judged by replaying
+    // their solution through the vendored git runtime that lives in here too.
+    codeLab: () => codeLab,
     // Never reached: verifyTracker is static by construction. Present because
     // createValidators builds every archetype's validator up front.
     dotnet: { available: () => false, compileRun: () => ({ built: false, output: "", errors: "" }) },
@@ -740,7 +743,11 @@ export function checkGoalGates(migrated, rootDir, scanCSharp, report) {
     try { cfg = loadBrowserGlobal(dataPath, "LESSON_CONFIG"); } catch { continue; }
     if (!cfg || !(cfg.tasks || []).some((t) => (t.goals || []).length)) continue;
     currentLesson = `"${m.registryId}"`;
-    validators.tracker({ config: cfg });
+    // Dispatch on archetype. A git gate speaks a different vocabulary entirely
+    // (`ran`, `staged`, `commit`), so scanning it as C# reads every one of them
+    // as empty and condemns content that is perfectly correct.
+    if (m.meta && m.meta.archetype === "git") validators.gitTracker({ config: cfg });
+    else validators.tracker({ config: cfg });
   }
 }
 
@@ -773,7 +780,7 @@ function main() {
   checkResourceArity(loadResourceBundles(migrated, root), report);
   checkContextVerbosity(migrated, root, report);
   checkExemplaryCode(migrated, root, report);
-  checkGoalGates(migrated, root, loadCodeLab().scanCSharp, report);
+  checkGoalGates(migrated, root, loadCodeLab(), report);
   checkConceptCoverage(
     loadConceptBundles(migrated, root),
     { introducedIds: introducedConceptIds(migrated), ownerByConcept: conceptOwners(migrated) },

@@ -33,6 +33,31 @@
           message: "Use the remainder operator: `treats % baskets`."
         }
       ],
+      goals: [
+        {
+          code: [
+            "class Program",
+            { row: "int apples = 3", writes: "int apples = 3" },
+            { row: "int baskets = 4", writes: "int baskets = 4" }
+          ],
+          gate: { type: "Program", member: "Main" }
+        },
+        {
+          code: [
+            "class Program",
+            { row: "WriteLine(apples * baskets)", writes: ["WriteLine", "*"] }
+          ],
+          gate: { type: "Program", member: "Main" }
+        },
+        {
+          code: [
+            "class Program",
+            { row: "int treats = 14", writes: "int treats = 14" },
+            { row: "WriteLine(treats % baskets)", writes: ["WriteLine", "treats % baskets"] }
+          ],
+          gate: { type: "Program", member: "Main" }
+        }
+      ],
       starter: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        // TODO: int apples = 3, int baskets = 4, then print apples * baskets\n        // TODO: int treats = 14, then print treats % baskets\n    }\n}\n",
       solution: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int apples = 3;\n        int baskets = 4;\n        Console.WriteLine(apples * baskets);\n\n        int treats = 14;\n        Console.WriteLine(treats % baskets);\n    }\n}\n"
     },
@@ -49,6 +74,22 @@
           message: "Join the pieces: `\"Good dog, \" + name`."
         }
       ],
+      goals: [
+        {
+          code: [
+            "class Program",
+            { row: "string name = \"Rex\"", writes: "string name = \"Rex\"" }
+          ],
+          gate: { type: "Program", member: "Main" }
+        },
+        {
+          code: [
+            "class Program",
+            { row: "WriteLine(\"Good dog, \" + name)", writes: ["WriteLine", "\"Good dog, \" + name"] }
+          ],
+          gate: { type: "Program", member: "Main" }
+        }
+      ],
       starter: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        // TODO: string name = \"Rex\", then print \"Good dog, \" + name\n    }\n}\n",
       solution: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        string name = \"Rex\";\n        Console.WriteLine(\"Good dog, \" + name);\n    }\n}\n"
     },
@@ -63,6 +104,23 @@
         {
           pattern: /bool\s+isAdult\s*=\s*age\s*>=\s*18/,
           message: "Compare and store: `bool isAdult = age >= 18;`."
+        }
+      ],
+      goals: [
+        {
+          code: [
+            "class Program",
+            { row: "int age = 20", writes: "int age = 20" }
+          ],
+          gate: { type: "Program", member: "Main" }
+        },
+        {
+          code: [
+            "class Program",
+            { row: "bool isAdult = age >= 18", writes: "bool isAdult = age >= 18" },
+            { row: "WriteLine(isAdult)", writes: ["WriteLine", "isAdult"] }
+          ],
+          gate: { type: "Program", member: "Main" }
         }
       ],
       starter: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        // TODO: int age = 20, then bool isAdult = age >= 18, then print isAdult\n    }\n}\n",
@@ -90,6 +148,23 @@
         expected: "False",
         message: "IsHot must decide from Temp. A Thermostat at 10 is not hot."
       },
+      goals: [
+        {
+          code: [
+            "class Thermostat",
+            { row: "int Temp = 30", writes: "Temp = 30" }
+          ],
+          gate: { type: "Thermostat", member: "Temp" }
+        },
+        {
+          code: [
+            "class Thermostat",
+            { row: "return Temp > 25", writes: ["return", "Temp > 25"] }
+          ],
+          gate: { type: "Thermostat", member: "IsHot" }
+        },
+        { gate: null }
+      ],
       starter: "using System;\n\nclass Thermostat\n{\n    public int Temp = 0;   // TODO: set Temp to 30\n\n    public bool IsHot()\n    {\n        // TODO: return whether Temp is greater than 25\n        return false;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Thermostat t = new Thermostat();\n        Console.WriteLine(t.IsHot());\n    }\n}\n",
       solution: "using System;\n\nclass Thermostat\n{\n    public int Temp = 30;\n\n    public bool IsHot()\n    {\n        return Temp > 25;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Thermostat t = new Thermostat();\n        Console.WriteLine(t.IsHot());\n    }\n}\n"
     },

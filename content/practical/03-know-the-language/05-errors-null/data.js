@@ -22,6 +22,13 @@
         }
       ],
       starter: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int treats = 10, dogs = 0;\n        // This line throws when dogs is 0.\n        // TODO: wrap it in a try, and catch (DivideByZeroException) to print\n        //   cannot split treats among zero dogs\n        Console.WriteLine(treats / dogs);\n    }\n}\n",
+      goals: [
+        {
+          code: ["class Program", { row: "try", writes: "try" }, { row: "catch (DivideByZeroException)", writes: "catch (DivideByZeroException)" }],
+          gate: { type: "Program", member: "Main" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int treats = 10, dogs = 0;\n        try\n        {\n            Console.WriteLine(treats / dogs);\n        }\n        catch (DivideByZeroException)\n        {\n            Console.WriteLine(\"cannot split treats among zero dogs\");\n        }\n    }\n}\n"
     },
     {
@@ -34,6 +41,13 @@
         }
       ],
       starter: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        try\n        {\n            throw new InvalidOperationException(\"the bowl is empty\");\n        }\n        catch (Exception e)\n        {\n            // TODO: print the exception's Message\n        }\n    }\n}\n",
+      goals: [
+        {
+          code: ["class Program", { row: "Console.WriteLine(e.Message);", writes: "e.Message" }],
+          gate: { type: "Program", member: "Main" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        try\n        {\n            throw new InvalidOperationException(\"the bowl is empty\");\n        }\n        catch (Exception e)\n        {\n            Console.WriteLine(e.Message);\n        }\n    }\n}\n"
     },
     {
@@ -49,6 +63,13 @@
         }
       ],
       starter: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        try\n        {\n            Console.WriteLine(\"feeding the cat\");\n        }\n        catch (Exception)\n        {\n            Console.WriteLine(\"something spooked the cat\");\n        }\n        // TODO: add a finally block here that prints \"locking the cat flap\"\n    }\n}\n",
+      goals: [
+        {
+          code: ["class Program", { row: "finally", writes: "finally" }],
+          gate: { type: "Program", member: "Main" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        try\n        {\n            Console.WriteLine(\"feeding the cat\");\n        }\n        catch (Exception)\n        {\n            Console.WriteLine(\"something spooked the cat\");\n        }\n        finally\n        {\n            Console.WriteLine(\"locking the cat flap\");\n        }\n    }\n}\n"
     },
     {
@@ -65,6 +86,13 @@
         }
       ],
       starter: "using System;\n\nclass Program\n{\n    static int Treats(int count)\n    {\n        // TODO: if count is negative, throw new ArgumentException(\"treats cannot be negative\")\n        return count;\n    }\n\n    static void Main()\n    {\n        try\n        {\n            Treats(-1);\n        }\n        catch (ArgumentException e)\n        {\n            Console.WriteLine(e.Message);\n        }\n    }\n}\n",
+      goals: [
+        {
+          code: ["class Program", { row: "throw new ArgumentException(\"treats cannot be negative\");", writes: "throw new ArgumentException(" }],
+          gate: { type: "Program", member: "Treats" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\n\nclass Program\n{\n    static int Treats(int count)\n    {\n        if (count < 0)\n            throw new ArgumentException(\"treats cannot be negative\");\n        return count;\n    }\n\n    static void Main()\n    {\n        try\n        {\n            Treats(-1);\n        }\n        catch (ArgumentException e)\n        {\n            Console.WriteLine(e.Message);\n        }\n    }\n}\n"
     },
     {
@@ -77,6 +105,13 @@
         }
       ],
       starter: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        string? name = null;\n        // TODO: use ?? so display becomes \"stray\" when name is null\n        string display = name;\n        Console.WriteLine(display);\n    }\n}\n",
+      goals: [
+        {
+          code: ["class Program", { row: "string display = name ?? \"stray\";", writes: "??" }],
+          gate: { type: "Program", member: "Main" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        string? name = null;\n        string display = name ?? \"stray\";\n        Console.WriteLine(display);\n    }\n}\n"
     },
     {
@@ -89,6 +124,13 @@
         }
       ],
       starter: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        string? name = null;\n        // TODO: use ?. so length is null instead of crashing when name is null\n        int? length = name.Length;\n        Console.WriteLine(length == null ? \"unknown\" : length.ToString());\n    }\n}\n",
+      goals: [
+        {
+          code: ["class Program", { row: "int? length = name?.Length;", writes: "?." }],
+          gate: { type: "Program", member: "Main" }
+        },
+        { gate: null }
+      ],
       solution: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        string? name = null;\n        int? length = name?.Length;\n        Console.WriteLine(length == null ? \"unknown\" : length.ToString());\n    }\n}\n"
     },
     {

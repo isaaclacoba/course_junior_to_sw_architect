@@ -2108,6 +2108,39 @@ a reader to skim past real findings.
 
 448 tests, 0 validator errors. The 159 gates can now be authored safely.
 
+## 2026-08-05 12:20-13:18 CEST - the git model learns to read files
+
+Closed the P1 gate, then built P2. The gate found something the deepening had
+walked past: `HEAD~n` was taught in prose by lessons 5, 6 and 12, but only
+lesson 12 declared `gt-revision`. Lesson 6's copy was already committed, so this
+predated the deepening. The ledger's own rule names the remedy - teach it first,
+do not reach forward - so lesson 5 introduces it now and 6 and 12 revisit.
+
+Two cards were still under the ratified three-command floor. One had no read at
+all; the other asked for `git status` in its goal but left it out of the
+solution, so the checker could not see the read the card already wanted. Every
+card is 3-5 commands now, measured from the verifier rather than by counting
+quotes in the source, which is what I had been doing and which over-counts any
+command carrying a message.
+
+P2 is the part that matters. A commit recorded only which paths it touched -
+enough to say both sides changed `cat.txt`, and not enough for a conflict lesson
+to show anything at all. Commits now carry the whole tree, because a commit is a
+snapshot and a theory lesson asks exactly that; the index and working tree carry
+text, which is what finally makes the staging area demonstrable rather than
+asserted. Merging aligns lines by content, merges three ways against the
+ancestor, and writes diff3 markers that show what the line was.
+
+The insertion case is the one I did not want to get wrong: comparing line 1 to
+line 1 means inserting a line at the top shifts everything below it, and the
+whole file falsely conflicts. There is a test for it, and I proved the test
+works by swapping the alignment for by-index matching and watching it fail
+rather than trusting a green run.
+
+Lessons are untouched: a file with no text recorded still conflicts on a path
+collision, which is what they rely on. 403 tests in the component, 14 of 14
+lessons verifying against the re-vendored bundle.
+
 ## 2026-08-05 13:27 - deriving the goal tracker's rows, and a property that could never tick
 
 With the validator now asserting every gate, the next question is how much of the
@@ -2154,3 +2187,60 @@ into Monaco. Then reverted it - candidates are for reading, and I had not read
 that one.
 
 30 ready, 48 body work, 56 needing a human. 453 tests, 0 validator errors.
+
+## 2026-08-05 14:05 - Add live goal trackers to 7 everyday-essentials lessons
+
+## 2026-08-05 14:06 - Add live goal trackers to 6 know-the-language lessons
+
+Added `goals:` arrays to all tasks in 01-collections (7), 03-lambdas (4), 04-linq (7), 05-errors-null (6), and the remaining tasks in 02-data-shapes (3 of 5) and 06-generics (2 of 4). 29 tasks total newly tracked. 458 tests pass, 0 validator errors.
+
+## 2026-08-05 14:07 - end
+
+## 2026-08-05 16:07 - Git theory lesson: the three areas
+
+Start. New viz lesson in `content/git/01-first-steps` explaining working tree,
+staging area and repository, built on the model's new file contents so the same
+file can hold three different versions at once. Takes `gt-working-tree` and
+`gt-staging-area` from `git-first-commit`.
+
+Built `content/git/01-first-steps/04-git-the-three-areas` - a 7-step `repo`-scene
+viz, second in part one. It uses the model's file contents: `notes.md` is
+committed, edited, staged, then edited again, so the working tree, staging and
+the last commit hold three different texts at once and the following commit saves
+the staged one. `gt-working-tree` and `gt-staging-area` moved here from
+`git-first-commit`, term/def included. EN+ES bundles, 26 keys each, identical key
+sets. validate unchanged at 24 errors / 143 warnings (all pre-existing);
+verify-lesson exits 0 on both lessons; 514 tests pass; check-voice adds no flag.
+
+## 2026-08-05 16:26 - end
+
+## 2026-08-05 16:32 - start
+
+Authoring git goal trackers for mark-a-version and merge-a-branch.
+- 2026-08-05 16:32:05 +0200 START goals[] for git fixing-mistakes lessons: 01-git-fix-the-last-commit, 04-git-undo-with-reset.
+
+## 2026-08-05 16:33 - end
+
+Added goal trackers to `git-mark-a-version` and `git-merge-a-branch`. Both lessons passed `node --check`, `tools/audit-goal-rows.mjs`, and `tools/verify-lesson.mjs --no-dotnet`.
+2026-08-05 16:33:55 +0200 - START authoring git goal trackers for git-where-am-i and git-make-a-branch.
+2026-08-05 16:35:04 +0200 - END authoring git goal trackers for git-where-am-i and git-make-a-branch; per-lesson audit-goal-rows and verify-lesson --no-dotnet passed.
+- 2026-08-05 16:37:09 +0200 END goals[] for git fixing-mistakes lessons: added trackers to 2 tasks in 01-git-fix-the-last-commit and 3 tasks in 04-git-undo-with-reset; per-lesson audit-goal-rows and verify-lesson --no-dotnet passed.
+
+2026-08-05 17:29 - END enabling the live goal tracker on the git track.
+
+Turned the git tracker on (removed the temporary `TRACKER_ON` flag), authored
+`goals[]` across the 6 git lessons that had none, and rewrote 8 prose labels in
+`git-settle-a-conflict` and `git-point-at-a-commit` so every row shows a real
+command or a repo fact in git's own notation. Git coverage is now 20/20 tasks.
+
+Two tool fixes came out of it. `tools/audit-goal-rows.mjs` now holds a git
+lesson's box HEADER to the same bar as its rows - on the git track the header IS
+the command the learner types, so a prose header was slipping through. And
+`tools/validate.mjs` was scanning git gates with the C# scanner, which reads
+`ran`/`staged`/`commit` as "(empty gate)" and condemned 65 correct gates; the
+course-wide sweep now dispatches on archetype to the git replay checker instead.
+
+Verified: 516 unit tests pass (2 new, pinning the git dispatch both ways),
+`validate.mjs` clean at 0 errors, all 15 git lessons pass `verify-lesson --no-dotnet`,
+no generated drift, and 4 git lessons driven command-by-command in headless Chrome
+to confirm boxes tick in order and transient gates latch.

@@ -184,16 +184,7 @@
   // The tracker is a GUIDE, never a grade. XP still comes from reaching the
   // authored target.
   //
-  // OFF ON THE GIT TRACK FOR NOW (owner's call, 2026-08-05): a git lesson already
-  // shows the learner a live commit graph, and a second live panel next to it was
-  // more than the page needed. The machinery all stays - the widget, the provider,
-  // the gate policy, the authored `goals` and the validator that proves they can
-  // tick - so nothing rots while the git visual is settled. Flip this one flag to
-  // bring the panel back; the goal prose renders as plain bullets meanwhile.
-  var TRACKER_ON = false;
-
   function tracker(surface) {
-    if (!TRACKER_ON) return null;
     var W = trackerWidget();
     var host = surface.ctx.hosts.goal;
     if (!W || !host) return null;

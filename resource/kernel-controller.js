@@ -46,9 +46,22 @@
   // archetype is a row here, not another branch in the boot chain. Paths are
   // repo-root-relative and get the derived repoBase prefix. An archetype with no
   // row (drill, viz, checkpoint) simply has none.
+  //
+  // The live goal tracker is a WIDGET plus a per-domain provider, so each
+  // archetype that shows one loads the same widget and its own provider. Order
+  // matters: the provider reads its policy off the window, so the policy file
+  // has to be on the page first.
   var ARCHETYPE_DEPS = {
-    build: ["kernel/grading/output-match.js", "kernel/grading/structure-match.js"],
-    git: ["kernel/grading/git-task.js", "kernel/grading/dag-match.js", "kernel/grading/state-match.js", "kernel/engine/git-progress.js"]
+    build: [
+      "kernel/grading/output-match.js", "kernel/grading/structure-match.js",
+      "kernel/engine/widgets/goal-tracker.js", "kernel/engine/widgets/csharp-goal-provider.js"
+    ],
+    git: [
+      "kernel/grading/git-task.js", "kernel/grading/dag-match.js", "kernel/grading/state-match.js",
+      "kernel/engine/git-progress.js",
+      "kernel/engine/widgets/goal-tracker.js", "kernel/grading/git-goal-match.js",
+      "kernel/engine/widgets/git-goal-provider.js"
+    ]
   };
 
   function injectScript(src, attrs) {

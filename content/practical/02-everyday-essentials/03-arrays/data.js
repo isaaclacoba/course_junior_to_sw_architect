@@ -27,6 +27,10 @@
         message: "`First` must read the array it is given - a kennel starting with \"Ada\" should return `Ada`, not a fixed name."
       },
       starter: "using System;\n\npublic class Kennel\n{\n    public string First(string[] names)\n    {\n        // TODO: return the name in the first position\n        return \"\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var kennel = new Kennel();\n        Console.WriteLine(kennel.First(new[] { \"Rex\", \"Milo\", \"Bella\" }));\n    }\n}\n",
+      goals: [
+        { code: ["class Kennel", { row: "names[0]", writes: "names[0]" }], gate: { type: "Kennel", member: "First" } },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Kennel\n{\n    public string First(string[] names)\n    {\n        return names[0];\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var kennel = new Kennel();\n        Console.WriteLine(kennel.First(new[] { \"Rex\", \"Milo\", \"Bella\" }));\n    }\n}\n"
     },
     {
@@ -48,6 +52,10 @@
         message: "`Count` must measure the array it is given - two items should return `2`, not a fixed count."
       },
       starter: "using System;\n\npublic class Tally\n{\n    public int Count(int[] xs)\n    {\n        // TODO: return how many items the array holds\n        return 0;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var tally = new Tally();\n        Console.WriteLine(tally.Count(new[] { 4, 8, 15, 16, 23 }));\n    }\n}\n",
+      goals: [
+        { code: ["class Tally", { row: "xs.Length", writes: ".Length" }], gate: { type: "Tally", member: "Count" } },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Tally\n{\n    public int Count(int[] xs)\n    {\n        return xs.Length;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var tally = new Tally();\n        Console.WriteLine(tally.Count(new[] { 4, 8, 15, 16, 23 }));\n    }\n}\n"
     },
     {
@@ -69,6 +77,10 @@
         message: "`Sum` must add up the array it is given - `10` and `20` should total `30`, not a fixed value."
       },
       starter: "using System;\n\npublic class Meter\n{\n    public int Sum(int[] xs)\n    {\n        // TODO: walk xs with foreach and add each item into a running total\n        return 0;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var meter = new Meter();\n        Console.WriteLine(meter.Sum(new[] { 2, 3, 5 }));\n    }\n}\n",
+      goals: [
+        { code: ["class Meter", { row: "foreach (int x in xs)", writes: "foreach(" }, { row: "total = total + x", writes: "total = total + x" }], gate: { type: "Meter", member: "Sum" } },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Meter\n{\n    public int Sum(int[] xs)\n    {\n        int total = 0;\n        foreach (int x in xs)\n        {\n            total = total + x;\n        }\n        return total;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var meter = new Meter();\n        Console.WriteLine(meter.Sum(new[] { 2, 3, 5 }));\n    }\n}\n"
     },
     {
@@ -90,6 +102,10 @@
         message: "`HowManyBig` must test the array it is given - only `100` is over `10` here, so the answer is `1`."
       },
       starter: "using System;\n\npublic class Sieve\n{\n    public int HowManyBig(int[] xs)\n    {\n        // TODO: walk xs and count the items greater than 10\n        return 0;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var sieve = new Sieve();\n        Console.WriteLine(sieve.HowManyBig(new[] { 3, 20, 7, 50 }));\n    }\n}\n",
+      goals: [
+        { code: ["class Sieve", { row: "foreach (int x in xs)", writes: "foreach(" }, { row: "if (x > 10)", writes: "x > 10" }, { row: "count = count + 1", writes: "count = count + 1" }], gate: { type: "Sieve", member: "HowManyBig" } },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Sieve\n{\n    public int HowManyBig(int[] xs)\n    {\n        int count = 0;\n        foreach (int x in xs)\n        {\n            if (x > 10)\n            {\n                count = count + 1;\n            }\n        }\n        return count;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var sieve = new Sieve();\n        Console.WriteLine(sieve.HowManyBig(new[] { 3, 20, 7, 50 }));\n    }\n}\n"
     },
     {
@@ -111,6 +127,10 @@
         message: "`Pieces` must split the text it is given - `\"a,b\"` holds two items, so the answer is `2`."
       },
       starter: "using System;\n\npublic class Line\n{\n    public int Pieces(string csv)\n    {\n        // TODO: split csv on ',' and return how many pieces it holds\n        return 0;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var line = new Line();\n        Console.WriteLine(line.Pieces(\"cat,dog,fish\"));\n    }\n}\n",
+      goals: [
+        { code: ["class Line", { row: "csv.Split(',')", writes: ".Split(" }, { row: ".Length", writes: ".Length" }], gate: { type: "Line", member: "Pieces" } },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Line\n{\n    public int Pieces(string csv)\n    {\n        return csv.Split(',').Length;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var line = new Line();\n        Console.WriteLine(line.Pieces(\"cat,dog,fish\"));\n    }\n}\n"
     },
     {

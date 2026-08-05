@@ -27,6 +27,10 @@
         message: "`Label` must build the line from the values it is given - a spider with 8 legs should read `Spider has 8 legs`, not a fixed animal."
       },
       starter: "using System;\n\npublic class Critter\n{\n    public string Label(string name, int legs)\n    {\n        // TODO: build one line from name and legs, using $\"...\"\n        return \"\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var c = new Critter();\n        Console.WriteLine(c.Label(\"Ant\", 6));\n    }\n}\n",
+      goals: [
+        { code: ["class Critter", { row: "$\"{name} has {legs} legs\"", writes: "$\"" }], gate: { type: "Critter", member: "Label" } },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Critter\n{\n    public string Label(string name, int legs)\n    {\n        return $\"{name} has {legs} legs\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var c = new Critter();\n        Console.WriteLine(c.Label(\"Ant\", 6));\n    }\n}\n"
     },
     {
@@ -48,6 +52,10 @@
         message: "`Shout` must reshape the text it is given - `\"dog\"` should come back as `DOG`, not a fixed `CAT`."
       },
       starter: "using System;\n\npublic class Announcer\n{\n    public string Shout(string name)\n    {\n        // TODO: return name with every letter in upper case\n        return \"\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var a = new Announcer();\n        Console.WriteLine(a.Shout(\"cat\"));\n    }\n}\n",
+      goals: [
+        { code: ["class Announcer", { row: "name.ToUpper()", writes: ".ToUpper(" }], gate: { type: "Announcer", member: "Shout" } },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Announcer\n{\n    public string Shout(string name)\n    {\n        return name.ToUpper();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var a = new Announcer();\n        Console.WriteLine(a.Shout(\"cat\"));\n    }\n}\n"
     },
     {
@@ -69,6 +77,10 @@
         message: "`Mentions` must search the text it is given - `\"cat\"` is not in `\"only dogs here\"`, so it should read `False`."
       },
       starter: "using System;\n\npublic class Log\n{\n    public bool Mentions(string text, string word)\n    {\n        // TODO: return whether word appears anywhere in text\n        return false;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var log = new Log();\n        Console.WriteLine(log.Mentions(\"the cat sat\", \"cat\"));\n    }\n}\n",
+      goals: [
+        { code: ["class Log", { row: "text.Contains(word)", writes: ".Contains(" }], gate: { type: "Log", member: "Mentions" } },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Log\n{\n    public bool Mentions(string text, string word)\n    {\n        return text.Contains(word);\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var log = new Log();\n        Console.WriteLine(log.Mentions(\"the cat sat\", \"cat\"));\n    }\n}\n"
     },
     {
@@ -90,6 +102,10 @@
         message: "`Swap` must transform the text it is given - `\"cat toy for cat\"` should become `dog toy for dog`, with every `cat` replaced."
       },
       starter: "using System;\n\npublic class Rewriter\n{\n    public string Swap(string text)\n    {\n        // TODO: return text with every \"cat\" replaced by \"dog\"\n        return \"\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var r = new Rewriter();\n        Console.WriteLine(r.Swap(\"cat food\"));\n    }\n}\n",
+      goals: [
+        { code: ["class Rewriter", { row: "text.Replace(\"cat\", \"dog\")", writes: ".Replace(" }], gate: { type: "Rewriter", member: "Swap" } },
+        { gate: null }
+      ],
       solution: "using System;\n\npublic class Rewriter\n{\n    public string Swap(string text)\n    {\n        return text.Replace(\"cat\", \"dog\");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var r = new Rewriter();\n        Console.WriteLine(r.Swap(\"cat food\"));\n    }\n}\n"
     },
     {

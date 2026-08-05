@@ -23,10 +23,14 @@
  * each validator is testable with fakes.
  */
 import { CONFIG_GLOBALS, lessonBody } from "../lib.mjs";
-import { checkGitTask, gitRuntimeFrom } from "./git-validate.mjs";
+import { checkGitTask, gitRuntimeFrom, replay, startOf, solutionOf, filesOf } from "./git-validate.mjs";
 import { createRequire } from "node:module";
 
-const structure = createRequire(import.meta.url)("../../kernel/grading/structure-match.js");
+const require_ = createRequire(import.meta.url);
+const structure = require_("../../kernel/grading/structure-match.js");
+// The SAME policy the browser widget paints with, so a gate CI calls dead is the
+// gate the learner sees stay dashed - there is no second opinion to drift from.
+const gitGoals = require_("../../kernel/grading/git-goal-match.js");
 
 // Scene-panel roots a viz lesson may mount.
 export const PANEL_CLASSES = ["cl-tx", "cl-al", "cl-rg", "cl-pb", "cl-mv", "cl-ms", "cl-tr", "cl-ag"];
@@ -367,8 +371,113 @@ export function createValidators(deps) {
       const r = checkGitTask(t, git);
       if (r.ok) ok(`${label} solution reaches the target (${r.commands} command(s))`);
       else { bad(`${label} ${r.reason} [${r.code}]`); allOk = false; }
+      // The tracker is checked even when the solution does not reach the target.
+      // Reporting only the first failure would hide a dead gate behind an
+      // unrelated broken command, and the author would fix one and ship the other.
+      if (!checkGitTracker(t, label, git)) allOk = false;
     });
     return allOk;
+  }
+
+  /**
+   * The git half of "the tracker must be able to LIGHT UP".
+   *
+   * Same contract as checkTracker for C#, but the evidence is a REPLAY rather
+   * than a source scan: seed the card, run the authored solution, and demand
+   * that every gate and every row is true at the end. A `ran` gate is also
+   * checked against the solution's command list, because a read the solution
+   * never types is a box that stays dashed while the learner is doing
+   * everything right.
+   */
+  function checkGitTracker(t, label, git) {
+    const goals = t.goals || [];
+    if (!goals.length) return true;
+
+    let trackerOk = true;
+    const note = () => { trackerOk = false; };
+
+    // Index alignment with the localized prose, exactly as on the C# side.
+    const proseCount = (t.goal || []).length;
+    if (proseCount && goals.length !== proseCount) {
+      bad(`${label} has ${goals.length} goals entry/entries for ${proseCount} goal line(s) - they are index-aligned, so the counts must match`);
+      note();
+    }
+
+    const files = filesOf(t);
+    const start = startOf(t);
+    const solution = solutionOf(t);
+    const s0 = Array.isArray(start) ? replay(git, start, null, files) : { state: git.init(files), failed: null };
+    if (s0.failed) {
+      bad(`${label} cannot check the goal tracker - start command failed: '${s0.failed.line}'`);
+      return false;
+    }
+    const done = replay(git, solution, s0.state);
+    if (done.failed) {
+      bad(`${label} cannot check the goal tracker - solution command failed: '${done.failed.line}'`);
+      return false;
+    }
+
+    // Replay the solution ONE COMMAND AT A TIME and keep a high-water mark, which
+    // is exactly what the browser does: the tracker syncs after every command and
+    // latches the goals that describe a moment. Judging only the end state would
+    // call "stage cat.txt, and only that one" dead, because `git commit` empties
+    // the index it just checked - a gate that is genuinely reachable would be
+    // reported as broken and authors would be pushed to write worse goals.
+    const everMet = [];
+    const everRow = [];
+    let rowCount = 0;
+    const ran = [];
+    let cur = s0.state;
+
+    const observe = () => {
+      const world = { state: cur, ran: ran.slice() };
+      const verdicts = gitGoals.verdicts(goals, world) || [];
+      goals.forEach((g, i) => {
+        if (verdicts[i] === true) everMet[i] = true;
+        const code = g && g.code;
+        if (!code) return;
+        const list = Array.isArray(code) ? code : [code];
+        const gate = g && g.gate !== undefined ? g.gate : undefined;
+        const rowVerdicts = gitGoals.rows(gate, list, world) || [];
+        if (!everRow[i]) everRow[i] = [];
+        rowVerdicts.forEach((met, r) => { if (met === true) everRow[i][r] = true; });
+      });
+    };
+
+    observe();
+    for (const line of solution) {
+      const step = replay(git, [line], cur);
+      cur = step.state;
+      ran.push(line);
+      observe();
+      if (step.failed) break;
+    }
+
+    goals.forEach((g, i) => {
+      const gate = g && g.gate !== undefined ? g.gate : undefined;
+      // A null/undefined gate is run-gated: only reaching the target settles it,
+      // so there is nothing factual to assert. Its rows are still claims, though.
+      if (gate !== null && gate !== undefined && !everMet[i]) {
+        bad(`${label} goals[${i}].gate (${gitGoals.describe(gate)}) is never met while the solution runs - it could never tick`);
+        note();
+      }
+      const code = g && g.code;
+      if (!code) return;
+      const list = Array.isArray(code) ? code : [code];
+      list.forEach((row, r) => {
+        rowCount++;
+        if (!(everRow[i] || [])[r]) {
+          const shown = gitGoals.rowLabel ? gitGoals.rowLabel(row) : row;
+          bad(`${label} goals[${i}].code[${r}] ("${shown}") is never true while the solution runs - that subtask row could never tick`);
+          note();
+        }
+      });
+    });
+
+    if (trackerOk) {
+      ok(`${label} goal tracker lights up fully on the solution (${goals.length} gate(s), ${rowCount} row(s))`);
+    }
+    return trackerOk;
   }
 
   // The goal tracker is a PURE STATIC check - it reads the solution's shape, not
@@ -416,5 +525,24 @@ export function createValidators(deps) {
     // Reused rather than reimplemented: a second copy of "is this gate dead"
     // would drift, and the copy that drifts is the one that stops catching.
     tracker: verifyTracker,
+    // The git equivalent, exposed for the same reason. A git gate is judged by
+    // REPLAYING the authored solution, so unlike the C# scan it needs the git
+    // runtime out of the vendored bundle - but it still needs no dotnet and no
+    // browser, so the course-wide sweep can run it too. Without this, the sweep
+    // fell back to the C# scanner on git lessons and read every git gate as
+    // "(empty gate)" - 65 errors that were all the checker's fault, not the
+    // content's, which is exactly the kind of noise that gets a gate switched off.
+    gitTracker: ({ config }) => {
+      const git = gitRuntimeFrom(deps.codeLab());
+      if (!git) {
+        bad("the vendored code-lab bundle exports no gitInit/gitRun - cannot replay git goal gates");
+        return false;
+      }
+      let allOk = true;
+      (config.tasks || []).filter((t) => !t.summary).forEach((t, i) => {
+        if (!checkGitTracker(t, taskLabel(t, i), git)) allOk = false;
+      });
+      return allOk;
+    },
   };
 }

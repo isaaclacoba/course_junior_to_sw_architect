@@ -9,6 +9,16 @@
   const tasks = [
     {
       expected: "OK",
+      goals: [
+        {
+          code: [
+            "class Program",
+            { row: 'return `"OK"`', writes: 'return "OK"' }
+          ],
+          gate: { type: "Program", member: "Status" }
+        },
+        { gate: null }
+      ],
       starter: "using System;\n\nclass Program\n{\n    static string Status()\n    {\n        // TODO: hand back \"OK\"\n        return \"\";\n    }\n\n    static void Main()\n    {\n        Console.WriteLine(Status());\n    }\n}\n",
       solution: "using System;\n\nclass Program\n{\n    static string Status()\n    {\n        return \"OK\";\n    }\n\n    static void Main()\n    {\n        Console.WriteLine(Status());\n    }\n}\n"
     },
@@ -19,6 +29,16 @@
           pattern: /\+\s*age\b|\bage\s*\+|\{\s*age\s*\}/,
           message: "Build the label from the `age` value (for example `\"Age: \" + age`), not a fixed string."
         }
+      ],
+      goals: [
+        {
+          code: [
+            "class Program",
+            { row: 'return `"Age: " + age`', writes: ['"Age: "', '+age'] }
+          ],
+          gate: { type: "Program", member: "Label" }
+        },
+        { gate: null }
       ],
       starter: "using System;\n\nclass Program\n{\n    static string Label(int age)\n    {\n        // TODO: return \"Age: \" plus the age\n        return \"\";\n    }\n\n    static void Main()\n    {\n        Console.WriteLine(Label(18));\n    }\n}\n",
       solution: "using System;\n\nclass Program\n{\n    static string Label(int age)\n    {\n        return \"Age: \" + age;\n    }\n\n    static void Main()\n    {\n        Console.WriteLine(Label(18));\n    }\n}\n"
@@ -34,6 +54,18 @@
           pattern: /if\s*\(|\?/,
           message: "Decide with an `if` (or a `?:`) - don't just return one fixed word."
         }
+      ],
+      goals: [
+        {
+          code: [
+            "class Program",
+            { row: "check `age >= 18`", writes: "age >= 18" },
+            { row: 'use `"adult"`', writes: '"adult"' },
+            { row: 'use `"minor"`', writes: '"minor"' }
+          ],
+          gate: { type: "Program", member: "Category" }
+        },
+        { gate: null }
       ],
       starter: "using System;\n\nclass Program\n{\n    static string Category(int age)\n    {\n        // TODO: \"adult\" when age >= 18, otherwise \"minor\"\n        return \"\";\n    }\n\n    static void Main()\n    {\n        Console.WriteLine(Category(20));\n    }\n}\n",
       solution: "using System;\n\nclass Program\n{\n    static string Category(int age)\n    {\n        if (age >= 18)\n        {\n            return \"adult\";\n        }\n        return \"minor\";\n    }\n\n    static void Main()\n    {\n        Console.WriteLine(Category(20));\n    }\n}\n"
@@ -58,6 +90,19 @@
           message: "Call `Category(40)` rather than printing the answer directly."
         }
       ],
+      goals: [
+        { gate: null },
+        {
+          code: [
+            "class Program",
+            { row: "print `Category(16)`", writes: ["WriteLine", "Category(16)"] },
+            { row: "print `Category(18)`", writes: ["WriteLine", "Category(18)"] },
+            { row: "print `Category(40)`", writes: ["WriteLine", "Category(40)"] }
+          ],
+          gate: { type: "Program", member: "Main" }
+        },
+        { gate: null }
+      ],
       starter: "using System;\n\nclass Program\n{\n    static string Category(int age)\n    {\n        if (age >= 18)\n        {\n            return \"adult\";\n        }\n        return \"minor\";\n    }\n\n    static void Main()\n    {\n        // TODO: print Category for 16, then 18, then 40\n    }\n}\n",
       solution: "using System;\n\nclass Program\n{\n    static string Category(int age)\n    {\n        if (age >= 18)\n        {\n            return \"adult\";\n        }\n        return \"minor\";\n    }\n\n    static void Main()\n    {\n        Console.WriteLine(Category(16));\n        Console.WriteLine(Category(18));\n        Console.WriteLine(Category(40));\n    }\n}\n"
     },
@@ -68,6 +113,17 @@
           pattern: /Category\s*\(\s*age\s*\)/,
           message: "Reuse `Category(age)` inside `Summary` instead of hardcoding the word."
         }
+      ],
+      goals: [
+        {
+          code: [
+            "class Program",
+            { row: 'add `"Status: "`', writes: '"Status: "' },
+            { row: "reuse `Category(age)`", writes: "Category(age)" }
+          ],
+          gate: { type: "Program", member: "Summary" }
+        },
+        { gate: null }
       ],
       starter: "using System;\n\nclass Program\n{\n    static string Category(int age)\n    {\n        if (age >= 18)\n        {\n            return \"adult\";\n        }\n        return \"minor\";\n    }\n\n    static string Summary(int age)\n    {\n        // TODO: return \"Status: \" plus the category for this age\n        return \"\";\n    }\n\n    static void Main()\n    {\n        Console.WriteLine(Summary(20));\n    }\n}\n",
       solution: "using System;\n\nclass Program\n{\n    static string Category(int age)\n    {\n        if (age >= 18)\n        {\n            return \"adult\";\n        }\n        return \"minor\";\n    }\n\n    static string Summary(int age)\n    {\n        return \"Status: \" + Category(age);\n    }\n\n    static void Main()\n    {\n        Console.WriteLine(Summary(20));\n    }\n}\n"
