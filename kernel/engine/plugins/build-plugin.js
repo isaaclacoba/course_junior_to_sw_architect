@@ -71,6 +71,12 @@
   function colorizeExample(ctx, task) {
     var example = ctx.hosts.example;
     if (!example) return;
+    // The section ships hidden, because a card without an example must not show
+    // an empty "here's the pattern" frame. Nothing ever turned it back on, so
+    // every example authored into lesson data has been invisible - the data was
+    // read, colourised, and written into an element nobody could see.
+    var wrap = ctx.hosts.exampleWrap;
+    if (wrap) wrap.hidden = !task.example;
     if (task.example) {
       if (typeof window !== "undefined" && window.monaco && monaco.editor && monaco.editor.colorize) {
         example.textContent = task.example;

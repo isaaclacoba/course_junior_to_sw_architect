@@ -1718,3 +1718,50 @@ still present, and the host taller by exactly the padding it gained.
 One note left for later. The example box never appears at all - nothing removes
 its `hidden`, so every `example` written into lesson data is invisible. That is
 why the phantom gap survived so long: the thing it was spacing was never there.
+
+## 2026-08-05 08:54 CEST - the example box, switched on at last
+
+Picked up the note from the end of the last entry. The example box has been
+built, styled and authored all along - 135 build cards across 28 lessons carry
+an `example` - and nothing ever removed its `hidden`. So none of it has ever
+been on screen. The fix is small: give the engine a host role for the wrapper
+and let the build plugin show it when the card has an example, hide it when it
+does not.
+
+Switching it on immediately broke the alignment I had just fixed, which was
+fair. The example becomes the first thing in the left column, so it - not the
+goal panel - is what has to line up with "Your Code". Rather than add a second
+tuned number I stated the shared inset once, as a variable on the split, and
+had each column reproduce it. Measured all four leading cards afterwards: the
+first heading in each column lands on the same pixel whether the example is
+showing or not.
+
+Most examples are short - the median is seven lines - but three run past 25 and
+would have pushed the goal tracker off the bottom of the column, which is the
+one thing that column exists to prevent. Those now scroll inside a capped box.
+Checked the worst case: the 31-line example leaves the goal heading 458px into
+a 620px column, so it stays in sight.
+
+Then the part I did not expect. With the examples visible, twenty of them turned
+out to be breaking the naming rule this course teaches - `int n`, `double x`,
+`string s`, `foreach (int c in coins)`. validate.mjs had been reporting every
+one of them for a long time and they had been left alone, because a warning
+about something nobody can see feels harmless. It is not. They were one commit
+away from being the first C# a learner reads on twenty cards. Renamed all of
+them; the couple that needed more than a rename got a better example instead of
+a contorted one.
+
+One of the twenty was the checker's fault, not the content's. It counted a
+literal in a COMMENT towards the duplicated-rule rule, so a comment explaining
+`score >= 50` beside the line that does it read as the same rule written twice.
+A comment restates a rule, it does not duplicate it. Comments are still scanned
+for names, because a comment showing a line of code teaches naming like any
+other line. Proved the narrowed rule still bites by planting a real duplication
+in code and watching it fire, then restoring.
+
+I did not add an exception for `i` in a for loop, which was tempting. There are
+exactly two for loops in the whole course, `index` reads better for a beginner
+than `i`, and a rule with no exceptions is the one that actually gets followed.
+
+440 tests pass, validate is at 0 errors and 144 warnings - down 20, all of them
+the example ones.

@@ -53,7 +53,7 @@
       solution: "using System;\n\npublic class Pet\n{\n    public virtual string Sound()\n    {\n        return \"quiet\";\n    }\n}\n\npublic class Parrot : Pet\n{\n    public override string Sound()\n    {\n        return \"Squawk\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Pet p = new Parrot();\n        Console.WriteLine(p.Sound());\n    }\n}\n"
     },
     {
-      example: "public class Printer\n{\n    public string Show(string a)\n    {\n        return a;\n    }\n\n    public string Show(string a, string b)\n    {\n        return a + b;\n    }\n}",
+      example: "public class Printer\n{\n    public string Show(string text)\n    {\n        return text;\n    }\n\n    public string Show(string first, string second)\n    {\n        return first + second;\n    }\n}",
       expected: "5",
       requireSource: [
         {
@@ -74,7 +74,7 @@
       solution: "using System;\n\npublic class Counter\n{\n    public int Add(int a)\n    {\n        return a;\n    }\n\n    public int Add(int a, int b)\n    {\n        return a + b;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var c = new Counter();\n        Console.WriteLine(c.Add(2, 3));\n    }\n}\n"
     },
     {
-      example: "public class Point\n{\n    private int x;\n\n    public Point(int x)\n    {\n        this.x = x;\n    }\n\n    public override string ToString()\n    {\n        return \"Point(\" + x + \")\";\n    }\n}",
+      example: "public class Score\n{\n    private int points;\n\n    public Score(int points)\n    {\n        this.points = points;\n    }\n\n    public override string ToString()\n    {\n        return \"Score: \" + points;\n    }\n}",
       expected: "Cat: Whiskers",
       requireSource: [
         {

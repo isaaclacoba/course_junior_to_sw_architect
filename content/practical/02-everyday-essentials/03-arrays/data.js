@@ -51,7 +51,7 @@
       solution: "using System;\n\npublic class Tally\n{\n    public int Count(int[] xs)\n    {\n        return xs.Length;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var tally = new Tally();\n        Console.WriteLine(tally.Count(new[] { 4, 8, 15, 16, 23 }));\n    }\n}\n"
     },
     {
-      example: "public class Wallet\n{\n    public int Total(int[] coins)\n    {\n        int total = 0;\n        foreach (int c in coins)\n        {\n            total = total + c;\n        }\n        return total;\n    }\n}",
+      example: "public class Wallet\n{\n    public int Total(int[] coins)\n    {\n        int total = 0;\n        foreach (int coin in coins)\n        {\n            total = total + coin;\n        }\n        return total;\n    }\n}",
       expected: "10",
       requireSource: [
         {
@@ -72,7 +72,7 @@
       solution: "using System;\n\npublic class Meter\n{\n    public int Sum(int[] xs)\n    {\n        int total = 0;\n        foreach (int x in xs)\n        {\n            total = total + x;\n        }\n        return total;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var meter = new Meter();\n        Console.WriteLine(meter.Sum(new[] { 2, 3, 5 }));\n    }\n}\n"
     },
     {
-      example: "public class Filter\n{\n    public int HowManySmall(int[] xs)\n    {\n        int n = 0;\n        foreach (int x in xs)\n        {\n            if (x < 5)\n            {\n                n = n + 1;\n            }\n        }\n        return n;\n    }\n}",
+      example: "public class Filter\n{\n    public int HowManySmall(int[] numbers)\n    {\n        int smallCount = 0;\n        foreach (int number in numbers)\n        {\n            if (number < 5)\n            {\n                smallCount = smallCount + 1;\n            }\n        }\n        return smallCount;\n    }\n}",
       expected: "2",
       requireSource: [
         {

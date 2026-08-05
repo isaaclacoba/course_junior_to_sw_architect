@@ -99,7 +99,7 @@
       solution: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        string? pet = null;\n        pet = \"Rex\";\n        Console.WriteLine(pet);\n    }\n}\n"
     },
     {
-      example: "class Robot\n{\n    public string Name = \"Beep\";       // state\n    public string Greet() { return \"Hi\"; }  // behaviour\n}\n// var r = new Robot();  r.Name is \"Beep\";  r.Greet() is \"Hi\"",
+      example: "class Robot\n{\n    public string Name = \"Beep\";       // state\n    public string Greet() { return \"Hi\"; }  // behaviour\n}\n// var robot = new Robot();  robot.Name is \"Beep\";  robot.Greet() is \"Hi\"",
       expected: [
         "Rex",
         "Woof"

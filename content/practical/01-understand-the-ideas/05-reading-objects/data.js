@@ -14,7 +14,7 @@
   const tasks = [
     {
       example:
-        'public class Sensor\n{\n    public int Temp()\n    {\n        return 22;\n    }\n}\n\npublic class Thermostat\n{\n    public string Read(Sensor sensor)\n    {\n        int t = sensor.Temp();\n        if (t > 20)\n        {\n            return "warm";\n        }\n        return "cool";\n    }\n}',
+        'public class Sensor\n{\n    public int Temp()\n    {\n        return 22;\n    }\n}\n\npublic class Thermostat\n{\n    public string Read(Sensor sensor)\n    {\n        int temperature = sensor.Temp();\n        if (temperature > 20)\n        {\n            return "warm";\n        }\n        return "cool";\n    }\n}',
       expected: "Good morning",
       requireSource: [
         { pattern: /clock\s*\.\s*Hour\s*\(\s*\)/, message: "Ask the `clock` for the hour with `clock.Hour()` instead of guessing." },

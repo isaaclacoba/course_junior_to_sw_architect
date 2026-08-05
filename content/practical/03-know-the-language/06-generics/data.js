@@ -44,7 +44,7 @@
       solution: "using System;\n\npublic class Picker\n{\n    public T First<T>(T[] items) => items[0];\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var picker = new Picker();\n        Console.WriteLine(picker.First(new int[] { 3, 4, 5 }));\n    }\n}\n"
     },
     {
-      example: "// Two properties, both filled by the constructor:\npublic class Point\n{\n    public int X { get; }\n    public int Y { get; }\n    public Point(int x, int y) { X = x; Y = y; }\n}\n\n// Pair<A, B> is the same shape, with A and B instead of int.",
+      example: "// Two properties, both filled by the constructor:\npublic class Reading\n{\n    public int Hour { get; }\n    public int Degrees { get; }\n    public Reading(int hour, int degrees) { Hour = hour; Degrees = degrees; }\n}\n\n// Pair<A, B> is the same shape, with A and B instead of int.",
       expected: "age: 3",
       requireSource: [
         {

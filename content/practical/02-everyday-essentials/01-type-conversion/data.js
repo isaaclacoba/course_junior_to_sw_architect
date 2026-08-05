@@ -28,7 +28,7 @@
       solution: "using System;\n\npublic class Kitten\n{\n    public int AgeNextYear(string ageText)\n    {\n        int age = int.Parse(ageText);\n        return age + 1;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var k = new Kitten();\n        Console.WriteLine(k.AgeNextYear(\"3\"));\n    }\n}\n"
     },
     {
-      example: "public class Badge\n{\n    public string Make(int n)\n    {\n        return \"B\" + n.ToString();\n    }\n}",
+      example: "public class Badge\n{\n    public string Make(int number)\n    {\n        return \"B\" + number.ToString();\n    }\n}",
       expected: "C7",
       requireSource: [
         {
@@ -49,7 +49,7 @@
       solution: "using System;\n\npublic class Chip\n{\n    public string Code(int n)\n    {\n        return \"C\" + n.ToString();\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var chip = new Chip();\n        Console.WriteLine(chip.Code(7));\n    }\n}\n"
     },
     {
-      example: "public class Ruler\n{\n    public int Floor(double x)\n    {\n        return (int)x;\n    }\n}",
+      example: "public class Ruler\n{\n    public int Floor(double value)\n    {\n        return (int)value;\n    }\n}",
       expected: "3",
       requireSource: [
         {
@@ -70,7 +70,7 @@
       solution: "using System;\n\npublic class Scale\n{\n    public int Whole(double kg)\n    {\n        return (int)kg;\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        var scale = new Scale();\n        Console.WriteLine(scale.Whole(3.9));\n    }\n}\n"
     },
     {
-      example: "public class Field\n{\n    public bool Valid(string s)\n    {\n        return int.TryParse(s, out int _);\n    }\n}",
+      example: "public class Field\n{\n    public bool Valid(string text)\n    {\n        return int.TryParse(text, out int _);\n    }\n}",
       expected: "False",
       requireSource: [
         {

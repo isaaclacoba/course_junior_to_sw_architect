@@ -20,7 +20,7 @@
 
   const tasks = [
     {
-      example: "var square = (int n) => n * n;\nConsole.WriteLine(square(2)); // 4\nConsole.WriteLine(square(3)); // 9",
+      example: "var square = (int number) => number * number;\nConsole.WriteLine(square(2)); // 4\nConsole.WriteLine(square(3)); // 9",
       expected: [
         "4",
         "5"
@@ -47,7 +47,7 @@
       solution: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        var addLeg = (int legs) => legs + 1;\n        Console.WriteLine(addLeg(3));\n        Console.WriteLine(addLeg(4));\n    }\n}\n"
     },
     {
-      example: "int[] nums = { 3, 12, 7, 20 };\nvar isBig = (int n) => n > 10;\nint big = 0;\nforeach (int n in nums)\n{\n    if (isBig(n)) big++;\n}\nConsole.WriteLine(big); // 2",
+      example: "int[] numbers = { 3, 12, 7, 20 };\nvar isBig = (int number) => number > 10;\nint bigCount = 0;\nforeach (int number in numbers)\n{\n    if (isBig(number)) bigCount++;\n}\nConsole.WriteLine(bigCount); // 2",
       expected: "2",
       requireSource: [
         {
@@ -71,7 +71,7 @@
       solution: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int[] legs = { 2, 4, 8, 4 };\n        var isFourLegged = (int count) => count == 4;\n        int total = 0;\n        foreach (int count in legs)\n        {\n            if (isFourLegged(count)) total++;\n        }\n        Console.WriteLine(total);\n    }\n}\n"
     },
     {
-      example: "int limit = 100;\nint[] prices = { 40, 250, 90, 30 };\nvar underLimit = (int p) => p <= limit;\nint cheap = 0;\nforeach (int p in prices)\n{\n    if (underLimit(p)) cheap++;\n}\nConsole.WriteLine(cheap); // 3",
+      example: "int limit = 100;\nint[] prices = { 40, 250, 90, 30 };\nvar underLimit = (int price) => price <= limit;\nint cheapCount = 0;\nforeach (int price in prices)\n{\n    if (underLimit(price)) cheapCount++;\n}\nConsole.WriteLine(cheapCount); // 3",
       expected: "3",
       requireSource: [
         {
@@ -95,7 +95,7 @@
       solution: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int minLegs = 4;\n        int[] legs = { 2, 4, 8, 4 };\n        var enough = (int count) => count >= minLegs;\n        int total = 0;\n        foreach (int count in legs)\n        {\n            if (enough(count)) total++;\n        }\n        Console.WriteLine(total);\n    }\n}\n"
     },
     {
-      example: "int tax = 5;\nint[] prices = { 20, 100 };\nvar withTax = (int p) => p + tax;\nforeach (int p in prices)\n{\n    Console.WriteLine(withTax(p)); // 25, 105\n}",
+      example: "int tax = 5;\nint[] prices = { 20, 100 };\nvar withTax = (int price) => price + tax;\nforeach (int price in prices)\n{\n    Console.WriteLine(withTax(price)); // 25, 105\n}",
       expected: [
         "15",
         "30"

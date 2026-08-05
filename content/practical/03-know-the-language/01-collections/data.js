@@ -111,7 +111,7 @@
       solution: "using System;\nusing System.Collections.Generic;\n\nclass Program\n{\n    static void Main()\n    {\n        Dictionary<string, int> legs = new Dictionary<string, int>();\n        legs[\"puppy\"] = 4;\n        if (legs.ContainsKey(\"snake\"))\n            Console.WriteLine(legs[\"snake\"] + \" legs\");\n        else\n            Console.WriteLine(\"no legs!\");\n    }\n}\n"
     },
     {
-      example: "List<int> nums = new List<int> { 1, 5, 2, 8 };\nint big = 0;\nforeach (int n in nums)\n{\n    if (n >= 5) big++;\n}\nConsole.WriteLine(big);   // 2",
+      example: "List<int> numbers = new List<int> { 1, 5, 2, 8 };\nint bigCount = 0;\nforeach (int number in numbers)\n{\n    if (number >= 5) bigCount++;\n}\nConsole.WriteLine(bigCount);   // 2",
       expected: "3 treats for 4 dogs",
       requireSource: [
         {

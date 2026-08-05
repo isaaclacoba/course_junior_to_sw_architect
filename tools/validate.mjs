@@ -40,7 +40,10 @@ import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { createRequire } from "node:module";
 import { loadBrowserGlobal, idFromHref, loadWindowBag, lessonBody } from "./lib.mjs";
+
+const structure = createRequire(import.meta.url)("../kernel/grading/structure-match.js");
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
@@ -640,6 +643,11 @@ export function checkExemplaryCode(migrated, rootDir, report) {
   // A literal used in a COMPARISON carries a rule. 0 and 1 are loop seeds and
   // identity values, not policy.
   const MAGIC = /[<>]=?\s*(\d+)|==\s*(\d+)/g;
+  // Comments are scanned for NAMES - they often show a line of code, and a
+  // learner reads it the same as any other. They are NOT scanned for repeated
+  // literals: a comment explaining `score >= 50` restates the rule, it does not
+  // duplicate it, and counting it reported a rule that was only written once.
+  const stripComments = structure.stripComments;
 
   for (const m of migrated) {
     const dataPath = path.join(rootDir, m.path, "data.js");
@@ -664,8 +672,9 @@ export function checkExemplaryCode(migrated, rootDir, report) {
           report.warn(`Exemplary code: "${m.registryId}" task ${i + 1} ${field} uses single-letter name(s) ${[...names].map((n) => `\`${n}\``).join(", ")} - name what the value IS`);
         }
         const counts = new Map();
+        const code = stripComments(src);
         MAGIC.lastIndex = 0;
-        while ((hit = MAGIC.exec(src))) {
+        while ((hit = MAGIC.exec(code))) {
           const v = hit[1] || hit[2];
           if (v === "0" || v === "1") continue;
           counts.set(v, (counts.get(v) || 0) + 1);

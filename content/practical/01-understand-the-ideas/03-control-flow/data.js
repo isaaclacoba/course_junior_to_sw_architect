@@ -71,7 +71,7 @@
       solution: "using System;\n\npublic class Countdown\n{\n    public void From(int count)\n    {\n        while (count >= 1)\n        {\n            Console.WriteLine(count);\n            count--;\n        }\n        Console.WriteLine(\"liftoff\");\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        new Countdown().From(3);\n    }\n}\n"
     },
     {
-      example: "string[] colors = { \"red\", \"green\" };\nfor (int i = 0; i < colors.Length; i++)\n{\n    Console.WriteLine((i + 1) + \": \" + colors[i]);\n}",
+      example: "string[] colors = { \"red\", \"green\" };\nfor (int index = 0; index < colors.Length; index++)\n{\n    Console.WriteLine((index + 1) + \": \" + colors[index]);\n}",
       expected: [
         "1. login",
         "2. logout"

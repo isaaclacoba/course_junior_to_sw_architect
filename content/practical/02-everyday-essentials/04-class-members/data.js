@@ -11,7 +11,7 @@
 
   const tasks = [
     {
-      example: "public class MathBits\n{\n    public static int Square(int n)\n    {\n        return n * n;\n    }\n}\n\n// called as: MathBits.Square(4)",
+      example: "public class MathBits\n{\n    public static int Square(int number)\n    {\n        return number * number;\n    }\n}\n\n// called as: MathBits.Square(4)",
       expected: "6",
       requireSource: [
         {

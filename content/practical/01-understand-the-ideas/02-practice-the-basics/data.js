@@ -9,7 +9,7 @@
 
   const tasks = [
     {
-      example: "int a = 14;\nint b = 4;\nConsole.WriteLine(a / b);   // 3  - whole times b fits\nConsole.WriteLine(a % b);   // 2  - what is left over",
+      example: "int sweets = 14;\nint children = 4;\nConsole.WriteLine(sweets / children);   // 3  - whole sweets each\nConsole.WriteLine(sweets % children);   // 2  - what is left over",
       expected: ["12", "2"],
       requireSource: [
         {
@@ -69,7 +69,7 @@
       solution: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        int age = 20;\n        bool isAdult = age >= 18;\n        Console.WriteLine(isAdult);\n    }\n}\n"
     },
     {
-      example: "class Bottle\n{\n    public int Fill = 0;            // state\n    public bool IsEmpty()          // behaviour\n    {\n        return Fill == 0;\n    }\n}\n// var b = new Bottle();  b.IsEmpty() is True",
+      example: "class Bottle\n{\n    public int Fill = 0;            // state\n    public bool IsEmpty()          // behaviour\n    {\n        return Fill == 0;\n    }\n}\n// var bottle = new Bottle();  bottle.IsEmpty() is True",
       expected: "True",
       requireSource: [
         {

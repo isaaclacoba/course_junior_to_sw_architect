@@ -257,6 +257,21 @@ see. Ship a sloppy `Main` and you have taught sloppiness, whatever the prose say
 This is not a style preference. A lesson whose own code breaks the rules it is
 teaching is **broken content** and must not ship.
 
+`example` deserves a special mention, because it is the one field an author is
+tempted to treat as a scratch note. It is not. It renders on the card, in the
+left column, above the goal - it is the first C# the learner reads, before they
+have written anything, and it is the thing they pattern-match against. Hold it
+to exactly the same bar as `solution`.
+
+We learned this the hard way: the example box was built, styled and authored on
+135 cards, but nothing ever un-hid it, so for a long time nobody saw any of it.
+When it was finally switched on, 20 of those examples turned out to be breaking
+the naming rule this very lesson set teaches - `int n`, `double x`, `string s`.
+They had been flagged by `validate.mjs` the whole time and ignored, because a
+warning about invisible content feels harmless. It is not: content nobody looks
+at rots, and then it ships all at once. Treat an exemplary-code warning as a
+blocker even when you cannot see the thing it is complaining about.
+
 ### What "proper coding guidelines" means here - concretely
 
 Do not guess at this list. It is the whole rule.

@@ -45,6 +45,8 @@
  *   diagram   Diagram          drill: the coach diagram / mermaid host
  *   code      Code             drill: the read-only snippet host
  *   example   Example          build: the "here's the pattern" example host
+ *   exampleWrap ExampleWrap    build: that example's <section>, hidden when a
+ *                              card has no example to show
  *   expected  Expected         build: the expected-output line
  *   goal      Goal             the per-card goal / checklist list
  *   points    Points           drill: the coach points list
@@ -94,6 +96,7 @@
     diagram: "Diagram",
     code: "Code",
     example: "Example",
+    exampleWrap: "ExampleWrap",
     expected: "Expected",
     goal: "Goal",
     points: "Points",

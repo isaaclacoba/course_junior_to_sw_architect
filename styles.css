@@ -628,17 +628,45 @@ h4 {
   margin-top: 0.8rem;
 }
 
-/* The two column headings must sit on one line, and they start from different
-   edges: "Goal" is INSIDE a bordered, padded panel, while "Your code" is bare
-   text above the editor. Inset the work column by exactly the panel's border +
-   padding and the two line up by construction rather than by a magic number.
-   The padding earns its keep twice: without it the heading's own margin
-   collapses straight out of the section, which is what dropped it 18px above
-   its neighbour in the first place. */
+/* The two column headings must sit on one line, and each one starts from a
+   different edge: "Goal" is INSIDE a bordered, padded panel, "Your code" is
+   bare text above the editor, and "Here's the pattern" is bare text above a
+   code block. So the shared baseline is stated once, as the inset the goal
+   panel happens to give its own heading - border plus padding - and whatever
+   sits at the top of a column reproduces it. Aligning by construction rather
+   than by a number tuned by eye is what keeps it true when the first element
+   in the column changes, which it does: the example box appears only on cards
+   that have one. */
+.build-split {
+  --col-head-inset: calc(0.75rem + 1px);
+}
+
 .build-col--work .fill-section {
   margin-top: 0;
-  padding-top: calc(0.75rem + 1px);
+  /* Also stops the heading's own margin collapsing straight out of the
+     section, which is what dropped it 18px above its neighbour. */
+  padding-top: var(--col-head-inset);
   border-top: 0;
+}
+
+.build-col--brief .example-box {
+  margin-top: 0;
+  padding-top: var(--col-head-inset);
+}
+
+/* The goal tracker lives under the example and has to stay in sight while you
+   type - that is the whole reason this column exists. Nearly every example is
+   a handful of lines, but a few run past 25 and would push the tracker off the
+   bottom, so the long ones scroll instead of shoving. */
+.build-col--brief .example-box pre {
+  max-height: 22rem;
+  overflow: auto;
+}
+
+/* `.example-box h3` drops the top margin every other h3 carries. Inside the
+   column it has to carry it, or its heading sits 18px above the other two. */
+.build-col--brief .example-box h3 {
+  margin-top: 1.15rem;
 }
 
 @media (max-width: 1080px) {
