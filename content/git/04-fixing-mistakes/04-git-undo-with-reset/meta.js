@@ -37,6 +37,9 @@ window.LESSON_META = {
     "uses": [
       {
         "id": "gt-head"
+      },
+      {
+        "id": "gt-reflog"
       }
     ]
   },

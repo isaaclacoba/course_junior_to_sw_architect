@@ -247,6 +247,10 @@
       "def": "El commit que vino justo antes de este - el enlace que convierte instantáneas sueltas en una historia.",
       "term": "Padre"
     },
+    "gt-reflog": {
+      "def": "El registro que git lleva de todos los sitios donde ha estado `HEAD`, del más nuevo al más viejo, y que mantiene un commit localizable por su hash cuando ya ninguna rama lo alcanza.",
+      "term": "Reflog"
+    },
     "gt-repository": {
       "def": "La carpeta que git vigila, junto con todas las instantáneas que has guardado en ella.",
       "term": "Repositorio"

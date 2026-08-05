@@ -332,7 +332,9 @@
     },
     "gt-amend": {
       "introducedBy": "git-fix-the-last-commit",
-      "revisitedBy": [],
+      "revisitedBy": [
+        "git-reflog"
+      ],
       "usedBy": []
     },
     "gt-branch": {
@@ -346,7 +348,8 @@
         "git-merge-a-branch",
         "git-when-changes-collide",
         "git-settle-a-conflict",
-        "git-point-at-a-commit"
+        "git-point-at-a-commit",
+        "git-reflog"
       ]
     },
     "gt-commit": {
@@ -375,7 +378,9 @@
     },
     "gt-detached-head": {
       "introducedBy": "git-point-at-a-commit",
-      "revisitedBy": [],
+      "revisitedBy": [
+        "git-reflog"
+      ],
       "usedBy": []
     },
     "gt-fast-forward": {
@@ -388,7 +393,8 @@
     "gt-hash": {
       "introducedBy": "git-where-am-i",
       "revisitedBy": [
-        "git-point-at-a-commit"
+        "git-point-at-a-commit",
+        "git-reflog"
       ],
       "usedBy": [
         "git-mark-a-version"
@@ -406,6 +412,7 @@
         "git-merge-a-branch",
         "git-fix-the-last-commit",
         "git-point-at-a-commit",
+        "git-reflog",
         "git-undo-with-reset"
       ]
     },
@@ -414,7 +421,9 @@
       "revisitedBy": [
         "git-what-a-branch-is"
       ],
-      "usedBy": []
+      "usedBy": [
+        "git-reflog"
+      ]
     },
     "gt-merge": {
       "introducedBy": "git-how-merging-works",
@@ -442,6 +451,13 @@
       "usedBy": [
         "git-how-merging-works",
         "git-when-changes-collide"
+      ]
+    },
+    "gt-reflog": {
+      "introducedBy": "git-reflog",
+      "revisitedBy": [],
+      "usedBy": [
+        "git-undo-with-reset"
       ]
     },
     "gt-repository": {
@@ -2347,6 +2363,21 @@
         "gt-head"
       ]
     },
+    "git-reflog": {
+      "introduces": [
+        "gt-reflog"
+      ],
+      "revisits": [
+        "gt-amend",
+        "gt-detached-head",
+        "gt-hash"
+      ],
+      "uses": [
+        "gt-branch",
+        "gt-head",
+        "gt-history"
+      ]
+    },
     "git-settle-a-conflict": {
       "introduces": [
         "gt-abort"
@@ -2380,7 +2411,8 @@
         "gt-working-tree"
       ],
       "uses": [
-        "gt-head"
+        "gt-head",
+        "gt-reflog"
       ]
     },
     "git-what-a-branch-is": {
@@ -3398,6 +3430,10 @@
     "gt-parent": {
       "term": "Parent",
       "def": "The commit that came just before this one - the link that turns loose snapshots into a history."
+    },
+    "gt-reflog": {
+      "term": "Reflog",
+      "def": "Git's own record of every place `HEAD` has stood, newest first, which keeps a commit findable by its hash after no branch reaches it any more."
     },
     "gt-repository": {
       "term": "Repository",

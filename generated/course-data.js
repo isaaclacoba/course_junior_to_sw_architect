@@ -1435,6 +1435,19 @@
               "kind": "lesson"
             },
             {
+              "id": "git-reflog",
+              "track": "git",
+              "part": "fixing-mistakes",
+              "href": "content/git/04-fixing-mistakes/05-git-reflog/",
+              "key": "git_reflog_awarded",
+              "total": 2,
+              "title": "Find a lost commit",
+              "blurb": "`git log` shows what a branch can still reach. `git reflog` shows every place `HEAD` has been, so a commit you thought you had thrown away is still findable by its hash.",
+              "pill": "gentle",
+              "time": "15 min",
+              "kind": "lesson"
+            },
+            {
               "id": "git-what-reset-moves",
               "track": "git",
               "part": "fixing-mistakes",

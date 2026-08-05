@@ -172,6 +172,10 @@
       "blurb": "Nombra un commit sin su hash, y colócate en uno directamente. Cuenta hacia atrás con `main~2` y `HEAD~1`, pon una rama en un commit antiguo, y mira qué aspecto tiene un `HEAD` desacoplado.",
       "title": "Apuntar a cualquier commit"
     },
+    "git-reflog": {
+      "blurb": "`git log` muestra lo que una rama todavía alcanza. `git reflog` muestra todos los sitios donde ha estado `HEAD`, así que un commit que creías tirado a la basura sigue estando localizable por su hash.",
+      "title": "Encontrar un commit perdido"
+    },
     "git-settle-a-conflict": {
       "blurb": "Dos ramas cambiaron `cat.txt`, así que la fusión se detuvo. Termínala marcando el archivo como resuelto y haciendo el commit - luego cancela otra sin dejar rastro.",
       "title": "Resolver un conflicto"

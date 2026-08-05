@@ -3678,6 +3678,7 @@ ${result.runtimeError}`.trim(),
         [...s.worktree].map(([p, e]) => [p, { status: e.status, text: e.text }])
       ),
       merge: s.merge ? { mergeHead: s.merge.mergeHead, conflicted: [...s.merge.conflicted] } : void 0,
+      reflog: (s.reflog || []).map((e) => ({ commit: e.commit, label: e.label })),
       seq: s.seq
     };
   }
@@ -3688,7 +3689,11 @@ ${result.runtimeError}`.trim(),
     if (s.head.kind === "detached") return s.head.commit;
     return s.refs.get(s.head.name) ?? null;
   }
-  function moveHead(s, to) {
+  function moveHead(s, to, why) {
+    if (why) {
+      if (!s.reflog) s.reflog = [];
+      s.reflog.push({ commit: to, label: why });
+    }
     if (s.head.kind === "branch") {
       s.refs.set(s.head.name, to);
     } else {
@@ -3778,6 +3783,13 @@ ${result.runtimeError}`.trim(),
       if (h === null) throw new GitError("HEAD is unborn");
       return h;
     }
+    const back = /^(?:HEAD|@)@\{(\d+)\}$/.exec(tok);
+    if (back) {
+      const log = s.reflog || [];
+      const i = log.length - 1 - Number(back[1]);
+      if (i < 0) throw new GitError(`fatal: log for 'HEAD' only has ${log.length} entries`);
+      return log[i].commit;
+    }
     if (s.refs.has(tok)) return s.refs.get(tok);
     const bref = `refs/heads/${tok}`;
     if (s.refs.has(bref)) return s.refs.get(bref);
@@ -3798,6 +3810,7 @@ ${result.runtimeError}`.trim(),
       head: { kind: "branch", name: "refs/heads/main" },
       index: /* @__PURE__ */ new Map(),
       worktree: /* @__PURE__ */ new Map(),
+      reflog: [],
       seq: 0
     };
   }
@@ -3846,7 +3859,7 @@ ${result.runtimeError}`.trim(),
     const blobs = new Map(old.blobs);
     for (const [p, text] of s.index) blobs.set(p, text);
     s.commits.set(id, { id, parents, message: msg, paths, blobs });
-    moveHead(s, id);
+    moveHead(s, id, `commit (amend): ${msg}`);
     s.index.clear();
     return { state: s, effect: { kind: "commit", id } };
   }
@@ -3881,7 +3894,7 @@ ${result.runtimeError}`.trim(),
       for (const [p, text] of treeAt(s, other)) if (!blobs2.has(p)) blobs2.set(p, text);
       for (const [p, text] of s.index) blobs2.set(p, text);
       s.commits.set(id2, { id: id2, parents: parents2, message, paths: paths2, blobs: blobs2 });
-      moveHead(s, id2);
+      moveHead(s, id2, `commit (merge): ${message}`);
       s.merge = void 0;
       s.index.clear();
       return { state: s, effect: { kind: "merge", id: id2 } };
@@ -3893,7 +3906,7 @@ ${result.runtimeError}`.trim(),
     s.seq += 1;
     const blobs = treeWithIndex(s, head);
     s.commits.set(id, { id, parents, message, paths, blobs });
-    moveHead(s, id);
+    moveHead(s, id, `commit: ${message}`);
     s.index.clear();
     return { state: s, effect: { kind: "commit", id } };
   }
@@ -3930,6 +3943,7 @@ ${result.runtimeError}`.trim(),
     if (s.refs.has(bref)) {
       moveWorktreeTo(s, s.refs.get(bref));
       s.head = { kind: "branch", name: bref };
+      s.reflog.push({ commit: s.refs.get(bref), label: `checkout: moving to ${target}` });
       return { state: s, effect: { kind: "checkout", ref: bref } };
     }
     if (target.startsWith("refs/heads/") && s.refs.has(target)) {
@@ -3940,6 +3954,7 @@ ${result.runtimeError}`.trim(),
     const commitId = revParse(s, target);
     moveWorktreeTo(s, commitId);
     s.head = { kind: "detached", commit: commitId };
+    s.reflog.push({ commit: commitId, label: `checkout: moving to ${target}` });
     return { state: s, effect: { kind: "checkout", commit: commitId } };
   }
   function moveWorktreeTo(s, to) {
@@ -3971,7 +3986,7 @@ ${result.runtimeError}`.trim(),
     }
     const oAnc = ancestors(s, o);
     if (oAnc.has(h)) {
-      moveHead(s, o);
+      moveHead(s, o, `merge ${otherRev}: Fast-forward`);
       return { state: s, effect: { kind: "ff", from: h, to: o } };
     }
     const base = mergeBases(s, h, o)[0] ?? null;
@@ -4020,7 +4035,7 @@ ${result.runtimeError}`.trim(),
     }
     for (const [p, text] of resolvedText) blobs.set(p, text);
     s.commits.set(id, { id, parents, message, paths, blobs });
-    moveHead(s, id);
+    moveHead(s, id, `merge ${otherRev}: Merge made by the recursive strategy.`);
     return { state: s, effect: { kind: "merge", id } };
   }
   function mergeAbort(state) {
@@ -4051,7 +4066,7 @@ ${result.runtimeError}`.trim(),
     const s = cloneState(state);
     const before = headCommit2(s);
     const target = revParse(s, targetRev);
-    moveHead(s, target);
+    moveHead(s, target, `reset: moving to ${targetRev}`);
     const tracked = trackedPaths(s, target);
     const undone = before ? changedPaths(s, before, target) : /* @__PURE__ */ new Set();
     const restingStatus = (p) => tracked.has(p) ? "modified" : "untracked";
@@ -4855,6 +4870,11 @@ ${result.runtimeError}`.trim(),
       usage: ["status"]
     },
     {
+      name: "reflog",
+      summary: "List where HEAD has been, newest first.",
+      usage: ["reflog"]
+    },
+    {
       name: "diff",
       summary: "Show what changed, line by line.",
       usage: ["diff", "diff --staged", "diff <commit>"]
@@ -5064,6 +5084,11 @@ The most similar command is
     }
     return chunks.join("\n");
   }
+  function reflogText(s) {
+    const entries = s.reflog || [];
+    if (entries.length === 0) return "fatal: your current branch does not have any commits yet";
+    return entries.slice().reverse().map((e, i) => `${e.commit} HEAD@{${i}}: ${e.label}`).join("\n");
+  }
   function statusText(s) {
     const blocks = [];
     const header = [];
@@ -5190,6 +5215,9 @@ The most similar command is
         }
         case "status": {
           return ok(state, statusText(state), { kind: "none" });
+        }
+        case "reflog": {
+          return ok(state, reflogText(state), { kind: "none" });
         }
         case "diff": {
           const parsed = parseDiffArgs(state, args);
