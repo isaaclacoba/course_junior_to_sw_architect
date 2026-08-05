@@ -56,3 +56,17 @@ theory/theory-check-3.md	theory-check-3.js,theory-check-3.html	P3 Part three che
 theory/theory-21.md	theory-21.js,theory-21.viz.js,theory-21.html	P4 Standing on other code
 theory/theory-20.md	theory-20.js,theory-20.viz.js,theory-20.html	P4 How code is shared
 theory/theory-check-4.md	theory-check-4.js,theory-check-4.html	P4 Part four checkpoint
+git/git-first-commit.md	content/git/01-first-steps/01-git-first-commit	Your first commit
+git/git-a-history-of-snapshots.md	content/git/01-first-steps/02-git-a-history-of-snapshots	A history of snapshots
+git/git-where-am-i.md	content/git/01-first-steps/03-git-where-am-i	Where am I?
+git/git-what-a-branch-is.md	content/git/02-branches/01-git-what-a-branch-is	What a branch really is
+git/git-make-a-branch.md	content/git/02-branches/02-git-make-a-branch	Make a branch and work on it
+git/git-mark-a-version.md	content/git/02-branches/03-git-mark-a-version	Mark a version with a tag
+git/git-how-merging-works.md	content/git/03-bringing-work-back/01-git-how-merging-works	How merging works
+git/git-merge-a-branch.md	content/git/03-bringing-work-back/02-git-merge-a-branch	Merge a branch back
+git/git-when-changes-collide.md	content/git/03-bringing-work-back/03-git-when-changes-collide	When two changes collide
+git/git-settle-a-conflict.md	content/git/03-bringing-work-back/04-git-settle-a-conflict	Settle a conflict
+git/git-fix-the-last-commit.md	content/git/04-fixing-mistakes/01-git-fix-the-last-commit	Fix the last commit
+git/git-point-at-a-commit.md	content/git/04-fixing-mistakes/02-git-point-at-a-commit	Point at any commit
+git/git-what-reset-moves.md	content/git/04-fixing-mistakes/03-git-what-reset-moves	What reset actually moves
+git/git-undo-with-reset.md	content/git/04-fixing-mistakes/04-git-undo-with-reset	Undo with reset
