@@ -4269,10 +4269,16 @@ ${result.runtimeError}`.trim(),
       this.path = null;
       this.zone = null;
       this.state = null;
+      /** null = decide from the repo; true/false = the learner said so. */
+      this.open = null;
       this.onClick = (ev) => {
-        const t = ev.target?.closest("[data-file],[data-zone]");
+        const t = ev.target?.closest(
+          "[data-file],[data-zone],[data-toggle]"
+        );
         if (!t || !this.state) return;
-        if (t.dataset.file) {
+        if (t.dataset.toggle) {
+          this.open = t.getAttribute("aria-expanded") !== "true";
+        } else if (t.dataset.file) {
           this.path = t.dataset.file;
           this.zone = null;
         } else if (t.dataset.zone) {
@@ -4307,10 +4313,14 @@ ${result.runtimeError}`.trim(),
         const title = copy.present ? copy.differs ? `${ZONE_LABEL[z]} - this copy differs from the one behind it` : ZONE_LABEL[z] : `${ZONE_LABEL[z]} - does not hold this file`;
         return `<button type="button" class="cl-git-fp-zone" data-zone="${z}" aria-pressed="${z === p.selected}"${copy.present ? "" : " disabled"} title="${escapeHtml4(title)}">${ZONE_LABEL[z]}${dot}</button>`;
       }).join("");
+      const anyDifference = p.zones.some((z) => z.differs);
+      const expanded = this.open === null ? anyDifference : this.open;
       const selected = p.zones.find((c) => c.zone === p.selected);
       const body = p.diff ? this.diffBody(p) : this.flatBody(selected.text);
       const foot = p.comparedWith ? `${ZONE_PHRASE[p.selected]}, compared with ${ZONE_PHRASE[p.comparedWith]}` : selected.present ? `${ZONE_PHRASE[p.selected]} - no change behind it` : "not in this zone";
-      this.el.innerHTML = `<div class="cl-git-fp-tabs" role="tablist">${chips}</div><div class="cl-git-fp-box"><div class="cl-git-fp-hd"><strong>${escapeHtml4(p.path)}</strong><span class="cl-git-fp-seg">${zoneButtons}</span></div>` + body + `<div class="cl-git-fp-ft">${escapeHtml4(foot)}</div></div>`;
+      const summary = anyDifference ? `${p.files.length > 1 ? escapeHtml4(p.path) + " - " : ""}the copies differ` : "the files read the same everywhere";
+      const toggle = `<button type="button" class="cl-git-fp-toggle" data-toggle="1" aria-expanded="${expanded}"><span class="cl-git-fp-caret" aria-hidden="true"></span><span>File contents</span><span class="cl-git-fp-summary">${summary}</span></button>`;
+      this.el.innerHTML = toggle + (expanded ? `<div class="cl-git-fp-tabs" role="tablist">${chips}</div><div class="cl-git-fp-box"><div class="cl-git-fp-hd"><strong>${escapeHtml4(p.path)}</strong><span class="cl-git-fp-seg">${zoneButtons}</span></div>` + body + `<div class="cl-git-fp-ft">${escapeHtml4(foot)}</div></div>` : "");
     }
     flatBody(text) {
       const lines = text === "" ? [] : text.split("\n");

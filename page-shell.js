@@ -500,12 +500,21 @@
   // The hero's intro paragraphs, built from h.intro. Shared by the initial
   // heroHTML render and by repaintHeroIntro (the Localizable swap) so both emit
   // identical markup.
+  // A lesson's intro is written the way every other string in the course is
+  // written, with `backticks` around code. Nothing turned them into markup, so
+  // eleven lessons printed the backtick characters at the learner. The intro is
+  // authored HTML, so this only adds the one thing the authors were already
+  // typing and expecting.
+  function heroInlineCode(html) {
+    return String(html == null ? "" : html).replace(/`([^`]+)`/g, "<code>$1</code>");
+  }
+
   function heroIntroHTML(h) {
     return (h.intro || [])
       .map((item) => {
         const html = typeof item === "string" ? item : item.html;
         const cls = (typeof item === "object" && item.class) || "subtitle";
-        return `<p class="${cls}">${html}</p>`;
+        return `<p class="${cls}">${heroInlineCode(html)}</p>`;
       })
       .join("\n");
   }

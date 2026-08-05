@@ -159,6 +159,22 @@ function renderDom(url) {
       const consoleLines = err
         .split("\n")
         .filter((l) => l.includes(":CONSOLE:"))
+        // Only the LESSON'S OWN code counts. Two other things log here and
+        // neither says anything about the lesson: the 72MB Blazor compiler host
+        // under `level3-app/`, and Monaco off a public CDN - run several
+        // verifiers at once and both lose the race, measured at 206 "Failed to
+        // fetch" lines on a page that is perfectly healthy alone. Judging a
+        // lesson by those is measuring this machine's load.
+        //
+        // A message with no `source:` is kept: an uncaught error with nowhere to
+        // point is exactly the kind this check exists for.
+        .filter((l) => {
+          const m = /source: (\S+)/.exec(l);
+          if (!m) return true;
+          const from = m[1];
+          if (from.includes("/level3-app/")) return false;
+          return from.startsWith("http://127.0.0.1") || from.startsWith("http://localhost");
+        })
         .map((l) => l.replace(/^\[[^\]]*\]\s*/, "").trim());
       resolve({ dom: out, console: consoleLines });
     };
