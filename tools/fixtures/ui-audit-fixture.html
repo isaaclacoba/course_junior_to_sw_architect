@@ -75,6 +75,10 @@
     <p>Interpolation that never happened: {{learnerName}}</p>
     <p id="leak-slot">undefined</p>
 
+    <!-- Still a defect INSIDE a label: C# has no `undefined`, so a chip reading
+         it is always a render that failed, unlike the `null` chip below. -->
+    <span id="leak-chip" class="agenda-chip">undefined</span>
+
     <!-- runtime/stuck-control: disabled forever, with no reason given. -->
     <button id="stuckBtn" type="button" disabled>Preparing something...</button>
 

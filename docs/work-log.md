@@ -2018,3 +2018,34 @@ They rendered perfectly, because the page falls back to the inline prose, and
 existed - it only ever compared the bundles it could find. It now asserts that
 every declared language has a file behind it, and the five bundles were
 generated from the inline English, value for value.
+
+## 2026-08-05 12:39 - reviewing my own work, and what the review found
+
+Code review of the two commits above. Three real defects, all in the auditor,
+all the same shape - a check that fails by going quiet rather than by
+complaining.
+
+`none` is a legal CSS colour channel, and `parseFloat("none")` is NaN. NaN
+does not throw, it spreads: the luminance is NaN, the ratio is NaN, and
+`NaN < 4.5` is false, so a genuinely unreadable element reports clean. Worse in
+a backdrop walk, where one NaN colour is accepted as the answer and the search
+stops. `none` now converts as zero, which is what the spec says a missing
+component means, and anything still unparseable returns null so the walk carries
+on. Fixing it immediately surfaced a finding that had been hidden.
+
+The second was mine from an hour earlier. Skipping chip and badge labels stopped
+the false positives on `null` - a word this course teaches - but it also
+silenced `undefined`, and C# has no such value. A chip reading `undefined` is
+always a render that failed. The skip now applies only to words the course
+actually teaches: `null` and `NaN` yes, `undefined` never.
+
+The third was the finding the NaN fix uncovered: the git tag chip, white 11px
+text on amber, 2.15:1. Same trap as the branch chips, missed because it is a
+different token. Mixed to 65% - 4.76:1, clearing the full AA floor rather than
+scraping the 3:1 bar. Only the vendored CSS was refreshed, not the JS bundle: a
+parallel session has `git-model.ts` mid-edit, and re-vendoring would have shipped
+their unfinished work into the course.
+
+Worth recording that the review paid for itself twice over - both auditor bugs
+were invisible by construction, and the second was introduced by the fix for the
+first.

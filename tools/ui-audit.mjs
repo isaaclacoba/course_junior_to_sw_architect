@@ -248,12 +248,16 @@ async function probeFn(families, settleMs) {
     // the slot, alone. So the two C#/JS keywords must own the element's entire
     // text before they count. `[object Object]` and a live {{token}} are never
     // anybody's content, so those still match anywhere.
+    // [regex, name, wholeOnly, teachable]. `teachable` marks a word this course
+    // legitimately puts on a chip or badge: `null` and `NaN` are C# language
+    // concepts with lessons of their own. `undefined` is NOT one - C# has no
+    // such value, so it is always a JS render that failed, label or not.
     const LEAKS = [
-      [/\[object [A-Z]\w+\]/, "[object Object]", false],
-      [/\{\{[^}]+\}\}/, "an unsubstituted {{token}}", false],
-      [/^undefined$/, "undefined", true],
-      [/^NaN$/, "NaN", true],
-      [/^null$/, "null", true],
+      [/\[object [A-Z]\w+\]/, "[object Object]", false, false],
+      [/\{\{[^}]+\}\}/, "an unsubstituted {{token}}", false, false],
+      [/^undefined$/, "undefined", true, false],
+      [/^NaN$/, "NaN", true, true],
+      [/^null$/, "null", true, true],
     ];
     // A label whose entire text is a keyword is a keyword label, not a failed
     // render - a concept chip reading `null` looks structurally identical to a
@@ -268,9 +272,9 @@ async function probeFn(families, settleMs) {
       if (!el || el.closest(SKIP) || !shown(el)) continue;
       const t = (n.nodeValue || "").trim();
       if (!t) continue;
-      for (const [re, name, wholeOnly] of LEAKS) {
+      for (const [re, name, wholeOnly, teachable] of LEAKS) {
         if (!re.test(t)) continue;
-        if (wholeOnly && el.closest(LABELISH)) continue;
+        if (teachable && el.closest(LABELISH)) continue;
         const key = name + "|" + cssPath(el);
         if (seen.has(key)) continue;
         seen.add(key);
@@ -380,8 +384,16 @@ async function probeFn(families, settleMs) {
   if (on("a11y")) {
     // Numbers out of a colour function's argument list, in any of the shapes
     // Chrome serialises: "1, 2, 3", "1 2 3 / 0.5", "50% 20% 10%".
+    // `none` is a real CSS Color 4 channel value, and the spec says a missing
+    // component converts as zero - but parseFloat says NaN, and NaN poisons
+    // everything downstream in SILENCE: the luminance is NaN, the ratio is NaN,
+    // and `NaN < need` is false, so a genuinely unreadable element reports
+    // clean. Worse in a backdrop, where one NaN stop is returned as the answer
+    // and the walk stops. Zero for `none`, null for anything still unparseable.
     const toks = (body) => String(body).split(/[\s,/]+/).filter(Boolean)
-      .map((t) => ({ v: parseFloat(t), pct: t.endsWith("%") }));
+      .map((t) => ({ v: /^none$/i.test(t) ? 0 : parseFloat(t), pct: t.endsWith("%") }));
+    const finite = (c) => (c && Number.isFinite(c.r) && Number.isFinite(c.g) &&
+      Number.isFinite(c.b) && Number.isFinite(c.a) ? c : null);
     const parse = (c) => {
       const s = String(c || "").trim();
       // color-mix() is not a thing getComputedStyle ever hands back - Chrome
@@ -394,14 +406,14 @@ async function probeFn(families, settleMs) {
         const p = toks(cs[1]);
         if (p.length < 3) return null;
         const ch = (t) => (t.pct ? t.v / 100 : t.v) * 255;
-        return { r: ch(p[0]), g: ch(p[1]), b: ch(p[2]), a: p.length > 3 ? (p[3].pct ? p[3].v / 100 : p[3].v) : 1 };
+        return finite({ r: ch(p[0]), g: ch(p[1]), b: ch(p[2]), a: p.length > 3 ? (p[3].pct ? p[3].v / 100 : p[3].v) : 1 });
       }
       const m = /rgba?\(([^)]+)\)/i.exec(s);
       if (!m) return null;
       const p = toks(m[1]);
       if (p.length < 3) return null;
       const ch = (t) => (t.pct ? t.v / 100 * 255 : t.v);
-      return { r: ch(p[0]), g: ch(p[1]), b: ch(p[2]), a: p.length > 3 ? (p[3].pct ? p[3].v / 100 : p[3].v) : 1 };
+      return finite({ r: ch(p[0]), g: ch(p[1]), b: ch(p[2]), a: p.length > 3 ? (p[3].pct ? p[3].v / 100 : p[3].v) : 1 });
     };
     const lum = (c) => {
       const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
