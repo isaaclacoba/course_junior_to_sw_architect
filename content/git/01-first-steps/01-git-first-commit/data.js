@@ -16,21 +16,23 @@
       title: "Start a repository and save something in it",
       concept: "Repository",
       context:
-        "`git init` tells git to watch this folder. After that nothing is saved by accident - you choose what to keep.\n\nSaving takes two steps. `git add` puts a file on the list for the next save, under Staging. `git commit -m` saves that list as one snapshot, and it moves to Repository.",
+        "`git init` tells git to watch this folder. After that nothing is saved by accident - you choose what to keep.\n\nSaving takes two steps. `git add` puts a file on the list for the next save, under Staging. `git commit -m` saves that list as one snapshot, and it moves to Repository.\n\n`git status` lists what git is not tracking yet - read it before you choose.",
       goal: [
         "Start the repository with `git init`.",
-        "Put `cat.txt` on the list with `git add cat.txt`.",
+        "Run `git status` - it names every file this folder is holding.",
+        "Stage the cat's file, and only that one. `git status` spells its name for you.",
         "Save it with `git commit -m \"add cat\"` - the message is checked, so type it exactly."
       ],
-      files: ["cat.txt"],
+      files: ["cat-notes.txt", "dog-notes.txt", "feeder.md"],
       start: [],
       target: [
-        "git add cat.txt",
+        "git add cat-notes.txt",
         "git commit -m \"add cat\""
       ],
       solution: [
         "git init",
-        "git add cat.txt",
+        "git status",
+        "git add cat-notes.txt",
         "git commit -m \"add cat\""
       ]
     },
@@ -59,12 +61,14 @@
       title: "Save a second version on top",
       concept: "History is a chain",
       context:
-        "This repository already holds one commit - `add cat`.\n\nSaving `dog.txt` does not replace it. The new commit points back at the old one, and the graph draws the link. That is all a history is: each snapshot remembering the one before it.",
+        "This repository already holds one commit - `add cat`. The next one goes on top, pointing back at it, and the graph draws the link.\n\nOne commit, one job. The dog has arrived, so every file that is the dog's goes in this save; anything else waits for its own commit. `git status` shows what is waiting.",
       goal: [
-        "Stage `dog.txt` and save it with `git commit -m \"add dog\"`.",
+        "Run `git status` - three files are waiting.",
+        "Stage the dog's files, all of them in one go, and leave the rest out.",
+        "Save them with `git commit -m \"add dog\"`.",
         "Leave the `add cat` commit alone - the new one goes on top of it."
       ],
-      files: ["cat.txt", "dog.txt"],
+      files: ["cat.txt", "dog.txt", "dog-bowl.txt", "bird.txt"],
       start: [
         "git add cat.txt",
         "git commit -m \"add cat\""
@@ -73,10 +77,12 @@
         "git add cat.txt",
         "git commit -m \"add cat\"",
         "git add dog.txt",
+        "git add dog-bowl.txt",
         "git commit -m \"add dog\""
       ],
       solution: [
-        "git add dog.txt",
+        "git status",
+        "git add dog.txt dog-bowl.txt",
         "git commit -m \"add dog\""
       ]
     },

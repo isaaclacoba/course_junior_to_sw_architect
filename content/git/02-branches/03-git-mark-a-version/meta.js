@@ -30,6 +30,9 @@ window.LESSON_META = {
     "revisits": [
       {
         "id": "gt-branch"
+      },
+      {
+        "id": "gt-revision"
       }
     ],
     "uses": [

@@ -2,6 +2,12 @@
 // history: the first puts a name on an older commit without moving, the second
 // moves onto one and leaves HEAD detached.
 //
+// Neither goal states the notation. It names the commit in words - `add dog`,
+// `add bird` - so `git log --oneline` is what tells the learner how many steps
+// back that is, and the `~n` they type is derived rather than copied. This
+// lesson owns gt-revision, so that derivation IS the teaching point; miscounting
+// by one is graded not-solved.
+//
 // Both start states are identical on purpose - the history is the constant, and
 // the only thing that changes is what the learner does to it. No card ever names
 // a literal hash: hashes are display-only here, and the verifier replays these
@@ -25,37 +31,39 @@
 
   const tasks = [
     {
-      title: "Put a branch on an older commit",
-      concept: "main~2",
+      title: "Put a name on an older commit",
+      concept: "git branch + ~",
       context:
-        "`main` names the newest commit on that line. Add `~2` and git walks back two parents from it, so `main~2` is the commit two before the tip.\n\n`git branch old main~2` makes the name `old` there. It does not move you - you stay on `main`, and the new name just sits further back.",
+        "`main` names the newest commit on that line. Add `~` and a number and git walks back that many parents, so `main~1` is the commit just before the tip.\n\n`git branch old <rev>` puts the name `old` wherever that revision lands, and leaves you standing where you are. You work out the number from the log.",
       goal: [
-        "See what the name resolves to first: `git rev-parse main~2`.",
-        "Make the branch there with `git branch old main~2`.",
-        "Stay on `main` - `old` should end up on `add dog`."
+        "Read `git log --oneline` and count how many steps back `add dog` sits from the tip.",
+        "Check the count with `git rev-parse main~<n>` before you use it.",
+        "Put a branch called `old` on that commit with `git branch old main~<n>`, and stay on `main`."
       ],
       files: files,
       start: fourCommits,
       target: fourCommits.concat(["git branch old main~2"]),
       solution: [
+        "git log --oneline",
         "git rev-parse main~2",
         "git branch old main~2"
       ]
     },
     {
       title: "Stand on a commit, not a branch",
-      concept: "git checkout HEAD~1",
+      concept: "Detached HEAD",
       context:
-        "`git checkout` takes one of these names too. `git checkout HEAD~1` moves you back one commit - and there is no branch sitting there, so `HEAD` ends up pointing straight at the commit.\n\nGit calls that a detached `HEAD`. It is fine for looking around, but a commit made here would have no branch name holding on to it.",
+        "`git checkout` takes the same kind of name. Point it at an older commit and there is no branch sitting there, so `HEAD` ends up on the commit itself. Git calls that a detached `HEAD`.\n\nCounting starts from where you stand, so `HEAD~1` is the commit before this one. Read the log again to find the number you need.",
       goal: [
-        "Step back one commit with `git checkout HEAD~1`.",
-        "Read `git status` - it should say `HEAD detached`, not `On branch main`.",
-        "Leave `main` where it is; the only thing that moves is you."
+        "Read `git log --oneline` and find the commit whose message is `add bird`.",
+        "Count the steps back from the tip and step onto it with `git checkout HEAD~<n>`.",
+        "Read `git status` - it should say `HEAD detached`. `main` does not move."
       ],
       files: files,
       start: fourCommits,
       target: fourCommits.concat(["git checkout HEAD~1"]),
       solution: [
+        "git log --oneline",
         "git checkout HEAD~1",
         "git status"
       ]

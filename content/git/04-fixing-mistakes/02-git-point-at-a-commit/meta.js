@@ -24,15 +24,15 @@ window.LESSON_META = {
   concepts: {
     "introduces": [
       {
-        "id": "gt-revision"
-      },
-      {
         "id": "gt-detached-head"
       }
     ],
     "revisits": [
       {
         "id": "gt-hash"
+      },
+      {
+        "id": "gt-revision"
       }
     ],
     "uses": [

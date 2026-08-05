@@ -1,6 +1,13 @@
-// Git · Part four - "Fix the last commit". Two cards, one command: the first
-// amends only the message, the second stages a forgotten file first so the
-// replacement commit carries it too.
+// Git · Part four - "Fix the last commit". Two cards, one command, and a read
+// in front of each that decides what the learner types.
+//
+// Card one seeds TWO misspelt messages. Only the one on top can be amended, so
+// `git log --oneline` is what tells the learner which correction to make;
+// amending the older one is graded off-plan.
+//
+// Card two seeds two uncommitted files and names neither in the goal, so
+// `git status` is what tells the learner which one belongs with the feeder.
+// Staging both fails on commit paths (kernel/grading/state-match.js).
 //
 // Card two deliberately changes the message as well as the file list. Grading
 // identifies a commit by message plus parent shape (kernel/grading/dag-match.js),
@@ -15,44 +22,45 @@
 
   const tasks = [
     {
-      title: "Fix a message you got wrong",
+      title: "Fix the typo you can still reach",
       concept: "git commit --amend",
       context:
-        "The last commit says `add dgo`. Nothing is broken, but the history now carries a typo.\n\n`git commit --amend` replaces that commit with a corrected one and moves `main` onto it. The old commit is left behind with nothing pointing at it, so the history stays two commits long.",
+        "Two of these commits have a misspelled message. `git commit --amend` replaces the commit you are standing on with a corrected one and moves `main` onto it, so it reaches exactly one of the two.\n\nRun `git log --oneline` before you type anything. It lists the newest commit at the top, and that is the only one amend can touch.",
       goal: [
-        "Fix the message with `git commit --amend -m \"add dog\"`.",
-        "Do not add a commit - the history should stay two long.",
-        "Check with `git log --oneline`; the typo should be gone."
+        "Read `git log --oneline` - two of these messages are misspelled.",
+        "Amend the one on top so the animal is spelled properly.",
+        "Leave the other typo alone; the history stays two commits long."
       ],
       files: ["cat.txt", "dog.txt"],
       start: [
         "git add cat.txt",
-        "git commit -m \"add cat\"",
+        "git commit -m \"add ct\"",
         "git add dog.txt",
         "git commit -m \"add dgo\""
       ],
       target: [
         "git add cat.txt",
-        "git commit -m \"add cat\"",
+        "git commit -m \"add ct\"",
         "git add dog.txt",
         "git commit -m \"add dog\""
       ],
       solution: [
+        "git log --oneline",
         "git commit --amend -m \"add dog\"",
         "git log --oneline"
       ]
     },
     {
-      title: "Fold in the file you left out",
+      title: "Fold in the file that belongs",
       concept: "git add + --amend",
       context:
-        "`bowl.txt` belongs with the feeder, but it is still sitting in the working tree - the last commit went in without it.\n\nAmend does not only rewrite the message. It rebuilds the commit from what is staged now, so stage `bowl.txt` first and the replacement carries both files.",
+        "The last commit saved the feeder on its own. Amend rebuilds the commit from whatever is staged right now, so a file you stage first joins the commit you already made.\n\nMore than one file never made it in, and only one of them belongs with the feeder. Run `git status` to see what is waiting.",
       goal: [
-        "Stage `bowl.txt` with `git add bowl.txt`.",
-        "Replace the last commit: `git commit --amend -m \"add the feeder and bowl\"`.",
-        "Still two commits when you are done, and nothing left in the working tree."
+        "Run `git status` to see what did not make it into the last commit.",
+        "Stage only the file that belongs with the feeder.",
+        "Amend the commit with the message `set up the feeder`, and leave the other file untracked."
       ],
-      files: ["cat.txt", "feeder.txt", "bowl.txt"],
+      files: ["cat.txt", "feeder.txt", "bowl.txt", "notes.txt"],
       start: [
         "git add cat.txt",
         "git commit -m \"add cat\"",
@@ -64,11 +72,12 @@
         "git commit -m \"add cat\"",
         "git add feeder.txt",
         "git add bowl.txt",
-        "git commit -m \"add the feeder and bowl\""
+        "git commit -m \"set up the feeder\""
       ],
       solution: [
+        "git status",
         "git add bowl.txt",
-        "git commit --amend -m \"add the feeder and bowl\""
+        "git commit --amend -m \"set up the feeder\""
       ]
     },
     {

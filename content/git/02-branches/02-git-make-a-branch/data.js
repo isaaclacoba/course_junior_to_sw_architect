@@ -1,7 +1,9 @@
-// Git · Part two - "Make a branch and work on it". Two cards: the first makes a
-// branch and deliberately does NOT move onto it, so the learner sees that naming
-// and standing are two different things; the second does both and commits, so the
-// graph forks while `main` stays put.
+// Git · Part two - "Make a branch and work on it". Two cards, and neither can be
+// solved without reading the repository first. Card 1 names its commit by MESSAGE
+// only, so `git log --oneline` is what turns it into a revision; it also does not
+// move the learner, so naming and standing stay two different things. Card 2 puts
+// `HEAD` on `docs` rather than `main`, so a learner who types `git switch -c`
+// straight away branches from the wrong place - `git branch` is what tells them.
 //
 // Grading is state-based, so both cards end in a new ref: card 1 in a branch
 // name, card 2 in a branch plus a commit only that branch can see.
@@ -15,24 +17,37 @@
       title: "Name a second line of work",
       concept: "git branch",
       context:
-        "A branch is a name pointing at a commit. `git branch feature` makes that name at the commit you are standing on.\n\nIt does not move you. `HEAD` still says `main`, so your next commit would still land on `main`.",
+        "A branch is a name pointing at a commit. `git branch feature` makes that name where you are standing.\n\nIt can also point further back. `HEAD~1` is the commit before `HEAD` and `HEAD~3` is three before it, so `git branch old HEAD~3` names a commit you are not on. `git log --oneline` tells you which one that is.",
       goal: [
-        "Make the branch with `git branch feature`.",
-        "Stay on `main` - do not step onto `feature` yet.",
-        "Run `git branch` to list both names; the `*` shows where you are."
+        "Run `git log --oneline` and find the commit whose message is `add dog`.",
+        "Make a branch called `feature` at that commit. On its own, `git branch feature` would put it at `HEAD`.",
+        "Stay on `main` - run `git branch` and check the `*` is still there."
       ],
-      files: [],
+      files: ["cat.txt", "dog.txt", "bird.txt", "feeder.txt"],
       start: [
         "git add cat.txt",
-        "git commit -m \"add cat\""
+        "git commit -m \"add cat\"",
+        "git add dog.txt",
+        "git commit -m \"add dog\"",
+        "git add bird.txt",
+        "git commit -m \"add bird\"",
+        "git add feeder.txt",
+        "git commit -m \"fix the feeder\""
       ],
       target: [
         "git add cat.txt",
         "git commit -m \"add cat\"",
-        "git branch feature"
+        "git add dog.txt",
+        "git commit -m \"add dog\"",
+        "git add bird.txt",
+        "git commit -m \"add bird\"",
+        "git add feeder.txt",
+        "git commit -m \"fix the feeder\"",
+        "git branch feature HEAD~2"
       ],
       solution: [
-        "git branch feature",
+        "git log --oneline",
+        "git branch feature HEAD~2",
         "git branch"
       ]
     },
@@ -40,29 +55,35 @@
       title: "Step onto it and commit there",
       concept: "git switch -c",
       context:
-        "`git switch feature` moves `HEAD` onto that branch, so your next commit lands there. `git switch -c feature` does both jobs at once: make the name, then step onto it.\n\nThe folder holds `dog.txt`. Commit it on `feature` and the graph forks - `main` does not follow you.",
+        "`git switch feature` moves `HEAD` onto that branch, so your next commit lands there. `git switch -c feature` does both jobs at once: make the name, then step onto it.\n\nThe new branch starts where you are standing, so check where that is first - `git branch` marks the current one with a `*`.",
       goal: [
-        "Make `feature` and step onto it in one command: `git switch -c feature`.",
-        "Stage `dog.txt` and save it with `git commit -m \"add dog\"`.",
-        "Leave `main` where it is - it should still point at `add bird`."
+        "Run `git branch` - it marks the branch you are on with a `*`.",
+        "The dog's work belongs on a new branch called `feature`, growing from `main`.",
+        "Make `feature` and step onto it with `git switch -c feature` - it starts where you are standing, so be standing in the right place.",
+        "Stage `dog.txt` and save it with `git commit -m \"add dog\"`."
       ],
-      files: [],
+      files: ["cat.txt", "readme.md", "dog.txt"],
       start: [
         "git add cat.txt",
         "git commit -m \"add cat\"",
-        "git add bird.txt",
-        "git commit -m \"add bird\""
+        "git switch -c docs",
+        "git add readme.md",
+        "git commit -m \"add readme\""
       ],
       target: [
         "git add cat.txt",
         "git commit -m \"add cat\"",
-        "git add bird.txt",
-        "git commit -m \"add bird\"",
+        "git switch -c docs",
+        "git add readme.md",
+        "git commit -m \"add readme\"",
+        "git switch main",
         "git switch -c feature",
         "git add dog.txt",
         "git commit -m \"add dog\""
       ],
       solution: [
+        "git branch",
+        "git switch main",
         "git switch -c feature",
         "git add dog.txt",
         "git commit -m \"add dog\""
@@ -86,7 +107,7 @@
         },
         {
           title: "`git branch feature` - ",
-          text: "makes the name at the commit you are on, and leaves you standing where you were."
+          text: "makes the name where you are standing, or further back with `HEAD~2`, and leaves you where you were."
         },
         {
           title: "`git switch -c feature` - ",

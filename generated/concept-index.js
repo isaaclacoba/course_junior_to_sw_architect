@@ -462,8 +462,11 @@
       "usedBy": []
     },
     "gt-revision": {
-      "introducedBy": "git-point-at-a-commit",
-      "revisitedBy": [],
+      "introducedBy": "git-make-a-branch",
+      "revisitedBy": [
+        "git-mark-a-version",
+        "git-point-at-a-commit"
+      ],
       "usedBy": []
     },
     "gt-staging-area": {
@@ -2285,7 +2288,9 @@
       ]
     },
     "git-make-a-branch": {
-      "introduces": [],
+      "introduces": [
+        "gt-revision"
+      ],
       "revisits": [
         "gt-branch",
         "gt-head",
@@ -2302,7 +2307,8 @@
         "gt-tag"
       ],
       "revisits": [
-        "gt-branch"
+        "gt-branch",
+        "gt-revision"
       ],
       "uses": [
         "gt-commit",
@@ -2325,11 +2331,11 @@
     },
     "git-point-at-a-commit": {
       "introduces": [
-        "gt-revision",
         "gt-detached-head"
       ],
       "revisits": [
-        "gt-hash"
+        "gt-hash",
+        "gt-revision"
       ],
       "uses": [
         "gt-branch",

@@ -1,69 +1,91 @@
-// Git · Part two - "Mark a version with a tag". Both cards end in a state
-// change through refs: a new tag at HEAD, then a new tag at HEAD~1.
+// Git · Part two - "Mark a version with a tag". Both cards end in new refs, and
+// neither can be answered without reading first: card 1 hides the version NUMBER
+// in the tag list, card 2 hides WHICH commit is the release in the log. A card
+// answerable by typing the obvious line would teach nothing about tags, because
+// the whole point of a tag is naming a commit you picked on purpose.
 (function () {
   "use strict";
 
   const tasks = [
     {
-      title: "Mark the commit you are on",
+      title: "Name the version you are standing on",
       concept: "git tag",
       context:
-        "A tag is a name pinned to one commit, and it does not move when new commits appear. Use it to mark a version you want to find again.\n\nYou already have three commits on `main`. Put the name `v1` on the commit you are standing on now.",
+        "A tag is a name pinned to one commit, and it does not move when new commits appear.\n\nThis project has shipped before, so some version names are already taken. `git tag` on its own lists them. Find out which numbers are gone, then put the next one on the commit you are on.",
       goal: [
-        "Pin the tag `v1` to the current commit with `git tag v1`.",
+        "Run `git tag` to see which version names already exist.",
+        "Run `git log --oneline` to see where the last one was pinned.",
+        "Pin the next version number to the commit you are standing on.",
         "Move nothing else - stay on the same branch and commit."
       ],
-      files: [],
+      files: ["cat.txt", "feeder.txt", "bowl.txt", "timer.txt"],
       start: [
         "git add cat.txt",
         "git commit -m \"add cat\"",
-        "git add dog.txt",
-        "git commit -m \"add dog\"",
-        "git add bird.txt",
-        "git commit -m \"add bird\""
+        "git add feeder.txt",
+        "git commit -m \"release: feeder v1\"",
+        "git tag v1",
+        "git add bowl.txt",
+        "git commit -m \"fix the water bowl\"",
+        "git add timer.txt",
+        "git commit -m \"release: feeder v2\""
       ],
       target: [
         "git add cat.txt",
         "git commit -m \"add cat\"",
-        "git add dog.txt",
-        "git commit -m \"add dog\"",
-        "git add bird.txt",
-        "git commit -m \"add bird\"",
-        "git tag v1"
+        "git add feeder.txt",
+        "git commit -m \"release: feeder v1\"",
+        "git tag v1",
+        "git add bowl.txt",
+        "git commit -m \"fix the water bowl\"",
+        "git add timer.txt",
+        "git commit -m \"release: feeder v2\"",
+        "git tag v2"
       ],
       solution: [
-        "git tag v1"
+        "git tag",
+        "git log --oneline",
+        "git tag v2"
       ]
     },
     {
-      title: "Mark an older commit",
+      title: "Name a commit you are not standing on",
       concept: "git tag <name> <revision>",
       context:
-        "You can also tag a commit that is not the current one by naming a revision. `HEAD~1` means one commit before where you stand.\n\nKeep standing where you are, and pin `v0` to the commit before the latest one.",
+        "`HEAD~1` means one commit before where you stand, `HEAD~2` two before, and so on. That is how you name a commit without moving to it.\n\nFour commits sit on `main` and none of them is tagged. One of them is the release - its message says so. The log is the only thing here that tells you which.",
       goal: [
-        "Tag the commit before last with `git tag v0 HEAD~1`.",
+        "Run `git log --oneline` and read the four messages.",
+        "Pin `v1` to the commit whose message calls it a release.",
+        "Pin `v0` to the very first commit, at the bottom of the log.",
         "Do not move `HEAD` and do not move any branch."
       ],
-      files: [],
+      files: ["cat.txt", "dog.txt", "feeder.txt", "bowl.txt"],
       start: [
         "git add cat.txt",
         "git commit -m \"add cat\"",
         "git add dog.txt",
         "git commit -m \"add dog\"",
-        "git add bird.txt",
-        "git commit -m \"add bird\""
+        "git add feeder.txt",
+        "git commit -m \"release: feeder v1\"",
+        "git add bowl.txt",
+        "git commit -m \"start the water bowl\""
       ],
       target: [
         "git add cat.txt",
         "git commit -m \"add cat\"",
         "git add dog.txt",
         "git commit -m \"add dog\"",
-        "git add bird.txt",
-        "git commit -m \"add bird\"",
-        "git tag v0 HEAD~1"
+        "git add feeder.txt",
+        "git commit -m \"release: feeder v1\"",
+        "git add bowl.txt",
+        "git commit -m \"start the water bowl\"",
+        "git tag v1 HEAD~1",
+        "git tag v0 HEAD~3"
       ],
       solution: [
-        "git tag v0 HEAD~1"
+        "git log --oneline",
+        "git tag v1 HEAD~1",
+        "git tag v0 HEAD~3"
       ]
     },
     {
@@ -72,18 +94,22 @@
       concept: "Recap",
       context: "A tag is fixed; a branch keeps moving.",
       summaryIntro:
-        "A tag is a stable label on one commit. It helps you return to that exact point later, even after many new commits.",
+        "A tag is a stable label on one commit. It helps you return to that exact point later, even after many new commits. The log is where you work out which commit deserves the label.",
       summaryItems: [
         {
           title: "Tag - ",
           text: "a name pinned to one commit that does not move with later work."
         },
         {
-          title: "`git tag v1` - ",
+          title: "`git tag` - ",
+          text: "with nothing after it, lists the names already taken, so you know which one is free."
+        },
+        {
+          title: "`git tag v2` - ",
           text: "marks the commit you are on now, with no checkout and no branch movement."
         },
         {
-          title: "`git tag v0 HEAD~1` - ",
+          title: "`git tag v1 HEAD~1` - ",
           text: "marks an older commit by revision, while you stay where you are."
         },
         {

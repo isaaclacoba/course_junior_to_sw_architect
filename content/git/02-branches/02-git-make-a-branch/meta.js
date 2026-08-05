@@ -27,7 +27,11 @@ window.LESSON_META = {
     voices: ["default"],
   },
   concepts: {
-    "introduces": [],
+    "introduces": [
+      {
+        "id": "gt-revision"
+      }
+    ],
     "revisits": [
       {
         "id": "gt-branch"

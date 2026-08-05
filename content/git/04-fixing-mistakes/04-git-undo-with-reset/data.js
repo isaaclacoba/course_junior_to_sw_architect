@@ -3,6 +3,13 @@
 // only thing the learner changes is the mode - and the only thing that can
 // differ in the graded end state is which zone holds `draft.txt`.
 //
+// No goal names a mode. Each states the OUTCOME wanted and the learner picks
+// `--soft`, `--mixed` or `--hard` from it; the commit to move to is named in
+// words (`add dog`) so `git log --oneline` is what tells them it is one step
+// back. Measured 2026-08-05 through tools/lib/git-validate.mjs: each of the
+// three solutions passes its own card and fails the other two, and `HEAD~2`
+// fails all three.
+//
 // That is deliberate: grading is three-area (kernel/grading/state-match.js), so
 // `--soft`, `--mixed` and `--hard` are told apart by staging and the working
 // tree rather than by the commit graph, which is identical in all three.
@@ -24,55 +31,58 @@
 
   const tasks = [
     {
-      title: "Undo the commit, keep the files staged",
-      concept: "git reset --soft",
+      title: "Undo the commit, keep the work ready",
+      concept: "git reset",
       context:
-        "The last commit is a mistake: `draft.txt` went in before it was ready, under the message `oops`.\n\n`git reset --soft HEAD~1` moves `main` back one commit and leaves that file staged. The snapshot goes; your work stays picked for the next commit.",
+        "The commit on top is a mistake: `draft.txt` went in before it was ready, under the message `oops`.\n\n`git reset <mode> <rev>` moves `main` back to the commit you name, and the mode decides where that file lands. Here you want it kept staged, ready to commit again the moment it is finished.",
       goal: [
-        "Undo the last commit with `git reset --soft HEAD~1`.",
-        "Leave `draft.txt` staged - do not unstage it.",
-        "Run `git status` to see which zone it landed in."
+        "Read `git log --oneline` and see how far back `add dog` is.",
+        "Move `main` onto `add dog` with one `git reset`.",
+        "`draft.txt` should end up staged, ready to go straight back in."
       ],
       files: FILES,
       start: THREE_COMMITS,
       target: THREE_COMMITS.concat(["git reset --soft HEAD~1"]),
       solution: [
+        "git log --oneline",
         "git reset --soft HEAD~1",
         "git status"
       ]
     },
     {
       title: "Put the file back in the folder instead",
-      concept: "git reset --mixed",
+      concept: "git reset",
       context:
-        "Same mistake, one word different. `--mixed` moves `main` back the same single commit, then empties staging.\n\n`draft.txt` ends up in the working tree, picked for nothing, so you choose again what goes into the next commit. This is the mode you get when you name none.",
+        "Same mistake, a different wish. This time you are not sure `draft.txt` belongs in the next commit either, and you want to choose again before anything is saved.\n\nThe move back is the same one; only the mode changes. Pick the mode that empties the staging area and drops the file in the working tree.",
       goal: [
-        "Undo the last commit with `git reset --mixed HEAD~1`.",
-        "Leave `draft.txt` in the working tree - do not stage it again.",
-        "Nothing should be staged when you are done."
+        "Read `git log --oneline` and count back to `add dog` again.",
+        "Move `main` there with a `git reset` that leaves nothing staged.",
+        "`draft.txt` should sit in the working tree when you are done."
       ],
       files: FILES,
       start: THREE_COMMITS,
       target: THREE_COMMITS.concat(["git reset --mixed HEAD~1"]),
       solution: [
+        "git log --oneline",
         "git reset --mixed HEAD~1",
         "git status"
       ]
     },
     {
       title: "Drop the commit and its file",
-      concept: "git reset --hard",
+      concept: "git reset",
       context:
-        "This time `draft.txt` was never wanted. `--hard` makes the same move as the other two and keeps nothing: staging is cleared and the file goes from the folder as well.\n\nIt is the only one of the three that can lose work you cannot get back, so read it twice before you run it.",
+        "This time `draft.txt` was never wanted. One of the three modes makes the same move back and keeps nothing: staging is emptied and the file goes from the folder as well.\n\nIt is the only one that throws work away, so read it twice before you run it. If you ever run it by mistake, `git reflog` still lists the commit you left behind for a while, and you can go back to it.",
       goal: [
-        "Undo the last commit with `git reset --hard HEAD~1`.",
-        "Leave staging empty and `draft.txt` gone.",
+        "Read `git log --oneline` and count back to `add dog` one more time.",
+        "Move `main` there and keep nothing - nothing staged, and no `draft.txt` in the folder.",
         "`git status` should show nothing waiting in either zone."
       ],
       files: FILES,
       start: THREE_COMMITS,
       target: THREE_COMMITS.concat(["git reset --hard HEAD~1"]),
       solution: [
+        "git log --oneline",
         "git reset --hard HEAD~1",
         "git status"
       ]
