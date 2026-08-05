@@ -41,7 +41,7 @@
         repo: { files: FILES, commands: BRANCHED, note: "Two names, one commit. Nothing was duplicated." },
       },
       {
-        narr: "So if both names point at the same commit, which one does your next commit belong to? That is what `HEAD` answers. `HEAD` is the marker for **where you are**, and right now it says `main`.",
+        narr: "If both names point at the same commit, which one does your next commit belong to? That is what `HEAD` answers. `HEAD` is the marker for **where you are**, and right now it says `main`.",
         repo: { files: FILES, commands: BRANCHED, ran: 0, note: "`HEAD` decides which name moves next." },
       },
       {

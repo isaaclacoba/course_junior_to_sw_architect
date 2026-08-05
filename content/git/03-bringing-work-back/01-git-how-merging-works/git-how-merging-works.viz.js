@@ -42,7 +42,7 @@
         repo: { files: FILES, commands: SPLIT, note: "`fix` is one commit ahead. `main` has not moved." },
       },
       {
-        narr: "Before running anything, look at where `main` sits: still on `add cat`, the exact commit `fix` grew out of. `main` has added nothing since the split. So there are not really two lines here - there is one line, and `main` is standing behind on it.",
+        narr: "Before running anything, look at where `main` sits: still on `add cat`, the exact commit `fix` grew out of. `main` has added nothing since the split. There are not two lines here at all - there is one line, and `main` is standing behind on it.",
         repo: { files: FILES, commands: SPLIT, note: "Nothing to combine - `main` is simply behind." },
       },
       {
@@ -58,7 +58,7 @@
         repo: { files: FILES, commands: JOINED, note: "One new commit, pointing back at both tips." },
       },
       {
-        narr: "So you can read which one you got straight off the graph, without being told. A name that just moved forward, with no new dot, was a fast-forward. A dot with two lines running back out of it is a merge commit - and it is there because both sides had moved.",
+        narr: "You can read which one you got straight off the graph, without being told. A name that just moved forward, with no new dot, was a fast-forward. A dot with two lines running back out of it is a merge commit, and it is there because both sides had moved.",
         repo: { files: FILES, commands: JOINED, note: "The shape tells you which merge happened." },
       },
     ],

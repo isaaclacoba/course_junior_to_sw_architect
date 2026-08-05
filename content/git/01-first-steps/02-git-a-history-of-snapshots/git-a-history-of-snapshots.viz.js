@@ -63,7 +63,7 @@
         },
       },
       {
-        narr: "So a history is not a list git keeps. It is what you get by following the links back from where you stand. Every commit you make from now on joins the chain the same way - remembering exactly one thing: what came before it.",
+        narr: "A history is not a list git keeps somewhere. It is what you get by following the links back from where you stand. Every commit you make from now on joins the chain the same way, remembering exactly one thing: what came before it.",
         repo: {
           files: FILES,
           commands: THREE,

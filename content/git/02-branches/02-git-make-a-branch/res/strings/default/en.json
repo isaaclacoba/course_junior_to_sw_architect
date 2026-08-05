@@ -3,7 +3,7 @@
   "card.blurb": "Split off a line of work and commit on it without touching `main`. Make a branch, step onto it, and watch the graph fork while the old line stays put.",
   "hero.eyebrow": "Git · Part two · Branches",
   "hero.title": "Make a branch and work on it",
-  "intro.0": "You want to try something without risking the work that already runs. So you split off a second line with its own name. Nothing is copied - a branch is only a name pointing at a commit. Here you make one, step onto it, and commit there while `main` stays where you left it.",
+  "intro.0": "You want to try something without risking the work that already runs, so you split off a second line with its own name. Nothing is copied - a branch is only a name pointing at a commit. Here you make one, step onto it, and commit there while `main` stays where you left it.",
   "task.1.title": "Name a second line of work",
   "task.1.concept": "git branch",
   "task.1.context": "A branch is a name pointing at a commit. `git branch feature` makes that name at the commit you are standing on.\n\nIt does not move you. `HEAD` still says `main`, so your next commit would still land on `main`.",

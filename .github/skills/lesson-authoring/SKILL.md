@@ -75,7 +75,10 @@ structural starting point.
       C#-only sugar arrives early (`=>`, `var`, `$"..."`, records).
 - [ ] One idea per card; a recap closes a multi-card lesson.
 - [ ] Prose passes `AGENTS.md`'s read-aloud test - full sentences, no fragments,
-      no `**Term:** definition` standing in for prose.
+      no `**Term:** definition` standing in for prose. Run
+      `node tools/check-voice.mjs <lesson-dir>`: it counts the four tells that
+      keep slipping through (tricolon, antithesis flourish, `So ...` openers,
+      naming an abstraction). Each hit is a question, not a verdict.
 - [ ] Every C# line meets `.github/skills/exemplary-lesson-code/SKILL.md`, and
       every `solution` compiles warning-free. A warning on the answer we call
       correct is broken content.

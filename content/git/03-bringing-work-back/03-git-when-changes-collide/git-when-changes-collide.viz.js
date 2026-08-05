@@ -56,7 +56,7 @@
         repo: { files: FILES, commands: FORK, note: "Two versions of one file, and no rule to pick between them." },
       },
       {
-        narr: "So run `git merge fix` and watch the graph carefully: **nothing was added**. No commit, no name moved. Git compared the two sides, found `cat.txt` on both, and stopped right there. That stop is a conflict - git refusing to guess, not git failing.",
+        narr: "Run `git merge fix` and watch the graph: **nothing was added**. No commit, no name moved. Git looked at both sides and found `cat.txt` changed on each one, so it stopped and left the decision to you. A conflict is git asking a question.",
         repo: { files: FILES, commands: STOPPED, note: "Git stopped. No commit was saved." },
       },
       {
@@ -64,7 +64,7 @@
         repo: { files: FILES, commands: JOINED, note: "You decided; git saved the result." },
       },
       {
-        narr: "So nothing was ever damaged. Git did every part it could work out alone, stopped at the one question it could not, and waited. A conflict is that question - and until you answer it, no commit is made.",
+        narr: "Nothing was ever damaged. Git finished every part it could work out alone and waited at the one it could not. Until you answer that question, no commit is made - which is why a conflict is safe to walk away from and come back to.",
         repo: { files: FILES, commands: JOINED, note: "A conflict is a question, not a failure." },
       },
     ],

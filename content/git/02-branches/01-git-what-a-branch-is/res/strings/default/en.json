@@ -12,7 +12,7 @@
   "step.0.note": "`main` points at the newest commit.",
   "step.1.narr": "Now make a second name: `git branch feature`. Look carefully - **nothing was copied**. There is no second set of commits, no second folder. There is one more label, sitting on the same commit `main` is on.",
   "step.1.note": "Two names, one commit. Nothing was duplicated.",
-  "step.2.narr": "So if both names point at the same commit, which one does your next commit belong to? That is what `HEAD` answers. `HEAD` is the marker for **where you are**, and right now it says `main`.",
+  "step.2.narr": "If both names point at the same commit, which one does your next commit belong to? That is what `HEAD` answers. `HEAD` is the marker for **where you are**, and right now it says `main`.",
   "step.2.note": "`HEAD` decides which name moves next.",
   "step.3.narr": "`git switch feature` moves `HEAD` onto the other name. Still nothing copied - the commits have not changed at all. You have only said which name you are standing on.",
   "step.3.note": "`HEAD` moved. The commits did not.",

@@ -3,7 +3,7 @@
   "card.blurb": "Separa una línea de trabajo y haz commits ahí sin tocar `main`. Crea una rama, súbete a ella y mira cómo el grafo se bifurca mientras la línea anterior se queda quieta.",
   "hero.eyebrow": "Git · Parte dos · Ramas",
   "hero.title": "Crear una rama y trabajar en ella",
-  "intro.0": "Quieres probar algo sin arriesgar el trabajo que ya funciona. Así que separas una segunda línea con su propio nombre. No se copia nada - una rama es solo un nombre que apunta a un commit. Aquí creas una, te subes a ella y haces un commit allí mientras `main` se queda donde la dejaste.",
+  "intro.0": "Quieres probar algo sin arriesgar el trabajo que ya funciona, así que separas una segunda línea con su propio nombre. No se copia nada - una rama es solo un nombre que apunta a un commit. Aquí creas una, te subes a ella y haces un commit allí mientras `main` se queda donde la dejaste.",
   "task.1.title": "Nombra una segunda línea de trabajo",
   "task.1.concept": "git branch",
   "task.1.context": "Una rama es un nombre que apunta a un commit. `git branch feature` crea ese nombre en el commit donde estás.\n\nNo te mueve. `HEAD` sigue diciendo `main`, así que tu siguiente commit caería todavía en `main`.",

@@ -52,7 +52,7 @@
         repo: { files: FILES, commands: HARD, note: "`--hard` - same move, the file is thrown away." },
       },
       {
-        narr: "So the branch step is identical in all three, and what you are really choosing is where the files land. That is what makes `--soft` handy: your work is still staged, so one more `git commit` puts it back under the message you meant.",
+        narr: "The branch step is identical in all three, and what you are really choosing is where the files land. That is what makes `--soft` handy: your work is still staged, so one more `git commit` puts it back under the message you meant.",
         repo: { files: FILES, commands: REDONE, note: "Reset moves a name. The mode decides where your files go." },
       },
     ],

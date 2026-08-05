@@ -14,7 +14,7 @@
   "step.2.note": "`--mixed` - el mismo movimiento, el archivo espera en el árbol de trabajo.",
   "step.3.narr": "`--hard` hace ese mismo movimiento una vez más, y esta vez no deja `draft.txt` en ningún sitio. Preparación vacía, carpeta vacía - lo que guardaba ese commit ya no está. Este es el que conviene leer dos veces antes de ejecutarlo.",
   "step.3.note": "`--hard` - el mismo movimiento, el archivo se tira.",
-  "step.4.narr": "Así que el paso de la rama es idéntico en los tres, y lo que eliges en realidad es dónde caen los archivos. Por eso `--soft` viene bien: tu trabajo sigue preparado, así que un `git commit` más lo devuelve con el mensaje que querías.",
+  "step.4.narr": "El paso de la rama es idéntico en los tres, y lo que eliges en realidad es dónde acaban los archivos. Por eso `--soft` resulta cómodo: tu trabajo sigue preparado, así que otro `git commit` lo devuelve con el mensaje que querías.",
   "step.4.note": "Reset mueve un nombre. El modo decide dónde van tus archivos.",
   "legend.0": "un commit - una instantánea guardada",
   "legend.1": "un nombre de rama",

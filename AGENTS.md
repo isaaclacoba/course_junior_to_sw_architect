@@ -54,6 +54,28 @@ model. Watch for these tells and fix them.
 9. **Read-aloud test.** If no colleague would say it out loud in a code review,
    rewrite it.
 
+## The four tells that keep coming back
+
+Rules 7-9 were written down and still got broken - one lesson shipped with four
+tricolons, three `So ...` openers and two antithesis flourishes. They are hard to
+see in your own prose, so they are named here and `node tools/check-voice.mjs`
+counts them. Every hit is a QUESTION, not a verdict: read it aloud, and if a
+colleague would say it, keep it.
+
+1. **Tricolon** - "Git compared the two sides, found `cat.txt` on both, and
+   stopped right there." Three clauses in a rising list. One is fine; two in a
+   paragraph is a rhythm, and the rhythm is the tell. Split it, or drop a clause.
+2. **Antithesis flourish** - "That stop is a conflict - git refusing to guess,
+   not git failing." Defining a thing by what it is not, as a closing beat. Say
+   what it IS and stop.
+3. **`So ...` as an opener** - fine once. Three steps in a row starting "So" is a
+   model summarising itself. Start with the subject instead.
+4. **Naming an abstraction instead of the thing** - "That reading is the
+   expensive one." Which reading? Expensive how? Name the mistake and its cost.
+
+A fifth, rarer: a vague adverb doing the work of a fact - "quietly backfires",
+"seamlessly handles". Say what actually happens.
+
 ## Writing an intro
 
 A good lesson intro follows this shape (it worked for "Inherit or compose?"):

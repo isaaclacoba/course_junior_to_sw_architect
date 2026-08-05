@@ -12,7 +12,7 @@
   "step.1.narr": "Haz commit de `dog.txt` y aparece un segundo punto, unido al primero. Esa línea es lo importante. El commit nuevo guarda sobre qué commit se construyó, y ese commit es su **padre**.",
   "step.2.narr": "Un tercer commit, un tercer enlace. Fíjate en la dirección: cada commit apunta **hacia atrás**, al anterior. Ninguno sabe qué viene después - un commit queda terminado en el momento en que lo haces, así que solo puede mirar atrás.",
   "step.3.narr": "Esa cadena hacia atrás es la que recorre `git log`. Empieza donde estás, sigue al padre, sigue a su padre, y ya tienes la **historia** - cada instantánea que dejaste detrás, en orden, sin que git guarde ningún orden en ninguna parte.",
-  "step.4.narr": "Así que una historia no es una lista que git mantenga. Es lo que obtienes al seguir los enlaces hacia atrás desde donde estás. Cada commit que hagas a partir de ahora se une a la cadena igual, recordando exactamente una cosa: qué vino antes.",
+  "step.4.narr": "Una historia no es una lista que git guarde en algún sitio. Es lo que obtienes al seguir los enlaces hacia atrás desde donde estás. Cada commit que hagas se une a la cadena igual, recordando exactamente una cosa: qué vino antes.",
   "step.0.note": "Un commit. Todavía no hay nada detrás.",
   "step.1.note": "El segundo commit recuerda al primero. Ese enlace es su padre.",
   "step.2.note": "Todas las flechas apuntan atrás. Ninguna apunta adelante.",

@@ -14,7 +14,7 @@
   "step.2.note": "`--mixed` - same move, the file waits in the working tree.",
   "step.3.narr": "`--hard` makes the same move once more, and this time it puts `draft.txt` nowhere. Staging empty, folder empty - what that commit was holding is gone. This is the one to read twice before you run it.",
   "step.3.note": "`--hard` - same move, the file is thrown away.",
-  "step.4.narr": "So the branch step is identical in all three, and what you are really choosing is where the files land. That is what makes `--soft` handy: your work is still staged, so one more `git commit` puts it back under the message you meant.",
+  "step.4.narr": "The branch step is identical in all three, and what you are really choosing is where the files land. That is what makes `--soft` handy: your work is still staged, so one more `git commit` puts it back under the message you meant.",
   "step.4.note": "Reset moves a name. The mode decides where your files go.",
   "legend.0": "a commit - one saved snapshot",
   "legend.1": "a branch name",
