@@ -88,3 +88,30 @@ test("a card whose start is a ready-made state still seeds its declared files", 
   const task = { files: ["cat.txt"], start: { commits: new Map(), refs: new Map(), head: {} } };
   assert.deepEqual(GitTask.filesOf(task), ["cat.txt"], "a non-array list must not break the scan");
 });
+
+test("a file declared with contents keeps all of them, not just the first", () => {
+  // Deduping on the entry itself stringifies every object to "[object Object]",
+  // so the second and third look like repeats and vanish. A lesson silently
+  // loses two of its three files, and the only symptom is a thinner board.
+  const task = {
+    files: [
+      { path: "cat.txt", text: "Mia" },
+      { path: "dog.txt", text: "Rex" },
+      { path: "notes.md", text: "half done" }
+    ]
+  };
+  assert.deepEqual(
+    GitTask.filesOf(task).map((f) => f.path),
+    ["cat.txt", "dog.txt", "notes.md"],
+  );
+});
+
+test("bare paths and files-with-contents can be mixed, and still dedupe by path", () => {
+  const task = {
+    files: ["bare.txt", { path: "rich.txt", text: "has text" }, "bare.txt"],
+    solution: ["git add rich.txt"]
+  };
+  const got = GitTask.filesOf(task);
+  assert.deepEqual(got.map((f) => (typeof f === "string" ? f : f.path)), ["bare.txt", "rich.txt"]);
+  assert.equal(got[1].text, "has text", "the contents survive the union with inferred paths");
+});

@@ -23,7 +23,11 @@
         "Stage the cat's file, and only that one. `git status` spells its name for you.",
         "Save it with `git commit -m \"add cat\"` - the message is checked, so type it exactly."
       ],
-      files: ["cat-notes.txt", "dog-notes.txt", "feeder.md"],
+      files: [
+        { path: "cat-notes.txt", text: "Mia, tabby, 4 years old.\nSleeps on the warm laptop." },
+        { path: "dog-notes.txt", text: "Rex, collie, 2 years old.\nBarks at the postman." },
+        { path: "feeder.md", text: "# Feeder\n\nTODO: work out the schedule." }
+      ],
       start: [],
       target: [
         "git add cat-notes.txt",
@@ -46,7 +50,11 @@
         "Stage `cat.txt` and `dog.txt`, and leave `notes.md` out.",
         "Save them as one commit with `git commit -m \"add the pets\"`."
       ],
-      files: ["cat.txt", "dog.txt", "notes.md"],
+      files: [
+        { path: "cat.txt", text: "Mia, tabby, 4 years old." },
+        { path: "dog.txt", text: "Rex, collie, 2 years old." },
+        { path: "notes.md", text: "# Pets\n\nTODO: half of this is missing" }
+      ],
       start: [],
       target: [
         "git add cat.txt",
@@ -70,7 +78,12 @@
         "Save them with `git commit -m \"add dog\"`.",
         "Leave the `add cat` commit alone - the new one goes on top of it."
       ],
-      files: ["cat.txt", "dog.txt", "dog-bowl.txt", "bird.txt"],
+      files: [
+        { path: "cat.txt", text: "Mia, tabby, 4 years old." },
+        { path: "dog.txt", text: "Rex, collie, 2 years old." },
+        { path: "dog-bowl.txt", text: "Steel bowl, chipped.\nBelongs to Rex." },
+        { path: "bird.txt", text: "Pip, budgie, loud at 6am." }
+      ],
       start: [
         "git add cat.txt",
         "git commit -m \"add cat\""

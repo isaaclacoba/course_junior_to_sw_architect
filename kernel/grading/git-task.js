@@ -65,10 +65,18 @@
     if (!task) return [];
     var seen = Object.create(null);
     var out = [];
+    // A declared file is either a bare path or `{ path, text }` - the second
+    // form is how a card gives a file contents. Dedupe on the PATH: keying on
+    // the entry itself turns every object into "[object Object]", so the second
+    // one and every one after it look like duplicates and silently vanish.
+    function pathOf(entry) {
+      return entry && typeof entry === "object" ? entry.path : entry;
+    }
     function take(paths) {
       for (var i = 0; i < paths.length; i++) {
-        if (seen[paths[i]]) continue;
-        seen[paths[i]] = true;
+        var key = pathOf(paths[i]);
+        if (!key || seen[key]) continue;
+        seen[key] = true;
         out.push(paths[i]);
       }
     }

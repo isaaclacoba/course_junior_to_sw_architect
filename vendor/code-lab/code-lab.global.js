@@ -73,7 +73,9 @@ var CodeLab = (() => {
     gitMerge: () => merge,
     gitMerge3: () => merge3,
     gitMergeAbort: () => mergeAbort,
+    gitPanelFiles: () => panelFiles,
     gitReset: () => reset,
+    gitResolveFilePanel: () => resolveFilePanel,
     gitResolvePaths: () => resolvePaths,
     gitRevList: () => revList,
     gitRevParse: () => revParse,
@@ -3516,6 +3518,779 @@ ${result.runtimeError}`.trim(),
     };
   }
 
+  // src/core/text-merge.ts
+  function splitLines(text) {
+    if (text === "") return [];
+    const lines = text.split("\n");
+    if (lines.length > 0 && lines[lines.length - 1] === "") lines.pop();
+    return lines;
+  }
+  function joinLines(lines) {
+    return lines.join("\n");
+  }
+  function lcsLines(a, b) {
+    const n = a.length;
+    const m = b.length;
+    const table = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+    for (let i2 = n - 1; i2 >= 0; i2--) {
+      for (let j2 = m - 1; j2 >= 0; j2--) {
+        table[i2][j2] = a[i2] === b[j2] ? table[i2 + 1][j2 + 1] + 1 : Math.max(table[i2 + 1][j2], table[i2][j2 + 1]);
+      }
+    }
+    const out = [];
+    let i = 0;
+    let j = 0;
+    while (i < n && j < m) {
+      if (a[i] === b[j]) {
+        out.push({ ai: i, bi: j });
+        i++;
+        j++;
+      } else if (table[i + 1][j] >= table[i][j + 1]) {
+        i++;
+      } else {
+        j++;
+      }
+    }
+    return out;
+  }
+  function diffHunks(base, side) {
+    const matches = lcsLines(base, side);
+    const hunks = [];
+    let bi = 0;
+    let si = 0;
+    const flush = (endBase, endSide) => {
+      if (endBase > bi || endSide > si) {
+        hunks.push({ start: bi, end: endBase, lines: side.slice(si, endSide) });
+      }
+    };
+    for (const m of matches) {
+      flush(m.ai, m.bi);
+      bi = m.ai + 1;
+      si = m.bi + 1;
+    }
+    flush(base.length, side.length);
+    return hunks;
+  }
+  var DEFAULT_LABELS2 = { ours: "HEAD", base: "ancestor", theirs: "other" };
+  function overlaps(a, b) {
+    const positive = Math.max(a.start, b.start) < Math.min(a.end, b.end);
+    if (positive) return true;
+    const bothInsert = a.start === a.end && b.start === b.end && a.start === b.start;
+    return bothInsert && joinLines(a.lines) !== joinLines(b.lines);
+  }
+  function groupHunks(ourHunks, theirHunks) {
+    const tagged = [
+      ...ourHunks.map((h) => ({ h, side: "ours" })),
+      ...theirHunks.map((h) => ({ h, side: "theirs" }))
+    ].sort((x, y) => x.h.start - y.h.start || x.h.end - y.h.end);
+    const groups = [];
+    for (const item of tagged) {
+      const last = groups[groups.length - 1];
+      const touching = last && (Math.max(last.start, item.h.start) < Math.min(last.end, item.h.end) || [...last.ours, ...last.theirs].some((h) => overlaps(h, item.h)));
+      if (touching) {
+        last.start = Math.min(last.start, item.h.start);
+        last.end = Math.max(last.end, item.h.end);
+        (item.side === "ours" ? last.ours : last.theirs).push(item.h);
+      } else {
+        groups.push({
+          start: item.h.start,
+          end: item.h.end,
+          ours: item.side === "ours" ? [item.h] : [],
+          theirs: item.side === "theirs" ? [item.h] : []
+        });
+      }
+    }
+    return groups;
+  }
+  function sideLines(group, side, base) {
+    if (side.length === 0) return base.slice(group.start, group.end);
+    const out = [];
+    let cursor = group.start;
+    for (const h of side) {
+      out.push(...base.slice(cursor, h.start));
+      out.push(...h.lines);
+      cursor = h.end;
+    }
+    out.push(...base.slice(cursor, group.end));
+    return out;
+  }
+  function merge3(baseText, oursText, theirsText, labels = DEFAULT_LABELS2) {
+    const base = splitLines(baseText);
+    const ours = splitLines(oursText);
+    const theirs = splitLines(theirsText);
+    const groups = groupHunks(diffHunks(base, ours), diffHunks(base, theirs));
+    const out = [];
+    let cursor = 0;
+    let conflicts = 0;
+    for (const g of groups) {
+      out.push(...base.slice(cursor, g.start));
+      const ourSide = sideLines(g, g.ours, base);
+      const theirSide = sideLines(g, g.theirs, base);
+      if (g.ours.length === 0) {
+        out.push(...theirSide);
+      } else if (g.theirs.length === 0) {
+        out.push(...ourSide);
+      } else if (joinLines(ourSide) === joinLines(theirSide)) {
+        out.push(...ourSide);
+      } else {
+        conflicts++;
+        out.push(`<<<<<<< ${labels.ours}`);
+        out.push(...ourSide);
+        out.push(`||||||| ${labels.base}`);
+        out.push(...base.slice(g.start, g.end));
+        out.push("=======");
+        out.push(...theirSide);
+        out.push(`>>>>>>> ${labels.theirs}`);
+      }
+      cursor = g.end;
+    }
+    out.push(...base.slice(cursor));
+    return { text: joinLines(out), clean: conflicts === 0, conflicts };
+  }
+
+  // src/core/git-model.ts
+  var GitError = class extends Error {
+    constructor(message) {
+      super(message);
+      this.name = "GitError";
+    }
+  };
+  function fnv1a(str) {
+    let h = 2166136261;
+    for (let i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  function makeHash(parents, message, seq) {
+    const preimage = parents.join(",") + "\n" + message + "\n" + seq;
+    return fnv1a(preimage).toString(16).padStart(8, "0").slice(0, 7);
+  }
+  function cloneState(s) {
+    return {
+      commits: new Map(s.commits),
+      refs: new Map(s.refs),
+      head: s.head.kind === "branch" ? { kind: "branch", name: s.head.name } : { kind: "detached", commit: s.head.commit },
+      index: new Map(s.index),
+      worktree: new Map(
+        [...s.worktree].map(([p, e]) => [p, { status: e.status, text: e.text }])
+      ),
+      merge: s.merge ? { mergeHead: s.merge.mergeHead, conflicted: [...s.merge.conflicted] } : void 0,
+      seq: s.seq
+    };
+  }
+  function refLabel(s) {
+    return s.head.kind === "branch" ? s.head.name.replace(/^refs\/heads\//, "") : null;
+  }
+  function headCommit2(s) {
+    if (s.head.kind === "detached") return s.head.commit;
+    return s.refs.get(s.head.name) ?? null;
+  }
+  function moveHead(s, to) {
+    if (s.head.kind === "branch") {
+      s.refs.set(s.head.name, to);
+    } else {
+      s.head = { kind: "detached", commit: to };
+    }
+  }
+  function ancestors(s, start) {
+    const seen = /* @__PURE__ */ new Set();
+    const stack = [start];
+    while (stack.length) {
+      const h = stack.pop();
+      if (seen.has(h)) continue;
+      seen.add(h);
+      const c = s.commits.get(h);
+      if (c) for (const p of c.parents) stack.push(p);
+    }
+    return seen;
+  }
+  function mergeBases(s, a, b) {
+    const aAnc = ancestors(s, a);
+    const common = [...ancestors(s, b)].filter((h) => aAnc.has(h));
+    const bases = [];
+    for (const c of common) {
+      let isBase = true;
+      for (const d of common) {
+        if (d === c) continue;
+        const dAnc = ancestors(s, d);
+        dAnc.delete(d);
+        if (dAnc.has(c)) {
+          isBase = false;
+          break;
+        }
+      }
+      if (isBase) bases.push(c);
+    }
+    return bases;
+  }
+  function changedPaths(s, tip, base) {
+    const baseAnc = base ? ancestors(s, base) : /* @__PURE__ */ new Set();
+    const paths = /* @__PURE__ */ new Set();
+    for (const h of ancestors(s, tip)) {
+      if (baseAnc.has(h)) continue;
+      const c = s.commits.get(h);
+      if (c) for (const p of c.paths) paths.add(p);
+    }
+    return paths;
+  }
+  function mergeCommitPaths(s, h, o) {
+    const base = mergeBases(s, h, o)[0] ?? null;
+    const hp = changedPaths(s, h, base);
+    const op = changedPaths(s, o, base);
+    return [.../* @__PURE__ */ new Set([...hp, ...op])];
+  }
+  function treeAt(s, h) {
+    if (h === null) return /* @__PURE__ */ new Map();
+    const c = s.commits.get(h);
+    return c ? new Map(c.blobs) : /* @__PURE__ */ new Map();
+  }
+  function fileAt(s, h, path) {
+    if (h === null) return null;
+    const c = s.commits.get(h);
+    if (!c) return null;
+    return c.blobs.has(path) ? c.blobs.get(path) : null;
+  }
+  function treeWithIndex(s, parent) {
+    const blobs = treeAt(s, parent);
+    for (const [p, text] of s.index) blobs.set(p, text);
+    return blobs;
+  }
+  function firstParent(s, h) {
+    const c = s.commits.get(h);
+    if (!c || c.parents.length === 0) {
+      throw new GitError(`revision ${h} has no parent`);
+    }
+    return c.parents[0];
+  }
+  function nthParent(s, h, n) {
+    const c = s.commits.get(h);
+    if (!c || c.parents.length < n) {
+      throw new GitError(`revision ${h} has no parent ${n}`);
+    }
+    return c.parents[n - 1];
+  }
+  function resolveBase(s, tok) {
+    if (tok === "HEAD" || tok === "@") {
+      const h = headCommit2(s);
+      if (h === null) throw new GitError("HEAD is unborn");
+      return h;
+    }
+    if (s.refs.has(tok)) return s.refs.get(tok);
+    const bref = `refs/heads/${tok}`;
+    if (s.refs.has(bref)) return s.refs.get(bref);
+    const tref = `refs/tags/${tok}`;
+    if (s.refs.has(tref)) return s.refs.get(tref);
+    if (s.commits.has(tok)) return tok;
+    if (/^[0-9a-f]{4,40}$/.test(tok)) {
+      const matches = [...s.commits.keys()].filter((h) => h.startsWith(tok));
+      if (matches.length === 1) return matches[0];
+      if (matches.length > 1) throw new GitError(`ambiguous short id: ${tok}`);
+    }
+    throw new GitError(`unknown revision: ${tok}`);
+  }
+  function init() {
+    return {
+      commits: /* @__PURE__ */ new Map(),
+      refs: /* @__PURE__ */ new Map(),
+      head: { kind: "branch", name: "refs/heads/main" },
+      index: /* @__PURE__ */ new Map(),
+      worktree: /* @__PURE__ */ new Map(),
+      seq: 0
+    };
+  }
+  function addFiles(state, files) {
+    const s = cloneState(state);
+    for (const f of files) {
+      const path = typeof f === "string" ? f : f.path;
+      const text = typeof f === "string" ? "" : f.text ?? "";
+      if (s.index.has(path) || s.worktree.has(path)) continue;
+      s.worktree.set(path, { status: "untracked", text });
+    }
+    return { state: s, effect: { kind: "none" } };
+  }
+  function edit(state, path, text) {
+    const s = cloneState(state);
+    const tracked = trackedPaths(s, headCommit2(s));
+    s.worktree.set(path, {
+      status: tracked.has(path) ? "modified" : "untracked",
+      text
+    });
+    return { state: s, effect: { kind: "none" } };
+  }
+  function stage(state, paths) {
+    const s = cloneState(state);
+    for (const p of paths) {
+      if (!s.worktree.has(p) && !s.index.has(p)) {
+        throw new GitError(`fatal: pathspec '${p}' did not match any files`);
+      }
+      const entry = s.worktree.get(p);
+      if (entry) s.index.set(p, entry.text);
+      else if (!s.index.has(p)) s.index.set(p, "");
+      s.worktree.delete(p);
+    }
+    return { state: s, effect: { kind: "none" } };
+  }
+  function amend(state, message) {
+    const s = cloneState(state);
+    const h = headCommit2(s);
+    if (h === null) throw new GitError("You do not have anything to amend.");
+    const old = s.commits.get(h);
+    const parents = old.parents;
+    const paths = [.../* @__PURE__ */ new Set([...old.paths, ...s.index.keys()])];
+    const msg = message ?? old.message;
+    const id = makeHash(parents, msg, s.seq);
+    s.seq += 1;
+    const blobs = new Map(old.blobs);
+    for (const [p, text] of s.index) blobs.set(p, text);
+    s.commits.set(id, { id, parents, message: msg, paths, blobs });
+    moveHead(s, id);
+    s.index.clear();
+    return { state: s, effect: { kind: "commit", id } };
+  }
+  function unstage(state, paths) {
+    const s = cloneState(state);
+    const tracked = trackedPaths(s, headCommit2(s));
+    for (const p of paths) {
+      if (!s.index.has(p)) continue;
+      const text = s.index.get(p);
+      s.index.delete(p);
+      s.worktree.set(p, {
+        status: tracked.has(p) ? "modified" : "untracked",
+        text
+      });
+    }
+    return { state: s, effect: { kind: "none" } };
+  }
+  function commit(state, message) {
+    const s = cloneState(state);
+    const head = headCommit2(s);
+    if (s.merge) {
+      if (s.merge.conflicted.length > 0) {
+        throw new GitError("cannot commit: unresolved conflicts remain");
+      }
+      if (head === null) throw new GitError("cannot merge into an unborn branch");
+      const other = s.merge.mergeHead;
+      const parents2 = [head, other];
+      const paths2 = mergeCommitPaths(s, head, other);
+      const id2 = makeHash(parents2, message, s.seq);
+      s.seq += 1;
+      const blobs2 = treeAt(s, head);
+      for (const [p, text] of treeAt(s, other)) if (!blobs2.has(p)) blobs2.set(p, text);
+      for (const [p, text] of s.index) blobs2.set(p, text);
+      s.commits.set(id2, { id: id2, parents: parents2, message, paths: paths2, blobs: blobs2 });
+      moveHead(s, id2);
+      s.merge = void 0;
+      s.index.clear();
+      return { state: s, effect: { kind: "merge", id: id2 } };
+    }
+    if (s.index.size === 0) throw new GitError("nothing to commit");
+    const parents = head === null ? [] : [head];
+    const paths = [...s.index.keys()];
+    const id = makeHash(parents, message, s.seq);
+    s.seq += 1;
+    const blobs = treeWithIndex(s, head);
+    s.commits.set(id, { id, parents, message, paths, blobs });
+    moveHead(s, id);
+    s.index.clear();
+    return { state: s, effect: { kind: "commit", id } };
+  }
+  function branch(state, name, at) {
+    const s = cloneState(state);
+    const ref = `refs/heads/${name}`;
+    if (s.refs.has(ref)) throw new GitError(`branch '${name}' already exists`);
+    const target = at !== void 0 ? revParse(s, at) : headCommit2(s);
+    if (target === null) throw new GitError("cannot create a branch: HEAD is unborn");
+    s.refs.set(ref, target);
+    return { state: s, effect: { kind: "branch", ref, commit: target } };
+  }
+  function tag(state, name, at) {
+    const s = cloneState(state);
+    const ref = `refs/tags/${name}`;
+    if (s.refs.has(ref)) throw new GitError(`tag '${name}' already exists`);
+    const target = at !== void 0 ? revParse(s, at) : headCommit2(s);
+    if (target === null) throw new GitError("cannot create a tag: HEAD is unborn");
+    s.refs.set(ref, target);
+    return { state: s, effect: { kind: "tag", ref, commit: target } };
+  }
+  function checkout(state, target, opts) {
+    const s = cloneState(state);
+    if (opts?.create) {
+      const ref = `refs/heads/${target}`;
+      if (s.refs.has(ref)) throw new GitError(`branch '${target}' already exists`);
+      const at = headCommit2(s);
+      if (at === null) throw new GitError("cannot create a branch: HEAD is unborn");
+      s.refs.set(ref, at);
+      s.head = { kind: "branch", name: ref };
+      return { state: s, effect: { kind: "checkout", ref } };
+    }
+    const bref = `refs/heads/${target}`;
+    if (s.refs.has(bref)) {
+      s.head = { kind: "branch", name: bref };
+      return { state: s, effect: { kind: "checkout", ref: bref } };
+    }
+    if (target.startsWith("refs/heads/") && s.refs.has(target)) {
+      s.head = { kind: "branch", name: target };
+      return { state: s, effect: { kind: "checkout", ref: target } };
+    }
+    const commitId = revParse(s, target);
+    s.head = { kind: "detached", commit: commitId };
+    return { state: s, effect: { kind: "checkout", commit: commitId } };
+  }
+  function merge(state, otherRev) {
+    const s = cloneState(state);
+    const h = headCommit2(s);
+    if (h === null) throw new GitError("cannot merge into an unborn branch");
+    const o = revParse(s, otherRev);
+    const hAnc = ancestors(s, h);
+    if (hAnc.has(o)) {
+      return { state: s, effect: { kind: "none" } };
+    }
+    const oAnc = ancestors(s, o);
+    if (oAnc.has(h)) {
+      moveHead(s, o);
+      return { state: s, effect: { kind: "ff", from: h, to: o } };
+    }
+    const base = mergeBases(s, h, o)[0] ?? null;
+    const hPaths = changedPaths(s, h, base);
+    const oPaths = changedPaths(s, o, base);
+    const both = [...hPaths].filter((p) => oPaths.has(p)).sort();
+    const conflicted = [];
+    const resolvedText = /* @__PURE__ */ new Map();
+    const markedText = /* @__PURE__ */ new Map();
+    for (const p of both) {
+      const baseText = fileAt(s, base, p) ?? "";
+      const ourText = fileAt(s, h, p) ?? "";
+      const theirText = fileAt(s, o, p) ?? "";
+      if (baseText === "" && ourText === "" && theirText === "") {
+        conflicted.push(p);
+        continue;
+      }
+      const r = merge3(baseText, ourText, theirText, {
+        ours: refLabel(s) ?? "HEAD",
+        base: "ancestor",
+        theirs: otherRev
+      });
+      if (r.clean) {
+        resolvedText.set(p, r.text);
+      } else {
+        conflicted.push(p);
+        markedText.set(p, r.text);
+      }
+    }
+    if (conflicted.length > 0) {
+      s.merge = { mergeHead: o, conflicted };
+      for (const [p, text] of markedText) s.worktree.set(p, { status: "modified", text });
+      return { state: s, effect: { kind: "conflict", paths: conflicted } };
+    }
+    const message = `Merge ${otherRev}`;
+    const parents = [h, o];
+    const paths = mergeCommitPaths(s, h, o);
+    const id = makeHash(parents, message, s.seq);
+    s.seq += 1;
+    const blobs = treeAt(s, h);
+    for (const [p, text] of treeAt(s, o)) {
+      if (!blobs.has(p) || fileAt(s, h, p) === fileAt(s, base, p)) blobs.set(p, text);
+    }
+    for (const [p, text] of resolvedText) blobs.set(p, text);
+    s.commits.set(id, { id, parents, message, paths, blobs });
+    moveHead(s, id);
+    return { state: s, effect: { kind: "merge", id } };
+  }
+  function mergeAbort(state) {
+    const s = cloneState(state);
+    if (!s.merge) throw new GitError("no merge in progress");
+    s.merge = void 0;
+    return { state: s, effect: { kind: "none" } };
+  }
+  function resolvePaths(state, paths) {
+    const s = cloneState(state);
+    if (!s.merge) throw new GitError("no merge in progress");
+    const remaining = s.merge.conflicted.filter((p) => !paths.includes(p));
+    s.merge = { mergeHead: s.merge.mergeHead, conflicted: remaining };
+    return { state: s, effect: { kind: "none" } };
+  }
+  function reset(state, mode, targetRev) {
+    const s = cloneState(state);
+    const before = headCommit2(s);
+    const target = revParse(s, targetRev);
+    moveHead(s, target);
+    const tracked = trackedPaths(s, target);
+    const undone = before ? changedPaths(s, before, target) : /* @__PURE__ */ new Set();
+    const restingStatus = (p) => tracked.has(p) ? "modified" : "untracked";
+    const undoneText = (p) => fileAt(s, before, p) ?? s.index.get(p) ?? s.worktree.get(p)?.text ?? "";
+    const rest = (p, text) => s.worktree.set(p, { status: restingStatus(p), text });
+    if (mode === "soft") {
+      for (const p of undone) s.index.set(p, undoneText(p));
+    } else if (mode === "mixed") {
+      for (const [p, text] of s.index) rest(p, text);
+      s.index.clear();
+      for (const p of undone) rest(p, undoneText(p));
+    } else if (mode === "hard") {
+      const staged = [...s.index];
+      s.index.clear();
+      for (const [path, entry] of [...s.worktree]) {
+        if (entry.status !== "untracked") s.worktree.delete(path);
+      }
+      for (const [path, text] of staged) {
+        if (!tracked.has(path)) s.worktree.set(path, { status: "untracked", text });
+      }
+      for (const path of undone) if (!tracked.has(path)) s.worktree.delete(path);
+    }
+    return { state: s, effect: { kind: "reset", mode, to: target } };
+  }
+  function trackedPaths(s, tip) {
+    return tip ? changedPaths(s, tip, null) : /* @__PURE__ */ new Set();
+  }
+  function revParse(state, rev) {
+    const m = rev.match(/^([^~^]+)(.*)$/);
+    if (!m) throw new GitError(`unknown revision: ${rev}`);
+    let commitId = resolveBase(state, m[1]);
+    const ops = m[2];
+    let i = 0;
+    while (i < ops.length) {
+      const ch = ops[i];
+      i++;
+      let num = "";
+      while (i < ops.length && ops[i] >= "0" && ops[i] <= "9") {
+        num += ops[i];
+        i++;
+      }
+      if (ch === "~") {
+        const n = num === "" ? 1 : parseInt(num, 10);
+        for (let k = 0; k < n; k++) commitId = firstParent(state, commitId);
+      } else if (ch === "^") {
+        const n = num === "" ? 1 : parseInt(num, 10);
+        commitId = nthParent(state, commitId, n);
+      } else {
+        throw new GitError(`unknown revision: ${rev}`);
+      }
+    }
+    return commitId;
+  }
+  function revList(state, range) {
+    let set;
+    if (range.trim() === "--all") {
+      set = /* @__PURE__ */ new Set();
+      for (const ref of state.refs.values()) {
+        for (const h of ancestors(state, ref)) set.add(h);
+      }
+      if (state.head.kind === "detached") {
+        for (const h of ancestors(state, state.head.commit)) set.add(h);
+      }
+    } else if (range.includes("...")) {
+      const [a, b] = range.split("...");
+      const aAnc = ancestors(state, revParse(state, a.trim()));
+      const bAnc = ancestors(state, revParse(state, b.trim()));
+      set = /* @__PURE__ */ new Set();
+      for (const h of aAnc) if (!bAnc.has(h)) set.add(h);
+      for (const h of bAnc) if (!aAnc.has(h)) set.add(h);
+    } else if (range.includes("..")) {
+      const [a, b] = range.split("..");
+      const aAnc = ancestors(state, revParse(state, a.trim()));
+      set = /* @__PURE__ */ new Set();
+      for (const h of ancestors(state, revParse(state, b.trim()))) {
+        if (!aAnc.has(h)) set.add(h);
+      }
+    } else {
+      set = ancestors(state, revParse(state, range.trim()));
+    }
+    return [...state.commits.keys()].filter((h) => set.has(h)).reverse();
+  }
+
+  // src/core/text-diff.ts
+  function diffLines(a, b) {
+    const out = [];
+    let ai = 0;
+    let bi = 0;
+    for (const m of lcsLines(a, b)) {
+      while (ai < m.ai) out.push({ kind: "-", text: a[ai++] });
+      while (bi < m.bi) out.push({ kind: "+", text: b[bi++] });
+      out.push({ kind: " ", text: a[m.ai] });
+      ai = m.ai + 1;
+      bi = m.bi + 1;
+    }
+    while (ai < a.length) out.push({ kind: "-", text: a[ai++] });
+    while (bi < b.length) out.push({ kind: "+", text: b[bi++] });
+    return out;
+  }
+  function hunksOf(lines, context) {
+    const changed = lines.map((l) => l.kind !== " ");
+    const keep = lines.map(
+      (_, i) => changed.slice(Math.max(0, i - context), i + context + 1).some(Boolean)
+    );
+    const hunks = [];
+    let ai = 0;
+    let bi = 0;
+    let current = null;
+    for (let i = 0; i < lines.length; i++) {
+      const l = lines[i];
+      if (keep[i]) {
+        if (!current) {
+          current = { aStart: ai + 1, aCount: 0, bStart: bi + 1, bCount: 0, lines: [] };
+          hunks.push(current);
+        }
+        current.lines.push(l);
+        if (l.kind !== "+") current.aCount++;
+        if (l.kind !== "-") current.bCount++;
+      } else {
+        current = null;
+      }
+      if (l.kind !== "+") ai++;
+      if (l.kind !== "-") bi++;
+    }
+    return hunks;
+  }
+  function formatFileDiff(path, oldText, newText, context = 3) {
+    if (oldText === newText) return "";
+    const a = splitLines(oldText);
+    const b = splitLines(newText);
+    const hunks = hunksOf(diffLines(a, b), context);
+    if (hunks.length === 0) return "";
+    const out = [
+      `diff --git a/${path} b/${path}`,
+      `--- a/${path}`,
+      `+++ b/${path}`
+    ];
+    for (const h of hunks) {
+      out.push(`@@ -${h.aCount === 0 ? 0 : h.aStart},${h.aCount} +${h.bCount === 0 ? 0 : h.bStart},${h.bCount} @@`);
+      for (const l of h.lines) out.push(l.kind + l.text);
+    }
+    return out.join("\n");
+  }
+
+  // src/core/file-panel.ts
+  var PANEL_ZONES = ["tree", "index", "repo"];
+  function copyIn(state, zone, path) {
+    if (zone === "tree") return state.worktree.get(path)?.text ?? null;
+    if (zone === "index") return state.index.get(path) ?? null;
+    return fileAt(state, headCommit2(state), path);
+  }
+  function panelFiles(state) {
+    const all = /* @__PURE__ */ new Set();
+    for (const p of state.worktree.keys()) all.add(p);
+    for (const p of state.index.keys()) all.add(p);
+    const head = headCommit2(state);
+    if (head !== null) {
+      const c = state.commits.get(head);
+      if (c) for (const p of c.blobs.keys()) all.add(p);
+    }
+    return [...all].sort();
+  }
+  function behind(zones, zone) {
+    const i = PANEL_ZONES.indexOf(zone);
+    for (let k = i + 1; k < PANEL_ZONES.length; k++) {
+      const z = zones.find((c) => c.zone === PANEL_ZONES[k]);
+      if (z && z.present) return z;
+    }
+    return null;
+  }
+  function resolveFilePanel(state, path, selected) {
+    const files = panelFiles(state);
+    const chosen = path && files.includes(path) ? path : files[0] ?? null;
+    const anyText = files.some((f) => PANEL_ZONES.some((z) => (copyIn(state, z, f) ?? "") !== ""));
+    if (chosen === null || !anyText) {
+      return { path: null, files, zones: [], selected: "tree", diff: null, comparedWith: null };
+    }
+    const zones = PANEL_ZONES.map((zone) => {
+      const text = copyIn(state, zone, chosen);
+      return { zone, present: text !== null, text: text ?? "", differs: false };
+    });
+    for (const z of zones) {
+      const prev3 = behind(zones, z.zone);
+      z.differs = z.present && prev3 !== null && prev3.text !== z.text;
+    }
+    const wanted = selected && zones.some((z) => z.zone === selected && z.present) ? selected : null;
+    const sel = wanted ?? (zones.find((z) => z.present)?.zone ?? "tree");
+    const selCopy = zones.find((z) => z.zone === sel);
+    const prev2 = behind(zones, sel);
+    const showDiff = selCopy.present && prev2 !== null && prev2.text !== selCopy.text;
+    return {
+      path: chosen,
+      files,
+      zones,
+      selected: sel,
+      diff: showDiff ? diffLines(splitLines(prev2.text), splitLines(selCopy.text)) : null,
+      comparedWith: showDiff ? prev2.zone : null
+    };
+  }
+
+  // src/dom/git-file-panel.ts
+  var ZONE_LABEL = {
+    tree: "Working tree",
+    index: "Staging",
+    repo: "Last commit"
+  };
+  var ZONE_PHRASE = {
+    tree: "working tree",
+    index: "staging",
+    repo: "the last commit"
+  };
+  var GitFilePanel = class {
+    constructor() {
+      this.path = null;
+      this.zone = null;
+      this.state = null;
+      this.onClick = (ev) => {
+        const t = ev.target?.closest("[data-file],[data-zone]");
+        if (!t || !this.state) return;
+        if (t.dataset.file) {
+          this.path = t.dataset.file;
+          this.zone = null;
+        } else if (t.dataset.zone) {
+          this.zone = t.dataset.zone;
+        }
+        this.paint(resolveFilePanel(this.state, this.path, this.zone));
+      };
+      this.el = document.createElement("div");
+      this.el.className = "cl-git-fp";
+      this.el.addEventListener("click", this.onClick);
+    }
+    /** Repaint for a new repo state, keeping the learner's file and zone choice
+     *  when they still make sense. */
+    sync(state) {
+      this.state = state;
+      this.paint(resolveFilePanel(state, this.path, this.zone));
+    }
+    paint(p) {
+      if (p.path === null) {
+        this.el.hidden = true;
+        this.el.innerHTML = "";
+        return;
+      }
+      this.el.hidden = false;
+      this.path = p.path;
+      this.zone = p.selected;
+      const chips = p.files.map(
+        (f) => `<button type="button" class="cl-git-fp-tab" data-file="${escapeHtml4(f)}" aria-selected="${f === p.path}">${escapeHtml4(f)}</button>`
+      ).join("");
+      const zoneButtons = PANEL_ZONES.map((z) => {
+        const copy = p.zones.find((c) => c.zone === z);
+        const dot = copy.differs ? '<i class="cl-git-fp-dot" aria-hidden="true"></i>' : "";
+        const title = copy.present ? copy.differs ? `${ZONE_LABEL[z]} - this copy differs from the one behind it` : ZONE_LABEL[z] : `${ZONE_LABEL[z]} - does not hold this file`;
+        return `<button type="button" class="cl-git-fp-zone" data-zone="${z}" aria-pressed="${z === p.selected}"${copy.present ? "" : " disabled"} title="${escapeHtml4(title)}">${ZONE_LABEL[z]}${dot}</button>`;
+      }).join("");
+      const selected = p.zones.find((c) => c.zone === p.selected);
+      const body = p.diff ? this.diffBody(p) : this.flatBody(selected.text);
+      const foot = p.comparedWith ? `${ZONE_PHRASE[p.selected]}, compared with ${ZONE_PHRASE[p.comparedWith]}` : selected.present ? `${ZONE_PHRASE[p.selected]} - no change behind it` : "not in this zone";
+      this.el.innerHTML = `<div class="cl-git-fp-tabs" role="tablist">${chips}</div><div class="cl-git-fp-box"><div class="cl-git-fp-hd"><strong>${escapeHtml4(p.path)}</strong><span class="cl-git-fp-seg">${zoneButtons}</span></div>` + body + `<div class="cl-git-fp-ft">${escapeHtml4(foot)}</div></div>`;
+    }
+    flatBody(text) {
+      const lines = text === "" ? [] : text.split("\n");
+      if (lines.length === 0) {
+        return `<pre class="cl-git-fp-body is-empty">(empty file)</pre>`;
+      }
+      return `<pre class="cl-git-fp-body">` + lines.map((l, i) => `<span class="cl-git-fp-ln">${i + 1}</span>${escapeHtml4(l)}`).join("\n") + `</pre>`;
+    }
+    diffBody(p) {
+      const cls = { " ": "", "-": " is-del", "+": " is-add" };
+      return `<pre class="cl-git-fp-body is-diff">` + p.diff.map(
+        (l) => `<span class="cl-git-fp-line${cls[l.kind]}"><span class="cl-git-fp-mark">${l.kind === " " ? "&nbsp;" : l.kind}</span>${escapeHtml4(l.text)}</span>`
+      ).join("\n") + `</pre>`;
+    }
+  };
+
   // src/dom/git-graph-view.ts
   var SVG_NS3 = "http://www.w3.org/2000/svg";
   var COL_GAP = 128;
@@ -3533,7 +4308,7 @@ ${result.runtimeError}`.trim(),
   function laneChipVar(lane) {
     return `color-mix(in srgb, ${laneVar(lane)} 70%, #000)`;
   }
-  function headCommit2(state) {
+  function headCommit3(state) {
     if (state.head.kind === "detached") return state.head.commit;
     return state.refs.get(state.head.name) ?? null;
   }
@@ -3581,7 +4356,8 @@ ${result.runtimeError}`.trim(),
       this.headEl.dataset.ref = "HEAD";
       this.headEl.hidden = true;
       this.graphWrap.append(this.svg, this.chipLayer, this.headEl);
-      this.root.append(this.graphWrap, this.buildWorkArea());
+      this.filePanel = new GitFilePanel();
+      this.root.append(this.graphWrap, this.buildWorkArea(), this.filePanel.el);
       this.root.addEventListener("click", this.onClick);
       host.appendChild(this.root);
       this.state = opts.state;
@@ -3638,6 +4414,7 @@ ${result.runtimeError}`.trim(),
       this.drawChips(g.chips.filter((c) => c.kind !== "head"), posOf, laneOf);
       this.placeHead(g.chips.find((c) => c.kind === "head"), posOf, animate);
       this.renderZones(state, animate);
+      this.filePanel.sync(state);
       this.prevNodeIds = newNodeIds;
       this.prevEdgeKeys = newEdgeKeys;
       this.prevGhostIds = new Set(this.ghost);
@@ -3839,7 +4616,7 @@ ${result.runtimeError}`.trim(),
     }
     /** Union of `paths` over every commit reachable from HEAD (empty when unborn). */
     reachablePaths(state) {
-      const start = headCommit2(state);
+      const start = headCommit3(state);
       const paths = /* @__PURE__ */ new Set();
       if (start === null) return paths;
       const seen = /* @__PURE__ */ new Set();
@@ -3868,587 +4645,6 @@ ${result.runtimeError}`.trim(),
       note: scene.note,
       ran: want === 0 ? [] : commands.slice(commands.length - want)
     };
-  }
-
-  // src/core/text-merge.ts
-  function splitLines(text) {
-    if (text === "") return [];
-    const lines = text.split("\n");
-    if (lines.length > 0 && lines[lines.length - 1] === "") lines.pop();
-    return lines;
-  }
-  function joinLines(lines) {
-    return lines.join("\n");
-  }
-  function lcsLines(a, b) {
-    const n = a.length;
-    const m = b.length;
-    const table = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
-    for (let i2 = n - 1; i2 >= 0; i2--) {
-      for (let j2 = m - 1; j2 >= 0; j2--) {
-        table[i2][j2] = a[i2] === b[j2] ? table[i2 + 1][j2 + 1] + 1 : Math.max(table[i2 + 1][j2], table[i2][j2 + 1]);
-      }
-    }
-    const out = [];
-    let i = 0;
-    let j = 0;
-    while (i < n && j < m) {
-      if (a[i] === b[j]) {
-        out.push({ ai: i, bi: j });
-        i++;
-        j++;
-      } else if (table[i + 1][j] >= table[i][j + 1]) {
-        i++;
-      } else {
-        j++;
-      }
-    }
-    return out;
-  }
-  function diffHunks(base, side) {
-    const matches = lcsLines(base, side);
-    const hunks = [];
-    let bi = 0;
-    let si = 0;
-    const flush = (endBase, endSide) => {
-      if (endBase > bi || endSide > si) {
-        hunks.push({ start: bi, end: endBase, lines: side.slice(si, endSide) });
-      }
-    };
-    for (const m of matches) {
-      flush(m.ai, m.bi);
-      bi = m.ai + 1;
-      si = m.bi + 1;
-    }
-    flush(base.length, side.length);
-    return hunks;
-  }
-  var DEFAULT_LABELS2 = { ours: "HEAD", base: "ancestor", theirs: "other" };
-  function overlaps(a, b) {
-    const positive = Math.max(a.start, b.start) < Math.min(a.end, b.end);
-    if (positive) return true;
-    const bothInsert = a.start === a.end && b.start === b.end && a.start === b.start;
-    return bothInsert && joinLines(a.lines) !== joinLines(b.lines);
-  }
-  function groupHunks(ourHunks, theirHunks) {
-    const tagged = [
-      ...ourHunks.map((h) => ({ h, side: "ours" })),
-      ...theirHunks.map((h) => ({ h, side: "theirs" }))
-    ].sort((x, y) => x.h.start - y.h.start || x.h.end - y.h.end);
-    const groups = [];
-    for (const item of tagged) {
-      const last = groups[groups.length - 1];
-      const touching = last && (Math.max(last.start, item.h.start) < Math.min(last.end, item.h.end) || [...last.ours, ...last.theirs].some((h) => overlaps(h, item.h)));
-      if (touching) {
-        last.start = Math.min(last.start, item.h.start);
-        last.end = Math.max(last.end, item.h.end);
-        (item.side === "ours" ? last.ours : last.theirs).push(item.h);
-      } else {
-        groups.push({
-          start: item.h.start,
-          end: item.h.end,
-          ours: item.side === "ours" ? [item.h] : [],
-          theirs: item.side === "theirs" ? [item.h] : []
-        });
-      }
-    }
-    return groups;
-  }
-  function sideLines(group, side, base) {
-    if (side.length === 0) return base.slice(group.start, group.end);
-    const out = [];
-    let cursor = group.start;
-    for (const h of side) {
-      out.push(...base.slice(cursor, h.start));
-      out.push(...h.lines);
-      cursor = h.end;
-    }
-    out.push(...base.slice(cursor, group.end));
-    return out;
-  }
-  function merge3(baseText, oursText, theirsText, labels = DEFAULT_LABELS2) {
-    const base = splitLines(baseText);
-    const ours = splitLines(oursText);
-    const theirs = splitLines(theirsText);
-    const groups = groupHunks(diffHunks(base, ours), diffHunks(base, theirs));
-    const out = [];
-    let cursor = 0;
-    let conflicts = 0;
-    for (const g of groups) {
-      out.push(...base.slice(cursor, g.start));
-      const ourSide = sideLines(g, g.ours, base);
-      const theirSide = sideLines(g, g.theirs, base);
-      if (g.ours.length === 0) {
-        out.push(...theirSide);
-      } else if (g.theirs.length === 0) {
-        out.push(...ourSide);
-      } else if (joinLines(ourSide) === joinLines(theirSide)) {
-        out.push(...ourSide);
-      } else {
-        conflicts++;
-        out.push(`<<<<<<< ${labels.ours}`);
-        out.push(...ourSide);
-        out.push(`||||||| ${labels.base}`);
-        out.push(...base.slice(g.start, g.end));
-        out.push("=======");
-        out.push(...theirSide);
-        out.push(`>>>>>>> ${labels.theirs}`);
-      }
-      cursor = g.end;
-    }
-    out.push(...base.slice(cursor));
-    return { text: joinLines(out), clean: conflicts === 0, conflicts };
-  }
-
-  // src/core/git-model.ts
-  var GitError = class extends Error {
-    constructor(message) {
-      super(message);
-      this.name = "GitError";
-    }
-  };
-  function fnv1a(str) {
-    let h = 2166136261;
-    for (let i = 0; i < str.length; i++) {
-      h ^= str.charCodeAt(i);
-      h = Math.imul(h, 16777619);
-    }
-    return h >>> 0;
-  }
-  function makeHash(parents, message, seq) {
-    const preimage = parents.join(",") + "\n" + message + "\n" + seq;
-    return fnv1a(preimage).toString(16).padStart(8, "0").slice(0, 7);
-  }
-  function cloneState(s) {
-    return {
-      commits: new Map(s.commits),
-      refs: new Map(s.refs),
-      head: s.head.kind === "branch" ? { kind: "branch", name: s.head.name } : { kind: "detached", commit: s.head.commit },
-      index: new Map(s.index),
-      worktree: new Map(
-        [...s.worktree].map(([p, e]) => [p, { status: e.status, text: e.text }])
-      ),
-      merge: s.merge ? { mergeHead: s.merge.mergeHead, conflicted: [...s.merge.conflicted] } : void 0,
-      seq: s.seq
-    };
-  }
-  function refLabel(s) {
-    return s.head.kind === "branch" ? s.head.name.replace(/^refs\/heads\//, "") : null;
-  }
-  function headCommit3(s) {
-    if (s.head.kind === "detached") return s.head.commit;
-    return s.refs.get(s.head.name) ?? null;
-  }
-  function moveHead(s, to) {
-    if (s.head.kind === "branch") {
-      s.refs.set(s.head.name, to);
-    } else {
-      s.head = { kind: "detached", commit: to };
-    }
-  }
-  function ancestors(s, start) {
-    const seen = /* @__PURE__ */ new Set();
-    const stack = [start];
-    while (stack.length) {
-      const h = stack.pop();
-      if (seen.has(h)) continue;
-      seen.add(h);
-      const c = s.commits.get(h);
-      if (c) for (const p of c.parents) stack.push(p);
-    }
-    return seen;
-  }
-  function mergeBases(s, a, b) {
-    const aAnc = ancestors(s, a);
-    const common = [...ancestors(s, b)].filter((h) => aAnc.has(h));
-    const bases = [];
-    for (const c of common) {
-      let isBase = true;
-      for (const d of common) {
-        if (d === c) continue;
-        const dAnc = ancestors(s, d);
-        dAnc.delete(d);
-        if (dAnc.has(c)) {
-          isBase = false;
-          break;
-        }
-      }
-      if (isBase) bases.push(c);
-    }
-    return bases;
-  }
-  function changedPaths(s, tip, base) {
-    const baseAnc = base ? ancestors(s, base) : /* @__PURE__ */ new Set();
-    const paths = /* @__PURE__ */ new Set();
-    for (const h of ancestors(s, tip)) {
-      if (baseAnc.has(h)) continue;
-      const c = s.commits.get(h);
-      if (c) for (const p of c.paths) paths.add(p);
-    }
-    return paths;
-  }
-  function mergeCommitPaths(s, h, o) {
-    const base = mergeBases(s, h, o)[0] ?? null;
-    const hp = changedPaths(s, h, base);
-    const op = changedPaths(s, o, base);
-    return [.../* @__PURE__ */ new Set([...hp, ...op])];
-  }
-  function treeAt(s, h) {
-    if (h === null) return /* @__PURE__ */ new Map();
-    const c = s.commits.get(h);
-    return c ? new Map(c.blobs) : /* @__PURE__ */ new Map();
-  }
-  function fileAt(s, h, path) {
-    if (h === null) return null;
-    const c = s.commits.get(h);
-    if (!c) return null;
-    return c.blobs.has(path) ? c.blobs.get(path) : null;
-  }
-  function treeWithIndex(s, parent) {
-    const blobs = treeAt(s, parent);
-    for (const [p, text] of s.index) blobs.set(p, text);
-    return blobs;
-  }
-  function firstParent(s, h) {
-    const c = s.commits.get(h);
-    if (!c || c.parents.length === 0) {
-      throw new GitError(`revision ${h} has no parent`);
-    }
-    return c.parents[0];
-  }
-  function nthParent(s, h, n) {
-    const c = s.commits.get(h);
-    if (!c || c.parents.length < n) {
-      throw new GitError(`revision ${h} has no parent ${n}`);
-    }
-    return c.parents[n - 1];
-  }
-  function resolveBase(s, tok) {
-    if (tok === "HEAD" || tok === "@") {
-      const h = headCommit3(s);
-      if (h === null) throw new GitError("HEAD is unborn");
-      return h;
-    }
-    if (s.refs.has(tok)) return s.refs.get(tok);
-    const bref = `refs/heads/${tok}`;
-    if (s.refs.has(bref)) return s.refs.get(bref);
-    const tref = `refs/tags/${tok}`;
-    if (s.refs.has(tref)) return s.refs.get(tref);
-    if (s.commits.has(tok)) return tok;
-    if (/^[0-9a-f]{4,40}$/.test(tok)) {
-      const matches = [...s.commits.keys()].filter((h) => h.startsWith(tok));
-      if (matches.length === 1) return matches[0];
-      if (matches.length > 1) throw new GitError(`ambiguous short id: ${tok}`);
-    }
-    throw new GitError(`unknown revision: ${tok}`);
-  }
-  function init() {
-    return {
-      commits: /* @__PURE__ */ new Map(),
-      refs: /* @__PURE__ */ new Map(),
-      head: { kind: "branch", name: "refs/heads/main" },
-      index: /* @__PURE__ */ new Map(),
-      worktree: /* @__PURE__ */ new Map(),
-      seq: 0
-    };
-  }
-  function addFiles(state, files) {
-    const s = cloneState(state);
-    for (const f of files) {
-      const path = typeof f === "string" ? f : f.path;
-      const text = typeof f === "string" ? "" : f.text ?? "";
-      if (s.index.has(path) || s.worktree.has(path)) continue;
-      s.worktree.set(path, { status: "untracked", text });
-    }
-    return { state: s, effect: { kind: "none" } };
-  }
-  function edit(state, path, text) {
-    const s = cloneState(state);
-    const tracked = trackedPaths(s, headCommit3(s));
-    s.worktree.set(path, {
-      status: tracked.has(path) ? "modified" : "untracked",
-      text
-    });
-    return { state: s, effect: { kind: "none" } };
-  }
-  function stage(state, paths) {
-    const s = cloneState(state);
-    for (const p of paths) {
-      if (!s.worktree.has(p) && !s.index.has(p)) {
-        throw new GitError(`fatal: pathspec '${p}' did not match any files`);
-      }
-      const entry = s.worktree.get(p);
-      if (entry) s.index.set(p, entry.text);
-      else if (!s.index.has(p)) s.index.set(p, "");
-      s.worktree.delete(p);
-    }
-    return { state: s, effect: { kind: "none" } };
-  }
-  function amend(state, message) {
-    const s = cloneState(state);
-    const h = headCommit3(s);
-    if (h === null) throw new GitError("You do not have anything to amend.");
-    const old = s.commits.get(h);
-    const parents = old.parents;
-    const paths = [.../* @__PURE__ */ new Set([...old.paths, ...s.index.keys()])];
-    const msg = message ?? old.message;
-    const id = makeHash(parents, msg, s.seq);
-    s.seq += 1;
-    const blobs = new Map(old.blobs);
-    for (const [p, text] of s.index) blobs.set(p, text);
-    s.commits.set(id, { id, parents, message: msg, paths, blobs });
-    moveHead(s, id);
-    s.index.clear();
-    return { state: s, effect: { kind: "commit", id } };
-  }
-  function unstage(state, paths) {
-    const s = cloneState(state);
-    const tracked = trackedPaths(s, headCommit3(s));
-    for (const p of paths) {
-      if (!s.index.has(p)) continue;
-      const text = s.index.get(p);
-      s.index.delete(p);
-      s.worktree.set(p, {
-        status: tracked.has(p) ? "modified" : "untracked",
-        text
-      });
-    }
-    return { state: s, effect: { kind: "none" } };
-  }
-  function commit(state, message) {
-    const s = cloneState(state);
-    const head = headCommit3(s);
-    if (s.merge) {
-      if (s.merge.conflicted.length > 0) {
-        throw new GitError("cannot commit: unresolved conflicts remain");
-      }
-      if (head === null) throw new GitError("cannot merge into an unborn branch");
-      const other = s.merge.mergeHead;
-      const parents2 = [head, other];
-      const paths2 = mergeCommitPaths(s, head, other);
-      const id2 = makeHash(parents2, message, s.seq);
-      s.seq += 1;
-      const blobs2 = treeAt(s, head);
-      for (const [p, text] of treeAt(s, other)) if (!blobs2.has(p)) blobs2.set(p, text);
-      for (const [p, text] of s.index) blobs2.set(p, text);
-      s.commits.set(id2, { id: id2, parents: parents2, message, paths: paths2, blobs: blobs2 });
-      moveHead(s, id2);
-      s.merge = void 0;
-      s.index.clear();
-      return { state: s, effect: { kind: "merge", id: id2 } };
-    }
-    if (s.index.size === 0) throw new GitError("nothing to commit");
-    const parents = head === null ? [] : [head];
-    const paths = [...s.index.keys()];
-    const id = makeHash(parents, message, s.seq);
-    s.seq += 1;
-    const blobs = treeWithIndex(s, head);
-    s.commits.set(id, { id, parents, message, paths, blobs });
-    moveHead(s, id);
-    s.index.clear();
-    return { state: s, effect: { kind: "commit", id } };
-  }
-  function branch(state, name, at) {
-    const s = cloneState(state);
-    const ref = `refs/heads/${name}`;
-    if (s.refs.has(ref)) throw new GitError(`branch '${name}' already exists`);
-    const target = at !== void 0 ? revParse(s, at) : headCommit3(s);
-    if (target === null) throw new GitError("cannot create a branch: HEAD is unborn");
-    s.refs.set(ref, target);
-    return { state: s, effect: { kind: "branch", ref, commit: target } };
-  }
-  function tag(state, name, at) {
-    const s = cloneState(state);
-    const ref = `refs/tags/${name}`;
-    if (s.refs.has(ref)) throw new GitError(`tag '${name}' already exists`);
-    const target = at !== void 0 ? revParse(s, at) : headCommit3(s);
-    if (target === null) throw new GitError("cannot create a tag: HEAD is unborn");
-    s.refs.set(ref, target);
-    return { state: s, effect: { kind: "tag", ref, commit: target } };
-  }
-  function checkout(state, target, opts) {
-    const s = cloneState(state);
-    if (opts?.create) {
-      const ref = `refs/heads/${target}`;
-      if (s.refs.has(ref)) throw new GitError(`branch '${target}' already exists`);
-      const at = headCommit3(s);
-      if (at === null) throw new GitError("cannot create a branch: HEAD is unborn");
-      s.refs.set(ref, at);
-      s.head = { kind: "branch", name: ref };
-      return { state: s, effect: { kind: "checkout", ref } };
-    }
-    const bref = `refs/heads/${target}`;
-    if (s.refs.has(bref)) {
-      s.head = { kind: "branch", name: bref };
-      return { state: s, effect: { kind: "checkout", ref: bref } };
-    }
-    if (target.startsWith("refs/heads/") && s.refs.has(target)) {
-      s.head = { kind: "branch", name: target };
-      return { state: s, effect: { kind: "checkout", ref: target } };
-    }
-    const commitId = revParse(s, target);
-    s.head = { kind: "detached", commit: commitId };
-    return { state: s, effect: { kind: "checkout", commit: commitId } };
-  }
-  function merge(state, otherRev) {
-    const s = cloneState(state);
-    const h = headCommit3(s);
-    if (h === null) throw new GitError("cannot merge into an unborn branch");
-    const o = revParse(s, otherRev);
-    const hAnc = ancestors(s, h);
-    if (hAnc.has(o)) {
-      return { state: s, effect: { kind: "none" } };
-    }
-    const oAnc = ancestors(s, o);
-    if (oAnc.has(h)) {
-      moveHead(s, o);
-      return { state: s, effect: { kind: "ff", from: h, to: o } };
-    }
-    const base = mergeBases(s, h, o)[0] ?? null;
-    const hPaths = changedPaths(s, h, base);
-    const oPaths = changedPaths(s, o, base);
-    const both = [...hPaths].filter((p) => oPaths.has(p)).sort();
-    const conflicted = [];
-    const resolvedText = /* @__PURE__ */ new Map();
-    const markedText = /* @__PURE__ */ new Map();
-    for (const p of both) {
-      const baseText = fileAt(s, base, p) ?? "";
-      const ourText = fileAt(s, h, p) ?? "";
-      const theirText = fileAt(s, o, p) ?? "";
-      if (baseText === "" && ourText === "" && theirText === "") {
-        conflicted.push(p);
-        continue;
-      }
-      const r = merge3(baseText, ourText, theirText, {
-        ours: refLabel(s) ?? "HEAD",
-        base: "ancestor",
-        theirs: otherRev
-      });
-      if (r.clean) {
-        resolvedText.set(p, r.text);
-      } else {
-        conflicted.push(p);
-        markedText.set(p, r.text);
-      }
-    }
-    if (conflicted.length > 0) {
-      s.merge = { mergeHead: o, conflicted };
-      for (const [p, text] of markedText) s.worktree.set(p, { status: "modified", text });
-      return { state: s, effect: { kind: "conflict", paths: conflicted } };
-    }
-    const message = `Merge ${otherRev}`;
-    const parents = [h, o];
-    const paths = mergeCommitPaths(s, h, o);
-    const id = makeHash(parents, message, s.seq);
-    s.seq += 1;
-    const blobs = treeAt(s, h);
-    for (const [p, text] of treeAt(s, o)) {
-      if (!blobs.has(p) || fileAt(s, h, p) === fileAt(s, base, p)) blobs.set(p, text);
-    }
-    for (const [p, text] of resolvedText) blobs.set(p, text);
-    s.commits.set(id, { id, parents, message, paths, blobs });
-    moveHead(s, id);
-    return { state: s, effect: { kind: "merge", id } };
-  }
-  function mergeAbort(state) {
-    const s = cloneState(state);
-    if (!s.merge) throw new GitError("no merge in progress");
-    s.merge = void 0;
-    return { state: s, effect: { kind: "none" } };
-  }
-  function resolvePaths(state, paths) {
-    const s = cloneState(state);
-    if (!s.merge) throw new GitError("no merge in progress");
-    const remaining = s.merge.conflicted.filter((p) => !paths.includes(p));
-    s.merge = { mergeHead: s.merge.mergeHead, conflicted: remaining };
-    return { state: s, effect: { kind: "none" } };
-  }
-  function reset(state, mode, targetRev) {
-    const s = cloneState(state);
-    const before = headCommit3(s);
-    const target = revParse(s, targetRev);
-    moveHead(s, target);
-    const tracked = trackedPaths(s, target);
-    const undone = before ? changedPaths(s, before, target) : /* @__PURE__ */ new Set();
-    const restingStatus = (p) => tracked.has(p) ? "modified" : "untracked";
-    const undoneText = (p) => fileAt(s, before, p) ?? s.index.get(p) ?? s.worktree.get(p)?.text ?? "";
-    const rest = (p, text) => s.worktree.set(p, { status: restingStatus(p), text });
-    if (mode === "soft") {
-      for (const p of undone) s.index.set(p, undoneText(p));
-    } else if (mode === "mixed") {
-      for (const [p, text] of s.index) rest(p, text);
-      s.index.clear();
-      for (const p of undone) rest(p, undoneText(p));
-    } else if (mode === "hard") {
-      const staged = [...s.index];
-      s.index.clear();
-      for (const [path, entry] of [...s.worktree]) {
-        if (entry.status !== "untracked") s.worktree.delete(path);
-      }
-      for (const [path, text] of staged) {
-        if (!tracked.has(path)) s.worktree.set(path, { status: "untracked", text });
-      }
-      for (const path of undone) if (!tracked.has(path)) s.worktree.delete(path);
-    }
-    return { state: s, effect: { kind: "reset", mode, to: target } };
-  }
-  function trackedPaths(s, tip) {
-    return tip ? changedPaths(s, tip, null) : /* @__PURE__ */ new Set();
-  }
-  function revParse(state, rev) {
-    const m = rev.match(/^([^~^]+)(.*)$/);
-    if (!m) throw new GitError(`unknown revision: ${rev}`);
-    let commitId = resolveBase(state, m[1]);
-    const ops = m[2];
-    let i = 0;
-    while (i < ops.length) {
-      const ch = ops[i];
-      i++;
-      let num = "";
-      while (i < ops.length && ops[i] >= "0" && ops[i] <= "9") {
-        num += ops[i];
-        i++;
-      }
-      if (ch === "~") {
-        const n = num === "" ? 1 : parseInt(num, 10);
-        for (let k = 0; k < n; k++) commitId = firstParent(state, commitId);
-      } else if (ch === "^") {
-        const n = num === "" ? 1 : parseInt(num, 10);
-        commitId = nthParent(state, commitId, n);
-      } else {
-        throw new GitError(`unknown revision: ${rev}`);
-      }
-    }
-    return commitId;
-  }
-  function revList(state, range) {
-    let set;
-    if (range.trim() === "--all") {
-      set = /* @__PURE__ */ new Set();
-      for (const ref of state.refs.values()) {
-        for (const h of ancestors(state, ref)) set.add(h);
-      }
-      if (state.head.kind === "detached") {
-        for (const h of ancestors(state, state.head.commit)) set.add(h);
-      }
-    } else if (range.includes("...")) {
-      const [a, b] = range.split("...");
-      const aAnc = ancestors(state, revParse(state, a.trim()));
-      const bAnc = ancestors(state, revParse(state, b.trim()));
-      set = /* @__PURE__ */ new Set();
-      for (const h of aAnc) if (!bAnc.has(h)) set.add(h);
-      for (const h of bAnc) if (!aAnc.has(h)) set.add(h);
-    } else if (range.includes("..")) {
-      const [a, b] = range.split("..");
-      const aAnc = ancestors(state, revParse(state, a.trim()));
-      set = /* @__PURE__ */ new Set();
-      for (const h of ancestors(state, revParse(state, b.trim()))) {
-        if (!aAnc.has(h)) set.add(h);
-      }
-    } else {
-      set = ancestors(state, revParse(state, range.trim()));
-    }
-    return [...state.commits.keys()].filter((h) => set.has(h)).reverse();
   }
 
   // src/terminal/shell.ts
@@ -4600,67 +4796,6 @@ ${result.runtimeError}`.trim(),
     }
   };
 
-  // src/core/text-diff.ts
-  function diffLines(a, b) {
-    const out = [];
-    let ai = 0;
-    let bi = 0;
-    for (const m of lcsLines(a, b)) {
-      while (ai < m.ai) out.push({ kind: "-", text: a[ai++] });
-      while (bi < m.bi) out.push({ kind: "+", text: b[bi++] });
-      out.push({ kind: " ", text: a[m.ai] });
-      ai = m.ai + 1;
-      bi = m.bi + 1;
-    }
-    while (ai < a.length) out.push({ kind: "-", text: a[ai++] });
-    while (bi < b.length) out.push({ kind: "+", text: b[bi++] });
-    return out;
-  }
-  function hunksOf(lines, context) {
-    const changed = lines.map((l) => l.kind !== " ");
-    const keep = lines.map(
-      (_, i) => changed.slice(Math.max(0, i - context), i + context + 1).some(Boolean)
-    );
-    const hunks = [];
-    let ai = 0;
-    let bi = 0;
-    let current = null;
-    for (let i = 0; i < lines.length; i++) {
-      const l = lines[i];
-      if (keep[i]) {
-        if (!current) {
-          current = { aStart: ai + 1, aCount: 0, bStart: bi + 1, bCount: 0, lines: [] };
-          hunks.push(current);
-        }
-        current.lines.push(l);
-        if (l.kind !== "+") current.aCount++;
-        if (l.kind !== "-") current.bCount++;
-      } else {
-        current = null;
-      }
-      if (l.kind !== "+") ai++;
-      if (l.kind !== "-") bi++;
-    }
-    return hunks;
-  }
-  function formatFileDiff(path, oldText, newText, context = 3) {
-    if (oldText === newText) return "";
-    const a = splitLines(oldText);
-    const b = splitLines(newText);
-    const hunks = hunksOf(diffLines(a, b), context);
-    if (hunks.length === 0) return "";
-    const out = [
-      `diff --git a/${path} b/${path}`,
-      `--- a/${path}`,
-      `+++ b/${path}`
-    ];
-    for (const h of hunks) {
-      out.push(`@@ -${h.aCount === 0 ? 0 : h.aStart},${h.aCount} +${h.bCount === 0 ? 0 : h.bStart},${h.bCount} @@`);
-      for (const l of h.lines) out.push(l.kind + l.text);
-    }
-    return out.join("\n");
-  }
-
   // src/terminal/commands/git.ts
   var SUBCOMMANDS = [
     {
@@ -4811,7 +4946,7 @@ The most similar command is
     return new Map([...s.worktree].map(([p, e]) => [p, e.status]));
   }
   function diffText(s, staged, rev) {
-    const head = headCommit3(s);
+    const head = headCommit2(s);
     const chunks = [];
     if (staged) {
       for (const [path, text] of [...s.index].sort((a, b) => a[0].localeCompare(b[0]))) {
@@ -4834,7 +4969,7 @@ The most similar command is
     const header = [];
     if (s.head.kind === "branch") {
       header.push(`On branch ${s.head.name.replace("refs/heads/", "")}`);
-      if (headCommit3(s) === null) header.push("No commits yet");
+      if (headCommit2(s) === null) header.push("No commits yet");
     } else {
       header.push(`HEAD detached at ${s.head.commit}`);
     }
