@@ -2656,10 +2656,14 @@ ${result.runtimeError}`.trim(),
   function escapeHtml4(text) {
     return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
+  var CODE_SLOT = "\0";
   function inline(text) {
-    return escapeHtml4(text).replace(/`([^`]+)`/g, "<code>$1</code>").split(/(<code>[\s\S]*?<\/code>)/).map(
-      (seg) => seg.startsWith("<code>") ? seg : seg.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/\*([^*]+)\*/g, "<em>$1</em>")
-    ).join("");
+    const spans = [];
+    const stashed = escapeHtml4(text).replace(/`([^`]+)`/g, (_m, code) => {
+      spans.push(`<code>${code}</code>`);
+      return `${CODE_SLOT}${spans.length - 1}${CODE_SLOT}`;
+    });
+    return stashed.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/\*([^*]+)\*/g, "<em>$1</em>").replace(new RegExp(`${CODE_SLOT}(\\d+)${CODE_SLOT}`, "g"), (_m, i) => spans[Number(i)]);
   }
   function renderNarration(text) {
     const lines = String(text ?? "").split("\n");
