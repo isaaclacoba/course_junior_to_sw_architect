@@ -63,18 +63,24 @@ var CodeLab = (() => {
     gitBranch: () => branch,
     gitCheckout: () => checkout,
     gitCommit: () => commit,
+    gitEdit: () => edit,
+    gitFileAt: () => fileAt,
     gitInit: () => init,
+    gitJoinLines: () => joinLines,
     gitLayout: () => layout,
     gitMerge: () => merge,
+    gitMerge3: () => merge3,
     gitMergeAbort: () => mergeAbort,
     gitReset: () => reset,
     gitResolvePaths: () => resolvePaths,
     gitRevList: () => revList,
     gitRevParse: () => revParse,
     gitRun: () => run,
+    gitSplitLines: () => splitLines,
     gitStage: () => stage,
     gitSubcommands: () => gitSubcommands,
     gitTag: () => tag,
+    gitTreeAt: () => treeAt,
     goTo: () => goTo,
     loadMonaco: () => loadMonaco,
     makeTour: () => makeTour,
@@ -3798,7 +3804,7 @@ ${result.runtimeError}`.trim(),
       return arrow;
     }
     renderZones(state, animate) {
-      const tree = [...state.worktree.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([path, status]) => ({ path, status }));
+      const tree = [...state.worktree.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([path, entry]) => ({ path, status: entry.status }));
       const staged = [...state.index.keys()].sort();
       const committed = this.reachablePaths(state);
       for (const f of tree) committed.delete(f.path);
@@ -3862,6 +3868,136 @@ ${result.runtimeError}`.trim(),
     };
   }
 
+  // src/core/text-merge.ts
+  function splitLines(text) {
+    if (text === "") return [];
+    const lines = text.split("\n");
+    if (lines.length > 0 && lines[lines.length - 1] === "") lines.pop();
+    return lines;
+  }
+  function joinLines(lines) {
+    return lines.join("\n");
+  }
+  function lcsLines(a, b) {
+    const n = a.length;
+    const m = b.length;
+    const table = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+    for (let i2 = n - 1; i2 >= 0; i2--) {
+      for (let j2 = m - 1; j2 >= 0; j2--) {
+        table[i2][j2] = a[i2] === b[j2] ? table[i2 + 1][j2 + 1] + 1 : Math.max(table[i2 + 1][j2], table[i2][j2 + 1]);
+      }
+    }
+    const out = [];
+    let i = 0;
+    let j = 0;
+    while (i < n && j < m) {
+      if (a[i] === b[j]) {
+        out.push({ ai: i, bi: j });
+        i++;
+        j++;
+      } else if (table[i + 1][j] >= table[i][j + 1]) {
+        i++;
+      } else {
+        j++;
+      }
+    }
+    return out;
+  }
+  function diffHunks(base, side) {
+    const matches = lcsLines(base, side);
+    const hunks = [];
+    let bi = 0;
+    let si = 0;
+    const flush = (endBase, endSide) => {
+      if (endBase > bi || endSide > si) {
+        hunks.push({ start: bi, end: endBase, lines: side.slice(si, endSide) });
+      }
+    };
+    for (const m of matches) {
+      flush(m.ai, m.bi);
+      bi = m.ai + 1;
+      si = m.bi + 1;
+    }
+    flush(base.length, side.length);
+    return hunks;
+  }
+  var DEFAULT_LABELS2 = { ours: "HEAD", base: "ancestor", theirs: "other" };
+  function overlaps(a, b) {
+    const positive = Math.max(a.start, b.start) < Math.min(a.end, b.end);
+    if (positive) return true;
+    const bothInsert = a.start === a.end && b.start === b.end && a.start === b.start;
+    return bothInsert && joinLines(a.lines) !== joinLines(b.lines);
+  }
+  function groupHunks(ourHunks, theirHunks) {
+    const tagged = [
+      ...ourHunks.map((h) => ({ h, side: "ours" })),
+      ...theirHunks.map((h) => ({ h, side: "theirs" }))
+    ].sort((x, y) => x.h.start - y.h.start || x.h.end - y.h.end);
+    const groups = [];
+    for (const item of tagged) {
+      const last = groups[groups.length - 1];
+      const touching = last && (Math.max(last.start, item.h.start) < Math.min(last.end, item.h.end) || [...last.ours, ...last.theirs].some((h) => overlaps(h, item.h)));
+      if (touching) {
+        last.start = Math.min(last.start, item.h.start);
+        last.end = Math.max(last.end, item.h.end);
+        (item.side === "ours" ? last.ours : last.theirs).push(item.h);
+      } else {
+        groups.push({
+          start: item.h.start,
+          end: item.h.end,
+          ours: item.side === "ours" ? [item.h] : [],
+          theirs: item.side === "theirs" ? [item.h] : []
+        });
+      }
+    }
+    return groups;
+  }
+  function sideLines(group, side, base) {
+    if (side.length === 0) return base.slice(group.start, group.end);
+    const out = [];
+    let cursor = group.start;
+    for (const h of side) {
+      out.push(...base.slice(cursor, h.start));
+      out.push(...h.lines);
+      cursor = h.end;
+    }
+    out.push(...base.slice(cursor, group.end));
+    return out;
+  }
+  function merge3(baseText, oursText, theirsText, labels = DEFAULT_LABELS2) {
+    const base = splitLines(baseText);
+    const ours = splitLines(oursText);
+    const theirs = splitLines(theirsText);
+    const groups = groupHunks(diffHunks(base, ours), diffHunks(base, theirs));
+    const out = [];
+    let cursor = 0;
+    let conflicts = 0;
+    for (const g of groups) {
+      out.push(...base.slice(cursor, g.start));
+      const ourSide = sideLines(g, g.ours, base);
+      const theirSide = sideLines(g, g.theirs, base);
+      if (g.ours.length === 0) {
+        out.push(...theirSide);
+      } else if (g.theirs.length === 0) {
+        out.push(...ourSide);
+      } else if (joinLines(ourSide) === joinLines(theirSide)) {
+        out.push(...ourSide);
+      } else {
+        conflicts++;
+        out.push(`<<<<<<< ${labels.ours}`);
+        out.push(...ourSide);
+        out.push(`||||||| ${labels.base}`);
+        out.push(...base.slice(g.start, g.end));
+        out.push("=======");
+        out.push(...theirSide);
+        out.push(`>>>>>>> ${labels.theirs}`);
+      }
+      cursor = g.end;
+    }
+    out.push(...base.slice(cursor));
+    return { text: joinLines(out), clean: conflicts === 0, conflicts };
+  }
+
   // src/core/git-model.ts
   var GitError = class extends Error {
     constructor(message) {
@@ -3887,10 +4023,15 @@ ${result.runtimeError}`.trim(),
       refs: new Map(s.refs),
       head: s.head.kind === "branch" ? { kind: "branch", name: s.head.name } : { kind: "detached", commit: s.head.commit },
       index: new Map(s.index),
-      worktree: new Map(s.worktree),
+      worktree: new Map(
+        [...s.worktree].map(([p, e]) => [p, { status: e.status, text: e.text }])
+      ),
       merge: s.merge ? { mergeHead: s.merge.mergeHead, conflicted: [...s.merge.conflicted] } : void 0,
       seq: s.seq
     };
+  }
+  function refLabel(s) {
+    return s.head.kind === "branch" ? s.head.name.replace(/^refs\/heads\//, "") : null;
   }
   function headCommit3(s) {
     if (s.head.kind === "detached") return s.head.commit;
@@ -3950,6 +4091,22 @@ ${result.runtimeError}`.trim(),
     const op = changedPaths(s, o, base);
     return [.../* @__PURE__ */ new Set([...hp, ...op])];
   }
+  function treeAt(s, h) {
+    if (h === null) return /* @__PURE__ */ new Map();
+    const c = s.commits.get(h);
+    return c ? new Map(c.blobs) : /* @__PURE__ */ new Map();
+  }
+  function fileAt(s, h, path) {
+    if (h === null) return null;
+    const c = s.commits.get(h);
+    if (!c) return null;
+    return c.blobs.has(path) ? c.blobs.get(path) : null;
+  }
+  function treeWithIndex(s, parent) {
+    const blobs = treeAt(s, parent);
+    for (const [p, text] of s.index) blobs.set(p, text);
+    return blobs;
+  }
   function firstParent(s, h) {
     const c = s.commits.get(h);
     if (!c || c.parents.length === 0) {
@@ -3993,12 +4150,23 @@ ${result.runtimeError}`.trim(),
       seq: 0
     };
   }
-  function addFiles(state, paths) {
+  function addFiles(state, files) {
     const s = cloneState(state);
-    for (const p of paths) {
-      if (s.index.has(p) || s.worktree.has(p)) continue;
-      s.worktree.set(p, "untracked");
+    for (const f of files) {
+      const path = typeof f === "string" ? f : f.path;
+      const text = typeof f === "string" ? "" : f.text ?? "";
+      if (s.index.has(path) || s.worktree.has(path)) continue;
+      s.worktree.set(path, { status: "untracked", text });
     }
+    return { state: s, effect: { kind: "none" } };
+  }
+  function edit(state, path, text) {
+    const s = cloneState(state);
+    const tracked = trackedPaths(s, headCommit3(s));
+    s.worktree.set(path, {
+      status: tracked.has(path) ? "modified" : "untracked",
+      text
+    });
     return { state: s, effect: { kind: "none" } };
   }
   function stage(state, paths) {
@@ -4007,7 +4175,9 @@ ${result.runtimeError}`.trim(),
       if (!s.worktree.has(p) && !s.index.has(p)) {
         throw new GitError(`fatal: pathspec '${p}' did not match any files`);
       }
-      s.index.set(p, "staged");
+      const entry = s.worktree.get(p);
+      if (entry) s.index.set(p, entry.text);
+      else if (!s.index.has(p)) s.index.set(p, "");
       s.worktree.delete(p);
     }
     return { state: s, effect: { kind: "none" } };
@@ -4022,7 +4192,9 @@ ${result.runtimeError}`.trim(),
     const msg = message ?? old.message;
     const id = makeHash(parents, msg, s.seq);
     s.seq += 1;
-    s.commits.set(id, { id, parents, message: msg, paths });
+    const blobs = new Map(old.blobs);
+    for (const [p, text] of s.index) blobs.set(p, text);
+    s.commits.set(id, { id, parents, message: msg, paths, blobs });
     moveHead(s, id);
     s.index.clear();
     return { state: s, effect: { kind: "commit", id } };
@@ -4032,8 +4204,12 @@ ${result.runtimeError}`.trim(),
     const tracked = trackedPaths(s, headCommit3(s));
     for (const p of paths) {
       if (!s.index.has(p)) continue;
+      const text = s.index.get(p);
       s.index.delete(p);
-      s.worktree.set(p, tracked.has(p) ? "modified" : "untracked");
+      s.worktree.set(p, {
+        status: tracked.has(p) ? "modified" : "untracked",
+        text
+      });
     }
     return { state: s, effect: { kind: "none" } };
   }
@@ -4050,7 +4226,10 @@ ${result.runtimeError}`.trim(),
       const paths2 = mergeCommitPaths(s, head, other);
       const id2 = makeHash(parents2, message, s.seq);
       s.seq += 1;
-      s.commits.set(id2, { id: id2, parents: parents2, message, paths: paths2 });
+      const blobs2 = treeAt(s, head);
+      for (const [p, text] of treeAt(s, other)) if (!blobs2.has(p)) blobs2.set(p, text);
+      for (const [p, text] of s.index) blobs2.set(p, text);
+      s.commits.set(id2, { id: id2, parents: parents2, message, paths: paths2, blobs: blobs2 });
       moveHead(s, id2);
       s.merge = void 0;
       s.index.clear();
@@ -4061,7 +4240,8 @@ ${result.runtimeError}`.trim(),
     const paths = [...s.index.keys()];
     const id = makeHash(parents, message, s.seq);
     s.seq += 1;
-    s.commits.set(id, { id, parents, message, paths });
+    const blobs = treeWithIndex(s, head);
+    s.commits.set(id, { id, parents, message, paths, blobs });
     moveHead(s, id);
     s.index.clear();
     return { state: s, effect: { kind: "commit", id } };
@@ -4125,9 +4305,33 @@ ${result.runtimeError}`.trim(),
     const base = mergeBases(s, h, o)[0] ?? null;
     const hPaths = changedPaths(s, h, base);
     const oPaths = changedPaths(s, o, base);
-    const conflicted = [...hPaths].filter((p) => oPaths.has(p)).sort();
+    const both = [...hPaths].filter((p) => oPaths.has(p)).sort();
+    const conflicted = [];
+    const resolvedText = /* @__PURE__ */ new Map();
+    const markedText = /* @__PURE__ */ new Map();
+    for (const p of both) {
+      const baseText = fileAt(s, base, p) ?? "";
+      const ourText = fileAt(s, h, p) ?? "";
+      const theirText = fileAt(s, o, p) ?? "";
+      if (baseText === "" && ourText === "" && theirText === "") {
+        conflicted.push(p);
+        continue;
+      }
+      const r = merge3(baseText, ourText, theirText, {
+        ours: refLabel(s) ?? "HEAD",
+        base: "ancestor",
+        theirs: otherRev
+      });
+      if (r.clean) {
+        resolvedText.set(p, r.text);
+      } else {
+        conflicted.push(p);
+        markedText.set(p, r.text);
+      }
+    }
     if (conflicted.length > 0) {
       s.merge = { mergeHead: o, conflicted };
+      for (const [p, text] of markedText) s.worktree.set(p, { status: "modified", text });
       return { state: s, effect: { kind: "conflict", paths: conflicted } };
     }
     const message = `Merge ${otherRev}`;
@@ -4135,7 +4339,12 @@ ${result.runtimeError}`.trim(),
     const paths = mergeCommitPaths(s, h, o);
     const id = makeHash(parents, message, s.seq);
     s.seq += 1;
-    s.commits.set(id, { id, parents, message, paths });
+    const blobs = treeAt(s, h);
+    for (const [p, text] of treeAt(s, o)) {
+      if (!blobs.has(p) || fileAt(s, h, p) === fileAt(s, base, p)) blobs.set(p, text);
+    }
+    for (const [p, text] of resolvedText) blobs.set(p, text);
+    s.commits.set(id, { id, parents, message, paths, blobs });
     moveHead(s, id);
     return { state: s, effect: { kind: "merge", id } };
   }
@@ -4160,20 +4369,22 @@ ${result.runtimeError}`.trim(),
     const tracked = trackedPaths(s, target);
     const undone = before ? changedPaths(s, before, target) : /* @__PURE__ */ new Set();
     const restingStatus = (p) => tracked.has(p) ? "modified" : "untracked";
+    const undoneText = (p) => fileAt(s, before, p) ?? s.index.get(p) ?? s.worktree.get(p)?.text ?? "";
+    const rest = (p, text) => s.worktree.set(p, { status: restingStatus(p), text });
     if (mode === "soft") {
-      for (const p of undone) s.index.set(p, "staged");
+      for (const p of undone) s.index.set(p, undoneText(p));
     } else if (mode === "mixed") {
-      for (const p of s.index.keys()) s.worktree.set(p, restingStatus(p));
+      for (const [p, text] of s.index) rest(p, text);
       s.index.clear();
-      for (const p of undone) s.worktree.set(p, restingStatus(p));
+      for (const p of undone) rest(p, undoneText(p));
     } else if (mode === "hard") {
-      const staged = [...s.index.keys()];
+      const staged = [...s.index];
       s.index.clear();
-      for (const [path, status] of [...s.worktree]) {
-        if (status !== "untracked") s.worktree.delete(path);
+      for (const [path, entry] of [...s.worktree]) {
+        if (entry.status !== "untracked") s.worktree.delete(path);
       }
-      for (const path of staged) {
-        if (!tracked.has(path)) s.worktree.set(path, "untracked");
+      for (const [path, text] of staged) {
+        if (!tracked.has(path)) s.worktree.set(path, { status: "untracked", text });
       }
       for (const path of undone) if (!tracked.has(path)) s.worktree.delete(path);
     }
@@ -4529,7 +4740,7 @@ The most similar command is
     return parts.length ? ` (${parts.join(", ")})` : "";
   }
   function worktreeOf(s) {
-    return s.worktree;
+    return new Map([...s.worktree].map(([p, e]) => [p, e.status]));
   }
   function statusText(s) {
     const blocks = [];
@@ -5479,7 +5690,7 @@ Fast-forward`;
   }
 
   // src/dom/error-panel.ts
-  var DEFAULT_LABELS2 = {
+  var DEFAULT_LABELS3 = {
     heading: "Let's fix this first",
     note: "Often a single early mistake (a missing or extra { } ( ) ;) is enough to confuse the rest. Fix the top one first, then run again.",
     why: "Learn why",
@@ -5492,7 +5703,7 @@ Fast-forward`;
     return e.column != null ? `Line ${e.line}, col ${e.column}` : `Line ${e.line}`;
   }
   function renderErrorPanel(errors, labels = {}, options = {}) {
-    const l = { ...DEFAULT_LABELS2, ...labels };
+    const l = { ...DEFAULT_LABELS3, ...labels };
     const isWarning = options.kind === "warning";
     const section = document.createElement("section");
     section.className = isWarning ? "cl-errors cl-errors--warning" : "cl-errors";

@@ -69,6 +69,7 @@
       start: STOPPED,
       target: COLLIDE.concat(["git tag before-merge"]),
       solution: [
+        "git status",
         "git merge --abort",
         "git tag before-merge"
       ]

@@ -42,6 +42,7 @@
       context:
         "The folder holds `cat.txt`, `dog.txt` and `notes.md` - and `notes.md` is half finished.\n\nStaging is where you choose. `git add` names the files that belong in this save; anything you leave out stays out. You can name several at once: `git add cat.txt dog.txt`.",
       goal: [
+        "Run `git status` - it shows all three files waiting.",
         "Stage `cat.txt` and `dog.txt`, and leave `notes.md` out.",
         "Save them as one commit with `git commit -m \"add the pets\"`."
       ],
@@ -53,6 +54,7 @@
         "git commit -m \"add the pets\""
       ],
       solution: [
+        "git status",
         "git add cat.txt dog.txt",
         "git commit -m \"add the pets\""
       ]
