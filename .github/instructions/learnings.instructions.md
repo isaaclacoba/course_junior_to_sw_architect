@@ -22,6 +22,19 @@ grows into a procedure, promote it to a skill and leave a pointer here.
   you commit must stand on committed source; their uncommitted work simply does
   not ship, and that is fine.
 
+## Docs and briefs
+
+- **Every brief and design-of-record stays UNDER 100 lines** (`work-brief` skill:
+  warn at 100, hard stop at 150). Measure with `wc -l` before you commit one - I
+  shipped a 140-line brief and a 147-line design doc without checking, and the
+  rule is in the skill precisely because prose expands to fill the space.
+- **Link, do not paste.** Detail belongs in the thing it describes: per-lesson
+  findings in the audit reports, contracts in the design doc, rationale in the
+  code. A brief that inlines them is the failure mode the limit exists to catch.
+- **Delete superseded sections rather than keeping them for history.** Git has the
+  history; a stale "exercise sketches" section just costs the budget a live
+  section needed.
+
 ## Design rounds (WoW)
 
 - **A widget's look-and-behaviour is a UX design decision - mockup + owner-decide -

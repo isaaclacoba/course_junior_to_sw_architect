@@ -31,23 +31,16 @@ and `git` (terminal + live graph, English). Track id `git`, name `Git`, concept 
 
 ## 2. Progression rationale
 
-- **Doing comes first, once.** Lesson 1 is practical with no viz before it on purpose: a
-  first commit needs no model - you pick files, you save them, the graph draws a dot. The
-  three zones are on screen while they do it, so lesson 2 has something to explain.
-- **Viz before keyboard for every idea that is invisible.** A branch, a merge, a conflict
-  and a reset are all pointer behaviour with no obvious surface, so each gets a narrated
-  visual immediately before the practical that types it: **4 before 5**, **7 before 8**,
-  **9 before 10**, **13 before 14**. Lesson 2 is the exception - it consolidates lesson 1.
-- **What each may assume.** 3 assumes a repository with commits (1). 5 assumes graph reading
-  (2) and `HEAD` (4). 6 needs a branch to contrast a tag against. 8 assumes two lines of work
-  (5). 10 assumes a merge that worked (8), so failing is the only new thing. 11-14 assume the
-  whole shape and only move labels.
-- **Difficulty steps up three times.** At **5** (two lines of history, and `HEAD` starts to
-  matter), at **10** (git stops mid-command and the learner must get the repository out of
-  that state), and at **12** (a commit named by relation, not by pointing) - which is why 12
-  sits before the reset pair: `reset HEAD~1` is unreadable without it.
-- **Cards carry the difficulty, not lessons.** Each practical lesson is 2-3 cards, each with
-  its own start state and one small win, per the ratified UX.
+- **Doing comes first, once.** Lesson 1 is practical with no viz before it: a first
+  commit needs no model, and it puts the three zones on screen for lesson 2 to explain.
+- **Viz before keyboard for every invisible idea.** A branch, a merge, a conflict and a
+  reset are pointer behaviour with no surface, so each gets a narrated visual immediately
+  before the practical that types it: **4 before 5, 7 before 8, 9 before 10, 13 before 14**.
+- **Difficulty steps up three times:** at 5 (two lines, `HEAD` starts to matter), at 10
+  (git stops mid-command and the learner must recover), and at 12 (naming a commit by
+  relation) - which is why 12 precedes the reset pair; `reset HEAD~1` is unreadable without it.
+- **Cards carry the difficulty, not lessons.** Superseded on depth: see the audit - the
+  built cards average 2 commands and none demands a decision.
 
 ## 3. Concept graph (introduce-once)
 
@@ -79,32 +72,8 @@ Revisits: 2 -> `gt-commit`; 4 -> `gt-history`; 5 -> `gt-branch`,`gt-head`; 8 -> 
 
 ## 4. Practical exercise sketches
 
-Shorthand for this doc only (lesson files spell every command out): `A f` = `git add f`,
-`C "m"` = `git commit -m "m"`. Every start is replayed from an empty repository, and **every
-card must end in a state change** - grading is DAG-only, so a card whose only action is
-`status` or `log` cannot pass.
-
-| Lesson | Card | Start | Goal in plain words | Target = start + |
-|---|---|---|---|---|
-| 1 | 1 | (empty) | Save `cat.txt` as the first commit, message `add cat`. | `A cat.txt; C "add cat"` |
-| 1 | 2 | `A cat.txt; C "add cat"` | Save `dog.txt` on top as `add dog`. | `A dog.txt; C "add dog"` |
-| 1 | 3 | `A cat.txt; C "add cat"` | Put `dog.txt` and `bird.txt` in ONE commit, `add two pets`. | `A dog.txt; A bird.txt; C "add two pets"` |
-| 3 | 1 | `A cat.txt; C "add cat"` | Check `git status` first, then commit only `dog.txt` as `add dog`. | `A dog.txt; C "add dog"` |
-| 3 | 2 | 3 commits | Read `git log --oneline`, then commit `fix the feeder` on top. | `A feeder.txt; C "fix the feeder"` |
-| 5 | 1 | `A cat.txt; C "add cat"` | Make a branch called `feature` - do not move onto it yet. | `git branch feature` |
-| 5 | 2 | 2 commits on `main` | Start `feature`, move onto it, and commit `add dog` there - `main` stays put. | `git switch -c feature; A dog.txt; C "add dog"` |
-| 6 | 1 | 3 commits on `main` | Pin the tag `v1` to the current commit. | `git tag v1` |
-| 6 | 2 | 3 commits on `main` | Pin `v0` to the commit before last, without moving anything. | `git tag v0 HEAD~1` |
-| 8 | 1 | `C "add cat"`; `git switch -c fix; A dog.txt; C "add dog"; S main` | Bring `fix` into `main`. `main` added nothing, so no new commit appears. | `git merge fix` |
-| 8 | 2 | as above but `main` has its own `C "feed the cat"` | Bring `fix` in again - this time it takes a merge commit called `merge fix`. | `git merge fix; C "merge fix"` |
-| 10 | 1 | both branches commit touching `cat.txt` | Merge `fix`, then tell git `cat.txt` is settled and finish with `merge fix`. | `git merge fix; A cat.txt; C "merge fix"` |
-| 10 | 2 | same, mid-conflict already | Call this merge off, then tag the commit you are on `before-merge`. | `git merge --abort; git tag before-merge` |
-| 11 | 1 | 2 commits, last one `add dgo` | Fix that typo in the last commit's message - no extra commit. | `git commit --amend -m "add dog"` |
-| 12 | 1 | 4 commits on `main` | Make a branch `old` at the commit two back from the tip. | `git branch old main~2` |
-| 12 | 2 | 4 commits on `main` | Step onto the previous commit directly, standing on no branch. | `git checkout HEAD~1` |
-| 14 | 1 | 3 commits, last one `oops` | Drop the last commit and keep its files staged. | `git reset --soft HEAD~1` |
-| 14 | 2 | same | Drop it and put its files back in the working tree, unstaged. | `git reset --mixed HEAD~1` |
-| 14 | 3 | same | Drop it and its files entirely. | `git reset --hard HEAD~1` |
+Superseded - the lessons are built. What each card should BECOME is in
+`docs/audit/git/` and `docs/plans/git-track-rebuild.md`.
 
 ## 5. What this track does NOT teach
 
@@ -114,24 +83,18 @@ by design too: file CONTENTS (so no `diff`, no `show`, no editing a conflict mar
 `.gitignore`, `restore` and `revert`. The seam for the next ("real git") track is clean: it
 starts at remotes and rewriting history, on the same graph widget.
 
-## 6. Open questions for the owner
+## 6. Open questions
 
-1. **Untracked files do not exist in the model.** A path appears only when the learner types
-   `git add <path>`, so the working-tree zone stays empty until a `reset --mixed` fills it
-   (lesson 14). The prose can honestly say "tell git to include `cat.txt`", but the
-   beginner's real story ("I made a file, `status` shows it untracked, I add it") is not
-   tellable, and `git add .` stages nothing. Accept, or seed a worktree in the model?
-2. **Concept prefix `gt-`** - existing tracks use `pr-`/`th-`/`ai-`; `gi-` is the alternative.
-3. **Overlap with theory-20 "How code is shared"**, which already introduces `th-commit`,
-   `th-history`, `th-vcs-branch`, `th-merge`, `th-version-control`. Ids are track-scoped so
-   this is legal and the defs differ in angle (theory = why it exists, git = what it does).
-   Keep both, or have the git track revisit the theory ids?
-4. **Message-exact grading.** DAG equivalence matches commits by parent shape AND message, so
-   every card must state the exact message to type. Fine, or relax messages per lesson?
-5. **No literal hashes anywhere** - lesson 12 teaches `HEAD~1`/`main~2`, never `checkout
-   <hash>`, because the verifier replays solutions. Agreed?
-6. **`--abort` cannot be graded strictly** (it leaves no trace), so card 10.2 pairs it with a
-   tag. Accept, or demote `--abort` to prose only?
-7. **14 lessons, 9 practical / 5 viz** - right size for elementary, or too long?
-8. **Ledger.** `docs/concept-ledger.md` has no Git section; adding one is a follow-up in the
-   first authoring change.
+Most are now decided - see the journal (`git-track-depth` D-1..11) and
+`docs/plans/git-track-rebuild.md`. Resolved: untracked files DO exist (seeded per
+card); the `gt-` prefix stands; `--abort` is paired with a tag because it leaves no
+trace to grade; no literal hashes anywhere.
+
+Still open:
+
+1. **Overlap with theory-20 "How code is shared"**, which owns `th-commit`,
+   `th-history`, `th-merge`. Ids are track-scoped so both are legal and the angles
+   differ (theory = why it exists, git = what it does). Keep both, or cross-link?
+2. **Message-exact grading.** Every card must state the exact commit message, because
+   DAG equivalence matches on parent shape AND message. Relax per lesson?
+3. **Ledger.** `docs/concept-ledger.md` still has no Git section.
