@@ -75,6 +75,7 @@ var CodeLab = (() => {
     gitMerge3: () => merge3,
     gitMergeAbort: () => mergeAbort,
     gitPanelFiles: () => panelFiles,
+    gitRebase: () => rebase,
     gitReset: () => reset,
     gitResolveFilePanel: () => resolveFilePanel,
     gitResolvePaths: () => resolvePaths,
@@ -4038,6 +4039,56 @@ ${result.runtimeError}`.trim(),
     moveHead(s, id, `merge ${otherRev}: Merge made by the recursive strategy.`);
     return { state: s, effect: { kind: "merge", id } };
   }
+  function rebase(state, upstreamRev) {
+    const s = cloneState(state);
+    const h = headCommit2(s);
+    if (h === null) throw new GitError("cannot rebase: HEAD is unborn");
+    const o = revParse(s, upstreamRev);
+    const hAnc = ancestors(s, h);
+    if (hAnc.has(o)) return { state: s, effect: { kind: "none" } };
+    const oAnc = ancestors(s, o);
+    if (oAnc.has(h)) {
+      moveHead(s, o, `rebase: fast-forward to ${upstreamRev}`);
+      return { state: s, effect: { kind: "ff", from: h, to: o } };
+    }
+    const base = mergeBases(s, h, o)[0] ?? null;
+    const replay = [...s.commits.keys()].filter((id) => hAnc.has(id) && !oAnc.has(id));
+    let tip = o;
+    for (const id of replay) {
+      const c = s.commits.get(id);
+      for (const path of c.paths) {
+        const upstreamText = fileAt(s, o, path);
+        const baseText = fileAt(s, base, path);
+        const mineText = c.blobs.get(path) ?? null;
+        const upstreamMoved = upstreamText !== baseText;
+        if (upstreamMoved && upstreamText !== mineText) {
+          throw new GitError(
+            `CONFLICT (content): could not apply ${c.id}... ${c.message}
+Both this commit and ${upstreamRev} changed ${path}.
+Resolving a rebase by hand is not part of this course yet - use \`git merge\` instead.`
+          );
+        }
+      }
+      const blobs = treeAt(s, tip);
+      for (const path of c.paths) {
+        const text = c.blobs.get(path);
+        if (text === void 0) blobs.delete(path);
+        else blobs.set(path, text);
+      }
+      const newId = makeHash([tip], c.message, s.seq);
+      s.seq += 1;
+      s.commits.set(newId, {
+        id: newId,
+        parents: [tip],
+        message: c.message,
+        paths: c.paths.slice(),
+        blobs
+      });
+      tip = newId;
+    }
+    moveHead(s, tip, `rebase: ${upstreamRev}`);
+    return { state: s, effect: { kind: "commit", id: tip } };
+  }
   function mergeAbort(state) {
     const s = cloneState(state);
     if (!s.merge) throw new GitError("no merge in progress");
@@ -4870,6 +4921,11 @@ ${result.runtimeError}`.trim(),
       usage: ["status"]
     },
     {
+      name: "rebase",
+      summary: "Make this branch's commits again, on top of another branch.",
+      usage: ["rebase <branch>"]
+    },
+    {
       name: "reflog",
       summary: "List where HEAD has been, newest first.",
       usage: ["reflog"]
@@ -5084,6 +5140,9 @@ The most similar command is
     }
     return chunks.join("\n");
   }
+  function headLabel(s) {
+    return s.head.kind === "branch" ? s.head.name : "HEAD";
+  }
   function reflogText(s) {
     const entries = s.reflog || [];
     if (entries.length === 0) return "fatal: your current branch does not have any commits yet";
@@ -5218,6 +5277,13 @@ The most similar command is
         }
         case "reflog": {
           return ok(state, reflogText(state), { kind: "none" });
+        }
+        case "rebase": {
+          const onto = args.find((a) => !a.startsWith("-"));
+          if (!onto) return fail(state, "usage: git rebase <branch>");
+          const r = rebase(state, onto);
+          if (r.effect.kind === "none") return ok(r.state, "Current branch is up to date.", r.effect);
+          return ok(r.state, `Successfully rebased and updated ${headLabel(state)}.`, r.effect);
         }
         case "diff": {
           const parsed = parseDiffArgs(state, args);
