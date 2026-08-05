@@ -71,15 +71,28 @@
 
   function squeeze(text) { return String(text == null ? "" : text).replace(/\s+/g, " ").trim(); }
 
+  // null means "there was nothing here to read", which is NOT the same as "there
+  // was nothing here". Returning [] for a missing index let `staged: []` - a
+  // real claim, "nothing is staged" - be satisfied by a RepoState that has no
+  // index at all, so a gate passed on a repository it could not even inspect.
   function keysOf(mapLike) {
-    if (!mapLike) return [];
+    if (!mapLike) return null;
     // Map.keys() is an ITERATOR, not array-like: slice on it yields [] and every
     // comparison would silently pass.
     if (typeof mapLike.keys === "function") return Array.from(mapLike.keys());
+    if (typeof mapLike !== "object") return null;
     return Object.keys(mapLike);
   }
-  function sorted(list) { return (list || []).slice().sort(); }
-  function sameSet(a, b) { return JSON.stringify(sorted(a)) === JSON.stringify(sorted(b)); }
+
+  // Both sides must genuinely be lists. `(list || []).slice()` was doing two
+  // wrong things at once: a falsy non-array such as `staged: ""` became [] and
+  // then compared EQUAL to an empty index, and a truthy non-array such as
+  // `staged: {}` threw straight out of a function documented never to throw -
+  // in the browser that lands in the terminal's own handler mid-exercise.
+  function sameSet(a, b) {
+    if (!Array.isArray(a) || !Array.isArray(b)) return false;
+    return JSON.stringify(a.slice().sort()) === JSON.stringify(b.slice().sort());
+  }
 
   function refName(state, name) {
     if (!state || !state.refs || !state.refs.get) return null;
@@ -191,15 +204,87 @@
    *
    * `world` is { state, ran } - the RepoState and the commands run so far.
    */
+  // A gate is a PLAIN object. Arrays are excluded on purpose: `[].at` is a real
+  // method in modern JS, so an array reaching the field scan below answers "yes,
+  // I have an `at`" and gets judged as a positional gate it never was.
+  function isGate(value) {
+    return !!value && typeof value === "object" && !Array.isArray(value);
+  }
+
+  // Does this gate actually TEST anything? A gate whose fields are all
+  // misspelled - `stagged`, `command` - carries no recognised condition, so
+  // every loop below skips and the gate comes back true from the first
+  // keystroke. tools/validate.mjs cannot catch that: it hunts gates that can
+  // NEVER tick, and an always-true gate sails straight past it and greets the
+  // learner already green. An empty `ran` is the same hole with a real field
+  // name - `ran: []` asks for no command at all.
+  //
+  // `staged: []`, `worktree: []` and `detached: false` are deliberately NOT
+  // empty: "nothing is staged" and "HEAD is attached" are real claims.
+  function testsSomething(gate) {
+    for (var i = 0; i < GATE_FIELDS.length; i++) {
+      var name = GATE_FIELDS[i];
+      var value = gate[name];
+      if (value === undefined || value === null) continue;
+      if (name === "ran") {
+        var cmds = Array.isArray(value) ? value : [value];
+        var any = false;
+        for (var c = 0; c < cmds.length; c++) if (squeeze(cmds[c])) any = true;
+        if (!any) continue;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  var REPO_FIELDS = ["branch", "tag", "at", "head", "detached", "commit", "on",
+    "parents", "paths", "staged", "worktree"];
+
+  function touchesRepo(gate) {
+    for (var i = 0; i < REPO_FIELDS.length; i++) {
+      if (gate[REPO_FIELDS[i]] !== undefined) return true;
+    }
+    return false;
+  }
+
+  // Can this world actually answer a question about the repository? The runtime
+  // hands back Maps; anything else cannot be read here, and reading it as empty
+  // would be a guess. Used to keep `absent` honest - see below.
+  function inspectable(state) {
+    if (!state) return false;
+    var commits = state.commits;
+    var refs = state.refs;
+    return !!(commits && typeof commits.get === "function" && typeof commits.forEach === "function" &&
+      refs && typeof refs.get === "function");
+  }
+
   function meets(gate, world) {
-    if (!gate || typeof gate !== "object") return false;
+    if (!isGate(gate)) return false;
+    if (!testsSomething(gate)) return false;
     var state = (world && world.state) || null;
     var ran = (world && world.ran) || [];
 
-    if (gate.absent) {
+    if (gate.absent !== undefined && gate.absent !== null) {
       // "Nothing like this is there" - the gate that proves an undo really
-      // happened. A malformed inner gate is treated as present, so the outer
-      // gate stays unmet rather than passing on a typo.
+      // happened.
+      //
+      // A malformed inner gate must leave the OUTER gate unmet. Recursing
+      // straight into `meets` did the opposite: `meets("typo")` is false, so
+      // "the thing is absent" came back true and the whole gate passed from the
+      // first keystroke. That is the worst failure a gate can have, because
+      // tools/validate.mjs only hunts gates that can NEVER tick - one that is
+      // always true sails through and greets the learner already ticked.
+      // The inner gate must itself TEST something. Otherwise `absent` inverts
+      // "this gate checks nothing, so it is not satisfied" into "the thing is
+      // absent" and the outer gate is green before the learner types - the same
+      // hole as an empty gate, but hidden one level down where it is harder to
+      // see and just as invisible to validate.mjs.
+      if (!isGate(gate.absent) || !testsSomething(gate.absent)) return false;
+      // "I could not look" is not "it is not there". Without this, a RepoState
+      // this module cannot read makes the inner gate false for the wrong reason
+      // and `absent` turns that straight into a green tick claiming the learner
+      // removed something that is in fact still sitting there.
+      if (touchesRepo(gate.absent) && !inspectable(state)) return false;
       if (meets(gate.absent, world)) return false;
     }
     if (gate.ran) {
@@ -211,13 +296,7 @@
 
     // Everything below reads the repository, so with no repository there is
     // nothing to be true about. An `absent`/`ran`-only gate has already answered.
-    var repoFields = ["branch", "tag", "at", "head", "detached", "commit", "on",
-      "parents", "paths", "staged", "worktree"];
-    var touchesRepo = false;
-    for (var f = 0; f < repoFields.length; f++) {
-      if (gate[repoFields[f]] !== undefined) { touchesRepo = true; break; }
-    }
-    if (!touchesRepo) return true;
+    if (!touchesRepo(gate)) return true;
     if (!state) return false;
 
     var anchor = gate.at !== undefined ? anchorId(state, gate.at) : undefined;

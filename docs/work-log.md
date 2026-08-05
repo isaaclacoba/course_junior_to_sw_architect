@@ -2244,3 +2244,35 @@ Verified: 516 unit tests pass (2 new, pinning the git dispatch both ways),
 `validate.mjs` clean at 0 errors, all 15 git lessons pass `verify-lesson --no-dotnet`,
 no generated drift, and 4 git lessons driven command-by-command in headless Chrome
 to confirm boxes tick in order and transient gates latch.
+
+2026-08-05 21:12 - END code review of the goal tracker, and the fixes it found.
+
+Reviewed the extraction commit. Seven real defects, every one of them the same
+shape: a gate or a panel answering "yes" without having checked anything.
+
+- `meets()` returned true for a gate that tests nothing - `{}`, `{ran: ""}`,
+  `{ran: []}`, or any gate whose field names are misspelled. An author writing
+  `stagged` got a box that was green before the learner typed. `validate.mjs`
+  cannot catch this: it hunts gates that can NEVER tick, so an always-true gate
+  walks straight past it.
+- `absent:` inverted three different "false for the wrong reason" into a tick -
+  a malformed inner value, an inner gate that tests nothing, and a RepoState
+  this module cannot read. "I could not look" is not "it is not there".
+- An array reaching the gate field-scan tripped `.at` (`Array.prototype.at` is
+  a real method), so it was judged as a positional gate it never was.
+- `sameSet` coerced a falsy non-array to `[]`, so `staged: ""` matched an empty
+  index exactly; a truthy non-array threw out of a function documented never to
+  throw. `keysOf` returned `[]` for a missing index, so `staged: []` was
+  satisfied by a repository with no index at all.
+- The widget did not guard the provider calls. It repaints after every keystroke
+  and every git command, so a throw there took the editor or the terminal with
+  it. The panel is a guide, not a grade - losing it is the acceptable cost.
+
+Verified: 527 unit tests (13 new), and every new test was checked by reverting
+its fix and watching it fail. Zero errors from `validate.mjs`, all 15 git
+lessons pass `verify-lesson`, C# lessons unaffected, and the tracker re-driven
+in a real browser.
+
+Not caused by these changes, but seen: running all 15 git lessons in parallel
+failed 2 of them once with a browser console error, and passed 15/15 on the next
+two runs. Flaky under parallel load, worth a look if it recurs.

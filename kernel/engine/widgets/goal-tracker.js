@@ -105,6 +105,19 @@
    *   provider   the domain module (see the contract at the top of this file).
    *   escapeHtml the engine's escaper, so a `<` in a row label cannot inject.
    */
+  // One line per tracker, not one per keystroke: a provider that throws throws
+  // every time, and a console flooded at 60 lines a second hides the first one.
+  function makeWarner() {
+    var warned = false;
+    return function (err) {
+      if (warned) return;
+      warned = true;
+      if (typeof console !== "undefined" && console.warn) {
+        console.warn("[goal-tracker] provider threw - goal panel left as it was", err);
+      }
+    };
+  }
+
   function create(options) {
     var opts = options || {};
     var host = opts.host || null;
@@ -118,6 +131,7 @@
     // High-water marks for LATCHING goals - see the note on `latch()` below.
     var everMet = [];
     var everRow = [];
+    var warnOnce = makeWarner();
     var api;
 
     // Snapshot the freshly painted - and freshly localized - goal prose, so the
@@ -154,7 +168,18 @@
       if (!host || !provider || !goals.length) return null;
       if (!prose.length) return null;
 
-      var met = provider.verdicts(goals, state);
+      // The tracker is a GUIDE, never a grade - so a provider that throws must
+      // cost the learner the panel, not the lesson. On a git card this runs
+      // after every command and on a build card after every keystroke, so an
+      // unguarded throw would take the terminal or the editor down with it.
+      // Leaving the panel untouched is the same honest answer as "cannot judge".
+      var met;
+      try {
+        met = provider.verdicts(goals, state);
+      } catch (e) {
+        warnOnce(e);
+        return null;
+      }
       // null means the provider cannot see enough to judge right now - no scanner
       // yet, no repository yet. Leave the panel exactly as it is; a guess here
       // would be a tick nobody earned or one silently taken away.
@@ -168,7 +193,15 @@
         else if (everMet[i] && latches(goals[i])) resolved[i] = true;
       }
 
-      var html = build(resolved, state);
+      // build() calls back into the provider for every goal, on the same hot
+      // path and with the same consequence.
+      var html;
+      try {
+        html = build(resolved, state);
+      } catch (e) {
+        warnOnce(e);
+        return null;
+      }
       lastMet = resolved;
       if (host.innerHTML !== html) {
         host.innerHTML = html;
@@ -250,6 +283,11 @@
       prose = [];
       lastHtml = null;
       lastMet = null;
+      // Forget the high-water marks too. They are per CARD, and one tracker
+      // instance outlives the card it was built for - left behind, they would
+      // let the next card open with rows already ticked from the previous one.
+      everMet = [];
+      everRow = [];
       if (host && host.classList) host.classList.remove("has-tracker");
       return api;
     }

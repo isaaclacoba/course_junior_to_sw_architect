@@ -374,3 +374,72 @@ test("rows under a latching goal latch with it", () => {
   t.sync({});
   assert.equal(t.html(), lit, "a latched box must not go grey underneath a green header");
 });
+
+// --- the panel must never be able to take the lesson down --------------------
+//
+// The tracker is a guide, not a grade. It repaints after every git command and
+// after every keystroke in the editor, so an unguarded throw out of a provider
+// would land inside the terminal's or the editor's own handler and break the
+// thing the learner is actually using. Losing the panel is the acceptable cost;
+// losing the lesson is not.
+
+test("a provider that throws in verdicts costs the panel, not the page", () => {
+  const host = fakeList(["do the thing"]);
+  const provider = {
+    outline: () => ({ kind: "box", header: "Cat", rows: [] }),
+    verdicts: () => { throw new Error("boom"); },
+  };
+  const t = Tracker.create({ host, provider });
+  t.capture().setGoals([{ gate: {} }]);
+  const warns = [];
+  const real = console.warn;
+  console.warn = (...a) => warns.push(a);
+  try {
+    assert.doesNotThrow(() => t.sync({}));
+    assert.equal(t.sync({}), null, "a tracker that cannot judge reports nothing");
+  } finally { console.warn = real; }
+  assert.equal(warns.length, 1, "the throw is reported once, not once per keystroke");
+});
+
+test("a provider that throws in outline costs the panel, not the page", () => {
+  const host = fakeList(["do the thing"]);
+  const provider = {
+    outline: () => { throw new Error("boom"); },
+    verdicts: () => [true],
+  };
+  const t = Tracker.create({ host, provider });
+  t.capture().setGoals([{ gate: {} }]);
+  const real = console.warn;
+  console.warn = () => {};
+  try {
+    assert.doesNotThrow(() => t.sync({}));
+    assert.equal(host.innerHTML, "", "the panel is left exactly as it was");
+  } finally { console.warn = real; }
+});
+
+// clear() is what a card with no goals calls, so the previous card's boxes
+// cannot linger. What is pinned here is the OBSERVABLE contract - a cleared
+// tracker paints nothing and drops its class - not the internal bookkeeping.
+//
+// Note on the latch marks that clear() also resets: that reset is symmetry, not
+// a fix. It cannot be reached through this API, because clear() empties the
+// captured prose too and sync() refuses to paint without it, so capture() is
+// always the reset that actually runs. Saying so here rather than writing a
+// test that would pass with or without it - a green test that proves nothing is
+// worse than no test, because it stops anyone looking again.
+test("clear() leaves a card with no goals showing nothing", () => {
+  const host = fakeList(["stage it"]);
+  const provider = {
+    outline: () => ({ kind: "box", header: "staged", rows: [] }),
+    verdicts: () => [true],
+    latches: () => true,
+  };
+  const t = Tracker.create({ host, provider });
+  t.capture().setGoals([{ gate: { staged: ["cat.txt"] } }]);
+  assert.deepEqual(t.sync({}), [true]);
+  assert.ok(host.classList.contains("has-tracker"));
+
+  t.clear();
+  assert.equal(t.sync({}), null, "nothing to track means nothing painted");
+  assert.ok(!host.classList.contains("has-tracker"), "the list gets its bullets back");
+});

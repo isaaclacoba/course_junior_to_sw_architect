@@ -211,7 +211,37 @@ test("a malformed gate is unmet, never an exception", () => {
   const world = { state: null, ran: [] };
   assert.equal(G.meets(null, world), false);
   assert.equal(G.meets("git status", world), false);
-  assert.equal(G.meets({}, world), true, "an empty object asks for nothing, so nothing is missing");
+  // This used to answer TRUE, on the reasoning that an empty object asks for
+  // nothing so nothing can be missing. That reasoning is wrong in the direction
+  // that costs the learner: a gate testing nothing is green before they type,
+  // and validate.mjs cannot see it because it only hunts gates that never tick.
+  // A gate that asks nothing is now a gate that is not satisfied.
+  assert.equal(G.meets({}, world), false, "a gate that tests nothing must not pass");
+});
+
+// The same hole with a real field name in it. An author who writes `stagged`
+// or `command` gets no syntax error and no warning - the field is simply not in
+// the vocabulary, every check skips, and the box is green from the first frame.
+test("a gate whose fields are all misspelled tests nothing, so it is unmet", () => {
+  const world = { state: null, ran: [] };
+  assert.equal(G.meets({ stagged: ["cat.txt"] }, world), false);
+  assert.equal(G.meets({ command: "git init" }, world), false);
+  assert.equal(G.meets({ ran: "" }, world), false, "an empty command asks for nothing");
+  assert.equal(G.meets({ ran: [] }, world), false, "an empty command list asks for nothing");
+});
+
+// ...but the fields that legitimately carry an "empty" value are still claims,
+// and over-correcting would silently kill them.
+test("an empty staged list and an attached HEAD are still real claims", async () => {
+  const clean = await repo(["git init"], FILES);
+  assert.equal(G.meets({ staged: [] }, { state: clean, ran: [] }), true,
+    "nothing staged is a fact about the repository, not an empty gate");
+  assert.equal(G.meets({ detached: false }, { state: clean, ran: [] }), true,
+    "HEAD attached is a fact too - `false` is a value, not a missing field");
+
+  const staged = await repo(["git init", "git add cat.txt"], FILES);
+  assert.equal(G.meets({ staged: [] }, { state: staged, ran: [] }), false);
+  assert.equal(G.meets({ staged: ["cat.txt"] }, { state: staged, ran: [] }), true);
 });
 
 test("a repository gate with no repository is unmet, never met", () => {
@@ -298,4 +328,77 @@ test("describe names what a gate wanted, for a validator's message", () => {
   assert.match(G.describe({ ran: "git status" }), /git status/);
   assert.equal(G.describe(null), "(no factual test)");
   assert.equal(G.describe({}), "(empty gate)");
+});
+
+// --- a gate must never pass because it was written wrong ---------------------
+//
+// `absent` recurses, and the recursion used to invert a typo into a pass:
+// meets("typo") is false, so "the thing is absent" came back TRUE and the whole
+// gate was satisfied before the learner typed anything.
+//
+// This is the worst way for a gate to be wrong. tools/validate.mjs hunts gates
+// that can NEVER tick, so a gate that is ALWAYS true sails past it and greets
+// the learner already green - and a tracker that is green from the start is
+// exactly the thing the tracker was built to stop being.
+test("a malformed `absent` leaves the gate unmet, never satisfied", () => {
+  const world = { state: null, ran: [] };
+  for (const broken of ["typo", 42, true, []]) {
+    assert.equal(G.meets({ absent: broken }, world), false,
+      `absent: ${JSON.stringify(broken)} must not satisfy the gate`);
+  }
+});
+
+test("a well-formed `absent` still works both ways", () => {
+  const world = { state: null, ran: ["git init"] };
+  // The inner gate is met, so the thing is NOT absent - outer gate unmet.
+  assert.equal(G.meets({ absent: { ran: "git init" } }, world), false);
+  // The inner gate is not met, so the thing really is absent - outer gate met.
+  assert.equal(G.meets({ absent: { ran: "git nonesuch" } }, world), true);
+});
+
+// --- `absent` must not invert a question it never asked -----------------------
+//
+// `absent` is the only gate that turns a false into a true, which makes every
+// "false for the wrong reason" in this module a green tick somewhere. Three
+// wrong reasons, all of them found by review rather than by use:
+test("`absent` wrapping a gate that tests nothing is unmet", () => {
+  const world = { state: null, ran: [] };
+  assert.equal(G.meets({ absent: {} }, world), false, "an empty inner gate is not an absence");
+  assert.equal(G.meets({ absent: { stagged: ["cat.txt"] } }, world), false, "a typo is not an absence");
+  assert.equal(G.meets({ absent: { ran: [] } }, world), false, "no command is not an absence");
+});
+
+test("`absent` does not turn a repository it cannot read into an absence", () => {
+  // The runtime hands back Maps. Anything else cannot be read here, and reading
+  // it as empty would claim the learner removed something still sitting there.
+  const unreadable = {
+    refs: {},
+    commits: { c1: { message: "add cat", parents: [], paths: ["cat.txt"] } },
+    index: new Map(), worktree: new Map(),
+    head: { kind: "branch", name: "refs/heads/main" },
+  };
+  assert.equal(G.meets({ absent: { commit: "add cat" } }, { state: unreadable, ran: [] }), false,
+    "\"I could not look\" is not \"it is not there\"");
+});
+
+// --- a set comparison must compare two SETS ----------------------------------
+test("a non-array staged/worktree value is unmet, and never throws", async () => {
+  const clean = await repo(["git init"], FILES);
+  const world = { state: clean, ran: [] };
+  // "" used to be coerced to [] and then matched an empty index exactly.
+  assert.equal(G.meets({ staged: "" }, world), false);
+  assert.equal(G.meets({ worktree: "" }, world), false);
+  // A truthy non-array used to throw straight out of a function documented never
+  // to throw - in the browser that lands inside the terminal's own handler.
+  assert.doesNotThrow(() => G.meets({ staged: {} }, world));
+  assert.equal(G.meets({ staged: {} }, world), false);
+});
+
+test("`staged: []` is not satisfied by a repository with no index at all", () => {
+  const noIndex = {
+    refs: new Map(), commits: new Map(),
+    head: { kind: "branch", name: "refs/heads/main" },
+  };
+  assert.equal(G.meets({ staged: [] }, { state: noIndex, ran: [] }), false,
+    "nothing to read is not the same as nothing staged");
 });
