@@ -1684,3 +1684,37 @@ shape belongs in the gate and the edit belongs in its own row.
 Verified: 439/439, 89/89 lessons with the new check, real dotnet on all seven
 SOLID solutions, and a headless render showing the new rows on card 4. Both new
 rules are in the skill.
+
+## 2026-08-05 08:15 - 09:05 - two columns that never agreed where the top was
+
+A reader pointed at the build card: the goal panel and the editor did not line
+up, and the first line of code was welded to the top frame.
+
+Measuring beat guessing, and the alignment turned out to be two faults stacked.
+The first is a rule that has been firing under nothing for as long as it has
+existed: `.example-box + .coach` opens a gap between the pattern box and the
+goal box, but `hidden` does not stop an element being the previous sibling, so
+the gap opened whether or not there was anything above it. Every build card in
+the course has been carrying 12.8px of space under an invisible element. The
+second is that the two headings start from different edges - "Goal" sits INSIDE
+a bordered, padded panel, "Your code" is bare text above the editor - and on top
+of that the bare heading's own margin collapsed straight out of its section,
+dropping it another 18px. Inset the work column by exactly the panel's border
+plus padding and the two headings land on the same pixel by construction rather
+than by a number someone tuned by eye. The padding also blocks the collapse,
+which is the second half of the same fix.
+
+The editor padding is Monaco's own option, not CSS on the host, and the
+difference matters. I tried the CSS first and measured it: the host height is
+driven by getContentHeight, so padding the host does not make it taller - it
+just takes twelve pixels away from the visible area and hides the bottom of the
+last line. Monaco's padding is counted in that height, so the box grows instead.
+The line numbers move with the code, which is the thing to check.
+
+Verified by measuring the real page, not by looking at it: both headings at
+838.4, first line and gutter both 12px down, last line 12px up, all 23 lines
+still present, and the host taller by exactly the padding it gained.
+
+One note left for later. The example box never appears at all - nothing removes
+its `hidden`, so every `example` written into lesson data is invisible. That is
+why the phantom gap survived so long: the thing it was spacing was never there.

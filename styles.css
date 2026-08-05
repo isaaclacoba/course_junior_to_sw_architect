@@ -621,13 +621,23 @@ h4 {
   margin-top: 0;
 }
 
-.build-col--brief .example-box + .coach {
+/* `hidden` does not stop an element being the previous SIBLING, so this gap
+   used to open under an example box nobody could see - pushing the goal panel
+   12.8px below the editor column for its whole life. */
+.build-col--brief .example-box:not([hidden]) + .coach {
   margin-top: 0.8rem;
 }
 
+/* The two column headings must sit on one line, and they start from different
+   edges: "Goal" is INSIDE a bordered, padded panel, while "Your code" is bare
+   text above the editor. Inset the work column by exactly the panel's border +
+   padding and the two line up by construction rather than by a magic number.
+   The padding earns its keep twice: without it the heading's own margin
+   collapses straight out of the section, which is what dropped it 18px above
+   its neighbour in the first place. */
 .build-col--work .fill-section {
   margin-top: 0;
-  padding-top: 0;
+  padding-top: calc(0.75rem + 1px);
   border-top: 0;
 }
 
