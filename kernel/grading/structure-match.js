@@ -196,7 +196,14 @@
     var text = typeof spec === "string" ? spec : (spec.name || "");
     var call = text.match(/([A-Za-z_]\w*)\s*(?:<[^>]*>)?\s*\(/);
     if (call) return call[1];
-    var words = String(text).trim().split(/\s+/);
+    // What follows the NAME is never part of it: a property's accessor block
+    // ("string Name { get; set; }"), an expression body ("int Count => _n"), or
+    // an initializer ("int _hours = 0"). Taking the last whitespace-separated
+    // word picked up "}", "_n" and "0" respectively - so a property row matched
+    // no member and sat grey forever, and a field row matched the wrong one.
+    // The name is the last identifier BEFORE any of that.
+    text = String(text).replace(/[={][\s\S]*$/, " ");
+    var words = text.trim().split(/\s+/);
     var ident = (words[words.length - 1] || "").match(/([A-Za-z_]\w*)/);
     return ident ? ident[1] : "";
   }

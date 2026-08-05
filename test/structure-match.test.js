@@ -448,3 +448,46 @@ test("verdicts goes green only when the gate and every row is", () => {
 test("verdicts keeps a run-gated goal null so a passing run can claim it", () => {
   assert.deepEqual(Array.from(S.verdicts(STEP_TYPES, [{ gate: null }], STEP_SRC)), [null]);
 });
+
+// --- symbolName: the row-to-member lookup ----------------------------------
+//
+// WHY THESE EXIST
+// symbolName had no tests, and a property row was silently unmatchable: it took
+// the last whitespace-separated word of "string Name { get; set; }", found "}",
+// and returned "". The row then matched no member and stayed grey no matter what
+// the learner wrote. A field with an initializer had the same shape of bug,
+// returning "0" for "int _hours = 0". Nothing failed - the tracker just lied.
+test("symbolName reads a method row", () => {
+  assert.equal(S.symbolName("bool IsHungry()"), "IsHungry");
+  assert.equal(S.symbolName("Cat(int hours)"), "Cat");
+  assert.equal(S.symbolName("bool IsHungry() => true"), "IsHungry");
+});
+
+test("symbolName reads a property row past its accessors", () => {
+  assert.equal(S.symbolName("string Name { get; set; }"), "Name");
+  assert.equal(S.symbolName("List<int> Items { get; }"), "Items");
+  assert.equal(S.symbolName("Dictionary<string,int> Map { get; set; }"), "Map");
+});
+
+test("symbolName ignores an initializer or expression body", () => {
+  assert.equal(S.symbolName('public string Name { get; set; } = ""'), "Name");
+  assert.equal(S.symbolName("int Count => _n"), "Count");
+  assert.equal(S.symbolName("int _hours = 0"), "_hours");
+});
+
+test("symbolName reads a bare field row and survives nothing", () => {
+  assert.equal(S.symbolName("int _hours"), "_hours");
+  assert.equal(S.symbolName(""), "");
+  assert.equal(S.symbolName(null), "");
+});
+
+// The bug in situ: a property row must be able to tick.
+test("a property row ticks when the solution declares the property", () => {
+  const types = [{
+    name: "Cat", kind: "class", bases: [],
+    members: [{ name: "Name", kind: "property", detail: "string Name { get; set; }" }],
+  }];
+  const verdicts = S.rows(types, { type: "Cat", member: "Name" },
+    ["class Cat", "string Name { get; set; }"], 'public class Cat { public string Name { get; set; } = ""; }');
+  assert.deepEqual(Array.from(verdicts), [true, true]);
+});

@@ -2107,3 +2107,50 @@ are localized now, so the empty quotes were pure noise, and noise is what trains
 a reader to skim past real findings.
 
 448 tests, 0 validator errors. The 159 gates can now be authored safely.
+
+## 2026-08-05 13:27 - deriving the goal tracker's rows, and a property that could never tick
+
+With the validator now asserting every gate, the next question is how much of the
+authoring is mechanical. `tools/derive-goals.mjs` answers it: point it at a
+lesson and it reads the solution, works out what the learner actually adds over
+the starter, and prints a `goals[]` block ready to paste.
+
+The useful part was not the deriving, it was refusing to derive. Three things
+are genuinely semantic and the tool says so instead of inventing an answer: a
+goal line that names two classes cannot become one box (the prose needs
+splitting, in every language bundle); a rewired `Main` needs step rows describing
+each move, and statements declare no symbol to derive them from; and a line about
+output is behaviour, not shape, so `{ gate: null }` is the right answer rather
+than a fallback.
+
+The first run reported 103 tasks with "nothing to track" and that number was a
+lie twice over. Twenty of them were git lessons - I was running a C# scanner over
+shell commands, a true answer to the wrong question. The rest were the real
+finding: the dominant shape in this course is not "add a class", it is "fill in a
+body the starter already declares". `Critter.Label` exists in the starter with a
+TODO inside it, so a member row would tick before the learner types a character -
+the mirror image of a row that never ticks, and just as much of a lie. Those need
+step rows watching the body, which is what `writes` is for, and there are 48 of
+them.
+
+The tool now runs every candidate it produces through the same validator that
+guards the repo, and only calls it READY if it passes. That immediately demoted
+36 proposals I would otherwise have shipped as good. A tool that feeds a gate
+should have to pass it.
+
+One of those rejections was not the tool's fault. `symbolName` in
+`structure-match.js` takes the last whitespace-separated word of a row, which for
+`string Name { get; set; }` is `}` - so it returned an empty string, matched no
+member, and the row sat grey forever. Every property row in the course was
+unmatchable, and a field row with an initializer matched `0`. It had no tests at
+all, which is why it survived. Whatever follows the name is never part of it, so
+accessors, expression bodies and initializers are all cut before the name is
+read.
+
+Proved end to end in a real browser rather than by argument: a derived box on the
+interfaces lesson renders `class Keeper` with its member row, hides the worked
+example as intended, and the row shows a tick the moment the solution is typed
+into Monaco. Then reverted it - candidates are for reading, and I had not read
+that one.
+
+30 ready, 48 body work, 56 needing a human. 453 tests, 0 validator errors.
