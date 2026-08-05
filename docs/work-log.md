@@ -1898,3 +1898,33 @@ against the worst of them.
 
 901 -> 73. Everything left is contrast inside the code-lab viz widgets, and as
 far as I can tell all of it is real.
+
+## 2026-08-05 11:24 - a compiler that could not start, and one branch too many
+
+Isaac hit a wall of SRI integrity errors on a build page. The cause was on
+disk, not in the code: `level3-app` held a mixed publish - `blazor.boot.json`
+from August 4, the assemblies from May 14 - so every hash the manifest declared
+disagreed with the bytes beside it, and the browser blocked all 200 of them.
+`dotnet.runtime.js` had been saying the same thing in its own words: "the
+version of dotnet.runtime.js is different from the version of dotnet.js". A
+clean `dotnet publish` replaced the lot, and all 200 hashes now match the bytes.
+The 404 on `Level3Capstone.styles.css` was the same fossil - the current host
+ships `CodeLabHost.styles.css`.
+
+That uncovered a second failure hiding behind the first. With the hashes fixed,
+the Run button still sat on "Starting compiler..." forever, and the only clue
+was a `crit:` line with `TypeError: Failed to fetch`. `InitAsync` runs from
+`OnAfterRenderAsync` on the very first render and re-downloads
+`blazor.boot.json` to discover the reference assemblies - while the Blazor
+loader may still be finishing with that same file. The browser aborts the
+duplicate, nothing caught it, the component died, and the button waited for a
+ready message that was never coming. It retries now. A transient abort at
+startup must not permanently disable the compiler.
+
+Worth noting how each was found: the mixed publish showed up by comparing file
+timestamps, and the boot race by checking whether it reproduced under both the
+python server and the audit's own - it did, which ruled out the harness and
+pointed straight at the app.
+
+Also folded `monaco-user-symbols` into the submodule's `master` and deleted it.
+It was a fast-forward, so nothing was lost. Work belongs on master.

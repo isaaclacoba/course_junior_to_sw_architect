@@ -2169,7 +2169,7 @@ ${result.runtimeError}`.trim(),
         const el = existing ?? document.createElement("div");
         el.className = "cl-mv-obj" + (o.dim ? " is-dim" : "");
         el.setAttribute("data-obj", o.id);
-        el.innerHTML = `<div class="cl-mv-oname">${o.type} <span style="color:#94a3b8">@${o.at ?? "heap"}</span></div>` + (o.fields ?? []).map((field) => {
+        el.innerHTML = `<div class="cl-mv-oname">${o.type} <span class="cl-mv-oat">@${o.at ?? "heap"}</span></div>` + (o.fields ?? []).map((field) => {
           const hot = (o.hotFields ?? []).includes(field[0]);
           return `<div class="cl-mv-field${hot ? " is-hot" : ""}">${field[0]} = ${field[1]}</div>`;
         }).join("");
@@ -3522,6 +3522,9 @@ ${result.runtimeError}`.trim(),
     const i = (lane % n + n) % n;
     return `var(--clg-lane-${i}, ${LANE_FALLBACK[i]})`;
   }
+  function laneChipVar(lane) {
+    return `color-mix(in srgb, ${laneVar(lane)} 70%, #000)`;
+  }
   function headCommit2(state) {
     if (state.head.kind === "detached") return state.head.commit;
     return state.refs.get(state.head.name) ?? null;
@@ -3721,7 +3724,7 @@ ${result.runtimeError}`.trim(),
           if (this.ghost.has(commit2)) pill.classList.add("cl-git-ghost");
           pill.textContent = chip.label;
           if (chip.kind === "branch") {
-            pill.style.background = laneVar(laneOf.get(commit2) ?? 0);
+            pill.style.background = laneChipVar(laneOf.get(commit2) ?? 0);
             pill.dataset.ref = `refs/heads/${chip.label}`;
           } else {
             pill.dataset.ref = `refs/tags/${chip.label}`;
