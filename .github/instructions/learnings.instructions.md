@@ -157,6 +157,48 @@ grows into a procedure, promote it to a skill and leave a pointer here.
   `{percent}` placeholder that `en.json` carried, so every path without loaded
   strings - including the tests - showed a label with no number in it.
 
+- **A sweep that prints nothing is indistinguishable from a hang.** Same rule as
+  the Run button, applied to our own tools. `ui-audit --all` is minutes long and
+  only prints at the end; it now writes a page counter to stderr, so stdout can
+  still be piped to a report.
+
+## Browser-driven checks
+
+Applies to `tools/ui-audit.mjs`, `tools/i18n-roundtrip.mjs` and anything else
+driving Chrome over CDP through `tools/lib/browser.mjs`.
+
+- **Never build in-page code as a template literal. Stringify a real function.**
+  A template literal processes escapes before the browser sees the code, so a
+  regex written `/\.\.\.|\d+\s*%/` arrives as `/...|d+s*%/`, where `...`
+  matches any three characters. A `stuck-control` check matched a button labelled
+  "Previous" that way. Write `async function probeFn(...)` and pass
+  `` `(${probeFn.toString()})(${JSON.stringify(args)})` `` - then there is no
+  escaping layer to get wrong.
+
+- **A finding that appears under the harness and not under
+  `python3 -m http.server` is the harness.** `startServer` was writing the head
+  without `Content-Length`; node fell back to chunked encoding and the Blazor
+  loader cancels its own `blazor.boot.json` when no length is declared. Every
+  build page looked like a hung compiler. Confirm against the plain server before
+  reporting a course defect.
+
+- **Never let a timeout decide whether the page is settled.** A rule that fires on
+  98 pages in a parallel sweep and on none of them individually is measuring
+  machine load, not the course. The animation cap was being beaten by a loaded
+  machine mid-fade. Ask the page for the state instead - "is an animation running
+  on this element" - because any cap loses to a slower machine.
+
+- **`background-color` is not what is painted.** A gradient paints too, and a
+  backdrop walk that reads only the colour goes straight past it to the body:
+  pale mint on a dark gradient card was reported as 1.29:1 against white, 123
+  times. Collect the gradient's colour stops and judge against the worst one.
+
+- **Know what actually removes an element from the tab order** before calling it a
+  focus trap: `display: none`, `visibility: hidden` and `[hidden]` all remove an
+  element *and its whole subtree* from sequential focus navigation. `opacity: 0`
+  and a zero-size box do not - those stay tabbable, and those are the defects. A
+  control that fades out with `opacity` alone needs `visibility` too.
+
 ## i18n
 
 - **Re-localize every dynamically-painted surface, not just render-time prose.**
