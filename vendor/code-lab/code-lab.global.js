@@ -3744,12 +3744,12 @@ ${result.runtimeError}`.trim(),
   function treeAt(s, h) {
     if (h === null) return /* @__PURE__ */ new Map();
     const c = s.commits.get(h);
-    return c ? new Map(c.blobs) : /* @__PURE__ */ new Map();
+    return c && c.blobs ? new Map(c.blobs) : /* @__PURE__ */ new Map();
   }
   function fileAt(s, h, path) {
     if (h === null) return null;
     const c = s.commits.get(h);
-    if (!c) return null;
+    if (!c || !c.blobs) return null;
     return c.blobs.has(path) ? c.blobs.get(path) : null;
   }
   function treeWithIndex(s, parent) {
@@ -4174,7 +4174,7 @@ ${result.runtimeError}`.trim(),
     const head = headCommit2(state);
     if (head !== null) {
       const c = state.commits.get(head);
-      if (c) for (const p of c.blobs.keys()) all.add(p);
+      if (c && c.blobs) for (const p of c.blobs.keys()) all.add(p);
     }
     return [...all].sort();
   }

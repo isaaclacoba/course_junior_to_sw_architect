@@ -33,5 +33,12 @@
   "task.3.summaryItems.4.title": "`git merge fix` - ",
   "task.3.summaryItems.4.text": "la misma línea en los dos casos, así que lee el grafo para ver cuál te tocó.",
   "task.3.summaryClose": "Siguiente: qué pasa cuando las dos partes cambiaron el mismo archivo y git se para a preguntarte.",
-  "meta.label": "Traer el trabajo de vuelta · Fusionar una rama de vuelta"
+  "meta.label": "Traer el trabajo de vuelta · Fusionar una rama de vuelta",
+  "task.1.files.0.text": "Mia, atigrada, 4 años.",
+  "task.1.files.1.text": "# Notas de mascotas\n\nMia ya está apuntada.\nRex sigue esperando en una rama.",
+  "task.1.files.2.text": "Rex, collie, 2 años.",
+  "task.2.files.0.text": "Mia, atigrada, 4 años.",
+  "task.2.files.1.text": "# Notas de mascotas\n\nMia ya está apuntada.\nRex sigue esperando en una rama.",
+  "task.2.files.2.text": "Rex, collie, 2 años.",
+  "task.2.files.3.text": "Comedero lleno a las 7 y a las 18."
 }

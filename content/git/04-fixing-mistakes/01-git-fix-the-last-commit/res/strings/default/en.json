@@ -15,7 +15,8 @@
   "task.2.context": "The last commit saved the feeder on its own. Amend rebuilds the commit from whatever is staged right now, so a file you stage first joins the commit you already made.\n\nMore than one file never made it in, and only one of them belongs with the feeder. Run `git status` to see what is waiting.",
   "task.2.goal.0": "Run `git status` to see what did not make it into the last commit.",
   "task.2.goal.1": "Stage only the file that belongs with the feeder.",
-  "task.2.goal.2": "Amend the commit with the message `set up the feeder`, and leave the other file untracked.",
+  "task.2.goal.2": "Read `git diff --staged` - it prints exactly what the amend will fold in.",
+  "task.2.goal.3": "Amend the commit with the message `set up the feeder`, and leave the other file untracked.",
   "task.3.title": "Fix the last commit - recap",
   "task.3.concept": "Recap",
   "task.3.context": "One command, and the last commit is a different commit.",
@@ -31,5 +32,11 @@
   "task.3.summaryClose": "Next: naming a commit without its hash, so you can point further back than the last one.",
   "concept.gt-amend.term": "Amending",
   "concept.gt-amend.def": "Replacing the commit you just made with a corrected one, rather than leaving the mistake in the history.",
-  "meta.label": "Fixing mistakes · Fix the last commit"
+  "meta.label": "Fixing mistakes · Fix the last commit",
+  "task.1.files.0.text": "Mia, tabby, 4 years old.",
+  "task.1.files.1.text": "Rex, collie, 2 years old.",
+  "task.2.files.0.text": "Mia, tabby, 4 years old.",
+  "task.2.files.1.text": "Dry food, refilled on Sundays.",
+  "task.2.files.2.text": "Water bowl, sits next to the feeder.",
+  "task.2.files.3.text": "TODO: book Mia in with the vet."
 }

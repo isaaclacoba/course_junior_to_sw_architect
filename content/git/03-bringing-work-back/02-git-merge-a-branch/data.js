@@ -41,7 +41,14 @@
         "Standing on `main`, merge the one that is missing from the log.",
         "Nothing new is saved and two names end up on one commit - that is a fast-forward."
       ],
-      files: ["cat.txt", "notes.md", "dog.txt"],
+      files: [
+        { path: "cat.txt", text: "Mia, tabby, 4 years old." },
+        {
+          path: "notes.md",
+          text: "# Pet notes\n\nMia is written up.\nRex is still waiting on a branch."
+        },
+        { path: "dog.txt", text: "Rex, collie, 2 years old." }
+      ],
       start: SPLIT,
       target: SPLIT.concat(["git merge fix"]),
       solution: [
@@ -61,7 +68,15 @@
         "A commit appears that neither branch had before.",
         "It has two parents - one line running back to each side."
       ],
-      files: ["cat.txt", "notes.md", "dog.txt", "feeder.txt"],
+      files: [
+        { path: "cat.txt", text: "Mia, tabby, 4 years old." },
+        {
+          path: "notes.md",
+          text: "# Pet notes\n\nMia is written up.\nRex is still waiting on a branch."
+        },
+        { path: "dog.txt", text: "Rex, collie, 2 years old." },
+        { path: "feeder.txt", text: "Feeder filled at 7am and 6pm." }
+      ],
       start: BOTH_MOVED,
       target: BOTH_MOVED.concat(["git merge fix"]),
       solution: [

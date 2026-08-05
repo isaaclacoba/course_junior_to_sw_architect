@@ -16,10 +16,15 @@
         "`git status` answers one question: what is going on in this folder right now. It lists what git is not tracking yet, and what you have staged for the next commit.\n\nThe folder holds `dog.txt` and `notes.md`. Only one of them belongs in this save - run `git status` and you will see both waiting.",
       goal: [
         "Run `git status` to see what is waiting.",
-        "Stage only `dog.txt` and commit it with `git commit -m \"add dog\"`.",
-        "Leave `notes.md` where it is."
+        "Stage only `dog.txt`, and leave `notes.md` where it is.",
+        "Run `git diff --staged` - it prints the lines you are about to save.",
+        "Commit them with `git commit -m \"add dog\"`."
       ],
-      files: ["dog.txt", "notes.md"],
+      files: [
+        { path: "dog.txt", text: "Rex, collie, 2 years old.\nWalks at seven, rain or shine." },
+        { path: "notes.md", text: "# Notes\n\nTODO: the vet's number goes here" },
+        { path: "cat.txt", text: "Mia, tabby, 4 years old." }
+      ],
       start: [
         "git add cat.txt",
         "git commit -m \"add cat\""
@@ -33,6 +38,7 @@
       solution: [
         "git status",
         "git add dog.txt",
+        "git diff --staged",
         "git commit -m \"add dog\""
       ]
     },
@@ -45,7 +51,12 @@
         "Run `git log --oneline` to read the three commits already here.",
         "Then add the next one: stage `feeder.txt` and commit it as `git commit -m \"fix the feeder\"`."
       ],
-      files: ["feeder.txt"],
+      files: [
+        { path: "feeder.txt", text: "Feeder: 8am and 6pm.\nThe timer ran an hour late - corrected." },
+        { path: "cat.txt", text: "Mia, tabby, 4 years old." },
+        { path: "dog.txt", text: "Rex, collie, 2 years old." },
+        { path: "bird.txt", text: "Pip, budgie, loud at 6am." }
+      ],
       start: [
         "git add cat.txt",
         "git commit -m \"add cat\"",

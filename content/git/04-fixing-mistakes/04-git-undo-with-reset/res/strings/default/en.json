@@ -10,6 +10,7 @@
   "task.1.goal.0": "Read `git log --oneline` and see how far back `add dog` is.",
   "task.1.goal.1": "Move `main` onto `add dog` with one `git reset`.",
   "task.1.goal.2": "`draft.txt` should end up staged, ready to go straight back in.",
+  "task.1.goal.3": "Read `git diff --staged` - it prints the lines that commit was holding, still there.",
   "task.2.title": "Put the file back in the folder instead",
   "task.2.concept": "git reset",
   "task.2.context": "Same mistake, a different wish. This time you are not sure `draft.txt` belongs in the next commit either, and you want to choose again before anything is saved.\n\nThe move back is the same one; only the mode changes. Pick the mode that empties the staging area and drops the file in the working tree.",
@@ -35,5 +36,14 @@
   "task.4.summaryItems.3.title": "`HEAD~1` - ",
   "task.4.summaryItems.3.text": "one step back from where you stand, so you never have to copy a hash to undo.",
   "task.4.summaryClose": "That is the whole elementary track: save work, split it, bring it back together, and move the labels when you get it wrong.",
-  "meta.label": "Fixing mistakes · Undo with reset"
+  "meta.label": "Fixing mistakes · Undo with reset",
+  "task.1.files.0.text": "Mia, tabby, 4 years old.",
+  "task.1.files.1.text": "Rex, collie, 2 years old.",
+  "task.1.files.2.text": "Bath day: Mia first, then Rex.\nTODO: nobody has asked the cat.",
+  "task.2.files.0.text": "Mia, tabby, 4 years old.",
+  "task.2.files.1.text": "Rex, collie, 2 years old.",
+  "task.2.files.2.text": "Bath day: Mia first, then Rex.\nTODO: nobody has asked the cat.",
+  "task.3.files.0.text": "Mia, tabby, 4 years old.",
+  "task.3.files.1.text": "Rex, collie, 2 years old.",
+  "task.3.files.2.text": "Bath day: Mia first, then Rex.\nTODO: nobody has asked the cat."
 }

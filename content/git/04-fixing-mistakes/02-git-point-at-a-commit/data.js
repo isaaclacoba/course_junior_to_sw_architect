@@ -27,7 +27,17 @@
     "git add fish.txt",
     "git commit -m \"add fish\""
   ];
-  const files = ["cat.txt", "dog.txt", "bird.txt", "fish.txt"];
+  // Each card gets its OWN objects: the resource binder writes the translated
+  // text onto them in place, so two cards sharing one array would overwrite
+  // each other.
+  function petFiles() {
+    return [
+      { path: "cat.txt", text: "Mia, tabby, 4 years old." },
+      { path: "dog.txt", text: "Rex, collie, 2 years old." },
+      { path: "bird.txt", text: "Pip, budgie, loud at 6am." },
+      { path: "fish.txt", text: "Bubbles, goldfish, 1 year old." }
+    ];
+  }
 
   const tasks = [
     {
@@ -40,7 +50,7 @@
         "Check the count with `git rev-parse main~<n>` before you use it.",
         "Put a branch called `old` on that commit with `git branch old main~<n>`, and stay on `main`."
       ],
-      files: files,
+      files: petFiles(),
       start: fourCommits,
       target: fourCommits.concat(["git branch old main~2"]),
       solution: [
@@ -59,7 +69,7 @@
         "Count the steps back from the tip and step onto it with `git checkout HEAD~<n>`.",
         "Read `git status` - it should say `HEAD detached`. `main` does not move."
       ],
-      files: files,
+      files: petFiles(),
       start: fourCommits,
       target: fourCommits.concat(["git checkout HEAD~1"]),
       solution: [

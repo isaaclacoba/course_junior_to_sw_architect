@@ -386,3 +386,25 @@ test("progress: malformed input reports rather than throws", () => {
   assert.equal(r.nextStep.kind, "malformed");
   assert.equal(r.union.commits.size, 0);
 });
+
+test("the union state keeps each commit's file contents for the board to show", () => {
+  // The board draws the UNION this module builds, and the file panel under the
+  // board reads contents out of it. Cloning a commit without `blobs` left every
+  // lesson whose files are already committed with an empty panel - and, before
+  // the reader was guarded, threw inside the controller, where the error was
+  // swallowed and nobody saw it.
+  const withBlobs = (state) => {
+    for (const c of state.commits.values()) {
+      c.blobs = new Map([["cat.txt", "Mia, " + c.message]]);
+      c.paths = ["cat.txt"];
+    }
+    return state;
+  };
+  const r = G.progress({ actual: withBlobs(base()), target: withBlobs(target()) }, { all: true });
+
+  assert.ok(r.union.commits.size > 0, "there is a union to draw");
+  for (const c of r.union.commits.values()) {
+    assert.ok(c.blobs instanceof Map, `commit "${c.message}" lost its contents in the clone`);
+    assert.equal(c.blobs.get("cat.txt"), "Mia, " + c.message);
+  }
+});

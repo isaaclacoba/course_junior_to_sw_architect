@@ -33,5 +33,12 @@
   "task.3.summaryItems.4.title": "`git merge fix` - ",
   "task.3.summaryItems.4.text": "the same line either way, so read the graph to see which one you got.",
   "task.3.summaryClose": "Next: what happens when both sides changed the same file, and git stops to ask you.",
-  "meta.label": "Bringing work back · Merge a branch back"
+  "meta.label": "Bringing work back · Merge a branch back",
+  "task.1.files.0.text": "Mia, tabby, 4 years old.",
+  "task.1.files.1.text": "# Pet notes\n\nMia is written up.\nRex is still waiting on a branch.",
+  "task.1.files.2.text": "Rex, collie, 2 years old.",
+  "task.2.files.0.text": "Mia, tabby, 4 years old.",
+  "task.2.files.1.text": "# Pet notes\n\nMia is written up.\nRex is still waiting on a branch.",
+  "task.2.files.2.text": "Rex, collie, 2 years old.",
+  "task.2.files.3.text": "Feeder filled at 7am and 6pm."
 }

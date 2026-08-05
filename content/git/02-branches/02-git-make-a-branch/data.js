@@ -23,7 +23,12 @@
         "Make a branch called `feature` at that commit. On its own, `git branch feature` would put it at `HEAD`.",
         "Stay on `main` - run `git branch` and check the `*` is still there."
       ],
-      files: ["cat.txt", "dog.txt", "bird.txt", "feeder.txt"],
+      files: [
+        { path: "cat.txt", text: "Mia, tabby, 4 years old." },
+        { path: "dog.txt", text: "Rex, collie, 2 years old." },
+        { path: "bird.txt", text: "Pip, budgie, loud at 6am." },
+        { path: "feeder.txt", text: "Feeder: 8am and 6pm.\nThe timer ran an hour late - corrected." }
+      ],
       start: [
         "git add cat.txt",
         "git commit -m \"add cat\"",
@@ -62,7 +67,11 @@
         "Make `feature` and step onto it with `git switch -c feature` - it starts where you are standing, so be standing in the right place.",
         "Stage `dog.txt` and save it with `git commit -m \"add dog\"`."
       ],
-      files: ["cat.txt", "readme.md", "dog.txt"],
+      files: [
+        { path: "cat.txt", text: "Mia, tabby, 4 years old." },
+        { path: "readme.md", text: "# Pet notes\n\nOne file per animal." },
+        { path: "dog.txt", text: "Rex, collie, 2 years old." }
+      ],
       start: [
         "git add cat.txt",
         "git commit -m \"add cat\"",

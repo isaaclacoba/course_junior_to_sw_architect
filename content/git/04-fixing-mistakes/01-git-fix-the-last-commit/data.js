@@ -6,8 +6,12 @@
 // amending the older one is graded off-plan.
 //
 // Card two seeds two uncommitted files and names neither in the goal, so
-// `git status` is what tells the learner which one belongs with the feeder.
-// Staging both fails on commit paths (kernel/grading/state-match.js).
+// `git status` is what tells the learner which one belongs with the feeder -
+// and their contents are the evidence for which one that is. Staging both fails
+// on commit paths (kernel/grading/state-match.js). `git diff --staged` sits
+// between the add and the amend because it is the only point in either card
+// where a diff has anything to print: everything else here is either untracked
+// (never in a diff) or already committed.
 //
 // Card two deliberately changes the message as well as the file list. Grading
 // identifies a commit by message plus parent shape (kernel/grading/dag-match.js),
@@ -31,7 +35,10 @@
         "Amend the one on top so the animal is spelled properly.",
         "Leave the other typo alone; the history stays two commits long."
       ],
-      files: ["cat.txt", "dog.txt"],
+      files: [
+        { path: "cat.txt", text: "Mia, tabby, 4 years old." },
+        { path: "dog.txt", text: "Rex, collie, 2 years old." }
+      ],
       start: [
         "git add cat.txt",
         "git commit -m \"add ct\"",
@@ -58,9 +65,15 @@
       goal: [
         "Run `git status` to see what did not make it into the last commit.",
         "Stage only the file that belongs with the feeder.",
+        "Read `git diff --staged` - it prints exactly what the amend will fold in.",
         "Amend the commit with the message `set up the feeder`, and leave the other file untracked."
       ],
-      files: ["cat.txt", "feeder.txt", "bowl.txt", "notes.txt"],
+      files: [
+        { path: "cat.txt", text: "Mia, tabby, 4 years old." },
+        { path: "feeder.txt", text: "Dry food, refilled on Sundays." },
+        { path: "bowl.txt", text: "Water bowl, sits next to the feeder." },
+        { path: "notes.txt", text: "TODO: book Mia in with the vet." }
+      ],
       start: [
         "git add cat.txt",
         "git commit -m \"add cat\"",
@@ -77,6 +90,7 @@
       solution: [
         "git status",
         "git add bowl.txt",
+        "git diff --staged",
         "git commit --amend -m \"set up the feeder\""
       ]
     },

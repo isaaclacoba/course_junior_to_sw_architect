@@ -31,5 +31,13 @@
   "task.3.summaryClose": "Next: what `reset` actually moves - now that you can name the commit to move it to.",
   "concept.gt-detached-head.term": "Detached HEAD",
   "concept.gt-detached-head.def": "Standing on a commit directly instead of on a branch, so a commit made there has no branch name holding on to it.",
-  "meta.label": "Fixing mistakes · Point at any commit"
+  "meta.label": "Fixing mistakes · Point at any commit",
+  "task.1.files.0.text": "Mia, tabby, 4 years old.",
+  "task.1.files.1.text": "Rex, collie, 2 years old.",
+  "task.1.files.2.text": "Pip, budgie, loud at 6am.",
+  "task.1.files.3.text": "Bubbles, goldfish, 1 year old.",
+  "task.2.files.0.text": "Mia, tabby, 4 years old.",
+  "task.2.files.1.text": "Rex, collie, 2 years old.",
+  "task.2.files.2.text": "Pip, budgie, loud at 6am.",
+  "task.2.files.3.text": "Bubbles, goldfish, 1 year old."
 }

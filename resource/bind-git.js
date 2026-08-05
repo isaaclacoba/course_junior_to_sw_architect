@@ -73,11 +73,16 @@
       // so a card that declares no text key keeps whatever its data file
       // inlined - and a card that does declare one must declare it in every
       // language, or switching back leaves the file stuck in the other one.
+      //
+      // This REPLACES the array rather than writing into the objects. Two cards
+      // that share one `files` const - an obvious thing to author, and it has
+      // been authored twice already - would otherwise end up sharing one card's
+      // text, because mutating in place mutates the other card's file too.
       if (Array.isArray(t.files)) {
-        t.files.forEach(function (f, k) {
-          if (!f || typeof f !== "object") return;
+        t.files = t.files.map(function (f, k) {
+          if (!f || typeof f !== "object") return f;
           var text = R.get("task." + n + ".files." + k + ".text");
-          if (text !== undefined) f.text = text;
+          return { path: f.path, text: text === undefined ? f.text : text };
         });
       }
       if (t.summary) {

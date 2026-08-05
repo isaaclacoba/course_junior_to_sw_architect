@@ -18,7 +18,12 @@
         "Pin the next version number to the commit you are standing on.",
         "Move nothing else - stay on the same branch and commit."
       ],
-      files: ["cat.txt", "feeder.txt", "bowl.txt", "timer.txt"],
+      files: [
+        { path: "cat.txt", text: "Mia, tabby, 4 years old." },
+        { path: "feeder.txt", text: "Feeder v1: two meals a day, 8am and 6pm." },
+        { path: "bowl.txt", text: "The water bowl leaked when full.\nFixed - fill only to the line." },
+        { path: "timer.txt", text: "Timer, new in v2.\nSkips the evening meal at weekends." }
+      ],
       start: [
         "git add cat.txt",
         "git commit -m \"add cat\"",
@@ -59,7 +64,12 @@
         "Pin `v0` to the very first commit, at the bottom of the log.",
         "Do not move `HEAD` and do not move any branch."
       ],
-      files: ["cat.txt", "dog.txt", "feeder.txt", "bowl.txt"],
+      files: [
+        { path: "cat.txt", text: "Mia, tabby, 4 years old." },
+        { path: "dog.txt", text: "Rex, collie, 2 years old." },
+        { path: "feeder.txt", text: "Feeder v1: two meals a day, 8am and 6pm." },
+        { path: "bowl.txt", text: "# Water bowl\n\nTODO: nothing built yet." }
+      ],
       start: [
         "git add cat.txt",
         "git commit -m \"add cat\"",

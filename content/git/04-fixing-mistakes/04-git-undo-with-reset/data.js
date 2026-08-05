@@ -18,7 +18,18 @@
 (function () {
   "use strict";
 
-  const FILES = ["cat.txt", "dog.txt", "draft.txt"];
+  // A fresh copy per card: the resource layer writes the translated text onto
+  // these objects, so three cards sharing one array would share one text.
+  // `draft.txt` is the file the whole lesson moves, and it reads as unfinished -
+  // that is what the file panel shows sitting in staging, in the folder, or gone.
+  const files = () => [
+    { path: "cat.txt", text: "Mia, tabby, 4 years old." },
+    { path: "dog.txt", text: "Rex, collie, 2 years old." },
+    {
+      path: "draft.txt",
+      text: "Bath day: Mia first, then Rex.\nTODO: nobody has asked the cat."
+    }
+  ];
 
   const THREE_COMMITS = [
     "git add cat.txt",
@@ -38,15 +49,17 @@
       goal: [
         "Read `git log --oneline` and see how far back `add dog` is.",
         "Move `main` onto `add dog` with one `git reset`.",
-        "`draft.txt` should end up staged, ready to go straight back in."
+        "`draft.txt` should end up staged, ready to go straight back in.",
+        "Read `git diff --staged` - it prints the lines that commit was holding, still there."
       ],
-      files: FILES,
+      files: files(),
       start: THREE_COMMITS,
       target: THREE_COMMITS.concat(["git reset --soft HEAD~1"]),
       solution: [
         "git log --oneline",
         "git reset --soft HEAD~1",
-        "git status"
+        "git status",
+        "git diff --staged"
       ]
     },
     {
@@ -59,7 +72,7 @@
         "Move `main` there with a `git reset` that leaves nothing staged.",
         "`draft.txt` should sit in the working tree when you are done."
       ],
-      files: FILES,
+      files: files(),
       start: THREE_COMMITS,
       target: THREE_COMMITS.concat(["git reset --mixed HEAD~1"]),
       solution: [
@@ -78,7 +91,7 @@
         "Move `main` there and keep nothing - nothing staged, and no `draft.txt` in the folder.",
         "`git status` should show nothing waiting in either zone."
       ],
-      files: FILES,
+      files: files(),
       start: THREE_COMMITS,
       target: THREE_COMMITS.concat(["git reset --hard HEAD~1"]),
       solution: [

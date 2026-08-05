@@ -185,7 +185,11 @@
       id: id,
       parents: parents,
       message: c.message,
-      paths: Array.isArray(c.paths) ? c.paths.slice() : []
+      paths: Array.isArray(c.paths) ? c.paths.slice() : [],
+      // Carry the contents through. Nothing in here reads them - identity and
+      // ghosting are shape-only - but this clone IS the state the board draws,
+      // and the file panel under the board has nothing to show without them.
+      blobs: c.blobs
     };
   }
 

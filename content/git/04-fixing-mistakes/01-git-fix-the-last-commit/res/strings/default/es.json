@@ -15,7 +15,8 @@
   "task.2.context": "El último commit guardó el comedero él solo. Enmendar reconstruye el commit con lo que haya preparado en ese momento, así que un archivo que prepares antes se une al commit que ya hiciste.\n\nHay más de un archivo que no llegó a entrar, y solo uno de ellos va con el comedero. Ejecuta `git status` para ver qué hay esperando.",
   "task.2.goal.0": "Ejecuta `git status` para ver qué no entró en el último commit.",
   "task.2.goal.1": "Prepara solo el archivo que va con el comedero.",
-  "task.2.goal.2": "Enmienda el commit con el mensaje `set up the feeder`, y deja el otro archivo sin seguimiento.",
+  "task.2.goal.2": "Lee `git diff --staged` - imprime exactamente lo que va a meter la enmienda.",
+  "task.2.goal.3": "Enmienda el commit con el mensaje `set up the feeder`, y deja el otro archivo sin seguimiento.",
   "task.3.title": "Arreglar el último commit - repaso",
   "task.3.concept": "Repaso",
   "task.3.context": "Un comando, y el último commit es otro commit.",
@@ -31,5 +32,11 @@
   "task.3.summaryClose": "A continuación: nombrar un commit sin su hash, para poder apuntar más atrás del último.",
   "concept.gt-amend.term": "Enmendar un commit",
   "concept.gt-amend.def": "Reemplazar el commit que acabas de hacer por uno corregido, en vez de dejar el fallo en la historia.",
-  "meta.label": "Arreglar errores · Arreglar el último commit"
+  "meta.label": "Arreglar errores · Arreglar el último commit",
+  "task.1.files.0.text": "Mia, atigrada, 4 años.",
+  "task.1.files.1.text": "Rex, collie, 2 años.",
+  "task.2.files.0.text": "Mia, atigrada, 4 años.",
+  "task.2.files.1.text": "Pienso seco, se rellena los domingos.",
+  "task.2.files.2.text": "Cuenco de agua, al lado del comedero.",
+  "task.2.files.3.text": "PENDIENTE: pedir cita con el veterinario para Mia."
 }

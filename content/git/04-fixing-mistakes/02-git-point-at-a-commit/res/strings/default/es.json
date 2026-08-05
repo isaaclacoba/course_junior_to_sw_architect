@@ -31,5 +31,13 @@
   "task.3.summaryClose": "A continuación: qué mueve `reset` en realidad - ahora que sabes nombrar el commit al que moverlo.",
   "concept.gt-detached-head.term": "HEAD desacoplado",
   "concept.gt-detached-head.def": "Estar en un commit directamente en vez de en una rama, así que un commit hecho ahí no tiene ningún nombre de rama que lo sujete.",
-  "meta.label": "Arreglar errores · Apuntar a cualquier commit"
+  "meta.label": "Arreglar errores · Apuntar a cualquier commit",
+  "task.1.files.0.text": "Mia, atigrada, 4 años.",
+  "task.1.files.1.text": "Rex, collie, 2 años.",
+  "task.1.files.2.text": "Pip, periquito, ruidoso a las 6.",
+  "task.1.files.3.text": "Bubbles, pez de colores, 1 año.",
+  "task.2.files.0.text": "Mia, atigrada, 4 años.",
+  "task.2.files.1.text": "Rex, collie, 2 años.",
+  "task.2.files.2.text": "Pip, periquito, ruidoso a las 6.",
+  "task.2.files.3.text": "Bubbles, pez de colores, 1 año."
 }

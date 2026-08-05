@@ -234,3 +234,21 @@ test("localizing contents never touches the command lists", () => {
   assert.deepEqual(plain(cfg.tasks[0].solution), ["git branch fix"], "solution stays English");
   assert.deepEqual(plain(cfg.tasks[0].target), ['git commit -m "init"', "git branch fix"]);
 });
+
+test("two cards sharing one files array do not end up sharing one card's text", () => {
+  // Authoring a `const FILES = [...]` and pointing every card at it is the
+  // obvious thing to do, and two authors have now done it. Writing the
+  // translation INTO those objects gives card 2's text to card 1 as well.
+  const bind = loadBindGit();
+  const shared = [{ path: "draft.txt", text: "inlined" }];
+  const cfg = { tasks: [gitTask({ files: shared }), gitTask({ files: shared })] };
+
+  bind.apply(fakeR({
+    "task.1.files.0.text": "card one text",
+    "task.2.files.0.text": "card two text",
+  }), { config: cfg });
+
+  assert.equal(plain(cfg.tasks[0].files[0]).text, "card one text");
+  assert.equal(plain(cfg.tasks[1].files[0]).text, "card two text");
+  assert.equal(shared[0].text, "inlined", "the authored array itself is left alone");
+});

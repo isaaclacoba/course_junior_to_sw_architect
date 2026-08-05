@@ -10,6 +10,7 @@
   "task.1.goal.0": "Lee `git log --oneline` y mira cuánto queda hacia atrás `add dog`.",
   "task.1.goal.1": "Mueve `main` hasta `add dog` con un solo `git reset`.",
   "task.1.goal.2": "`draft.txt` debe acabar preparado, listo para volver a entrar.",
+  "task.1.goal.3": "Lee `git diff --staged` - imprime las líneas que guardaba ese commit, ahí siguen.",
   "task.2.title": "Devuelve el archivo a la carpeta",
   "task.2.concept": "git reset",
   "task.2.context": "El mismo error, otro deseo. Esta vez tampoco tienes claro que `draft.txt` vaya en el próximo commit, y quieres volver a elegir antes de guardar nada.\n\nEl movimiento hacia atrás es el mismo; lo único que cambia es el modo. Elige el modo que vacía el área de preparación y suelta el archivo en el árbol de trabajo.",
@@ -35,5 +36,14 @@
   "task.4.summaryItems.3.title": "`HEAD~1` - ",
   "task.4.summaryItems.3.text": "un paso atrás desde donde estás, así que nunca tienes que copiar un hash para deshacer.",
   "task.4.summaryClose": "Ese es el recorrido elemental completo: guardar el trabajo, separarlo, volver a juntarlo y mover las etiquetas cuando te equivocas.",
-  "meta.label": "Arreglar errores · Deshacer con reset"
+  "meta.label": "Arreglar errores · Deshacer con reset",
+  "task.1.files.0.text": "Mia, atigrada, 4 años.",
+  "task.1.files.1.text": "Rex, collie, 2 años.",
+  "task.1.files.2.text": "Día de baño: primero Mia, luego Rex.\nPENDIENTE: nadie se lo ha preguntado a la gata.",
+  "task.2.files.0.text": "Mia, atigrada, 4 años.",
+  "task.2.files.1.text": "Rex, collie, 2 años.",
+  "task.2.files.2.text": "Día de baño: primero Mia, luego Rex.\nPENDIENTE: nadie se lo ha preguntado a la gata.",
+  "task.3.files.0.text": "Mia, atigrada, 4 años.",
+  "task.3.files.1.text": "Rex, collie, 2 años.",
+  "task.3.files.2.text": "Día de baño: primero Mia, luego Rex.\nPENDIENTE: nadie se lo ha preguntado a la gata."
 }
