@@ -9,10 +9,10 @@
   "concept.gt-abort.def": "Calling a stopped merge off and going back to how things were before you started it.",
   "task.1.title": "Finish the stopped merge",
   "task.1.concept": "git add (mark it settled)",
-  "task.1.context": "`fix` and `main` each changed `cat.txt` since the split, so `git merge fix` stops and saves nothing.\n\nMid-merge, `git add cat.txt` does not stage a change - it tells git that file is settled. Then `git commit` writes the merge commit that was waiting on you.",
+  "task.1.context": "Both branches rewrote the same line of `cat.txt`, so `git merge fix` stops and saves nothing. Git will not choose between them for you.\n\nIt writes both versions into the file, wrapped in markers, with the original line between them so you can see what it was. Your job is to leave the text you want and delete the rest. Then `git add cat.txt` says that file is settled, and `git commit` writes the merge commit that was waiting on you.",
   "task.1.goal.0": "Standing on `main`, run `git merge fix` and read what it prints.",
-  "task.1.goal.1": "Say `cat.txt` is settled with `git add cat.txt`.",
-  "task.1.goal.2": "Finish with `git commit -m \"merge fix\"` - it lands with two parents.",
+  "task.1.goal.1": "Read `cat.txt` in the panel, then keep the line you want and drop the markers: `echo -e \"Mia, tabby, 4 years old.\\nSleeps on the keyboard.\\nFed at seven.\" > cat.txt`.",
+  "task.1.goal.2": "Say it is settled with `git add cat.txt`.",
   "task.2.title": "Call one off instead",
   "task.2.concept": "git merge --abort",
   "task.2.context": "Same two branches, and this time the merge is already stopped - `git status` will show `cat.txt` unmerged.\n\nYou do not have to finish it. `git merge --abort` puts everything back to how it was before you started. Then pin a name on the commit you are left standing on, so this spot is easy to find again.",
@@ -31,5 +31,10 @@
   "task.3.summaryItems.2.text": "finishes the paused merge, saving the commit with two parents.",
   "task.3.summaryItems.3.title": "`git merge --abort` - ",
   "task.3.summaryItems.3.text": "calls the whole merge off and leaves you exactly where you started it.",
-  "task.3.summaryClose": "Next: fixing the commit you just made, instead of piling an `oops` on top of it."
+  "task.3.summaryClose": "Next: fixing the commit you just made, instead of piling an `oops` on top of it.",
+  "task.1.goal.3": "Finish with `git commit -m \"merge fix\"` - it lands with two parents.",
+  "task.1.files.0.text": "Rex, collie, 2 years old.",
+  "task.1.files.1.text": "Mia, tabby, 4 years old.\nSleeps somewhere warm.\nFed at seven.",
+  "task.2.files.0.text": "Rex, collie, 2 years old.",
+  "task.2.files.1.text": "Mia, tabby, 4 years old.\nSleeps somewhere warm.\nFed at seven."
 }

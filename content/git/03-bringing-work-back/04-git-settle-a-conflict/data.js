@@ -18,15 +18,27 @@
 (function () {
   "use strict";
 
+  const CAT_BASE = "Mia, tabby, 4 years old.\nSleeps somewhere warm.\nFed at seven.";
+  const CAT_MAIN = "Mia, tabby, 4 years old.\nSleeps in the sun.\nFed at seven.";
+  const CAT_FIX = "Mia, tabby, 4 years old.\nSleeps on the keyboard.\nFed at seven.";
+
+  // Both branches rewrite the SAME line of cat.txt, which is what a conflict
+  // actually is - git compares the text, not the filename. The learner never
+  // sees this replay; they arrive to find two branches that disagree.
   const COLLIDE = [
     "git add dog.txt",
     "git commit -m \"add dog\"",
     "git add cat.txt",
-    "git commit -m \"cat sleeps in the sun\"",
+    "git commit -m \"add cat\"",
     "git branch fix",
-    "git reset --mixed HEAD~1",
+    "echo -e \"" + CAT_MAIN + "\" > cat.txt",
     "git add cat.txt",
-    "git commit -m \"cat is hungry\""
+    "git commit -m \"cat sleeps in the sun\"",
+    "git checkout fix",
+    "echo -e \"" + CAT_FIX + "\" > cat.txt",
+    "git add cat.txt",
+    "git commit -m \"cat sleeps on the keyboard\"",
+    "git checkout main"
   ];
 
   const STOPPED = COLLIDE.concat(["git merge fix"]);
@@ -36,21 +48,34 @@
       title: "Finish the stopped merge",
       concept: "git add (mark it settled)",
       context:
-        "`fix` and `main` each changed `cat.txt` since the split, so `git merge fix` stops and saves nothing.\n\nMid-merge, `git add cat.txt` does not stage a change - it tells git that file is settled. Then `git commit` writes the merge commit that was waiting on you.",
+        "Both branches rewrote the same line of `cat.txt`, so `git merge fix` stops and saves nothing. Git will not choose between them for you.\n\nIt writes both versions into the file, wrapped in markers, with the original line between them so you can see what it was. Your job is to leave the text you want and delete the rest. Then `git add cat.txt` says that file is settled, and `git commit` writes the merge commit that was waiting on you.",
       goal: [
         "Standing on `main`, run `git merge fix` and read what it prints.",
-        "Say `cat.txt` is settled with `git add cat.txt`.",
+        "Read `cat.txt` in the panel, then keep the line you want and drop the markers: `echo -e \"Mia, tabby, 4 years old.\\nSleeps on the keyboard.\\nFed at seven.\" > cat.txt`.",
+        "Say it is settled with `git add cat.txt`.",
         "Finish with `git commit -m \"merge fix\"` - it lands with two parents."
       ],
-      files: ["dog.txt", "cat.txt"],
+      goals: [
+        { code: ["git merge fix", { row: "still on main", head: "main" }, { row: "cat.txt needs settling", worktree: ["cat.txt"] }],
+          gate: { ran: "git merge fix" } },
+        { code: ["rewrite cat.txt", "markers gone"], gate: { ran: "echo" } },
+        { code: ["git add cat.txt"], gate: { ran: "git add cat.txt" } },
+        { code: ["commit `merge fix`", "two parents"], gate: { commit: "merge fix", parents: 2 } }
+      ],
+      files: [
+        { path: "dog.txt", text: "Rex, collie, 2 years old." },
+        { path: "cat.txt", text: CAT_BASE }
+      ],
       start: COLLIDE,
       target: COLLIDE.concat([
         "git merge fix",
+        "echo -e \"" + CAT_FIX + "\" > cat.txt",
         "git add cat.txt",
         "git commit -m \"merge fix\""
       ]),
       solution: [
         "git merge fix",
+        "echo -e \"" + CAT_FIX + "\" > cat.txt",
         "git add cat.txt",
         "git commit -m \"merge fix\""
       ]
@@ -65,7 +90,16 @@
         "Call the merge off with `git merge --abort`.",
         "Pin the commit you are on with `git tag before-merge`."
       ],
-      files: ["dog.txt", "cat.txt"],
+      goals: [
+        { code: ["git status", { row: "cat.txt is unmerged", worktree: ["cat.txt"] }], gate: { ran: "git status" } },
+        { code: ["git merge --abort"], gate: { ran: "git merge --abort" } },
+        { code: ["tag before-merge", { row: "points at HEAD", tag: "before-merge", at: "HEAD" }],
+          gate: { tag: "before-merge" } }
+      ],
+      files: [
+        { path: "dog.txt", text: "Rex, collie, 2 years old." },
+        { path: "cat.txt", text: CAT_BASE }
+      ],
       start: STOPPED,
       target: COLLIDE.concat(["git tag before-merge"]),
       solution: [

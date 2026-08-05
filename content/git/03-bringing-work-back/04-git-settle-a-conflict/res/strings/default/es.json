@@ -9,10 +9,10 @@
   "concept.gt-abort.def": "Dejar sin efecto una fusión detenida y volver a como estaban las cosas antes de empezarla.",
   "task.1.title": "Termina la fusión detenida",
   "task.1.concept": "git add (marcar como resuelto)",
-  "task.1.context": "`fix` y `main` cambiaron `cat.txt` cada una desde la separación, así que `git merge fix` se detiene y no guarda nada.\n\nDurante la fusión, `git add cat.txt` no prepara un cambio - le dice a git que ese archivo queda resuelto. Después `git commit` escribe el commit de fusión que te estaba esperando.",
-  "task.1.goal.0": "Estando en `main`, ejecuta `git merge fix` y lee lo que imprime.",
-  "task.1.goal.1": "Di que `cat.txt` queda resuelto con `git add cat.txt`.",
-  "task.1.goal.2": "Termina con `git commit -m \"merge fix\"` - cae con dos padres.",
+  "task.1.context": "Las dos ramas reescribieron la misma línea de `cat.txt`, así que `git merge fix` se para y no guarda nada. Git no va a elegir por ti.\n\nEscribe las dos versiones dentro del archivo, entre marcas, con la línea original en medio para que veas cómo era. Tu trabajo es dejar el texto que quieres y borrar el resto. Luego `git add cat.txt` dice que ese archivo está resuelto, y `git commit` escribe el commit de fusión que te estaba esperando.",
+  "task.1.goal.0": "Desde `main`, ejecuta `git merge fix` y lee lo que imprime.",
+  "task.1.goal.1": "Lee `cat.txt` en el panel, y deja la línea que quieras quitando las marcas: `echo -e \"Mia, tabby, 4 years old.\\nSleeps on the keyboard.\\nFed at seven.\" > cat.txt`.",
+  "task.1.goal.2": "Di que está resuelto con `git add cat.txt`.",
   "task.2.title": "Cancélala en vez de terminarla",
   "task.2.concept": "git merge --abort",
   "task.2.context": "Las mismas dos ramas, y esta vez la fusión ya está detenida - `git status` mostrará `cat.txt` sin fusionar.\n\nNo tienes por qué terminarla. `git merge --abort` lo deja todo como estaba antes de empezar. Después pon un nombre al commit en el que te quedas, para volver a encontrar este punto con facilidad.",
@@ -31,5 +31,10 @@
   "task.3.summaryItems.2.text": "termina la fusión en pausa y guarda el commit con dos padres.",
   "task.3.summaryItems.3.title": "`git merge --abort` - ",
   "task.3.summaryItems.3.text": "cancela la fusión entera y te deja exactamente donde la empezaste.",
-  "task.3.summaryClose": "Siguiente: arreglar el commit que acabas de hacer, en vez de amontonar un `oops` encima."
+  "task.3.summaryClose": "Siguiente: arreglar el commit que acabas de hacer, en vez de amontonar un `oops` encima.",
+  "task.1.goal.3": "Termina con `git commit -m \"merge fix\"` - aterriza con dos padres.",
+  "task.1.files.0.text": "Rex, collie, 2 años.",
+  "task.1.files.1.text": "Mia, atigrada, 4 años.\nDuerme en algún sitio calentito.\nCome a las siete.",
+  "task.2.files.0.text": "Rex, collie, 2 años.",
+  "task.2.files.1.text": "Mia, atigrada, 4 años.\nDuerme en algún sitio calentito.\nCome a las siete."
 }

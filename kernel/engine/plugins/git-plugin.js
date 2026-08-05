@@ -88,6 +88,22 @@
     }
     return null;
   }
+  function trackerWidget() {
+    var g = typeof globalThis !== "undefined" ? globalThis : null;
+    if (g && g.KernelGoalTracker) return g.KernelGoalTracker;
+    if (typeof require === "function") {
+      try { return require("../widgets/goal-tracker.js"); } catch (e) {}
+    }
+    return null;
+  }
+  function gitGoals() {
+    var g = typeof globalThis !== "undefined" ? globalThis : null;
+    if (g && g.KernelGitGoals) return g.KernelGitGoals;
+    if (typeof require === "function") {
+      try { return require("../widgets/git-goal-provider.js"); } catch (e) {}
+    }
+    return null;
+  }
   function fill(tpl, vars) {
     var LC = resolveLC();
     return LC && LC.fill ? LC.fill(tpl, vars) : tpl;
@@ -149,7 +165,69 @@
     var injected = ctx && ctx.cfg && ctx.cfg.shell;
     if (injected) return injected;
     if (!CL.Shell || typeof CL.createGitCommand !== "function") return null;
-    return new CL.Shell().register(CL.createGitCommand());
+    var shell = new CL.Shell().register(CL.createGitCommand());
+    // `echo ... > file` is how anything changes what is INSIDE a file. Without
+    // it a learner can move files between zones but never edit one, so they
+    // cannot settle a conflict by hand and `git diff` has nothing to show.
+    // Registered defensively: an older vendored bundle simply will not have it.
+    if (typeof CL.createEchoCommand === "function") shell.register(CL.createEchoCommand());
+    return shell;
+  }
+
+  // ---- the live goal tracker -----------------------------------------------
+  // The panel itself is kernel/engine/widgets/goal-tracker.js - the same widget
+  // the C# track paints with - and the git meaning of a goal is
+  // kernel/engine/widgets/git-goal-provider.js. The plugin only says WHEN to
+  // repaint and hands over what the provider reads: the repository, and the
+  // commands run on this card.
+  //
+  // The tracker is a GUIDE, never a grade. XP still comes from reaching the
+  // authored target.
+  //
+  // OFF ON THE GIT TRACK FOR NOW (owner's call, 2026-08-05): a git lesson already
+  // shows the learner a live commit graph, and a second live panel next to it was
+  // more than the page needed. The machinery all stays - the widget, the provider,
+  // the gate policy, the authored `goals` and the validator that proves they can
+  // tick - so nothing rots while the git visual is settled. Flip this one flag to
+  // bring the panel back; the goal prose renders as plain bullets meanwhile.
+  var TRACKER_ON = false;
+
+  function tracker(surface) {
+    if (!TRACKER_ON) return null;
+    var W = trackerWidget();
+    var host = surface.ctx.hosts.goal;
+    if (!W || !host) return null;
+    if (!surface.tracker || surface.trackerHost !== host) {
+      surface.tracker = W.create({
+        host: host,
+        provider: gitGoals(),
+        escapeHtml: surface.ctx.helpers.escapeHtml,
+      });
+      surface.trackerHost = host;
+    }
+    return surface.tracker;
+  }
+
+  // Snapshot the freshly painted (and freshly localized) goal prose, then set the
+  // goals the tracker paints. Called on every render and every locale swap,
+  // BEFORE the first sync of that card - once the tracker has painted, the list
+  // holds boxes, and capturing then would snapshot its own ticks.
+  function captureGoals(surface) {
+    var t = tracker(surface);
+    if (!t) return;
+    var goals = (surface.task && surface.task.goals) || [];
+    t.capture().setGoals(goals);
+    if (!goals.length) t.clear();
+  }
+
+  // Repaint the goal panel. Runs after every command, so a read the card asked
+  // for ticks the moment it is run.
+  function syncTracker(surface) {
+    var task = surface.task;
+    if (!task || !(task.goals && task.goals.length)) return;
+    var t = tracker(surface);
+    if (!t) return;
+    t.sync({ state: surface.state, ran: surface.ran || [], passed: !!surface.solved });
   }
 
   // ---- the single canvas ---------------------------------------------------
@@ -253,6 +331,8 @@
         target: null,
         showAll: false,
         progress: null,
+        ran: [],
+        solved: false,
         targetBtn: makeTargetButton(ctx),
       };
 
@@ -300,9 +380,16 @@
       surface.start = toState(CL, startOf(task), files);
       surface.target = toState(CL, targetOf(task), files);
       surface.state = surface.start;
+      // A fresh exercise has been read by nobody yet, and nothing is solved.
+      surface.ran = [];
+      surface.solved = false;
       if (surface.terminal) surface.terminal.clear();
       labelTarget(surface);
+      // The core has just painted this card's goal list; snapshot it before the
+      // tracker writes its own boxes over the top.
+      captureGoals(surface);
       paint(surface, false);
+      syncTracker(surface);
     },
 
     // One learner line. This IS the grading loop - there is no Check button, so
@@ -326,7 +413,14 @@
       if (surface.terminal && res && res.output) {
         surface.terminal.write(res.output, res.error ? "err" : "out");
       }
+      // Record the line whether it worked or not: `ran` answers "has this been
+      // run", and a card that asks the learner to READ something is satisfied by
+      // the reading. A command that errored told them something too.
+      if (!surface.ran) surface.ran = [];
+      surface.ran.push(line);
       var p = paint(surface, true);
+      surface.solved = !!p.solved;
+      syncTracker(surface);
       surface.ctx.report({
         ok: p.solved,
         reason: p.reason,
@@ -355,12 +449,17 @@
       var t = task || surface.task;
       if (!t) return;
       surface.state = surface.start || toState(codeLab(), startOf(t), filesOf(t));
+      // Reset restarts the exercise, so the reads go with it - a tick has to be
+      // something the learner did in the attempt they are now on.
+      surface.ran = [];
+      surface.solved = false;
       if (surface.terminal) {
         surface.terminal.clear();
         surface.terminal.focus();
       }
       if (surface.ctx.hosts.result) surface.ctx.hosts.result.hidden = true;
       paint(surface, false);
+      syncTracker(surface);
     },
 
     // Ghost depth toggle: the whole target, or only the next step (the default,
@@ -370,6 +469,7 @@
       surface.showAll = !surface.showAll;
       labelTarget(surface);
       paint(surface, true);
+      syncTracker(surface);
     },
 
     // The core re-localizes its own chrome; the only label the plugin owns is
@@ -378,6 +478,10 @@
     setLocale: function (surface) {
       if (!surface || surface.inert) return;
       labelTarget(surface);
+      // The core repainted the goal list in the new language, so the snapshot the
+      // ticks are rebuilt from has to be retaken before they go back on.
+      captureGoals(surface);
+      syncTracker(surface);
     },
   };
 
