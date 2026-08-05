@@ -22,22 +22,57 @@ and two lessons state falsehoods. Fix all three without growing past 16 lessons.
 
 ## Plan
 
-- [ ] **P0** Correct the false sentence in `git-undo-with-reset` - `--hard` is
-      recoverable via `reflog`. Three files, no engine.
-- [ ] **P1** Every practical card becomes 3-6 commands with a read that changes
-      what comes next. Per-card specs in the design doc.
-- [ ] **P2** Model gains file text: `Commit.blobs`, text in `index`/`worktree`,
-      LCS alignment, 3-way merge, `diff3` markers. **`paths` stays derivable** -
-      3 call sites, and that is a hard exit criterion.
-- [ ] **P3** File-text panel; Monaco as the conflict editor; `git diff` as a
-      habit, not a lesson.
-- [ ] **P4** Rebuild the five theory lessons to their owned question.
-- [ ] **P5** Two new lessons: the three areas, and `reflog` **before** the reset
-      pair. `reflog` needs no file text, so it is not gated on P2.
-- [ ] **P6** `rebase -i` on Monaco. Last.
+Each step names the file it touches and what "done" looks like. P0 and P1 need no
+engine work.
 
-Each phase ships on its own and leaves the track green. P0 and P1 need no engine
-work.
+**P0 - stop saying something untrue**
+- [ ] 1. `git-undo-with-reset` `task.3.context`: `--hard` is recoverable via
+      `reflog`. Edit `data.js` + `en.json` + `es.json`.
+- [ ] 2. Grep the track for any other "cannot get back" claim.
+
+**P1 - every card demands a decision** (data only; done = 3-6 commands, one of
+them a read that changes what comes next)
+- [ ] 3. `mark-a-version`: start at 4 commits; read `log`, tag the release, then
+      tag an earlier commit by revision. 1 command -> 3.
+- [ ] 4. `merge-a-branch`: two candidate branches; read `log` to find which is
+      behind, merge that one.
+- [ ] 5. `first-commit` cards 1+3: read `status` first; card 3 chooses which of
+      three files belong together.
+- [ ] 6. `make-a-branch` card 1: branch at an OLDER commit, found in the log.
+- [ ] 7. `point-at-a-commit`: state the goal in words; the learner derives
+      `HEAD~1` instead of being told it.
+- [ ] 8. `undo-with-reset`: state the OUTCOME wanted; the learner picks
+      `--soft`/`--mixed`/`--hard`.
+- [ ] 9. `fix-the-last-commit`: two typos; read the log to find which is last.
+- [ ] 10. **Gate:** re-count commands and decisions per card, `verify-lesson` on
+      all 14, EN/ES parity.
+
+**P2 - the model gains file text**
+- [ ] 11. `Commit.blobs` + text in `index`/`worktree`. **`paths` stays derivable**
+      (3 call sites: `state-match.js`, `git-progress.js`).
+- [ ] 12. LCS line alignment, unit-tested first.
+- [ ] 13. 3-way merge; a conflict is an OVERLAP. Test that a one-line insertion
+      does NOT conflict - that is the bug naive line-indexing would ship.
+- [ ] 14. `diff3` marker writer, showing the ancestor.
+- [ ] 15. **Gate:** re-vendor; all 14 lessons verify unchanged.
+
+**P3 - surfaces**
+- [ ] 16. File-text panel: one file shown in worktree / index / commit.
+- [ ] 17. Monaco wired as the conflict-resolution editor.
+- [ ] 18. `git diff` as a command and as the read step in P1's cards. No lesson.
+
+**P4 - theory**
+- [ ] 19. Rebuild the five theory lessons, each to the one question it owns
+      (table in the design doc).
+
+**P5 - the two missing lessons**
+- [ ] 20. Three-areas lesson; it TAKES `gt-working-tree` + `gt-staging-area` and
+      lesson 1 drops to `revisits`.
+- [ ] 21. `reflog`: model support + lesson, placed BEFORE the reset pair. Not
+      gated on P2.
+
+**P6**
+- [ ] 22. `rebase`, then `rebase -i` on Monaco. Last.
 
 ## Progress
 
