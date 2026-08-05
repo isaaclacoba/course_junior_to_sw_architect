@@ -1815,3 +1815,49 @@ number in it. A fallback that is not the shipped string is a lie waiting for a
 slow network.
 
 442 tests pass, validate unchanged at 0 errors and 144 warnings.
+
+## 2026-08-05 10:31 - a UI auditor, and the two hours it cost to trust it
+
+Started the third of the three outstanding items: a repeatable way to catch
+defects that only exist once a browser has laid the page out. Everything else in
+this repo reads source. The example box that was authored on 135 cards and never
+un-hidden was invisible to every one of those checks, and obvious to anyone with
+a browser open.
+
+Reuse first. `tools/i18n-roundtrip.mjs` already carried a zero-dependency CDP
+client, a static server, a Chrome launcher and a memory-sized tab pool, so I
+pulled all of it out into `tools/lib/browser.mjs` and made i18n-roundtrip import
+it. Its more careful teardown - wait for the process to exit before deleting the
+profile - became the shared one. Both its static sweep and a real browser
+round-trip still pass, which is what makes the extraction safe rather than brave.
+
+`tools/ui-audit.mjs` is thirteen rules over three families: runtime, layout and
+accessibility. Findings group by rule, not by page, because one systemic defect
+across ninety pages is one thing to fix.
+
+The part I would repeat: `--self-test`. `tools/fixtures/ui-audit-fixture.html`
+carries one deliberate instance of each defect, and the self-test fails unless
+every rule fires. It earned itself on the first run - `focusable-hidden` never
+fired, because I had required the element to be invisible and `aria-hidden`
+elements are drawn perfectly well; they are hidden only from assistive
+technology. That rule would have reported a clean course forever. It is now two
+correct rules.
+
+Then the tool audited itself, badly, four times over. `stuck-control` matched a
+button labelled "Previous" - because the probe was a template literal, and a
+template literal eats the escapes before the browser ever sees them, so
+`\.\.\.` arrived as `...`, which matches any three characters. The fix was
+structural rather than another layer of backslashes: the probe is now a real
+function that gets stringified, so there is no escaping layer left to get wrong.
+Monaco's virtualised DOM produced 25 layout false positives and is skipped.
+Sampling mid-animation called the whole hero invisible, so the probe waits for
+`document.getAnimations()` with a cap.
+
+The one that nearly became a bug report: every build page showed a stuck Run
+button and `TypeError: Failed to fetch` under the auditor, and booted fine under
+`python3 -m http.server`. The auditor's own server was writing the head without
+`Content-Length`, node fell back to chunked encoding, and the Blazor loader
+cancels its own `blazor.boot.json` when the length is not declared. I came very
+close to reporting a course defect that did not exist. When a finding only
+appears under the harness, suspect the harness.
+

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>ui-audit self-test fixture</title>
+  <!--
+    ONE deliberate defect per rule the auditor claims to catch. `node
+    tools/ui-audit.mjs --self-test` audits this page and fails unless EVERY rule
+    fires on it.
+
+    This exists because a checker that has gone quiet looks exactly like a
+    codebase that is clean, and this repo has been bitten by that more than a
+    dozen times. Adding a rule to the auditor means adding its defect here.
+
+    Nothing here is a style to copy. It is all wrong on purpose.
+  -->
+  <style>
+    body { background: #ffffff; color: #222; font-family: system-ui, sans-serif; margin: 20px; }
+
+    /* layout/invisible-content: real text, zero-size box - the example-box bug. */
+    .zero-size { display: block; width: 0; height: 0; overflow: hidden; }
+
+    /* layout/offscreen: hangs off the right edge of the document. */
+    .off-screen { position: relative; left: 3000px; width: 200px; background: #eee; }
+
+    /* layout/clipped: more content than box, with no way to scroll to it. */
+    .clipped { height: 20px; overflow: hidden; border: 1px solid #ccc; }
+
+    /* layout/overlap: two block siblings drawn on top of each other. */
+    .overlap-wrap { display: block; }
+    .overlap-a { height: 40px; background: #dde; }
+    .overlap-b { margin-top: -30px; height: 40px; background: #edd; }
+
+    /* a11y/contrast: light grey on white is about 1.6:1, well under 4.5. */
+    .low-contrast { color: #d8d8d8; background: #ffffff; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Auditor self-test</h1>
+
+    <p class="zero-size">This sentence is in the DOM and cannot be seen.</p>
+
+    <p class="off-screen">This paragraph hangs off the side of the document.</p>
+
+    <div class="clipped"><p>The first line fits. The second line is cut off with no scrollbar and no way for a reader to reach it, which means the words below this point are simply gone.</p></div>
+
+    <section class="overlap-wrap">
+      <div class="overlap-a">Block one</div>
+      <div class="overlap-b">Block two, drawn over block one</div>
+    </section>
+
+    <p class="low-contrast">Pale grey text on a white background.</p>
+
+    <p>Interpolation that never happened: {{learnerName}}</p>
+    <p>A value that was never set: undefined</p>
+
+    <!-- runtime/stuck-control: disabled forever, with no reason given. -->
+    <button id="stuckBtn" type="button" disabled>Preparing something...</button>
+
+    <!-- a11y/unnamed-control -->
+    <button id="namelessBtn" type="button"></button>
+
+    <!-- a11y/positive-tabindex -->
+    <a href="#somewhere" tabindex="3">Jumps the queue</a>
+
+    <!-- a11y/focusable-hidden: aria-hidden does not remove it from the tab order. -->
+    <div aria-hidden="true"><button type="button">Hidden from screen readers, still tabbable</button></div>
+
+    <!-- a11y/focusable-invisible: visibility:hidden, but still reachable. -->
+    <button type="button" style="visibility: hidden">Focus lands on nothing</button>
+  </main>
+
+  <script>
+    // runtime/console-error
+    console.error("a deliberate console error from the self-test fixture");
+    // runtime/request-failed
+    fetch("./this-file-does-not-exist.json").catch(function () {});
+  </script>
+</body>
+</html>
