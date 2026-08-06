@@ -6086,6 +6086,7 @@ ${written}` : written;
       return {
         id: found.id,
         type,
+        header: `${type} ${found.body.length}\\0`,
         text: found.entries.map((e) => `${e.mode} ${e.name}\\0<20 raw bytes: ${short(e.id)}...>`).join("\n")
       };
     }
@@ -6093,7 +6094,8 @@ ${written}` : written;
     return {
       id: found.id,
       type,
-      text: raw ? `${type} ${found.body.length}\\0${body}` : body
+      header: raw ? `${type} ${found.body.length}\\0` : void 0,
+      text: body
     };
   }
 
@@ -6126,8 +6128,10 @@ ${written}` : written;
       const opened = scene.open ? openObject(replay, scene.open, scene.openRaw) : null;
       this.openEl.hidden = !opened;
       if (opened) {
+        const rawHead = opened.header ? `<span class="cl-ob-rawhead">${escapeHtml4(opened.header)}</span>
+` : "";
         this.openEl.innerHTML = `<span class="cl-ob-openhead">${escapeHtml4(opened.type)} ${short(opened.id)}</span>
-` + escapeHtml4(opened.text);
+` + rawHead + escapeHtml4(opened.text);
       }
       this.noteEl.innerHTML = scene.note ? escapeHtml4(scene.note) : "";
       this.noteEl.hidden = !scene.note;
