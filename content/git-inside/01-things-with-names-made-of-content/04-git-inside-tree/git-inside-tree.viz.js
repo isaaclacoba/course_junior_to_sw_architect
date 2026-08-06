@@ -21,7 +21,7 @@
     legend: [
       { sw: "#1f6f5f", label: "an object, and everything inside it" },
       { sw: "#55c86a", label: "written just now" },
-      { sw: "#8b98a5", label: "dashed - no name reaches it yet" }
+      { sw: "#8b98a5", label: "dashed - nothing points at it yet" }
     ],
     layout: {
       visual: [{ type: "objects" }],

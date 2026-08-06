@@ -6,7 +6,7 @@
   "intro.0": "Un blob guarda tus bytes y olvida el nombre de tu archivo. Y sin embargo git te devuelve los archivos con su nombre correcto siempre, así que el nombre está anotado en algún sitio. Está en un segundo tipo de objeto, cuyo único trabajo es decir qué nombre va con qué bytes.",
   "legend.0": "un objeto, y todo lo que lleva dentro",
   "legend.1": "escrito ahora mismo",
-  "legend.2": "a rayas - todavía no lo alcanza ningún nombre",
+  "legend.2": "a rayas - todavía no apunta nada hacia él",
   "step.0.narr": "Dos archivos, dos blobs. Bytes y nada más, dos veces. Si esto fuera todo lo que guarda git, restaurar tu trabajo te daría dos montones de texto y ninguna forma de saber cuál era `notes.md`.",
   "step.1.narr": "`git add` escribe algo más: un **tree** (un árbol). Un tree es una lista, y cada fila de la lista dice un nombre y el id de la cosa que se llama así.",
   "step.2.narr": "Lee una fila entera y tiene tres partes: `100644` - un archivo normal, no ejecutable - luego el nombre `notes.md`, y luego el id del blob. Modo, nombre, id. Eso es una entrada de tree, y no hay nada más dentro.",
@@ -20,5 +20,5 @@
   "step.4.note": "cambia un byte, renombra el tree",
   "step.5.note": "nombres y bytes, pero todavía sin historia",
   "concept.gt-tree.term": "Tree",
-  "concept.gt-tree.def": "El objeto que guarda los nombres de archivo. Es una lista, y cada fila es un modo, un nombre y el id del objeto que se llama así - o sea que un tree es lo que convierte un montón de blobs sin nombre otra vez en tu carpeta."
+  "concept.gt-tree.def": "El objeto que guarda los nombres de archivo: el listado de un solo directorio, plano, con una fila por entrada que da un modo, un tipo, un id y un nombre. Una fila puede apuntar a otro tree, que es un subdirectorio - git escribe un objeto tree por directorio, y es ese anidamiento, y no un tree suelto, lo que forma la estructura ramificada que la palabra suele significar."
 }

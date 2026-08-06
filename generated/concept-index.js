@@ -3378,7 +3378,7 @@
     },
     "gt-blob": {
       "term": "Blob",
-      "def": "The object git writes for a file's contents. It holds the bytes and nothing else - no file name, no date, no author - which is why two identical files are one blob and why renaming costs nothing."
+      "def": "The object git writes for a file's contents: a short header giving the type and the byte count, a zero byte, then the exact bytes of the file. No file name, no date, no permissions - so identical files share one blob, and an edit stores a second whole blob rather than a difference."
     },
     "gt-branch": {
       "term": "Branch",
@@ -3462,7 +3462,7 @@
     },
     "gt-tree": {
       "term": "Tree",
-      "def": "The object that holds file names. It is a list, and each row is a mode, a name, and the id of the object with that name - so a tree is what turns a pile of nameless blobs back into your folder."
+      "def": "The object that holds file names: one directory's listing, flat, with one row per entry giving a mode, a type, an id and a name. A row may point at another tree, which is a subdirectory - git writes one tree object per directory, and it is that nesting, not any single tree object, that forms the branching structure the word normally means."
     },
     "gt-working-tree": {
       "term": "Working tree",

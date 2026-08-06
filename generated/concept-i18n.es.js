@@ -204,7 +204,7 @@
       "term": "Enmendar un commit"
     },
     "gt-blob": {
-      "def": "El objeto que git escribe para el contenido de un archivo. Contiene los bytes y nada más - ni nombre de archivo, ni fecha, ni autor - y por eso dos archivos idénticos son un solo blob y renombrar no cuesta nada.",
+      "def": "El objeto que git escribe para el contenido de un archivo: una cabecera corta con el tipo y el número de bytes, un byte cero, y luego los bytes exactos del archivo. Sin nombre de archivo, sin fecha, sin permisos - por eso los archivos idénticos comparten un blob, y una edición guarda un segundo blob entero en vez de una diferencia.",
       "term": "Blob"
     },
     "gt-branch": {
@@ -288,7 +288,7 @@
       "term": "Etiqueta"
     },
     "gt-tree": {
-      "def": "El objeto que guarda los nombres de archivo. Es una lista, y cada fila es un modo, un nombre y el id del objeto que se llama así - o sea que un tree es lo que convierte un montón de blobs sin nombre otra vez en tu carpeta.",
+      "def": "El objeto que guarda los nombres de archivo: el listado de un solo directorio, plano, con una fila por entrada que da un modo, un tipo, un id y un nombre. Una fila puede apuntar a otro tree, que es un subdirectorio - git escribe un objeto tree por directorio, y es ese anidamiento, y no un tree suelto, lo que forma la estructura ramificada que la palabra suele significar.",
       "term": "Tree"
     },
     "gt-working-tree": {

@@ -1,4 +1,4 @@
 {
   "concept.gt-tree.term": "Tree",
-  "concept.gt-tree.def": "The object that holds file names. It is a list, and each row is a mode, a name, and the id of the object with that name - so a tree is what turns a pile of nameless blobs back into your folder."
+  "concept.gt-tree.def": "The object that holds file names: one directory's listing, flat, with one row per entry giving a mode, a type, an id and a name. A row may point at another tree, which is a subdirectory - git writes one tree object per directory, and it is that nesting, not any single tree object, that forms the branching structure the word normally means."
 }

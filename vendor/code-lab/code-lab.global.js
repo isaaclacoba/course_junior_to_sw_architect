@@ -1611,7 +1611,7 @@ ${result.runtimeError}`.trim(),
     objNoNames: "(no names yet)",
     objYourFolder: "your folder",
     objNothingYet: "Nothing points at anything yet.",
-    objUnnamed: "unnamed",
+    objUnnamed: "nothing points here",
     objNames: "names"
   };
   function deriveRefs(stack = []) {
@@ -5920,6 +5920,7 @@ ${written}` : written;
       fresh: want === 0 ? [] : acts.slice(acts.length - want),
       detail: scene.detail === "full" ? "full" : "core",
       open: OPENABLE.includes(scene.open) ? scene.open : void 0,
+      openRaw: scene.openRaw === true,
       note: scene.note,
       author: scene.author || DEFAULT_AUTHOR
     };
@@ -6048,7 +6049,7 @@ ${written}` : written;
   function short(id) {
     return id.slice(0, 7);
   }
-  function openObject(replay, type) {
+  function openObject(replay, type, raw = false) {
     let found = null;
     for (const object of replay.store.objects.values()) {
       if (object.type === type) found = object;
@@ -6061,7 +6062,12 @@ ${written}` : written;
         text: found.entries.map((e) => `${e.mode} blob ${e.id}	${e.name}`).join("\n")
       };
     }
-    return { id: found.id, type, text: new TextDecoder().decode(found.body) };
+    const body = new TextDecoder().decode(found.body);
+    return {
+      id: found.id,
+      type,
+      text: raw ? `${type} ${found.body.length}\\0${body}` : body
+    };
   }
 
   // src/dom/objects-view.ts
@@ -6090,7 +6096,7 @@ ${written}` : written;
       this.chainEl.hidden = !wantsChain;
       if (wantsFolder) this.folderEl.innerHTML = folderHtml(replay, this.labels, scene.detail);
       if (wantsChain) this.chainEl.innerHTML = chainHtml(chainRows(replay), this.labels);
-      const opened = scene.open ? openObject(replay, scene.open) : null;
+      const opened = scene.open ? openObject(replay, scene.open, scene.openRaw) : null;
       this.openEl.hidden = !opened;
       if (opened) {
         this.openEl.innerHTML = `<span class="cl-ob-openhead">${escapeHtml4(opened.type)} ${short(opened.id)}</span>

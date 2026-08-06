@@ -149,8 +149,8 @@
       "title": "Arreglar el último commit"
     },
     "git-inside-blob": {
-      "blurb": "Abre el objeto que escribió git y descubre lo que NO contiene. Ni nombre de archivo, ni fecha, ni autor - solo tus bytes, que es la razón de que dos archivos idénticos sean el mismo objeto y de que renombrar salga gratis.",
-      "title": "¿Dónde ha ido el nombre de tu archivo?"
+      "blurb": "Abre un blob y lee la cabecera oculta que git pone delante de tus bytes. Explica de dónde sale de verdad el id, por qué un solo carácter editado guarda una segunda copia entera, y por qué tres archivos idénticos comparten un objeto.",
+      "title": "De qué está hecho un blob en realidad"
     },
     "git-inside-commit-object": {
       "blurb": "El objeto commit, abierto y leído línea a línea. Cinco líneas de texto plano - un tree, un autor, una hora, un mensaje - y una de ellas es la que convierte guardados sueltos en una historia.",

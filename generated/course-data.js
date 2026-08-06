@@ -1463,8 +1463,8 @@
               "href": "content/git-inside/01-things-with-names-made-of-content/03-git-inside-blob/",
               "key": "git_inside_blob_awarded",
               "total": 1,
-              "title": "Where did your file's name go?",
-              "blurb": "Open the object git wrote and find out what it does NOT contain. No file name, no date, no author - just your bytes, which is why two identical files are the same object and why renaming is free.",
+              "title": "What a blob is actually made of",
+              "blurb": "Open a blob and read the hidden header git puts in front of your bytes. It explains where the id really comes from, why one edited character stores a second whole copy, and why three identical files share one object.",
               "pill": "gentle",
               "time": "15 min",
               "kind": "lesson"
