@@ -45,6 +45,15 @@ fits, pick the lowest-ceremony row that fully holds it.
 | deterministic enforcement at a tool/lifecycle event               | **hook**         | `.github/hooks/<name>.json`                                | agent-customization     |
 | a context-isolated subagent or a tool-restricted stage            | **custom agent** | `.github/agents/<name>.agent.md`                           | agent-customization     |
 
+**Changing the WoW is itself a line of work.** A one-off *learning* is a 2-line
+append - just write it. But a NEW skill / instruction / tool, or a change that
+spans several agent files, is a line of work like any other and takes a brief
+(`docs/plans/<slug>.md`, the `work-brief` shape) BEFORE the edits - plus the
+owner's pick on the shape, not just yours. This is easy to miss because
+`work-brief` triggers read "feature / module / tool / refactor" and an agent-file
+change does not obviously sound like one. It is one. Skipping it happened, was
+caught by the owner, and is the reason this paragraph exists.
+
 Three distinctions do most of the work:
 
 - **Tool vs skill.** A tool is *code you run*; a skill is *a procedure the agent
@@ -108,12 +117,18 @@ When repeated ad-hoc commands become a script, follow the pattern that produced
    grep -rl "related-keyword" .github/skills .github/instructions
    ```
 
-3. **Classify** with Step 0, then create or extend the chosen primitive. Prefer
-   extending an existing file over adding a near-duplicate.
-4. **Quality-check**: general enough to help future sessions, specific enough to
+3. **Classify** with Step 0. If the answer is anything bigger than a learning -
+   a new skill/instruction/tool, or edits across several agent files - write the
+   brief and get the owner's pick on the SHAPE first. Show them the audit (what
+   already covers this, and the gap) and the options, and let them choose; do not
+   present your own classification as decided.
+4. **Create or extend** the chosen primitive. Prefer extending an existing file
+   over adding a near-duplicate, and prefer one canonical home plus pointers over
+   restating the same rule in every file that touches it.
+5. **Quality-check**: general enough to help future sessions, specific enough to
    act on, a concrete right-vs-wrong example where useful, no duplication, and a
    `description` clear enough that the agent knows WHEN to apply or invoke it.
-5. **Inform the user**: what was captured, where, and why that primitive - and
+6. **Inform the user**: what was captured, where, and why that primitive - and
    whether you extended existing content or created new.
 
 Do not commit or push unless the user asks (pushing `master` deploys).

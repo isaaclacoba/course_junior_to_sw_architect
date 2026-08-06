@@ -4,8 +4,10 @@ description: >-
   Create and maintain a "work brief" - one skimmable file that is BOTH the
   owner's readable status page and the agent's step tracker for a non-trivial
   task. USE FOR: starting a new line of work - a feature, a module, a tool, a
-  multi-hundred-line or scattered-logic refactor, or any task that is ambiguous
-  or not-yet-well-defined; starting a multi-step piece of work; giving the owner
+  multi-hundred-line or scattered-logic refactor, a change to the WAY OF WORKING
+  itself (a new skill / instruction / agent file, or edits across several of
+  them), or any task that is ambiguous or not-yet-well-defined; starting a
+  multi-step piece of work; giving the owner
   a <=100-line "what are we doing" view; tracking progress with checkable steps
   + a dated log; keeping a plan in sync across turns/sessions. DO NOT USE FOR:
   trivial one-step tasks (just do them); deep architecture/design rationale
@@ -26,6 +28,10 @@ lives in linked docs, not here.
   brief: a new feature/module/tool, a multi-hundred-line refactor, pulling scattered
   logic into a module, or any task >3 steps or whose steps are not yet well-defined.
   Rule of thumb: the more ambiguous, the more design.
+- **Changing the WoW counts.** A new skill / instruction / agent file, or edits
+  across several of them, is a line of work and takes a brief - it just does not
+  sound like a "feature", which is exactly how it gets skipped. (It was skipped
+  once, and the owner caught it.) See `update-skills` step 3.
 - NOT for one-shot edits, and NOT as a home for design rationale (link that).
 
 ## Phase 0 - the design round (mandatory for a NEW line of work)
