@@ -35,9 +35,9 @@ and auto-escalate if they grow.
 11. [x] Rail renderer at session start - verify: measured 2 lines, 61 cols
 12. [x] Gate report on a misstep - verify: exit 0 while warning; names `10 unticked plan step(s)`; silent on a clean changeset
 13. [x] Ladder as an on-demand command, **fixed to fit 80 cols** - verify: measured 8 lines, 65 cols (mockup was 83)
-14. [ ] `recall` enforced as state 1 - verify: FSM refuses to leave `recall` without a citing row
-15. [ ] Watch it warn-only across real work - verify: false-positive count recorded here
-16. [ ] Owner reviews the noise, then decides whether to flip to blocking - verify: a new decision row
+14. [x] `recall` enforced as state 1 - verify: all later rungs met + no citing row still reads `recall`; 6 gaming attempts refused; sabotage makes the controls fail
+15. [x] Watch it warn-only across real work - verify: `factory sweep`, 39 commits - see Findings
+16. [ ] Owner reviews the noise, then decides whether to flip to blocking - verify: a new decision row. **Recommendation: do not flip - see Findings**
 
 ## Progress
 - 2026-08-06 Measured the failure: 69% of briefs ship with their code; 385 commits analysed for thresholds.
@@ -48,6 +48,28 @@ and auto-escalate if they grow.
 - 2026-08-06 `tools/factory.mjs` built: state, classify, attribute, rail, gate, ladder, selftest. Warn-only, every command exits 0. `classify` 0.19s, `rail` 0.94s.
 - 2026-08-06 Every pre-FSM feature reads `recall` - no old feature ever recorded one. A true reading, not a bug, and it is the backlog.
 - 2026-08-06 Step 14 is already implemented by the derivation (recall is rung 1, and prose alone does not satisfy it) but is left unticked for the owner to verify.
+
+## Findings from the warn-only watch (step 15)
+The derivation is right and the phase it reports is usually wrong - because the
+journal is younger than the work. Both numbers matter to step 16.
+
+- **10 of the 11 features with any ticked plan step read `recall`.** Only
+  `sw-factory` reports its true phase. Every literal claim is accurate - those
+  features really have no journal row - but as a phase report it is wrong, and
+  under blocking all 10 would be frozen at rung 1.
+- **Attribution cannot be judged yet: 1 of 17 briefs declares `## Owns`.** Over 39
+  commits, 22 are wholly unclaimed and 34 partly. That measures a missing
+  convention, not misattribution.
+- **One confirmed false positive, from my own change.** A `## Owns` claim is
+  retroactive, so claiming `work-brief/SKILL.md` made the 39-commit replay
+  attribute `d0d4fbe` - which was `mockup-first-wow` work - to `sw-factory` too.
+  `sweep` now prints the caveat instead of letting the count read as pure drift.
+- Lane classification looks sane: 28% of 39 commits fast-path, against the
+  design's measured 46% for `<=3 files` - lower because new files and guarded
+  dirs also escalate. No commit was claimed by two briefs.
+- **I did not backfill recall rows for the other 10 features.** Writing "recall
+  done" on work I did not recall would forge the exact evidence the FSM exists to
+  demand. That is the owner's call, and it is one row per feature.
 
 ## Open
 - **`.github/hooks/` is not wired yet, on purpose.** User-level hooks are proven

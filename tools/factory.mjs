@@ -22,6 +22,7 @@
 //   rail      [--feature SLUG] [--paths a,b,c]            2 lines, session start (D-5)
 //   gate      [--feature SLUG] [--paths a,b,c]            6 lines, only on a misstep
 //   ladder    [--feature SLUG] [--paths a,b,c]            8 lines, on demand
+//   sweep     [--commits N] [--json] [--verbose]           replay real history (step 15)
 //   selftest                                              asserts the rules + widths
 
 import { readFile, readdir } from "node:fs/promises";
@@ -87,6 +88,68 @@ export function changedPaths() {
     files.push({ path, isNew: xy === "??" || xy.includes("A") });
   }
   return files;
+}
+
+// Replay real commits through the same classifier and attribution the live gate
+// uses (step 15). Read-only: `git log` never writes, and --no-optional-locks keeps
+// it off the index a parallel session may hold.
+export function commitsFromLog(n) {
+  let out;
+  try {
+    out = execFileSync(
+      "git",
+      ["--no-optional-locks", "log", "-n", String(n), "--no-merges", "--name-status", "--format=%x01%H%x09%s"],
+      { cwd: ROOT, encoding: "utf8", maxBuffer: 64 << 20 }
+    );
+  } catch {
+    return [];
+  }
+  const commits = [];
+  for (const chunk of out.split("\u0001").slice(1)) {
+    const [head, ...rest] = chunk.split("\n");
+    const [sha, subject] = head.split("\t");
+    const paths = [];
+    for (const line of rest) {
+      if (!line.trim()) continue;
+      const parts = line.split("\t");
+      const status = parts[0][0];
+      if (status === "D") continue; // a deletion owns nothing to attribute
+      const path = parts[parts.length - 1];
+      paths.push({ path, isNew: status === "A" });
+    }
+    if (paths.length) commits.push({ sha: (sha || "").slice(0, 7), subject: subject ?? "", paths });
+  }
+  return commits;
+}
+
+export function sweep(commits, briefs) {
+  const rows = commits.map((c) => {
+    const cls = classify(c.paths);
+    const attr = attribute(c.paths, briefs);
+    return {
+      sha: c.sha,
+      subject: c.subject,
+      files: cls.files,
+      lane: cls.fastPath ? "fast" : "full",
+      features: Object.keys(attr.byFeature),
+      unclaimed: attr.unclaimed.length,
+      conflicts: attr.conflicts.length,
+    };
+  });
+  const n = rows.length || 1;
+  const claiming = briefs.filter((b) => b.declaredOwns.length > 0).length;
+  return {
+    rows,
+    total: rows.length,
+    briefs: briefs.length,
+    briefsDeclaringOwns: claiming,
+    fastPath: rows.filter((r) => r.lane === "fast").length,
+    fastPathPct: Math.round((rows.filter((r) => r.lane === "fast").length / n) * 100),
+    fullyUnclaimed: rows.filter((r) => r.features.length === 0).length,
+    anyUnclaimed: rows.filter((r) => r.unclaimed > 0).length,
+    withConflicts: rows.filter((r) => r.conflicts > 0).length,
+    multiFeature: rows.filter((r) => r.features.length > 1).length,
+  };
 }
 
 // A --paths list has no git status behind it, so nothing is known to be new.
@@ -256,12 +319,20 @@ async function journalEvidence(slug) {
 // is a fact about the archive, not the agent's prose (D-11, and the design's
 // "a gate that greps for a word is trivially gamed").
 export function recallCitations(outputs, decisionIds) {
+  // Resolve case-insensitively: the matcher already is, and a Set lookup that is
+  // not would silently refuse a valid citation written `d-sw-factory-11`.
+  const canon = new Map([...decisionIds].map((id) => [String(id).toLowerCase(), String(id)]));
   const cited = new Set();
   let none = false;
   for (const r of outputs) {
     const text = `${r.title ?? ""}\n${r.body ?? ""}`;
-    for (const m of text.matchAll(/\bD-[a-z0-9][a-z0-9-]*-\d+\b/gi)) if (decisionIds.has(m[0])) cited.add(m[0]);
-    if (/^\s*recall:\s*none\s*$/im.test(text)) none = true;
+    for (const m of text.matchAll(/\bD-[a-z0-9][a-z0-9-]*-\d+\b/gi)) {
+      const hit = canon.get(m[0].toLowerCase());
+      if (hit) cited.add(hit);
+    }
+    // "none" must be declared literally, but may carry an explanation after it -
+    // refusing an honest `recall: none - nothing prior` would punish the good case.
+    if (/^\s*recall:\s*none\b/im.test(text)) none = true;
   }
   return { cited: [...cited], none };
 }
@@ -471,12 +542,22 @@ async function selftest() {
   t("attr: unclaimed path is the warning", a.unclaimed.includes("tools/derive-goals.mjs"));
   t("attr: ok-no false conflict", a.conflicts.length === 0, JSON.stringify(a.conflicts));
 
-  // --- recall evidence must RESOLVE, not merely be written
-  const ids = new Set(["D-sw-factory-11"]);
-  t("recall: resolving id counts", recallCitations([{ body: "cites D-sw-factory-11" }], ids).cited.length === 1);
-  t("recall: ok-invented id does not count", recallCitations([{ body: "cites D-made-up-99" }], ids).cited.length === 0);
-  t("recall: ok-prose alone does not count", recallCitations([{ body: "I recalled everything, honest" }], ids).cited.length === 0);
-  t("recall: explicit none counts", recallCitations([{ body: "recall: none" }], ids).none);
+  // --- recall evidence must RESOLVE, not merely be written (step 14)
+  const ids = new Set(["D-sw-factory-11", "D-wow-enforcement-6"]);
+  const rc = (body) => recallCitations([{ body }], ids);
+  const satisfies = (body) => rc(body).cited.length > 0 || rc(body).none;
+  t("recall: resolving id counts", rc("cites D-sw-factory-11").cited.length === 1);
+  t("recall: a cross-feature id counts", rc("D-wow-enforcement-6 ruled this out").cited.length === 1);
+  t("recall: case-insensitive resolve", rc("see d-sw-factory-11").cited[0] === "D-sw-factory-11");
+  t("recall: explicit none counts", rc("recall: none").none);
+  t("recall: none may carry an explanation", rc("recall: none - nothing prior").none);
+  // gaming attempts - each of these must REFUSE
+  t("recall: ok-invented id refused", !satisfies("cites D-made-up-99"));
+  t("recall: ok-prose alone refused", !satisfies("I recalled everything, honest"));
+  t("recall: ok-near-miss id refused", !satisfies("see D-sw-factory-110"));
+  t("recall: ok-id with no number refused", !satisfies("see D-sw-factory"));
+  t("recall: ok-the bare word refused", !satisfies("recall"));
+  t("recall: ok-none inside a sentence refused", !satisfies("there were none to recall"));
 
   // --- state derivation (step 7 verify)
   const rows = (kinds) => kinds.map((k) => ({ kind: k, title: "", body: "cites D-x-1" }));
@@ -510,8 +591,34 @@ async function selftest() {
     decisionIds: dids,
     brief: null,
   })) === "deciding");
+  // step 14: recall is state 1 - every LATER rung satisfied must NOT let it advance
+  const recallHeld = deriveRungs({
+    outputs: [{ kind: "audit", title: "", body: "no decision ids at all" }],
+    decisions: [{ id: "D-x-1", status: "active" }],
+    decisionIds: dids,
+    brief: { slug: "x", hasDesign: true, briefPath: "docs/plans/x.md", steps: [{ done: true }] },
+  });
+  t("state: recall holds even when all later rungs pass",
+    stateFromRungs(recallHeld) === "recall", stateFromRungs(recallHeld));
+  t("state: ok-satisfied recall does advance",
+    stateFromRungs(deriveRungs({
+      outputs: [{ kind: "audit", title: "", body: "cites D-x-1" }],
+      decisions: [{ id: "D-x-1", status: "active" }],
+      decisionIds: dids,
+      brief: { slug: "x", hasDesign: true, briefPath: "docs/plans/x.md", steps: [{ done: true }] },
+    })) === "verifying");
   t("state: owner gate is on deciding->specifying only",
     noBrief.filter((r) => r.ownerGate).length === 1 && noBrief.find((r) => r.ownerGate).state === "deciding");
+
+  // --- sweep (step 15) reads real history and never blocks
+  const swept = sweep(commitsFromLog(5), briefs);
+  t("sweep: reads real commits", swept.total > 0, `${swept.total}`);
+  t("sweep: every row classified", swept.rows.every((r) => r.lane === "fast" || r.lane === "full"));
+  t("sweep: ok-deletions do not attribute", commitsFromLog(40).every((c) => c.paths.every((p) => p.path)));
+  const synth = sweep([{ sha: "0000000", subject: "s", paths: [P("docs/plans/sw-factory.md")] }], briefs);
+  t("sweep: attributes a known path", synth.rows[0].features.includes("sw-factory"));
+  t("sweep: ok-a claimed commit is not counted unclaimed", synth.fullyUnclaimed === 0);
+  t("sweep: reports Owns adoption", synth.briefs > 0 && synth.briefsDeclaringOwns >= 1, `${synth.briefsDeclaringOwns}/${synth.briefs}`);
 
   // --- widths, measured (the ladder's 83-column wrap was found exactly this way)
   const s = await computeState({});
@@ -539,19 +646,39 @@ async function selftest() {
 }
 
 // ---- main -------------------------------------------------------------------
-const CMDS = new Set(["state", "classify", "attribute", "rail", "gate", "ladder", "selftest"]);
+const CMDS = new Set(["state", "classify", "attribute", "rail", "gate", "ladder", "sweep", "selftest"]);
 
 async function main(argv) {
   const cmd = argv[0];
   const o = parseArgs(argv.slice(1));
   if (!cmd || !CMDS.has(cmd)) {
     console.log("factory - the way-of-working FSM (warn-only)");
-    console.log("  state | classify | attribute | rail | gate | ladder | selftest");
+    console.log("  state | classify | attribute | rail | gate | ladder | sweep | selftest");
     console.log("see docs/architecture/sw-factory.md");
     process.exitCode = cmd ? 2 : 0;
     return;
   }
   if (cmd === "selftest") return selftest();
+
+  if (cmd === "sweep") {
+    const briefs = await loadBriefs();
+    const n = Number(o.commits ?? 40);
+    const r = sweep(commitsFromLog(n), briefs);
+    if (o.json) return console.log(JSON.stringify(r, null, 2));
+    if (o.verbose)
+      for (const row of r.rows)
+        console.log(`  ${row.sha} ${row.lane} ${String(row.files).padStart(3)}f  ${(row.features.join("+") || "(unclaimed)").padEnd(22)} ${row.subject.slice(0, 30)}`);
+    console.log(`factory sweep: ${r.total} commit(s), warn-only, nothing blocked`);
+    console.log(`  fast-path         ${r.fastPath} (${r.fastPathPct}%)`);
+    console.log(`  no brief claims   ${r.fullyUnclaimed} commit(s) wholly, ${r.anyUnclaimed} partly`);
+    console.log(`  two briefs claim  ${r.withConflicts} commit(s)`);
+    console.log(`  spans >1 feature  ${r.multiFeature} commit(s)`);
+    // Attribution is judged by TODAY's claims, so a replay is anachronistic: a
+    // path claimed now attributes past commits that predate the feature. Say so
+    // here rather than letting the unclaimed count read as pure drift.
+    console.log(`  note: ${r.briefsDeclaringOwns} of ${r.briefs} briefs declare \`## Owns\`; claims apply retroactively`);
+    return;
+  }
 
   if (cmd === "classify" || cmd === "attribute") {
     const paths = resolvePaths(o);
