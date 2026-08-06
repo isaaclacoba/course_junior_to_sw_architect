@@ -539,6 +539,9 @@ export function renderGate(s, problems) {
 // Exit codes matter more than the payload: 0 = success, 2 = BLOCKING error,
 // anything else = a non-blocking warning. This tool exits 0 always (D-1).
 const HOOK_EVENTS = new Set(["SessionStart", "PostToolUse", "Stop", "SubagentStop"]);
+
+// The chain that advances the machine: each state agent invokes the next by name.
+export const AGENT_CHAIN = { recall: "grounding", grounding: "deciding", deciding: "specifying", specifying: "building", building: "verifying" };
 const READ_ONLY_TOOLS = new Set([
   "view", "read", "read_file", "readFile", "grep", "glob", "search", "search_files",
   "list", "list_dir", "listDirectory", "fetch", "web_fetch", "webFetch", "sql",
@@ -945,6 +948,37 @@ async function selftest() {
     brief: { slug: "x", hasDesign: true, briefPath: "p", steps: [{ done: true }, { done: false }] } };
   t("untracked: deriveRungs never waives a rung", stateFromRungs(deriveRungs(bare)) === "recall");
   t("untracked: `untracked` is not one of the six states", !STATES.includes("untracked"));
+
+  // --- the agent chain (D-22). This is what actually advances the machine: each
+  // state agent invokes the next by name. Nothing else enforces the order, so a
+  // broken link here silently turns the FSM back into advisory prose.
+  const AGENTS = join(ROOT, ".github", "agents");
+  const agentSrc = (n) => readFileSync(join(AGENTS, `${n}.agent.md`), "utf8");
+  for (const [me, nxt] of Object.entries(AGENT_CHAIN)) {
+    const src = agentSrc(me);
+    const seg = src.slice(src.indexOf("## Hand off"));
+    t(`chain: ${me} can invoke another agent`, /^tools:.*\bagent\b/m.test(src));
+    t(`chain: ${me} -> ${nxt}`, new RegExp(`[Ii]nvoke the \\*\\*\`${nxt}\\*?\`?`, "i").test(seg)
+      || new RegExp("invoke the \\*\\*`" + nxt + "`", "i").test(seg), seg.slice(0, 0));
+    // ok- control: it must name ONLY the next state, never skip one
+    const others = [...STATES].filter((x) => x !== nxt && x !== me);
+    const stray = others.filter((o) => new RegExp("invoke the \\*\\*`" + o + "`", "i").test(seg));
+    t(`chain: ok-${me} skips no state`, stray.length === 0, stray.join(","));
+  }
+  const vf = agentSrc("verifying");
+  t("chain: verifying is terminal", !/[Ii]nvoke the \*\*`(recall|grounding|deciding|specifying)`/.test(vf.slice(vf.indexOf("## Hand off"))));
+  t("chain: verifying hands back to building on failure", vf.includes("**`building`**"));
+  const dc = agentSrc("deciding");
+  t("chain: deciding waits for the OWNER - the one gate", /[Ww]ait for the owner/.test(dc));
+  t("chain: auditor is a leaf and cannot pull in other agents", !/^tools:.*\bagent\b/m.test(agentSrc("auditor")));
+  // every state has an agent, and every agent named is a real state
+  for (const st of STATES) t(`chain: ok-${st} has an agent file`, existsSync(join(AGENTS, `${st}.agent.md`)));
+  // the two entry points: the always-on rule, and the prompt the human types
+  const ci = readFileSync(join(ROOT, ".github", "copilot-instructions.md"), "utf8");
+  t("entry: the always-on rule says to INVOKE the state's agent",
+    /[Ii]nvoke the agent named after that state/.test(ci));
+  for (const st of STATES) t(`entry: ok-always-on rule names ${st}`, ci.includes(`\`${st}\``));
+  t("entry: /factory prompt exists", existsSync(join(ROOT, ".github", "prompts", "factory.prompt.md")));
 
   // --- agent hooks (D-16, D-20). Warn-only: nothing may ever be denied.
   t("hook: PreToolUse is NOT wired - only it can deny", !HOOK_EVENTS.has("PreToolUse"));

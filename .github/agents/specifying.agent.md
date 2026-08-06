@@ -1,7 +1,7 @@
 ---
 description: "FSM state 4 of 6 - SPECIFYING. Turns closed decisions into the two artifacts the work is built from: the brief at docs/plans/<slug>.md and the design-of-record at docs/architecture/<slug>.md. Writes ONLY what the owner decided, to a hard length budget, with a Plan of verifiable steps and an ## Owns path claim. Use after the owner closes the design round and before any code."
 name: specifying
-tools: [read, search, edit, execute]
+tools: [read, search, edit, execute, agent]
 model: ['Claude Sonnet 4.5 (copilot)', 'GPT-5 (copilot)']
 argument-hint: "Name the feature slug to write the brief and design-of-record for."
 ---
@@ -43,6 +43,22 @@ no row supports, you have found an open question - stop and hand it back to
 ## Exit evidence (this is what the FSM checks)
 Both `docs/plans/<slug>.md` and `docs/architecture/<slug>.md` exist. Verify with
 `node tools/factory.mjs state --feature <slug>` and `wc -l` on both.
+
+## Hand off - this is how the machine advances
+
+You do not stop when your work is done. You **invoke the next state's agent**, by
+name, with the `agent` tool - that chain IS the state machine. Nothing else
+enforces it.
+
+1. Confirm you cleared the rung: `node tools/factory.mjs state --feature <slug>`
+   must no longer say `specifying`.
+2. Invoke the **`building`** agent: implement to the design, nothing beyond it.
+3. Give it the slug, what you produced, and the id of any row you wrote. It
+   starts in a fresh context - anything you do not pass on is lost.
+
+If the rung did not clear, say so and stop. Do not hand off a state you did not
+finish, and never skip a state to save a turn - `idle -> building` is the exact
+failure this exists to prevent.
 
 ## Constraints
 - DO NOT invent scope. A step the owner never agreed to is not a plan, it is a

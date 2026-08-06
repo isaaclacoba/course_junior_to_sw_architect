@@ -55,6 +55,22 @@ agreed to. An unplanned need is a question, not a licence.
 ## Exit evidence (this is what the FSM checks)
 Every Plan checkbox ticked. `node tools/factory.mjs state --feature <slug>`.
 
+## Hand off - this is how the machine advances
+
+You do not stop when your work is done. You **invoke the next state's agent**, by
+name, with the `agent` tool - that chain IS the state machine. Nothing else
+enforces it.
+
+1. Confirm you cleared the rung: `node tools/factory.mjs state --feature <slug>`
+   must no longer say `building`.
+2. Invoke the **`verifying`** agent: prove it works, and prove the checks can fail.
+3. Give it the slug, what you produced, and the id of any row you wrote. It
+   starts in a fresh context - anything you do not pass on is lost.
+
+If the rung did not clear, say so and stop. Do not hand off a state you did not
+finish, and never skip a state to save a turn - `idle -> building` is the exact
+failure this exists to prevent.
+
 ## Constraints
 - DO NOT touch files outside this feature's `## Owns` without saying so first.
   Another session may be live in this same tree; their uncommitted work is

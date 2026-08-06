@@ -1,11 +1,16 @@
 ---
-description: "Kick off a design round for a named line of work - ground first, then decide WITH the owner (batched, owner decides), record decisions, and only then write the brief + design-of-record. Honest framing: this is a human-invoked kickoff, not a gate."
+description: "DEPRECATED - use /factory instead, which derives which state the work is actually in rather than assuming it needs a design round. Kept because a design round is still the right thing when you already know the work is new and undesigned; it enters the state machine at `grounding`."
 name: "Design round"
 argument-hint: "the feature / module / tool / refactor to design, e.g. add a settings page"
 agent: "agent"
 ---
 
 You have been handed a new line of work: **${input:topic}**.
+
+> Prefer `/factory`. It asks `tools/factory.mjs` which of the six states this work
+> is actually in and hands it to that state's agent, instead of assuming a design
+> round is what is needed. Use this prompt only when you already know the work is
+> new and undesigned - it is the same thing, entered at `grounding`.
 
 The human typed `/design-round` to declare this is new work and to start a design
 round WITH them - Phase 0 of the [`work-brief`](../skills/work-brief/SKILL.md) skill.

@@ -20,7 +20,8 @@ and auto-escalate if they grow.
 - `.github/hooks/*.json`, `.github/hooks/*.sh`
 - `docs/journal/factory-config.json`, `docs/journal/factory/`
 - `.github/skills/work-brief/SKILL.md`
-- `.github/agents/*.agent.md`
+- `.github/agents/*.agent.md`, `.github/prompts/factory.prompt.md`
+- golden rule 7 in `.github/copilot-instructions.md`
 - `docs/architecture/sw-factory.md`, `docs/plans/sw-factory.md`
 
 ## Plan
@@ -47,9 +48,13 @@ and auto-escalate if they grow.
 21. [x] One agent per state + 2 specialists (`D-22`) - verify: 8 files with valid frontmatter, `name` matching the filename and a >60ch description; `architect` vs `deciding` description overlap cut from 10 shared words to 4; every description declares STATE or specialist
 22. [x] Hook payload matched against the contract the CLI itself ships - verify: warnings moved off the undocumented `decision: "warn"` onto `systemMessage`; 4 assertions + an `ok-` control that no payload ever blocks or denies; both sabotages fail; 6 inputs incl. malformed all exit 0, never the blocking 2
 23. [x] History dedupes - a Stop that measures nothing new writes nothing - verify: two identical Stops wrote 2 files before, 1 after; a dropped column now fails the selftest (it did not, because the test iterated the list it was checking)
-24. [ ] Confirm the hooks actually fire in a live session - verify: a `SessionStart` rail appears in a NEW session
+24. [x] **The agent chain is the enforcement** - every state agent invokes the next by name with the `agent` tool - verify: 3 agents were missing the `agent` tool and could not have handed off; 24 assertions in `selftest`; 3 sabotages (skip a state, drop the tool, weaken the always-on rule) all fail the build
+25. [x] Two entry doors, because a hook cannot be relied on - verify: `/factory` prompt derives the state and routes to its agent; golden rule 7 rewritten to say "invoke the agent named after that state" - 11 lines to 10, so the always-on budget shrank
+26. [ ] Watch a real feature walk the chain end to end - verify: one line of work goes `recall` -> `verifying` with each handoff made by an agent, not by me
 
 ## Progress
+- 2026-08-06 The mechanism was wrong and the owner said so: hooks are a convenience, the AGENT CHAIN is the enforcement. Agents can invoke agents, so the process is a chain, not a paragraph. Three state agents could not even hand off - they lacked the `agent` tool.
+- 2026-08-06 My first chain sabotage passed because the sabotage itself was case-wrong (`invoke` vs `Invoke`) and so was the check. Both fixed; skipping a state now fails by name.
 - 2026-08-06 My own history test was vacuous: it iterated `HISTORY_MEASURES` to check `HISTORY_MEASURES`, so deleting a column deleted its own coverage and the sabotage passed. Now derived from the stored schema instead.
 - 2026-08-06 Found the CLI ships its own hook reference (`agent-customization/references/hooks.md`). It confirms `.github/hooks/*.json` is a real discovery location, and shows my warning field was invented: the contract documents `systemMessage`, `continue`, `stopReason` and a PostToolUse-only `decision: block`. The Stop warnings would most likely never have been shown.
 - 2026-08-06 Rail made self-sufficient: it now names WHICH agent runs the current state, which is the only thing linking the derivation to the six agent files.

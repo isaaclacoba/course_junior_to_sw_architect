@@ -38,6 +38,22 @@ Use `poc` for something you ran, `audit` for something you read and counted,
 `subagent` for a delegated exploration. Verify with
 `node tools/factory.mjs state --feature <slug>`.
 
+## Hand off - this is how the machine advances
+
+You do not stop when your work is done. You **invoke the next state's agent**, by
+name, with the `agent` tool - that chain IS the state machine. Nothing else
+enforces it.
+
+1. Confirm you cleared the rung: `node tools/factory.mjs state --feature <slug>`
+   must no longer say `grounding`.
+2. Invoke the **`deciding`** agent: put the real options to the OWNER, in batches.
+3. Give it the slug, what you produced, and the id of any row you wrote. It
+   starts in a fresh context - anything you do not pass on is lost.
+
+If the rung did not clear, say so and stop. Do not hand off a state you did not
+finish, and never skip a state to save a turn - `idle -> building` is the exact
+failure this exists to prevent.
+
 ## Constraints
 - DO NOT decide. You supply the evidence; the owner picks, in `deciding`.
 - DO NOT edit source, engines, lessons or config. A PoC is a THROWAWAY file

@@ -1,7 +1,7 @@
 ---
 description: "FSM state 6 of 6 - VERIFYING. Independently checks that a built feature does what its brief and design-of-record promised: runs the repo gates, re-runs each step's own verify, hunts for the checks that pass without checking anything, and gives a blunt go/no-go. Read-only - it reports, it does not fix. Use once every Plan step is ticked."
 name: verifying
-tools: [read, search, execute]
+tools: [read, search, execute, agent]
 model: ['Claude Sonnet 4.5 (copilot)', 'GPT-5 (copilot)']
 argument-hint: "Name the feature slug to verify, and the owner's bar if it is not the brief."
 ---
@@ -46,6 +46,15 @@ The gates pass, and you have said go. Record the round so it is not repeated:
 
     node tools/journal.mjs record --kind audit --feature <slug> \
       --title "verify: <slug>" --body "<what you ran, what passed, what you could not verify>"
+
+## Hand off - this is how the machine advances
+
+You are the last rung. When the gate passes, say so plainly and stop - do NOT
+invoke another agent, and do NOT start new work. New work re-enters at `recall`.
+
+If the gate fails, hand back to **`building`** with the exact failure, and let it
+fix and return. Never wave a failure through, and never fix it yourself - a
+verifier that edits the code stops being independent.
 
 ## Constraints
 - DO NOT fix anything. You report; `building` repairs. A reviewer who edits the

@@ -1,7 +1,7 @@
 ---
 description: "FSM state 1 of 6 - RECALL. Runs BEFORE any grounding, design or code on a line of work: searches the decision journal for what this repo already ruled on the topic, reports it, and records a citing journal row. Use when starting or resuming a feature, or when a question smells like it was answered before. Read-only except the journal row it writes."
 name: recall
-tools: [read, search, execute]
+tools: [read, search, execute, agent]
 model: ['Claude Sonnet 4.5 (copilot)', 'GPT-5 (copilot)']
 argument-hint: "Name the feature slug (and the topic) to recall prior rulings for."
 ---
@@ -42,6 +42,22 @@ and say what you searched for. That is an honest answer and it passes.
 
 Verify you cleared the rung: `node tools/factory.mjs state --feature <slug>`
 should no longer say `recall`.
+
+## Hand off - this is how the machine advances
+
+You do not stop when your work is done. You **invoke the next state's agent**, by
+name, with the `agent` tool - that chain IS the state machine. Nothing else
+enforces it.
+
+1. Confirm you cleared the rung: `node tools/factory.mjs state --feature <slug>`
+   must no longer say `recall`.
+2. Invoke the **`grounding`** agent: make the options real - audit the code, run a PoC.
+3. Give it the slug, what you produced, and the id of any row you wrote. It
+   starts in a fresh context - anything you do not pass on is lost.
+
+If the rung did not clear, say so and stop. Do not hand off a state you did not
+finish, and never skip a state to save a turn - `idle -> building` is the exact
+failure this exists to prevent.
 
 ## Constraints
 - DO NOT decide anything. A gap you find is a question for the owner, and the
