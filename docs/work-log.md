@@ -2397,7 +2397,7 @@ all six lessons that took a concept; `node --test test/` 527 pass, 0 fail;
 
 ## 2026-08-06 10:10 CEST - end
 
-## 2026-08-06 11:55 CEST - Inside git: engine, landing and the first lesson
+## 2026-08-06 12:02 CEST - Inside git: engine, landing and the first lesson
 
 The `objects` scene ships in `code-lab`: a store whose ids are real git's,
 an act vocabulary with no git command in it, and one panel drawing the same
@@ -2429,4 +2429,4 @@ Not clean: `npm run gate` fails one RANDOM lesson per `--all` run under its
 default parallelism - `04-ai-9`, then `03-ai-3`, always "lesson did not render".
 Each passes on its own. A runner capacity issue, not a content defect.
 
-## 2026-08-06 11:55 CEST - end
+## 2026-08-06 12:02 CEST - end
