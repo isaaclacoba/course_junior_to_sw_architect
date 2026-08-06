@@ -93,6 +93,9 @@ Status: <not started | in progress | blocked | done>  -  Design: <link or "none"
 ## Approach
 <3-6 lines: the strategy in plain words. No code.>
 
+## Owns
+- `<path or glob this brief owns>`
+
 ## Plan
 1. [ ] <step, one line> - verify: <the pass/fail check>
 2. [x] <done step> - verify: <what proved it>
@@ -110,6 +113,18 @@ Status: <not started | in progress | blocked | done>  -  Design: <link or "none"
 - Keep it skimmable: one line per Plan step, one line per Progress entry. Link,
   do not paste. Prune stale or obvious Progress lines rather than letting them
   pile up.
+
+## `## Owns` - who is writing which files
+Two sessions can share one working tree and one branch, so "who owns this file"
+cannot be read from git. The brief declares it: one bullet per path or glob.
+
+- **Required from the `building` phase on**, optional before it - the early
+  phases self-attribute, because `docs/plans/<slug>.md` and
+  `docs/architecture/<slug>.md` already carry the slug in the filename.
+- Globs allowed (`*` within a segment, `**` across, a trailing `/` means the
+  whole directory). List the design doc and the brief too.
+- `node tools/factory.mjs attribute` reads these. A path **no brief claims** is
+  drift, and a path **two briefs claim** warns both sessions - both on purpose.
 
 ## The tracking mechanism
 - The **Plan** steps are the source of truth for "what is left". Mirror them into

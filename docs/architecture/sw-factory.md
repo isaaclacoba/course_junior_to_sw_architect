@@ -1,7 +1,7 @@
 # The software factory - an FSM for the way we work
 
-Status: designed, not built. Ratified 2026-08-06 from 11 owner decisions
-(`D-sw-factory-1..11`). Grounding: `node tools/journal.mjs feature sw-factory`.
+Status: built warn-only as `tools/factory.mjs`; hook delivery still pending.
+Ratified 2026-08-06 from 11 owner decisions. Progress: `docs/plans/sw-factory.md`.
 
 ## The problem, measured
 
@@ -153,20 +153,20 @@ ladder wraps at 83 characters in an 80-column terminal.
 
 | Shape | Lines | Widest | Fits 80 | When |
 |---|---|---|---|---|
-| rail | 2 | 54 | yes | session start |
+| rail | 2 | 61 | yes | session start |
 | gate report | 6 | 66 | yes | only on a misstep |
-| ladder | 8 | **83** | **no - must be fixed** | on demand |
+| ladder | 8 | 65 | yes - refitted from 83 | on demand |
 
 The rail orients, the gate report warns, the ladder is detail on request.
 
 ## Risks
 
-- **Hook execution is unproven here.** There is no standalone `copilot` binary on
-  this machine, so an isolated session cannot be spawned to test it. A log-only
-  user-level probe did not fire mid-session, consistent with hooks loading at
-  session start. **Nothing may be built on hooks until a new session proves one
-  fires.** If they do not fire, the fallback is the same FSM as a `tools/`
-  command the agent runs - weaker, but the state derivation is unaffected.
+- **Hooks fire - repo-level ones are still unproven.** A new session logged both
+  `sessionStart` and `postToolUse` from a user-level probe, which settles what the
+  earlier mid-session negative left open: hooks load at session start. Unproven:
+  `.github/hooks/` discovery, and fail-closed `preToolUse` - a broken one denies
+  tool calls for every session on this account, so it needs a window with no
+  second session live. Until then the FSM is a `tools/` command the agent runs.
 - **Timeouts are fail-open.** A slow gate is an absent gate, so the derivation
   must stay fast - it reads parquet and a few file paths, nothing more.
 - **A gate that greps for a word is trivially gamed.** Every transition check
