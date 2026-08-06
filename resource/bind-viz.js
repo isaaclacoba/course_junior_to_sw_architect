@@ -26,7 +26,7 @@
   // in the step's scene object and is NOT part of the narration - so it needs its
   // own localization pass. Code identifiers (tool/param names, the emitted call)
   // and structural fields (role, state, score) are deliberately excluded.
-  var SCENE_PROPS = ["transcript", "agent", "agentLoop", "toolRack", "memoryShelf", "retrieval", "plan", "repo"];
+  var SCENE_PROPS = ["transcript", "agent", "agentLoop", "toolRack", "memoryShelf", "retrieval", "plan", "repo", "objects"];
 
   // For a scene of `type`, list [keySuffix, path] pairs: the res key is
   // "step.<i>.<keySuffix>" and `path` locates the string inside the scene.
@@ -67,6 +67,12 @@
       // The git board's caption. `commands` and `files` are NOT here on purpose:
       // they are real git, and translating them would break the replay the step
       // is drawn from - the same rule bind-git states for start/target/solution.
+      push("note", ["note"]);
+    } else if (type === "objects") {
+      // The caption only. `acts` are NOT here, and the reason is sharper than
+      // for `repo`: an object's id is computed from its bytes, so translating a
+      // file's text or a save's message gives the Spanish learner DIFFERENT
+      // forty characters from the English one - and the prose quotes those ids.
       push("note", ["note"]);
     } else if (type === "plan") {
       push("caption", ["caption"]);

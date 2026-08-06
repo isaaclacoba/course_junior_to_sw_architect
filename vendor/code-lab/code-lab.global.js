@@ -1606,7 +1606,13 @@ ${result.runtimeError}`.trim(),
     toolCall: "call \u2192",
     toolError: "\u2190 error",
     toolResult: "\u2190 result",
-    fanCaption: "Probability of the next token"
+    fanCaption: "Probability of the next token",
+    objEmpty: "(empty)",
+    objNoNames: "(no names yet)",
+    objYourFolder: "your folder",
+    objNothingYet: "Nothing points at anything yet.",
+    objUnnamed: "unnamed",
+    objNames: "names"
   };
   function deriveRefs(stack = []) {
     const refs = [];
@@ -6021,7 +6027,7 @@ ${written}` : written;
       if (rows.some((row) => row.id === id)) continue;
       push(
         object.type,
-        `${object.type} (unnamed)`,
+        object.type,
         id,
         object.entries ? treeBodyText(object.entries) : object.text || object.commit?.message
       );
@@ -6042,7 +6048,8 @@ ${written}` : written;
 
   // src/dom/objects-view.ts
   var ObjectsView = class {
-    constructor() {
+    constructor(labels = DEFAULT_VIZ_LABELS) {
+      this.labels = labels;
       this.el = document.createElement("div");
       this.el.className = "cl-ob";
       this.folderEl = document.createElement("pre");
@@ -6061,22 +6068,22 @@ ${written}` : written;
       const wantsChain = scene.lens === "chain" || scene.lens === "both";
       this.folderEl.hidden = !wantsFolder;
       this.chainEl.hidden = !wantsChain;
-      if (wantsFolder) this.folderEl.innerHTML = folderHtml(replay);
-      if (wantsChain) this.chainEl.innerHTML = chainHtml(chainRows(replay));
+      if (wantsFolder) this.folderEl.innerHTML = folderHtml(replay, this.labels);
+      if (wantsChain) this.chainEl.innerHTML = chainHtml(chainRows(replay), this.labels);
       this.noteEl.innerHTML = scene.note ? escapeHtml4(scene.note) : "";
       this.noteEl.hidden = !scene.note;
     }
   };
-  function folderHtml(replay) {
+  function folderHtml(replay, labels) {
     const { store, added } = replay;
     const lines2 = [".git/", "  objects/"];
-    if (!store.objects.size) lines2.push(`    ${dim("(empty)")}`);
+    if (!store.objects.size) lines2.push(`    ${dim(escapeHtml4(labels.objEmpty))}`);
     for (const [id, object] of store.objects) {
       const body = `${id.slice(0, 2)}/${id.slice(2, 8)}...  <span class="cl-ob-type">${object.type}</span>`;
       lines2.push(`    ${added.has(id) ? `<span class="cl-ob-new">${body}</span>` : body}`);
     }
     lines2.push("  refs/heads/");
-    if (!store.refs.size) lines2.push(`    ${dim("(no names yet)")}`);
+    if (!store.refs.size) lines2.push(`    ${dim(escapeHtml4(labels.objNoNames))}`);
     for (const [name, id] of store.refs) {
       lines2.push(`    ${escapeHtml4(name.replace(/^refs\/heads\//, ""))}   ${dim(short(id))}`);
     }
@@ -6088,7 +6095,7 @@ ${written}` : written;
       }
     }
     if (store.worktree.size) {
-      lines2.push("", "your folder");
+      lines2.push("", escapeHtml4(labels.objYourFolder));
       for (const [path] of store.worktree) lines2.push(`  ${escapeHtml4(path)}`);
     }
     return lines2.join("\n");
@@ -6096,8 +6103,8 @@ ${written}` : written;
   function dim(text) {
     return `<span class="cl-ob-dim">${text}</span>`;
   }
-  function chainHtml(rows) {
-    if (!rows.length) return `<p class="cl-ob-empty">Nothing points at anything yet.</p>`;
+  function chainHtml(rows, labels) {
+    if (!rows.length) return `<p class="cl-ob-empty">${escapeHtml4(labels.objNothingYet)}</p>`;
     return rows.map((row) => {
       if (row.kind === "ref") {
         return `<span class="cl-ob-ref">${escapeHtml4(row.label)}</span>`;
@@ -6105,8 +6112,9 @@ ${written}` : written;
       const classes = ["cl-ob-row"];
       if (row.fresh) classes.push("cl-ob-fresh");
       if (row.unreachable) classes.push("cl-ob-orphan");
-      const names = row.names.length ? ` names ${row.names.map((id) => `<span class="cl-ob-names">${short(id)}</span>`).join(" ")}` : "";
-      return `<div class="${classes.join(" ")}"><span class="cl-ob-kind">${escapeHtml4(row.label)}</span><span class="cl-ob-id">${short(row.id)}</span><span class="cl-ob-body">${escapeHtml4(row.body || "")}${names}</span></div>`;
+      const kind = row.unreachable ? `${escapeHtml4(row.label)} (${escapeHtml4(labels.objUnnamed)})` : escapeHtml4(row.label);
+      const names = row.names.length ? ` ${escapeHtml4(labels.objNames)} ${row.names.map((id) => `<span class="cl-ob-names">${short(id)}</span>`).join(" ")}` : "";
+      return `<div class="${classes.join(" ")}"><span class="cl-ob-kind">${kind}</span><span class="cl-ob-id">${short(row.id)}</span><span class="cl-ob-body">${escapeHtml4(row.body || "")}${names}</span></div>`;
     }).join("");
   }
 
@@ -6276,7 +6284,7 @@ ${written}` : written;
         retrieval: () => new RetrievalView(),
         planboard: () => new PlanboardView(),
         repo: () => new RepoView(),
-        objects: () => new ObjectsView(),
+        objects: (_spec, ctx) => new ObjectsView(ctx.vizLabels),
         controls: (_spec, ctx) => this.controls = new VizControls(ctx.actions, ctx.handlers, ctx.nextHref, ctx.legend, ctx.nextLabel, ctx.vizLabels)
       };
       this.onResize = () => {

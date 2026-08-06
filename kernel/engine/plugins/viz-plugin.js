@@ -58,6 +58,9 @@
     "textSize", "textSmall", "textDefault", "textLarge",
     "authorYou", "authorApp", "authorModel", "authorCode",
     "toolCall", "toolError", "toolResult", "fanCaption",
+    // The objects scene's own words. `blob`, `tree` and `commit` are absent on
+    // purpose - they are git's vocabulary and the learner meets them verbatim.
+    "objEmpty", "objNoNames", "objYourFolder", "objNothingYet", "objUnnamed", "objNames",
   ];
 
   function applyVizLabels(cfg) {

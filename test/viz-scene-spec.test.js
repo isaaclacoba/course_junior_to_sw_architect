@@ -9,15 +9,17 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
 const path = require("node:path");
 const { pathToFileURL } = require("node:url");
 
-let extractSceneEntries, SCENE_PROPS;
+let extractSceneEntries, SCENE_PROPS, sceneLeaves;
 
 test.before(async () => {
   const mod = await import(pathToFileURL(path.join(__dirname, "..", "tools", "lib", "viz-scene-spec.mjs")));
   extractSceneEntries = mod.extractSceneEntries;
   SCENE_PROPS = mod.SCENE_PROPS;
+  sceneLeaves = mod.sceneLeaves;
 });
 
 function sampleViz() {
@@ -34,11 +36,34 @@ function sampleViz() {
   };
 }
 
-test("SCENE_PROPS lists the seven AI scene types", () => {
+// The list this test used to hardcode was "the seven AI scene types", so when
+// the `repo` scene was added to bind-viz.js and not to the spec, the test kept
+// passing and the drift shipped: `repo` captions were never extracted and never
+// translated. A hardcoded copy of the thing under test cannot catch a drift -
+// it IS the drift. Read both lists and compare them to each other instead.
+test("the browser binder and the tool spec list exactly the same scene types", () => {
+  const binder = fs.readFileSync(path.join(__dirname, "..", "resource", "bind-viz.js"), "utf8");
+  const match = binder.match(/var SCENE_PROPS = \[([^\]]+)\]/);
+  assert.ok(match, "resource/bind-viz.js no longer declares SCENE_PROPS as a literal array");
+  const fromBinder = match[1].split(",").map((s) => s.trim().replace(/^"|"$/g, ""));
   assert.deepEqual(
     [...SCENE_PROPS].sort(),
-    ["agent", "agentLoop", "memoryShelf", "plan", "retrieval", "toolRack", "transcript"]
+    [...fromBinder].sort(),
+    "bind-viz.js and viz-scene-spec.mjs must list the same scenes, or a scene's prose is silently untranslatable",
   );
+});
+
+test("every listed scene type actually yields leaves", () => {
+  // A type in the list with no branch in `sceneLeaves` is the same bug wearing a
+  // different hat: present in the spec, still extracting nothing.
+  for (const type of SCENE_PROPS) {
+    const sample = { note: "n", caption: "c", goal: "g", think: "t", query: "q",
+      stripCaption: "sc", core: { sub: "s" }, banner: "b", workingCaption: "wc" };
+    assert.ok(
+      sceneLeaves(type, sample).length > 0,
+      `scene "${type}" is listed but sceneLeaves() has no branch for it`,
+    );
+  }
 });
 
 test("extractSceneEntries pulls prose from every scene type with step-scoped keys", () => {

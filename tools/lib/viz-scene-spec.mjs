@@ -7,7 +7,7 @@
 import fs from "node:fs";
 import vm from "node:vm";
 
-export const SCENE_PROPS = ["transcript", "agent", "agentLoop", "toolRack", "memoryShelf", "retrieval", "plan"];
+export const SCENE_PROPS = ["transcript", "agent", "agentLoop", "toolRack", "memoryShelf", "retrieval", "plan", "repo", "objects"];
 
 // For a scene of `type`, list [keySuffix, path] pairs: the res key is
 // "step.<i>.<keySuffix>" and `path` locates the string inside the scene.
@@ -44,6 +44,15 @@ export function sceneLeaves(type, sc) {
     push("caption", ["caption"]);
     push("query", ["query"]);
     (sc.docs || []).forEach((_, j) => push(`doc.${j}`, ["docs", j, "text"]));
+  } else if (type === "repo") {
+    // The board's caption only. `commands` and `files` are real git, and
+    // translating them would break the replay the step is drawn from.
+    push("note", ["note"]);
+  } else if (type === "objects") {
+    // The caption only, and for a sharper reason than `repo`: an object's id is
+    // computed from its bytes, so translating a file's text or a save's message
+    // hands the Spanish learner different forty characters from the English one.
+    push("note", ["note"]);
   } else if (type === "plan") {
     push("caption", ["caption"]);
     push("goal", ["goal"]);
