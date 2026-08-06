@@ -2396,3 +2396,37 @@ all six lessons that took a concept; `node --test test/` 527 pass, 0 fail;
 `generated/course-data.js` resolves 11 git cards. Not committed.
 
 ## 2026-08-06 10:10 CEST - end
+
+## 2026-08-06 11:55 CEST - Inside git: engine, landing and the first lesson
+
+The `objects` scene ships in `code-lab`: a store whose ids are real git's,
+an act vocabulary with no git command in it, and one panel drawing the same
+state as the folder on disk, as the chain of names, or as both. The chain
+layout was measured, not argued - five built inside the real widget at the real
+562px visual panel, and three of them died on the numbers.
+
+Running the scene through the real bundle caught two bugs every unit test had
+passed, both guesses about what to DRAW rather than about what is true: a row
+named whatever was drawn below it (right by luck with one commit, wrong with
+two), and an unnamed tree rendered with an empty body.
+
+Three i18n holes closed before the first lesson could be bilingual. The scene
+spec `tools/lib/viz-scene-spec.mjs` was missing `objects` AND `repo`, so a repo
+caption was never extracted; the test meant to prevent that drift hardcoded its
+own copy of the list and so passed while the drift shipped; and the widget's own
+words were English-only. Acts are deliberately NOT translated - an object's id
+is computed from its bytes.
+
+The landing page now puts two tracks under one tab via a `group` field, with a
+segmented control inside. Bar, count and Continue follow the selected half.
+
+Verified: `validate.mjs` 0 errors; `check-i18n` PASS; `check-voice` 0 flags;
+`verify-lesson` EN+ES on the new lesson, now with its scene actually resolved;
+`i18n-roundtrip` clean on it; 531 course tests, 506 code-lab tests, 0 fail; EN
+and ES both driven in a real browser.
+
+Not clean: `npm run gate` fails one RANDOM lesson per `--all` run under its
+default parallelism - `04-ai-9`, then `03-ai-3`, always "lesson did not render".
+Each passes on its own. A runner capacity issue, not a content defect.
+
+## 2026-08-06 11:55 CEST - end
