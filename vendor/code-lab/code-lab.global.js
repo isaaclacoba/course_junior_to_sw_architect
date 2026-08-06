@@ -5982,15 +5982,22 @@ ${written}` : written;
     const { store, added } = replay;
     const live = store.reachable();
     const rows = [];
-    const push = (kind, label, id, body) => {
+    const seen = /* @__PURE__ */ new Set();
+    const push = (kind, label, id, depth, body) => {
+      if (seen.has(id)) return;
+      seen.add(id);
       const object = store.objects.get(id);
-      const names = object?.commit ? [object.commit.tree, ...object.commit.parents] : [];
+      const names = object?.commit ? [
+        { role: "tree", id: object.commit.tree },
+        ...object.commit.parents.map((p) => ({ role: "parent", id: p }))
+      ] : [];
       rows.push({
         kind,
         label,
         id,
         body,
-        names: names.filter((named) => !body?.includes(short(named))),
+        depth,
+        names: names.filter((n) => !body?.includes(short(n.id))),
         fresh: added.has(id),
         unreachable: !live.has(id)
       });
@@ -6003,37 +6010,39 @@ ${written}` : written;
           label: name.replace(/^refs\/heads\//, ""),
           id,
           names: [],
+          depth: 0,
           fresh: false,
           unreachable: false
         });
       }
     }
+    const walkTree = (id, depth) => {
+      const node = id ? store.objects.get(id) : void 0;
+      if (!node?.entries) return;
+      push("tree", "tree", id, depth, treeBodyText(node.entries));
+      for (const entry of node.entries) {
+        if (store.objects.get(entry.id)?.entries) walkTree(entry.id, depth + 1);
+        else push("blob", "blob", entry.id, depth + 1, store.objects.get(entry.id)?.text);
+      }
+    };
     let walk = head;
-    let top = null;
+    let sawCommit = false;
     let guard = 0;
     while (walk && store.objects.get(walk)?.commit && guard++ < 64) {
       const commit2 = store.objects.get(walk).commit;
-      if (!top) top = walk;
-      push("commit", "commit", walk, commit2.message);
+      sawCommit = true;
+      push("commit", "commit", walk, 0, commit2.message);
+      walkTree(commit2.tree, 1);
       walk = commit2.parents[0];
     }
-    const treeId = top ? store.objects.get(top).commit.tree : lastTreeOf(store);
-    const walkTree = (id) => {
-      const node = id ? store.objects.get(id) : void 0;
-      if (!node?.entries) return;
-      push("tree", "tree", id, treeBodyText(node.entries));
-      for (const entry of node.entries) {
-        if (store.objects.get(entry.id)?.entries) walkTree(entry.id);
-        else push("blob", "blob", entry.id, store.objects.get(entry.id)?.text);
-      }
-    };
-    walkTree(treeId);
+    if (!sawCommit) walkTree(lastTreeOf(store), 0);
     for (const [id, object] of store.objects) {
-      if (rows.some((row) => row.id === id)) continue;
+      if (seen.has(id)) continue;
       push(
         object.type,
         object.type,
         id,
+        0,
         object.entries ? treeBodyText(object.entries) : object.text || object.commit?.message
       );
     }
@@ -6189,8 +6198,11 @@ ${written}` : written;
       if (row.fresh) classes.push("cl-ob-fresh");
       if (row.unreachable) classes.push("cl-ob-orphan");
       const kind = row.unreachable ? `${escapeHtml4(row.label)} (${escapeHtml4(labels.objUnnamed)})` : escapeHtml4(row.label);
-      const names = row.names.length ? ` ${escapeHtml4(labels.objNames)} ${row.names.map((id) => `<span class="cl-ob-names">${short(id)}</span>`).join(" ")}` : "";
-      return `<div class="${classes.join(" ")}"><span class="cl-ob-kind">${kind}</span><span class="cl-ob-id">${short(row.id)}</span><span class="cl-ob-body">${escapeHtml4(row.body || "")}${names}</span></div>`;
+      const names = row.names.length ? ` ${escapeHtml4(labels.objNames)} ${row.names.map(
+        (n) => `<span class="cl-ob-role">${escapeHtml4(n.role)}</span><span class="cl-ob-names">${short(n.id)}</span>`
+      ).join(" ")}` : "";
+      const indent = row.depth > 0 ? ` style="margin-left:${row.depth * 1.1}rem"` : "";
+      return `<div class="${classes.join(" ")}"${indent}><span class="cl-ob-kind">${kind}</span><span class="cl-ob-id">${short(row.id)}</span><span class="cl-ob-body">${escapeHtml4(row.body || "")}${names}</span></div>`;
     }).join("");
   }
 
