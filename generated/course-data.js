@@ -1234,6 +1234,9 @@
       "kicker": "Version control",
       "blurb": "Never used git or a terminal? Type real commands and watch the repository draw itself - commits, branches, merges, and how to undo a mistake.",
       "partPrefix": "Git · Part ",
+      "group": "git",
+      "groupLabel": "Hands on",
+      "groupBlurb": "Two ways in. Type the commands, or open the machine up and see what they are made of.",
       "parts": [
         {
           "track": "git",
@@ -1409,6 +1412,59 @@
               "kind": "lesson"
             }
           ]
+        }
+      ]
+    },
+    {
+      "id": "git-inside",
+      "name": "Inside git",
+      "kicker": "Version control",
+      "blurb": "No commands at all. Open the hidden folder git keeps and see what a saved version is actually made of - and why its name comes from the bytes inside it.",
+      "partPrefix": "Inside git · Part ",
+      "group": "git",
+      "groupLabel": "Inside git",
+      "parts": [
+        {
+          "track": "git-inside",
+          "id": "things-with-names-made-of-content",
+          "title": "Things with names made of content",
+          "kicker": "Inside git · Part one",
+          "lessons": [
+            {
+              "id": "git-inside-hidden-folder",
+              "track": "git-inside",
+              "part": "things-with-names-made-of-content",
+              "href": "content/git-inside/01-things-with-names-made-of-content/01-git-inside-hidden-folder/",
+              "key": "git_inside_hidden_folder_awarded",
+              "total": 1,
+              "title": "What is in that hidden folder?",
+              "blurb": "The hidden folder git keeps, read line by line before you have saved anything. It holds almost nothing yet, and that is exactly why it is the place to start.",
+              "pill": "gentle",
+              "time": "10 min",
+              "kind": "lesson"
+            }
+          ]
+        },
+        {
+          "track": "git-inside",
+          "id": "names-that-move",
+          "title": "Names that move",
+          "kicker": "Inside git · Part two",
+          "lessons": []
+        },
+        {
+          "track": "git-inside",
+          "id": "the-store-over-time",
+          "title": "The store over time",
+          "kicker": "Inside git · Part three",
+          "lessons": []
+        },
+        {
+          "track": "git-inside",
+          "id": "more-than-one-copy",
+          "title": "More than one copy of the store",
+          "kicker": "Inside git · Part four",
+          "lessons": []
         }
       ]
     }

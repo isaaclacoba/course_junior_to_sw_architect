@@ -342,18 +342,40 @@ export function createValidators(deps) {
     if (opts.noViz) { skip("viz resolvers (--no-viz)"); return true; }
     const steps = config.steps || [];
     const CL = deps.codeLab();
-    const resolvers = { transcript: CL.resolveTranscript, retrieval: CL.resolveRetrieval, plan: CL.resolvePlan };
+    // Every scene that HAS a resolver in the bundle belongs here. A scene left
+    // out is a scene whose data is never checked - the step still renders, so
+    // nothing complains, and a typo in an author's scene reaches the learner.
+    const resolvers = {
+      transcript: CL.resolveTranscript,
+      retrieval: CL.resolveRetrieval,
+      plan: CL.resolvePlan,
+      repo: CL.resolveRepo,
+      objects: CL.resolveObjects,
+    };
     let allOk = true, ran = 0;
     steps.forEach((step, i) => {
       for (const [field, fn] of Object.entries(resolvers)) {
         if (!step[field]) continue;
         if (typeof fn !== "function") { skip(`step ${i + 1} ${field}: no resolver in bundle`); continue; }
-        try { const out = fn(step[field]); if (!out || typeof out !== "object") throw new Error("resolver returned non-object"); ran++; }
+        try {
+          const out = fn(step[field]);
+          if (!out || typeof out !== "object") throw new Error("resolver returned null - the scene is missing its required field");
+          ran++;
+          // An objects scene resolves fine with acts that do nothing; replaying
+          // is what proves the step actually draws something.
+          if (field === "objects" && typeof CL.replayObjects === "function") {
+            const replay = CL.replayObjects(out);
+            if (out.acts.length && replay.store.objects.size === 0 && replay.store.worktree.size === 0) {
+              bad(`step ${i + 1} objects: ${out.acts.length} act(s) changed nothing - check the act names`);
+              allOk = false;
+            }
+          }
+        }
         catch (e) { bad(`step ${i + 1} ${field} resolver threw: ${e.message}`); allOk = false; }
       }
     });
     if (ran) ok(`${ran} scene(s) resolved cleanly across ${steps.length} step(s)`);
-    else skip(`no transcript/retrieval/plan scenes to resolve (${steps.length} step(s))`);
+    else skip(`no resolvable scenes in this lesson (${steps.length} step(s))`);
     return allOk;
   }
 

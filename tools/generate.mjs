@@ -90,6 +90,14 @@ function projectTracks(registry, migrated) {
       kicker: t.kicker,
       blurb: t.blurb,
       partPrefix: t.partPrefix,
+      // Two tracks can be halves of one course. `group` says which tab they
+      // share; `groupLabel` is what the segment inside it calls this half, and
+      // `groupBlurb` (first member only) is the sentence above the segment.
+      // Whitelisted like everything else here - a registry field nobody projects
+      // is a field the landing page cannot see.
+      group: t.group,
+      groupLabel: t.groupLabel,
+      groupBlurb: t.groupBlurb,
       parts: t.parts.map(function (p, pi) {
         return {
           track: t.id,
@@ -374,6 +382,10 @@ function buildLandingI18n(registry, migrated) {
         if (ti.name != null) tr.name = ti.name;
         if (ti.kicker != null) tr.kicker = ti.kicker;
         if (ti.blurb != null) tr.blurb = ti.blurb;
+        // The segment label and the sentence above it are chrome too - without
+        // these the git tab keeps two English segment labels on a Spanish page.
+        if (ti.groupLabel != null) tr.groupLabel = ti.groupLabel;
+        if (ti.groupBlurb != null) tr.groupBlurb = ti.groupBlurb;
         if (Object.keys(tr).length) overlay.tracks[t.id] = tr;
       }
       const prefixLoc = ti && ti.partPrefix;

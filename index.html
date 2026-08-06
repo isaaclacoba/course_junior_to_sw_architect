@@ -290,6 +290,45 @@
         box-shadow: 0 1px 3px var(--shadow-soft);
       }
 
+      /* Second level: which half of a two-track course you are reading. Only
+         rendered for a group with more than one member, so three of the four
+         tabs look exactly as they did. */
+      .c-sub-switch {
+        display: flex;
+        width: max-content;
+        max-width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        overflow: hidden;
+        margin: -8px 0 20px;
+      }
+      .c-sub-switch[hidden] { display: none; }
+      .c-sub-btn {
+        border: 0;
+        border-right: 1px solid var(--line);
+        background: var(--panel);
+        font: inherit;
+        font-size: 0.92rem;
+        color: var(--ink-soft);
+        text-align: left;
+        padding: 9px 20px;
+        cursor: pointer;
+        transition: background 0.2s ease, color 0.2s ease;
+      }
+      .c-sub-btn:last-child { border-right: 0; }
+      .c-sub-btn.is-active {
+        background: var(--card);
+        color: var(--ink);
+        font-weight: 600;
+        box-shadow: inset 0 -3px 0 var(--primary);
+      }
+      .c-sub-btn small {
+        display: block;
+        font-weight: 400;
+        font-size: 0.76rem;
+        color: var(--ink-soft);
+      }
+
       .c-track-path.c-anim { animation: trackIn 0.4s ease; }
       @keyframes trackIn {
         from { opacity: 0; transform: translateY(12px); }
@@ -432,15 +471,17 @@
         <p class="c-eyebrow">From junior to software architect</p>
         <h1 class="c-title">Learn C# - and how software really works</h1>
         <p class="c-lead">
-          Three ways in. The <strong>practical</strong> track teaches C# by building and running
+          Four ways in. The <strong>practical</strong> track teaches C# by building and running
           real code in your browser. The <strong>theory</strong> track starts from zero - what
           software is and how a computer actually runs it. The <strong>AI</strong> track opens up
-          how large language models and agents work under the hood. Pick one - you can switch any
-          time.
+          how large language models and agents work under the hood. The <strong>git</strong>
+          course comes in two halves: type the commands, or open the machine up and see what
+          they are made of. Pick one - you can switch any time.
         </p>
 
         <div id="trackActive" hidden>
           <div class="c-track-switch" id="trackSwitch" role="tablist" aria-label="Choose track"></div>
+          <div class="c-sub-switch" id="trackSubSwitch" role="tablist" aria-label="Choose which half" hidden></div>
           <div class="c-progress">
             <div class="c-progress-row">
               <span class="c-progress-label" id="cTrackLabel">Your progress</span>

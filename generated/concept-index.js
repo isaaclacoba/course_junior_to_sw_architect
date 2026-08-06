@@ -379,6 +379,11 @@
       "revisitedBy": [],
       "usedBy": []
     },
+    "gt-git-folder": {
+      "introducedBy": "git-inside-hidden-folder",
+      "revisitedBy": [],
+      "usedBy": []
+    },
     "gt-hash": {
       "introducedBy": "git-where-am-i",
       "revisitedBy": [
@@ -426,6 +431,11 @@
       "usedBy": [
         "git-settle-a-conflict"
       ]
+    },
+    "gt-object-store": {
+      "introducedBy": "git-inside-hidden-folder",
+      "revisitedBy": [],
+      "usedBy": []
     },
     "gt-rebase": {
       "introducedBy": "git-rebase",
@@ -2252,6 +2262,14 @@
         "gt-head"
       ]
     },
+    "git-inside-hidden-folder": {
+      "introduces": [
+        "gt-git-folder",
+        "gt-object-store"
+      ],
+      "revisits": [],
+      "uses": []
+    },
     "git-make-a-branch": {
       "introduces": [
         "gt-revision",
@@ -3318,6 +3336,10 @@
       "term": "Fast-forward",
       "def": "When your branch has added nothing since the split, git just slides its name forward and makes no new commit."
     },
+    "gt-git-folder": {
+      "term": "The .git folder",
+      "def": "The hidden folder git keeps beside your work. It holds the whole repository - everything git has kept, and the names pointing at it - as ordinary files you could open."
+    },
     "gt-hash": {
       "term": "Hash",
       "def": "The short code git gives a commit as its name, so you can point at that exact snapshot."
@@ -3337,6 +3359,10 @@
     "gt-merge-commit": {
       "term": "Merge commit",
       "def": "The commit a merge makes when both sides moved on - the one commit with two parents."
+    },
+    "gt-object-store": {
+      "term": "Object store",
+      "def": "The `objects/` folder inside `.git`. Everything git keeps ends up there, one file per thing, and it starts out empty."
     },
     "gt-rebase": {
       "term": "Rebase",

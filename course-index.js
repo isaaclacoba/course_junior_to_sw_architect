@@ -43,6 +43,7 @@
   var chooser = byId("trackChooser");
   var chooserCards = byId("trackCards");
   var activeEl = byId("trackActive");
+  var subSwitchEl = byId("trackSubSwitch");
   var switchEl = byId("trackSwitch");
   var mount = byId("trackMount");
 
@@ -87,33 +88,73 @@
     '</li>';
   }
 
-  C.tracks().forEach(function (t) {
+  // Two tracks can be the two halves of one course - the git course is a
+  // hands-on track and an internals track. They share ONE tab, named by the
+  // group; a segmented control inside picks which half you are reading. A track
+  // with no `group` is its own group of one and no segment appears.
+  //
+  // The FIRST member owns the tab: its kicker, name and blurb are the group's.
+  function groupsOf(tracks) {
+    var seen = {};
+    var order = [];
+    tracks.forEach(function (t) {
+      var gid = t.group || t.id;
+      if (!seen[gid]) { seen[gid] = { id: gid, lead: t, members: [] }; order.push(seen[gid]); }
+      seen[gid].members.push(t);
+    });
+    return order;
+  }
+  var GROUPS = groupsOf(C.tracks());
+  function groupOf(trackId) {
+    for (var i = 0; i < GROUPS.length; i++) {
+      for (var j = 0; j < GROUPS[i].members.length; j++) {
+        if (GROUPS[i].members[j].id === trackId) return GROUPS[i];
+      }
+    }
+    return null;
+  }
+  function trackText(t) {
     var o = ov(); var to = o && o.tracks && o.tracks[t.id];
-    var tname = (to && to.name) || t.name;
-    var tkicker = (to && to.kicker) || t.kicker;
-    var tblurb = (to && to.blurb) || t.blurb;
+    return {
+      name: (to && to.name) || t.name,
+      kicker: (to && to.kicker) || t.kicker,
+      blurb: (to && to.blurb) || t.blurb,
+      groupLabel: (to && to.groupLabel) || t.groupLabel || ((to && to.name) || t.name),
+      groupBlurb: (to && to.groupBlurb) || t.groupBlurb,
+    };
+  }
+
+  // One chooser card and one tab per GROUP; one path per TRACK.
+  GROUPS.forEach(function (g) {
+    var txt = trackText(g.lead);
     var cc = document.createElement("button");
     cc.type = "button";
     cc.className = "c-track-card";
-    cc.setAttribute("data-track", t.id);
-    cc.innerHTML = '<span class="c-track-kicker">' + tkicker + '</span>' +
-      '<span class="c-track-name">' + tname + '</span>' +
-      '<span class="c-track-blurb">' + tblurb + '</span>';
+    cc.setAttribute("data-track", g.lead.id);
+    cc.innerHTML = '<span class="c-track-kicker">' + txt.kicker + '</span>' +
+      '<span class="c-track-name">' + txt.name + '</span>' +
+      '<span class="c-track-blurb">' + (txt.groupBlurb || txt.blurb) + '</span>';
     chooserCards.appendChild(cc);
 
     var sb = document.createElement("button");
     sb.type = "button";
     sb.className = "c-switch-btn";
-    sb.setAttribute("data-track", t.id);
-    sb.textContent = tname;
+    sb.setAttribute("data-track", g.lead.id);
+    sb.textContent = txt.name;
     switchEl.appendChild(sb);
+  });
 
+  C.tracks().forEach(function (t) {
     var path = document.createElement("div");
     path.className = "c-track-path";
     path.id = "track-" + t.id;
     path.setAttribute("data-track", t.id);
     path.hidden = true;
-    path.innerHTML = '<ol class="c-path">' + t.parts.map(partHTML).join("") + '</ol>';
+    // A part with no lessons yet is a heading with nothing under it, which reads
+    // as a broken page rather than as a plan. The registry keeps the whole
+    // syllabus; the page shows the parts that have something in them.
+    var filled = t.parts.filter(function (p) { return p.lessons.length > 0; });
+    path.innerHTML = '<ol class="c-path">' + filled.map(partHTML).join("") + '</ol>';
     mount.appendChild(path);
   });
 
@@ -153,6 +194,7 @@
   function showChooser() {
     if (activeEl) activeEl.hidden = true;
     if (chooser) chooser.hidden = false;
+    if (subSwitchEl) subSwitchEl.hidden = true;
     if (Nav) Nav.hide();
     Object.keys(trackEls).forEach(function (k) { if (trackEls[k]) trackEls[k].hidden = true; });
     current = null;
@@ -164,11 +206,15 @@
     if (chooser) chooser.hidden = true;
     if (activeEl) activeEl.hidden = false;
     Object.keys(trackEls).forEach(function (k) { if (trackEls[k]) trackEls[k].hidden = k !== name; });
-    if (switchEl) {
+    var group = groupOf(name);
+    if (switchEl && group) {
       Array.prototype.slice.call(switchEl.querySelectorAll(".c-switch-btn")).forEach(function (b) {
-        b.classList.toggle("is-active", b.getAttribute("data-track") === name);
+        b.classList.toggle("is-active", b.getAttribute("data-track") === group.lead.id);
       });
     }
+    paintSubSwitch(group, name);
+    // The stored id is the MEMBER, and the tab is derived from its group. Storing
+    // the group instead would remember the tab and forget which half you were on.
     P.setTrack(name);
     if (Nav) Nav.setTrack(C.track(name), trackEls[name]);
     renderTrack(name);
@@ -178,6 +224,26 @@
       void el.offsetWidth;
       el.classList.add("c-anim");
     }
+  }
+
+  // The second level. Absent for a group of one, so three of the four tabs look
+  // exactly as they did.
+  function paintSubSwitch(group, selected) {
+    if (!subSwitchEl) return;
+    if (!group || group.members.length < 2) {
+      subSwitchEl.hidden = true;
+      subSwitchEl.innerHTML = "";
+      return;
+    }
+    subSwitchEl.hidden = false;
+    subSwitchEl.innerHTML = group.members.map(function (m) {
+      var txt = trackText(m);
+      var count = m.parts.reduce(function (n, p) { return n + p.lessons.length; }, 0);
+      var word = count === 1 ? tr("landing.lesson", "lesson") : tr("landing.lessons", "lessons");
+      return '<button type="button" class="c-sub-btn' + (m.id === selected ? " is-active" : "") +
+        '" data-track="' + m.id + '" role="tab" aria-selected="' + (m.id === selected) + '">' +
+        txt.groupLabel + '<small>' + count + " " + word + "</small></button>";
+    }).join("");
   }
 
   // ---------- events ----------
@@ -190,7 +256,19 @@
   if (switchEl) {
     switchEl.addEventListener("click", function (e) {
       var b = e.target.closest(".c-switch-btn");
-      if (b) { showTrack(b.getAttribute("data-track"), true); window.scrollTo({ top: 0, behavior: "smooth" }); }
+      if (!b) return;
+      // A tab names a GROUP. Land on its first member unless you were already
+      // inside this group, in which case stay on the half you were reading.
+      var g = groupOf(b.getAttribute("data-track"));
+      var target = (g && groupOf(current) === g) ? current : (g ? g.lead.id : b.getAttribute("data-track"));
+      showTrack(target, true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+  if (subSwitchEl) {
+    subSwitchEl.addEventListener("click", function (e) {
+      var b = e.target.closest(".c-sub-btn");
+      if (b) showTrack(b.getAttribute("data-track"), true);
     });
   }
 
@@ -235,6 +313,7 @@
     setAria("#cJbEdgeL", "landing.scrollLeft");
     setAria("#cJbEdgeR", "landing.scrollRight");
     setAria("#trackSwitch", "landing.chooseTrack");
+    setAria("#trackSubSwitch", "landing.chooseHalf");
     setAria("#cTotop", "landing.backToTop");
     if (window.ChromeText["landing.title"]) document.title = window.ChromeText["landing.title"];
   }

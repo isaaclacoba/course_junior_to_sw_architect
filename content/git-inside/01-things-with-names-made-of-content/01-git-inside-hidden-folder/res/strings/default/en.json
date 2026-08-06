@@ -1,0 +1,6 @@
+{
+  "concept.gt-git-folder.term": "The .git folder",
+  "concept.gt-git-folder.def": "The hidden folder git keeps beside your work. It holds the whole repository - everything git has kept, and the names pointing at it - as ordinary files you could open.",
+  "concept.gt-object-store.term": "Object store",
+  "concept.gt-object-store.def": "The `objects/` folder inside `.git`. Everything git keeps ends up there, one file per thing, and it starts out empty."
+}

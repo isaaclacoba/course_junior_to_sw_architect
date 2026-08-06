@@ -47,11 +47,17 @@
       { id: "how-an-agent-thinks", title: "How an agent thinks", i18n: { es: { title: "Cómo piensa un agente" } } },
       { id: "making-agents-reliable", title: "Making agents reliable", i18n: { es: { title: "Hacer agentes de fiar" } } }
     ] },
-    { id: "git", name: "Git", kicker: "Version control", partPrefix: "Git · Part ", blurb: "Never used git or a terminal? Type real commands and watch the repository draw itself - commits, branches, merges, and how to undo a mistake.", i18n: { es: { name: "Git", kicker: "Control de versiones", partPrefix: "Git · Parte ", blurb: "¿Nunca has usado git ni un terminal? Escribe comandos de verdad y mira cómo se dibuja el repositorio - commits, ramas, fusiones y cómo deshacer un error." } }, parts: [
+    { id: "git", name: "Git", kicker: "Version control", partPrefix: "Git · Part ", group: "git", groupLabel: "Hands on", groupBlurb: "Two ways in. Type the commands, or open the machine up and see what they are made of.", blurb: "Never used git or a terminal? Type real commands and watch the repository draw itself - commits, branches, merges, and how to undo a mistake.", i18n: { es: { name: "Git", kicker: "Control de versiones", partPrefix: "Git · Parte ", groupLabel: "Manos a la obra", groupBlurb: "Dos formas de entrar. Escribe los comandos, o abre la máquina y mira de qué están hechos.", blurb: "¿Nunca has usado git ni un terminal? Escribe comandos de verdad y mira cómo se dibuja el repositorio - commits, ramas, fusiones y cómo deshacer un error." } }, parts: [
       { id: "first-steps", title: "First steps", i18n: { es: { title: "Primeros pasos" } } },
       { id: "branches", title: "Branches", i18n: { es: { title: "Ramas" } } },
       { id: "bringing-work-back", title: "Bringing work back", i18n: { es: { title: "Reunir el trabajo" } } },
       { id: "fixing-mistakes", title: "Fixing mistakes", i18n: { es: { title: "Arreglar errores" } } }
+    ] },
+    { id: "git-inside", name: "Inside git", kicker: "Version control", partPrefix: "Inside git · Part ", group: "git", groupLabel: "Inside git", blurb: "No commands at all. Open the hidden folder git keeps and see what a saved version is actually made of - and why its name comes from the bytes inside it.", i18n: { es: { name: "Git por dentro", kicker: "Control de versiones", partPrefix: "Git por dentro · Parte ", groupLabel: "Por dentro", blurb: "Ni un solo comando. Abre la carpeta oculta que git mantiene y mira de qué está hecha de verdad una versión guardada - y por qué su nombre sale de los bytes que contiene." } }, parts: [
+      { id: "things-with-names-made-of-content", title: "Things with names made of content", i18n: { es: { title: "Cosas con nombres hechos de contenido" } } },
+      { id: "names-that-move", title: "Names that move", i18n: { es: { title: "Nombres que se mueven" } } },
+      { id: "the-store-over-time", title: "The store over time", i18n: { es: { title: "El almacén con el tiempo" } } },
+      { id: "more-than-one-copy", title: "More than one copy of the store", i18n: { es: { title: "Más de una copia del almacén" } } }
     ] },
   ];
 
@@ -181,6 +187,7 @@
     { track: "git", part: "fixing-mistakes", id: "git-reflog", href: "content/git/04-fixing-mistakes/05-git-reflog/", kind: "lesson", path: "content/git/04-fixing-mistakes/05-git-reflog" },
     { track: "git", part: "fixing-mistakes", id: "git-undo-with-reset", href: "content/git/04-fixing-mistakes/04-git-undo-with-reset/", kind: "lesson", path: "content/git/04-fixing-mistakes/04-git-undo-with-reset" },
     { track: "git", part: "fixing-mistakes", id: "git-rebase", href: "content/git/04-fixing-mistakes/06-git-rebase/", kind: "lesson", path: "content/git/04-fixing-mistakes/06-git-rebase" },
+    { track: "git-inside", part: "things-with-names-made-of-content", id: "git-inside-hidden-folder", href: "content/git-inside/01-things-with-names-made-of-content/01-git-inside-hidden-folder/", kind: "lesson", path: "content/git-inside/01-things-with-names-made-of-content/01-git-inside-hidden-folder" },
   ];
 
   var byIdIndex = {};

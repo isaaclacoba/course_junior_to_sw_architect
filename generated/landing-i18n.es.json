@@ -148,6 +148,10 @@
       "blurb": "Corrige el commit que acabas de hacer en vez de apilar un `oops` encima. Arregla un mensaje mal escrito, mete el archivo que se quedó fuera, y deja la historia con la misma longitud.",
       "title": "Arreglar el último commit"
     },
+    "git-inside-hidden-folder": {
+      "blurb": "La carpeta oculta que mantiene git, leída línea a línea antes de haber guardado nada. Todavía no contiene casi nada, y justo por eso es el sitio por donde empezar.",
+      "title": "¿Qué hay en esa carpeta oculta?"
+    },
     "git-make-a-branch": {
       "blurb": "Separa una línea de trabajo y haz commits ahí sin tocar `main`. Crea una rama, súbete a ella y mira cómo el grafo se bifurca mientras la línea anterior se queda quieta.",
       "title": "Crear una rama y trabajar en ella"
@@ -386,6 +390,10 @@
     "Git · Part one": "Git · Parte uno",
     "Git · Part three": "Git · Parte tres",
     "Git · Part two": "Git · Parte dos",
+    "Inside git · Part four": "Git por dentro · Parte cuatro",
+    "Inside git · Part one": "Git por dentro · Parte uno",
+    "Inside git · Part three": "Git por dentro · Parte tres",
+    "Inside git · Part two": "Git por dentro · Parte dos",
     "Part five": "Parte cinco",
     "Part four": "Parte cuatro",
     "Part one": "Parte uno",
@@ -413,9 +421,13 @@
     "How software runs and connects": "Cómo se ejecuta y se conecta el software",
     "Know the language": "Conoce el lenguaje",
     "Making agents reliable": "Hacer agentes de fiar",
+    "More than one copy of the store": "Más de una copia del almacén",
+    "Names that move": "Nombres que se mueven",
     "Prove it works": "Demuestra que funciona",
     "The building blocks of AI": "Los pilares de la IA",
     "The development world": "El mundo del desarrollo",
+    "The store over time": "El almacén con el tiempo",
+    "Things with names made of content": "Cosas con nombres hechos de contenido",
     "Understand the ideas": "Comprende las ideas",
     "What a computer really is": "Qué es de verdad un ordenador"
   },
@@ -427,8 +439,16 @@
     },
     "git": {
       "blurb": "¿Nunca has usado git ni un terminal? Escribe comandos de verdad y mira cómo se dibuja el repositorio - commits, ramas, fusiones y cómo deshacer un error.",
+      "groupBlurb": "Dos formas de entrar. Escribe los comandos, o abre la máquina y mira de qué están hechos.",
+      "groupLabel": "Manos a la obra",
       "kicker": "Control de versiones",
       "name": "Git"
+    },
+    "git-inside": {
+      "blurb": "Ni un solo comando. Abre la carpeta oculta que git mantiene y mira de qué está hecha de verdad una versión guardada - y por qué su nombre sale de los bytes que contiene.",
+      "groupLabel": "Por dentro",
+      "kicker": "Control de versiones",
+      "name": "Git por dentro"
     },
     "practical": {
       "blurb": "Aprende C# escribiendo y ejecutando código de verdad, victoria a victoria, hasta el diseño SOLID.",
