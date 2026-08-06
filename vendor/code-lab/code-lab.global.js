@@ -6083,28 +6083,20 @@ ${written}` : written;
       if (object.type === type) found = object;
     }
     if (!found) return null;
+    const header = raw && !found.entries ? `${type} ${found.body.length}\\0` : void 0;
     if (found.entries) {
       const kindOf = (id) => replay.store.objects.get(id)?.entries ? "tree" : "blob";
-      if (!raw) {
-        return {
-          id: found.id,
-          type,
-          text: found.entries.map((e) => `${e.mode.padStart(6, "0")} ${kindOf(e.id)} ${e.id}	${e.name}`).join("\n")
-        };
-      }
       return {
         id: found.id,
         type,
-        header: `${type} ${found.body.length}\\0`,
-        text: found.entries.map((e) => `${e.mode} ${e.name}\\0<20 raw bytes: ${short(e.id)}...>`).join("\n")
+        text: found.entries.map((e) => `${e.mode.padStart(6, "0")} ${kindOf(e.id)} ${e.id}	${e.name}`).join("\n")
       };
     }
-    const body = new TextDecoder().decode(found.body);
     return {
       id: found.id,
       type,
-      header: raw ? `${type} ${found.body.length}\\0` : void 0,
-      text: body
+      header,
+      text: new TextDecoder().decode(found.body)
     };
   }
 
