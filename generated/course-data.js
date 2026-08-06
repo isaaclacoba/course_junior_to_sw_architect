@@ -1440,7 +1440,7 @@
               "title": "What is in that hidden folder?",
               "blurb": "The hidden folder git keeps, read line by line before you have saved anything. It holds almost nothing yet, and that is exactly why it is the place to start.",
               "pill": "gentle",
-              "time": "10 min",
+              "time": "15 min",
               "kind": "lesson"
             }
           ]

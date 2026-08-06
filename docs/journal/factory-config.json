@@ -1,0 +1,35 @@
+{
+  "_comment": [
+    "The grandfather clause (D-sw-factory-13, D-sw-factory-14).",
+    "The recall rung requires a journal row proving prior decisions were read",
+    "before the work started. That rule was ratified on 2026-08-06. Every feature",
+    "listed here already existed by then, so the demand cannot be satisfied",
+    "honestly - you cannot recall-before-starting work that has already finished.",
+    "Clearing it would mean writing a row asserting a recall that never happened,",
+    "and the FSM would then treat that lie as evidence.",
+    "",
+    "Exempt means ONE thing: the recall rung reads satisfied for that feature.",
+    "Grounding, deciding, specifying, building and verifying are still checked in",
+    "full. Nothing started after the rule belongs here, and the tool never adds to",
+    "this list by itself - it only warns when an entry no longer has a brief."
+  ],
+  "recallExemptReason": "predates the rule",
+  "recallExempt": [
+    "concept-i18n",
+    "decision-log",
+    "drill-engine-conformance",
+    "git-content",
+    "git-inside-track",
+    "git-track",
+    "git-track-depth",
+    "git-track-expansion",
+    "git-track-rebuild",
+    "grading-subsystem",
+    "lesson-engine",
+    "mockup-first-wow",
+    "object-model-teaching",
+    "page-shell-split",
+    "solid-lesson",
+    "wow-enforcement"
+  ]
+}

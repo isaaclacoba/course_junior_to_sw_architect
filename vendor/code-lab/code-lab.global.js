@@ -5917,6 +5917,7 @@ ${written}` : written;
       lens: scene.lens === "chain" || scene.lens === "both" ? scene.lens : "folder",
       acts,
       fresh: want === 0 ? [] : acts.slice(acts.length - want),
+      detail: scene.detail === "full" ? "full" : "core",
       note: scene.note,
       author: scene.author || DEFAULT_AUTHOR
     };
@@ -6068,15 +6069,20 @@ ${written}` : written;
       const wantsChain = scene.lens === "chain" || scene.lens === "both";
       this.folderEl.hidden = !wantsFolder;
       this.chainEl.hidden = !wantsChain;
-      if (wantsFolder) this.folderEl.innerHTML = folderHtml(replay, this.labels);
+      if (wantsFolder) this.folderEl.innerHTML = folderHtml(replay, this.labels, scene.detail);
       if (wantsChain) this.chainEl.innerHTML = chainHtml(chainRows(replay), this.labels);
       this.noteEl.innerHTML = scene.note ? escapeHtml4(scene.note) : "";
       this.noteEl.hidden = !scene.note;
     }
   };
-  function folderHtml(replay, labels) {
+  function folderHtml(replay, labels, detail) {
     const { store, added } = replay;
-    const lines2 = [".git/", "  objects/"];
+    const lines2 = [".git/"];
+    if (detail === "full") {
+      lines2.push(`  ${dim("config")}`, `  ${dim("description")}`, `  ${dim("hooks/")}`, `  ${dim("info/")}`);
+    }
+    lines2.push("  objects/");
+    if (detail === "full") lines2.push(`    ${dim("info/")}`, `    ${dim("pack/")}`);
     if (!store.objects.size) lines2.push(`    ${dim(escapeHtml4(labels.objEmpty))}`);
     for (const [id, object] of store.objects) {
       const body = `${id.slice(0, 2)}/${id.slice(2, 8)}...  <span class="cl-ob-type">${object.type}</span>`;
@@ -6087,7 +6093,9 @@ ${written}` : written;
     for (const [name, id] of store.refs) {
       lines2.push(`    ${escapeHtml4(name.replace(/^refs\/heads\//, ""))}   ${dim(short(id))}`);
     }
-    lines2.push(`  HEAD    ${dim(`-> ${store.head.kind === "ref" ? store.head.ref : short(store.head.id)}`)}`);
+    if (detail === "full") lines2.push(`  ${dim("refs/tags/")}`);
+    const headLine = store.head.kind === "ref" ? `ref: ${store.head.ref}` : short(store.head.id);
+    lines2.push(`  HEAD    ${dim(escapeHtml4(headLine))}`);
     if (store.index.size) {
       lines2.push("  index");
       for (const [path, id] of store.index) {

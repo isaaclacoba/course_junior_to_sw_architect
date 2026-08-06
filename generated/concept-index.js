@@ -432,11 +432,6 @@
         "git-settle-a-conflict"
       ]
     },
-    "gt-object-store": {
-      "introducedBy": "git-inside-hidden-folder",
-      "revisitedBy": [],
-      "usedBy": []
-    },
     "gt-rebase": {
       "introducedBy": "git-rebase",
       "revisitedBy": [],
@@ -2264,8 +2259,7 @@
     },
     "git-inside-hidden-folder": {
       "introduces": [
-        "gt-git-folder",
-        "gt-object-store"
+        "gt-git-folder"
       ],
       "revisits": [],
       "uses": []
@@ -3338,7 +3332,7 @@
     },
     "gt-git-folder": {
       "term": "The .git folder",
-      "def": "The hidden folder git keeps beside your work. It holds the whole repository - everything git has kept, and the names pointing at it - as ordinary files you could open."
+      "def": "The hidden folder `git init` creates beside your work. It holds the whole repository - everything git has kept, the names pointing at it, and one line saying which name you are on - as ordinary files you could open."
     },
     "gt-hash": {
       "term": "Hash",
@@ -3359,10 +3353,6 @@
     "gt-merge-commit": {
       "term": "Merge commit",
       "def": "The commit a merge makes when both sides moved on - the one commit with two parents."
-    },
-    "gt-object-store": {
-      "term": "Object store",
-      "def": "The `objects/` folder inside `.git`. Everything git keeps ends up there, one file per thing, and it starts out empty."
     },
     "gt-rebase": {
       "term": "Rebase",

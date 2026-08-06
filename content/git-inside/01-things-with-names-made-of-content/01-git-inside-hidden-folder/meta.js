@@ -11,7 +11,7 @@ window.LESSON_META = {
   blurb: "The hidden folder git keeps, read line by line before you have saved anything. It holds almost nothing yet, and that is exactly why it is the place to start.",
   links: [{ href: "index.html", label: "Back to the course" }],
   pill: "gentle",
-  time: "10 min",
+  time: "15 min",
   archetype: "viz",
   engine: null,
   runtime: "kernel",
@@ -25,9 +25,6 @@ window.LESSON_META = {
     "introduces": [
       {
         "id": "gt-git-folder"
-      },
-      {
-        "id": "gt-object-store"
       }
     ],
     "revisits": [],

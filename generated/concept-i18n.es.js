@@ -224,7 +224,7 @@
       "term": "Avance rápido"
     },
     "gt-git-folder": {
-      "def": "La carpeta oculta que git mantiene junto a tu trabajo. Contiene el repositorio entero - todo lo que git ha guardado y los nombres que lo señalan - en forma de archivos normales que podrías abrir.",
+      "def": "La carpeta oculta que crea `git init` junto a tu trabajo. Contiene el repositorio entero - todo lo que git ha guardado, los nombres que lo señalan y una línea que dice en qué nombre estás - en forma de archivos normales que podrías abrir.",
       "term": "La carpeta .git"
     },
     "gt-hash": {
@@ -246,10 +246,6 @@
     "gt-merge-commit": {
       "def": "El commit que crea una fusión cuando las dos partes avanzaron - el único commit con dos padres.",
       "term": "Commit de fusión"
-    },
-    "gt-object-store": {
-      "def": "La carpeta `objects/` dentro de `.git`. Ahí acaba todo lo que git guarda, un archivo por cada cosa, y empieza vacía.",
-      "term": "Almacén de objetos"
     },
     "gt-rebase": {
       "def": "Hacer los commits de tu rama otra vez encima de otra rama, lo que deja el historial como una sola línea recta y le da un id nuevo a cada commit rehecho.",
