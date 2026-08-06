@@ -294,7 +294,14 @@ export function classify(paths) {
 }
 
 // ---- journal evidence -------------------------------------------------------
-export const NO_ACTIVITY = { available: 0, mentions: 0, queries: 0 };
+export const NO_ACTIVITY = { available: 0, mentions: 0, queries: 0, sessions: 0 };
+
+// `absent` is the only FAILING verdict, so it has to be earned. Measured over the
+// full 693-session backfill: all 15 features with real work spanned >=2 sessions,
+// and all 3 that looked "absent" spanned exactly 1 - their only mentions were a
+// config file that happens to list the slug. One session is not coverage, it is a
+// coincidence, so below the floor the machine goes `blind` and claims nothing.
+export const RECALL_COVERAGE_SESSIONS = 2;
 
 export async function journalEvidence(slug) {
   const empty = { outputs: [], decisions: [], decisionIds: new Set(), activity: NO_ACTIVITY };
@@ -347,14 +354,20 @@ export async function journalEvidence(slug) {
   if (files.activity.length) {
     const like = `%${slug}%`;
     const [row] = await read(
-      `WITH a AS (SELECT kind, coalesce(body, '') || ' ' || coalesce(preview, '') AS hay ` +
+      `WITH a AS (SELECT kind, session_id, coalesce(body, '') || ' ' || coalesce(preview, '') AS hay ` +
         `FROM read_parquet([${list(files.activity)}], union_by_name=true)) ` +
         `SELECT (SELECT count(*) FROM a) available, ` +
         `(SELECT count(*) FROM a WHERE hay ILIKE ?) mentions, ` +
+        `(SELECT count(DISTINCT session_id) FROM a WHERE hay ILIKE ?) sessions, ` +
         `(SELECT count(*) FROM a WHERE kind = 'tool_start' AND hay ILIKE ? AND regexp_matches(hay, ?)) queries`,
-      [like, like, recallReadPattern(slug)]
+      [like, like, like, recallReadPattern(slug)]
     );
-    activity = { available: Number(row.available), mentions: Number(row.mentions), queries: Number(row.queries) };
+    activity = {
+      available: Number(row.available),
+      mentions: Number(row.mentions),
+      sessions: Number(row.sessions),
+      queries: Number(row.queries),
+    };
   }
   return { outputs, decisions, decisionIds, activity };
 }
@@ -378,7 +391,7 @@ export function recallReadPattern(slug) {
 export function recallObservation(activity) {
   const a = activity ?? NO_ACTIVITY;
   if (a.queries > 0) return "observed";
-  if (a.mentions > 0) return "absent";
+  if (a.mentions > 0 && (a.sessions ?? 0) >= RECALL_COVERAGE_SESSIONS) return "absent";
   return "blind";
 }
 
@@ -1171,12 +1184,23 @@ async function selftest() {
   })) === "deciding");
   // --- rung 1 is grounded in the transcript, not in a row the agent wrote about
   // itself. Three verdicts, and each must be reachable and decisive.
-  const ACT = (mentions, queries, available = 100) => ({ available, mentions, queries });
+  const ACT = (mentions, queries, sessions = 3, available = 100) => ({ available, mentions, queries, sessions });
   t("recall: a journal read is observed", recallObservation(ACT(9, 2)) === "observed");
   t("recall: covered but never read is absent", recallObservation(ACT(9, 0)) === "absent");
   t("recall: no coverage is blind", recallObservation(ACT(0, 0)) === "blind");
   t("recall: no firehose at all is blind", recallObservation(NO_ACTIVITY) === "blind");
   t("recall: ok-undefined activity is blind, never absent", recallObservation(undefined) === "blind");
+
+  // The coverage floor. Measured: the 3 features that read "absent" over the full
+  // backfill were each named in ONE session, by a config file listing the slug.
+  t("recall: one session is not coverage, so not absent",
+    recallObservation(ACT(4, 0, 1)) === "blind");
+  t("recall: the floor does not need many mentions, just sessions",
+    recallObservation(ACT(3, 0, RECALL_COVERAGE_SESSIONS)) === "absent");
+  t("recall: a read still counts from a single session",
+    recallObservation(ACT(4, 1, 1)) === "observed");
+  t("recall: ok-missing sessions field never fabricates coverage",
+    recallObservation({ available: 100, mentions: 9, queries: 0 }) === "blind");
 
   // What the firehose is allowed to accept as a real recall. The exclusion is the
   // load-bearing half: writing the row that claims recall must never prove recall.
@@ -1208,6 +1232,8 @@ async function selftest() {
   const citedRow = [{ kind: "audit", title: "", body: "recall of D-x-1" }];
   const emptyRow = [{ kind: "audit", title: "", body: "no decision ids at all" }];
   const rung1 = (outputs, activity) => deriveRungs({ outputs, decisions: [], decisionIds: dids, brief: null, activity })[0];
+  t("recall: a one-session feature is grandfathered, not failed",
+    rung1(citedRow, ACT(4, 0, 1)).ok);
 
   t("recall: observation passes with NO self-report at all",
     rung1(emptyRow, ACT(9, 2)).ok);

@@ -25,7 +25,8 @@
 
 import { DuckDBInstance } from "@duckdb/node-api";
 import { readFile, writeFile, readdir, mkdir, rm } from "node:fs/promises";
-import { existsSync, readdirSync } from "node:fs";
+import { createInterface } from "node:readline";
+import { existsSync, readdirSync, createReadStream } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { tmpdir, homedir } from "node:os";
@@ -34,6 +35,7 @@ import { randomBytes } from "node:crypto";
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const JOURNAL = process.env.JOURNAL_DIR || join(ROOT, "docs", "journal");
 const ETL_BATCH_ROWS = 20000;
+const ETL_BATCH_BYTES = 64 * 1024 * 1024;
 const DIRS = {
   activity: join(JOURNAL, "activity"),
   outputs: join(JOURNAL, "outputs"),
@@ -394,29 +396,49 @@ async function cmdEtl(con, o) {
   await mkdir(JOURNAL, { recursive: true });
   let total = 0;
   let batch = [];
-  // One parquet file per session would leave hundreds of tiny files, so rows are
-  // batched; the watermark is saved with each flush, so a crash cannot duplicate.
+  let batchBytes = 0;
+  // Rows are batched so a backfill does not leave one tiny parquet file per
+  // session, and flushed on EITHER a row count or a byte budget - a single
+  // tool_start body can be ~700KB, so counting rows alone does not bound memory.
+  // The watermark is written with each flush, so an interrupted run resumes on
+  // the next unread line instead of duplicating what it already stored.
   const flush = async () => {
     if (!batch.length) return;
     total += await appendRows(con, DIRS.activity, batch, CAST.activity);
     batch = [];
+    batchBytes = 0;
     await writeFile(WATERMARK, JSON.stringify(wm, null, 2));
   };
+  const take = async (rows) => {
+    for (const r of rows) {
+      batch.push(r);
+      batchBytes += (r.body?.length ?? 0) + (r.preview?.length ?? 0) + 64;
+    }
+    if (batch.length >= ETL_BATCH_ROWS || batchBytes >= ETL_BATCH_BYTES) await flush();
+  };
   for (const { sessionId, path } of sources) {
-    const text = await readFile(path, "utf8");
-    const lines = text.split("\n").filter((l) => l.trim());
     const from = wm[sessionId] || 0;
-    if (lines.length <= from) continue;
     // agent name: prefer session-store, else 'agent'
-    let agent = "agent";
+    const agent = "agent";
     const fresh = from === 0;
-    const rows = [];
-    for (let i = from; i < lines.length; i++) rows.push(...activityRowsFromLine(lines[i], sessionId, agent));
-    if (fresh && store) rows.push(...(await enrichFromStore(store, sessionId, agent)));
-    batch.push(...rows);
-    wm[sessionId] = lines.length;
-    console.log(`  ${sessionId}: +${rows.length} rows (lines ${from}..${lines.length})`);
-    if (batch.length >= ETL_BATCH_ROWS) await flush();
+    if (fresh && store) await take(await enrichFromStore(store, sessionId, agent));
+    // Streamed, not read whole: the largest transcript here is 153MB, and
+    // readFile + split would hold the file, the line array and the rows at once.
+    let seen = 0;
+    let added = 0;
+    const rl = createInterface({ input: createReadStream(path, "utf8"), crlfDelay: Infinity });
+    for await (const line of rl) {
+      if (!line.trim()) continue;
+      seen++;
+      if (seen <= from) continue;
+      const rows = activityRowsFromLine(line, sessionId, agent);
+      added += rows.length;
+      wm[sessionId] = seen;
+      await take(rows);
+    }
+    if (seen <= from) continue;
+    wm[sessionId] = seen;
+    console.log(`  ${sessionId}: +${added} rows (lines ${from}..${seen})`);
   }
   await flush();
   await writeFile(WATERMARK, JSON.stringify(wm, null, 2));
