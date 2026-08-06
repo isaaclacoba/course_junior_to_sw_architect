@@ -38,19 +38,23 @@ Phase 1 - code-lab (upstream of everything)
 11. [ ] Make `traceToSteps` take translated narration templates (~14) - verify: unit test.
 12. [ ] typecheck + tests + build + re-vendor - verify: the new symbols are in the vendored IIFE.
 Phase 2 - the `lab` archetype
-13. [ ] `kernel/engine/plugins/lab-plugin.js` on the generic engine - verify: plugin tests.
-14. [ ] Trace gate vocabulary in `kernel/grading/` - verify: gate tests, every goal starts RED.
-15. [ ] Card scaffold + the P2 header grid in page-shell/styles - verify: headless render, edges align.
-16. [ ] `resource/bind-*.js` binder so a lab lesson localizes - verify: EN/ES round-trip.
+13. [ ] MOCKUP: the ticking trace-goal tracker (red -> green as the trace lands), owner
+    picks - verify: option chosen + journalled, before any plugin code.
+14. [ ] `kernel/engine/plugins/lab-plugin.js` on the generic engine - verify: plugin tests.
+15. [ ] Trace gate vocabulary in `kernel/grading/` - verify: gate tests, every goal starts RED.
+16. [ ] Card scaffold + the P2 header grid in page-shell/styles - verify: headless render, edges align.
+17. [ ] `resource/bind-*.js` binder so a lab lesson localizes - verify: EN/ES round-trip.
 Phase 3 - content
-17. [ ] Rework `01-foundations` task 6: two instances, values passed in, introduces `pr-field`.
-18. [ ] New build lesson: constructors (revisits `pr-field`), after `04-writing-methods`.
-19. [ ] New lab lesson: one class, many objects.
-20. [ ] Fix the parameter definition; add `pr-argument`; update `docs/concept-ledger.md`.
-21. [ ] Registry + directory renumbering (array order is the real order, not the `NN-` prefix).
+18. [ ] MOCKUP: ONE authored card of the new constructor lesson, real chrome, owner reads
+    it - verify: shape approved before the other cards are written.
+19. [ ] Rework `01-foundations` task 6: two instances, values passed in, introduces `pr-field`.
+20. [ ] New build lesson: constructors (revisits `pr-field`), after `04-writing-methods`.
+21. [ ] New lab lesson: one class, many objects.
+22. [ ] Fix the parameter definition; add `pr-argument`; update `docs/concept-ledger.md`.
+23. [ ] Registry + directory renumbering (array order is the real order, not the `NN-` prefix).
 Phase 4 - close
-22. [ ] `node tools/verify-lesson.mjs` on every changed lesson, EN+ES.
-23. [ ] `npm run gate`, delete the mockups, commit submodule first then the course.
+24. [ ] `node tools/verify-lesson.mjs` on every changed lesson, EN+ES.
+25. [ ] `npm run gate`, delete the mockups, commit submodule first then the course.
 
 ## Constraints that bit during design
 - The lab editor is 686px, about **75 characters**. A longer starter line puts a

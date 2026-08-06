@@ -12,7 +12,7 @@ reliable trigger), build `architect` + `auditor` as opt-in tools, and broaden th
 `work-brief` skill's triggers. No hard-block hook, no auto-routing claims.
 
 ## Plan
-1. [ ] Sharpen golden rule 6 in copilot-instructions.md (imperative, self-contained) - verify: reads as trigger+loop+anti-pattern, no external pointer needed.
+1. [ ] Sharpen the design-round golden rule in copilot-instructions.md (imperative, self-contained) - verify: reads as trigger+loop+anti-pattern, no external pointer needed.
 2. [ ] `/design-round` prompt (.github/prompts/design-round.prompt.md) - verify: kicks off a round for a named feature.
 3. [ ] Broaden the work-brief skill description triggers - verify: loads on feature/module/tool/refactor tasks.
 4. [ ] `architect` agent (.github/agents/architect.agent.md), tool-restricted, records to journal - verify: valid frontmatter, no bulk edits.

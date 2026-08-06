@@ -24,7 +24,7 @@ Real enforcement would need a CI/PR chokepoint (the repo deploys straight from `
 none exists) + owner-attributable proof. Deferred until a PR gate exists (see Future).
 
 ## What we build (honest-small)
-1. **Sharpen golden rule 6** (always-on, `copilot-instructions.md`) into a self-contained
+1. **Sharpen the design-round golden rule** (always-on, `copilot-instructions.md`) into a self-contained
    imperative: the trigger (feature / module / tool / refactor / ambiguous >3-step task),
    the loop (ground -> ask batches, recommend but the OWNER decides -> only then build),
    and the forbidden anti-pattern (your choices presented as decided). Framed honestly as
@@ -62,7 +62,7 @@ that fails a PR whose diff is feature-shaped but carries no design-of-record + a
 owner-attributable decision (a signal the agent cannot author alone).
 
 ## Build order
-1 sharpen golden rule 6. 2 `/design-round` prompt. 3 `work-brief` triggers. 4 `architect`
+1 sharpen the design-round golden rule. 2 `/design-round` prompt. 3 `work-brief` triggers. 4 `architect`
 agent. 5 `auditor` agent. Each verified: renders/loads; agents have valid frontmatter,
 tool restrictions, and `name` matching the folder.
 

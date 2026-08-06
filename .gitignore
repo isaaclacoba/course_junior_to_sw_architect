@@ -6,6 +6,12 @@ level3-app/
 blazor-publish/
 _site/
 
+# Design mockups - disposable per-phase concept probes (see the mockup-first skill).
+# They are thrown away when the phase closes and must never become a second
+# source of truth.
+_mockup-*.html
+_*-probe.html
+
 # Audit-gate reports/logs (pre-push i18n round-trip postmortems)
 .audit-gate/
 node_modules/

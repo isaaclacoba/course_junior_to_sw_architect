@@ -47,8 +47,8 @@ The loop (repeat until ambiguity is near zero):
 Definition of done for the design (track it in the brief): long-term goal,
 short-term goals, UX, UI, a success signal / KPI, and unit-test coverage.
 
-- **UI/UX is shown as a non-functional HTML mockup** - layout, colour palette,
-  visuals, UX interactions. Never a text description; the owner cannot approve text.
+- **Every option is SHOWN as a mockup and then measured**, never described - the
+  owner cannot approve text. Procedure: the `mockup-first` skill.
 - **Fleeted subagents read the brief + design-of-record FIRST**, so they build the
   agreed design, not their own.
 - **Record decisions** in a searchable, compact log (for later archaeology; the log
@@ -56,6 +56,16 @@ short-term goals, UX, UI, a success signal / KPI, and unit-test coverage.
 
 Only once ambiguity is near zero do you write the brief + design-of-record from the
 DECIDED items, then build.
+
+**The design round is not the last mockup.** Each later phase that introduces
+something the owner has not seen opens with its own small mockup - see
+`mockup-first`. Give those steps a mockup verify gate in the Plan, so the brief
+tracks them like any other step:
+
+```
+9. [ ] Mock the trace-goal tracker, measure, owner picks - verify: option chosen + journalled
+10. [ ] Build the lab plugin to the picked shape - verify: plugin tests
+```
 
 Anti-pattern (forbidden): ask a couple of questions, then extrapolate the rest of
 the architecture and record it as "Locked". A few answers never license a full

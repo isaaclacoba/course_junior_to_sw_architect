@@ -16,7 +16,10 @@ spaced hyphen ` - `, no emojis, no marketing.
 
 ## What you judge (the owner's bar)
 1. **Architecture quality** - does the design fit the repo (reuse-first, the
-   engines/runner/editor in `.github/copilot-instructions.md`), or reinvent?
+   engines/runner/editor in `.github/copilot-instructions.md`), or reinvent? Was
+   the concept VALIDATED before the architecture was fixed - is there a mockup
+   and a measurement behind each shape decision, or was it argued in prose? An
+   unvalidated design is the usual reason an implementation later drifts.
 2. **Code quality** - if code exists, is it clear, modular, DRY, KISS?
 3. **Unit-test coverage** - are the claimed behaviours actually tested?
 4. **Goal achievement** - does it meet the stated goal (a tight design lands

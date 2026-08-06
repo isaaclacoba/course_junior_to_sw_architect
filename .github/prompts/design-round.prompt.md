@@ -19,7 +19,8 @@ Run the loop until ambiguity is near zero:
 2. **Ask a batch of 5-10 explicit decisions.** Each is a real choice: RECOMMEND
    with the tradeoff, the OWNER decides. Never present your choices as settled - an
    ambiguity is a question. Do not dump everything at once.
-3. **Show UI/UX as a non-functional HTML mockup** - layout, palette, interactions.
+3. **Show every option as a mockup, then MEASURE it** - the
+   [`mockup-first`](../skills/mockup-first/SKILL.md) skill has the procedure.
    Never a text description; the owner cannot approve text.
 4. **Learn more** (another PoC or grounding audit), then loop with the next batch.
 5. **Record each decision** to the journal as it lands:

@@ -37,13 +37,17 @@ grows into a procedure, promote it to a skill and leave a pointer here.
 
 ## Design rounds (WoW)
 
-- **A widget's look-and-behaviour is a UX design decision - mockup + owner-decide -
-  even inside a "build" phase.** The design-of-record's contracts fix the DATA shapes
-  (`RepoState`, `layout() -> {nodes,edges,chips}`), NOT the visual. Do not let "the
-  design is done, this is just implementation" bypass the WoW: for any new visual
-  surface (a graph, a panel, an animation) show a non-functional HTML mockup and get
-  the owner's pick BEFORE coding the view. Symptom of the trap: fleeting agents to
-  build the view and "approving" it yourself.
+- **Mockup first, every phase - see the `mockup-first` skill.** This grew out of the
+  learning that a widget's look-and-behaviour is a design decision even inside a
+  "build" phase (the design-of-record fixes DATA shapes, not the visual), and it now
+  covers every phase and every kind of unseen work. Order: mockup -> validate the
+  concept -> agree the architecture -> implement. The skill carries the anti-patterns,
+  including the two that bit here - "the design is done, this is just implementation",
+  and fleeting a subagent to build the view then approving it yourself.
+- **Measure the mockup; do not argue about it.** Two lesson-lab layouts that "looked
+  fine" were clipping the learner's own code by 166px and 214px, and one tracker
+  placement put the goals below the entire widget. Prose sustains those debates;
+  a headless measurement ends them in one run.
 
 ## Editing
 
