@@ -9,22 +9,21 @@ Brief: [git-inside-track.md](../plans/git-inside-track.md). Mockup:
 
 A second git track, `git-inside`, shown by a segmented control inside the Git tab
 next to the practical one, under the name **Inside git**. It explains what a
-repository is MADE OF. It is standalone - a learner may open it having never used
-git - and it contains **no commands anywhere**, which is what keeps it from being
+repository is MADE OF, is standalone - a learner may open it having never used
+git - and contains **no commands anywhere**, which is what keeps it from being
 the practical track with a cutaway view.
 
 ## Contract: the scene - one, with three lenses
 
 A step declares `lens: "folder" | "chain" | "both"` over one `StoreState`.
+Author-chosen per step; no learner toggle - the caption and the picture must
+always agree. One data shape and one resolver, so the lenses cannot drift.
 
 | Lens | Answers | Used when the lesson is about |
 |---|---|---|
 | `folder` | Where does this live, what is in it? | a new kind of FILE in `.git` |
 | `chain` | Who names whom? | a RELATIONSHIP between objects |
 | `both` | Are these two pictures the same? | the first complete save, and each part recap |
-
-Author-chosen per step; no learner toggle - the caption and the picture must
-always agree. One data shape and one resolver, so the lenses cannot drift.
 
 ## Contract: the object store
 
