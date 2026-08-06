@@ -20,5 +20,6 @@ node_modules/
 # Curated docs/journal/{features,decisions,outputs}/ ARE committed (small, non-regenerable).
 # activity/ waits for git-lfs (see docs/architecture/decision-log.md).
 docs/journal/activity/
+docs/journal/factory/
 docs/journal/_watermark.json
 docs/journal/config.json
