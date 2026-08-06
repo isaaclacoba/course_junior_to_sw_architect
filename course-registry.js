@@ -186,6 +186,7 @@
     { track: "git", part: "fixing-mistakes", id: "git-reflog", href: "content/git/04-fixing-mistakes/05-git-reflog/", kind: "lesson", path: "content/git/04-fixing-mistakes/05-git-reflog" },
     { track: "git", part: "fixing-mistakes", id: "git-what-reset-moves", href: "content/git/04-fixing-mistakes/03-git-what-reset-moves/", kind: "lesson", path: "content/git/04-fixing-mistakes/03-git-what-reset-moves" },
     { track: "git", part: "fixing-mistakes", id: "git-undo-with-reset", href: "content/git/04-fixing-mistakes/04-git-undo-with-reset/", kind: "lesson", path: "content/git/04-fixing-mistakes/04-git-undo-with-reset" },
+    { track: "git", part: "fixing-mistakes", id: "git-rebase", href: "content/git/04-fixing-mistakes/06-git-rebase/", kind: "lesson", path: "content/git/04-fixing-mistakes/06-git-rebase" },
   ];
 
   var byIdIndex = {};

@@ -1472,6 +1472,19 @@
               "pill": "gentle",
               "time": "20 min",
               "kind": "lesson"
+            },
+            {
+              "id": "git-rebase",
+              "track": "git",
+              "part": "fixing-mistakes",
+              "href": "content/git/04-fixing-mistakes/06-git-rebase/",
+              "key": "git_rebase_awarded",
+              "total": 2,
+              "title": "Replay your work on top",
+              "blurb": "`git merge` joins two lines of work and records that they met. `git rebase` makes your commits again on top of the other branch, so the history comes out as a straight line. Knowing the difference matters, because a replayed commit is not the commit you had.",
+              "pill": "gentle",
+              "time": "15 min",
+              "kind": "lesson"
             }
           ]
         }

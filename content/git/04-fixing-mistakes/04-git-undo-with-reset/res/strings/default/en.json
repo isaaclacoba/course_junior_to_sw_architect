@@ -35,7 +35,7 @@
   "task.4.summaryItems.2.text": "moves the name back and keeps nothing; the files go with the commit.",
   "task.4.summaryItems.3.title": "`HEAD~1` - ",
   "task.4.summaryItems.3.text": "one step back from where you stand, so you never have to copy a hash to undo.",
-  "task.4.summaryClose": "That is the whole elementary track: save work, split it, bring it back together, and move the labels when you get it wrong.",
+  "task.4.summaryClose": "That is most of the track: save work, split it, bring it back together, and move the labels when you get it wrong. One lesson left, on the other way of bringing two branches together.",
   "meta.label": "Fixing mistakes · Undo with reset",
   "task.1.files.0.text": "Mia, tabby, 4 years old.",
   "task.1.files.1.text": "Rex, collie, 2 years old.",

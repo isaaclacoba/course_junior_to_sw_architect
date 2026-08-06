@@ -151,7 +151,7 @@
           text: "one step back from where you stand, so you never have to copy a hash to undo."
         }
       ],
-      summaryClose: "That is the whole elementary track: save work, split it, bring it back together, and move the labels when you get it wrong."
+      summaryClose: "That is most of the track: save work, split it, bring it back together, and move the labels when you get it wrong. One lesson left, on the other way of bringing two branches together."
     }
   ];
 

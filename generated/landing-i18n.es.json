@@ -172,6 +172,10 @@
       "blurb": "Nombra un commit sin su hash, y colócate en uno directamente. Cuenta hacia atrás con `main~2` y `HEAD~1`, pon una rama en un commit antiguo, y mira qué aspecto tiene un `HEAD` desacoplado.",
       "title": "Apuntar a cualquier commit"
     },
+    "git-rebase": {
+      "blurb": "`git merge` une dos líneas de trabajo y deja constancia de que se encontraron. `git rebase` hace tus commits otra vez encima de la otra rama, así que el historial sale como una línea recta. Saber la diferencia importa, porque un commit rehecho no es el commit que tenías.",
+      "title": "Rehacer tu trabajo encima"
+    },
     "git-reflog": {
       "blurb": "`git log` muestra lo que una rama todavía alcanza. `git reflog` muestra todos los sitios donde ha estado `HEAD`, así que un commit que creías tirado a la basura sigue estando localizable por su hash.",
       "title": "Encontrar un commit perdido"

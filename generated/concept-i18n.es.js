@@ -247,6 +247,10 @@
       "def": "El commit que vino justo antes de este - el enlace que convierte instantáneas sueltas en una historia.",
       "term": "Padre"
     },
+    "gt-rebase": {
+      "def": "Hacer los commits de tu rama otra vez encima de otra rama, lo que deja el historial como una sola línea recta y le da un id nuevo a cada commit rehecho.",
+      "term": "Rebase"
+    },
     "gt-reflog": {
       "def": "El registro que git lleva de todos los sitios donde ha estado `HEAD`, del más nuevo al más viejo, y que mantiene un commit localizable por su hash cuando ya ninguna rama lo alcanza.",
       "term": "Reflog"

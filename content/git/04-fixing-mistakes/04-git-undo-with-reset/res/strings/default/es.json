@@ -35,7 +35,7 @@
   "task.4.summaryItems.2.text": "mueve el nombre hacia atrás y no guarda nada; los archivos se van con el commit.",
   "task.4.summaryItems.3.title": "`HEAD~1` - ",
   "task.4.summaryItems.3.text": "un paso atrás desde donde estás, así que nunca tienes que copiar un hash para deshacer.",
-  "task.4.summaryClose": "Ese es el recorrido elemental completo: guardar el trabajo, separarlo, volver a juntarlo y mover las etiquetas cuando te equivocas.",
+  "task.4.summaryClose": "Eso es casi todo el recorrido: guardar el trabajo, separarlo, volver a juntarlo y mover las etiquetas cuando te equivocas. Queda una lección, sobre la otra manera de juntar dos ramas.",
   "meta.label": "Arreglar errores · Deshacer con reset",
   "task.1.files.0.text": "Mia, atigrada, 4 años.",
   "task.1.files.1.text": "Rex, collie, 2 años.",

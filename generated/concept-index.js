@@ -349,7 +349,8 @@
         "git-when-changes-collide",
         "git-settle-a-conflict",
         "git-point-at-a-commit",
-        "git-reflog"
+        "git-reflog",
+        "git-rebase"
       ]
     },
     "gt-commit": {
@@ -397,7 +398,8 @@
         "git-reflog"
       ],
       "usedBy": [
-        "git-mark-a-version"
+        "git-mark-a-version",
+        "git-rebase"
       ]
     },
     "gt-head": {
@@ -413,7 +415,8 @@
         "git-fix-the-last-commit",
         "git-point-at-a-commit",
         "git-reflog",
-        "git-undo-with-reset"
+        "git-undo-with-reset",
+        "git-rebase"
       ]
     },
     "gt-history": {
@@ -422,14 +425,16 @@
         "git-what-a-branch-is"
       ],
       "usedBy": [
-        "git-reflog"
+        "git-reflog",
+        "git-rebase"
       ]
     },
     "gt-merge": {
       "introducedBy": "git-how-merging-works",
       "revisitedBy": [
         "git-merge-a-branch",
-        "git-when-changes-collide"
+        "git-when-changes-collide",
+        "git-rebase"
       ],
       "usedBy": [
         "git-settle-a-conflict"
@@ -453,9 +458,16 @@
         "git-when-changes-collide"
       ]
     },
+    "gt-rebase": {
+      "introducedBy": "git-rebase",
+      "revisitedBy": [],
+      "usedBy": []
+    },
     "gt-reflog": {
       "introducedBy": "git-reflog",
-      "revisitedBy": [],
+      "revisitedBy": [
+        "git-rebase"
+      ],
       "usedBy": [
         "git-undo-with-reset"
       ]
@@ -2363,6 +2375,21 @@
         "gt-head"
       ]
     },
+    "git-rebase": {
+      "introduces": [
+        "gt-rebase"
+      ],
+      "revisits": [
+        "gt-reflog",
+        "gt-merge"
+      ],
+      "uses": [
+        "gt-branch",
+        "gt-hash",
+        "gt-head",
+        "gt-history"
+      ]
+    },
     "git-reflog": {
       "introduces": [
         "gt-reflog"
@@ -3430,6 +3457,10 @@
     "gt-parent": {
       "term": "Parent",
       "def": "The commit that came just before this one - the link that turns loose snapshots into a history."
+    },
+    "gt-rebase": {
+      "term": "Rebase",
+      "def": "Making the commits on your branch again on top of another branch, which leaves the history as one straight line and gives every replayed commit a new id."
     },
     "gt-reflog": {
       "term": "Reflog",
