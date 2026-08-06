@@ -675,6 +675,9 @@ async function readStdin() {
 // row is one observation; `history` shows the trend. Written on Stop and on
 // demand via `sweep --record`.
 const HISTORY = join(ROOT, "docs", "journal", "factory");
+// the numbers themselves - `ts` and `source` are metadata, not a measurement,
+// so two rows differing only in those two say nothing new.
+const HISTORY_MEASURES = ["commits", "fastpath", "unclaimed", "multi", "briefs", "owns", "untracked", "stalled"];
 const HISTORY_CAST = [
   "CAST(ts AS TIMESTAMP) ts",
   "CAST(commits AS INTEGER) commits",
@@ -712,7 +715,17 @@ export async function measureHealth({ commits = 40 } = {}) {
   };
 }
 
+// A row is only worth keeping if it says something the last one did not. Without
+// this, every Stop writes a file - including the ones from probing the hook, which
+// is exactly how ten junk rows reached the history the first time. `manual` always
+// writes: an explicit `sweep --record` is the owner asking for a datapoint.
+export function sameMeasures(a, b) {
+  if (!a || !b) return false;
+  return HISTORY_MEASURES.every((k) => Number(a[k] ?? -1) === Number(b[k] ?? -2));
+}
+
 export async function recordHealth(row, source = "manual") {
+  if (source !== "manual" && sameMeasures(row, (await readHealth(1))[0])) return null;
   const { DuckDBInstance } = await import("@duckdb/node-api");
   const con = await (await DuckDBInstance.create(":memory:")).connect();
   await mkdir(HISTORY, { recursive: true });
@@ -944,6 +957,24 @@ async function selftest() {
   // The payload shape is only worth asserting against the contract the CLI ships
   // (agent-customization skill, references/hooks.md). `decision: "warn"` was an
   // inference from an example, is not documented, and would most likely be dropped.
+  // --- history dedupe: a Stop that measures nothing new must write nothing (D-17)
+  const base = { commits: 1, fastpath: 2, unclaimed: 3, multi: 4, briefs: 5, owns: 6, untracked: 7, stalled: 8 };
+  t("history: identical measures are the same row", sameMeasures(base, { ...base }));
+  t("history: metadata alone is not a difference",
+    sameMeasures(base, { ...base, ts: "2099-01-01", source: "stop" }));
+  for (const k of HISTORY_MEASURES)
+    t(`history: ok-a change in ${k} is a new row`, !sameMeasures(base, { ...base, [k]: 99 }));
+  t("history: nothing is not the same as something", !sameMeasures(base, null));
+  // Derived from HISTORY_CAST, NOT from HISTORY_MEASURES: a test that iterates the
+  // list it is checking deletes its own coverage when a column is dropped. That is
+  // exactly what happened - removing `stalled` from HISTORY_MEASURES passed.
+  const storedInts = [...HISTORY_CAST.matchAll(/CAST\((\w+) AS INTEGER\)/g)].map((m) => m[1]);
+  t("history: every stored number is compared - no column silently ignored",
+    storedInts.length > 0 && storedInts.every((k) => HISTORY_MEASURES.includes(k)),
+    `stored=${storedInts.join(",")} compared=${HISTORY_MEASURES.join(",")}`);
+  for (const k of storedInts)
+    t(`history: ok-${k} is compared`, HISTORY_MEASURES.includes(k));
+
   const spoken = warn("Stop", "sample warning");
   t("hook: a warning uses the documented `systemMessage` channel",
     spoken.systemMessage === "sample warning", JSON.stringify(spoken));

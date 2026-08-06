@@ -46,9 +46,11 @@ and auto-escalate if they grow.
 20. [x] Hooks wired: `SessionStart` + `PostToolUse` + `Stop`, never `PreToolUse` (`D-16`/`D-21`) - verify: all three return valid JSON and exit 0 through the wrapper with no `node` on `PATH`; sabotaging `PreToolUse` and `stop_hook_active` both fail the selftest
 21. [x] One agent per state + 2 specialists (`D-22`) - verify: 8 files with valid frontmatter, `name` matching the filename and a >60ch description; `architect` vs `deciding` description overlap cut from 10 shared words to 4; every description declares STATE or specialist
 22. [x] Hook payload matched against the contract the CLI itself ships - verify: warnings moved off the undocumented `decision: "warn"` onto `systemMessage`; 4 assertions + an `ok-` control that no payload ever blocks or denies; both sabotages fail; 6 inputs incl. malformed all exit 0, never the blocking 2
-23. [ ] Confirm the hooks actually fire in a live session - verify: a `SessionStart` rail appears in a NEW session
+23. [x] History dedupes - a Stop that measures nothing new writes nothing - verify: two identical Stops wrote 2 files before, 1 after; a dropped column now fails the selftest (it did not, because the test iterated the list it was checking)
+24. [ ] Confirm the hooks actually fire in a live session - verify: a `SessionStart` rail appears in a NEW session
 
 ## Progress
+- 2026-08-06 My own history test was vacuous: it iterated `HISTORY_MEASURES` to check `HISTORY_MEASURES`, so deleting a column deleted its own coverage and the sabotage passed. Now derived from the stored schema instead.
 - 2026-08-06 Found the CLI ships its own hook reference (`agent-customization/references/hooks.md`). It confirms `.github/hooks/*.json` is a real discovery location, and shows my warning field was invented: the contract documents `systemMessage`, `continue`, `stopReason` and a PostToolUse-only `decision: block`. The Stop warnings would most likely never have been shown.
 - 2026-08-06 Rail made self-sufficient: it now names WHICH agent runs the current state, which is the only thing linking the derivation to the six agent files.
 - 2026-08-06 Measured the failure: 69% of briefs ship with their code; 385 commits analysed for thresholds.
