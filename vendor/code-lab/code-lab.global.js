@@ -67,7 +67,9 @@ var CodeLab = (() => {
     gitDiffLines: () => diffLines,
     gitEdit: () => edit,
     gitFileAt: () => fileAt,
+    gitFindConflicts: () => findConflicts,
     gitFormatFileDiff: () => formatFileDiff,
+    gitHasConflictMarkers: () => hasConflictMarkers,
     gitInit: () => init,
     gitJoinLines: () => joinLines,
     gitLayout: () => layout,
@@ -77,6 +79,7 @@ var CodeLab = (() => {
     gitPanelFiles: () => panelFiles,
     gitRebase: () => rebase,
     gitReset: () => reset,
+    gitResolveConflicts: () => resolveConflicts,
     gitResolveFilePanel: () => resolveFilePanel,
     gitResolvePaths: () => resolvePaths,
     gitRevList: () => revList,
@@ -173,9 +176,9 @@ ${result.runtimeError}`.trim(),
   }
 
   // src/core/lines.ts
-  function normalizeLines(lines) {
-    if (lines === void 0 || lines === null) return [];
-    const list = Array.isArray(lines) ? lines : [lines];
+  function normalizeLines(lines2) {
+    if (lines2 === void 0 || lines2 === null) return [];
+    const list = Array.isArray(lines2) ? lines2 : [lines2];
     return [...new Set(list.filter((n) => Number.isFinite(n) && n > 0))].sort(
       (a, b) => a - b
     );
@@ -271,8 +274,8 @@ ${result.runtimeError}`.trim(),
       this.overlay = void 0;
       this.modal = void 0;
     }
-    normalizeLines(lines) {
-      return normalizeLines(lines);
+    normalizeLines(lines2) {
+      return normalizeLines(lines2);
     }
     buildDom() {
       if (this.overlay) return;
@@ -323,9 +326,9 @@ ${result.runtimeError}`.trim(),
       document.body.append(this.overlay, this.modal);
     }
     renderCode(code) {
-      const lines = splitCodeLines(code);
+      const lines2 = splitCodeLines(code);
       this.codePane.innerHTML = "";
-      this.state.lineEls = lines.map((text, i) => {
+      this.state.lineEls = lines2.map((text, i) => {
         const row = document.createElement("div");
         row.className = "cl-tour-line";
         const num = document.createElement("span");
@@ -2229,15 +2232,15 @@ ${result.runtimeError}`.trim(),
     }
     render(model) {
       if (this.codeList) {
-        const lines = model.code ?? this.code;
+        const lines2 = model.code ?? this.code;
         const pc = model.pc ?? -1;
         this.el.querySelector("[data-codepanel]").classList.toggle("dimmed", !model.codeLive);
-        if (this.codeList.children.length !== lines.length) {
+        if (this.codeList.children.length !== lines2.length) {
           this.codeList.innerHTML = "";
-          for (let i = 0; i < lines.length; i++) this.codeList.appendChild(document.createElement("li"));
+          for (let i = 0; i < lines2.length; i++) this.codeList.appendChild(document.createElement("li"));
         }
         Array.from(this.codeList.children).forEach((li, i) => {
-          const line = lines[i] ?? "";
+          const line = lines2[i] ?? "";
           li.innerHTML = markedLineHtml(line, spansForLine(i, line, model.codeMark, pc));
           li.classList.toggle("pc", i === pc);
         });
@@ -2325,16 +2328,16 @@ ${result.runtimeError}`.trim(),
       });
     }
     sync(ctx) {
-      const lines = ctx.model.code ?? this.code;
+      const lines2 = ctx.model.code ?? this.code;
       const pc = ctx.model.pc ?? -1;
       const pcChanged = pc !== this.lastPc;
       this.el.classList.toggle("dimmed", !ctx.model.codeLive);
-      if (this.list.children.length !== lines.length) {
+      if (this.list.children.length !== lines2.length) {
         this.list.innerHTML = "";
-        for (let i = 0; i < lines.length; i++) this.list.appendChild(document.createElement("li"));
+        for (let i = 0; i < lines2.length; i++) this.list.appendChild(document.createElement("li"));
       }
       Array.from(this.list.children).forEach((li, i) => {
-        const line = lines[i] ?? "";
+        const line = lines2[i] ?? "";
         li.innerHTML = markedLineHtml(line, spansForLine(i, line, ctx.model.codeMark, pc));
         li.classList.toggle("pc", i === pc);
       });
@@ -2678,7 +2681,7 @@ ${result.runtimeError}`.trim(),
     return stashed.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/\*([^*]+)\*/g, "<em>$1</em>").replace(new RegExp(`${CODE_SLOT}(\\d+)${CODE_SLOT}`, "g"), (_m, i) => spans[Number(i)]);
   }
   function renderNarration(text) {
-    const lines = String(text ?? "").split("\n");
+    const lines2 = String(text ?? "").split("\n");
     let html = "";
     let bullets = [];
     const flush = () => {
@@ -2687,7 +2690,7 @@ ${result.runtimeError}`.trim(),
         bullets = [];
       }
     };
-    for (const raw of lines) {
+    for (const raw of lines2) {
       const line = raw.trim();
       if (!line) {
         flush();
@@ -3523,12 +3526,12 @@ ${result.runtimeError}`.trim(),
   // src/core/text-merge.ts
   function splitLines(text) {
     if (text === "") return [];
-    const lines = text.split("\n");
-    if (lines.length > 0 && lines[lines.length - 1] === "") lines.pop();
-    return lines;
+    const lines2 = text.split("\n");
+    if (lines2.length > 0 && lines2[lines2.length - 1] === "") lines2.pop();
+    return lines2;
   }
-  function joinLines(lines) {
-    return lines.join("\n");
+  function joinLines(lines2) {
+    return lines2.join("\n");
   }
   function lcsLines(a, b) {
     const n = a.length;
@@ -4217,17 +4220,17 @@ Resolving a rebase by hand is not part of this course yet - use \`git merge\` in
     while (bi < b.length) out.push({ kind: "+", text: b[bi++] });
     return out;
   }
-  function hunksOf(lines, context) {
-    const changed = lines.map((l) => l.kind !== " ");
-    const keep = lines.map(
+  function hunksOf(lines2, context) {
+    const changed = lines2.map((l) => l.kind !== " ");
+    const keep = lines2.map(
       (_, i) => changed.slice(Math.max(0, i - context), i + context + 1).some(Boolean)
     );
     const hunks = [];
     let ai = 0;
     let bi = 0;
     let current = null;
-    for (let i = 0; i < lines.length; i++) {
-      const l = lines[i];
+    for (let i = 0; i < lines2.length; i++) {
+      const l = lines2[i];
       if (keep[i]) {
         if (!current) {
           current = { aStart: ai + 1, aCount: 0, bStart: bi + 1, bCount: 0, lines: [] };
@@ -4319,6 +4322,80 @@ Resolving a rebase by hand is not part of this course yet - use \`git merge\` in
     };
   }
 
+  // src/core/conflict-file.ts
+  var OPEN = /^<{7}\s*(.*)$/;
+  var BASE = /^\|{7}\s*(.*)$/;
+  var SPLIT = /^={7}\s*$/;
+  var CLOSE = /^>{7}\s*(.*)$/;
+  function lines(text) {
+    if (text === "") return [];
+    const out = text.split("\n");
+    if (out.length > 0 && out[out.length - 1] === "") out.pop();
+    return out;
+  }
+  function findConflicts(text) {
+    const src = lines(text);
+    const out = [];
+    for (let i = 0; i < src.length; i++) {
+      const open = OPEN.exec(src[i]);
+      if (!open) continue;
+      const region = {
+        start: i,
+        end: i,
+        ourLabel: open[1] || "ours",
+        theirLabel: "theirs",
+        ours: [],
+        base: [],
+        theirs: []
+      };
+      let side = "ours";
+      let closed = false;
+      for (let j = i + 1; j < src.length; j++) {
+        const line = src[j];
+        const baseMark = BASE.exec(line);
+        const closeMark = CLOSE.exec(line);
+        if (baseMark) {
+          side = "base";
+          continue;
+        }
+        if (SPLIT.test(line)) {
+          side = "theirs";
+          continue;
+        }
+        if (closeMark) {
+          region.theirLabel = closeMark[1] || "theirs";
+          region.end = j + 1;
+          closed = true;
+          break;
+        }
+        region[side].push(line);
+      }
+      if (!closed) continue;
+      out.push(region);
+      i = region.end - 1;
+    }
+    return out;
+  }
+  function resolveConflicts(text, choice) {
+    const src = lines(text);
+    const regions = findConflicts(text);
+    if (regions.length === 0) return text;
+    const out = [];
+    let cursor = 0;
+    for (const r of regions) {
+      out.push(...src.slice(cursor, r.start));
+      if (choice === "ours") out.push(...r.ours);
+      else if (choice === "theirs") out.push(...r.theirs);
+      else out.push(...r.ours, ...r.theirs);
+      cursor = r.end;
+    }
+    out.push(...src.slice(cursor));
+    return out.join("\n");
+  }
+  function hasConflictMarkers(text) {
+    return findConflicts(text).length > 0;
+  }
+
   // src/dom/git-file-panel.ts
   var ZONE_LABEL = {
     tree: "Working tree",
@@ -4337,11 +4414,29 @@ Resolving a rebase by hand is not part of this course yet - use \`git merge\` in
       this.state = null;
       /** null = decide from the repo; true/false = the learner said so. */
       this.open = null;
+      this.editHandler = null;
+      this.editor = null;
+      /** The path Monaco is currently mounted for, so it is not torn down on every
+       *  repaint while the learner is typing in it. */
+      this.editorPath = null;
       this.onClick = (ev) => {
         const t = ev.target?.closest(
-          "[data-file],[data-zone],[data-toggle]"
+          "[data-file],[data-zone],[data-toggle],[data-keep],[data-save]"
         );
         if (!t || !this.state) return;
+        if (t.dataset.keep) {
+          const path = t.dataset.path;
+          const text = this.currentConflictText(path);
+          if (text !== null && this.editHandler) {
+            this.editHandler(path, resolveConflicts(text, t.dataset.keep));
+          }
+          return;
+        }
+        if (t.dataset.save) {
+          const path = t.dataset.path;
+          if (this.editor && this.editHandler) this.editHandler(path, this.editor.getValue());
+          return;
+        }
         if (t.dataset.toggle) {
           this.open = t.getAttribute("aria-expanded") !== "true";
         } else if (t.dataset.file) {
@@ -4355,6 +4450,10 @@ Resolving a rebase by hand is not part of this course yet - use \`git merge\` in
       this.el = document.createElement("div");
       this.el.className = "cl-git-fp";
       this.el.addEventListener("click", this.onClick);
+    }
+    /** Told when the learner writes a file. */
+    onEdit(fn) {
+      this.editHandler = fn;
     }
     /** Repaint for a new repo state, keeping the learner's file and zone choice
      *  when they still make sense. */
@@ -4382,18 +4481,51 @@ Resolving a rebase by hand is not part of this course yet - use \`git merge\` in
       const anyDifference = p.zones.some((z) => z.differs);
       const expanded = this.open === null ? anyDifference : this.open;
       const selected = p.zones.find((c) => c.zone === p.selected);
-      const body = p.diff ? this.diffBody(p) : this.flatBody(selected.text);
+      const conflicted = p.selected === "tree" && selected.present && hasConflictMarkers(selected.text);
+      const body = conflicted ? this.conflictBody(p.path) : p.diff ? this.diffBody(p) : this.flatBody(selected.text);
       const foot = p.comparedWith ? `${ZONE_PHRASE[p.selected]}, compared with ${ZONE_PHRASE[p.comparedWith]}` : selected.present ? `${ZONE_PHRASE[p.selected]} - no change behind it` : "not in this zone";
       const summary = anyDifference ? `${p.files.length > 1 ? escapeHtml4(p.path) + " - " : ""}the copies differ` : "the files read the same everywhere";
       const toggle = `<button type="button" class="cl-git-fp-toggle" data-toggle="1" aria-expanded="${expanded}"><span class="cl-git-fp-caret" aria-hidden="true"></span><span>File contents</span><span class="cl-git-fp-summary">${summary}</span></button>`;
       this.el.innerHTML = toggle + (expanded ? `<div class="cl-git-fp-tabs" role="tablist">${chips}</div><div class="cl-git-fp-box"><div class="cl-git-fp-hd"><strong>${escapeHtml4(p.path)}</strong><span class="cl-git-fp-seg">${zoneButtons}</span></div>` + body + `<div class="cl-git-fp-ft">${escapeHtml4(foot)}</div></div>` : "");
+      if (expanded && conflicted) this.mountEditor(p.path, selected.text);
+      else {
+        this.editor = null;
+        this.editorPath = null;
+      }
+    }
+    /** The shell the editor mounts into, plus the shortcuts. */
+    conflictBody(path) {
+      const p = escapeHtml4(path);
+      return `<div class="cl-git-fp-conflict"><div class="cl-git-fp-actions"><span class="cl-git-fp-note">Git could not choose. Leave the lines you want.</span><button type="button" class="cl-git-fp-keep" data-keep="ours" data-path="${p}">Keep ours</button><button type="button" class="cl-git-fp-keep" data-keep="theirs" data-path="${p}">Keep theirs</button><button type="button" class="cl-git-fp-keep" data-keep="both" data-path="${p}">Keep both</button></div><div class="cl-git-fp-editor" data-editor-host="1"></div><div class="cl-git-fp-actions is-end"><button type="button" class="cl-git-fp-save" data-save="1" data-path="${p}">Save the file</button></div></div>`;
+    }
+    /** Mount Monaco once per file. Re-mounting on every repaint would take the
+     *  cursor away mid-word, so an editor already showing this path is left be. */
+    mountEditor(path, text) {
+      const host = this.el.querySelector("[data-editor-host]");
+      if (!host) return;
+      if (this.editorPath === path && this.editor) {
+        if (this.editor.getValue() !== text) this.editor.setValue(text);
+        return;
+      }
+      this.editorPath = path;
+      const editor = new MonacoEditor();
+      this.editor = editor;
+      void loadMonaco().then(() => editor.mount(host, { value: text, language: "plaintext", readOnly: false })).catch(() => {
+        host.innerHTML = `<pre class="cl-git-fp-body">${escapeHtml4(text)}</pre><p class="cl-git-fp-ft">The editor could not load - use the buttons above.</p>`;
+        this.editor = null;
+      });
+    }
+    /** The marked-up text as it stands, for the shortcut buttons. */
+    currentConflictText(path) {
+      if (this.editor) return this.editor.getValue();
+      return this.state?.worktree.get(path)?.text ?? null;
     }
     flatBody(text) {
-      const lines = text === "" ? [] : text.split("\n");
-      if (lines.length === 0) {
+      const lines2 = text === "" ? [] : text.split("\n");
+      if (lines2.length === 0) {
         return `<pre class="cl-git-fp-body is-empty">(empty file)</pre>`;
       }
-      return `<pre class="cl-git-fp-body">` + lines.map((l, i) => `<span class="cl-git-fp-ln">${i + 1}</span>${escapeHtml4(l)}`).join("\n") + `</pre>`;
+      return `<pre class="cl-git-fp-body">` + lines2.map((l, i) => `<span class="cl-git-fp-ln">${i + 1}</span>${escapeHtml4(l)}`).join("\n") + `</pre>`;
     }
     diffBody(p) {
       const cls = { " ": "", "-": " is-del", "+": " is-add" };
@@ -4428,6 +4560,7 @@ Resolving a rebase by hand is not part of this course yet - use \`git merge\` in
     constructor() {
       this.state = null;
       this.handlers = [];
+      this.editHandlers = [];
       // The ghost overlay for the current state (see the header note).
       this.ghost = /* @__PURE__ */ new Set();
       this.diverged = /* @__PURE__ */ new Set();
@@ -4490,6 +4623,13 @@ Resolving a rebase by hand is not part of this course yet - use \`git merge\` in
       this.ghost = new Set((opts?.ghost ?? []).filter((id) => !this.diverged.has(id)));
     }
     on(event, handler) {
+      if (event === "fileEdit") {
+        this.editHandlers.push(handler);
+        this.filePanel.onEdit((path, text) => {
+          for (const h of this.editHandlers) h(path, text);
+        });
+        return;
+      }
       if (event === "inspect") this.handlers.push(handler);
     }
     destroy() {
@@ -5011,8 +5151,8 @@ Resolving a rebase by hand is not part of this course yet - use \`git merge\` in
     ].join("\n");
   }
   function helpFor(doc) {
-    const lines = doc.usage.map((u, i) => `${i === 0 ? "usage:" : "   or:"} git ${u}`);
-    return lines.join("\n") + "\n\n" + doc.summary;
+    const lines2 = doc.usage.map((u, i) => `${i === 0 ? "usage:" : "   or:"} git ${u}`);
+    return lines2.join("\n") + "\n\n" + doc.summary;
   }
   function suggest(name) {
     let best = null;

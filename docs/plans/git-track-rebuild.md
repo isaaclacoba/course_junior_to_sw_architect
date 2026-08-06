@@ -57,22 +57,22 @@ them a read that changes what comes next)
 - [x] 15. **Gate:** re-vendor; all 14 lessons verify unchanged.
 
 **P3 - surfaces**
-- [ ] 16. File-text panel: one file shown in worktree / index / commit.
+- [x] 16. File-text panel: one file shown in worktree / index / commit.
 - [ ] 17. Monaco wired as the conflict-resolution editor.
-- [ ] 18. `git diff` as a command and as the read step in P1's cards. No lesson.
+- [x] 18. `git diff` as a command and as the read step in P1's cards. No lesson.
 
 **P4 - theory**
-- [ ] 19. Rebuild the five theory lessons, each to the one question it owns
+- [x] 19. Rebuild the five theory lessons, each to the one question it owns
       (table in the design doc).
 
 **P5 - the two missing lessons**
 - [x] 20. Three-areas lesson; it TAKES `gt-working-tree` + `gt-staging-area` and
       lesson 1 drops to `revisits`.
-- [ ] 21. `reflog`: model support + lesson, placed BEFORE the reset pair. Not
+- [x] 21. `reflog`: model support + lesson, placed BEFORE the reset pair. Not
       gated on P2.
 
 **P6**
-- [ ] 22. `rebase`, then `rebase -i` on Monaco. Last.
+- [x] 22. `rebase` - model, command and lesson. `rebase -i` not done.
 
 ## Progress
 
@@ -82,6 +82,9 @@ them a read that changes what comes next)
 - 2026-08-05 Docs cut to the 100-line rule after the owner caught them at 140/147
 - 2026-08-06 P0+P1 landed (9434bf4): median commands/card 2 -> 3, no 1-command
   card left; `gt-revision` moved to lesson 5, its earliest genuine use
+- 2026-08-06 P3-P6 landed: file panel (collapsing), `git diff`, `echo`, real
+  conflicts, the three-areas lesson, five theory lessons rebuilt, `reflog`
+  and `rebase` - model, commands and lessons. 17 git lessons.
 - 2026-08-06 P2 landed (code-lab d603c3d, course 8a76d5b): commits carry a full
   snapshot, index/worktree carry text, merge is LCS + 3-way + diff3 markers.
   14 lessons verify unchanged; every card is now 3-5 commands

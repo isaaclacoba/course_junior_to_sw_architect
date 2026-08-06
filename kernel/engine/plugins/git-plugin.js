@@ -240,6 +240,24 @@
     } else {
       surface.graph.mount(host, { state: p.union, ghost: overlay.ghost, diverged: overlay.diverged });
       surface.mounted = true;
+      // The board draws a conflicted file in an editor, but it cannot change
+      // the repository - the plugin owns the state, so it hears the edit and
+      // applies it, then re-grades exactly as a typed command would.
+      if (typeof surface.graph.on === "function") {
+        surface.graph.on("fileEdit", function (path, text) {
+          var CL = codeLab();
+          if (typeof CL.gitEdit !== "function" || !surface.state) return;
+          surface.state = CL.gitEdit(surface.state, path, text).state;
+          var p2 = paint(surface, true);
+          surface.solved = !!p2.solved;
+          syncTracker(surface);
+          surface.ctx.report({
+            ok: p2.solved,
+            reason: p2.reason,
+            message: messageFor(surface.ctx, p2),
+          });
+        });
+      }
     }
     return p;
   }
