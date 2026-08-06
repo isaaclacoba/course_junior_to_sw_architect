@@ -40,6 +40,11 @@ export function makeWindow() {
     requestAnimationFrame: noop, cancelAnimationFrame: noop, matchMedia: () => ({ matches: false, addEventListener: noop }),
     navigator: { userAgent: "node", language: "en" }, location: { search: "", href: "" },
     localStorage: { getItem: () => null, setItem: noop, removeItem: noop },
+    // Standard in every browser and in Node. Absent from a bare vm context, and
+    // a bundle that touches one at load time then throws and hands back an EMPTY
+    // CodeLab - which reads as "the runtime is missing" rather than "this global
+    // is". Cheaper to provide them than to debug that twice.
+    TextEncoder, TextDecoder,
     document: {
       createElement: elFactory, createElementNS: elFactory, createTextNode: () => ({}),
       getElementById: () => null, querySelector: () => null, querySelectorAll: () => [],

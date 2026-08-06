@@ -24,6 +24,7 @@ var CodeLab = (() => {
     ALL_REGIONS: () => ALL_REGIONS,
     CodeLab: () => CodeLab,
     CommandHistory: () => CommandHistory,
+    DEFAULT_AUTHOR: () => DEFAULT_AUTHOR,
     DEFAULT_LOOP_MEMORIES: () => DEFAULT_LOOP_MEMORIES,
     DEFAULT_LOOP_TOOLS: () => DEFAULT_LOOP_TOOLS,
     DEFAULT_MEMORY_STORES: () => DEFAULT_MEMORY_STORES,
@@ -33,8 +34,12 @@ var CodeLab = (() => {
     GitGraph: () => GitGraph,
     IframeRunner: () => IframeRunner,
     LineTerminal: () => LineTerminal,
+    MODE_DIR: () => MODE_DIR,
+    MODE_EXEC: () => MODE_EXEC,
+    MODE_FILE: () => MODE_FILE,
     MemoryViz: () => MemoryViz,
     MonacoEditor: () => MonacoEditor,
+    ObjectStore: () => ObjectStore,
     PlainHighlighter: () => PlainHighlighter,
     PrismHighlighter: () => PrismHighlighter,
     Quiz: () => Quiz,
@@ -50,6 +55,9 @@ var CodeLab = (() => {
     atFirst: () => atFirst,
     atLast: () => atLast,
     authorOf: () => authorOf,
+    bytesOf: () => bytesOf,
+    chainRows: () => chainRows,
+    commitBody: () => commitBody,
     computeLineFlags: () => computeLineFlags,
     conceptResults: () => conceptResults,
     counterLabel: () => counterLabel,
@@ -91,6 +99,7 @@ var CodeLab = (() => {
     gitTag: () => tag,
     gitTreeAt: () => treeAt,
     goTo: () => goTo,
+    hashObject: () => hashObject,
     loadMonaco: () => loadMonaco,
     makeTour: () => makeTour,
     markedLineHtml: () => markedLineHtml,
@@ -98,14 +107,17 @@ var CodeLab = (() => {
     neededToPass: () => neededToPass,
     next: () => next,
     normalizeLines: () => normalizeLines,
+    objectBytes: () => objectBytes,
     planProgress: () => planProgress,
     presentRun: () => presentRun,
     prev: () => prev,
     receiverBefore: () => receiverBefore,
     referencedIds: () => referencedIds,
     renderErrorPanel: () => renderErrorPanel,
+    replayObjects: () => replayObjects,
     resolveMarks: () => resolveMarks,
     resolveModel: () => resolveModel,
+    resolveObjects: () => resolveObjects,
     resolvePlan: () => resolvePlan,
     resolveRackTools: () => resolveRackTools,
     resolveRepo: () => resolveRepo,
@@ -114,16 +126,20 @@ var CodeLab = (() => {
     scanCSharp: () => scanCSharp,
     scoreQuiz: () => scoreQuiz,
     selectRunCode: () => selectRunCode,
+    sha1: () => sha1,
     shelfStores: () => shelfStores,
     shellTokenize: () => tokenize,
     shellTokenizeLine: () => tokenizeLine,
+    short: () => short,
     showErrorPanel: () => showErrorPanel,
     shuffleQuiz: () => shuffle,
     spansForLine: () => spansForLine,
     splitCodeLines: () => splitCodeLines,
     stripCommentsAndStrings: () => stripCommentsAndStrings,
     toolRackRows: () => toolRackRows,
-    traceToSteps: () => traceToSteps
+    traceToSteps: () => traceToSteps,
+    treeBody: () => treeBody,
+    treeSortKey: () => treeSortKey
   });
 
   // src/highlighter.ts
@@ -5725,6 +5741,375 @@ ${written}` : written;
     }
   };
 
+  // src/core/git-objects.ts
+  var MODE_FILE = "100644";
+  var MODE_EXEC = "100755";
+  var MODE_DIR = "40000";
+  var encoder = null;
+  function bytesOf(text) {
+    if (!encoder) encoder = new TextEncoder();
+    return encoder.encode(text);
+  }
+  function concat(chunks) {
+    let total = 0;
+    for (const chunk of chunks) total += chunk.length;
+    const out = new Uint8Array(total);
+    let at = 0;
+    for (const chunk of chunks) {
+      out.set(chunk, at);
+      at += chunk.length;
+    }
+    return out;
+  }
+  function hexToBytes(hex) {
+    const out = new Uint8Array(hex.length / 2);
+    for (let i = 0; i < out.length; i++) out[i] = parseInt(hex.substr(i * 2, 2), 16);
+    return out;
+  }
+  function sha1(bytes) {
+    const length = bytes.length;
+    const padded = new Uint8Array((length + 8 >> 6) + 1 << 6);
+    padded.set(bytes);
+    padded[length] = 128;
+    const view = new DataView(padded.buffer);
+    view.setUint32(padded.length - 4, length << 3 >>> 0, false);
+    view.setUint32(padded.length - 8, Math.floor(length / 536870912), false);
+    let h0 = 1732584193, h1 = 4023233417, h2 = 2562383102, h3 = 271733878, h4 = 3285377520;
+    const w = new Int32Array(80);
+    for (let offset = 0; offset < padded.length; offset += 64) {
+      for (let i = 0; i < 16; i++) w[i] = view.getInt32(offset + i * 4, false);
+      for (let i = 16; i < 80; i++) {
+        const mixed = w[i - 3] ^ w[i - 8] ^ w[i - 14] ^ w[i - 16];
+        w[i] = mixed << 1 | mixed >>> 31;
+      }
+      let a = h0, b = h1, c = h2, d = h3, e = h4;
+      for (let i = 0; i < 80; i++) {
+        let f, k;
+        if (i < 20) {
+          f = b & c | ~b & d;
+          k = 1518500249;
+        } else if (i < 40) {
+          f = b ^ c ^ d;
+          k = 1859775393;
+        } else if (i < 60) {
+          f = b & c | b & d | c & d;
+          k = 2400959708;
+        } else {
+          f = b ^ c ^ d;
+          k = 3395469782;
+        }
+        const next2 = (a << 5 | a >>> 27) + f + e + k + w[i] | 0;
+        e = d;
+        d = c;
+        c = b << 30 | b >>> 2;
+        b = a;
+        a = next2;
+      }
+      h0 = h0 + a | 0;
+      h1 = h1 + b | 0;
+      h2 = h2 + c | 0;
+      h3 = h3 + d | 0;
+      h4 = h4 + e | 0;
+    }
+    return [h0, h1, h2, h3, h4].map((n) => (n >>> 0).toString(16).padStart(8, "0")).join("");
+  }
+  function objectBytes(type, body) {
+    return concat([bytesOf(`${type} ${body.length}\0`), body]);
+  }
+  function hashObject(type, body) {
+    return sha1(objectBytes(type, body));
+  }
+  function compareBytes(left, right) {
+    const shared = Math.min(left.length, right.length);
+    for (let i = 0; i < shared; i++) {
+      if (left[i] !== right[i]) return left[i] - right[i];
+    }
+    return left.length - right.length;
+  }
+  function treeSortKey(entry) {
+    return bytesOf(entry.mode === MODE_DIR ? `${entry.name}/` : entry.name);
+  }
+  function treeBody(entries) {
+    const sorted = entries.slice().sort((a, b) => compareBytes(treeSortKey(a), treeSortKey(b)));
+    const chunks = [];
+    for (const entry of sorted) {
+      chunks.push(bytesOf(`${entry.mode} ${entry.name}\0`), hexToBytes(entry.id));
+    }
+    return concat(chunks);
+  }
+  function commitBody(commit2) {
+    const lines2 = [`tree ${commit2.tree}
+`];
+    for (const parent of commit2.parents) lines2.push(`parent ${parent}
+`);
+    lines2.push(`author ${commit2.author}
+`);
+    lines2.push(`committer ${commit2.committer || commit2.author}
+`);
+    lines2.push("\n");
+    lines2.push(commit2.message.endsWith("\n") ? commit2.message : `${commit2.message}
+`);
+    return bytesOf(lines2.join(""));
+  }
+  var ObjectStore = class {
+    constructor() {
+      this.objects = /* @__PURE__ */ new Map();
+      /** Ref name -> object id, e.g. "refs/heads/main". A file holding one id. */
+      this.refs = /* @__PURE__ */ new Map();
+      /** Path -> blob id. `.git/index`, the list of what you picked. */
+      this.index = /* @__PURE__ */ new Map();
+      /** Path -> text. Your folder. Not part of git at all. */
+      this.worktree = /* @__PURE__ */ new Map();
+      this.head = { kind: "ref", ref: "refs/heads/main" };
+    }
+    put(type, body, decoded) {
+      const id = hashObject(type, body);
+      if (!this.objects.has(id)) this.objects.set(id, { id, type, body, ...decoded });
+      return id;
+    }
+    writeBlob(text) {
+      return this.put("blob", bytesOf(text), { text });
+    }
+    writeTree(entries) {
+      return this.put("tree", treeBody(entries), { entries: entries.slice() });
+    }
+    writeCommit(commit2) {
+      return this.put("commit", commitBody(commit2), { commit: { ...commit2 } });
+    }
+    headId() {
+      if (this.head.kind === "detached") return this.head.id;
+      return this.refs.get(this.head.ref) || null;
+    }
+    /** Every object reachable by following names from the refs and HEAD. What is
+     *  outside this set is still on disk, byte for byte, and no name reaches it -
+     *  which is the whole difference between undone and gone. */
+    reachable() {
+      const seen = /* @__PURE__ */ new Set();
+      const queue = [...this.refs.values()];
+      const head = this.headId();
+      if (head) queue.push(head);
+      while (queue.length) {
+        const id = queue.pop();
+        if (!id || seen.has(id)) continue;
+        const object = this.objects.get(id);
+        if (!object) continue;
+        seen.add(id);
+        if (object.commit) queue.push(object.commit.tree, ...object.commit.parents);
+        else if (object.entries) for (const entry of object.entries) queue.push(entry.id);
+      }
+      return seen;
+    }
+  };
+
+  // src/core/objects-scene.ts
+  var DEFAULT_AUTHOR = "A Learner <learner@example.com> 1700000000 +0000";
+  function resolveObjects(scene) {
+    if (!scene || !Array.isArray(scene.acts)) return null;
+    const acts = scene.acts.slice();
+    const want = scene.fresh === void 0 ? 1 : Math.max(0, Math.min(scene.fresh, acts.length));
+    return {
+      lens: scene.lens === "chain" || scene.lens === "both" ? scene.lens : "folder",
+      acts,
+      fresh: want === 0 ? [] : acts.slice(acts.length - want),
+      note: scene.note,
+      author: scene.author || DEFAULT_AUTHOR
+    };
+  }
+  function replayObjects(scene) {
+    const store = new ObjectStore();
+    const added = /* @__PURE__ */ new Set();
+    const freshFrom = scene.acts.length - scene.fresh.length;
+    const stored = /* @__PURE__ */ new Map();
+    const savedByMessage = /* @__PURE__ */ new Map();
+    let latestTree = null;
+    let latestCommit = null;
+    scene.acts.forEach((act, at) => {
+      const before = new Set(store.objects.keys());
+      switch (act.act) {
+        case "write":
+          store.worktree.set(act.path, act.text);
+          break;
+        case "store": {
+          const text = store.worktree.get(act.path);
+          if (text === void 0) break;
+          stored.set(act.path, store.writeBlob(text));
+          break;
+        }
+        case "pick": {
+          const id = stored.get(act.path);
+          if (id) store.index.set(act.path, id);
+          break;
+        }
+        case "list": {
+          if (!stored.size) break;
+          latestTree = store.writeTree(
+            [...stored].map(([name, id]) => ({ mode: MODE_FILE, name, id }))
+          );
+          break;
+        }
+        case "save": {
+          if (!latestTree) break;
+          latestCommit = store.writeCommit({
+            tree: latestTree,
+            parents: latestCommit ? [latestCommit] : [],
+            author: scene.author,
+            message: act.message
+          });
+          savedByMessage.set(act.message, latestCommit);
+          break;
+        }
+        case "name": {
+          const target = act.at ? savedByMessage.get(act.at) : latestCommit;
+          if (target) store.refs.set(act.ref, target);
+          break;
+        }
+      }
+      if (at >= freshFrom) {
+        for (const id of store.objects.keys()) if (!before.has(id)) added.add(id);
+      }
+    });
+    return { store, added };
+  }
+  function chainRows(replay) {
+    const { store, added } = replay;
+    const live = store.reachable();
+    const rows = [];
+    const push = (kind, label, id, body) => {
+      const object = store.objects.get(id);
+      const names = object?.commit ? [object.commit.tree, ...object.commit.parents] : [];
+      rows.push({
+        kind,
+        label,
+        id,
+        body,
+        names: names.filter((named) => !body?.includes(short(named))),
+        fresh: added.has(id),
+        unreachable: !live.has(id)
+      });
+    };
+    const head = store.headId();
+    if (head) {
+      for (const [name, id] of store.refs) {
+        rows.push({
+          kind: "ref",
+          label: name.replace(/^refs\/heads\//, ""),
+          id,
+          names: [],
+          fresh: false,
+          unreachable: false
+        });
+      }
+    }
+    let walk = head;
+    let top = null;
+    let guard = 0;
+    while (walk && store.objects.get(walk)?.commit && guard++ < 64) {
+      const commit2 = store.objects.get(walk).commit;
+      if (!top) top = walk;
+      push("commit", "commit", walk, commit2.message);
+      walk = commit2.parents[0];
+    }
+    const treeId = top ? store.objects.get(top).commit.tree : lastTreeOf(store);
+    const tree = treeId ? store.objects.get(treeId) : void 0;
+    if (tree?.entries) {
+      push("tree", "tree", treeId, treeBodyText(tree.entries));
+      for (const entry of tree.entries) {
+        push("blob", "blob", entry.id, store.objects.get(entry.id)?.text);
+      }
+    }
+    for (const [id, object] of store.objects) {
+      if (rows.some((row) => row.id === id)) continue;
+      push(
+        object.type,
+        `${object.type} (unnamed)`,
+        id,
+        object.entries ? treeBodyText(object.entries) : object.text || object.commit?.message
+      );
+    }
+    return rows;
+  }
+  function treeBodyText(entries) {
+    return entries.map((entry) => `${entry.name} -> ${short(entry.id)}`).join(", ");
+  }
+  function lastTreeOf(store) {
+    let found = null;
+    for (const [id, object] of store.objects) if (object.entries) found = id;
+    return found;
+  }
+  function short(id) {
+    return id.slice(0, 7);
+  }
+
+  // src/dom/objects-view.ts
+  var ObjectsView = class {
+    constructor() {
+      this.el = document.createElement("div");
+      this.el.className = "cl-ob";
+      this.folderEl = document.createElement("pre");
+      this.folderEl.className = "cl-ob-folder";
+      this.chainEl = document.createElement("div");
+      this.chainEl.className = "cl-ob-chain";
+      this.noteEl = document.createElement("p");
+      this.noteEl.className = "cl-ob-cap";
+      this.el.append(this.folderEl, this.chainEl, this.noteEl);
+    }
+    sync(ctx) {
+      const scene = resolveObjects(ctx.model.objects);
+      if (!scene) return;
+      const replay = replayObjects(scene);
+      const wantsFolder = scene.lens === "folder" || scene.lens === "both";
+      const wantsChain = scene.lens === "chain" || scene.lens === "both";
+      this.folderEl.hidden = !wantsFolder;
+      this.chainEl.hidden = !wantsChain;
+      if (wantsFolder) this.folderEl.innerHTML = folderHtml(replay);
+      if (wantsChain) this.chainEl.innerHTML = chainHtml(chainRows(replay));
+      this.noteEl.innerHTML = scene.note ? escapeHtml4(scene.note) : "";
+      this.noteEl.hidden = !scene.note;
+    }
+  };
+  function folderHtml(replay) {
+    const { store, added } = replay;
+    const lines2 = [".git/", "  objects/"];
+    if (!store.objects.size) lines2.push(`    ${dim("(empty)")}`);
+    for (const [id, object] of store.objects) {
+      const body = `${id.slice(0, 2)}/${id.slice(2, 8)}...  <span class="cl-ob-type">${object.type}</span>`;
+      lines2.push(`    ${added.has(id) ? `<span class="cl-ob-new">${body}</span>` : body}`);
+    }
+    lines2.push("  refs/heads/");
+    if (!store.refs.size) lines2.push(`    ${dim("(no names yet)")}`);
+    for (const [name, id] of store.refs) {
+      lines2.push(`    ${escapeHtml4(name.replace(/^refs\/heads\//, ""))}   ${dim(short(id))}`);
+    }
+    lines2.push(`  HEAD    ${dim(`-> ${store.head.kind === "ref" ? store.head.ref : short(store.head.id)}`)}`);
+    if (store.index.size) {
+      lines2.push("  index");
+      for (const [path, id] of store.index) {
+        lines2.push(`    ${dim(`${escapeHtml4(path)}  ${short(id)}`)}`);
+      }
+    }
+    if (store.worktree.size) {
+      lines2.push("", "your folder");
+      for (const [path] of store.worktree) lines2.push(`  ${escapeHtml4(path)}`);
+    }
+    return lines2.join("\n");
+  }
+  function dim(text) {
+    return `<span class="cl-ob-dim">${text}</span>`;
+  }
+  function chainHtml(rows) {
+    if (!rows.length) return `<p class="cl-ob-empty">Nothing points at anything yet.</p>`;
+    return rows.map((row) => {
+      if (row.kind === "ref") {
+        return `<span class="cl-ob-ref">${escapeHtml4(row.label)}</span>`;
+      }
+      const classes = ["cl-ob-row"];
+      if (row.fresh) classes.push("cl-ob-fresh");
+      if (row.unreachable) classes.push("cl-ob-orphan");
+      const names = row.names.length ? ` names ${row.names.map((id) => `<span class="cl-ob-names">${short(id)}</span>`).join(" ")}` : "";
+      return `<div class="${classes.join(" ")}"><span class="cl-ob-kind">${escapeHtml4(row.label)}</span><span class="cl-ob-id">${short(row.id)}</span><span class="cl-ob-body">${escapeHtml4(row.body || "")}${names}</span></div>`;
+    }).join("");
+  }
+
   // src/dom/viz-controls.ts
   var DEFAULT_LEGEND = [
     { sw: "#37d3a6", label: "data in RAM" },
@@ -5891,6 +6276,7 @@ ${written}` : written;
         retrieval: () => new RetrievalView(),
         planboard: () => new PlanboardView(),
         repo: () => new RepoView(),
+        objects: () => new ObjectsView(),
         controls: (_spec, ctx) => this.controls = new VizControls(ctx.actions, ctx.handlers, ctx.nextHref, ctx.legend, ctx.nextLabel, ctx.vizLabels)
       };
       this.onResize = () => {
