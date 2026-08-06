@@ -4,6 +4,8 @@
   "hero.eyebrow": "Git · Part three · Bringing work back",
   "hero.title": "Settle a conflict",
   "intro.0": "A stopped merge feels like a hole you have fallen into, so the instinct is to close the terminal and hope it goes away. That is how half-finished merges end up committed by accident. There are only two ways out of one, and both are short: finish it by saying which file is settled, or call the whole thing off and stand exactly where you were before. Here you do both, on the same pair of branches.",
+  "concept.gt-conflict.term": "Conflict",
+  "concept.gt-conflict.def": "When two branches rewrote the same lines, git stops and hands the file back for you to decide.",
   "meta.label": "Bringing work back · Settle a conflict",
   "concept.gt-abort.term": "Aborting a merge",
   "concept.gt-abort.def": "Calling a stopped merge off and going back to how things were before you started it.",

@@ -4,6 +4,8 @@
   "hero.eyebrow": "Git · Part four · Fixing mistakes",
   "hero.title": "Undo with reset",
   "intro.0": "The commit is made and it should not have been. Deleting the file and starting over is the tempting move, and it usually throws away more than the mistake. `reset` moves your branch's name back instead, and hands you the real decision: keep those files staged, drop them back in the folder, or let them go. Here you run all three on the same mistake and watch the zones answer.",
+  "concept.gt-reset.term": "Reset",
+  "concept.gt-reset.def": "Moving your branch's name to another commit, with a choice of what happens to the files you had staged or edited.",
   "task.1.title": "Undo the commit, keep the work ready",
   "task.1.concept": "git reset",
   "task.1.context": "The commit on top is a mistake: `draft.txt` went in before it was ready, under the message `oops`.\n\n`git reset <mode> <rev>` moves `main` back to the commit you name, and the mode decides where that file lands. Here you want it kept staged, ready to commit again the moment it is finished.",

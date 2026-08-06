@@ -22,12 +22,12 @@ window.LESSON_META = {
     voices: ["default"],
   },
   concepts: {
-    "introduces": [],
-    "revisits": [
+    "introduces": [
       { "id": "gt-merge" },
       { "id": "gt-fast-forward" },
       { "id": "gt-merge-commit" }
     ],
+    "revisits": [],
     "uses": [
       { "id": "gt-branch" },
       { "id": "gt-head" },

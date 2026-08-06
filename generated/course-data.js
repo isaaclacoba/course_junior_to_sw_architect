@@ -1255,32 +1255,6 @@
               "kind": "lesson"
             },
             {
-              "id": "git-the-three-areas",
-              "track": "git",
-              "part": "first-steps",
-              "href": "content/git/01-first-steps/04-git-the-three-areas/",
-              "key": "git_the_three_areas_awarded",
-              "total": 1,
-              "title": "The three areas",
-              "blurb": "Why is there a middle step between editing a file and saving it? Watch one file end up with three different versions at the same time, one in each of git's three areas, and see which one `git commit` writes down.",
-              "pill": "gentle",
-              "time": "10 min",
-              "kind": "lesson"
-            },
-            {
-              "id": "git-a-history-of-snapshots",
-              "track": "git",
-              "part": "first-steps",
-              "href": "content/git/01-first-steps/02-git-a-history-of-snapshots/",
-              "key": "git_a_history_of_snapshots_awarded",
-              "total": 1,
-              "title": "A history of snapshots",
-              "blurb": "A commit holds a copy of the whole folder, every file at once. Change one line, save it, then step back a commit and watch the older version come back.",
-              "pill": "gentle",
-              "time": "8 min",
-              "kind": "lesson"
-            },
-            {
               "id": "git-where-am-i",
               "track": "git",
               "part": "first-steps",
@@ -1301,19 +1275,6 @@
           "title": "Branches",
           "kicker": "Git · Part two",
           "lessons": [
-            {
-              "id": "git-what-a-branch-is",
-              "track": "git",
-              "part": "branches",
-              "href": "content/git/02-branches/01-git-what-a-branch-is/",
-              "key": "git_what_a_branch_is_awarded",
-              "total": 1,
-              "title": "What a branch really is",
-              "blurb": "A branch is a name pointing at a commit. Save different text on two branches, flip between them, and watch the same file change in your folder.",
-              "pill": "gentle",
-              "time": "10 min",
-              "kind": "lesson"
-            },
             {
               "id": "git-make-a-branch",
               "track": "git",
@@ -1349,19 +1310,6 @@
           "kicker": "Git · Part three",
           "lessons": [
             {
-              "id": "git-how-merging-works",
-              "track": "git",
-              "part": "bringing-work-back",
-              "href": "content/git/03-bringing-work-back/01-git-how-merging-works/",
-              "key": "git_how_merging_works_awarded",
-              "total": 1,
-              "title": "How merging works",
-              "blurb": "Merging is not always the same move. Watch git slide a name forward without saving anything new, then watch it make the one commit that points back at two parents.",
-              "pill": "gentle",
-              "time": "10 min",
-              "kind": "lesson"
-            },
-            {
               "id": "git-merge-a-branch",
               "track": "git",
               "part": "bringing-work-back",
@@ -1372,19 +1320,6 @@
               "blurb": "One command brings a branch home - and it does two different things. Run `git merge` when `main` stayed put, then again when it did not.",
               "pill": "gentle",
               "time": "15 min",
-              "kind": "lesson"
-            },
-            {
-              "id": "git-when-changes-collide",
-              "track": "git",
-              "part": "bringing-work-back",
-              "href": "content/git/03-bringing-work-back/03-git-when-changes-collide/",
-              "key": "git_when_changes_collide_awarded",
-              "total": 1,
-              "title": "When two changes collide",
-              "blurb": "Two branches edit one file and git merges it without asking. Move one of those edits onto the other's line and the same merge stops - watch both, and read what git leaves behind in the file.",
-              "pill": "gentle",
-              "time": "10 min",
               "kind": "lesson"
             },
             {
@@ -1445,19 +1380,6 @@
               "blurb": "`git log` shows what a branch can still reach. `git reflog` shows every place `HEAD` has been, so a commit you thought you had thrown away is still findable by its hash.",
               "pill": "gentle",
               "time": "15 min",
-              "kind": "lesson"
-            },
-            {
-              "id": "git-what-reset-moves",
-              "track": "git",
-              "part": "fixing-mistakes",
-              "href": "content/git/04-fixing-mistakes/03-git-what-reset-moves/",
-              "key": "git_what_reset_moves_awarded",
-              "total": 1,
-              "title": "What reset actually moves",
-              "blurb": "`--soft`, `--mixed` and `--hard` move your branch to exactly the same place. Watch where each one leaves the files the undone commit was holding.",
-              "pill": "gentle",
-              "time": "10 min",
               "kind": "lesson"
             },
             {

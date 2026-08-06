@@ -4,6 +4,8 @@
   "hero.eyebrow": "Git · Parte tres · Traer el trabajo de vuelta",
   "hero.title": "Resolver un conflicto",
   "intro.0": "Una fusión detenida parece un agujero en el que te has caído, así que el instinto es cerrar la terminal y esperar a que se pase. Así es como acaban commiteadas sin querer las fusiones a medias. Solo hay dos salidas, y las dos son cortas: terminarla diciendo qué archivo queda resuelto, o cancelarla entera y quedarte exactamente donde estabas antes. Aquí haces las dos, sobre el mismo par de ramas.",
+  "concept.gt-conflict.term": "Conflicto",
+  "concept.gt-conflict.def": "Cuando dos ramas reescribieron las mismas líneas, git se detiene y te devuelve el archivo para que decidas tú.",
   "meta.label": "Traer el trabajo de vuelta · Resolver un conflicto",
   "concept.gt-abort.term": "Cancelar una fusión",
   "concept.gt-abort.def": "Dejar sin efecto una fusión detenida y volver a como estaban las cosas antes de empezarla.",

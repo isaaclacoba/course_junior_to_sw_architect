@@ -140,10 +140,6 @@
       "blurb": "Has usado List&lt;T&gt; - ahora escribe el tuyo. Construye un Box&lt;T&gt;, un método genérico y un Pair&lt;A, B&gt; que funcionen con cualquier tipo de valor.",
       "title": "Genéricos"
     },
-    "git-a-history-of-snapshots": {
-      "blurb": "Un commit guarda una copia de la carpeta entera, todos los archivos de golpe. Cambia una línea, guárdala, y luego retrocede un commit para ver volver la versión anterior.",
-      "title": "Una historia de instantáneas"
-    },
     "git-first-commit": {
       "blurb": "Entrega una carpeta a git y guarda tus primeras versiones. Tres ejercicios cortos en un terminal de verdad: arranca el repositorio, elige qué archivos entran y guárdalos - el gráfico se dibuja solo mientras escribes.",
       "title": "Tu primer commit"
@@ -151,10 +147,6 @@
     "git-fix-the-last-commit": {
       "blurb": "Corrige el commit que acabas de hacer en vez de apilar un `oops` encima. Arregla un mensaje mal escrito, mete el archivo que se quedó fuera, y deja la historia con la misma longitud.",
       "title": "Arreglar el último commit"
-    },
-    "git-how-merging-works": {
-      "blurb": "Fusionar no siempre es el mismo movimiento. Mira cómo git desliza un nombre hacia delante sin guardar nada nuevo, y luego cómo crea el único commit que apunta hacia atrás a dos padres.",
-      "title": "Cómo funciona fusionar"
     },
     "git-make-a-branch": {
       "blurb": "Separa una línea de trabajo y haz commits ahí sin tocar `main`. Crea una rama, súbete a ella y mira cómo el grafo se bifurca mientras la línea anterior se queda quieta.",
@@ -184,25 +176,9 @@
       "blurb": "Dos ramas cambiaron `cat.txt`, así que la fusión se detuvo. Termínala marcando el archivo como resuelto y haciendo el commit - luego cancela otra sin dejar rastro.",
       "title": "Resolver un conflicto"
     },
-    "git-the-three-areas": {
-      "blurb": "¿Por qué hay un paso intermedio entre editar un archivo y guardarlo? Mira cómo un mismo archivo acaba con tres versiones distintas a la vez, una en cada área de git, y cuál de ellas escribe `git commit`.",
-      "title": "Las tres áreas"
-    },
     "git-undo-with-reset": {
       "blurb": "Mueve tu rama un commit hacia atrás y decide dónde deben caer sus archivos. Ejecuta `--soft`, `--mixed` y `--hard` sobre el mismo error y mira cómo responden las tres zonas.",
       "title": "Deshacer con reset"
-    },
-    "git-what-a-branch-is": {
-      "blurb": "Una rama es un nombre que apunta a un commit. Guarda texto distinto en dos ramas, salta de una a otra, y mira cómo cambia el mismo archivo en tu carpeta.",
-      "title": "Qué es realmente una rama"
-    },
-    "git-what-reset-moves": {
-      "blurb": "`--soft`, `--mixed` y `--hard` mueven tu rama exactamente al mismo sitio. Mira dónde deja cada uno los archivos que guardaba el commit deshecho.",
-      "title": "Qué mueve realmente reset"
-    },
-    "git-when-changes-collide": {
-      "blurb": "Dos ramas editan un mismo archivo y git lo fusiona sin preguntar. Mueve una de esas ediciones encima de la otra y la misma fusión se detiene - mira las dos, y lee lo que git deja dentro del archivo.",
-      "title": "Cuando dos cambios chocan"
     },
     "git-where-am-i": {
       "blurb": "Lee tu propio repositorio antes de cambiarlo. Pregúntale a git qué está esperando a guardarse y qué guardaste ya, y añade el siguiente commit sabiendo exactamente dónde estás.",

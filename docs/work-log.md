@@ -2276,3 +2276,123 @@ in a real browser.
 Not caused by these changes, but seen: running all 15 git lessons in parallel
 failed 2 of them once with a browser console error, and passed 15/15 on the next
 two runs. Flaky under parallel load, worth a look if it recurs.
+
+## 2026-08-05 21:42-21:54 CEST - New git lesson: "Find a lost commit" (`git reflog`)
+
+Authored `content/git/04-fixing-mistakes/05-git-reflog/`, slotted at position 3
+of Part 4 by moving its `course-registry.js` row above `git-what-reset-moves`
+(directory prefixes untouched - order is array order). Archetype `git`, two
+interactive cards plus a recap, `gt-reflog` introduced, EN + ES bundles at 41
+keys each.
+
+The lesson sits BEFORE the reset pair, so `gt-reset` is not available yet and no
+card may ask the learner to type `reset`. The commit is therefore lost by
+`git commit --amend` - the same predicament, built only from what part four card
+1 already taught. Card 1 loses a commit and stands on it again (`git checkout
+<hash>`); card 2 walks in on the loss and gives the commit a name
+(`git branch rescue <hash>`). `reset` is named once, in the recap, as what comes
+next - which is what finally makes `undo-with-reset`'s existing promise true.
+
+Two things measured rather than assumed:
+- `HEAD@{n}` is NOT a revision this model accepts. `git reset --hard HEAD@{1}`
+  parses as a pathspec and silently succeeds having done nothing, so no goal
+  asks for it and the recap says plainly that the hash is what you type.
+- Recovery needs a generated hash, but grading is structural and gates match on
+  leading words, so no gate names one. Only `solution`/`target` carry `18f5843`,
+  which is safe because the hash preimage is parents + message + seq - no clock,
+  no randomness, and no file content, so the localized file text cannot move it
+  (EN and ES replay to byte-identical reflogs). `verify-lesson` replays the
+  solution every run, so a hashing change fails loudly.
+
+Every `absent` clause is anchored `on: "main"` rather than left bare. A bare
+absence stops being true the moment the learner recovers the commit, and the
+tracker's latch does not survive a language switch - EN->ES on a finished card
+turned a green goal grey. Anchoring it is also the more accurate claim: what
+`git log` cannot see is what `main` cannot reach.
+
+Also added `gt-reflog` to `undo-with-reset`'s `uses` - its prose already leans on
+the command - which cleared the orphan-concept warning the new concept raised.
+
+Verified: `validate.mjs` 0 errors (warnings 142 -> 141, the drop is the orphan);
+`verify-lesson.mjs` exit 0 on the new lesson and still exit 0 on
+`04-git-undo-with-reset`; `check-i18n.mjs` PASS, 0 missing keys; EN/ES key sets
+identical and same-ordered (41/41, checked with python); `check-voice.mjs` 0
+flags across the lesson's 24 prose strings (the one git-track flag is the
+pre-existing `gt-amend.def`). Both cards also driven by hand in a real browser:
+8/8 goal rows tick, XP awards, a 6-character hash prefix passes, and EN->ES->EN
+holds every tick with no `undefined`.
+
+## 2026-08-06 08:28 CEST - New git lesson: "Replay your work on top" (`git rebase`)
+
+Start. Last lesson of the git track, Part 4, `git` archetype (interactive
+terminal). Two cards plus a recap; introduces `gt-rebase`, revisits `gt-reflog`
+and `gt-merge`.
+
+New lesson `content/git/04-fixing-mistakes/06-git-rebase/`, last in the git track.
+Two cards plus a recap, `git` archetype. Card 1: `git branch` -> `git checkout
+feature` -> `git log` -> `git rebase main` -> `git log --oneline`; the branches
+touch different files (`bird.txt` vs `dog.txt`) because a same-file rebase is
+refused by the model with `CONFLICT (content)` and there is no mid-rebase
+resolve. Card 2: read the reflog, put `before-rebase` on the pre-replay hash
+`344a3ea`, stand on it, and walk the old line.
+
+Two goals asking for the same command would both light on the first run, because
+`ran` matches leading words and accumulates over the card. So the "before" read
+is bare `git log` and the "after" read is `git log --oneline`; the bare form also
+prints the hash on its own line, which is what both cards ask the learner to
+watch. The goals that must tell the two `add bird` commits apart ask about
+REACHABILITY (`commit: "add dog", on: "feature"`), never about the message.
+
+`git-undo-with-reset`'s closing line said "That is the whole elementary track" -
+no longer true with a lesson after it, so it was reworded in `data.js` and both
+bundles.
+
+Verified: `generate.mjs` clean; `validate.mjs` 0 errors, 142 warnings (+1 vs the
+previous run - `gt-rebase` is introduced by the last lesson of the track so
+nothing revisits it, the same shape as the existing `gt-abort` warning);
+`verify-lesson.mjs` exit 0 on the new lesson and still exit 0 on
+`04-git-undo-with-reset`; every goal gate and every goal ROW starts red on the
+untouched card (measured through the git goal provider); EN/ES 43/43 keys,
+identical sets and identical order (python); `check-i18n.mjs` PASS, 0 missing
+keys; `check-voice.mjs` 0 new flags across `content/git` (the one flag is the
+pre-existing `gt-amend.def`); `npm run gate` PASS including the EN<->ES browser
+round-trip on both changed lessons; `node --test test/` 527 pass, 0 fail; the
+landing page renders 17 git cards including `git_rebase_awarded`, and
+`git-undo-with-reset`'s next button resolves to `06-git-rebase/`.
+
+## 2026-08-06 08:36 CEST - end
+
+## 2026-08-06 09:25 CEST - start
+
+Git THEORY track: remove the six `viz` theory lessons from the git track and run
+a new design round with the owner. Constraints from the owner: the theory track
+lives in parallel to the practical git track inside the git course; it must not
+mimic the practical track in any way; it must explain git INTERNALS simply, in
+the course voice, to learners who have never used git.
+
+Design round run with the owner across four batches - 23 decisions, all recorded
+to the journal under the feature `git-theory-track`. The theory track becomes
+**Inside git**: a second git track shown by a segmented control inside the Git
+tab, standalone, with no commands anywhere. It is ordered by the object store and
+set in the `.git` folder; the command-payoff part was dropped by the owner to
+remove the last mimicry risk. Packfiles, gc, remotes and rebase stay in scope as
+existence-and-shape, not deep internals.
+
+Three visual variants were mocked up and the owner asked for all three - so they
+became ONE scene with `lens: folder | chain | both`, author-picked per step. Real
+SHA-1 over the real object format is a hard requirement: the track's central claim
+is that the name comes from the content, and a fake hash makes that an article of
+faith. Mockup: `poc-git-theory.html`. Brief: `docs/plans/git-inside-track.md`.
+Design: `docs/architecture/git-inside-track.md`.
+
+P0 landed in the working tree: the six `viz` theory lessons deleted, their
+registry rows removed, and ten concepts re-homed to the practical lesson that
+first meets each (`gt-parent` dropped - nothing referenced it). The git track is
+now 11 pure-terminal lessons.
+
+Verified: `generate.mjs` clean; `validate.mjs` 0 errors, 145 warnings (none new);
+`check-i18n --track git` PASS with 0 missing keys; `verify-lesson.mjs` exit 0 on
+all six lessons that took a concept; `node --test test/` 527 pass, 0 fail;
+`generated/course-data.js` resolves 11 git cards. Not committed.
+
+## 2026-08-06 10:10 CEST - end

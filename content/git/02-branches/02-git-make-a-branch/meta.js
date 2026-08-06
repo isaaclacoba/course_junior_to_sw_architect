@@ -1,8 +1,7 @@
 // Concept ownership note: `gt-branch` and `gt-head` are introduced here because
-// the viz lesson that owns them in the plan (`git-what-a-branch-is`, the 01- slot
-// of this part) is not built yet. When that lesson lands, move both ids - and
-// their `concept.*.term` / `.def` keys in res/strings - over to it, and demote
-// them here to `revisits`.
+// this is the first lesson that makes a learner meet them. The theory track owns
+// what a branch is made OF (a name file holding one object id); this track owns
+// the word as it is used at the keyboard.
 window.LESSON_META = {
   id: "git-make-a-branch",
   key: "git_make_a_branch_awarded",
@@ -30,15 +29,15 @@ window.LESSON_META = {
     "introduces": [
       {
         "id": "gt-revision"
-      }
-    ],
-    "revisits": [
+      },
       {
         "id": "gt-branch"
       },
       {
         "id": "gt-head"
-      },
+      }
+    ],
+    "revisits": [
       {
         "id": "gt-commit"
       }

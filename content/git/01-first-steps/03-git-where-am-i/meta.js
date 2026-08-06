@@ -25,6 +25,9 @@ window.LESSON_META = {
     "introduces": [
       {
         "id": "gt-hash"
+      },
+      {
+        "id": "gt-history"
       }
     ],
     "revisits": [

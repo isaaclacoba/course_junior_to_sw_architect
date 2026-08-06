@@ -243,10 +243,6 @@
       "def": "El commit que crea una fusión cuando las dos partes avanzaron - el único commit con dos padres.",
       "term": "Commit de fusión"
     },
-    "gt-parent": {
-      "def": "El commit que vino justo antes de este - el enlace que convierte instantáneas sueltas en una historia.",
-      "term": "Padre"
-    },
     "gt-rebase": {
       "def": "Hacer los commits de tu rama otra vez encima de otra rama, lo que deja el historial como una sola línea recta y le da un id nuevo a cada commit rehecho.",
       "term": "Rebase"

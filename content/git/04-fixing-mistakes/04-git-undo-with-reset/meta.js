@@ -22,11 +22,12 @@ window.LESSON_META = {
     voices: ["default"],
   },
   concepts: {
-    "introduces": [],
-    "revisits": [
+    "introduces": [
       {
         "id": "gt-reset"
-      },
+      }
+    ],
+    "revisits": [
       {
         "id": "gt-staging-area"
       },

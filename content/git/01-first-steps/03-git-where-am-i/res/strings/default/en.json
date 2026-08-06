@@ -4,6 +4,8 @@
   "hero.eyebrow": "Git · Part one · First steps",
   "hero.title": "Where am I?",
   "intro.0": "You open a folder on Monday with no memory of how you left it. Did you save that change, or only start it? Git will tell you, but only if you ask - and asking is the habit that separates people who trust git from people who are a bit scared of it. Two questions cover most of it: what is going on right now, and what happened before. Here you learn to ask both, then commit with your eyes open.",
+  "concept.gt-history.term": "History",
+  "concept.gt-history.def": "The chain of commits behind where you stand now, each pointing back at its parent.",
   "task.1.title": "Ask before you save",
   "task.1.concept": "git status and git diff",
   "task.1.context": "`git status` answers one question: what is going on in this folder right now. It names the files - which are untracked, which you have changed, which are staged.\n\nIt does not tell you what changed INSIDE a file. `git diff` does that: the lines you took out, the lines you put in. Together they are the two halves of looking before you act - which file, and what in it.",

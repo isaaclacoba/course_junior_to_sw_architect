@@ -338,15 +338,12 @@
       "usedBy": []
     },
     "gt-branch": {
-      "introducedBy": "git-what-a-branch-is",
+      "introducedBy": "git-make-a-branch",
       "revisitedBy": [
-        "git-make-a-branch",
-        "git-mark-a-version",
-        "git-how-merging-works"
+        "git-mark-a-version"
       ],
       "usedBy": [
         "git-merge-a-branch",
-        "git-when-changes-collide",
         "git-settle-a-conflict",
         "git-point-at-a-commit",
         "git-reflog",
@@ -356,25 +353,18 @@
     "gt-commit": {
       "introducedBy": "git-first-commit",
       "revisitedBy": [
-        "git-the-three-areas",
-        "git-a-history-of-snapshots",
         "git-where-am-i",
-        "git-what-a-branch-is",
         "git-make-a-branch",
         "git-fix-the-last-commit"
       ],
       "usedBy": [
         "git-mark-a-version",
-        "git-how-merging-works",
-        "git-merge-a-branch",
-        "git-when-changes-collide"
+        "git-merge-a-branch"
       ]
     },
     "gt-conflict": {
-      "introducedBy": "git-when-changes-collide",
-      "revisitedBy": [
-        "git-settle-a-conflict"
-      ],
+      "introducedBy": "git-settle-a-conflict",
+      "revisitedBy": [],
       "usedBy": []
     },
     "gt-detached-head": {
@@ -385,10 +375,8 @@
       "usedBy": []
     },
     "gt-fast-forward": {
-      "introducedBy": "git-how-merging-works",
-      "revisitedBy": [
-        "git-merge-a-branch"
-      ],
+      "introducedBy": "git-merge-a-branch",
+      "revisitedBy": [],
       "usedBy": []
     },
     "gt-hash": {
@@ -403,12 +391,8 @@
       ]
     },
     "gt-head": {
-      "introducedBy": "git-what-a-branch-is",
-      "revisitedBy": [
-        "git-make-a-branch",
-        "git-how-merging-works",
-        "git-what-reset-moves"
-      ],
+      "introducedBy": "git-make-a-branch",
+      "revisitedBy": [],
       "usedBy": [
         "git-mark-a-version",
         "git-merge-a-branch",
@@ -420,20 +404,16 @@
       ]
     },
     "gt-history": {
-      "introducedBy": "git-a-history-of-snapshots",
-      "revisitedBy": [
-        "git-what-a-branch-is"
-      ],
+      "introducedBy": "git-where-am-i",
+      "revisitedBy": [],
       "usedBy": [
         "git-reflog",
         "git-rebase"
       ]
     },
     "gt-merge": {
-      "introducedBy": "git-how-merging-works",
+      "introducedBy": "git-merge-a-branch",
       "revisitedBy": [
-        "git-merge-a-branch",
-        "git-when-changes-collide",
         "git-rebase"
       ],
       "usedBy": [
@@ -441,21 +421,10 @@
       ]
     },
     "gt-merge-commit": {
-      "introducedBy": "git-how-merging-works",
-      "revisitedBy": [
-        "git-merge-a-branch",
-        "git-when-changes-collide"
-      ],
-      "usedBy": [
-        "git-settle-a-conflict"
-      ]
-    },
-    "gt-parent": {
-      "introducedBy": "git-a-history-of-snapshots",
+      "introducedBy": "git-merge-a-branch",
       "revisitedBy": [],
       "usedBy": [
-        "git-how-merging-works",
-        "git-when-changes-collide"
+        "git-settle-a-conflict"
       ]
     },
     "gt-rebase": {
@@ -475,20 +444,15 @@
     "gt-repository": {
       "introducedBy": "git-first-commit",
       "revisitedBy": [
-        "git-the-three-areas",
         "git-where-am-i"
       ],
       "usedBy": [
-        "git-a-history-of-snapshots",
-        "git-what-a-branch-is",
         "git-make-a-branch"
       ]
     },
     "gt-reset": {
-      "introducedBy": "git-what-reset-moves",
-      "revisitedBy": [
-        "git-undo-with-reset"
-      ],
+      "introducedBy": "git-undo-with-reset",
+      "revisitedBy": [],
       "usedBy": []
     },
     "gt-revision": {
@@ -500,10 +464,8 @@
       "usedBy": []
     },
     "gt-staging-area": {
-      "introducedBy": "git-the-three-areas",
+      "introducedBy": "git-first-commit",
       "revisitedBy": [
-        "git-first-commit",
-        "git-what-reset-moves",
         "git-undo-with-reset"
       ],
       "usedBy": [
@@ -519,10 +481,8 @@
       ]
     },
     "gt-working-tree": {
-      "introducedBy": "git-the-three-areas",
+      "introducedBy": "git-first-commit",
       "revisitedBy": [
-        "git-first-commit",
-        "git-what-reset-moves",
         "git-undo-with-reset"
       ],
       "usedBy": [
@@ -2271,27 +2231,14 @@
         "pr-class"
       ]
     },
-    "git-a-history-of-snapshots": {
-      "introduces": [
-        "gt-parent",
-        "gt-history"
-      ],
-      "revisits": [
-        "gt-commit"
-      ],
-      "uses": [
-        "gt-repository"
-      ]
-    },
     "git-first-commit": {
       "introduces": [
         "gt-repository",
-        "gt-commit"
-      ],
-      "revisits": [
+        "gt-commit",
         "gt-working-tree",
         "gt-staging-area"
       ],
+      "revisits": [],
       "uses": []
     },
     "git-fix-the-last-commit": {
@@ -2305,28 +2252,13 @@
         "gt-head"
       ]
     },
-    "git-how-merging-works": {
+    "git-make-a-branch": {
       "introduces": [
-        "gt-merge",
-        "gt-fast-forward",
-        "gt-merge-commit"
-      ],
-      "revisits": [
+        "gt-revision",
         "gt-branch",
         "gt-head"
       ],
-      "uses": [
-        "gt-commit",
-        "gt-parent"
-      ]
-    },
-    "git-make-a-branch": {
-      "introduces": [
-        "gt-revision"
-      ],
       "revisits": [
-        "gt-branch",
-        "gt-head",
         "gt-commit"
       ],
       "uses": [
@@ -2350,12 +2282,12 @@
       ]
     },
     "git-merge-a-branch": {
-      "introduces": [],
-      "revisits": [
+      "introduces": [
         "gt-merge",
         "gt-fast-forward",
         "gt-merge-commit"
       ],
+      "revisits": [],
       "uses": [
         "gt-branch",
         "gt-head",
@@ -2407,11 +2339,10 @@
     },
     "git-settle-a-conflict": {
       "introduces": [
-        "gt-abort"
-      ],
-      "revisits": [
+        "gt-abort",
         "gt-conflict"
       ],
+      "revisits": [],
       "uses": [
         "gt-merge",
         "gt-branch",
@@ -2419,21 +2350,11 @@
         "gt-tag"
       ]
     },
-    "git-the-three-areas": {
-      "introduces": [
-        "gt-working-tree",
-        "gt-staging-area"
-      ],
-      "revisits": [
-        "gt-repository",
-        "gt-commit"
-      ],
-      "uses": []
-    },
     "git-undo-with-reset": {
-      "introduces": [],
+      "introduces": [
+        "gt-reset"
+      ],
       "revisits": [
-        "gt-reset",
         "gt-staging-area",
         "gt-working-tree"
       ],
@@ -2442,47 +2363,10 @@
         "gt-reflog"
       ]
     },
-    "git-what-a-branch-is": {
-      "introduces": [
-        "gt-branch",
-        "gt-head"
-      ],
-      "revisits": [
-        "gt-commit",
-        "gt-history"
-      ],
-      "uses": [
-        "gt-repository"
-      ]
-    },
-    "git-what-reset-moves": {
-      "introduces": [
-        "gt-reset"
-      ],
-      "revisits": [
-        "gt-staging-area",
-        "gt-working-tree",
-        "gt-head"
-      ],
-      "uses": []
-    },
-    "git-when-changes-collide": {
-      "introduces": [
-        "gt-conflict"
-      ],
-      "revisits": [
-        "gt-merge",
-        "gt-merge-commit"
-      ],
-      "uses": [
-        "gt-branch",
-        "gt-commit",
-        "gt-parent"
-      ]
-    },
     "git-where-am-i": {
       "introduces": [
-        "gt-hash"
+        "gt-hash",
+        "gt-history"
       ],
       "revisits": [
         "gt-commit",
@@ -3453,10 +3337,6 @@
     "gt-merge-commit": {
       "term": "Merge commit",
       "def": "The commit a merge makes when both sides moved on - the one commit with two parents."
-    },
-    "gt-parent": {
-      "term": "Parent",
-      "def": "The commit that came just before this one - the link that turns loose snapshots into a history."
     },
     "gt-rebase": {
       "term": "Rebase",

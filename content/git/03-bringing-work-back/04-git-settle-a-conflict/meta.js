@@ -23,11 +23,10 @@ window.LESSON_META = {
   },
   concepts: {
     "introduces": [
-      { "id": "gt-abort" }
-    ],
-    "revisits": [
+      { "id": "gt-abort" },
       { "id": "gt-conflict" }
     ],
+    "revisits": [],
     "uses": [
       { "id": "gt-merge" },
       { "id": "gt-branch" },

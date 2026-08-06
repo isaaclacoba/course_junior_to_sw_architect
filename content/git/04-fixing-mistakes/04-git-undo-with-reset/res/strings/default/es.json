@@ -4,6 +4,8 @@
   "hero.eyebrow": "Git · Parte cuatro · Arreglar errores",
   "hero.title": "Deshacer con reset",
   "intro.0": "El commit ya está hecho y no debería estarlo. Borrar el archivo y empezar de cero es lo que apetece, y suele tirar bastante más que el error. En su lugar, `reset` mueve hacia atrás el nombre de tu rama y te deja la decisión de verdad: mantener esos archivos preparados, devolverlos a la carpeta o dejarlos ir. Aquí ejecutas los tres sobre el mismo error y miras cómo responden las zonas.",
+  "concept.gt-reset.term": "Reset",
+  "concept.gt-reset.def": "Mover el nombre de tu rama a otro commit, eligiendo qué pasa con los archivos que tenías preparados o editados.",
   "task.1.title": "Deshaz el commit y deja el trabajo listo",
   "task.1.concept": "git reset",
   "task.1.context": "El commit de arriba es un error: `draft.txt` entró antes de estar listo, con el mensaje `oops`.\n\n`git reset <mode> <rev>` mueve `main` de vuelta al commit que nombres, y el modo decide dónde cae ese archivo. Aquí lo quieres preparado, listo para volver a confirmarlo en cuanto esté terminado.",

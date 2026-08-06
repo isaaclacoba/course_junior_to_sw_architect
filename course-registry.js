@@ -171,20 +171,14 @@
 
     // ---- git / first-steps ----
     { track: "git", part: "first-steps", id: "git-first-commit", href: "content/git/01-first-steps/01-git-first-commit/", kind: "lesson", path: "content/git/01-first-steps/01-git-first-commit" },
-    { track: "git", part: "first-steps", id: "git-the-three-areas", href: "content/git/01-first-steps/04-git-the-three-areas/", kind: "lesson", path: "content/git/01-first-steps/04-git-the-three-areas" },
-    { track: "git", part: "first-steps", id: "git-a-history-of-snapshots", href: "content/git/01-first-steps/02-git-a-history-of-snapshots/", kind: "lesson", path: "content/git/01-first-steps/02-git-a-history-of-snapshots" },
     { track: "git", part: "first-steps", id: "git-where-am-i", href: "content/git/01-first-steps/03-git-where-am-i/", kind: "lesson", path: "content/git/01-first-steps/03-git-where-am-i" },
-    { track: "git", part: "branches", id: "git-what-a-branch-is", href: "content/git/02-branches/01-git-what-a-branch-is/", kind: "lesson", path: "content/git/02-branches/01-git-what-a-branch-is" },
     { track: "git", part: "branches", id: "git-make-a-branch", href: "content/git/02-branches/02-git-make-a-branch/", kind: "lesson", path: "content/git/02-branches/02-git-make-a-branch" },
     { track: "git", part: "branches", id: "git-mark-a-version", href: "content/git/02-branches/03-git-mark-a-version/", kind: "lesson", path: "content/git/02-branches/03-git-mark-a-version" },
-    { track: "git", part: "bringing-work-back", id: "git-how-merging-works", href: "content/git/03-bringing-work-back/01-git-how-merging-works/", kind: "lesson", path: "content/git/03-bringing-work-back/01-git-how-merging-works" },
     { track: "git", part: "bringing-work-back", id: "git-merge-a-branch", href: "content/git/03-bringing-work-back/02-git-merge-a-branch/", kind: "lesson", path: "content/git/03-bringing-work-back/02-git-merge-a-branch" },
-    { track: "git", part: "bringing-work-back", id: "git-when-changes-collide", href: "content/git/03-bringing-work-back/03-git-when-changes-collide/", kind: "lesson", path: "content/git/03-bringing-work-back/03-git-when-changes-collide" },
     { track: "git", part: "bringing-work-back", id: "git-settle-a-conflict", href: "content/git/03-bringing-work-back/04-git-settle-a-conflict/", kind: "lesson", path: "content/git/03-bringing-work-back/04-git-settle-a-conflict" },
     { track: "git", part: "fixing-mistakes", id: "git-fix-the-last-commit", href: "content/git/04-fixing-mistakes/01-git-fix-the-last-commit/", kind: "lesson", path: "content/git/04-fixing-mistakes/01-git-fix-the-last-commit" },
     { track: "git", part: "fixing-mistakes", id: "git-point-at-a-commit", href: "content/git/04-fixing-mistakes/02-git-point-at-a-commit/", kind: "lesson", path: "content/git/04-fixing-mistakes/02-git-point-at-a-commit" },
     { track: "git", part: "fixing-mistakes", id: "git-reflog", href: "content/git/04-fixing-mistakes/05-git-reflog/", kind: "lesson", path: "content/git/04-fixing-mistakes/05-git-reflog" },
-    { track: "git", part: "fixing-mistakes", id: "git-what-reset-moves", href: "content/git/04-fixing-mistakes/03-git-what-reset-moves/", kind: "lesson", path: "content/git/04-fixing-mistakes/03-git-what-reset-moves" },
     { track: "git", part: "fixing-mistakes", id: "git-undo-with-reset", href: "content/git/04-fixing-mistakes/04-git-undo-with-reset/", kind: "lesson", path: "content/git/04-fixing-mistakes/04-git-undo-with-reset" },
     { track: "git", part: "fixing-mistakes", id: "git-rebase", href: "content/git/04-fixing-mistakes/06-git-rebase/", kind: "lesson", path: "content/git/04-fixing-mistakes/06-git-rebase" },
   ];

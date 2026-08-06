@@ -4,6 +4,8 @@
   "hero.eyebrow": "Git · Parte uno · Primeros pasos",
   "hero.title": "¿Dónde estoy?",
   "intro.0": "Abres una carpeta un lunes sin acordarte de cómo la dejaste. ¿Guardaste ese cambio, o solo lo empezaste? Git te lo dice, pero solo si preguntas - y preguntar es el hábito que separa a quien confía en git de quien le tiene un poco de miedo. Dos preguntas cubren casi todo: qué está pasando ahora, y qué pasó antes. Aquí aprendes a hacer las dos, y luego haces un commit con los ojos abiertos.",
+  "concept.gt-history.term": "Historia",
+  "concept.gt-history.def": "La cadena de commits que hay detrás de donde estás ahora, cada uno apuntando a su padre.",
   "task.1.title": "Pregunta antes de guardar",
   "task.1.concept": "git status y git diff",
   "task.1.context": "`git status` responde a una pregunta: qué está pasando ahora mismo en esta carpeta. Nombra los archivos - cuáles no están seguidos, cuáles has cambiado, cuáles están preparados.\n\nLo que no dice es qué ha cambiado DENTRO de un archivo. Eso lo hace `git diff`: las líneas que quitaste, las que pusiste. Juntos son las dos mitades de mirar antes de actuar - qué archivo, y qué hay en él.",

@@ -28,9 +28,7 @@ window.LESSON_META = {
       },
       {
         "id": "gt-commit"
-      }
-    ],
-    "revisits": [
+      },
       {
         "id": "gt-working-tree"
       },
@@ -38,6 +36,7 @@ window.LESSON_META = {
         "id": "gt-staging-area"
       }
     ],
+    "revisits": [],
     "uses": []
   },
 };
