@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "sw-factory: the way-of-working FSM, warn-only. PreToolUse is deliberately absent - it is the only event that can deny a tool call, and not wiring it removes that risk entirely. Every hook exits 0; a thrown error prints {} so a bug here cannot disturb a session. See docs/architecture/sw-factory.md.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": ".github/hooks/factory-hook.sh SessionStart",
+        "windows": "node tools\\factory.mjs hook SessionStart",
+        "timeout": 15
+      }
+    ],
+    "PostToolUse": [
+      {
+        "type": "command",
+        "command": ".github/hooks/factory-hook.sh PostToolUse",
+        "windows": "node tools\\factory.mjs hook PostToolUse",
+        "timeout": 10
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": ".github/hooks/factory-hook.sh Stop",
+        "windows": "node tools\\factory.mjs hook Stop",
+        "timeout": 20
+      }
+    ]
+  }
+}

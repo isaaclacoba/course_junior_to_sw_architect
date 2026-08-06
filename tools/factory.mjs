@@ -25,10 +25,12 @@
 //   sweep     [--commits N] [--json] [--verbose]           replay real history (step 15)
 //   selftest                                              asserts the rules + widths
 
-import { readFile, readdir } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { readFile, readdir, writeFile, mkdir, rm } from "node:fs/promises";
+import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { randomBytes } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { dirname, join } from "node:path";
+import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -43,6 +45,24 @@ export const OWNER_GATE = "deciding->specifying";
 // A change under any of these never fast-paths - WoW files and shared machinery.
 export const GUARDED_DIRS = [".github/", "kernel/", "code-lab/", "tools/"];
 export const FASTPATH_MAX_FILES = 3;
+
+// Features that predate the FSM (D-18/D-19). The tool claims NOTHING about
+// them - it does not mark their rungs satisfied, because that would assert they
+// passed a bar they never faced. An explicit committed list, never derived and
+// never self-extended; a listed feature with no brief is reported, so the list
+// cannot rot in silence.
+const CONFIG = join(ROOT, "docs", "journal", "factory-config.json");
+export function loadFactoryConfig() {
+  try {
+    const c = JSON.parse(readFileSync(CONFIG, "utf8"));
+    return {
+      untracked: new Set(c.untracked ?? []),
+      reason: c.untrackedReason ?? "predates the FSM",
+    };
+  } catch {
+    return { untracked: new Set(), reason: "predates the FSM" };
+  }
+}
 
 const COLS = 80;
 const clip = (s, n = COLS) => (s.length <= n ? s : s.slice(0, n - 3) + "...");
@@ -273,7 +293,7 @@ export function classify(paths) {
 }
 
 // ---- journal evidence -------------------------------------------------------
-async function journalEvidence(slug) {
+export async function journalEvidence(slug) {
   const empty = { outputs: [], decisions: [], decisionIds: new Set() };
   const dirs = { outputs: join(JOURNAL, "outputs"), decisions: join(JOURNAL, "decisions") };
   const files = {};
@@ -398,9 +418,20 @@ async function computeState(o) {
   const slug = pickFeature(o, attr, briefs);
   const brief = briefs.find((b) => b.slug === slug) ?? null;
   const ev = slug ? await journalEvidence(slug) : { outputs: [], decisions: [], decisionIds: new Set() };
+  const cfg = loadFactoryConfig();
+  const untracked = Boolean(slug) && cfg.untracked.has(slug);
   const rungs = deriveRungs({ ...ev, brief });
-  const state = stateFromRungs(rungs);
-  return { slug, brief, briefs, paths, attr, rungs, state, cls: classify(paths), ...ev };
+  // `untracked` is not a rung and never appears in STATES - it means the machine
+  // declines to judge, which is different from judging the feature to be early.
+  const state = untracked ? "untracked" : stateFromRungs(rungs);
+  return {
+    slug, brief, briefs, paths, attr, rungs, state,
+    cls: classify(paths),
+    untracked,
+    untrackedReason: cfg.reason,
+    staleUntracked: staleUntracked(briefs, cfg),
+    ...ev,
+  };
 }
 
 // Feature choice: an explicit flag, else the changeset's single clear owner, else
@@ -416,6 +447,9 @@ function pickFeature(o, attr, briefs) {
 // Every renderer is width-budgeted; `selftest` asserts the measured widths, which
 // is how the ladder's 83-column wrap was caught in the mockup.
 export function renderRail(s) {
+  // Untracked: say nothing. Claiming a phase here would assert the feature
+  // passed rungs it never faced (D-18).
+  if (s.untracked) return [];
   if (!s.slug) {
     return [
       clip("factory: no feature claimed - state `recall`"),
@@ -431,6 +465,13 @@ export function renderRail(s) {
 }
 
 export function renderLadder(s) {
+  if (s.untracked) {
+    return [
+      clip(`${s.slug} - not tracked (${s.untrackedReason})`),
+      clip("  the FSM claims nothing about this feature - no phase, no advice"),
+      clip(`  to measure it, delete its line from ${relative(ROOT, CONFIG)}`),
+    ];
+  }
   const head = s.slug ? `${s.slug} - full ladder (warn-only)` : "no feature claimed - full ladder (warn-only)";
   const rungs = [...s.rungs, { state: "verifying", ok: false, evidence: "npm run gate", fix: "npm run gate" }];
   const lines = [clip(head)];
@@ -459,6 +500,7 @@ function summarise(list, budget) {
 }
 
 export function renderGate(s, problems) {
+  if (s.untracked) return [];
   const touched = uniq(s.paths.map((p) => p.path));
   const lines = [
     clip(`factory: WARN-ONLY. ${problems[0] ?? "phase mismatch"}`, 66),
@@ -474,9 +516,249 @@ export function renderGate(s, problems) {
   return lines;
 }
 
+// ---- agent hooks (D-16, D-20) -----------------------------------------------
+// Warn-only, so there is no PreToolUse and nothing can ever be denied - only
+// PreToolUse can block, and not wiring it removes that risk entirely. Every path
+// here prints JSON and exits 0; a thrown error prints `{}` so a bug in this file
+// can never disturb a session (its own or anyone else's).
+//
+// The contract, taken from a shipping repo-level example rather than docs:
+//   stdin   the event as JSON (tool_name, cwd, session_id, stop_hook_active)
+//   stdout  {} for silence, or { hookSpecificOutput: { hookEventName, ... } }
+//   speak   additionalContext to inform, decision "warn" + reason to nudge
+const HOOK_EVENTS = new Set(["SessionStart", "PostToolUse", "Stop", "SubagentStop"]);
+const READ_ONLY_TOOLS = new Set([
+  "view", "read", "read_file", "readFile", "grep", "glob", "search", "search_files",
+  "list", "list_dir", "listDirectory", "fetch", "web_fetch", "webFetch", "sql",
+  "ask_user", "list_bash", "read_bash", "list_agents", "read_agent", "think",
+]);
+
+const speak = (event, extra) => ({ hookSpecificOutput: { hookEventName: event, ...extra } });
+const context = (event, text) => speak(event, { additionalContext: text });
+const warn = (event, reason) => speak(event, { decision: "warn", reason });
+
+// PostToolUse fires on every tool call, so it must stay journal-free and must
+// only speak when the lane actually FLIPS - a line on every call is noise.
+function laneFile(sessionId) {
+  return join(tmpdir(), `factory-lane-${String(sessionId || "anon").replace(/[^\w.-]/g, "_")}.txt`);
+}
+export function laneFlipped(sessionId, lane) {
+  const f = laneFile(sessionId);
+  let prev = null;
+  try {
+    prev = readFileSync(f, "utf8").trim();
+  } catch {}
+  if (prev === lane) return false;
+  try {
+    writeFileSync(f, lane);
+  } catch {}
+  return prev !== null && prev !== lane;
+}
+
+// D-20: checkbox rot is why the `building` rung cannot be trusted. It cannot be
+// repaired backwards, only stopped going forward - so say something at the one
+// moment the session still has the context to tick the box.
+// Count ticked steps as HEAD has them, so "did a step get ticked in this working
+// tree" is a real comparison rather than "was the brief file touched at all".
+export function ticksAtHead(briefPath) {
+  try {
+    const md = execFileSync("git", ["--no-optional-locks", "show", `HEAD:${briefPath}`], {
+      cwd: ROOT,
+      encoding: "utf8",
+      maxBuffer: 8 << 20,
+      stdio: ["ignore", "pipe", "ignore"],
+    });
+    return parseSteps(md).filter((x) => x.done).length;
+  } catch {
+    return 0; // a brief that does not exist at HEAD is new; every tick is new too
+  }
+}
+
+export function untickedWork(paths, briefs, cfg = loadFactoryConfig(), ticksAt = ticksAtHead) {
+  const touched = new Set(paths.map((p) => p.path));
+  const out = [];
+  for (const b of briefs) {
+    if (cfg.untracked.has(b.slug)) continue;
+    if (!b.declaredOwns?.length) continue;
+    const ownsTouched = [...touched].filter((p) => p !== b.briefPath && b.owns.some((g) => matchesGlob(p, g)));
+    if (!ownsTouched.length) continue;
+    const now = b.steps.filter((x) => x.done).length;
+    if (now > ticksAt(b.briefPath)) continue; // a step really was ticked
+    out.push({ slug: b.slug, files: ownsTouched.length, brief: b.briefPath, ticked: now });
+  }
+  return out;
+}
+
+export async function runHook(event, input) {
+  if (!HOOK_EVENTS.has(event)) return {};
+  if (input?.stop_hook_active) return {};
+
+  if (event === "PostToolUse") {
+    // This fires on EVERY tool call, in every session in the repo, so the cheap
+    // exit comes first. A SKIP list rather than an allow list on purpose: tool
+    // names differ between agents, and an allow list that matches nothing would
+    // fail silently while looking like it worked. `bash` is not skipped - it writes.
+    if (READ_ONLY_TOOLS.has(String(input?.tool_name ?? ""))) return {};
+    const paths = changedPaths();
+    if (!paths.length) return {};
+    const lane = classify(paths).fastPath ? "fast-path" : "full ladder";
+    if (lane !== "full ladder" || !laneFlipped(input?.session_id, lane)) return {};
+    return context(
+      event,
+      "factory: this edit moved the change off the fast path (new file, >3 files, " +
+        "or a guarded dir). Run `node tools/factory.mjs ladder` before going further."
+    );
+  }
+
+  if (event === "SessionStart") {
+    const s = await computeState({});
+    const lines = renderRail(s);
+    if (!lines.length) return {};
+    return context(event, lines.join("\n"));
+  }
+
+  if (event === "Stop" || event === "SubagentStop") {
+    const briefs = await loadBriefs();
+    const paths = changedPaths();
+    const unticked = untickedWork(paths, briefs);
+    if (event === "Stop") {
+      try {
+        await recordHealth(await measureHealth({}), "stop");
+      } catch {}
+    }
+    if (unticked.length) {
+      const list = unticked.map((u) => `${u.slug} (${u.files} file(s), ${u.brief})`).join("; ");
+      return warn(
+        event,
+        `factory: you changed files owned by ${list} but ticked no step in the brief. ` +
+          "Tick the step you finished, or add one for what you actually did - an untickable " +
+          "brief is why the machine cannot tell what is built."
+      );
+    }
+    const s = await computeState({}); // re-reads the working tree itself
+    const problems = missteps(s);
+    if (!problems.length) return {};
+    return warn(event, `factory (warn-only): ${renderGate(s, problems).join(" | ")}`);
+  }
+  return {};
+}
+
+async function readStdin() {
+  if (process.stdin.isTTY) return {};
+  const chunks = [];
+  for await (const c of process.stdin) chunks.push(c);
+  try {
+    return JSON.parse(Buffer.concat(chunks).toString("utf8") || "{}");
+  } catch {
+    return {};
+  }
+}
+
+// ---- audit history (D-17) ---------------------------------------------------
+// Warn-only means nothing is ever blocked, so the only way to tell whether the
+// way of working is improving is to measure the same numbers repeatedly. Each
+// row is one observation; `history` shows the trend. Written on Stop and on
+// demand via `sweep --record`.
+const HISTORY = join(ROOT, "docs", "journal", "factory");
+const HISTORY_CAST = [
+  "CAST(ts AS TIMESTAMP) ts",
+  "CAST(commits AS INTEGER) commits",
+  "CAST(fastpath AS INTEGER) fastpath",
+  "CAST(unclaimed AS INTEGER) unclaimed",
+  "CAST(multi AS INTEGER) multi",
+  "CAST(briefs AS INTEGER) briefs",
+  "CAST(owns AS INTEGER) owns",
+  "CAST(untracked AS INTEGER) untracked",
+  "CAST(stalled AS INTEGER) stalled",
+  "CAST(\"source\" AS VARCHAR) AS \"source\"",
+].join(", ");
+
+// Measure everything a health round would want to watch improve.
+export async function measureHealth({ commits = 40 } = {}) {
+  const briefs = await loadBriefs();
+  const cfg = loadFactoryConfig();
+  const sw = sweep(commitsFromLog(commits), briefs);
+  const journalRungs = ["recall", "grounding", "deciding"];
+  let stalled = 0;
+  for (const b of briefs) {
+    if (cfg.untracked.has(b.slug)) continue;
+    const st = stateFromRungs(deriveRungs({ ...(await journalEvidence(b.slug)), brief: b }));
+    if (journalRungs.includes(st)) stalled++;
+  }
+  return {
+    commits: sw.total,
+    fastpath: sw.fastPath,
+    unclaimed: sw.fullyUnclaimed,
+    multi: sw.multiFeature,
+    briefs: briefs.length,
+    owns: briefs.filter((b) => b.declaredOwns?.length).length,
+    untracked: [...cfg.untracked].filter((f) => briefs.some((b) => b.slug === f)).length,
+    stalled,
+  };
+}
+
+export async function recordHealth(row, source = "manual") {
+  const { DuckDBInstance } = await import("@duckdb/node-api");
+  const con = await (await DuckDBInstance.create(":memory:")).connect();
+  await mkdir(HISTORY, { recursive: true });
+  const tmp = join(tmpdir(), `factory-${Date.now()}-${randomBytes(4).toString("hex")}.jsonl`);
+  const out = join(HISTORY, `${Date.now()}-${randomBytes(4).toString("hex")}.parquet`);
+  const ts = new Date().toISOString().replace("Z", "").replace("T", " ");
+  await writeFile(tmp, JSON.stringify({ ts, ...row, source }));
+  try {
+    await con.run(
+      `COPY (SELECT ${HISTORY_CAST} FROM read_json('${tmp.replace(/'/g, "''")}', ` +
+        `format='newline_delimited', union_by_name=true)) TO '${out.replace(/'/g, "''")}' ` +
+        `(FORMAT PARQUET, COMPRESSION ZSTD)`
+    );
+  } finally {
+    await rm(tmp, { force: true });
+  }
+  return out;
+}
+
+export async function readHealth(limit = 20) {
+  if (!existsSync(HISTORY)) return [];
+  const files = readdirSync(HISTORY).filter((f) => f.endsWith(".parquet")).map((f) => join(HISTORY, f));
+  if (!files.length) return [];
+  const { DuckDBInstance } = await import("@duckdb/node-api");
+  const con = await (await DuckDBInstance.create(":memory:")).connect();
+  const list = files.map((f) => `'${f.replace(/'/g, "''")}'`).join(", ");
+  const reader = await con.runAndReadAll(
+    `SELECT * FROM read_parquet([${list}], union_by_name=true) ORDER BY ts DESC LIMIT ${Number(limit)}`
+  );
+  return reader.getRowObjects();
+}
+
+// A rising number is not automatically bad, so the trend is shown, never graded.
+export function renderHealth(rows) {
+  if (!rows.length) return ["factory history: no observations yet - run `factory sweep --record`"];
+  const lines = [clip(`factory history: ${rows.length} observation(s), newest first`)];
+  lines.push(clip("  when              stalled  unclaimed  owns/briefs  untracked"));
+  for (const r of rows) {
+    const when = String(r.ts).slice(0, 16);
+    lines.push(
+      clip(
+        `  ${when.padEnd(17)} ${String(r.stalled).padStart(7)}  ${String(r.unclaimed).padStart(9)}  ` +
+          `${`${r.owns}/${r.briefs}`.padStart(11)}  ${String(r.untracked).padStart(9)}`
+      )
+    );
+  }
+  return lines;
+}
+
 // A misstep is derived, never asserted. Warn-only: this returns text, not an exit code.
+// A listed feature with no brief means the list has rotted. Reported, not
+// silently corrected - the list is the owner's, and the tool never edits it.
+export function staleUntracked(briefs, cfg = loadFactoryConfig()) {
+  const slugs = new Set(briefs.map((b) => b.slug));
+  return [...cfg.untracked].filter((f) => !slugs.has(f));
+}
+
 export function missteps(s) {
   const out = [];
+  if (s.untracked) return [];
+  if (s.staleUntracked?.length) out.push(`untracked list names ${s.staleUntracked.length} missing brief(s)`);
   const editing = s.paths.length > 0;
   const idx = STATES.indexOf(s.state);
   if (editing && idx < STATES.indexOf("building") && !s.cls.fastPath) {
@@ -610,6 +892,79 @@ async function selftest() {
   t("state: owner gate is on deciding->specifying only",
     noBrief.filter((r) => r.ownerGate).length === 1 && noBrief.find((r) => r.ownerGate).state === "deciding");
 
+  // --- untracked: pre-FSM features (D-18/D-19). The machine must claim NOTHING.
+  const cfg = loadFactoryConfig();
+  t("untracked: list loads", cfg.untracked.size > 0, `${cfg.untracked.size}`);
+  t("untracked: list names no missing brief", staleUntracked(briefs, cfg).length === 0, staleUntracked(briefs, cfg).join(","));
+  t("untracked: reason is honest, not a pass", !/\b(ok|done|passed|satisfied)\b/i.test(cfg.reason), cfg.reason);
+  // controls: work that must stay measured
+  for (const live of ["sw-factory", "git-inside-content"])
+    t(`untracked: ok-${live} is NOT untracked`, !cfg.untracked.has(live));
+  t("untracked: a brand-new feature is not untracked", !cfg.untracked.has("some-feature-invented-today"));
+  // the machine declines to judge rather than judging early
+  const utd = { untracked: true, untrackedReason: cfg.reason, slug: "old", state: "untracked", rungs: [], paths: [], attr: { unclaimed: [], conflicts: [] }, cls: { fastPath: false } };
+  t("untracked: rail says nothing", renderRail(utd).length === 0);
+  t("untracked: gate says nothing", renderGate(utd, ["x"]).length === 0);
+  t("untracked: no misstep is raised", missteps(utd).length === 0);
+  const utl = renderLadder(utd);
+  t("untracked: ladder is 3 lines", utl.length === 3, `${utl.length}`);
+  t("untracked: ladder ticks no rung", !utl.some((l) => l.includes("[x]")), utl.join("|"));
+  t("untracked: ladder gives no next step", !utl.some((l) => l.startsWith("  next:")));
+  t("untracked: ladder says how to opt back in", utl.some((l) => l.includes("factory-config.json")));
+  t("untracked: ladder fits 80 cols", Math.max(...utl.map((l) => l.length)) <= COLS, `${Math.max(...utl.map((l) => l.length))}`);
+  // deriveRungs itself stays pure - no waiver knob to accidentally set
+  const bare = { outputs: [{ kind: "audit", body: "no ids" }], decisions: [{ id: "D-x-1", status: "active" }], decisionIds: dids,
+    brief: { slug: "x", hasDesign: true, briefPath: "p", steps: [{ done: true }, { done: false }] } };
+  t("untracked: deriveRungs never waives a rung", stateFromRungs(deriveRungs(bare)) === "recall");
+  t("untracked: `untracked` is not one of the six states", !STATES.includes("untracked"));
+
+  // --- agent hooks (D-16, D-20). Warn-only: nothing may ever be denied.
+  t("hook: PreToolUse is NOT wired - only it can deny", !HOOK_EVENTS.has("PreToolUse"));
+  t("hook: unknown event says nothing", Object.keys(await runHook("Whatever", {})).length === 0);
+  t("hook: honours stop_hook_active", Object.keys(await runHook("Stop", { stop_hook_active: true })).length === 0);
+  // a fresh id per run: the lane file lives in tmp and would otherwise carry
+  // the previous run's lane into this one
+  t("hook: a read-only tool costs nothing", Object.keys(await runHook("PostToolUse", { tool_name: "view" })).length === 0);
+  t("hook: `bash` is never skipped - it writes", !READ_ONLY_TOOLS.has("bash"));
+  for (const w of ["edit", "create", "str_replace", "editFiles", "createFile"])
+    t(`hook: ok-${w} is not skipped`, !READ_ONLY_TOOLS.has(w));
+  const sid = `sel-${randomBytes(4).toString("hex")}`;
+  const lanes = [laneFlipped(sid, "fast-path"), laneFlipped(sid, "fast-path"), laneFlipped(sid, "full ladder")];
+  t("hook: first observation is not a flip", lanes[0] === false);
+  t("hook: an unchanged lane is not a flip", lanes[1] === false);
+  t("hook: a changed lane IS a flip", lanes[2] === true);
+  t("hook: a flip is reported once, not repeatedly", laneFlipped(sid, "full ladder") === false);
+  // D-20 tick reminder, on fixtures so the real tree cannot affect the result
+  const ownCfg = { untracked: new Set(["old-thing"]) };
+  const mkBrief = (slug, done) => ({ slug, briefPath: `docs/plans/${slug}.md`, declaredOwns: ["src/x.js"],
+    owns: [`docs/plans/${slug}.md`, "src/x.js"], steps: [{ done: true }, { done }] });
+  const touchedX = [{ path: "src/x.js" }];
+  t("tick: warns when owned files changed and no step ticked",
+    untickedWork(touchedX, [mkBrief("live", false)], ownCfg, () => 1).length === 1);
+  t("tick: ok-silent once a step really was ticked",
+    untickedWork(touchedX, [mkBrief("live", true)], ownCfg, () => 1).length === 0);
+  t("tick: ok-silent when nothing owned was touched",
+    untickedWork([{ path: "unrelated/y.js" }], [mkBrief("live", false)], ownCfg, () => 1).length === 0);
+  t("tick: ok-silent for an untracked feature",
+    untickedWork(touchedX, [mkBrief("old-thing", false)], ownCfg, () => 1).length === 0);
+  t("tick: ok-silent for a brief with no declared ## Owns",
+    untickedWork(touchedX, [{ ...mkBrief("live", false), declaredOwns: [] }], ownCfg, () => 1).length === 0);
+  t("tick: editing only the brief is not owned work",
+    untickedWork([{ path: "docs/plans/live.md" }], [mkBrief("live", false)], ownCfg, () => 1).length === 0);
+  t("tick: a brief absent at HEAD counts every tick as new", ticksAtHead("docs/plans/does-not-exist.md") === 0);
+
+  // --- audit history (D-17): the only way to see warn-only improving
+  const health = await measureHealth({ commits: 10 });
+  for (const k of ["commits", "fastpath", "unclaimed", "multi", "briefs", "owns", "untracked", "stalled"])
+    t(`history: measures ${k}`, Number.isInteger(health[k]) && health[k] >= 0, `${health[k]}`);
+  t("history: owns counts DECLARED sections, not defaults", health.owns < health.briefs, `${health.owns}/${health.briefs}`);
+  t("history: untracked never exceeds briefs", health.untracked <= health.briefs);
+  t("history: empty render tells you how to start", renderHealth([]).length === 1 && renderHealth([])[0].includes("--record"));
+  const hrows = await readHealth(5);
+  const hr = renderHealth(hrows);
+  t("history: render fits 80 cols", Math.max(...hr.map((l) => l.length)) <= COLS, `${Math.max(...hr.map((l) => l.length))}`);
+  t("history: reads back what it wrote", hrows.length === 0 || Number(hrows[0].briefs) === health.briefs, `${hrows[0]?.briefs}`);
+
   // --- sweep (step 15) reads real history and never blocks
   const swept = sweep(commitsFromLog(5), briefs);
   t("sweep: reads real commits", swept.total > 0, `${swept.total}`);
@@ -646,20 +1001,35 @@ async function selftest() {
 }
 
 // ---- main -------------------------------------------------------------------
-const CMDS = new Set(["state", "classify", "attribute", "rail", "gate", "ladder", "sweep", "selftest"]);
+const CMDS = new Set(["state", "classify", "attribute", "rail", "gate", "ladder", "sweep", "history", "hook", "selftest"]);
 
 async function main(argv) {
   const cmd = argv[0];
   const o = parseArgs(argv.slice(1));
   if (!cmd || !CMDS.has(cmd)) {
     console.log("factory - the way-of-working FSM (warn-only)");
-    console.log("  state | classify | attribute | rail | gate | ladder | sweep | selftest");
+    console.log("  state | classify | attribute | rail | gate | ladder");
+    console.log("  sweep [--record] | history | hook <Event> | selftest");
     console.log("see docs/architecture/sw-factory.md");
     process.exitCode = cmd ? 2 : 0;
     return;
   }
   if (cmd === "selftest") return selftest();
 
+  if (cmd === "hook") {
+    // Fail-safe: never let this file disturb a session. Any throw prints `{}`.
+    let res = {};
+    try {
+      res = await runHook(o.event ?? argv[1] ?? "", await readStdin());
+    } catch {
+      res = {};
+    }
+    process.stdout.write(JSON.stringify(res));
+    return;
+  }
+  if (cmd === "history") {
+    return renderHealth(await readHealth(Number(o.limit ?? 20))).forEach((l) => console.log(l));
+  }
   if (cmd === "sweep") {
     const briefs = await loadBriefs();
     const n = Number(o.commits ?? 40);
@@ -677,6 +1047,10 @@ async function main(argv) {
     // path claimed now attributes past commits that predate the feature. Say so
     // here rather than letting the unclaimed count read as pure drift.
     console.log(`  note: ${r.briefsDeclaringOwns} of ${r.briefs} briefs declare \`## Owns\`; claims apply retroactively`);
+    if (o.record) {
+      const file = await recordHealth(await measureHealth({ commits: n }), "manual");
+      console.log(`  recorded  ${relative(ROOT, file)}`);
+    }
     return;
   }
 
@@ -702,7 +1076,9 @@ async function main(argv) {
     if (o.json)
       return console.log(
         JSON.stringify(
-          { feature: s.slug, state: s.state, ownerGate: OWNER_GATE, fastPath: s.cls.fastPath, rungs: s.rungs.map((r) => ({ state: r.state, ok: r.ok, evidence: r.evidence })), unclaimed: s.attr.unclaimed, conflicts: s.attr.conflicts },
+          s.untracked
+            ? { feature: s.slug, state: "untracked", reason: s.untrackedReason, tracked: false }
+            : { feature: s.slug, state: s.state, ownerGate: OWNER_GATE, fastPath: s.cls.fastPath, rungs: s.rungs.map((r) => ({ state: r.state, ok: r.ok, evidence: r.evidence })), unclaimed: s.attr.unclaimed, conflicts: s.attr.conflicts },
           null,
           2
         )

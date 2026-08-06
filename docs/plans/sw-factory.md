@@ -17,8 +17,10 @@ and auto-escalate if they grow.
 
 ## Owns
 - `tools/factory.mjs`
-- `.github/hooks/*.json`
+- `.github/hooks/*.json`, `.github/hooks/*.sh`
+- `docs/journal/factory-config.json`, `docs/journal/factory/`
 - `.github/skills/work-brief/SKILL.md`
+- `.github/agents/*.agent.md`
 - `docs/architecture/sw-factory.md`, `docs/plans/sw-factory.md`
 
 ## Plan
@@ -37,7 +39,13 @@ and auto-escalate if they grow.
 13. [x] Ladder as an on-demand command, **fixed to fit 80 cols** - verify: measured 8 lines, 65 cols (mockup was 83)
 14. [x] `recall` enforced as state 1 - verify: all later rungs met + no citing row still reads `recall`; 6 gaming attempts refused; sabotage makes the controls fail
 15. [x] Watch it warn-only across real work - verify: `factory sweep`, 39 commits - see Findings
-16. [ ] Owner reviews the noise, then decides whether to flip to blocking - verify: a new decision row. **Recommendation: do not flip - see Findings**
+16. [x] Owner reviews the noise, then decides whether to flip to blocking - verify: `D-sw-factory-12` - stay warn-only, add an audit history
+17. [x] Untracked list replaces the grandfather clause (`D-18`/`D-19`) - verify: 16 features report `untracked`; rail, gate and misstep all silent; 0 of 11 misreport (was 10 of 11); `git-inside-content`, created today, still reports `recall`
+18. [x] Audit history in `docs/journal/factory/` (`D-17`) - verify: `sweep --record` then `history` reads the row back; 8 measures, render fits 80 cols
+19. [x] Tick reminder (`D-20`) - verify: compares ticked steps against `HEAD`, warns with a real tick missing and goes silent when one is added; 6 `ok-` controls
+20. [x] Hooks wired: `SessionStart` + `PostToolUse` + `Stop`, never `PreToolUse` (`D-16`/`D-21`) - verify: all three return valid JSON and exit 0 through the wrapper with no `node` on `PATH`; sabotaging `PreToolUse` and `stop_hook_active` both fail the selftest
+21. [x] One agent per state + 2 specialists (`D-22`) - verify: 8 files with valid frontmatter, `name` matching the filename and a >60ch description; `architect` vs `deciding` description overlap cut from 10 shared words to 4; every description declares STATE or specialist
+22. [ ] Confirm the hooks actually fire in a live session - verify: a `SessionStart` rail appears in a NEW session
 
 ## Progress
 - 2026-08-06 Measured the failure: 69% of briefs ship with their code; 385 commits analysed for thresholds.
@@ -47,6 +55,7 @@ and auto-escalate if they grow.
 - 2026-08-06 Hooks DO fire here: `sessionStart` + `postToolUse` both logged. Repo-level `.github/hooks/` and fail-closed `preToolUse` stay unproven - unsafe to test while a second session is live.
 - 2026-08-06 `tools/factory.mjs` built: state, classify, attribute, rail, gate, ladder, selftest. Warn-only, every command exits 0. `classify` 0.19s, `rail` 0.94s.
 - 2026-08-06 Every pre-FSM feature reads `recall` - no old feature ever recorded one. A true reading, not a bug, and it is the backlog.
+- 2026-08-06 Six state agents + `architect`/`auditor` rewritten as specialists. The context-rot argument was mine and it was wrong: it applies to always-on instruction files, not to `.agent.md`, which loads only when invoked.
 - 2026-08-06 Step 14 is already implemented by the derivation (recall is rung 1, and prose alone does not satisfy it) but is left unticked for the owner to verify.
 
 ## Findings from the warn-only watch (step 15)
