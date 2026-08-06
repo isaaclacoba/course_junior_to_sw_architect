@@ -34,7 +34,7 @@ and auto-escalate if they grow.
 8. [x] Fast-path classifier - verify: `selftest` - 3 predicates, all 4 guarded dirs, and 3-files-fast -> 4-files-escalates
 9. [x] Path attribution from `## Owns` - verify: `selftest` separates the two live features; `tools/derive-goals.mjs` reads unclaimed
 10. [x] `## Owns` added to the work-brief shape, required at `building` - verify: one shape line + one section; `factory attribute` reads it
-11. [x] Rail renderer at session start - verify: measured 2 lines, 61 cols
+11. [x] Rail renderer at session start - verify: measured 3 lines, 70 cols; names the state's agent and the ladder command, so a fresh session needs no prior knowledge; 2 sabotages (drop the line, name a non-state agent) both fail the selftest
 12. [x] Gate report on a misstep - verify: exit 0 while warning; names `10 unticked plan step(s)`; silent on a clean changeset
 13. [x] Ladder as an on-demand command, **fixed to fit 80 cols** - verify: measured 8 lines, 65 cols (mockup was 83)
 14. [x] `recall` enforced as state 1 - verify: all later rungs met + no citing row still reads `recall`; 6 gaming attempts refused; sabotage makes the controls fail
@@ -48,6 +48,7 @@ and auto-escalate if they grow.
 22. [ ] Confirm the hooks actually fire in a live session - verify: a `SessionStart` rail appears in a NEW session
 
 ## Progress
+- 2026-08-06 Rail made self-sufficient: it now names WHICH agent runs the current state, which is the only thing linking the derivation to the six agent files.
 - 2026-08-06 Measured the failure: 69% of briefs ship with their code; 385 commits analysed for thresholds.
 - 2026-08-06 Found agent hooks CAN deny, which expires the 2026-08-03 red-team's premise. Verified against GitHub's docs directly, not via the subagent.
 - 2026-08-06 Research: "dark software factory" has no verifiable implementations; vendors warn against frameworks at this scale.

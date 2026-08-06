@@ -1,8 +1,7 @@
 # The software factory - an FSM for the way we work
 
 Status: built warn-only as `tools/factory.mjs`; hooks wired, delivery unconfirmed.
-Ratified 2026-08-06 from 11 owner decisions. Progress: `docs/plans/sw-factory.md`.
-
+Ratified 2026-08-06, 22 decisions. Progress: `docs/plans/sw-factory.md`.
 ## The problem, measured
 
 The way of working is written down and largely ignored. Not a feeling - across
@@ -11,47 +10,37 @@ commit that also ships implementation code**; the worst shipped with 54 code
 files. Caveat: a brief authored early but committed late looks identical to one
 written afterwards, so this bounds the problem without proving intent.
 
-The cause is not laziness. Every layer of the WoW is advisory:
-`copilot-instructions.md`, `AGENTS.md` and `*.instructions.md` auto-load every
-turn but cannot stop anything; skills may simply not fire; and an `.agent.md` is
-selected by the user or inferred by the model. **An agent file is not "forced"** -
-which rules it out as a GATE, not as where a state's knowledge lives (`D-22`).
-Nothing in the repo could ever say no.
+The cause is not laziness. Every layer of the WoW is advisory: the instruction
+files auto-load every turn but cannot stop anything; skills may simply not fire;
+and an `.agent.md` is selected by the user or inferred by the model. **An agent
+file is not "forced"** - which rules it out as a GATE, not as where a state's
+knowledge lives (`D-22`). Nothing in the repo could ever say no.
 
-## What changed since the last time we asked
+## What changed, and what this is not
 
 `docs/architecture/wow-enforcement.md` (2026-08-03) ran this round and concluded
-enforcement was mostly ceremony. That rested on a premise which has expired: the
-only candidate then was a **git** hook - opt-in, bypassable with `--no-verify`,
-firing long after the agent had already gone the wrong way.
+enforcement was ceremony - on a premise that has expired. The only candidate then
+was a **git** hook: opt-in, bypassable with `--no-verify`, firing long after the
+agent had gone the wrong way. Copilot CLI now has **agent hooks**, committed at
+`.github/hooks/*.json` and firing on the agent's own tool calls. That is the only
+reason this round was worth running. Tempered by fail-open timeouts (a slow gate
+is an absent one) and by delivery not yet being proven here (see Risks).
 
-Copilot CLI now has **agent hooks**: committed at `.github/hooks/*.json`, firing
-on the agent's own tool calls, and `preToolUse` is **fail-closed**. That is a
-different mechanism, and the only reason this round was worth running. Two
-things temper it - timeouts are **fail-open**, so a slow gate is an absent one;
-and delivery is not yet proven here (see Risks).
-
-## What this is not
-
-Research into "agentic pipelines" found the term in marketing with **no source
-code or production case study behind it**. The vendors argue the other way:
-Anthropic warns that frameworks "obscure the underlying prompts and responses";
-AutoGen says optimise a single agent before reaching for a team; Claude Code
-notes instruction files over ~200 lines **measurably reduce adherence** - an
-argument against fixing this by writing more always-on prose.
-
-So this is not a graph framework, not an orchestrator, and not a multi-agent
-pipeline. At one repo with one owner, the state machine is a text file.
+It is still not a framework. "Agentic pipeline" appears in marketing with **no
+source code or case study behind it**, and the vendors argue the other way:
+Anthropic warns frameworks "obscure the underlying prompts and responses",
+AutoGen says optimise a single agent first, and instruction files over ~200 lines
+**measurably reduce adherence**. At one repo with one owner, the state machine is
+a text file.
 
 ## Who runs each state
 
-Each state is an agent in `.github/agents/`, because the states carry genuinely
-different knowledge - `recall` knows the journal; `building` needs the
-architecture map, SOLID and the exemplary-code standard, which the design states
-never use. One combined agent would carry five irrelevant rule sets every
+Each state is an agent of the same name in `.github/agents/`, because the states
+carry genuinely different knowledge - `recall` knows the journal; `building` needs
+the architecture map, SOLID and the exemplary-code standard, which the design
+states never use. One combined agent would carry five irrelevant rule sets every
 invocation (`D-22`). An `.agent.md` loads only when invoked, so an unused one
 costs nothing; the context-rot argument above applies to always-on files only.
-
 Two SPECIALISTS sit beside the ladder, called BY the states and never instead of
 them: `architect` for a structural question from `deciding` or `specifying`, and
 `auditor` for a SOLID / code-quality investigation from `verifying` or `building`.
@@ -61,30 +50,28 @@ them: `architect` for a structural question from `deciding` or `specifying`, and
 Six states. Every transition derives from an artifact that already exists, so
 the agent cannot advance by claiming to have advanced (`D-3`).
 
-| State | Means | Exit evidence | Agent |
-|---|---|---|---|
-| `recall` | retrieve what was already decided | a journal row citing prior decisions found, or explicitly `none` | `recall` |
-| `grounding` | audit the real code, PoC, research | `audit` / `subagent` rows for the feature | `grounding` |
-| `deciding` | batches of questions, owner answers | `D-<feature>-N` rows - **owner closes this one** | `deciding` |
-| `specifying` | write it down | `docs/plans/<slug>.md` + `docs/architecture/<slug>.md` | `specifying` |
-| `building` | implement to the design | commits to paths the brief owns | `building` |
-| `verifying` | prove it | `npm run gate` / `verify-lesson` exit code | `verifying` |
+| State | Means | Exit evidence |
+|---|---|---|
+| `recall` | retrieve what was already decided | a journal row citing prior decisions found, or explicitly `none` |
+| `grounding` | audit the real code, PoC, research | `audit` / `subagent` rows for the feature |
+| `deciding` | batches of questions, owner answers | `D-<feature>-N` rows - **owner closes this one** |
+| `specifying` | write it down | `docs/plans/<slug>.md` + `docs/architecture/<slug>.md` |
+| `building` | implement to the design | commits to paths the brief owns |
+| `verifying` | prove it | `npm run gate` / `verify-lesson` exit code |
 
-`idle -> building` is not a legal transition. That single illegal edge is the
-whole point of the machine (`D-4`).
+`idle -> building` is not a legal transition; that single illegal edge is the
+whole point of the machine (`D-4`). `recall` is state 1 because the failure it
+prevents happened *during this design round* - the agent proposed blocking hooks
+without noticing `D-wow-enforcement-6` had already rejected exactly that (`D-10`,
+`D-11`). Only `deciding -> specifying` requires a human: an agent judging its own
+ambiguity judges it near zero (`D-9`).
 
-`recall` is state 1 because the failure it prevents happened *during this design
-round*: the agent proposed blocking hooks without noticing `D-wow-enforcement-6`
-had already rejected exactly that (`D-10`, `D-11`). Only `deciding -> specifying`
-requires a human - an agent judging its own ambiguity judges it near zero (`D-9`).
-
-**`untracked` is not a seventh state.** The first three rungs are read from the
-journal, which no work predating it can satisfy; those features are listed in
-`docs/journal/factory-config.json` and the machine reports `untracked` and
-claims *nothing* (`D-18`). It is not a waiver - `deriveRungs` has no waiver
-parameter, so no rung can be marked satisfied. Backfilling was refused: it would
-forge the evidence the FSM exists to demand (`D-15`). A feature opts back in by
-being deleted from that list (`D-19`).
+**`untracked` is not a seventh state.** The first three rungs read the journal,
+which no work predating it can satisfy; those features are listed in
+`docs/journal/factory-config.json` and the machine claims *nothing* about them
+(`D-18`). Not a waiver - `deriveRungs` has no waiver parameter, so no rung can be
+marked satisfied. Backfilling was refused: it forges the evidence the FSM exists
+to demand (`D-15`). A feature opts back in by being deleted from the list (`D-19`).
 
 ## Scope, and the fast-path
 
@@ -107,11 +94,10 @@ a threshold is crossed. The agent cannot declare "trivial" and then write 40 fil
 ## Attribution
 
 Two sessions share this tree and the `master` branch, so a tree-global FSM would
-warn this agent for the other session's edits, and a branch cannot tell them apart.
-
-Work is attributed by **path** (`D-8`). The early phases self-attribute: journal
-rows carry `feature=`, and the two `docs/` files carry the slug in the filename.
-From `building` onward the brief declares its paths in `## Owns`.
+warn this agent for the other's edits, and a branch cannot tell them apart. Work
+is attributed by **path** (`D-8`): journal rows carry `feature=`, the two `docs/`
+files carry the slug in the filename, and from `building` onward the brief
+declares its paths in `## Owns`.
 
 Two consequences worth having: a file **no brief claims** cannot be attributed -
 exactly the drift being hunted, so it becomes the warning - and when **two briefs
@@ -119,8 +105,7 @@ claim one path**, both sessions get warned.
 
 ## Enforcement, and what it must never touch
 
-**Agent hooks only. Never a git hook** (`D-2`). The distinction is the whole
-safety argument:
+**Agent hooks only. Never a git hook** (`D-2`) - the whole safety argument:
 
 | | git hooks - what burned us | agent hooks - what this uses |
 |---|---|---|
@@ -146,7 +131,7 @@ what prose hid: the ladder wrapped at 83 columns, since refitted.
 
 | Shape | Lines | Widest | When |
 |---|---|---|---|
-| rail | 2 | 61 | session start |
+| rail | 3 | 70 | session start |
 | gate report | 6 | 66 | only on a misstep |
 | ladder | 8 | 65 | on demand |
 

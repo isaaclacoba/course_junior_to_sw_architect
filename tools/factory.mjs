@@ -452,8 +452,9 @@ export function renderRail(s) {
   if (s.untracked) return [];
   if (!s.slug) {
     return [
-      clip("factory: no feature claimed - state `recall`"),
-      clip("next: journal search the topic, then record what you found"),
+      clip("factory: no feature claimed - state `recall` (rung 1 of 6)"),
+      clip("  next: journal search the topic, then record what you found"),
+      clip("  run this state with the `recall` agent; `factory ladder` for all 6"),
     ];
   }
   const rung = s.rungs.find((r) => r.state === s.state);
@@ -461,7 +462,8 @@ export function renderRail(s) {
   const at = STATES.indexOf(s.state) + 1;
   const l1 = `factory: ${s.slug} in \`${s.state}\` (rung ${at} of 6) - ${lane}`;
   const l2 = `next: ${rung ? rung.fix : "npm run gate"}`;
-  return [clip(l1), clip("  " + l2)];
+  const l3 = `run this state with the \`${s.state}\` agent; \`factory ladder\` for all 6`;
+  return [clip(l1), clip("  " + l2), clip("  " + l3)];
 }
 
 export function renderLadder(s) {
@@ -981,8 +983,20 @@ async function selftest() {
   const ladder = renderLadder(s);
   const gate = renderGate(s, missteps(s));
   const widest = (ls) => Math.max(0, ...ls.map((l) => l.length));
-  t("rail: 2 lines", rail.length === 2, `${rail.length}`);
+  t("rail: 3 lines", rail.length === 3, `${rail.length}`);
   t("rail: <=80 cols", widest(rail) <= 80, `${widest(rail)}`);
+  // the rail is the ONLY thing a fresh session sees, so it must be self-sufficient:
+  // name the state, what to do next, and which agent runs it (D-22).
+  t("rail: names the agent for the state", rail[2].includes(`\`${s.state}\` agent`), rail[2]);
+  t("rail: points at the ladder", rail[2].includes("factory ladder"), rail[2]);
+  // ok- control: the agent named must be a real state, never an invented one
+  t("ok-rail: agent name is one of the 6 states",
+    STATES.some((st) => rail[2].includes(`\`${st}\` agent`)), rail[2]);
+  // ok- control: the unclaimed-feature rail is self-sufficient too
+  const unclaimedRail = renderRail({ ...s, slug: null });
+  t("ok-rail: unclaimed rail also names an agent and fits",
+    unclaimedRail.length === 3 && unclaimedRail[2].includes("`recall` agent") && widest(unclaimedRail) <= 80,
+    `${unclaimedRail.length}/${widest(unclaimedRail)}`);
   t("gate: 6 lines", gate.length === 6, `${gate.length}`);
   t("gate: <=80 cols", widest(gate) <= 80, `${widest(gate)}`);
   t("ladder: 8 lines", ladder.length === 8, `${ladder.length}`);
