@@ -37,7 +37,7 @@
         objects: { lens: "chain", acts: [WRITE, STORE, LIST], fresh: 0, note: "your work, and nothing about you" }
       },
       {
-        narr: "`git commit` writes a third object. It is the smallest of the three, and unlike the tree it is plain text all the way through - you could read it with `cat` if git did not compress it on disk.",
+        narr: "`git commit` writes a third object, and it is the smallest of the three. Where a tree hides raw bytes inside itself, a commit is plain text from end to end - the only object a person could read straight off the disk, if git did not compress it there.",
         objects: { lens: "both", acts: [WRITE, STORE, LIST, SAVE], fresh: 1, note: "a third object, and the smallest" }
       },
       {
@@ -49,11 +49,11 @@
         objects: { lens: "chain", acts: [WRITE, STORE, LIST, SAVE], fresh: 0, open: "commit", note: "author wrote it, committer saved it" }
       },
       {
-        narr: "That text is all there is, so the same rule applies to it: run those bytes through SHA-1 and you get **089528ab9685d519f68fcfc73b52c17237b1990f**. Change the message, the time or a single byte of your file, and this id changes with it.",
+        narr: "That text is the whole object, so the usual rule applies to it too: SHA-1 over those bytes gives **089528ab9685d519f68fcfc73b52c17237b1990f**. The message, the timestamp and every byte of every file underneath all feed into it, which is why one id can stand for an entire project at one moment.",
         objects: { lens: "chain", acts: [WRITE, STORE, LIST, SAVE, NAME], fresh: 1, open: "commit", note: "the commit's own name, from its own bytes" }
       },
       {
-        narr: "Now save a second time. The new commit carries one line the first one could not: **`parent`**, holding the id of the save before it. That single line is what makes a pile of saves into a history you can walk backwards.",
+        narr: "A second save carries a line the first one could not: **`parent`**, holding the id of the save before it. One line per commit is all it takes to turn a heap of saves into a chain that can be walked backwards.",
         objects: { lens: "chain", acts: [WRITE, STORE, LIST, SAVE, NAME, EDIT, STORE, LIST, SAVE2, NAME], fresh: 4, open: "commit", note: "parent - the line that makes a history" }
       },
       {

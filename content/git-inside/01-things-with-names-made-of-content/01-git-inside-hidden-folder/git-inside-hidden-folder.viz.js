@@ -1,10 +1,13 @@
 // Visual for git-inside-hidden-folder - a DATA-ONLY file, driving the `objects`
 // panel's `folder` lens: the .git folder as it sits on disk.
 //
+// THEORY VOICE (see the theory-lesson-authoring skill): every sentence describes
+// git. The reader runs nothing here.
+//
 // Step 1 uses `detail: "full"` so the listing is everything `git init` really
 // creates, checked against real git 2.34. A learner who opens a real .git after
-// this lesson should find nothing that was hidden from them. Every later step
-// drops back to the three parts the track is actually about.
+// this lesson should find nothing that was hidden from them. Step 2 drops to the
+// three parts the track is about, so the picture visibly shrinks.
 //
 // The acts are never translated: an object's name is computed from its bytes, so
 // a Spanish `notes.md` would carry different forty characters from the English
@@ -28,27 +31,23 @@
     },
     steps: [
       {
-        narr: "`git init` is the command that turns an ordinary folder into a repository, and this is everything it makes: **one hidden folder** called `.git`, beside your work. Nothing is running. None of your files moved.",
+        narr: "`git init` turns an ordinary folder into a repository, and this is everything it makes: **one hidden folder** called `.git`, beside the work. Nothing starts running, and no existing file moves.",
         objects: { lens: "folder", acts: [], fresh: 0, detail: "full", note: "everything git init creates" }
       },
       {
-        narr: "Most of it you can ignore today. `config` holds settings for this one repository, `description` is used by one old web viewer, and `hooks/` is a dozen sample scripts, all switched off. **Three things** carry the whole idea: `objects/`, `refs/heads/` and `HEAD`.",
-        objects: { lens: "folder", acts: [], fresh: 0, detail: "full", note: "settings, samples, and the three that matter" }
+        narr: "Most of that can be set aside. `config` holds settings for this one repository, `description` is used by a single old web viewer, and `hooks/` is a dozen sample scripts, all switched off. **Three things** carry the whole idea: `objects/`, `refs/heads/` and `HEAD`.",
+        objects: { lens: "folder", acts: [], fresh: 0, note: "the three parts the rest of this track is about" }
       },
       {
-        narr: "Start with the one that is not empty. `HEAD` is a text file with **a single line in it**, and the line is right there: `ref: refs/heads/main`. It does not hold your work. It holds the name of a name - and that name does not exist yet.",
-        objects: { lens: "folder", acts: [], fresh: 0, note: "HEAD - one line of text" }
+        narr: "Only one of the three has anything in it. `HEAD` is a text file holding **a single line** - `ref: refs/heads/main`. It carries no work of its own; it names a file in `refs/heads/`, and that file does not exist yet. A branch, before its first save, is a name git is expecting rather than a thing git has.",
+        objects: { lens: "folder", acts: [], fresh: 0, note: "HEAD names a file that is not there yet" }
       },
       {
-        narr: "That name would live in `refs/heads/`, one small file per branch. Yours is empty, so `main` is a branch git is expecting. It appears the moment you first save something.",
-        objects: { lens: "folder", acts: [], fresh: 0, note: "refs/heads/ - no names yet" }
+        narr: "`objects/` is where everything git keeps ends up, one file per thing, and it stays empty while the work does not. New files appear in the folder alongside `.git` and nowhere inside it. Git watches nothing; something has to hand a file over before git holds a copy.",
+        objects: { lens: "folder", acts: [NOTES, TODO], fresh: 2, note: "two files here, and nothing yet in objects/" }
       },
       {
-        narr: "And `objects/` is where **everything git keeps** goes, one file per thing. Write a file of your own and it shows up under your folder - not in `objects/`. Write a second one, same story. Git is not watching you type: `git add` is the command that carries a file across, and until you run it, `objects/` stays empty.",
-        objects: { lens: "folder", acts: [NOTES, TODO], fresh: 2, note: "two files of yours, none of git's" }
-      },
-      {
-        narr: "A repository is three parts: a place for things, a place for names, and one line saying which name you are on. Two are empty and one is expecting. The next lesson fills `objects/` - and the name that file gets is chosen by nobody.",
+        narr: "A repository, then, is three parts: a place for things, a place for names, and one line saying which name is current. At this point two are empty and one is expecting. What fills `objects/` first, and where its name comes from, is the next lesson.",
         objects: { lens: "folder", acts: [NOTES, TODO], fresh: 0, note: "a repository, before its first save" }
       }
     ]

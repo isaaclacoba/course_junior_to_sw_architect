@@ -37,31 +37,31 @@
         objects: { lens: "chain", acts: [WRITE, STORE], fresh: 1, open: "blob", note: "a blob: a name, and the bytes it was made from" }
       },
       {
-        narr: "Now read what is **not** there. No `notes.md`. No date, no author, no folder, no permissions. Everything you would call information *about* the file is missing. Only the file's own bytes survived.",
+        narr: "What is absent matters more. No `notes.md`, no date, no author, no folder, no permissions - everything anyone would call information *about* the file. Only the file's own bytes survived.",
         objects: { lens: "chain", acts: [WRITE, STORE], fresh: 0, open: "blob", note: "the content, and nothing about it" }
       },
       {
-        narr: "But hash those bytes yourself and you get the wrong answer. `printf 'hello world\\n' | sha1sum` prints **22596363b3de40b06f981fb85d82312e8c0ed511**, and the blob is called `3b18e51`. Something else went into the hash.",
+        narr: "But SHA-1 over exactly those bytes returns the wrong answer. `printf 'hello world\\n' | sha1sum` gives **22596363b3de40b06f981fb85d82312e8c0ed511**, while the blob is called `3b18e51`. Something more went into that hash.",
         objects: { lens: "chain", acts: [WRITE, STORE], fresh: 0, open: "blob", note: "hashing this text does NOT give 3b18e51" }
       },
       {
-        narr: "This is what git really hashed. It puts a **header** in front of your content first: the word `blob`, a space, the size in bytes, then a zero byte. `printf 'blob 12\\0hello world\\n' | sha1sum` prints `3b18e51` exactly. The header is part of the object - it is just never shown to you.",
+        narr: "This is what git really hashed. A **header** goes in front of the content first - the word `blob`, a space, the size in bytes, then a zero byte - and `printf 'blob 12\\0hello world\\n' | sha1sum` gives `3b18e51` exactly. Both halves of the header earn their place: the size tells a reader where the content ends, and the type word keeps a blob and a commit holding identical text from ever landing on the same name.",
         objects: { lens: "chain", acts: [WRITE, STORE], fresh: 0, open: "blob", openRaw: true, note: "blob + size + a zero byte + your content" }
       },
       {
-        narr: "The header earns its two parts. `12` is the byte count, so a reader knows where the content ends without scanning for a terminator. The word `blob` means a blob and a commit that happened to hold identical text still get different names - the type is hashed, so the kinds can never collide.",
+        narr: "The header is part of the object and is never displayed, so every id in git is a fingerprint of slightly more than the thing it names. A three-byte file would carry `blob 3\\0` instead.",
         objects: { lens: "chain", acts: [WRITE, STORE], fresh: 0, open: "blob", openRaw: true, note: "a 3-byte file would read `blob 3\\0`" }
       },
       {
-        narr: "Now change the file and store it again. Git does not write down what changed - it writes a **second, complete blob**. Try it on a 100KB file: append one character and `.git/objects` gains a second object of 104,736 bytes. Git keeps whole versions, never differences.",
+        narr: "Storage follows one blunt rule: a changed file becomes a **second, complete blob**, never a record of what changed. On a 100KB file, one extra character leaves `.git/objects` holding a second object of 104,736 bytes. Git keeps whole versions.",
         objects: { lens: "chain", acts: [WRITE, STORE, EDIT, STORE], fresh: 1, note: "one edit, two entire copies" }
       },
       {
-        narr: "The opposite case is just as strict. Make two more files with that same first line and store them: **no new object appears**. Same bytes, same header, same name, so there is nothing to write. Change the file permissions on one of them - mark it executable - and still nothing appears. A blob has no permissions to change.",
+        narr: "Sharing is just as blunt in the other direction. Further files holding that same first line add **no object at all** - same bytes, same header, same name, nothing to write. Changing one file's permissions to make it executable adds nothing either, because a blob has no permissions in it to change.",
         objects: { lens: "chain", acts: [WRITE, STORE, COPY1, STORE1, COPY2, STORE2], fresh: 0, note: "three files, and still one blob for that text" }
       },
       {
-        narr: "So a blob answers only one question: what were the bytes? Which file they belonged to, and whether it was executable, are facts git records - `git checkout` restores both - but it records them somewhere else. The next lesson opens that somewhere.",
+        narr: "A blob answers one question: what were the bytes? Which file they belonged to, and whether it was executable, are things git does record - `git checkout` restores both - but it records them somewhere else. The next lesson opens that somewhere.",
         objects: { lens: "both", acts: [WRITE, STORE, COPY1, STORE1, COPY2, STORE2], fresh: 0, note: "the file name and the mode live outside the blob" }
       }
     ]

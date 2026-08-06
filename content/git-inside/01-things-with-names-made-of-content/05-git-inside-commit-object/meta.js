@@ -6,7 +6,7 @@ window.LESSON_META = {
   eyebrow: "Inside git · Part one · Things with names made of content",
   title: "What is a save actually made of?",
   intro: [
-    "You have a blob holding your bytes and a tree holding your file name. Neither one says who saved this, or when, or what the work looked like before. A third kind of object carries all of that, and it is smaller than you would guess - five short lines of text. Open one up and the whole shape of git history is visible in it."
+    "You have a blob holding your bytes and a tree holding your file name. Neither one says who saved this, or when, or what the work looked like before. A third kind of object carries all of that, and it is smaller than you would guess - five short lines of text. Opened up, those five lines carry the whole shape of git history."
   ],
   blurb: "The commit object, opened and read line by line. Five lines of plain text - a tree, an author, a time, a message - and one of them is what turns separate saves into a history.",
   links: [{ href: "index.html", label: "Back to the course" }],
