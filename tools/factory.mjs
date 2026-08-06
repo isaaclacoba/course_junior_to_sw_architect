@@ -293,9 +293,15 @@ export function classify(paths) {
 }
 
 // ---- journal evidence -------------------------------------------------------
+export const NO_ACTIVITY = { available: 0, mentions: 0, queries: 0 };
+
 export async function journalEvidence(slug) {
-  const empty = { outputs: [], decisions: [], decisionIds: new Set() };
-  const dirs = { outputs: join(JOURNAL, "outputs"), decisions: join(JOURNAL, "decisions") };
+  const empty = { outputs: [], decisions: [], decisionIds: new Set(), activity: NO_ACTIVITY };
+  const dirs = {
+    outputs: join(JOURNAL, "outputs"),
+    decisions: join(JOURNAL, "decisions"),
+    activity: join(JOURNAL, "activity"),
+  };
   const files = {};
   for (const [k, d] of Object.entries(dirs)) {
     try {
@@ -304,13 +310,16 @@ export async function journalEvidence(slug) {
       files[k] = [];
     }
   }
-  if (!files.outputs.length && !files.decisions.length) return empty;
+  if (!files.outputs.length && !files.decisions.length && !files.activity.length) return empty;
   let con;
   try {
     const { DuckDBInstance } = await import("@duckdb/node-api");
     con = await (await DuckDBInstance.create(":memory:")).connect();
   } catch {
-    return empty; // no reader available - report no evidence rather than crash
+    // The reader is missing but the rows are RIGHT THERE. Returning `empty` here
+    // would report "0 decisions cited" for a feature with 22 of them, and send the
+    // agent back to rung 1 on finished work. Not knowing is not the same as none.
+    return { ...empty, unreadable: files.outputs.length + files.decisions.length + files.activity.length };
   }
   const list = (fs) => fs.map((f) => `'${f.replace(/'/g, "''")}'`).join(", ");
   const read = async (sql, params = []) => (await con.runAndReadAll(sql, params)).getRowObjects();
@@ -331,7 +340,45 @@ export async function journalEvidence(slug) {
       if (r.feature === slug) decisions.push(r);
     }
   }
-  return { outputs, decisions, decisionIds };
+  // The firehose of what sessions ACTUALLY did. Rung 1 asks it whether a journal
+  // read really happened, instead of believing a row the agent wrote about itself.
+  let activity = NO_ACTIVITY;
+  if (files.activity.length) {
+    const like = `%${slug}%`;
+    const [row] = await read(
+      `WITH a AS (SELECT kind, coalesce(body, '') || ' ' || coalesce(preview, '') AS hay ` +
+        `FROM read_parquet([${list(files.activity)}], union_by_name=true)) ` +
+        `SELECT (SELECT count(*) FROM a) available, ` +
+        `(SELECT count(*) FROM a WHERE hay ILIKE ?) mentions, ` +
+        `(SELECT count(*) FROM a WHERE kind = 'tool_start' AND hay ILIKE ? AND regexp_matches(hay, ?)) queries`,
+      [like, like, recallReadPattern(slug)]
+    );
+    activity = { available: Number(row.available), mentions: Number(row.mentions), queries: Number(row.queries) };
+  }
+  return { outputs, decisions, decisionIds, activity };
+}
+
+// What counts as having actually recalled: READING the journal or the feature's
+// own design docs. Writing a row (`record`, `decision`) deliberately does not -
+// otherwise the act of claiming recall would be the thing that proves it.
+export function recallReadPattern(slug) {
+  const esc = String(slug).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  // The slug must sit close to the read. A tool call is often a long heredoc that
+  // mentions many things, and an unbounded match credited a feature for a journal
+  // read that had nothing to do with it (measured: 2 of derive-goals' 2 "reads").
+  // Bodies are JSON, so a newline is a literal backslash-n - excluding backslash
+  // is what stops the window at the end of the command.
+  return `journal\\.mjs\\s+(feature|search|show)[^\\\\"]{0,100}${esc}|docs/(architecture|plans)/${esc}\\.md`;
+}
+
+// Three-valued on purpose. "The transcript does not show it" and "there is no
+// transcript" are different facts, and collapsing them is how a gate either
+// punishes work that predates the firehose or waves through work nobody did.
+export function recallObservation(activity) {
+  const a = activity ?? NO_ACTIVITY;
+  if (a.queries > 0) return "observed";
+  if (a.mentions > 0) return "absent";
+  return "blind";
 }
 
 // A recall row is not "a row that says recall". It must name a decision id that
@@ -358,8 +405,10 @@ export function recallCitations(outputs, decisionIds) {
 }
 
 // ---- state derivation (step 7) ----------------------------------------------
-export function deriveRungs({ outputs, decisions, decisionIds, brief }) {
+export function deriveRungs({ outputs, decisions, decisionIds, brief, activity }) {
   const recall = recallCitations(outputs, decisionIds);
+  const seen = recallObservation(activity);
+  const claimed = recall.cited.length > 0 || recall.none;
   const grounding = outputs.filter((r) => ["audit", "subagent", "poc"].includes(r.kind));
   const active = decisions.filter((d) => d.status !== "superseded");
   const steps = brief?.steps ?? [];
@@ -369,10 +418,27 @@ export function deriveRungs({ outputs, decisions, decisionIds, brief }) {
   return [
     {
       state: "recall",
-      ok: recall.cited.length > 0 || recall.none,
-      evidence: recall.none ? "declared `none`" : `${recall.cited.length} decision(s) cited`,
-      missing: "a journal row citing a decision id that resolves",
-      fix: "journal.mjs record --kind audit --feature <slug>",
+      // A claim cannot outvote an observation. Where the firehose covers this
+      // feature's work and shows no journal read, "I recalled" does not pass.
+      ok: seen === "observed" || (seen === "blind" && claimed),
+      // The ladder gives evidence 26 columns, so the word that carries the whole
+      // distinction - observed vs claimed - has to survive the clip.
+      evidence:
+        seen === "observed"
+          ? `observed: ${activity.queries} read(s)`
+          : seen === "absent"
+            ? "claimed, no read seen"
+            : recall.none
+              ? "declared none (claimed)"
+              : `${recall.cited.length} cited (claimed)`,
+      missing:
+        seen === "absent"
+          ? "a journal read in the transcript, not just a row saying you did one"
+          : "a journal row citing a decision id that resolves",
+      fix:
+        seen === "absent"
+          ? "journal.mjs feature <slug> / search <text>, then record what you found"
+          : "journal.mjs record --kind audit --feature <slug>",
     },
     {
       state: "grounding",
@@ -417,18 +483,27 @@ async function computeState(o) {
   const attr = attribute(paths, briefs);
   const slug = pickFeature(o, attr, briefs);
   const brief = briefs.find((b) => b.slug === slug) ?? null;
-  const ev = slug ? await journalEvidence(slug) : { outputs: [], decisions: [], decisionIds: new Set() };
+  const ev = slug
+    ? await journalEvidence(slug)
+    : { outputs: [], decisions: [], decisionIds: new Set(), activity: NO_ACTIVITY };
   const cfg = loadFactoryConfig();
   const untracked = Boolean(slug) && cfg.untracked.has(slug);
   const rungs = deriveRungs({ ...ev, brief });
   // `untracked` is not a rung and never appears in STATES - it means the machine
   // declines to judge, which is different from judging the feature to be early.
-  const state = untracked ? "untracked" : stateFromRungs(rungs);
+  // Blind: the journal exists but could not be read, so the first three rungs are
+  // unknowable. Claim nothing, exactly as with `untracked` - a confident wrong
+  // answer here is worse than no answer.
+  const blind = Boolean(ev.unreadable);
+  const state = untracked || blind ? "untracked" : stateFromRungs(rungs);
   return {
     slug, brief, briefs, paths, attr, rungs, state,
     cls: classify(paths),
-    untracked,
-    untrackedReason: cfg.reason,
+    untracked: untracked || blind,
+    blind,
+    untrackedReason: blind
+      ? `cannot read the journal - ${ev.unreadable} row file(s) present but no reader (npm install)`
+      : cfg.reason,
     staleUntracked: staleUntracked(briefs, cfg),
     ...ev,
   };
@@ -464,6 +539,27 @@ export function renderRail(s) {
   const l2 = `next: ${rung ? rung.fix : "npm run gate"}`;
   const l3 = `run this state with the \`${s.state}\` agent; \`factory ladder\` for all 6`;
   return [clip(l1), clip("  " + l2), clip("  " + l3)];
+}
+
+// The BOOTSTRAP. An agent that knows nothing runs this and gets a state plus the
+// agent to invoke. Unlike `rail`, it may NEVER be silent: this is the one command
+// an agent runs before it knows anything, and silence reads as "the tool is
+// broken" - which sends it right back to improvising the process.
+export function renderStart(s, known = []) {
+  const L = [];
+  if (s.untracked) {
+    L.push(clip(`${s.slug} - the FSM does not track this feature`));
+    L.push(clip(`  ${s.untrackedReason} - it predates the machine, so no state is claimed`));
+    L.push(clip("  ask the OWNER how to proceed. Do not guess a state."));
+    return L;
+  }
+  L.push(...renderLadder(s));
+  L.push(clip(`  ==> invoke the \`${s.state}\` agent (.github/agents/${s.state}.agent.md)`));
+  if (!s.slug) {
+    L.push(clip("  no feature named, so this is treated as NEW work - it starts at rung 1."));
+    if (known.length) L.push(clip(`  resuming instead? --feature <slug>: ${clip(known.join(" "), 60)}`));
+  }
+  return L;
 }
 
 export function renderLadder(s) {
@@ -904,6 +1000,73 @@ async function selftest() {
     decisionIds: dids,
     brief: null,
   })) === "deciding");
+  // --- rung 1 is grounded in the transcript, not in a row the agent wrote about
+  // itself. Three verdicts, and each must be reachable and decisive.
+  const ACT = (mentions, queries, available = 100) => ({ available, mentions, queries });
+  t("recall: a journal read is observed", recallObservation(ACT(9, 2)) === "observed");
+  t("recall: covered but never read is absent", recallObservation(ACT(9, 0)) === "absent");
+  t("recall: no coverage is blind", recallObservation(ACT(0, 0)) === "blind");
+  t("recall: no firehose at all is blind", recallObservation(NO_ACTIVITY) === "blind");
+  t("recall: ok-undefined activity is blind, never absent", recallObservation(undefined) === "blind");
+
+  // What the firehose is allowed to accept as a real recall. The exclusion is the
+  // load-bearing half: writing the row that claims recall must never prove recall.
+  const RD = new RegExp(recallReadPattern("sw-factory"));
+  // pinned to the forms journal.mjs actually documents, not to an assumed one:
+  //   feature --slug S | search TEXT [--feature S] | show SLUG
+  t("recall: `feature --slug` is a read", RD.test("node tools/journal.mjs feature --slug sw-factory"));
+  t("recall: `search TEXT` is a read", RD.test("node tools/journal.mjs search sw-factory"));
+  t("recall: `search --feature` is a read", RD.test("node tools/journal.mjs search hook --feature sw-factory"));
+  t("recall: `show SLUG` is a read", RD.test("node tools/journal.mjs show sw-factory"));
+  t("recall: opening the design doc is a read", RD.test("docs/architecture/sw-factory.md"));
+  t("recall: opening the brief is a read", RD.test("docs/plans/sw-factory.md"));
+  t("recall: `journal.mjs record` is NOT a read",
+    !RD.test("node tools/journal.mjs record --kind audit --feature sw-factory --title x"));
+  t("recall: `journal.mjs decision` is NOT a read",
+    !RD.test("node tools/journal.mjs decision --feature sw-factory --question x"));
+  t("recall: another feature's design doc is NOT a read", !RD.test("docs/architecture/git-inside-track.md"));
+  t("recall: a read of ANOTHER feature is not a read of this one",
+    !RD.test("node tools/journal.mjs feature git-inside-track"));
+  // the real false positive: one long heredoc holding a journal read AND, lines
+  // later, an unrelated mention of this slug
+  t("recall: a distant mention in the same tool call is NOT a read",
+    !RD.test('node tools/journal.mjs feature other-thing\\ncat > /tmp/w.txt <<EOF\\nsw-factory notes\\nEOF'));
+  t("recall: ok-adjacent slug still reads", RD.test("node tools/journal.mjs search sw-factory"));
+  t("recall: ok-slug dots are escaped, not wildcards",
+    !new RegExp(recallReadPattern("a.c")).test("docs/architecture/abc.md"));
+
+  const LADDER_EVIDENCE_COLS = 26;
+  const citedRow = [{ kind: "audit", title: "", body: "recall of D-x-1" }];
+  const emptyRow = [{ kind: "audit", title: "", body: "no decision ids at all" }];
+  const rung1 = (outputs, activity) => deriveRungs({ outputs, decisions: [], decisionIds: dids, brief: null, activity })[0];
+
+  t("recall: observation passes with NO self-report at all",
+    rung1(emptyRow, ACT(9, 2)).ok);
+  t("recall: a claim cannot outvote an observation of absence",
+    !rung1(citedRow, ACT(9, 0)).ok);
+  t("recall: absence names the transcript, not the missing row",
+    /no read seen/.test(rung1(citedRow, ACT(9, 0)).evidence));
+  t("recall: blind grandfathers a pre-firehose claim",
+    rung1(citedRow, ACT(0, 0)).ok);
+  t("recall: blind still refuses an unbacked claim",
+    !rung1(emptyRow, ACT(0, 0)).ok);
+  t("recall: a claim is never reported as observed",
+    !/observed/.test(rung1(citedRow, ACT(0, 0)).evidence));
+  t("recall: blind says so out loud",
+    /\(claimed\)/.test(rung1(citedRow, ACT(0, 0)).evidence));
+  // If an evidence string outgrows the column budget the clip eats the verdict,
+  // and the ladder starts reporting a claim as though it were an observation.
+  for (const [label, ev] of [
+    ["observed", rung1(emptyRow, ACT(9, 2)).evidence],
+    ["absent", rung1(citedRow, ACT(9, 0)).evidence],
+    ["blind/cited", rung1(citedRow, ACT(0, 0)).evidence],
+    ["blind/none", rung1([{ kind: "audit", title: "", body: "recall: none" }], ACT(0, 0)).evidence],
+  ]) {
+    t(`recall: ${label} evidence survives the ${LADDER_EVIDENCE_COLS}-col clip`,
+      ev.length <= LADDER_EVIDENCE_COLS && clip(ev, LADDER_EVIDENCE_COLS) === ev,
+      `${ev.length}: ${ev}`);
+  }
+
   // step 14: recall is state 1 - every LATER rung satisfied must NOT let it advance
   const recallHeld = deriveRungs({
     outputs: [{ kind: "audit", title: "", body: "no decision ids at all" }],
@@ -1107,13 +1270,15 @@ async function selftest() {
 }
 
 // ---- main -------------------------------------------------------------------
-const CMDS = new Set(["state", "classify", "attribute", "rail", "gate", "ladder", "sweep", "history", "hook", "selftest"]);
+const CMDS = new Set(["start", "state", "classify", "attribute", "rail", "gate", "ladder", "sweep", "history", "hook", "selftest"]);
 
 async function main(argv) {
   const cmd = argv[0];
   const o = parseArgs(argv.slice(1));
   if (!cmd || !CMDS.has(cmd)) {
     console.log("factory - the way-of-working FSM (warn-only)");
+    console.log("  start   <- START HERE. Says which state you are in and which");
+    console.log("            agent to invoke. Takes --feature <slug> to resume work.");
     console.log("  state | classify | attribute | rail | gate | ladder");
     console.log("  sweep [--record] | history | hook <Event> | selftest");
     console.log("see docs/architecture/sw-factory.md");
@@ -1193,6 +1358,10 @@ async function main(argv) {
   }
   if (cmd === "rail") return renderRail(s).forEach((l) => console.log(l));
   if (cmd === "ladder") return renderLadder(s).forEach((l) => console.log(l));
+  if (cmd === "start") {
+    const known = s.briefs.map((b) => b.slug).sort();
+    return renderStart(s, known).forEach((l) => console.log(l));
+  }
   if (cmd === "gate") {
     const problems = missteps(s);
     if (!problems.length) return console.log("factory: no misstep.");

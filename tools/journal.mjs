@@ -33,6 +33,7 @@ import { randomBytes } from "node:crypto";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const JOURNAL = process.env.JOURNAL_DIR || join(ROOT, "docs", "journal");
+const ETL_BATCH_ROWS = 20000;
 const DIRS = {
   activity: join(JOURNAL, "activity"),
   outputs: join(JOURNAL, "outputs"),
@@ -139,9 +140,31 @@ async function loadConfig() {
 }
 async function resolveTranscripts(flag) {
   const cfg = await loadConfig();
-  const dir = flag || process.env.JOURNAL_TRANSCRIPTS || cfg.transcriptsDir;
-  if (dir && existsSync(dir)) return dir;
-  return null;
+  const candidates = [
+    flag,
+    process.env.JOURNAL_TRANSCRIPTS,
+    cfg.transcriptsDir,
+    join(homedir(), ".copilot", "session-state"),
+  ].filter(Boolean);
+  return candidates.find((p) => existsSync(p)) || null;
+}
+
+// Transcripts sit in two layouts side by side: an older flat `<id>.jsonl` and a
+// newer `<id>/events.jsonl`. Reading one layout silently drops most sessions.
+async function transcriptSources(dir) {
+  const entries = await readdir(dir, { withFileTypes: true });
+  const bySession = new Map();
+  for (const e of entries) {
+    if (e.isFile() && e.name.endsWith(".jsonl")) bySession.set(e.name.replace(/\.jsonl$/, ""), join(dir, e.name));
+  }
+  for (const e of entries) {
+    if (!e.isDirectory()) continue;
+    const nested = join(dir, e.name, "events.jsonl");
+    if (existsSync(nested)) bySession.set(e.name, nested);
+  }
+  return [...bySession]
+    .map(([sessionId, path]) => ({ sessionId, path }))
+    .sort((a, b) => (a.sessionId < b.sessionId ? -1 : 1));
 }
 async function resolveSessionStore(flag) {
   const cfg = await loadConfig();
@@ -366,12 +389,21 @@ async function cmdEtl(con, o) {
   const store = o["no-store"] || process.env.JOURNAL_NO_STORE ? null : await resolveSessionStore(o["session-store"]);
   if (store) console.log(`  (enriching from session-store: ${store})`);
   const wm = existsSync(WATERMARK) ? JSON.parse(await readFile(WATERMARK, "utf8")) : {};
-  let files = (await readdir(tdir)).filter((f) => f.endsWith(".jsonl"));
-  if (o.session) files = files.filter((f) => f.startsWith(o.session));
+  let sources = await transcriptSources(tdir);
+  if (o.session) sources = sources.filter((s) => s.sessionId.startsWith(o.session));
+  await mkdir(JOURNAL, { recursive: true });
   let total = 0;
-  for (const f of files) {
-    const sessionId = f.replace(/\.jsonl$/, "");
-    const text = await readFile(join(tdir, f), "utf8");
+  let batch = [];
+  // One parquet file per session would leave hundreds of tiny files, so rows are
+  // batched; the watermark is saved with each flush, so a crash cannot duplicate.
+  const flush = async () => {
+    if (!batch.length) return;
+    total += await appendRows(con, DIRS.activity, batch, CAST.activity);
+    batch = [];
+    await writeFile(WATERMARK, JSON.stringify(wm, null, 2));
+  };
+  for (const { sessionId, path } of sources) {
+    const text = await readFile(path, "utf8");
     const lines = text.split("\n").filter((l) => l.trim());
     const from = wm[sessionId] || 0;
     if (lines.length <= from) continue;
@@ -381,14 +413,14 @@ async function cmdEtl(con, o) {
     const rows = [];
     for (let i = from; i < lines.length; i++) rows.push(...activityRowsFromLine(lines[i], sessionId, agent));
     if (fresh && store) rows.push(...(await enrichFromStore(store, sessionId, agent)));
-    const n = await appendRows(con, DIRS.activity, rows, CAST.activity);
+    batch.push(...rows);
     wm[sessionId] = lines.length;
-    total += n;
-    console.log(`  ${sessionId}: +${n} rows (lines ${from}..${lines.length})`);
+    console.log(`  ${sessionId}: +${rows.length} rows (lines ${from}..${lines.length})`);
+    if (batch.length >= ETL_BATCH_ROWS) await flush();
   }
-  await mkdir(JOURNAL, { recursive: true });
+  await flush();
   await writeFile(WATERMARK, JSON.stringify(wm, null, 2));
-  console.log(`etl done: +${total} activity rows from ${files.length} transcript(s)`);
+  console.log(`etl done: +${total} activity rows from ${sources.length} transcript(s)`);
 }
 
 // ---- dispatch ---------------------------------------------------------------
