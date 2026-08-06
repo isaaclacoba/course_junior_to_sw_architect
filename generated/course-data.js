@@ -1490,7 +1490,7 @@
               "key": "git_inside_commit_object_awarded",
               "total": 1,
               "title": "What is a save actually made of?",
-              "blurb": "The commit object, opened and read line by line. Five lines of plain text - a tree, an author, a time, a message - and one of them is what turns separate saves into a history.",
+              "blurb": "The commit object, opened and read line by line. Five lines of plain text - a tree, two people, a time, a message - and one more line that turns separate saves into a history.",
               "pill": "gentle",
               "time": "15 min",
               "kind": "lesson"
