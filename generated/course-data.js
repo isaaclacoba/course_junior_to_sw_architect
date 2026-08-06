@@ -1476,8 +1476,8 @@
               "href": "content/git-inside/01-things-with-names-made-of-content/04-git-inside-tree/",
               "key": "git_inside_tree_awarded",
               "total": 1,
-              "title": "What remembers it was called notes.md?",
-              "blurb": "A blob has no file name, so something else must hold it. Meet the second kind of object - a plain list of name-and-id pairs - and see that it is named by its own contents, exactly like everything else.",
+              "title": "The object that knows your folder",
+              "blurb": "Read a real tree object: the mode in front of each name, the twenty raw bytes behind it, and what happens to every id above a file when you edit it.",
               "pill": "gentle",
               "time": "15 min",
               "kind": "lesson"

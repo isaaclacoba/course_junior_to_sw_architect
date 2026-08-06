@@ -1,12 +1,11 @@
 // Visual for git-inside-tree - a DATA-ONLY file driving the `objects` panel.
 //
-// Real ids, cross-checked against git 2.34:
-//   blob "hello world\n"                          3b18e512dba79e4c8300dd08aeb37f8e728b8dad
-//   tree with one entry 100644 notes.md -> blob   55f6b9cfc432d40ed27933041d16dcf4d816a630
-// The second was checked with `git add notes.md && git write-tree`.
-//
-// Nesting (a tree naming a tree) is DEFERRED on purpose, not hidden: the acts
-// here build flat trees, and the last step says so.
+// Every id here came out of real git 2.34.1 and our store reproduces all four:
+//   blob notes.md      3b18e512dba79e4c8300dd08aeb37f8e728b8dad
+//   blob docs/guide.md d9b401251bb36c51ca5c56c2ffc8a24a78ff20ae
+//   tree docs/         af5e9eaee94e434a05e5e461f8d102b42da42834
+//   tree top           6e5cb5bf4fb518d4d56f1639d9dfca12ad228aed
+// One card, one new thing. No card restates the one before it.
 (function () {
   "use strict";
 
@@ -15,6 +14,13 @@
   var WRITE2 = { act: "write", path: "todo.md", text: "feed the cat\n" };
   var STORE2 = { act: "store", path: "todo.md" };
   var LIST = { act: "list" };
+  var DEEP = { act: "write", path: "docs/guide.md", text: "read me\n" };
+  var STORE_DEEP = { act: "store", path: "docs/guide.md" };
+  var EDIT_DEEP = { act: "write", path: "docs/guide.md", text: "read me first\n" };
+
+  var FLAT = [WRITE, STORE, WRITE2, STORE2, LIST];
+  var NESTED = [WRITE, STORE, DEEP, STORE_DEEP, LIST];
+  var NESTED_EDITED = [WRITE, STORE, DEEP, STORE_DEEP, LIST, EDIT_DEEP, STORE_DEEP, LIST];
 
   window.LESSON_CONFIG = {
     code: [],
@@ -29,28 +35,24 @@
     },
     steps: [
       {
-        narr: "Two files, two blobs. Bytes and nothing else, twice. If this were all git kept, restoring your work would give you two piles of text and no way to know which was `notes.md`.",
-        objects: { lens: "chain", acts: [WRITE, STORE, WRITE2, STORE2], fresh: 2, note: "two blobs, and no file names in sight" }
+        narr: "Two files, two blobs, and no file names anywhere. `git add` writes one more object to fix that - a **tree**. Each row of it pairs a name with the id of the bytes that go under that name.",
+        objects: { lens: "chain", acts: FLAT, fresh: 1, open: "tree", note: "the tree, exactly as `git cat-file -p` prints it" }
       },
       {
-        narr: "`git add` writes something else as well: a **tree**. A tree is a list, and each row of the list says a name and the id of the thing with that name.",
-        objects: { lens: "chain", acts: [WRITE, STORE, WRITE2, STORE2, LIST], fresh: 1, note: "a tree: names on the left, ids on the right" }
+        narr: "The number in front is a **file mode**, borrowed from Unix. Read `100644` as two halves: `100` means an ordinary file, `644` means readable by everyone and writable by you. Git accepts only five values - `100644` a file, `100755` an executable file, `120000` a symlink, `040000` a directory, `160000` another repository.",
+        objects: { lens: "chain", acts: FLAT, fresh: 0, open: "tree", note: "the only permissions git keeps: executable, or not" }
       },
       {
-        narr: "Read a row in full and there are three parts: `100644` - an ordinary, non-executable file - then the name `notes.md`, then the id of the blob. Mode, name, id. That is a tree entry, and there is nothing else in it.",
-        objects: { lens: "chain", acts: [WRITE, STORE, WRITE2, STORE2, LIST], fresh: 0, note: "mode, name, id - the whole entry" }
+        narr: "That listing is a pretty-printed view. What sits in the object is tighter: the mode loses its leading zero, there is no type word, and each id is **twenty raw bytes** rather than forty characters of hex. `git cat-file -p` is doing the decoding for you.",
+        objects: { lens: "chain", acts: FLAT, fresh: 0, open: "tree", openRaw: true, note: "what is really stored, entry by entry" }
       },
       {
-        narr: "The tree has a name of its own, and it comes from the same rule as everything else: hash its bytes. With just `notes.md` in it, that name is **55f6b9cfc432d40ed27933041d16dcf4d816a630** - and `git add notes.md && git write-tree` prints exactly that in a real repository.",
-        objects: { lens: "chain", acts: [WRITE, STORE, LIST], fresh: 0, note: "a tree is an object, named like any other" }
+        narr: "Now put a file in a folder. A second tree object appears, because git writes **one tree per directory** - and the top one now has a row whose id is not a blob but that other tree. An object that contains objects of its own kind: that is why it is called a tree.",
+        objects: { lens: "chain", acts: NESTED, fresh: 2, open: "tree", note: "two directories on disk, two tree objects" }
       },
       {
-        narr: "Change any file and its blob gets a new id, so the tree row changes, so the **tree** gets a new id too. A change at the bottom renames everything above it.",
-        objects: { lens: "chain", acts: [WRITE, STORE, WRITE2, STORE2, LIST], fresh: 0, note: "change a byte, rename the tree" }
-      },
-      {
-        narr: "One thing this track will not go into: a folder inside your project is just a tree naming another tree, the same shape one level down. What is still missing is bigger - nothing here says who saved this, or when, or what came before it. The next lesson adds the object that does.",
-        objects: { lens: "chain", acts: [WRITE, STORE, WRITE2, STORE2, LIST], fresh: 0, note: "names and bytes, but no story yet" }
+        narr: "Edit that buried file and watch how far the damage travels. Its blob gets a new id, so the `docs` tree row changes, so `docs` gets a new id, so the top row changes, so the top tree gets a new id. **Three objects renamed by one edit** - which is exactly what makes the next object, the commit, able to stand for your whole project with a single id.",
+        objects: { lens: "chain", acts: NESTED_EDITED, fresh: 3, note: "one edit at the bottom, three new ids up the chain" }
       }
     ]
   };

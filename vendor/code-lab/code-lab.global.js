@@ -5952,9 +5952,7 @@ ${written}` : written;
         }
         case "list": {
           if (!stored.size) break;
-          latestTree = store.writeTree(
-            [...stored].map(([name, id]) => ({ mode: MODE_FILE, name, id }))
-          );
+          latestTree = writeNested(store, stored);
           break;
         }
         case "save": {
@@ -6020,13 +6018,16 @@ ${written}` : written;
       walk = commit2.parents[0];
     }
     const treeId = top ? store.objects.get(top).commit.tree : lastTreeOf(store);
-    const tree = treeId ? store.objects.get(treeId) : void 0;
-    if (tree?.entries) {
-      push("tree", "tree", treeId, treeBodyText(tree.entries));
-      for (const entry of tree.entries) {
-        push("blob", "blob", entry.id, store.objects.get(entry.id)?.text);
+    const walkTree = (id) => {
+      const node = id ? store.objects.get(id) : void 0;
+      if (!node?.entries) return;
+      push("tree", "tree", id, treeBodyText(node.entries));
+      for (const entry of node.entries) {
+        if (store.objects.get(entry.id)?.entries) walkTree(entry.id);
+        else push("blob", "blob", entry.id, store.objects.get(entry.id)?.text);
       }
-    }
+    };
+    walkTree(treeId);
     for (const [id, object] of store.objects) {
       if (rows.some((row) => row.id === id)) continue;
       push(
@@ -6038,8 +6039,26 @@ ${written}` : written;
     }
     return rows;
   }
+  function writeNested(store, stored) {
+    const build = (prefix) => {
+      const entries = [];
+      const dirs = /* @__PURE__ */ new Set();
+      for (const [path, id] of stored) {
+        if (!path.startsWith(prefix)) continue;
+        const rest = path.slice(prefix.length);
+        const slash = rest.indexOf("/");
+        if (slash < 0) entries.push({ mode: MODE_FILE, name: rest, id });
+        else dirs.add(rest.slice(0, slash));
+      }
+      for (const dir of dirs) {
+        entries.push({ mode: MODE_DIR, name: dir, id: build(`${prefix}${dir}/`) });
+      }
+      return store.writeTree(entries);
+    };
+    return build("");
+  }
   function treeBodyText(entries) {
-    return entries.map((entry) => `${entry.name} -> ${short(entry.id)}`).join(", ");
+    return entries.map((entry) => `${entry.mode.padStart(6, "0")} ${entry.name} -> ${short(entry.id)}`).join("   ");
   }
   function lastTreeOf(store) {
     let found = null;
@@ -6056,10 +6075,18 @@ ${written}` : written;
     }
     if (!found) return null;
     if (found.entries) {
+      const kindOf = (id) => replay.store.objects.get(id)?.entries ? "tree" : "blob";
+      if (!raw) {
+        return {
+          id: found.id,
+          type,
+          text: found.entries.map((e) => `${e.mode.padStart(6, "0")} ${kindOf(e.id)} ${e.id}	${e.name}`).join("\n")
+        };
+      }
       return {
         id: found.id,
         type,
-        text: found.entries.map((e) => `${e.mode} blob ${e.id}	${e.name}`).join("\n")
+        text: found.entries.map((e) => `${e.mode} ${e.name}\\0<20 raw bytes: ${short(e.id)}...>`).join("\n")
       };
     }
     const body = new TextDecoder().decode(found.body);

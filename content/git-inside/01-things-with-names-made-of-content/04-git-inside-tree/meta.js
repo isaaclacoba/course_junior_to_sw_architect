@@ -2,13 +2,13 @@ window.LESSON_META = {
   id: "git-inside-tree",
   key: "git_inside_tree_awarded",
   total: 1,
-  docTitle: "What remembers it was called notes.md?",
+  docTitle: "The object that knows your folder",
   eyebrow: "Inside git · Part one · Things with names made of content",
-  title: "What remembers it was called notes.md?",
+  title: "The object that knows your folder",
   intro: [
-    "A blob holds your bytes and forgets your file name. Yet git puts your files back with the right names every time, so the name is written down somewhere. It is in a second kind of object, one whose entire job is to say which name goes with which bytes."
+    "A blob keeps bytes and forgets everything else. The object that remembers your file was called `notes.md` is the tree - and it also records one permission bit, nests one object per directory, and changes its own id whenever anything underneath it changes."
   ],
-  blurb: "A blob has no file name, so something else must hold it. Meet the second kind of object - a plain list of name-and-id pairs - and see that it is named by its own contents, exactly like everything else.",
+  blurb: "Read a real tree object: the mode in front of each name, the twenty raw bytes behind it, and what happens to every id above a file when you edit it.",
   links: [{ href: "index.html", label: "Back to the course" }],
   pill: "gentle",
   time: "15 min",

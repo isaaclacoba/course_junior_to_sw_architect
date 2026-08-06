@@ -165,8 +165,8 @@
       "title": "¿Por qué git nombra las cosas por su contenido?"
     },
     "git-inside-tree": {
-      "blurb": "Un blob no tiene nombre de archivo, así que algo tiene que guárdarlo. Conoce el segundo tipo de objeto - una lista sencilla de pares nombre-id - y comprueba que se nombra por su propio contenido, igual que todo lo demás.",
-      "title": "¿Qué recuerda que se llamaba notes.md?"
+      "blurb": "Lee un objeto tree de verdad: el modo delante de cada nombre, los veinte bytes crudos que hay detrás, y qué le pasa a cada id por encima de un archivo cuando lo editas.",
+      "title": "El objeto que conoce tu carpeta"
     },
     "git-make-a-branch": {
       "blurb": "Separa una línea de trabajo y haz commits ahí sin tocar `main`. Crea una rama, súbete a ella y mira cómo el grafo se bifurca mientras la línea anterior se queda quieta.",
