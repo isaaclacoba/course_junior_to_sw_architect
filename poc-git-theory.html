@@ -37,11 +37,21 @@
   .tname{font-size:1.35rem;font-weight:700;margin:0}
   .tblurb{color:var(--ink-soft);font-size:.95rem;margin:4px 0 16px;max-width:60ch}
   .seg{display:flex;border:1px solid var(--line);border-radius:12px;overflow:hidden;width:max-content}
+  .seg[hidden]{display:none}
   .seg > div{padding:10px 20px;font-size:.92rem;color:var(--ink-soft);background:var(--panel);
              border-right:1px solid var(--line)}
   .seg > div:last-child{border-right:0}
   .seg .on{background:var(--card);color:var(--ink);font-weight:600;box-shadow:inset 0 -3px 0 var(--primary)}
   .seg small{display:block;font-weight:400;color:var(--ink-soft);font-size:.76rem}
+  .tab,.seg > div{cursor:pointer;user-select:none}
+  .prog{display:flex;align-items:center;gap:12px;margin:16px 0 4px}
+  .bar{flex:1;height:8px;border-radius:999px;background:var(--bg-3);overflow:hidden}
+  .bar span{display:block;height:100%;background:var(--primary);width:0}
+  .prog > span{font-size:.82rem;color:var(--ink-soft);white-space:nowrap}
+  .cta{border:0;border-radius:10px;background:var(--primary);color:#fff;font:inherit;
+       font-size:.85rem;padding:7px 14px;cursor:pointer;white-space:nowrap}
+  .partHead{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+            color:var(--primary);margin:18px 0 6px}
   .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}
   .card{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--card)}
   .card p{margin:2px 0 0;color:var(--ink-soft);font-size:.83rem}
@@ -93,6 +103,9 @@
        font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.85rem;word-break:break-all}
   .out .g{color:var(--term-ink)}
   .verify{margin-top:10px;font-size:.84rem;color:var(--ink-soft)}
+  .segbtn{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:6px 12px;
+          font:inherit;font-size:.82rem;font-family:ui-monospace,Menlo,Consolas,monospace;cursor:pointer}
+  .segbtn.on{border-color:var(--primary);box-shadow:inset 0 -3px 0 var(--primary);font-weight:600}
 
   /* ---------- D. rule ---------- */
   table.rule{width:100%;border-collapse:collapse;font-size:.88rem}
@@ -107,32 +120,27 @@
 <div class="wrap">
 
 <h1>Inside git - mockup</h1>
-<p class="sub">Section A is still a picture. Sections B and C are live: every id below is
-  computed here, by the same code that will ship, and matches what real git produces.</p>
+<p class="sub">All of it runs. The landing reads the real course data; every id in sections B
+  and C is computed here, by the same code that will ship, and matches real git.</p>
 <div class="note">
   Check any id yourself - <code>echo "hello world" | git hash-object --stdin</code> gives
   <code>3b18e512dba79e4c8300dd08aeb37f8e728b8dad</code>, which is what the blob box shows.
   22 checks against real git pass in <code>_verify-store.mjs</code>.
 </div>
 
-<h2>A. Where the track lives</h2>
-<span class="pick">Chosen - segmented control</span>
+<h2>A. Where the track lives - live, on the real course data</h2>
+<p class="sub">The tabs and the segment work. Hands on lists the real eleven lessons;
+  Inside git lists the fifteen from the syllabus. Your choice is remembered.</p>
 <div class="frame">
-  <div class="tabs"><div class="tab">Practical</div><div class="tab">Theory</div>
-    <div class="tab">AI</div><div class="tab on">Git</div></div>
-  <p class="kicker">Version control</p>
-  <p class="tname">Git</p>
-  <p class="tblurb">Two ways in. Type the commands, or open the machine up and see what they are made of.</p>
-  <div class="seg">
-    <div>Hands on<small>11 lessons - type real commands</small></div>
-    <div class="on">Inside git<small>15 lessons - no commands, just the machine</small></div>
-  </div>
-  <div class="cards">
-    <div class="card"><span class="pill">Part 1</span><b>Why does git name things by their contents?</b>
-      <p>Two files with the same bytes get the same name. Every time, on every machine.</p></div>
-    <div class="card"><span class="pill">Part 1</span><b>Where did your file's name go?</b>
-      <p>What git actually stores when you save a file - and what it leaves out.</p></div>
-  </div>
+  <div class="tabs" id="tabs"></div>
+  <p class="kicker" id="gKicker"></p>
+  <p class="tname" id="gName"></p>
+  <p class="tblurb" id="gBlurb"></p>
+  <div class="seg" id="seg"></div>
+  <div class="prog"><div class="bar"><span id="barFill"></span></div>
+    <span id="progText"></span>
+    <button class="cta" id="cta"></button></div>
+  <div id="cardList"></div>
 </div>
 
 <h2>B. The scene - one state, three lenses, live</h2>
@@ -149,8 +157,8 @@
   <p class="cap" id="caption"></p>
 </div>
 
-<h2>C. The playground - type content, watch it get a name</h2>
-<p class="sub">No commands. The id updates as you type.</p>
+<h2>C. The playground - the one thing the learner touches</h2>
+<p class="sub">No commands anywhere. Level one: type content, watch it get a name.</p>
 <div class="frame">
   <div class="pg">
     <label for="pgInput">Type anything</label>
@@ -170,6 +178,19 @@
     and the old name returns.</p>
 </div>
 
+<p class="sub" style="margin-top:26px">Level two - assemble a tree and a commit by hand - is not
+  built yet. Level three: point the name somewhere else. Nothing is deleted; watch what
+  stops being reachable.</p>
+<div class="frame">
+  <div class="pg">
+    <label>refs/heads/main holds</label>
+    <div id="refPick" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"></div>
+    <div class="out" id="refOut"></div>
+  </div>
+  <div class="boxes" id="refChain" style="margin-top:12px"></div>
+  <p class="cap" id="refCap"></p>
+</div>
+
 <h2>D. One scene, three lenses - not three widgets</h2>
 <div class="frame">
   <table class="rule">
@@ -187,10 +208,126 @@
 
 </div>
 
+<script src="generated/course-data.js"></script>
 <script src="poc-git-store.js"></script>
 <script>
 (function () {
   "use strict";
+
+  // ---- A. the landing, on the real course data ----------------------------
+  //
+  // Two tracks, one tab. A GROUP names the tab; its members are the segments.
+  // Everything the learner sees - the bar, the count, the Continue button -
+  // follows the SELECTED member, because that is the thing they are looking at.
+  var INSIDE = {
+    id: "git-inside", label: "Inside git", sub: "no commands, just the machine",
+    parts: [
+      { title: "Things with names made of content", lessons: [
+        ["What is in that hidden folder?", "You ran one command and a folder appeared. Open it."],
+        ["Why does git name things by their contents?", "Two files with the same bytes get the same name, on every machine."],
+        ["Where did your file's name go?", "What git stores for a file - and what it leaves out."],
+        ["What remembers that it was called notes.md?", "If the box has no name on it, something else must hold the name."],
+        ["What is a save actually made of?", "Follow the names from one small note and you arrive at your file."]] },
+      { title: "Names that move", lessons: [
+        ["Why is making a branch instant?", "A branch is a file with forty characters in it. That is the whole thing."],
+        ["How does git know where you are?", "One more small file, holding the name of a name."],
+        ["What is the staging area, as a file?", "The pile you are about to save is a list on disk. Read it."],
+        ["Does editing a line change anything git kept?", "Nothing in the store is ever rewritten. Watch what happens instead."]] },
+      { title: "The store over time", lessons: [
+        ["What makes something still there?", "Follow every name from every branch. What you never reach is a different thing."],
+        ["Why does a rewritten save get a new name?", "Change anything and it is a copy, not a move - and the original stays."],
+        ["Is every version really its own file?", "Thousands of small files would be silly. See what git does about it."]] },
+      { title: "More than one copy of the store", lessons: [
+        ["What does copying a repository copy?", "Another store beside yours, holding the same objects."],
+        ["How can git know you are ahead of them?", "It wrote down where they were, the last time it looked."],
+        ["What is a repository, then?", "Objects and names. That is the whole machine."]] }
+    ]
+  };
+
+  var C = window.CourseData;
+  var GROUPS = C.tracks().map(function (t) {
+    return { id: t.id, label: t.name, kicker: t.kicker, blurb: t.blurb,
+             members: [{ id: t.id, label: t.name, sub: "" }] };
+  });
+  var git = GROUPS.filter(function (g) { return g.id === "git"; })[0];
+  git.blurb = "Two ways in. Type the commands, or open the machine up and see what they are made of.";
+  git.members = [
+    { id: "git", label: "Hands on", sub: "type real commands" },
+    { id: INSIDE.id, label: INSIDE.label, sub: INSIDE.sub }
+  ];
+
+  // One key, as the real page uses. The tab is DERIVED from the member's group,
+  // so remembering the sub-track is enough and nothing can fall out of step.
+  var KEY = "poc_course_track";
+  var groupOf = function (memberId) {
+    return GROUPS.filter(function (g) {
+      return g.members.some(function (m) { return m.id === memberId; });
+    })[0] || GROUPS[0];
+  };
+  var selected = localStorage.getItem(KEY) || "git-inside";
+  if (!groupOf(selected)) selected = "git";
+
+  function partsOf(memberId) {
+    if (memberId === INSIDE.id) {
+      return INSIDE.parts.map(function (p) {
+        return { title: p.title, lessons: p.lessons.map(function (l) {
+          return { title: l[0], blurb: l[1] }; }) };
+      });
+    }
+    var track = C.track(memberId);
+    return track ? track.parts : [];
+  }
+
+  function drawLanding() {
+    var group = groupOf(selected);
+    document.getElementById("tabs").innerHTML = GROUPS.map(function (g) {
+      return '<div class="tab' + (g.id === group.id ? " on" : "") + '" data-g="' + g.id + '">' + g.label + "</div>";
+    }).join("");
+    document.getElementById("gKicker").textContent = group.kicker;
+    document.getElementById("gName").textContent = group.label;
+    document.getElementById("gBlurb").textContent = group.blurb;
+
+    var seg = document.getElementById("seg");
+    seg.hidden = group.members.length < 2;
+    seg.innerHTML = group.members.map(function (m) {
+      var count = partsOf(m.id).reduce(function (n, p) { return n + p.lessons.length; }, 0);
+      return '<div class="' + (m.id === selected ? "on" : "") + '" data-m="' + m.id + '">' + m.label
+        + "<small>" + count + " lessons - " + m.sub + "</small></div>";
+    }).join("");
+
+    var parts = partsOf(selected);
+    var all = parts.reduce(function (acc, p) { return acc.concat(p.lessons); }, []);
+    var done = 0; // A mockup has no progress; the rule is what matters.
+    document.getElementById("barFill").style.width = (all.length ? (done / all.length) * 100 : 0) + "%";
+    document.getElementById("progText").textContent = done + " / " + all.length + " lessons";
+    document.getElementById("cta").textContent = all.length ? "Start: " + all[done].title : "Start";
+
+    document.getElementById("cardList").innerHTML = parts.map(function (p, i) {
+      return '<p class="partHead">Part ' + (i + 1) + " - " + p.title + "</p><div class=\"cards\">"
+        + p.lessons.map(function (l) {
+            return '<div class="card"><b>' + l.title + "</b><p>" + l.blurb + "</p></div>";
+          }).join("") + "</div>";
+    }).join("");
+  }
+
+  document.getElementById("tabs").addEventListener("click", function (e) {
+    var id = e.target.getAttribute("data-g");
+    if (!id) return;
+    selected = groupOf(id).members[0].id;
+    if (id === "git") selected = "git";
+    localStorage.setItem(KEY, selected);
+    drawLanding();
+  });
+  document.getElementById("seg").addEventListener("click", function (e) {
+    var node = e.target.closest("[data-m]");
+    if (!node) return;
+    selected = node.getAttribute("data-m");
+    localStorage.setItem(KEY, selected);
+    drawLanding();
+  });
+  drawLanding();
+
+  // ---- B + C. the scene and the playground --------------------------------
   var G = window.GitStore;
   var AUTHOR = "A Learner <learner@example.com> 1700000000 +0000";
 
@@ -208,7 +345,15 @@
     { lens: "folder", why: "a new kind of file", cap: "A branch is the small file at the bottom. It holds one name, forty characters long. That is the entire thing.",
       run: function (s, m) { s.refs.set("refs/heads/main", m.commit); } },
     { lens: "chain", why: "a relationship", cap: "Now edit the file. A second blob appears and the first one is untouched - nothing in the store is ever rewritten. The old save still leads to the old bytes.",
-      run: function (s, m) { m.blob2 = s.writeBlob("hello world\ngoodbye\n"); s.worktree.set("hello.txt", "hello world\ngoodbye\n"); } }
+      run: function (s, m) { m.blob2 = s.writeBlob("hello world\ngoodbye\n"); s.worktree.set("hello.txt", "hello world\ngoodbye\n"); } },
+    { lens: "folder", why: "a new kind of file", cap: "Pick the new version for the next save and a fourth file changes: the index, a plain list of names against object ids. That list is the pile you are about to keep.",
+      run: function (s, m) { s.index.set("hello.txt", m.blob2); } },
+    { lens: "both", why: "a part recap", cap: "Two saves now, and the branch names the newer one. Objects and names - the whole machine is on this screen.",
+      run: function (s, m) {
+        m.tree2 = s.writeTree([{ mode: G.MODE_FILE, name: "hello.txt", id: m.blob2 }]);
+        m.commit2 = s.writeCommit({ tree: m.tree2, parents: [m.commit], author: AUTHOR, message: "add a goodbye" });
+        s.refs.set("refs/heads/main", m.commit2);
+      } }
   ];
 
   function buildStore(upTo) {
@@ -238,11 +383,17 @@
     lines.push("    heads/");
     if (s.refs.size === 0) lines.push('      <span class="dim">(no branches yet)</span>');
     s.refs.forEach(function (id, name) {
-      var isNew = step === 4;
+      var isNew = step === 4 || step === 7;
       lines.push("      " + (isNew ? '<span class="new">' : "") + name.replace("refs/heads/", "")
         + '   <span class="dim">' + short(id) + "</span>" + (isNew ? "</span>" : ""));
     });
     lines.push('  HEAD       <span class="dim">-&gt; ' + (s.head.ref || "") + "</span>");
+    if (s.index.size) {
+      lines.push("  index" + (step === 6 ? '   <span class="new">(new)</span>' : ""));
+      s.index.forEach(function (id, path) {
+        lines.push('    <span class="dim">' + path + "  " + short(id) + "</span>");
+      });
+    }
     var el = document.createElement("div");
     el.className = "tree";
     el.innerHTML = lines.join("\n");
@@ -258,26 +409,51 @@
   function renderChain(built, step) {
     var s = built.store, m = built.marks, parts = [];
     var live = s.reachable();
-    if (s.refs.size) {
+    var fresh = function (id) { return built.addedAt[id] === step ? "new" : ""; };
+    var arrow = '<span class="arrow">&rarr;</span>';
+
+    var head = s.resolveHead();
+    if (head) {
       s.refs.forEach(function (id, name) {
-        parts.push('<span class="reftag">' + name.replace("refs/heads/", "") + "</span>");
-        parts.push('<span class="arrow">&rarr;</span>');
+        parts.push('<span class="reftag">' + name.replace("refs/heads/", "") + "</span>", arrow);
       });
     }
-    if (m.commit) {
-      parts.push(boxFor("commit", m.commit, "save the greeting", built.addedAt[m.commit] === step ? "new" : ""));
-      parts.push('<span class="arrow">&rarr;</span>');
+    // Follow the names, exactly as the store does. Commits first, newest to
+    // oldest, so "points at its parent" is a thing you can see.
+    var root = head || m.tree || m.blob;
+    var walk = root, guard = 0;
+    while (walk && s.objects.get(walk) && s.objects.get(walk).type === "commit" && guard++ < 20) {
+      var node = s.objects.get(walk);
+      parts.push(boxFor("commit", walk, node.commit.message, fresh(walk)));
+      walk = (node.commit.parents || [])[0];
+      if (walk) parts.push(arrow);
     }
-    if (m.tree) {
-      parts.push(boxFor("tree", m.tree, "hello.txt -> " + short(m.blob), built.addedAt[m.tree] === step ? "new" : ""));
-      parts.push('<span class="arrow">&rarr;</span>');
+    var top = head && s.objects.get(head);
+    if (top && top.type === "commit") {
+      parts.push('<span style="flex-basis:100%;height:10px"></span>');
+      root = top.commit.tree;
     }
-    if (m.blob) parts.push(boxFor("blob", m.blob, "hello world", built.addedAt[m.blob] === step ? "new" : ""));
-    if (m.blob2) {
-      parts.push('<span class="arrow" style="opacity:.35">&nbsp;</span>');
-      parts.push(boxFor("blob (nobody names it)", m.blob2, "hello world\ngoodbye",
-        (built.addedAt[m.blob2] === step ? "new " : "") + (live.has(m.blob2) ? "" : "orphan")));
+    var tree = root && s.objects.get(root);
+    if (tree && tree.type === "tree") {
+      parts.push(boxFor("tree", root, tree.entries.map(function (e) {
+        return e.name + " -> " + short(e.id);
+      }).join("\n"), fresh(root)), arrow);
+      tree.entries.forEach(function (e) {
+        var blob = s.objects.get(e.id);
+        parts.push(boxFor("blob", e.id, blob ? blob.text : "", fresh(e.id)));
+      });
+    } else if (root && s.objects.get(root) && s.objects.get(root).type === "blob") {
+      parts.push(boxFor("blob", root, s.objects.get(root).text, fresh(root)));
     }
+    // Anything no name reaches. Still on disk, and a different thing entirely.
+    s.objects.forEach(function (o, id) {
+      if (live.size && live.has(id)) return;
+      if (!live.size && (id === root || (tree && tree.entries.some(function (e) { return e.id === id; })))) return;
+      parts.push('<span class="arrow" style="opacity:.3">&nbsp;</span>');
+      parts.push(boxFor(o.type + " (nobody names it)", id, o.text || (o.commit && o.commit.message) || "",
+        (fresh(id) + " orphan").trim()));
+    });
+
     if (!parts.length) parts.push('<span class="sub" style="margin:0">Nothing points at anything yet.</span>');
     var el = document.createElement("div");
     el.className = "boxes";
@@ -321,6 +497,52 @@
   }
   input.addEventListener("input", hashIt);
   hashIt();
+
+  // ---- playground level three: point the name somewhere else ---------------
+  //
+  // Nothing is ever deleted here. Moving the one name is the whole action, and
+  // the store answers on its own which objects a name can no longer reach.
+  var refStore = new G.Store();
+  var refCommits = [];
+  (function seed() {
+    var previous = null;
+    ["save the greeting", "add a goodbye", "and a postscript"].forEach(function (message, i) {
+      var blob = refStore.writeBlob("hello world\n" + "x".repeat(i) + "\n");
+      var tree = refStore.writeTree([{ mode: G.MODE_FILE, name: "hello.txt", id: blob }]);
+      previous = refStore.writeCommit({
+        tree: tree, parents: previous ? [previous] : [], author: AUTHOR, message: message,
+      });
+      refCommits.push({ id: previous, message: message });
+    });
+    refStore.refs.set("refs/heads/main", previous);
+  })();
+
+  function drawRef() {
+    var at = refStore.refs.get("refs/heads/main");
+    var live = refStore.reachable();
+    document.getElementById("refPick").innerHTML = refCommits.map(function (c) {
+      return '<button class="segbtn' + (c.id === at ? " on" : "") + '" data-c="' + c.id + '">'
+        + short(c.id) + "  " + esc(c.message) + "</button>";
+    }).join("");
+    document.getElementById("refOut").textContent = at;
+    document.getElementById("refChain").innerHTML = refCommits.map(function (c) {
+      var reached = live.has(c.id);
+      return boxFor(reached ? "commit" : "commit (unreachable)", c.id, c.message,
+        (c.id === at ? "new " : "") + (reached ? "" : "orphan"));
+    }).join('<span class="arrow" style="opacity:.35">&nbsp;</span>');
+    var lost = refCommits.filter(function (c) { return !live.has(c.id); }).length;
+    document.getElementById("refCap").textContent = lost === 0
+      ? "Every save is reachable from the name. Nothing is hiding."
+      : lost + (lost === 1 ? " save is" : " saves are") + " still in the store, byte for byte, and no name reaches "
+        + (lost === 1 ? "it" : "them") + " any more. That is the whole difference between undone and gone.";
+  }
+  document.getElementById("refPick").addEventListener("click", function (e) {
+    var node = e.target.closest("[data-c]");
+    if (!node) return;
+    refStore.refs.set("refs/heads/main", node.getAttribute("data-c"));
+    drawRef();
+  });
+  drawRef();
 })();
 </script>
 </body>

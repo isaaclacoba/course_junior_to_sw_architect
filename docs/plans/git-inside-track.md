@@ -32,15 +32,18 @@ surprise. No stage is longer than one review.
    `_verify-store.mjs` 22/22 against real git, tree sort order included
 5. [x] All three lenses rendering from one `StoreState` - verify: a six-step
    scenario in `poc-git-theory.html`, each step declaring its lens
-6. [ ] Refs, `HEAD`, index, and the point-a-ref playground - verify: moving a ref
-   changes what the store means, and the folder shows it
+6. [x] Refs, `HEAD`, index, and the point-a-ref playground - verify: an 8-step
+   scenario reaches two commits, a parent chain and the index; moving the ref
+   makes the store itself report which saves nothing reaches. Level two of the
+   playground (assemble a tree and a commit by hand) is deferred to P2.
 
 **P2 - into the engine**
 7. [ ] Port to `code-lab` as the object-store core - verify: unit tests for
    hashing, serialisation and reachability, all against real git's output
 8. [ ] The scene and its three lenses - verify: view tests; re-vendor the bundle
-9. [ ] Landing-page segmented control + `git-inside` track in the registry -
-   verify: both sub-tracks reachable, one shared git total
+9. [ ] `git-inside` in the registry + the landing group - verify: both
+   sub-tracks reachable, selection remembered, Continue follows the selected one
+10. [ ] Glossary gains its missing git section - verify: `gt-` concepts appear
 
 **P3 - lessons, reviewed per part**
 10. [ ] Part 1 (5 lessons) - verify: `verify-lesson` EN+ES on each, owner review
@@ -56,13 +59,11 @@ surprise. No stage is longer than one review.
   practicals, `gt-parent` dropped; git track down to 11 pure-terminal lessons
 - 2026-08-06 P1 steps 3-5 done - `poc-git-store.js` reproduces real git's ids
   (22/22), and the mockup steps a real store through all three lenses
+- 2026-08-06 P1 done - the landing section runs on the real course data (tabs,
+  segment, per-sub-track bar and Continue, selection remembered under one key);
+  8-step scene with parent chain and index; ref-pointing playground
 
 ## Open
 
-- Six landing-page decisions raised by the plumbing audit: a fifth registry track
-  becomes a fifth tab with no opt-out; the group header in the mockup has no
-  markup or registry slot; segment labels need their own field; the Continue
-  button and the `course_track` key both need a rule; XP is already global so
-  "one shared git total" only affects done/tracked.
 - The old audit reports in `docs/audit/git/` still describe the six deleted
   lessons. Leave as history, or delete those six reports? Recommend leaving them.
