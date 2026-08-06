@@ -305,6 +305,12 @@ preference:
 ONLY.** Do not put a stepped visual inside a practical lesson or a terminal
 inside a theory one.
 
+**Writing the CARDS of a theory lesson is its own skill - see
+`theory-lesson-authoring`.** A theory lesson explains a system rather than having
+the learner do things, so it has a different voice (describe, never instruct), a
+different bar for what a card may claim, and a grounding step before any prose is
+written. This skill covers the mechanics; that one covers the content.
+
 **Order is pedagogy, not decoration.** The syllabus
 (`docs/plans/git-content.md`) puts the visual immediately BEFORE the lesson that
 types the idea - 4 before 5, 7 before 8, 9 before 10, 13 before 14 - because a

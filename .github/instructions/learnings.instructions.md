@@ -22,6 +22,18 @@ grows into a procedure, promote it to a skill and leave a pointer here.
   you commit must stand on committed source; their uncommitted work simply does
   not ship, and that is fine.
 
+## Theory lessons
+
+- **A theory lesson DESCRIBES a system; it never instructs the learner.** "Now put
+  a file in a folder", "Edit that file and watch" is practical-track voice and is a
+  defect in a theory card - count them, the target is 0. Every card must also teach
+  something the previous one did not, and change what is on screen; narrating a
+  detail the visual does not draw is the same failure. Full procedure, including
+  the grounding step that produces the actual content: the `theory-lesson-authoring`
+  skill.
+- **Simplifying is not licence to contradict.** "A tree is a list" is a lie, not a
+  simplification - the test is whether the learner must unlearn it later.
+
 ## Docs and briefs
 
 - **Every brief and design-of-record stays UNDER 100 lines** (`work-brief` skill:
