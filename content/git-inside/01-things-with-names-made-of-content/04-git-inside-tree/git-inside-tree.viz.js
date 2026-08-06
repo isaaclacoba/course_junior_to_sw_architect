@@ -1,11 +1,14 @@
 // Visual for git-inside-tree - a DATA-ONLY file driving the `objects` panel.
 //
-// Every id here came out of real git 2.34.1 and our store reproduces all four:
+// THEORY VOICE. The learner is not doing anything here - they are being shown
+// how git works. No "now do X", no "watch", no "try it": those belong to the
+// practical track. Every sentence describes git, not the reader.
+//
+// Ids from real git 2.34.1, reproduced by our store:
 //   blob notes.md      3b18e512dba79e4c8300dd08aeb37f8e728b8dad
 //   blob docs/guide.md d9b401251bb36c51ca5c56c2ffc8a24a78ff20ae
 //   tree docs/         af5e9eaee94e434a05e5e461f8d102b42da42834
 //   tree top           6e5cb5bf4fb518d4d56f1639d9dfca12ad228aed
-// One card, one new thing. No card restates the one before it.
 (function () {
   "use strict";
 
@@ -18,6 +21,7 @@
   var STORE_DEEP = { act: "store", path: "docs/guide.md" };
   var EDIT_DEEP = { act: "write", path: "docs/guide.md", text: "read me first\n" };
 
+  var BLOBS = [WRITE, STORE, WRITE2, STORE2];
   var FLAT = [WRITE, STORE, WRITE2, STORE2, LIST];
   var NESTED = [WRITE, STORE, DEEP, STORE_DEEP, LIST];
   var NESTED_EDITED = [WRITE, STORE, DEEP, STORE_DEEP, LIST, EDIT_DEEP, STORE_DEEP, LIST];
@@ -35,24 +39,24 @@
     },
     steps: [
       {
-        narr: "Two files, two blobs, and no file names anywhere. `git add` writes one more object to fix that - a **tree**. Each row of it pairs a name with the id of the bytes that go under that name.",
-        objects: { lens: "chain", acts: FLAT, fresh: 1, open: "tree", note: "the tree, exactly as `git cat-file -p` prints it" }
+        narr: "Blobs carry bytes and no names, so on their own they cannot rebuild a folder. Git closes that gap with a second kind of object, the **tree**, whose rows pair a name with the id of the bytes that belong under it.",
+        objects: { lens: "chain", acts: BLOBS, fresh: 0, note: "bytes, but nothing that says which file they are" }
       },
       {
-        narr: "The number in front is a **file mode**, borrowed from Unix. Read `100644` as two halves: `100` means an ordinary file, `644` means readable by everyone and writable by you. Git accepts only five values - `100644` a file, `100755` an executable file, `120000` a symlink, `040000` a directory, `160000` another repository.",
-        objects: { lens: "chain", acts: FLAT, fresh: 0, open: "tree", note: "the only permissions git keeps: executable, or not" }
+        narr: "Here is one, holding both files. The whole object is those rows - a tree stores no dates, no sizes, no history. It answers a single question: which names does this folder have, and what is under each of them.",
+        objects: { lens: "chain", acts: FLAT, fresh: 1, open: "tree", note: "one row per name, and nothing else" }
       },
       {
-        narr: "That listing is a pretty-printed view. What sits in the object is tighter: the mode loses its leading zero, there is no type word, and each id is **twenty raw bytes** rather than forty characters of hex. `git cat-file -p` is doing the decoding for you.",
-        objects: { lens: "chain", acts: FLAT, fresh: 0, open: "tree", openRaw: true, note: "what is really stored, entry by entry" }
+        narr: "Each row also begins with a number. Git keeps almost nothing about permissions - only whether a file is meant to be executable, plus what kind of thing the row leads to. Five values cover every case, and the odd-looking shape is inherited from Unix.",
+        objects: { lens: "chain", acts: FLAT, fresh: 0, open: "tree", note: "100644 a file, 100755 executable, 040000 a folder" }
       },
       {
-        narr: "Now put a file in a folder. A second tree object appears, because git writes **one tree per directory** - and the top one now has a row whose id is not a blob but that other tree. An object that contains objects of its own kind: that is why it is called a tree.",
-        objects: { lens: "chain", acts: NESTED, fresh: 2, open: "tree", note: "two directories on disk, two tree objects" }
+        narr: "A row can lead to another tree, and that is what a folder is. Git writes one tree object per directory, so a project with a `docs` folder in it has two of them - the top tree with a row for `docs`, and the tree that `docs` row leads to.",
+        objects: { lens: "chain", acts: NESTED, fresh: 2, open: "tree", note: "a folder is a row that leads to another tree" }
       },
       {
-        narr: "Edit that buried file and watch how far the damage travels. Its blob gets a new id, so the `docs` tree row changes, so `docs` gets a new id, so the top row changes, so the top tree gets a new id. **Three objects renamed by one edit** - which is exactly what makes the next object, the commit, able to stand for your whole project with a single id.",
-        objects: { lens: "chain", acts: NESTED_EDITED, fresh: 3, note: "one edit at the bottom, three new ids up the chain" }
+        narr: "Because names come from contents, a change never stays where it happened. A different byte in `docs/guide.md` makes a different blob id, which changes a row in the `docs` tree, which changes that tree's id, which changes a row in the top tree. One edit, three renamed objects - and the top id now stands for every byte beneath it.",
+        objects: { lens: "chain", acts: NESTED_EDITED, fresh: 3, note: "the top id summarises everything under it" }
       }
     ]
   };
