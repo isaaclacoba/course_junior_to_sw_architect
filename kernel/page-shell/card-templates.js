@@ -160,16 +160,25 @@
       </section>`;
   }
 
-  // The git practice scaffold. Ratified layout (docs/architecture/git-track.md,
-  // "Practical page UX", 2026-08-04): the graph and its working area are one
-  // full-width widget host, the terminal sits UNDER it, and the action row is
-  // Reset + Show solution. Two deliberate absences: there is NO Check button
-  // (every Enter in the terminal re-checks the goal), and no "Show whole target"
-  // button - git-plugin.js creates that one into the Actions host itself, since
-  // it owns the toggled label.
+  // The git practice scaffold. Two columns (docs/architecture/git-track.md,
+  // "Practical page UX", owner-ratified 2026-08-06 from a real-widget mockup):
+  // the live goal tracker sits in a sticky left column and the work - graph,
+  // working area, terminal - fills the right, mirroring the build card so a
+  // learner meets ONE layout on both tracks.
+  //
+  // The card takes `card--split` for the same reason the build card does, and
+  // here it is load-bearing rather than cosmetic: measured across all git cards
+  // the widest graph is 640px, and inside the 980px reading column a two-column
+  // card clips the graph on most of the wide cards. SUPERSEDES the 2026-08-04
+  // "terminal under one full-width widget" layout.
+  //
+  // Two deliberate absences remain: there is NO Check button (every Enter in the
+  // terminal re-checks the goal), and no "Show whole target" button -
+  // git-plugin.js creates that one into the Actions host itself, since it owns
+  // the toggled label.
   function gitCard(p) {
     return `
-      <section class="card" aria-live="polite">
+      <section class="card card--split" aria-live="polite">
         <header class="challenge-head">
           <div>
             <p id="${p}Meta" class="meta"></p>
@@ -182,25 +191,31 @@
           </div>
         </header>
 
-        <section class="coach">
-          <h3${tAttr("card.goal")}>${tHtml("card.goal", "Goal")}</h3>
-          <ul id="${p}Goal" class="coach-list"></ul>
-        </section>
+        <div class="git-split">
+          <div class="git-col git-col--brief">
+            <section class="coach">
+              <h3${tAttr("card.goal")}>${tHtml("card.goal", "Goal")}</h3>
+              <ul id="${p}Goal" class="coach-list"></ul>
+            </section>
+          </div>
 
-        <section class="git-stage">
-          <div id="${p}Graph" class="git-graph-host"></div>
-          <div id="${p}Terminal" class="git-terminal-host"></div>
-        </section>
+          <div class="git-col git-col--work">
+            <section class="git-stage">
+              <div id="${p}Graph" class="git-graph-host"></div>
+              <div id="${p}Terminal" class="git-terminal-host"></div>
+            </section>
 
-        <section id="${p}Actions" class="actions">
-          <button id="${p}Reset" class="btn" type="button"${tAttr("nav.reset")}>${tHtml("nav.reset", "Reset")}</button>
-          <button id="${p}Solution" class="btn danger" type="button"${tAttr("nav.solution")}>${tHtml("nav.solution", "Show Solution")}</button>
-        </section>
+            <section id="${p}Actions" class="actions">
+              <button id="${p}Reset" class="btn" type="button"${tAttr("nav.reset")}>${tHtml("nav.reset", "Reset")}</button>
+              <button id="${p}Solution" class="btn danger" type="button"${tAttr("nav.solution")}>${tHtml("nav.solution", "Show Solution")}</button>
+            </section>
 
-        <section id="${p}Result" class="result-panel" hidden>
-          <h3 id="${p}ResultTitle"></h3>
-          <p id="${p}ResultBody"></p>
-        </section>
+            <section id="${p}Result" class="result-panel" hidden>
+              <h3 id="${p}ResultTitle"></h3>
+              <p id="${p}ResultBody"></p>
+            </section>
+          </div>
+        </div>
 
         <section id="${p}Summary" class="summary-section" hidden>
           <p id="${p}SummaryIntro" class="context"></p>

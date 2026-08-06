@@ -571,6 +571,7 @@ ${result.runtimeError}`.trim(),
         tabSize: 4,
         insertSpaces: true,
         scrollBeyondLastLine: false,
+        wordWrap: opts.wordWrap ? "on" : "off",
         bracketPairColorization: { enabled: true },
         // Breathing room so the first and last lines are not welded to the frame.
         // This is Monaco's OWN padding, not CSS on the host: `getContentHeight`
@@ -4510,7 +4511,14 @@ Resolving a rebase by hand is not part of this course yet - use \`git merge\` in
       this.editorPath = path;
       const editor = new MonacoEditor();
       this.editor = editor;
-      void loadMonaco().then(() => editor.mount(host, { value: text, language: "plaintext", readOnly: false })).catch(() => {
+      void loadMonaco().then(
+        () => editor.mount(host, {
+          value: text,
+          language: "plaintext",
+          readOnly: false,
+          wordWrap: true
+        })
+      ).catch(() => {
         host.innerHTML = `<pre class="cl-git-fp-body">${escapeHtml4(text)}</pre><p class="cl-git-fp-ft">The editor could not load - use the buttons above.</p>`;
         this.editor = null;
       });
@@ -4601,8 +4609,11 @@ Resolving a rebase by hand is not part of this course yet - use \`git merge\` in
       this.headEl.dataset.ref = "HEAD";
       this.headEl.hidden = true;
       this.graphWrap.append(this.svg, this.chipLayer, this.headEl);
+      this.graphViewport = document.createElement("div");
+      this.graphViewport.className = "cl-git-viewport";
+      this.graphViewport.append(this.graphWrap);
       this.filePanel = new GitFilePanel();
-      this.root.append(this.graphWrap, this.buildWorkArea(), this.filePanel.el);
+      this.root.append(this.graphViewport, this.buildWorkArea(), this.filePanel.el);
       this.root.addEventListener("click", this.onClick);
       host.appendChild(this.root);
       this.state = opts.state;

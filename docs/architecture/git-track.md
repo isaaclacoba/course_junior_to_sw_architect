@@ -74,8 +74,24 @@ model (this track) and real-git-WASM (next track) share one visual, `RepoState` 
   Buttons are **Reset** (restore the card's start state + clear the terminal) and **Show
   solution** (print the commands). A general hint system is separate cross-widget work.
   SUPERSEDES the earlier "explicit Check button" decision.
-- **Layout: terminal UNDER the widget**, keeping graph + working-area together and full
-  width. No separate target panel is needed (see below), which removes the alignment problem.
+- **Layout: two columns - goal tracker left, work right** (owner-ratified 2026-08-06,
+  SUPERSEDES the 2026-08-04 "full-width widget, terminal under it"). The tracker sits beside
+  the work exactly as it does on a build card, so a learner meets one layout on both tracks;
+  inside the right column the terminal still sits UNDER the graph + working-area. No separate
+  target panel is needed (see below), which removes the alignment problem.
+  The card must carry `card--split` (the build card's `min(1320px, 94vw)` breakout): measuring
+  all 24 real cards gives graph widths of 128-640px, and at the plain 980px reading width a
+  two-column card clips the 640px merge graph on 3 of 5 corner cases. Below 1080px the two
+  columns collapse back to one.
+  Rejected (mockup-proven): a full-width terminal spanning both columns - it lands BELOW the
+  action buttons; and a narrow 20rem goal column - it still clips 1 case in 5 at 980px.
+- **A long history scrolls, it does not spill.** The graph grows 128px per commit and never
+  wraps, so code-lab wraps it in `.cl-git-viewport` (`git-graph-view.ts`), which stays
+  column-width and scrolls sideways. Only the graph moves - the three working-area zones and
+  the file panel below stay put. The theory track's stepped `repo` scenes inherit this.
+- **The conflicted-file editor wraps.** That panel is a narrow, prose-ish buffer, so it mounts
+  Monaco with `wordWrap: true`; a learner never scrolls sideways to read a conflict marker
+  they are being asked to edit. Build lessons keep wrap OFF - wrapping C# makes indentation lie.
 - **The target is drawn IN PLACE - one canvas laid out from the target.** Commits the learner
   has are solid; commits still missing are **ghosted** in the slot they will occupy;
   commits the learner made that the target does not contain are **flagged** (red dashed).

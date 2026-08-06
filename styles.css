@@ -2098,6 +2098,39 @@ input.almost {
    =================================================================== */
 
 /* ---- MemoryViz shell: its own tokens, narration, controls, legend --- */
+/* The git board. code-lab ships a LIGHT-ONLY palette on `.cl-git`, and nothing
+   re-pointed it, so on a dark page the board kept painting its ink at #1f2430 -
+   measured 1.2:1 against the page, which is invisible rather than merely dim.
+   Re-point the widget's own tokens and every rule inside it follows; the rules
+   are ancestor-qualified so they win regardless of stylesheet order. */
+[data-theme="dark"] .cl-git {
+  --clg-bg: var(--bg-2);
+  --clg-node: var(--bg-3);
+  --clg-ink: var(--ink);
+  --clg-muted: var(--ink-soft);
+  --clg-line: var(--line);
+  /* The lane colours are deliberately NOT lifted. They are chip BACKGROUNDS
+     under white text, so a lighter lane reads worse, not better - measured
+     2.9:1 on a lifted indigo against 4.6:1 on the shipped one. They are
+     saturated enough to hold up against a dark page as lines and dots. */
+  --clg-tag: #fbbf24;
+  /* Stays DARK on purpose - this token is a chip BACKGROUND under white text. */
+  --clg-head: #3f4757;
+  --clg-mod: #fbbf24;
+  --clg-untracked: #b4bcc8;
+  --clg-staged: #4ade80;
+  --clg-committed: #9aa4b2;
+  --clg-danger: var(--danger);
+  /* A ghost has to survive a dark background, where 0.26 reads as absent. */
+  --clg-ghost-opacity: 0.4;
+}
+
+/* The one colour in the widget that is not a token: a near-white pill, which on
+   a dark page put light text on white. */
+[data-theme="dark"] .cl-git .cl-git-kbd {
+  background: var(--bg-3);
+}
+
 [data-theme="dark"] .cl-mv {
   --mv-ink: var(--ink);
   --mv-muted: var(--ink-soft);
@@ -2245,4 +2278,61 @@ input.almost {
    they touch the Goal box above. Same 1rem every other card section gets. */
 .git-stage {
   margin-top: 1rem;
+}
+
+/* --- the git practical card: two columns ------------------------------------
+   Owner-ratified 2026-08-06 (docs/architecture/git-track.md) from a real-widget
+   mockup: the goal tracker sits beside the work, exactly as it does on a build
+   card, so a learner meets one layout on both tracks. The card itself carries
+   `card--split`, which is load-bearing here - the widest real graph is 640px and
+   would clip inside the 980px reading column. */
+.git-split {
+  display: grid;
+  grid-template-columns: minmax(0, 27rem) minmax(0, 1fr);
+  gap: 1.1rem;
+  align-items: start;
+  margin-top: 1rem;
+}
+
+.git-col {
+  min-width: 0;
+}
+
+/* The tracker follows the learner down a long terminal session, and scrolls on
+   its own when a card carries more goals than the viewport is tall. */
+.git-col--brief {
+  position: sticky;
+  top: 0.8rem;
+  max-height: calc(100vh - 1.6rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.git-col--brief .coach {
+  margin-top: 0;
+}
+
+.git-col--work .git-stage {
+  margin-top: 0;
+}
+
+/* The graph outgrows its column on a long history, and it scrolls sideways
+   rather than spilling over the card. That is code-lab's own `.cl-git-viewport`
+   (see `git-graph-view.ts`), so the theory track's stepped `repo` scenes get the
+   same behaviour - there is nothing to add here. */
+
+@media (max-width: 1080px) {
+  .git-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .git-col--brief {
+    position: static;
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .git-col--work .git-stage {
+    margin-top: 1.2rem;
+  }
 }
