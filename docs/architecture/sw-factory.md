@@ -4,11 +4,11 @@ Status: built warn-only as `tools/factory.mjs`; hooks wired, delivery unconfirme
 Ratified 2026-08-06, 22 decisions. Progress: `docs/plans/sw-factory.md`.
 ## The problem, measured
 
-The way of working is written down and largely ignored. Not a feeling - across
-385 commits, of the 16 briefs in `docs/plans/`, **11 (69%) first appear in a
-commit that also ships implementation code**; the worst shipped with 54 code
-files. Caveat: a brief authored early but committed late looks identical to one
-written afterwards, so this bounds the problem without proving intent.
+The way of working is written down and largely ignored. Not a feeling - of the 16
+briefs in `docs/plans/`, **11 (69%) first appear in a commit that also ships
+implementation code**; the worst shipped with 54 code files. Caveat: a brief
+authored early but committed late looks identical to one written afterwards, so
+this bounds the problem without proving intent.
 
 The cause is not laziness. Every layer of the WoW is advisory: the instruction
 files auto-load every turn but cannot stop anything; skills may simply not fire;
@@ -28,10 +28,9 @@ is an absent one) and by delivery not yet being proven here (see Risks).
 
 It is still not a framework. "Agentic pipeline" appears in marketing with **no
 source code or case study behind it**, and the vendors argue the other way:
-Anthropic warns frameworks "obscure the underlying prompts and responses",
-AutoGen says optimise a single agent first, and instruction files over ~200 lines
-**measurably reduce adherence**. At one repo with one owner, the state machine is
-a text file.
+Anthropic warns frameworks "obscure the underlying prompts and responses", AutoGen
+says optimise a single agent first, and instruction files over ~200 lines
+**measurably reduce adherence**. Here, the state machine is a text file.
 
 ## Who runs each state
 
@@ -62,9 +61,9 @@ the agent cannot advance by claiming to have advanced (`D-3`).
 `idle -> building` is not a legal transition; that single illegal edge is the
 whole point of the machine (`D-4`). `recall` is state 1 because the failure it
 prevents happened *during this design round* - the agent proposed blocking hooks
-without noticing `D-wow-enforcement-6` had already rejected exactly that (`D-10`,
-`D-11`). Only `deciding -> specifying` requires a human: an agent judging its own
-ambiguity judges it near zero (`D-9`).
+without noticing `D-wow-enforcement-6` had rejected exactly that (`D-10`, `D-11`).
+Only `deciding -> specifying` needs a human: an agent judging its own ambiguity
+judges it near zero (`D-9`).
 
 **`untracked` is not a seventh state.** The first three rungs read the journal,
 which no work predating it can satisfy; those features are listed in
@@ -78,28 +77,24 @@ to demand (`D-15`). A feature opts back in by being deleted from the list (`D-19
 Every task enters the FSM (`D-6`), but entering is not walking the full ladder -
 otherwise a typo needs a brief, the friction every git hook was deleted to escape.
 
-A task **fast-paths straight to `building`** only when all three hold (`D-7`):
-
-- it creates no new file,
-- it touches 3 files or fewer,
-- it touches nothing under `.github/`, `kernel/`, `code-lab/`, `tools/`.
+A task **fast-paths straight to `building`** only when all three hold (`D-7`): it
+creates no new file, touches 3 files or fewer, and touches nothing under
+`.github/`, `kernel/`, `code-lab/` or `tools/`.
 
 The thresholds are measured: across 385 commits the median touches 4 files, so
 `<=3` (46%) deliberately sends the *typical* change down the full ladder.
 
-**The anti-gaming rule is load-bearing.** Classification is continuous, not a
-one-time declaration - the FSM re-measures on every edit and escalates the moment
-a threshold is crossed. The agent cannot declare "trivial" and then write 40 files.
+**The anti-gaming rule is load-bearing.** Classification is continuous - the FSM
+re-measures on every edit and escalates the moment a threshold is crossed, so the
+agent cannot declare "trivial" and then write 40 files.
 
 ## Attribution
 
 Two sessions share this tree and the `master` branch, so a tree-global FSM would
 warn this agent for the other's edits, and a branch cannot tell them apart. Work
 is attributed by **path** (`D-8`): journal rows carry `feature=`, the two `docs/`
-files carry the slug in the filename, and from `building` onward the brief
-declares its paths in `## Owns`.
-
-Two consequences worth having: a file **no brief claims** cannot be attributed -
+files carry the slug, and from `building` on the brief declares its paths in
+`## Owns`. Two consequences worth having: a file **no brief claims** cannot be attributed -
 exactly the drift being hunted, so it becomes the warning - and when **two briefs
 claim one path**, both sessions get warned.
 
@@ -118,16 +113,16 @@ Nothing here may touch git, CI, a commit or a push. `SessionStart`, `PostToolUse
 and `Stop` are wired; `PreToolUse` deliberately is not - fail-closed, a broken one
 denies tool calls account-wide (`D-21`).
 
-**Warn-only first; blocking only after we have watched it** (`D-1`). Warn-only
-produces the data we lack - does the FSM identify the phase *correctly*? A wrong
-warning costs a line of text; a wrong denial strands the agent mid-task. Each
-sweep is recorded to `docs/journal/factory/`, so the answer is measured over time
-rather than argued (`D-17`).
+**Warn-only first; blocking only after we have watched it** (`D-1`). It produces
+the data we lack - does the FSM identify the phase *correctly*? A wrong warning
+costs a line of text; a wrong denial strands the agent mid-task. Each sweep is
+recorded to `docs/journal/factory/`, so the answer is measured, not argued (`D-17`).
 
 ## What the owner sees
 
 Three shapes, mocked up against real state and measured (`D-5`) - which caught
-what prose hid: the ladder wrapped at 83 columns, since refitted.
+what prose hid: the ladder wrapped at 83 columns, since refitted. The rail names
+the agent for the current state; it is the only link from the FSM to the agents.
 
 | Shape | Lines | Widest | When |
 |---|---|---|---|
@@ -137,14 +132,18 @@ what prose hid: the ladder wrapped at 83 columns, since refitted.
 
 ## Risks
 
-- **Hooks fire; repo-level discovery is unproven.** A probe logged `sessionStart`
-  and `postToolUse`, so hooks load at session start; `.github/hooks/` discovery is
-  wired but unconfirmed. Until then the FSM is a command the agent runs.
-- **Timeouts are fail-open**, so the derivation must stay fast - it reads parquet
-  and a few file paths, nothing more.
+- **Hooks fire; live delivery is unproven.** A probe logged `sessionStart` and
+  `postToolUse`. `.github/hooks/*.json` is a documented discovery location (the
+  CLI ships `agent-customization/references/hooks.md`), but ours has not been seen
+  to fire. Until it is, the FSM is a command the agent runs.
+- **Timeouts are fail-open**, so the derivation stays fast - parquet and a few
+  file paths, nothing more.
 - **A gate that greps for a word is trivially gamed.** Every check reads
   artifacts, never the agent's prose.
+- **Exit code 2 is BLOCKING.** `factory hook` exits 0 on every path, including
+  malformed stdin, and emits only `systemMessage` / `additionalContext` (`D-1`).
 - **The briefs themselves rot.** `wow-enforcement` shipped all 5 deliverables with
   0 of 5 steps ticked, so `building` under-reports. The `Stop` hook reminds the
-  agent to tick, comparing against `git show HEAD:<brief>` - not "was it touched".
-- **Context rot.** The FSM should replace advisory prose, not pile on top of it.
+  agent to tick, comparing against `git show HEAD:` - not "was the file touched".
+- **Context rot.** The FSM should replace advisory prose, not pile on top of it -
+  and it has not deleted any yet. That is the debt this leaves behind.

@@ -524,10 +524,20 @@ export function renderGate(s, problems) {
 // here prints JSON and exits 0; a thrown error prints `{}` so a bug in this file
 // can never disturb a session (its own or anyone else's).
 //
-// The contract, taken from a shipping repo-level example rather than docs:
+// The contract, from the reference the CLI itself ships (agent-customization
+// skill, references/hooks.md) plus a shipping repo-level example:
 //   stdin   the event as JSON (tool_name, cwd, session_id, stop_hook_active)
 //   stdout  {} for silence, or { hookSpecificOutput: { hookEventName, ... } }
-//   speak   additionalContext to inform, decision "warn" + reason to nudge
+//   inform  hookSpecificOutput.additionalContext - injects text into the session
+//   warn    top-level `systemMessage` - the documented non-blocking channel
+// `decision: "warn"` was an INFERENCE from an example and is NOT in the shipped
+// contract (which documents only PostToolUse `decision: block`), so a warning
+// sent that way would most likely never be shown. Both fields are emitted:
+// `systemMessage` because it is documented, `additionalContext` because it is
+// how the SessionStart rail is known to arrive.
+//
+// Exit codes matter more than the payload: 0 = success, 2 = BLOCKING error,
+// anything else = a non-blocking warning. This tool exits 0 always (D-1).
 const HOOK_EVENTS = new Set(["SessionStart", "PostToolUse", "Stop", "SubagentStop"]);
 const READ_ONLY_TOOLS = new Set([
   "view", "read", "read_file", "readFile", "grep", "glob", "search", "search_files",
@@ -537,7 +547,10 @@ const READ_ONLY_TOOLS = new Set([
 
 const speak = (event, extra) => ({ hookSpecificOutput: { hookEventName: event, ...extra } });
 const context = (event, text) => speak(event, { additionalContext: text });
-const warn = (event, reason) => speak(event, { decision: "warn", reason });
+const warn = (event, reason) => ({
+  systemMessage: reason,
+  ...speak(event, { additionalContext: reason }),
+});
 
 // PostToolUse fires on every tool call, so it must stay journal-free and must
 // only speak when the lane actually FLIPS - a line on every call is noise.
@@ -928,6 +941,20 @@ async function selftest() {
   // the previous run's lane into this one
   t("hook: a read-only tool costs nothing", Object.keys(await runHook("PostToolUse", { tool_name: "view" })).length === 0);
   t("hook: `bash` is never skipped - it writes", !READ_ONLY_TOOLS.has("bash"));
+  // The payload shape is only worth asserting against the contract the CLI ships
+  // (agent-customization skill, references/hooks.md). `decision: "warn"` was an
+  // inference from an example, is not documented, and would most likely be dropped.
+  const spoken = warn("Stop", "sample warning");
+  t("hook: a warning uses the documented `systemMessage` channel",
+    spoken.systemMessage === "sample warning", JSON.stringify(spoken));
+  t("hook: a warning never sends the undocumented `decision` field",
+    !("decision" in spoken) && !("decision" in (spoken.hookSpecificOutput ?? {})), JSON.stringify(spoken));
+  t("hook: a warning also injects context, the one channel proven to arrive",
+    spoken.hookSpecificOutput?.additionalContext === "sample warning", JSON.stringify(spoken));
+  // ok- control: nothing anywhere may ask to BLOCK or DENY. Warn-only is D-1.
+  const anyBlock = JSON.stringify([spoken, context("SessionStart", "x")]);
+  t("ok-hook: no payload ever blocks or denies",
+    !/"(decision|permissionDecision)"\s*:\s*"(block|deny)"/.test(anyBlock), anyBlock);
   for (const w of ["edit", "create", "str_replace", "editFiles", "createFile"])
     t(`hook: ok-${w} is not skipped`, !READ_ONLY_TOOLS.has(w));
   const sid = `sel-${randomBytes(4).toString("hex")}`;

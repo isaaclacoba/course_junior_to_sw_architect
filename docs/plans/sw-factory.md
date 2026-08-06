@@ -45,9 +45,11 @@ and auto-escalate if they grow.
 19. [x] Tick reminder (`D-20`) - verify: compares ticked steps against `HEAD`, warns with a real tick missing and goes silent when one is added; 6 `ok-` controls
 20. [x] Hooks wired: `SessionStart` + `PostToolUse` + `Stop`, never `PreToolUse` (`D-16`/`D-21`) - verify: all three return valid JSON and exit 0 through the wrapper with no `node` on `PATH`; sabotaging `PreToolUse` and `stop_hook_active` both fail the selftest
 21. [x] One agent per state + 2 specialists (`D-22`) - verify: 8 files with valid frontmatter, `name` matching the filename and a >60ch description; `architect` vs `deciding` description overlap cut from 10 shared words to 4; every description declares STATE or specialist
-22. [ ] Confirm the hooks actually fire in a live session - verify: a `SessionStart` rail appears in a NEW session
+22. [x] Hook payload matched against the contract the CLI itself ships - verify: warnings moved off the undocumented `decision: "warn"` onto `systemMessage`; 4 assertions + an `ok-` control that no payload ever blocks or denies; both sabotages fail; 6 inputs incl. malformed all exit 0, never the blocking 2
+23. [ ] Confirm the hooks actually fire in a live session - verify: a `SessionStart` rail appears in a NEW session
 
 ## Progress
+- 2026-08-06 Found the CLI ships its own hook reference (`agent-customization/references/hooks.md`). It confirms `.github/hooks/*.json` is a real discovery location, and shows my warning field was invented: the contract documents `systemMessage`, `continue`, `stopReason` and a PostToolUse-only `decision: block`. The Stop warnings would most likely never have been shown.
 - 2026-08-06 Rail made self-sufficient: it now names WHICH agent runs the current state, which is the only thing linking the derivation to the six agent files.
 - 2026-08-06 Measured the failure: 69% of briefs ship with their code; 385 commits analysed for thresholds.
 - 2026-08-06 Found agent hooks CAN deny, which expires the 2026-08-03 red-team's premise. Verified against GitHub's docs directly, not via the subagent.
