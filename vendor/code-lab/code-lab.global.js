@@ -6033,6 +6033,7 @@ ${written}` : written;
       detail: scene.detail === "full" ? "full" : "core",
       open: OPENABLE.includes(scene.open) ? scene.open : void 0,
       openRaw: scene.openRaw === true,
+      focus: Array.isArray(scene.focus) ? scene.focus.filter((k) => typeof k === "string" && k) : [],
       note: scene.note,
       author: scene.author || DEFAULT_AUTHOR
     };
@@ -6276,7 +6277,7 @@ ${written}` : written;
       this.folderEl.hidden = !wantsFolder;
       this.chainEl.hidden = !wantsChain;
       const opened = scene.open ? openObject(replay, scene.open, scene.openRaw) : null;
-      if (wantsFolder) this.folderEl.innerHTML = folderHtml(replay, this.labels, scene.detail);
+      if (wantsFolder) this.folderEl.innerHTML = folderHtml(replay, this.labels, scene.detail, scene.focus);
       if (wantsChain) {
         const rows = chainRows(replay);
         this.chainEl.innerHTML = chainHtml(rows, this.labels, replay.store, opened ? opened.id : null);
@@ -6331,48 +6332,88 @@ ${written}` : written;
   function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
-  function folderHtml(replay, labels, detail) {
+  function folderHtml(replay, labels, detail, focus = []) {
     const { store, added } = replay;
+    const wanted = new Set(focus);
+    const row = (indent, keys, content) => {
+      const hit = (Array.isArray(keys) ? keys : [keys]).some((k) => wanted.has(k));
+      return indent + (hit ? `<span class="cl-ob-focus">${content}</span>` : content);
+    };
     const lines2 = [".git/"];
     if (detail === "full") {
-      lines2.push(`  ${dim("config")}`, `  ${dim("description")}`, `  ${dim("hooks/")}`, `  ${dim("info/")}`);
+      lines2.push(
+        row("  ", "config", dim("config")),
+        row("  ", "description", dim("description")),
+        row("  ", "hooks/", dim("hooks/")),
+        row("  ", "info/", dim("info/"))
+      );
     }
-    lines2.push("  objects/");
-    if (detail === "full") lines2.push(`    ${dim("info/")}`, `    ${dim("pack/")}`);
+    lines2.push(row("  ", "objects/", "objects/"));
+    if (detail === "full") {
+      lines2.push(
+        row("    ", "objects/info/", dim("info/")),
+        row("    ", "objects/pack/", dim("pack/"))
+      );
+    }
     if (!store.objects.size) lines2.push(`    ${dim(escapeHtml4(labels.objEmpty))}`);
     for (const [id, object] of store.objects) {
       const tinted = `<span class="cl-ob-id ${tintClass(id, store)}">${id.slice(0, 2)}/${id.slice(2, 8)}...</span>`;
-      const body = `${tinted}  <span class="cl-ob-type">${object.type}</span>`;
-      lines2.push(`    ${added.has(id) ? `<span class="cl-ob-new">${body}</span>` : body}`);
+      const body = `${tinted}  <span class="cl-ob-type">${object.type.padEnd(6)}</span>${linksHtml(object, store)}`;
+      lines2.push(row(
+        "    ",
+        [id, short(id), object.type],
+        added.has(id) ? `<span class="cl-ob-new">${body}</span>` : body
+      ));
     }
-    lines2.push("  refs/heads/");
+    lines2.push(row("  ", "refs/heads/", "refs/heads/"));
     if (!store.refs.size) lines2.push(`    ${dim(escapeHtml4(labels.objNoNames))}`);
     const headRef = store.head.kind === "ref" ? store.head.ref : null;
     for (const [name, id] of store.refs) {
       const shortName = escapeHtml4(name.replace(/^refs\/heads\//, ""));
       const marker = headRef === name ? ` <span class="cl-ob-head" data-head="${escapeAttr(name)}">\u25C2 HEAD</span>` : `<span class="cl-ob-head" data-head="${escapeAttr(name)}" style="opacity:0">\u25C2 HEAD</span>`;
-      lines2.push(`    <span class="cl-ob-ref">${shortName}</span>   ${tintId(id, store)}${marker}`);
+      lines2.push(row(
+        "    ",
+        [name, shortName],
+        `<span class="cl-ob-ref">${shortName}</span>   ${tintId(id, store)}${marker}`
+      ));
     }
-    if (detail === "full") lines2.push(`  ${dim("refs/tags/")}`);
+    if (detail === "full") lines2.push(row("  ", "refs/tags/", dim("refs/tags/")));
     const headLine = store.head.kind === "ref" ? `ref: ${store.head.ref}` : tintId(store.head.id, store);
-    lines2.push(`  HEAD    ${dim(escapeHtml4(headLine))}`);
+    lines2.push(row("  ", "HEAD", `HEAD    ${dim(escapeHtml4(headLine))}`));
     if (store.index.size) {
-      lines2.push("  index");
+      lines2.push(row("  ", "index", "index"));
       for (const [path, id] of store.index) {
-        lines2.push(`    ${dim(`${escapeHtml4(path)}  `)}${tintId(id, store)}`);
+        lines2.push(row(
+          "    ",
+          `index/${path}`,
+          `${dim(`${escapeHtml4(path)}  `)}${tintId(id, store)}`
+        ));
       }
     }
     if (store.worktree.size) {
-      lines2.push("", escapeHtml4(labels.objYourFolder));
+      lines2.push("", row("", "your folder", escapeHtml4(labels.objYourFolder)));
       const width = Math.max(...[...store.worktree.keys()].map((p) => p.length));
       for (const [path, text] of store.worktree) {
         const firstLine = text.split("\n")[0];
         const shown = firstLine.length > 30 ? `${firstLine.slice(0, 29)}\u2026` : firstLine;
         const pad = " ".repeat(width - path.length);
-        lines2.push(`  ${escapeHtml4(path)}${pad}   ${dim(escapeHtml4(shown))}`);
+        lines2.push(row("  ", path, `${escapeHtml4(path)}${pad}   ${dim(escapeHtml4(shown))}`));
       }
     }
     return lines2.join("\n");
+  }
+  function linksHtml(object, store) {
+    const parts = [];
+    for (const entry of object.entries ?? []) {
+      parts.push(`${dim(escapeHtml4(entry.name))} ${tintId(entry.id, store)}`);
+    }
+    if (object.commit) {
+      parts.push(`${dim("tree")} ${tintId(object.commit.tree, store)}`);
+      for (const parent of object.commit.parents) {
+        parts.push(`${dim("parent")} ${tintId(parent, store)}`);
+      }
+    }
+    return parts.length ? ` ${parts.join("  ")}` : "";
   }
   function dim(text) {
     return `<span class="cl-ob-dim">${text}</span>`;
