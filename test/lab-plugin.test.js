@@ -19,6 +19,9 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+const repoRoot = path.join(__dirname, "..");
 
 const LessonCommon = require("../kernel/page-shell/lesson-common.js");
 const LessonEngine = require("../kernel/engine/lesson-engine.js");
@@ -81,8 +84,18 @@ function makeCodeLab() {
           setSource(code) { this.sources.push(code); },
           getSource() { return this.sources[this.sources.length - 1] || ""; },
           destroy() { this.destroyed = true; },
-          // The test's handle on "the learner pressed Visualize".
-          fireTrace(outcome) { cfg.onTrace(outcome); },
+          // The test's handle on "the learner pressed Visualize" - the press
+          // AND the trace that arrives seconds later, in that order, because
+          // the plugin stamps the run with the card it started on. `surface` is
+          // set by the plugin on mount; without the press the trace belongs to
+          // no card and is correctly ignored.
+          fireTrace(outcome) {
+            if (this.beginRun) this.beginRun();
+            this.deliverTrace(outcome);
+          },
+          // Just the trace, with no press in front of it - how a test models a
+          // trace that arrives late, after the learner has moved on.
+          deliverTrace(outcome) { cfg.onTrace(outcome); },
         };
         created.push(lab);
         return lab;
@@ -335,4 +348,49 @@ test("the compiler host url is prefixed for a lesson four directories deep", asy
       "a migrated lesson reaches back to the root, or the runner 404s and Run does nothing",
     );
   });
+});
+
+// The plugin hands VizLab a bag of labels keyed by VizLabels' own field names.
+// A key that is not one is not an error anywhere - the widget just does not find
+// it, keeps its English default, and the label renders in English on a Spanish
+// page. Seven such names shipped once (`hpStack`, `hpHeap`, `consoleTitle`, and
+// three `hpFrame*`), which is exactly how the memory panel stayed English.
+test("every label key the plugin forwards is a real VizLabels field", () => {
+  const src = fs.readFileSync(
+    path.join(repoRoot, "kernel", "engine", "plugins", "lab-plugin.js"), "utf8");
+  const listed = /var LAB_LABEL_KEYS = \[([\s\S]*?)\];/.exec(src);
+  assert.ok(listed, "LAB_LABEL_KEYS must stay greppable");
+  const keys = [...listed[1].matchAll(/"([^"]+)"/g)].map((m) => m[1]);
+  assert.ok(keys.length > 20, "the list should not have quietly emptied");
+
+  const model = fs.readFileSync(
+    path.join(repoRoot, "code-lab", "src", "core", "memory-model.ts"), "utf8");
+  const defaults = /DEFAULT_VIZ_LABELS[^{]*\{([\s\S]*?)\n\};/.exec(model);
+  assert.ok(defaults, "DEFAULT_VIZ_LABELS must stay greppable");
+  const real = new Set([...defaults[1].matchAll(/^\s{2}([A-Za-z][A-Za-z0-9]*):/gm)].map((m) => m[1]));
+
+  const unknown = keys.filter((k) => !real.has(k));
+  assert.deepEqual(unknown, [],
+    "these keys are not VizLabels fields, so the widget silently ignores them");
+});
+
+test("a trace that lands after the learner moved on does not pass the new card", async () => {
+  // The real timing bug: Visualize is pressed on card one, the learner clicks
+  // Next while the compiler is still tracing, and the trace arrives with card
+  // two on screen. Graded naively, card two reports a pass nobody earned.
+  await withDom("tt", async (dom, codeLab) => {
+    const controller = LessonEngine.create(labConfig([
+      { title: "card one", starter: "// one", gates: [{ constructed: "Cat", times: 2 }] },
+      { title: "card two", starter: "// two", gates: [{ constructed: "Dog", times: 9 }] },
+    ]));
+    await controller.boot();
+    const lab = codeLab._created[0];
+
+    lab.beginRun();
+    dom.getElementById("ttNext").click();
+    lab.deliverTrace(TRACED);
+
+    assert.equal(dom.getElementById("ttResult").hidden, true, "card two shows no verdict at all");
+    assert.equal(LessonCommon.storage.getItem("tt_awarded"), null, "and awards nothing");
+  }, { matcher: YES_MATCHER });
 });

@@ -92,11 +92,17 @@
   // VizLab's own chrome + the MemoryViz panel labels it passes down, as viz.*
   // keys. Absent keys keep code-lab's English defaults, so the default language
   // stays byte-identical. Same mechanism as viz-plugin's applyVizLabels.
+  // These MUST be the field names on code-lab's own VizLabels - a name that is not
+  // one (this list once carried `hpStack`, `hpHeap`, `consoleTitle` and three
+  // `hpFrame*` that never existed) is silently dropped by the widget, so the label
+  // renders in English on a Spanish page and nothing anywhere complains.
+  // `test/lab-plugin.test.js` asserts every key here is a real VizLabels field.
   var LAB_LABEL_KEYS = [
     "prev", "play", "pause", "next", "nextLesson", "reset", "step",
     "textSize", "textSmall", "textDefault", "textLarge",
-    "hpMemory", "hpStack", "hpHeap", "hpFrameCtor", "hpFrameMethod", "hpFrameStatic",
-    "consoleTitle", "consoleEmpty",
+    "hpMemory", "hpMemoryNote", "hpStatics", "hpStaticsNote", "hpConstants", "hpConstantsNote",
+    "hpKindEntry", "hpKindStatic", "hpKindMethod", "hpKindCtor", "hpOn", "hpPaused",
+    "consoleHead", "consoleIdle",
     "vlVisualize", "vlPreparing", "vlTracing", "vlHint", "vlNoSteps", "vlNoStepsHint",
     "vlDidNotCompile", "vlFailedHint", "vlTracedOne", "vlTracedMany", "vlTruncated", "vlThrew",
   ];
@@ -252,6 +258,14 @@
         taskIndex: 0,
         runPassed: false,
         lastOutcome: null,
+        // A trace takes seconds, and the learner can press Next while one is
+        // still running. `cardEpoch` counts card renders; `runEpoch` is the value
+        // stamped when Visualize was pressed. A trace whose stamp no longer
+        // matches belongs to a card that is off screen, and grading it would
+        // judge the new card on the old card's code - which passed card 2 before
+        // it had been read, let alone run.
+        cardEpoch: 0,
+        runEpoch: -1,
       };
 
       // The trace arrives when the learner presses Visualize, which is the only
@@ -264,6 +278,7 @@
         labels: labelsFromChrome() || undefined,
         narration: (ctx.cfg && ctx.cfg.narration) || undefined,
         onTrace: function (outcome) {
+          if (surface.runEpoch !== surface.cardEpoch) return; // a previous card's run
           surface.lastOutcome = outcome;
           var result = gradeOutcome(surface, surface.task, outcome);
           surface.runPassed = !!(result && result.ok);
@@ -274,6 +289,36 @@
 
       // The card's own two buttons. There is no Run button to bind - VizLab owns
       // Visualize, and that press is the run this card grades.
+      //
+      // They are also MOVED into VizLab's toolbar, next to Visualize. All three
+      // act on the same editor, so leaving Visualize alone above the editor and
+      // the other two in a row below reads as two unrelated controls; the learner
+      // has to look in two places for one set of actions.
+      // The test double is a plain object, not an element - so ask before calling.
+      var toolbar = (host && typeof host.querySelector === "function")
+        ? host.querySelector(".cl-vl-toolbar") : null;
+
+      // "A run started on the card that is on screen." The press and the trace
+      // are separate events seconds apart, so this is the only moment the run
+      // can be stamped with the card it belongs to. It hangs off the widget
+      // handle because the widget is what knows a run began - the click listener
+      // below is simply the browser's way of saying so.
+      surface.lab.beginRun = function () { LabPlugin.beginRun(surface); };
+
+      // Capture phase, so the stamp is set before VizLab's own handler runs.
+      var vizBtn = toolbar && toolbar.querySelector(".cl-vl-run");
+      if (vizBtn) {
+        vizBtn.addEventListener("click", surface.lab.beginRun, true);
+      }
+
+      if (toolbar && hosts.actions) {
+        var status = toolbar.querySelector(".cl-vl-status");
+        [hosts.solution, hosts.reset].forEach(function (btn) {
+          if (btn) toolbar.insertBefore(btn, status);
+        });
+        hosts.actions.hidden = true;
+      }
+
       if (hosts.solution) {
         hosts.solution.addEventListener("click", function () {
           LabPlugin.showSolution(surface, surface.task);
@@ -295,11 +340,20 @@
       surface.taskIndex = i;
       surface.runPassed = false;
       surface.lastOutcome = null;
+      surface.cardEpoch += 1; // any trace still in flight now belongs to no card
       // The core has just painted this card's goal list. Snapshot it BEFORE the
       // first sync, so the tracker never captures its own ticks as the prose.
       captureGoals(surface);
       if (surface.lab && surface.lab.setSource) surface.lab.setSource(task.starter || "");
       syncTracker(surface);
+    },
+
+    // "The learner pressed Visualize." The press and the trace are separate
+    // events seconds apart, so the run has to be stamped with the card it
+    // started on - see `cardEpoch`. This is the transition the button fires and
+    // the one a test must fire to model a press honestly.
+    beginRun: function (surface) {
+      surface.runEpoch = surface.cardEpoch;
     },
 
     // A lab card is graded from the trace, which arrives on the widget's own
