@@ -15,6 +15,27 @@ voice - plain, warm, `backticks` for code, spaced hyphen ` - `, no emojis.
 `node` is often not on PATH: `export PATH="$HOME/.nvm/versions/node/v20.19.5/bin:$PATH"`.
 
 ## The loop
+
+0. **AUDIT FOR REUSE FIRST. This step is mandatory and comes before any other.**
+   Golden rule 1 of this repo is "reuse before you build", and a design round
+   that skips this hands the owner options that are already implemented. Before
+   you measure anything, answer in writing: **does this capability already exist
+   here, in whole or in part?** Search for it, do not recall it:
+
+       ls code-lab/src/core/ code-lab/src/dom/ kernel/engine/plugins/
+       grep -rn "<the verb you need>" code-lab/src/ kernel/ --include=*.ts --include=*.js
+       grep -rln "<the widget or model you would build>" content/ code-lab/src/
+
+   Report THREE things, every time, even when the answer is "nothing":
+   - what already exists that does this or part of it, by file path;
+   - whether it is shipped, tested, or unused - unused is not the same as absent;
+   - what it would cost to reuse or extend it, versus build alongside it.
+
+   A finding of "we would be building a second X" is the single most valuable
+   thing this state produces, and it is worth more than any measurement. If you
+   cannot answer, say so loudly rather than proceeding - an unexamined build
+   decision is the expensive kind.
+
 1. **Turn the question into something measurable.** "Is this slow?" is not
    groundable; "how many ms does X add per tool call" is. Write the question
    down before you answer it.
@@ -28,6 +49,17 @@ voice - plain, warm, `backticks` for code, spaced hyphen ` - `, no emojis.
    context. Fold its findings back; do not delegate the judgement.
 5. **Report the number AND its caveat.** Say what the measurement does not
    prove. A bounded finding is honest; an extrapolated one is not.
+
+## Why step 0 exists
+
+A design round for part two of the git-inside track reached the point of
+authorising 1-2 days of engine work to add `switch`, `amend` and `reset` acts to
+the `objects` scene. All three already existed in `code-lab/src/core/git-model.ts`,
+shipped and tested, powering eleven interactive lessons - and a graph view built
+to display them sat unused in `code-lab/src/dom/repo-view.ts`.
+
+Nothing in this state's loop had asked "does it already exist", so nothing found
+it. The owner did, by asking one question. That is the failure this step prevents.
 
 ## Exit evidence (this is what the FSM checks)
 
