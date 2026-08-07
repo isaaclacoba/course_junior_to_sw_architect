@@ -2450,3 +2450,26 @@ table, then each guard watched failing before restore.
 typecheck clean; 550 tests, 549 pass - the one failure is the pre-existing
 objects-view.dom case, another line of work, untouched. Vendored bundle verified by
 loading it through a script tag and calling the new seams, not by grepping for names.
+
+## 2026-08-07 10:26 CEST - step 14, the lab plugin
+`kernel/engine/plugins/lab-plugin.js`. A lab card is a PRACTICE card, not a widget
+one - it has a task, goals, a verdict and XP, so it takes every piece of core chrome
+a build card takes. Only the body differs: CodeLab.VizLab instead of a bare editor,
+and a verdict read off the execution trace instead of off printed output. The stack
+is one-way and nothing was added to it: lab-plugin -> VizLab -> MemoryViz.
+
+VizLab needed `setSource`, which it had no way to do - it took its code once at
+create. Without it every card change would rebuild the widget, and rebuilding it
+warms a second compiler. That is the one code-lab change this step needed.
+
+The four not-traced statuses each get their own message and none reaches the
+matcher: a program that did not compile, threw, drew nothing, or met a compiler
+that never loaded has said nothing about the learner. Neither does a missing
+grading kernel - the card says the check could not run and blames us, rather than
+handing out XP for a check nobody performed.
+
+14 tests, then three sabotages watched failing: send a dead tracer to the matcher
+(2 fail), pass silently with no matcher loaded (1 fail), rebuild the widget per
+card (1 fail). Restored, 14/14. Repo suite 545/545. code-lab 550, one failure -
+the pre-existing objects-view case from another line of work, untouched. Vendored
+bundle checked by loading it in jsdom and reading the prototype, not by grepping.

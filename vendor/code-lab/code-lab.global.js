@@ -7192,6 +7192,21 @@ ${written}` : written;
     setStatus(text) {
       this.statusEl.textContent = text;
     }
+    /** Load a different exercise into the editor without tearing the widget down,
+     *  so a lesson can move between cards while keeping the one warmed compiler
+     *  this surface owns. Clears the stage back to its hint - the picture on
+     *  screen belongs to the code that produced it, never to the next exercise. */
+    setSource(code) {
+      this.editor.setValue(code);
+      if (this.editor.setMarkers) this.editor.setMarkers([]);
+      this.setStatus("");
+      this.showHint(this.labels.vlHint);
+    }
+    /** The learner's current code. A host grades the trace, not the text; this is
+     *  for saving work and for restoring it, not for marking. */
+    getSource() {
+      return this.editor.getValue();
+    }
     destroy() {
       this.teardownViz();
       this.editor.destroy();
