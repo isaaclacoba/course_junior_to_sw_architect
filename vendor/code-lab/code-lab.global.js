@@ -6253,6 +6253,7 @@ ${written}` : written;
   // src/dom/objects-view.ts
   var ObjectsView = class {
     constructor(labels = DEFAULT_VIZ_LABELS) {
+      this.prevStore = null;
       this.labels = labels;
       this.el = document.createElement("div");
       this.el.className = "cl-ob";
@@ -6275,7 +6276,7 @@ ${written}` : written;
       this.folderEl.hidden = !wantsFolder;
       this.chainEl.hidden = !wantsChain;
       if (wantsFolder) this.folderEl.innerHTML = folderHtml(replay, this.labels, scene.detail);
-      if (wantsChain) this.chainEl.innerHTML = chainHtml(chainRows(replay), this.labels);
+      if (wantsChain) this.chainEl.innerHTML = chainHtml(chainRows(replay), this.labels, replay.store);
       const opened = scene.open ? openObject(replay, scene.open, scene.openRaw) : null;
       this.openEl.hidden = !opened;
       if (opened) {
@@ -6286,8 +6287,47 @@ ${written}` : written;
       }
       this.noteEl.innerHTML = scene.note ? escapeHtml4(scene.note) : "";
       this.noteEl.hidden = !scene.note;
+      this.prevStore = replay.store;
+    }
+    /** Animate the transition between steps. Respects `prefers-reduced-motion`. */
+    async animate(model) {
+      const scene = resolveObjects(model.objects);
+      if (!scene || !this.prevStore) return;
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const replay = replayObjects(scene);
+      const prevHead = this.prevStore.head;
+      const currHead = replay.store.head;
+      if (prevHead.kind === "ref" && currHead.kind === "ref" && prevHead.ref !== currHead.ref) {
+        const oldMarker = this.folderEl.querySelector(`[data-head="${escapeAttr(prevHead.ref)}"]`);
+        const newMarker = this.folderEl.querySelector(`[data-head="${escapeAttr(currHead.ref)}"]`);
+        if (oldMarker && newMarker) {
+          oldMarker.style.opacity = "0";
+          newMarker.style.opacity = "1";
+          newMarker.classList.add("cl-ob-head-moved");
+          await sleep(600);
+          newMarker.classList.remove("cl-ob-head-moved");
+        }
+      }
     }
   };
+  var TINTS = 8;
+  function tintClass(id, store) {
+    let i = 0;
+    for (const key of store.objects.keys()) {
+      if (key === id) return `cl-ob-id-t${i % TINTS}`;
+      i++;
+    }
+    return "cl-ob-id-t0";
+  }
+  function tintId(id, store) {
+    return `<span class="cl-ob-id ${tintClass(id, store)}">${short(id)}</span>`;
+  }
+  function escapeAttr(value) {
+    return value.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
   function folderHtml(replay, labels, detail) {
     const { store, added } = replay;
     const lines2 = [".git/"];
@@ -6298,21 +6338,25 @@ ${written}` : written;
     if (detail === "full") lines2.push(`    ${dim("info/")}`, `    ${dim("pack/")}`);
     if (!store.objects.size) lines2.push(`    ${dim(escapeHtml4(labels.objEmpty))}`);
     for (const [id, object] of store.objects) {
-      const body = `${id.slice(0, 2)}/${id.slice(2, 8)}...  <span class="cl-ob-type">${object.type}</span>`;
+      const tinted = `<span class="cl-ob-id ${tintClass(id, store)}">${id.slice(0, 2)}/${id.slice(2, 8)}...</span>`;
+      const body = `${tinted}  <span class="cl-ob-type">${object.type}</span>`;
       lines2.push(`    ${added.has(id) ? `<span class="cl-ob-new">${body}</span>` : body}`);
     }
     lines2.push("  refs/heads/");
     if (!store.refs.size) lines2.push(`    ${dim(escapeHtml4(labels.objNoNames))}`);
+    const headRef = store.head.kind === "ref" ? store.head.ref : null;
     for (const [name, id] of store.refs) {
-      lines2.push(`    ${escapeHtml4(name.replace(/^refs\/heads\//, ""))}   ${dim(short(id))}`);
+      const shortName = escapeHtml4(name.replace(/^refs\/heads\//, ""));
+      const marker = headRef === name ? ` <span class="cl-ob-head" data-head="${escapeAttr(name)}">\u25C2 HEAD</span>` : `<span class="cl-ob-head" data-head="${escapeAttr(name)}" style="opacity:0">\u25C2 HEAD</span>`;
+      lines2.push(`    <span class="cl-ob-ref">${shortName}</span>   ${tintId(id, store)}${marker}`);
     }
     if (detail === "full") lines2.push(`  ${dim("refs/tags/")}`);
-    const headLine = store.head.kind === "ref" ? `ref: ${store.head.ref}` : short(store.head.id);
+    const headLine = store.head.kind === "ref" ? `ref: ${store.head.ref}` : tintId(store.head.id, store);
     lines2.push(`  HEAD    ${dim(escapeHtml4(headLine))}`);
     if (store.index.size) {
       lines2.push("  index");
       for (const [path, id] of store.index) {
-        lines2.push(`    ${dim(`${escapeHtml4(path)}  ${short(id)}`)}`);
+        lines2.push(`    ${dim(`${escapeHtml4(path)}  `)}${tintId(id, store)}`);
       }
     }
     if (store.worktree.size) {
@@ -6330,21 +6374,25 @@ ${written}` : written;
   function dim(text) {
     return `<span class="cl-ob-dim">${text}</span>`;
   }
-  function chainHtml(rows, labels) {
+  function chainHtml(rows, labels, store) {
     if (!rows.length) return `<p class="cl-ob-empty">${escapeHtml4(labels.objNothingYet)}</p>`;
+    const headRef = store.head.kind === "ref" ? store.head.ref : null;
     return rows.map((row) => {
       if (row.kind === "ref") {
-        return `<span class="cl-ob-ref">${escapeHtml4(row.label)}</span>`;
+        const shortName = escapeHtml4(row.label);
+        const fullRef = `refs/heads/${row.label}`;
+        const marker = headRef === fullRef ? ` <span class="cl-ob-head" data-head="${escapeAttr(fullRef)}">\u25C2 HEAD</span>` : `<span class="cl-ob-head" data-head="${escapeAttr(fullRef)}" style="opacity:0">\u25C2 HEAD</span>`;
+        return `<span class="cl-ob-ref">${shortName}</span>${marker}`;
       }
       const classes = ["cl-ob-row"];
       if (row.fresh) classes.push("cl-ob-fresh");
       if (row.unreachable) classes.push("cl-ob-orphan");
       const kind = row.unreachable ? `${escapeHtml4(row.label)} (${escapeHtml4(labels.objUnnamed)})` : escapeHtml4(row.label);
       const names = row.names.length ? ` ${escapeHtml4(labels.objNames)} ${row.names.map(
-        (n) => `<span class="cl-ob-role">${escapeHtml4(n.role)}</span><span class="cl-ob-names">${short(n.id)}</span>`
+        (n) => `<span class="cl-ob-role">${escapeHtml4(n.role)}</span><span class="cl-ob-names ${tintClass(n.id, store)}">${short(n.id)}</span>`
       ).join(" ")}` : "";
       const indent = row.depth > 0 ? ` style="margin-left:${row.depth * 1.1}rem"` : "";
-      return `<div class="${classes.join(" ")}"${indent}><span class="cl-ob-kind">${kind}</span><span class="cl-ob-id">${short(row.id)}</span><span class="cl-ob-body">${escapeHtml4(row.body || "")}${names}</span></div>`;
+      return `<div class="${classes.join(" ")}"${indent}><span class="cl-ob-kind">${kind}</span>` + tintId(row.id, store) + `<span class="cl-ob-body">${escapeHtml4(row.body || "")}${names}</span></div>`;
     }).join("");
   }
 
