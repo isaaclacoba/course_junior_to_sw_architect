@@ -1,7 +1,7 @@
 window.LESSON_META = {
   id: "many-objects",
   key: "many_objects_awarded",
-  total: 3,
+  total: 5,
   docTitle: "One class, many objects",
   eyebrow: "Understand the ideas",
   title: "One class, many objects",

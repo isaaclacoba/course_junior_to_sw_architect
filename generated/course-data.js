@@ -99,7 +99,7 @@
               "part": "understand-the-ideas",
               "href": "content/practical/01-understand-the-ideas/07-many-objects/",
               "key": "many_objects_awarded",
-              "total": 3,
+              "total": 5,
               "title": "One class, many objects",
               "blurb": "Make several objects from one class and watch them appear in memory, each with its own values.",
               "pill": "gentle",

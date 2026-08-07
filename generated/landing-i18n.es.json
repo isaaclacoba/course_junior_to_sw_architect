@@ -228,6 +228,10 @@
       "blurb": "Consulta una colección sin escribir un bucle. Escribe tú cada consulta y ejecútala - Where, Count, Any, All, Select, FirstOrDefault y OrderBy, un operador por tarea.",
       "title": "LINQ"
     },
+    "many-objects": {
+      "blurb": "Crea varios objetos a partir de una sola clase y míralos aparecer en memoria, cada uno con sus propios valores.",
+      "title": "Una clase, muchos objetos"
+    },
     "no-repeats": {
       "blurb": "Por qué la lógica copiada es una trampa de mantenimiento, y cómo llevarla a una única función con nombre mantiene cada arreglo en un solo sitio.",
       "title": "No te repitas"
