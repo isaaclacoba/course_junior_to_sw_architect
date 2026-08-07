@@ -8,6 +8,9 @@
 //   content ........................ 87ab8c928838d4dc85624d40fb10d44577510534\n
 //                                    = 40 hex characters + one newline
 //   the commit it names ............ the repo's only commit, from `git commit -m "first"`
+//   git tag light .................. .git/refs/tags/light -> f72f3c5... (commit)
+//   git tag -a v1 -m "..." ......... .git/refs/tags/v1    -> 36847b1... (tag object)
+//   tag object fields .............. object, type, tag, tagger, message
 (function () {
   "use strict";
 
@@ -15,6 +18,8 @@
   var STORE = { act: "store", path: "notes.md" };
   var SAVE = { act: "save", message: "first" };
   var NAME = { act: "name", ref: "refs/heads/master", commitId: "87ab8c9" };
+  var TAG_LIGHT = { act: "name", ref: "refs/tags/light", commitId: "f72f3c5" };
+  var TAG_ANNOTATED = { act: "name", ref: "refs/tags/v1", commitId: "f72f3c5" };
 
   var ONE = [WRITE, STORE, SAVE, NAME];
 
@@ -45,6 +50,10 @@
       {
         narr: "Opened raw, it is **41 bytes**: forty hexadecimal characters spelling out the commit id, followed by one newline. That size never changes - the shortest commit id in the world and the longest both occupy 41 bytes, because a SHA-1 is always 160 bits. Storing fifty branches pointing at fifty different commits writes 2,050 bytes of refs, no matter how many millions of objects those commits lead to.",
         objects: { lens: "chain", acts: ONE, fresh: 0, openRef: "refs/heads/master", openRefRaw: true, note: "40 hex characters + one newline" }
+      },
+      {
+        narr: "A **tag** ref sits in `.git/refs/tags/` and follows the same shape: 41 bytes holding one id. The file `light` points at commit `f72f3c5`, and the file `v1` points at `36847b1`. Both refs hold only an id, and both occupy 41 bytes. The difference is what the id leads to - `light` names a commit directly, while `v1` names a **tag object**, a fourth kind of object that carries its own message and tagger. Lesson five in part one stopped at three object kinds and said a fourth exists; this is where it appears.",
+        objects: { lens: "chain", acts: ONE.concat(TAG_LIGHT, TAG_ANNOTATED), fresh: 1, openRef: "refs/tags/v1", note: "two tag refs, one leads to a tag object" }
       },
       {
         narr: "Unlike an object, changing what the ref points at **does not change its name**. Rewriting those 41 bytes so the ref leads to a different commit moves `master` forward or backward without touching the word `master` itself - and that is what makes a branch move. The next lesson opens the file that decides which ref moves when a commit is made.",

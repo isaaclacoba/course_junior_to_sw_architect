@@ -160,13 +160,29 @@
       "blurb": "El objeto commit, abierto y leído línea a línea. Cinco líneas de texto plano - un tree, dos personas, una hora, un mensaje - y una línea más que convierte guardados sueltos en un historial.",
       "title": "¿De qué está hecho un guardado?"
     },
+    "git-inside-head": {
+      "blurb": "Abre HEAD y ve cómo git sabe qué rama actualizar. En su estado usual nombra un ref, y cuando está detached contiene un id de commit directamente.",
+      "title": "¿Cómo sabe git dónde estás?"
+    },
     "git-inside-hidden-folder": {
       "blurb": "La carpeta que crea `git init`, leída línea a línea antes de haber guardado nada. Casi todo está vacío, y por eso se ve entero de una sola vez.",
       "title": "¿Qué hay en esa carpeta oculta?"
     },
+    "git-inside-immutability": {
+      "blurb": "Enmienda un commit y observa qué le pasa al original. Está en el almacén intacto, y lo único que cambió es qué lo nombra.",
+      "title": "¿Editar una línea cambia algo que git guardó?"
+    },
+    "git-inside-index": {
+      "blurb": "Abre el index y ve qué escribe staging realmente. Es un archivo binario que mapea rutas a ids de blob y modos de archivo, nada más.",
+      "title": "¿Qué es el área de staging, como archivo?"
+    },
     "git-inside-names-from-content": {
       "blurb": "Cuarenta caracteres en hexadecimal, sacados de los propios bytes. Mira de dónde sale ese nombre, por qué dos archivos idénticos son un solo objeto y qué le pasa al nombre si cambias una sola letra.",
       "title": "¿Por qué git nombra las cosas por su contenido?"
+    },
+    "git-inside-ref-file": {
+      "blurb": "Abre la carpeta refs y ve de qué está hecha una rama realmente. Es un archivo que contiene un id de commit, nada más.",
+      "title": "El archivo ref"
     },
     "git-inside-tree": {
       "blurb": "Lee un objeto tree de verdad: el modo delante de cada nombre, los veinte bytes crudos que hay detrás, y qué le pasa a cada id por encima de un archivo cuando lo editas.",

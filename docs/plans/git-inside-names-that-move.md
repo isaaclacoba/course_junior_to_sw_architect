@@ -31,13 +31,13 @@ Governing steer (D-7): elementary breadth-over-depth. The bar is part one - show
 6. [x] Scaffold L7 HEAD, author prose - verify: lesson renders EN, compiles clean (7 cards, 0 imperatives, PASS)
 7. [x] Scaffold L8 index, author prose - verify: lesson renders EN, compiles clean (6 cards, 0 imperatives, PASS)
 8. [x] Scaffold L9 immutability, author prose - verify: lesson renders EN, compiles clean (7 cards, 0 imperatives, PASS)
-9. [ ] Add reflog intro card to L7 (D-10) - verify: one card, no detail, compiles clean
-10. [ ] Add config intro card to L7 or L8 (D-10) - verify: one card, compiles clean
-11. [ ] Add annotated tag intro card to L6 (D-10) - verify: one card, compiles clean
-12. [ ] Voice L6-L9 ES - verify: `check-i18n --track git-inside` passes
-13. [ ] Fix part one L5 "three kinds and no more" claim (D-13) - verify: EN+ES corrected
-14. [ ] Run full gate on part two - verify: `verify-lesson --all` on L6-L9, `i18n-roundtrip` clean
-15. [ ] Register lessons in course-registry, regenerate - verify: cards appear on index.html
+9. [x] Add reflog intro card to L7 (D-10) - verify: one card, no detail, compiles clean
+10. [x] Add config intro card to L7 or L8 (D-10) - verify: one card, compiles clean - **Added to L8, 7 scenes now, PASS**
+11. [x] Add annotated tag intro card to L6 (D-10) - verify: one card, compiles clean - **Added to L6, 6 scenes now, PASS**
+12. [x] Voice L6-L9 ES - verify: `check-i18n --track git-inside` passes - **PASS, all 4 lessons voiced, 0 voice flags, all verifies pass**
+13. [x] Fix part one L5 "three kinds and no more" claim (D-13) - verify: EN+ES corrected
+14. [x] Run full gate on part two - verify: `verify-lesson --all` on L6-L9, `i18n-roundtrip` clean
+15. [x] Register lessons in course-registry, regenerate - verify: cards appear on index.html
 16. [ ] Commit part two - verify: pushed to master, deploys green
 
 ## Progress

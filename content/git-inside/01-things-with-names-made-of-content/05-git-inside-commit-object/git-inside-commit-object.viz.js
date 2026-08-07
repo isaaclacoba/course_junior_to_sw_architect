@@ -64,8 +64,8 @@
         objects: { lens: "chain", acts: TWICE, fresh: 4, open: "commit", note: "parent - one line, and there is a history" }
       },
       {
-        narr: "Three kinds of object, then, and no more: bytes in a blob, names in a tree, and a commit tying a tree to a parent and to a person. Everything else in git is names pointing at these - which is where part two starts, with the one that has been sitting in `refs/heads/` all along.",
-        objects: { lens: "both", acts: TWICE, fresh: 0, note: "three kinds of object, and that is the whole store" }
+        narr: "Three kinds of object so far: bytes in a blob, names in a tree, and a commit tying a tree to a parent and to a person. A fourth exists, and part two meets it. Everything else in git is names pointing at these - which is where part two starts, with the one that has been sitting in `refs/heads/` all along.",
+        objects: { lens: "both", acts: TWICE, fresh: 0, note: "three kinds of object, and a fourth still to come" }
       }
     ]
   };

@@ -8,6 +8,8 @@
 //   first 4 bytes ................ DIRC (the signature)
 //   git ls-files -s .............. 100644 3b18e512dba79e4c8300dd08aeb37f8e728b8dad 0  notes.md
 //   fields (no stage) ............ mode, blob id, path
+//   .git/config .................. 124 bytes, plain text, INI sections
+//   config fields ................ repositoryformatversion, filemode, logallrefupdates, user.email
 (function () {
   "use strict";
 
@@ -57,6 +59,10 @@
       {
         narr: "The index is the middle layer - it stands between the working files and the object database, and it is what makes staging exist as a concept. A file joins the next commit when it is added, and adding writes the index; the commit comes later, built from it. That separation is what lets a commit hold the snapshot you chose.",
         objects: { lens: "chain", acts: TWO_FILES.concat([SAVE, NAME]), fresh: 0, openIndex: true, note: "the layer between working tree and commit" }
+      },
+      {
+        narr: "Not everything in `.git` is an object or a name. The file **`.git/config`** is plain text holding settings - INI-style sections and keys that decide how this repository behaves. One setting, `logallrefupdates`, is what controls whether git keeps a reflog at all. Config occupies 124 bytes in a fresh repository, and the file grows as settings are added.",
+        objects: { lens: "chain", acts: SETUP, fresh: 0, detail: "full", note: "config holds settings, not objects" }
       }
     ]
   };

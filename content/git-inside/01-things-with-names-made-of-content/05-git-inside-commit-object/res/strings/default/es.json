@@ -12,13 +12,13 @@
   "step.2.narr": "Dos de esas líneas nombran personas, porque git admite dos papeles. El **autor** escribió el cambio; el **committer** es quien lo metió en este repositorio. Se diferencian cuando un parche viaja - uno lo escribe, otro lo aplica - y cada línea lleva su propia marca de tiempo, que es donde vive la fecha de un commit.",
   "step.3.narr": "Con este objeto tampoco cambia nada en cuanto al nombre. Delante va la misma cabecera - `commit 180` para un cuerpo de 180 bytes - y SHA-1 sobre el conjunto da **089528ab9685d519f68fcfc73b52c17237b1990f**. Ese id cubre por tanto el mensaje, las marcas de tiempo, el tree, y a través del tree cada byte de cada archivo.",
   "step.4.narr": "Un segundo guardado escribe un commit con una línea que el primero no podía tener: **`parent`**, con el id del guardado anterior. Que cada commit nombre al anterior convierte un montón de guardados en una cadena que se puede seguir hacia atrás, y no hace falta nada más en git para que exista un historial.",
-  "step.5.narr": "Tres tipos de objeto, entonces, y ninguno más: bytes en un blob, nombres en un tree, y un commit que ata un tree a un padre y a una persona. Todo lo demás en git son nombres que apuntan a estos - que es por donde empieza la parte dos, con el que lleva todo el rato en `refs/heads/`.",
+  "step.5.narr": "Tres tipos de objeto hasta ahora: bytes en un blob, nombres en un tree, y un commit que ata un tree a un padre y a una persona. Existe un cuarto, y la parte dos lo encuentra. Todo lo demás en git son nombres que apuntan a estos - que es por donde empieza la parte dos, con el que lleva todo el rato en `refs/heads/`.",
   "step.0.note": "el trabajo, y ninguna explicación de él",
   "step.1.note": "cinco líneas, y la primera es un id de tree",
   "step.2.note": "el autor lo escribió, el committer lo puso aquí",
   "step.3.note": "la misma regla de cabecera, aplicada a un commit",
   "step.4.note": "parent - una línea, y ya hay historial",
-  "step.5.note": "tres tipos de objeto, y ese es el almacén entero",
+  "step.5.note": "tres tipos de objeto, y un cuarto aún por venir",
   "concept.gt-commit-object.term": "Objeto commit",
   "concept.gt-commit-object.def": "El objeto que escribe un guardado: cinco líneas cortas de texto que nombran el tree de ese guardado, el guardado anterior, quién escribió el trabajo, quién lo guardó y por qué. Su id sale de esas líneas, igual que en cualquier otro objeto."
 }

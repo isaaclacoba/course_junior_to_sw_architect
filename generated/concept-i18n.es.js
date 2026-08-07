@@ -251,6 +251,14 @@
       "def": "La cadena de commits que hay detrás de donde estás ahora, cada uno apuntando a su padre.",
       "term": "Historia"
     },
+    "gt-immutability": {
+      "def": "Los objetos en git no pueden ser editados - sus ids vienen de sus bytes, así que cambiar bytes cambiaría el id. Enmendar un commit escribe un nuevo commit y mueve un nombre. El original permanece en el almacén intacto, inalcanzable hasta que la recolección de basura lo remueve. Los nombres se mueven; los bytes no.",
+      "term": "Inmutabilidad"
+    },
+    "gt-index": {
+      "def": "El archivo binario en `.git/index` que mapea rutas preparadas a ids de blob y modos de archivo. El index es la capa entre el árbol de trabajo y el commit - decide qué alcanzará el siguiente commit. Agregar un archivo escribe el index; el commit se escribe después, a partir de él. Al hacer commit, el estado actual del index se congela en un objeto tree inmutable.",
+      "term": "Index"
+    },
     "gt-merge": {
       "def": "Traer los commits de otra rama a la que estás, para que dos líneas pasen a ser una.",
       "term": "Fusión"
@@ -262,6 +270,10 @@
     "gt-rebase": {
       "def": "Hacer los commits de tu rama otra vez encima de otra rama, lo que deja el historial como una sola línea recta y le da un id nuevo a cada commit rehecho.",
       "term": "Rebase"
+    },
+    "gt-ref": {
+      "def": "Un nombre elegido por una persona que apunta a un commit, guardado como un archivo de texto de 41 bytes: 40 caracteres hex para el id del commit, luego un salto de línea. A diferencia de un objeto, cambiar a qué apunta un ref no cambia el nombre del ref, que es cómo una rama se mueve.",
+      "term": "Ref"
     },
     "gt-reflog": {
       "def": "El registro que git lleva de todos los sitios donde ha estado `HEAD`, del más nuevo al más viejo, y que mantiene un commit localizable por su hash cuando ya ninguna rama lo alcanza.",
