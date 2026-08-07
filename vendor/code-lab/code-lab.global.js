@@ -6275,9 +6275,12 @@ ${written}` : written;
       const wantsChain = scene.lens === "chain" || scene.lens === "both";
       this.folderEl.hidden = !wantsFolder;
       this.chainEl.hidden = !wantsChain;
-      if (wantsFolder) this.folderEl.innerHTML = folderHtml(replay, this.labels, scene.detail);
-      if (wantsChain) this.chainEl.innerHTML = chainHtml(chainRows(replay), this.labels, replay.store);
       const opened = scene.open ? openObject(replay, scene.open, scene.openRaw) : null;
+      if (wantsFolder) this.folderEl.innerHTML = folderHtml(replay, this.labels, scene.detail);
+      if (wantsChain) {
+        const rows = chainRows(replay);
+        this.chainEl.innerHTML = chainHtml(rows, this.labels, replay.store, opened ? opened.id : null);
+      }
       this.openEl.hidden = !opened;
       if (opened) {
         const rawHead = opened.header ? `<span class="cl-ob-rawhead">${escapeHtml4(opened.header)}</span>
@@ -6374,7 +6377,7 @@ ${written}` : written;
   function dim(text) {
     return `<span class="cl-ob-dim">${text}</span>`;
   }
-  function chainHtml(rows, labels, store) {
+  function chainHtml(rows, labels, store, openedId) {
     if (!rows.length) return `<p class="cl-ob-empty">${escapeHtml4(labels.objNothingYet)}</p>`;
     const headRef = store.head.kind === "ref" ? store.head.ref : null;
     return rows.map((row) => {
@@ -6387,12 +6390,14 @@ ${written}` : written;
       const classes = ["cl-ob-row"];
       if (row.fresh) classes.push("cl-ob-fresh");
       if (row.unreachable) classes.push("cl-ob-orphan");
+      const isOpen = openedId !== null && row.id === openedId;
+      if (isOpen) classes.push("cl-ob-open-row");
       const kind = escapeHtml4(row.label);
-      const names = row.names.length ? ` ${escapeHtml4(labels.objNames)} ${row.names.map(
+      const names = !isOpen && row.names.length ? ` ${escapeHtml4(labels.objNames)} ${row.names.map(
         (n) => `<span class="cl-ob-role">${escapeHtml4(n.role)}</span><span class="cl-ob-names ${tintClass(n.id, store)}">${short(n.id)}</span>`
       ).join(" ")}` : "";
       const indent = row.depth > 0 ? ` style="margin-left:${row.depth * 1.1}rem"` : "";
-      return `<div class="${classes.join(" ")}"${indent}><span class="cl-ob-kind">${kind}</span>` + tintId(row.id, store) + `<span class="cl-ob-body">${escapeHtml4(row.body || "")}${names}</span></div>`;
+      return `<div class="${classes.join(" ")}"${indent}><span class="cl-ob-kind">${kind}</span>` + tintId(row.id, store) + `<span class="cl-ob-body">${escapeHtml4(isOpen ? "" : row.body || "")}${names}</span></div>`;
     }).join("");
   }
 
