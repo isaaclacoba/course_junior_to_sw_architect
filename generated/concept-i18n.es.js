@@ -364,7 +364,7 @@
       "term": "const"
     },
     "pr-constructor": {
-      "def": "El método especial que se ejecuta al crear un objeto, usado para preparar su estado inicial.",
+      "def": "El código que se ejecuta una vez al crear un objeto, para dejarlo listo. Lleva el nombre de la propia clase y no devuelve nada.",
       "term": "Constructor"
     },
     "pr-datatype": {

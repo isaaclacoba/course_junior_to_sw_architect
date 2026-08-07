@@ -67,9 +67,10 @@
     { track: "practical", part: "understand-the-ideas", id: "practice-the-basics", href: "content/practical/01-understand-the-ideas/02-practice-the-basics/", kind: "lesson", path: "content/practical/01-understand-the-ideas/02-practice-the-basics" },
     { track: "practical", part: "understand-the-ideas", id: "control-flow", href: "content/practical/01-understand-the-ideas/03-control-flow/", kind: "lesson", path: "content/practical/01-understand-the-ideas/03-control-flow" },
     { track: "practical", part: "understand-the-ideas", id: "writing-methods", href: "content/practical/01-understand-the-ideas/04-writing-methods/", kind: "lesson", path: "content/practical/01-understand-the-ideas/04-writing-methods" },
-    { track: "practical", part: "understand-the-ideas", id: "reading-objects", href: "content/practical/01-understand-the-ideas/05-reading-objects/", kind: "lesson", path: "content/practical/01-understand-the-ideas/05-reading-objects" },
-    { track: "practical", part: "understand-the-ideas", id: "reuse-without-regret", href: "content/practical/01-understand-the-ideas/06-reuse-without-regret/", kind: "lesson", path: "content/practical/01-understand-the-ideas/06-reuse-without-regret" },
-    { track: "practical", part: "understand-the-ideas", id: "many-objects", href: "content/practical/01-understand-the-ideas/07-many-objects/", kind: "lesson", path: "content/practical/01-understand-the-ideas/07-many-objects" },
+    { track: "practical", part: "understand-the-ideas", id: "constructors", href: "content/practical/01-understand-the-ideas/05-constructors/", kind: "lesson", path: "content/practical/01-understand-the-ideas/05-constructors" },
+    { track: "practical", part: "understand-the-ideas", id: "many-objects", href: "content/practical/01-understand-the-ideas/06-many-objects/", kind: "lesson", path: "content/practical/01-understand-the-ideas/06-many-objects" },
+    { track: "practical", part: "understand-the-ideas", id: "reading-objects", href: "content/practical/01-understand-the-ideas/07-reading-objects/", kind: "lesson", path: "content/practical/01-understand-the-ideas/07-reading-objects" },
+    { track: "practical", part: "understand-the-ideas", id: "reuse-without-regret", href: "content/practical/01-understand-the-ideas/08-reuse-without-regret/", kind: "lesson", path: "content/practical/01-understand-the-ideas/08-reuse-without-regret" },
 
     // ---- practical / everyday-essentials ----
     { track: "practical", part: "everyday-essentials", id: "type-conversion", href: "content/practical/02-everyday-essentials/01-type-conversion/", kind: "lesson", path: "content/practical/02-everyday-essentials/01-type-conversion" },

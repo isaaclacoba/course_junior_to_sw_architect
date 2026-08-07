@@ -53,7 +53,5 @@
   "concept.pr-delegation.def": "Pasarle un trabajo a un objeto que tienes guardado en vez de hacerlo tú mismo.",
   "concept.pr-delegation.term": "Delegación",
   "concept.pr-single-responsibility.def": "Un método o una clase que hace exactamente una cosa, así tiene una única razón para cambiar.",
-  "concept.pr-single-responsibility.term": "Una sola tarea",
-  "concept.pr-constructor.def": "El método especial que se ejecuta al crear un objeto, usado para preparar su estado inicial.",
-  "concept.pr-constructor.term": "Constructor"
+  "concept.pr-single-responsibility.term": "Una sola tarea"
 }

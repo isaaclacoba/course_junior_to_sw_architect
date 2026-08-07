@@ -51,7 +51,5 @@
   "concept.pr-delegation.term": "Delegation",
   "concept.pr-delegation.def": "Forwarding a job to a held object instead of doing it yourself.",
   "concept.pr-single-responsibility.term": "One job",
-  "concept.pr-single-responsibility.def": "A method or class doing exactly one thing, so it has a single reason to change.",
-  "concept.pr-constructor.term": "Constructor",
-  "concept.pr-constructor.def": "The special method that runs when an object is created, used to set up its starting state."
+  "concept.pr-single-responsibility.def": "A method or class doing exactly one thing, so it has a single reason to change."
 }

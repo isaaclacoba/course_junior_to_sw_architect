@@ -112,6 +112,10 @@
       "blurb": "¿No podemos heredarlo todo - incluso de tres clases a la vez? Topa con la mentira del «es un», el límite de un solo padre de C# y con componer piezas que puedes cambiar sin tocar el resto.",
       "title": "¿Heredar o componer?"
     },
+    "constructors": {
+      "blurb": "Un objeto tiene que empezar por algún sitio. Escribe el código que se ejecuta al crearlo, pásale los valores que necesita y mira dónde acaba cada uno.",
+      "title": "Constructores"
+    },
     "control-flow": {
       "blurb": "Cómo el código decide y repite. Escribe un pequeño método que funcione para cada herramienta: if/else, lógica booleana, while, for, foreach con break/continue y switch - y ejecútalo.",
       "title": "Flujo de control"

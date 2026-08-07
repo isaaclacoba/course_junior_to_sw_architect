@@ -45,13 +45,13 @@ Phase 2 - the `lab` archetype
 16. [x] Card scaffold + the P2 header grid in page-shell/styles - verify: headless render, edges align.
 17. [x] `resource/bind-*.js` binder so a lab lesson localizes - verify: EN/ES round-trip.
 Phase 3 - content
-18. [ ] MOCKUP: ONE authored card of the new constructor lesson, real chrome, owner reads
+18. [x] MOCKUP: ONE authored card of the new constructor lesson, real chrome, owner reads
     it - verify: shape approved before the other cards are written.
-19. [ ] Rework `01-foundations` task 6: two instances, values passed in, introduces `pr-field`.
-20. [ ] New build lesson: constructors (revisits `pr-field`), after `04-writing-methods`.
+19. [x] Rework `01-foundations` task 6: two instances, values passed in, introduces `pr-field`.
+20. [x] New build lesson: constructors (revisits `pr-field`), after `04-writing-methods`.
 21. [x] New lab lesson: one class, many objects.
 22. [x] Fix the parameter definition; add `pr-argument`; update `docs/concept-ledger.md`.
-23. [ ] Registry + directory renumbering (array order is the real order, not the `NN-` prefix).
+23. [x] Registry + directory renumbering (array order is the real order, not the `NN-` prefix).
 Phase 4 - close
 24. [ ] `node tools/verify-lesson.mjs` on every changed lesson, EN+ES.
 25. [ ] `npm run gate`, delete the mockups, commit submodule first then the course.

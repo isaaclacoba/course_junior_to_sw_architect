@@ -541,6 +541,7 @@
     "pr-argument": {
       "introducedBy": "writing-methods",
       "revisitedBy": [
+        "constructors",
         "many-objects"
       ],
       "usedBy": []
@@ -591,6 +592,7 @@
         "many-objects"
       ],
       "usedBy": [
+        "constructors",
         "class-members",
         "type-system",
         "generics",
@@ -641,6 +643,7 @@
         "writing-methods"
       ],
       "usedBy": [
+        "constructors",
         "reading-objects",
         "arrays",
         "null-safety",
@@ -655,8 +658,9 @@
       "usedBy": []
     },
     "pr-constructor": {
-      "introducedBy": "reading-objects",
+      "introducedBy": "constructors",
       "revisitedBy": [
+        "reading-objects",
         "class-members",
         "dependency-injection"
       ],
@@ -734,6 +738,7 @@
     "pr-field": {
       "introducedBy": "foundations",
       "revisitedBy": [
+        "constructors",
         "class-members"
       ],
       "usedBy": [
@@ -841,6 +846,7 @@
         "testing-basics"
       ],
       "usedBy": [
+        "constructors",
         "reuse-without-regret",
         "type-conversion",
         "strings",
@@ -883,12 +889,13 @@
     "pr-object": {
       "introducedBy": "foundations",
       "revisitedBy": [
-        "reading-objects",
         "many-objects",
+        "reading-objects",
         "access-properties"
       ],
       "usedBy": [
         "practice-the-basics",
+        "constructors",
         "reuse-without-regret",
         "type-conversion",
         "strings",
@@ -926,6 +933,7 @@
     "pr-parameter": {
       "introducedBy": "writing-methods",
       "revisitedBy": [
+        "constructors",
         "many-objects"
       ],
       "usedBy": [
@@ -2187,6 +2195,22 @@
         "pr-field"
       ]
     },
+    "constructors": {
+      "introduces": [
+        "pr-constructor"
+      ],
+      "revisits": [
+        "pr-field",
+        "pr-parameter",
+        "pr-argument"
+      ],
+      "uses": [
+        "pr-class",
+        "pr-object",
+        "pr-method",
+        "pr-conditional"
+      ]
+    },
     "control-flow": {
       "introduces": [
         "pr-conditional",
@@ -2641,10 +2665,10 @@
       "introduces": [
         "pr-collaboration",
         "pr-delegation",
-        "pr-single-responsibility",
-        "pr-constructor"
+        "pr-single-responsibility"
       ],
       "revisits": [
+        "pr-constructor",
         "pr-method",
         "pr-object"
       ],
@@ -3579,7 +3603,7 @@
     },
     "pr-constructor": {
       "term": "Constructor",
-      "def": "The special method that runs when an object is created, used to set up its starting state."
+      "def": "The code that runs once when an object is made, to set up what it starts with. It carries the class's own name and hands nothing back."
     },
     "pr-datatype": {
       "term": "Datatype",

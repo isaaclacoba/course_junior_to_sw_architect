@@ -68,10 +68,36 @@
               "kind": "lesson"
             },
             {
+              "id": "constructors",
+              "track": "practical",
+              "part": "understand-the-ideas",
+              "href": "content/practical/01-understand-the-ideas/05-constructors/",
+              "key": "constructors_awarded",
+              "total": 5,
+              "title": "Constructors",
+              "blurb": "An object has to start somewhere. Write the code that runs when it is made, hand it the values it needs, and see where each one ends up.",
+              "pill": "gentle",
+              "time": "25 min",
+              "kind": "lesson"
+            },
+            {
+              "id": "many-objects",
+              "track": "practical",
+              "part": "understand-the-ideas",
+              "href": "content/practical/01-understand-the-ideas/06-many-objects/",
+              "key": "many_objects_awarded",
+              "total": 5,
+              "title": "One class, many objects",
+              "blurb": "Make several objects from one class and watch them appear in memory, each with its own values.",
+              "pill": "gentle",
+              "time": "20 min",
+              "kind": "lesson"
+            },
+            {
               "id": "reading-objects",
               "track": "practical",
               "part": "understand-the-ideas",
-              "href": "content/practical/01-understand-the-ideas/05-reading-objects/",
+              "href": "content/practical/01-understand-the-ideas/07-reading-objects/",
               "key": "reading_objects_awarded",
               "total": 6,
               "title": "Reading Objects",
@@ -84,26 +110,13 @@
               "id": "reuse-without-regret",
               "track": "practical",
               "part": "understand-the-ideas",
-              "href": "content/practical/01-understand-the-ideas/06-reuse-without-regret/",
+              "href": "content/practical/01-understand-the-ideas/08-reuse-without-regret/",
               "key": "reuse_without_regret_awarded",
               "total": 4,
               "title": "Reuse without regret",
               "blurb": "Build the two ways to reuse code yourself - inherit from a parent, or hold smaller parts - meet the diamond problem, and see why we lean on composition.",
               "pill": "gentle",
               "time": "25 min",
-              "kind": "lesson"
-            },
-            {
-              "id": "many-objects",
-              "track": "practical",
-              "part": "understand-the-ideas",
-              "href": "content/practical/01-understand-the-ideas/07-many-objects/",
-              "key": "many_objects_awarded",
-              "total": 5,
-              "title": "One class, many objects",
-              "blurb": "Make several objects from one class and watch them appear in memory, each with its own values.",
-              "pill": "gentle",
-              "time": "20 min",
               "kind": "lesson"
             }
           ]

@@ -31,12 +31,12 @@ window.LESSON_META = {
       },
       {
         "id": "pr-single-responsibility"
-      },
-      {
-        "id": "pr-constructor"
       }
     ],
     "revisits": [
+      {
+        "id": "pr-constructor"
+      },
       {
         "id": "pr-method"
       },
