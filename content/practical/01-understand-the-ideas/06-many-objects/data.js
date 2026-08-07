@@ -100,16 +100,28 @@
     "",
   ].join("\n");
 
-  // Card 4's class: `Add` is the blank. `_total` starts at zero, so the starter
-  // compiles and prints 0 - the gap between 0 and the answer is the lesson.
-  var COUNTER_EMPTY_ADD = [
+  // Card 4's class. The cap is the blank, and the running total is already
+  // written - the card is about what happens to `amount`, not about addition.
+  // `Counter` takes its starting total through a constructor like every other
+  // class in this lesson; a class that fills itself in would quietly undo the
+  // three cards before it.
+  var COUNTER_CAP_TODO = [
     "public class Counter",
     "{",
+    "    private const int MaxPerAdd = 10;",
+    "",
     "    private int _total;",
+    "",
+    "    public Counter(int startingTotal)",
+    "    {",
+    "        _total = startingTotal;",
+    "    }",
     "",
     "    public void Add(int amount)",
     "    {",
-    "        // TODO: add amount to the running total",
+    "        // TODO: no single add may exceed MaxPerAdd - cut `amount` down to it",
+    "",
+    "        _total = _total + amount;",
     "    }",
     "",
     "    public int Total()",
@@ -120,13 +132,25 @@
     "",
   ].join("\n");
 
-  var COUNTER_CLASS = [
+  var COUNTER_CAPPED = [
     "public class Counter",
     "{",
+    "    private const int MaxPerAdd = 10;",
+    "",
     "    private int _total;",
+    "",
+    "    public Counter(int startingTotal)",
+    "    {",
+    "        _total = startingTotal;",
+    "    }",
     "",
     "    public void Add(int amount)",
     "    {",
+    "        if (amount > MaxPerAdd)",
+    "        {",
+    "            amount = MaxPerAdd;",
+    "        }",
+    "",
     "        _total = _total + amount;",
     "    }",
     "",
@@ -288,91 +312,104 @@
       },
 
       {
-        title: "A parameter only lives inside its method",
+        title: "What the method gets is a copy",
         concept: "Local scope",
         context:
-          "An ordinary method takes arguments the same way a constructor does. `Add(3)` copies " +
-          "`3` into the parameter `amount`, and `amount` exists only while `Add` is running - " +
-          "it appears on the stack when the call starts and is gone when the call " +
-          "returns.\n\nWrite the body of `Add`, then add a third call so the total comes to 9. " +
-          "Visualize it and watch the stack: `amount` shows up three times, holding a " +
-          "different number each time, and never outlives its call.",
+          "A method takes arguments the same way a constructor does: each one is copied into " +
+          "the parameter in the matching position. Copied - that is the part people get " +
+          "wrong. `amount` is a fresh variable belonging to this one call of `Add`, so " +
+          "writing to it changes nothing outside.\n\nNo single add may exceed `MaxPerAdd`. " +
+          "Cut `amount` down to it, then Visualize: on the `Add` frame `amount` drops to 10, " +
+          "while `requested` back in `Main` is still 50 - untouched, because `Add` never had " +
+          "it, only a copy of its value.",
         gates: [
-          { calls: { type: "Counter", member: "Add", times: 3 } },
-          { prints: "9" },
+          { calls: { type: "Counter", member: "Add", times: 2 } },
+          { prints: "13" },
+          { prints: "50" },
         ],
         goal: [
-          "`Add` runs three times.",
-          "The program prints `9`.",
+          "The capped add contributes 10, so the total prints `13`.",
+          "`requested` still prints `50` after the call.",
         ],
         goals: [
-          { code: ["three calls"], gate: { calls: { type: "Counter", member: "Add", times: 3 } } },
-          { code: ["prints 9"], gate: { prints: "9" } },
+          { code: ["two calls"], gate: { calls: { type: "Counter", member: "Add", times: 2 } } },
+          { code: ["total is 13"], gate: { prints: "13" } },
+          { code: ["requested is still 50"], gate: { prints: "50" } },
         ],
         starter:
-          COUNTER_EMPTY_ADD +
+          COUNTER_CAP_TODO +
           main([
-            "        Counter tally = new Counter();",
-            "        tally.Add(3);",
-            "        tally.Add(4);",
+            "        Counter tally = new Counter(0);",
+            "        int requested = 50;",
             "",
-            "        // TODO: add one more call so the total reaches 9",
+            "        tally.Add(requested);",
+            "        tally.Add(3);",
             "",
             "        System.Console.WriteLine(tally.Total());",
+            "        System.Console.WriteLine(requested);",
           ]),
         solution:
-          COUNTER_CLASS +
+          COUNTER_CAPPED +
           main([
-            "        Counter tally = new Counter();",
+            "        Counter tally = new Counter(0);",
+            "        int requested = 50;",
+            "",
+            "        tally.Add(requested);",
             "        tally.Add(3);",
-            "        tally.Add(4);",
-            "        tally.Add(2);",
             "",
             "        System.Console.WriteLine(tally.Total());",
+            "        System.Console.WriteLine(requested);",
           ]),
-        // Card 4 needs a no-argument constructor, which `Counter` gets for free.
+        // A learner who ignores `amount` and always adds the cap prints 20, not 13 -
+        // that is what the second call, deliberately under the cap, is there to catch.
       },
 
       {
         title: "Which object is the method running on?",
         concept: "Receiver",
         context:
-          "`tally.Add(2)` names two things: the method to run, and the object to run it on. " +
-          "One `Add` is written once and shared by every counter, but each call reaches into " +
-          "the fields of the one object in front of the dot.\n\nMake a second counter and add " +
-          "a different amount to it. Visualize it: the same `Add` frame opens twice, and each " +
-          "time the arrow points at a different counter - so the two totals never mix.",
+          "`morning.Add(5)` names two things: the method to run, and the object to run it on. " +
+          "One `Add` is written once and shared by every counter, so the argument alone cannot " +
+          "decide the answer - the object in front of the dot does.\n\nAdd the same 5 to both " +
+          "counters. They start at different totals, so the same call gives different answers. " +
+          "Visualize it: the `Add` frame opens twice with an identical `amount`, and each time " +
+          "`this` points at a different card on the heap.",
         gates: [
           { liveObjects: "Counter", atLeast: 2 },
-          { distinctField: { type: "Counter", field: "_total" } },
+          { calls: { type: "Counter", member: "Add", times: 2 } },
+          { prints: "15" },
+          { prints: "105" },
         ],
         goal: [
           "Two `Counter` objects exist at the same time.",
-          "The two counters hold different totals.",
+          "Both get the same 5, so `Add` runs twice.",
+          "The totals come out `15` and `105`.",
         ],
         goals: [
           { code: ["two counters"], gate: { liveObjects: "Counter", atLeast: 2 } },
-          { code: ["different totals"], gate: { distinctField: { type: "Counter", field: "_total" } } },
+          { code: ["Add runs twice"], gate: { calls: { type: "Counter", member: "Add", times: 2 } } },
+          { code: ["15 and 105"], gate: { prints: "105" } },
         ],
         starter:
-          COUNTER_CLASS +
+          COUNTER_CAPPED +
           main([
-            "        Counter morning = new Counter();",
-            "        morning.Add(3);",
+            "        Counter morning = new Counter(10);",
+            "        Counter evening = new Counter(100);",
             "",
-            "        // TODO: make a second counter, add a different amount to it,",
-            "        // then print both totals",
+            "        morning.Add(5);",
+            "",
+            "        // TODO: add the same 5 to `evening`, then print its total too",
             "",
             "        System.Console.WriteLine(morning.Total());",
           ]),
         solution:
-          COUNTER_CLASS +
+          COUNTER_CAPPED +
           main([
-            "        Counter morning = new Counter();",
-            "        morning.Add(3);",
+            "        Counter morning = new Counter(10);",
+            "        Counter evening = new Counter(100);",
             "",
-            "        Counter evening = new Counter();",
-            "        evening.Add(8);",
+            "        morning.Add(5);",
+            "        evening.Add(5);",
             "",
             "        System.Console.WriteLine(morning.Total());",
             "        System.Console.WriteLine(evening.Total());",
