@@ -109,6 +109,16 @@ Once the owner has picked:
   owner decides. You are not a stand-in for them.
 - **Describing the layout in prose and asking "does this sound right?"** It
   always sounds right. That is the failure.
+- **"A real mockup needs the feature built first - chicken and egg."** There is
+  no chicken and egg. A mockup fakes the ENGINE and shows the BEHAVIOUR: hand-
+  write the two states as static frames and let a button swap them. If a design
+  round is asking whether to pay for engine work, the thing the owner must see is
+  exactly the thing that does not exist yet - so it gets faked, in full, and it
+  looks finished. Shipping act signatures and a written description of the visual
+  INSTEAD of the visual is this anti-pattern wearing a mockup's filename.
+- **A mockup that is a spec in HTML.** If the file's content would survive being
+  pasted into a document unchanged, nothing was mocked. The test: could the owner
+  point at the screen and say "that bit, smaller"?
 - **One mockup at Phase 0, then five phases of unseen work.**
 - **Committing the mockup** so it slowly rots into a second source of truth.
 

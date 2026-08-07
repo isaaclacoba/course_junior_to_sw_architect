@@ -25,6 +25,12 @@ no emojis, no marketing.
 3. **Show, never describe.** Any UI, layout, or output format goes to the owner
    as an HTML or plain-text MOCKUP, then MEASURED. The owner cannot approve
    prose, and a layout that "looks fine" is routinely wrong when measured.
+   **"It cannot be mocked until it is built" is never true and is never an
+   acceptable answer.** Fake the engine, show the behaviour - hand-write the
+   before and after states and let a button swap them. When the decision is
+   whether to pay for engine work, the unbuilt thing is precisely what must
+   appear on screen. A file containing signatures and a description of the
+   visual is not a mockup.
 4. **Record each answer as it lands:**
 
        node tools/journal.mjs decision --feature <slug> --question "..." \
