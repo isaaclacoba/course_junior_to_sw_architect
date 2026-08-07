@@ -43,33 +43,34 @@ not an endorsement.
 | 1 | foundations | 1 | printing output; a variable holds a value; datatypes; assignment (store, not equals); `null` (nothing yet); what an object is (state + behaviour, class vs instance) | `Console.WriteLine`, `int`/`long`/`double`/`decimal`/`bool`/`char`/`string`, `=`, `string?`+`null`, class/field/method, `new` | - |
 | 2 | practice-the-basics | 1 | compute with values (arithmetic); join text; ask a yes/no question (comparison to a `bool`); an object that answers about itself - bridges to Control Flow | `+` `-` `*` `/`, string `+`, `==` `!=` `>` `<` `>=` `<=`, class/field/method | 1 |
 | 3 | control-flow | 1 | choose a branch; combine yes/no; repeat; skip/stop; multi-way choose (write-and-run methods) | if/else, `&&` `||` `!`, while, for, foreach, break/continue, switch, `string[]` | 1,2 |
-| 4 | writing-methods | 1 | a named step: return a value, take input, hold a rule, reuse it, call another | method, return, parameters | 3 |
+| 4 | writing-methods | 1 | a named step: return a value, take input, hold a rule, reuse it, call another; a parameter is the named slot, an argument is the value passed into it | method, return, parameter (the slot) vs argument (the value) | 3 |
 | 5 | reading-objects | 1 | objects collaborate: one asks another and acts (seeds one-job, receive-don't-build) | class, field, constructor, method, if/else, comparison, string `+` | 1,4 |
 | 6 | reuse-without-regret | 1 | is-a vs has-a; favour composition; the diamond problem; polymorphism as payoff | inheritance, virtual/override, interface (named) | 1,5 |
-| 7 | type-conversion | 2 | text to number and back; drop decimals with a cast; parse safely | `int.Parse`/`int.TryParse`, `(int)` cast, `.ToString()`, `out` | 1,4 |
-| 8 | strings | 2 | text is a value: build from parts, change case, search inside, rewrite pieces | `$"..."` interpolation `(C#)`, `.ToUpper()`/`.Contains()`/`.Replace()`/`.Substring()` | 1,7 |
-| 9 | arrays | 2 | a fixed-size ordered sequence: index (from 0), length, iterate; split text into pieces | `int[]`/`string[]`, `new[] { }`, `a[i]`, `.Length`, foreach, `.Split()` | 4,8 |
-| 10 | class-members | 2 | behaviour/data that belongs to the type not the instance; a value fixed for good | `static` (method/field), `const`, `readonly` | 1,4 |
-| 11 | null-safety | 2 | a value may be absent ("no value"); handle the absent case instead of crashing | `int?`/`string?`, `??`, `?.`, `??=`, `== null` `(C#)` | 1,7 |
-| 12 | access-properties | 2 | control what is visible; expose state through a property, not a raw field | `public`/`private`/`protected`, `{ get; set; }`, `init`, expression-bodied get `(C#)` | 1,4 |
-| 13 | type-system | 2 | an abstract base you cannot create; override a behaviour; overload a name; a type's own text form; deterministic cleanup | `abstract`, `virtual`/`override`, overloading, `override ToString()`, `IDisposable`/`using` | 6,12 |
-| 14 | collections | 3 | an ordered many; a keyed lookup; iterate and tally | List<T>, Dictionary<K,V>, foreach | 3,4 |
-| 15 | data-shapes | 3 | ways to package data: property, computed value, a fixed set, value-copy, value-equality | `{ get; set; }` `[inversion]`, `=>` `(C#)`, enum, struct, record `(C#)` | 1,14 |
-| 16 | lambdas | 3 | a function passed as a value; capturing surrounding locals | `=>` lambda `(C#)`, Func/Predicate | 4,14 |
-| 17 | linq | 3 | query a collection without loops: filter, count, exists, all, map, first, order | Where/Count/Any/All/Select/FirstOrDefault/OrderBy `(C#)` | 14,16 |
-| 18 | errors-null (Exception handling) | 3 | handle things going wrong; keep a program standing when it fails | try/catch/finally, throw (`??`/`?.` now in null-safety, row 11) | 4 |
-| 19 | generics | 3 | write a type or method that works for any type | `Box<T>`, `First<T>`, `Pair<A,B>` | 14 |
-| 20 | encapsulation (why objects?) | 4 | group data, put behaviour beside it, hide internals, guard a rule, keep it in one place - **S** | private, class | 1,4 |
-| 21 | interfaces (why abstract?) | 4 | name a shared promise; depend on the promise not the concrete; add a type without touching callers - **D/O** | interface | 6,20 |
-| 22 | polymorphism (why many versions?) | 4 | each type carries its own behaviour; one call site, many types; choose at run time - **O** | interface, virtual/override, List<IAnimal> | 21 |
-| 23 | composition (inherit or compose?) | 4 | true is-a vs hold-a-part; the one-base-class limit; delegate to parts; swap a part behind an interface - **L** | inheritance, composition, interface | 6,21,22 |
-| 24 | dependency-injection (why inject?) | 4 | don't build your dependency inside; receive it; depend on an interface; hand in a double - **D** | constructor injection, interface | 7,21 |
-| 25 | testing-basics | 5 | a test = arrange, act, assert; assert the exact result; a reusable assert; expect a throw | method, throw, assert helper | 4,24 |
-| 26 | test-doubles | 5 | fake, stub, spy - injected stand-ins for a real dependency | interface, injection | 24,25 |
-| 27 | testable-design | 5 | the habits that make code testable are the SOLID habits: inject, one job, no hidden state | interface, injection | 20,24,25 |
-| 28 | refactor-moves | 6 | change the shape, keep the behaviour; five moves, each a SOLID action | interface, injection, polymorphism, extract/split | 20,21,22,23,24 |
-| 29 | the-solid-principles (level2) | 6 | all five principles as write-the-fix builds; trap in prose, fix graded (requireSource + verify) | interface, injection, polymorphism | 20,21,22,23,24,28 |
-| 30 | capstone | 6 | apply all of SOLID to one program; milestones S, DI, O, DIP, L (ISP missing) | full C#, structural checks | 20-29 |
+| 7 | many-objects | 1 | one class, many instances, each with its own values; what `new` runs; an argument fills a parameter by position; a parameter is a local that lives only for the call; a method runs on one receiver | class, constructor, parameter, `new`, instance method | 1,4,5 |
+| 8 | type-conversion | 2 | text to number and back; drop decimals with a cast; parse safely | `int.Parse`/`int.TryParse`, `(int)` cast, `.ToString()`, `out` | 1,4 |
+| 9 | strings | 2 | text is a value: build from parts, change case, search inside, rewrite pieces | `$"..."` interpolation `(C#)`, `.ToUpper()`/`.Contains()`/`.Replace()`/`.Substring()` | 1,8 |
+| 10 | arrays | 2 | a fixed-size ordered sequence: index (from 0), length, iterate; split text into pieces | `int[]`/`string[]`, `new[] { }`, `a[i]`, `.Length`, foreach, `.Split()` | 4,9 |
+| 11 | class-members | 2 | behaviour/data that belongs to the type not the instance; a value fixed for good | `static` (method/field), `const`, `readonly` | 1,4 |
+| 12 | null-safety | 2 | a value may be absent ("no value"); handle the absent case instead of crashing | `int?`/`string?`, `??`, `?.`, `??=`, `== null` `(C#)` | 1,8 |
+| 13 | access-properties | 2 | control what is visible; expose state through a property, not a raw field | `public`/`private`/`protected`, `{ get; set; }`, `init`, expression-bodied get `(C#)` | 1,4 |
+| 14 | type-system | 2 | an abstract base you cannot create; override a behaviour; overload a name; a type's own text form; deterministic cleanup | `abstract`, `virtual`/`override`, overloading, `override ToString()`, `IDisposable`/`using` | 6,13 |
+| 15 | collections | 3 | an ordered many; a keyed lookup; iterate and tally | List<T>, Dictionary<K,V>, foreach | 3,4 |
+| 16 | data-shapes | 3 | ways to package data: property, computed value, a fixed set, value-copy, value-equality | `{ get; set; }` `[inversion]`, `=>` `(C#)`, enum, struct, record `(C#)` | 1,15 |
+| 17 | lambdas | 3 | a function passed as a value; capturing surrounding locals | `=>` lambda `(C#)`, Func/Predicate | 4,15 |
+| 18 | linq | 3 | query a collection without loops: filter, count, exists, all, map, first, order | Where/Count/Any/All/Select/FirstOrDefault/OrderBy `(C#)` | 15,17 |
+| 19 | errors-null (Exception handling) | 3 | handle things going wrong; keep a program standing when it fails | try/catch/finally, throw (`??`/`?.` now in null-safety, row 12) | 4 |
+| 20 | generics | 3 | write a type or method that works for any type | `Box<T>`, `First<T>`, `Pair<A,B>` | 15 |
+| 21 | encapsulation (why objects?) | 4 | group data, put behaviour beside it, hide internals, guard a rule, keep it in one place - **S** | private, class | 1,4 |
+| 22 | interfaces (why abstract?) | 4 | name a shared promise; depend on the promise not the concrete; add a type without touching callers - **D/O** | interface | 6,21 |
+| 23 | polymorphism (why many versions?) | 4 | each type carries its own behaviour; one call site, many types; choose at run time - **O** | interface, virtual/override, List<IAnimal> | 22 |
+| 24 | composition (inherit or compose?) | 4 | true is-a vs hold-a-part; the one-base-class limit; delegate to parts; swap a part behind an interface - **L** | inheritance, composition, interface | 6,22,23 |
+| 25 | dependency-injection (why inject?) | 4 | don't build your dependency inside; receive it; depend on an interface; hand in a double - **D** | constructor injection, interface | 8,22 |
+| 26 | testing-basics | 5 | a test = arrange, act, assert; assert the exact result; a reusable assert; expect a throw | method, throw, assert helper | 4,25 |
+| 27 | test-doubles | 5 | fake, stub, spy - injected stand-ins for a real dependency | interface, injection | 25,26 |
+| 28 | testable-design | 5 | the habits that make code testable are the SOLID habits: inject, one job, no hidden state | interface, injection | 21,25,26 |
+| 29 | refactor-moves | 6 | change the shape, keep the behaviour; five moves, each a SOLID action | interface, injection, polymorphism, extract/split | 21,22,23,24,25 |
+| 30 | the-solid-principles (level2) | 6 | all five principles as write-the-fix builds; trap in prose, fix graded (requireSource + verify) | interface, injection, polymorphism | 21,22,23,24,25,29 |
+| 31 | capstone | 6 | apply all of SOLID to one program; milestones S, DI, O, DIP, L (ISP missing) | full C#, structural checks | 21-30 |
 
 ## Theory track
 

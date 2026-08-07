@@ -11,7 +11,7 @@
   "task.1.goal.1": "Ejecútalo. La salida debería ser `OK`.",
   "task.2.title": "Dale una entrada al método",
   "task.2.concept": "Parámetro",
-  "task.2.context": "Las comprobaciones de verdad dependen de datos. Un `parámetro` es el valor que le das cuando llamas al método.",
+  "task.2.context": "Las comprobaciones de verdad dependen de datos. El `parámetro` es el hueco con nombre que escribes en el método - `int age`. El `argumento` es el valor que pasas al llamarlo - `18`. El hueco se escribe una vez; el argumento cambia en cada llamada.",
   "task.2.goal.0": "Haz que `Label(int age)` devuelva `\"Age: \"` seguido del `age`.",
   "task.2.goal.1": "`Main` llama a `Label(18)`, así que la salida debería ser `Age: 18`.",
   "task.3.title": "Deja que decida el método",
@@ -32,6 +32,8 @@
   "task.5.goal.1": "`Main` llama a `Summary(20)`, así que la salida debería ser `Status: adult`.",
   "concept.pr-method.def": "Un trozo de comportamiento con nombre que llamas para obtener una respuesta, así una regla se escribe una vez y se reutiliza.",
   "concept.pr-method.term": "Método",
-  "concept.pr-parameter.def": "Un valor que le pasas a un método al llamarlo, para que el mismo método sirva con entradas distintas.",
+  "concept.pr-argument.def": "El valor que pasas de verdad al llamar a un método. Rellena el hueco de un parámetro, emparejado por posición.",
+  "concept.pr-argument.term": "Argumento",
+  "concept.pr-parameter.def": "Un hueco con nombre en la declaración de un método, que representa un valor que el método todavía no tiene - para que el mismo método sirva con entradas distintas.",
   "concept.pr-parameter.term": "Parámetro"
 }

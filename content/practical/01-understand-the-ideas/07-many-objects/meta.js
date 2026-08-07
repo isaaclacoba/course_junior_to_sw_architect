@@ -30,7 +30,12 @@ window.LESSON_META = {
         def: "One object made from a class. Several instances of one class each hold their own values."
       }
     ],
-    revisits: [{ id: "pr-object" }, { id: "pr-class" }],
+    revisits: [
+      { id: "pr-object" },
+      { id: "pr-class" },
+      { id: "pr-parameter" },
+      { id: "pr-argument" }
+    ],
     uses: [{ id: "pr-variable" }, { id: "pr-assignment" }, { id: "pr-printing" }]
   },
 };

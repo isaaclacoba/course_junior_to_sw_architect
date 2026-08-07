@@ -303,6 +303,10 @@
       "def": "Un tipo que decide qué partes suyas puede ver el exterior, marcándolas como public o private.",
       "term": "Modificador de acceso"
     },
+    "pr-argument": {
+      "def": "El valor que pasas de verdad al llamar a un método. Rellena el hueco de un parámetro, emparejado por posición.",
+      "term": "Argumento"
+    },
     "pr-arithmetic": {
       "def": "Calcular un valor nuevo a partir de otros con + - * / %.",
       "term": "Aritmética"
@@ -500,7 +504,7 @@
       "term": "Override"
     },
     "pr-parameter": {
-      "def": "Un valor que le pasas a un método al llamarlo, para que el mismo método sirva con entradas distintas.",
+      "def": "Un hueco con nombre en la declaración de un método, que representa un valor que el método todavía no tiene - para que el mismo método sirva con entradas distintas.",
       "term": "Parámetro"
     },
     "pr-parse": {

@@ -538,6 +538,13 @@
       ],
       "usedBy": []
     },
+    "pr-argument": {
+      "introducedBy": "writing-methods",
+      "revisitedBy": [
+        "many-objects"
+      ],
+      "usedBy": []
+    },
     "pr-arithmetic": {
       "introducedBy": "practice-the-basics",
       "revisitedBy": [],
@@ -916,7 +923,9 @@
     },
     "pr-parameter": {
       "introducedBy": "writing-methods",
-      "revisitedBy": [],
+      "revisitedBy": [
+        "many-objects"
+      ],
       "usedBy": [
         "reading-objects"
       ]
@@ -2551,7 +2560,9 @@
       ],
       "revisits": [
         "pr-object",
-        "pr-class"
+        "pr-class",
+        "pr-parameter",
+        "pr-argument"
       ],
       "uses": [
         "pr-variable",
@@ -3190,7 +3201,8 @@
     "writing-methods": {
       "introduces": [
         "pr-method",
-        "pr-parameter"
+        "pr-parameter",
+        "pr-argument"
       ],
       "revisits": [
         "pr-conditional"
@@ -3502,6 +3514,10 @@
       "term": "Access modifier",
       "def": "A type deciding which of its parts the outside can see, marking them public or private."
     },
+    "pr-argument": {
+      "term": "Argument",
+      "def": "The value you actually pass when you call a method. It fills a parameter slot, matched by position."
+    },
     "pr-arithmetic": {
       "term": "Arithmetic",
       "def": "Computing a new value from existing ones with + - * / %."
@@ -3700,7 +3716,7 @@
     },
     "pr-parameter": {
       "term": "Parameter",
-      "def": "A value you hand a method when you call it, so the same method works for different inputs."
+      "def": "A named slot in a method's declaration, standing for a value the method has not been given yet - so the same method works for different inputs."
     },
     "pr-parse": {
       "term": "Parsing",

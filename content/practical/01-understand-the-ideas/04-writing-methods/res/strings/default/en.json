@@ -9,7 +9,7 @@
   "task.1.goal.1": "Run it. The output should be `OK`.",
   "task.2.title": "Give the method some input",
   "task.2.concept": "Parameter",
-  "task.2.context": "Real checks depend on data. A `parameter` is the value you hand in when you call the method.",
+  "task.2.context": "Real checks depend on data. The `parameter` is the named slot you write on the method - `int age`. The `argument` is the value you pass at the call - `18`. You write the slot once; the argument changes every time you call.",
   "task.2.goal.0": "Make `Label(int age)` return `\"Age: \"` followed by the `age`.",
   "task.2.goal.1": "`Main` calls `Label(18)`, so the output should be `Age: 18`.",
   "task.3.title": "Let the method decide",
@@ -31,5 +31,7 @@
   "concept.pr-method.term": "Method",
   "concept.pr-method.def": "A named piece of behaviour you call to get an answer back, so a rule is written once and reused.",
   "concept.pr-parameter.term": "Parameter",
-  "concept.pr-parameter.def": "A value you hand a method when you call it, so the same method works for different inputs."
+  "concept.pr-parameter.def": "A named slot in a method's declaration, standing for a value the method has not been given yet - so the same method works for different inputs.",
+  "concept.pr-argument.term": "Argument",
+  "concept.pr-argument.def": "The value you actually pass when you call a method. It fills a parameter slot, matched by position."
 }

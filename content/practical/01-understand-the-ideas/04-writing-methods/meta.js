@@ -28,6 +28,9 @@ window.LESSON_META = {
       },
       {
         "id": "pr-parameter"
+      },
+      {
+        "id": "pr-argument"
       }
     ],
     "revisits": [
