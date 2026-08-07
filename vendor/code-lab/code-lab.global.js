@@ -28,6 +28,7 @@ var CodeLab = (() => {
     DEFAULT_LOOP_MEMORIES: () => DEFAULT_LOOP_MEMORIES,
     DEFAULT_LOOP_TOOLS: () => DEFAULT_LOOP_TOOLS,
     DEFAULT_MEMORY_STORES: () => DEFAULT_MEMORY_STORES,
+    DEFAULT_TRACE_NARRATION: () => DEFAULT_TRACE_NARRATION,
     DEFAULT_VIZ_LABELS: () => DEFAULT_VIZ_LABELS,
     FULL_REGIONS: () => FULL_REGIONS,
     GitError: () => GitError,
@@ -57,6 +58,7 @@ var CodeLab = (() => {
     authorOf: () => authorOf,
     bytesOf: () => bytesOf,
     chainRows: () => chainRows,
+    classifyTraceOutcome: () => classifyTraceOutcome,
     commitBody: () => commitBody,
     computeLineFlags: () => computeLineFlags,
     conceptResults: () => conceptResults,
@@ -66,6 +68,7 @@ var CodeLab = (() => {
     defaultHighlighter: () => defaultHighlighter,
     deriveRefs: () => deriveRefs,
     drawQuiz: () => drawQuiz,
+    fill: () => fill,
     firstUnanswered: () => firstUnanswered,
     formatToolSignature: () => formatToolSignature,
     gitAddFiles: () => addFiles,
@@ -104,11 +107,14 @@ var CodeLab = (() => {
     makeTour: () => makeTour,
     markedLineHtml: () => markedLineHtml,
     membersOf: () => membersOf,
+    mergeTemplates: () => mergeTemplates,
+    missingPlaceholders: () => missingPlaceholders,
     neededToPass: () => neededToPass,
     next: () => next,
     normalizeLines: () => normalizeLines,
     objectBytes: () => objectBytes,
     objectFocusKeys: () => objectFocusKeys,
+    placeholdersOf: () => placeholdersOf,
     planProgress: () => planProgress,
     presentRun: () => presentRun,
     prev: () => prev,
@@ -118,6 +124,7 @@ var CodeLab = (() => {
     replayObjects: () => replayObjects,
     resolveMarks: () => resolveMarks,
     resolveModel: () => resolveModel,
+    resolveNarration: () => resolveNarration,
     resolveObjects: () => resolveObjects,
     resolvePlan: () => resolvePlan,
     resolveRackTools: () => resolveRackTools,
@@ -139,6 +146,7 @@ var CodeLab = (() => {
     stripCommentsAndStrings: () => stripCommentsAndStrings,
     toolRackRows: () => toolRackRows,
     traceToSteps: () => traceToSteps,
+    tracerFailedOutcome: () => tracerFailedOutcome,
     treeBody: () => treeBody,
     treeSortKey: () => treeSortKey
   });
@@ -1613,11 +1621,51 @@ ${result.runtimeError}`.trim(),
     objYourFolder: "your folder",
     objNothingYet: "Nothing points at anything yet.",
     objUnnamed: "nothing points here",
-    objNames: "names"
+    objNames: "names",
+    hpMemory: "MEMORY",
+    hpMemoryNote: "the call stack on the left, objects on the heap on the right",
+    hpStatics: "STATICS",
+    hpStaticsNote: "values shared across the program",
+    hpConstants: "CONSTANTS",
+    hpConstantsNote: "fixed at compile time",
+    hpKindEntry: "entry point",
+    hpKindStatic: "static method",
+    hpKindMethod: "instance method",
+    hpKindCtor: "constructor",
+    hpOn: "on {recv}",
+    hpPaused: "paused at line {line}",
+    hpThis: "this",
+    hpSecParams: "handed in",
+    hpSecLocals: "declared here",
+    consoleHead: "Console",
+    consoleIdle: "Nothing printed yet.",
+    vlPreparing: "Preparing compiler...",
+    vlVisualize: "Visualize",
+    vlTracing: "Tracing...",
+    vlBootDownload: "Downloading compiler... {percent}%",
+    vlBootStart: "Starting compiler...",
+    vlBootWarm: "Warming up...",
+    vlTracingSecs: "Tracing... {secs}s",
+    vlHint: "Write a small program, then press Visualize to watch it run.",
+    vlDidNotCompile: "Did not compile.",
+    vlNoStepsHint: "That program produced no steps to show. Add a statement or two inside Main.",
+    vlNoSteps: "Nothing to trace.",
+    // Singular and plural are separate templates - see the note in
+    // trace-narration.ts; not every language pluralises by adding a letter.
+    vlTracedOne: "Traced {n} step.",
+    vlTracedMany: "Traced {n} steps.",
+    // These two are appended to a "Traced ..." line, so they keep their leading space.
+    vlTruncated: " Stopped early - the program ran too long.",
+    vlThrew: " It threw: {message}",
+    vlFailedHint: "The tracer took too long or could not load. Try again."
   };
+  function thisDotId(frameId) {
+    return `${frameId}:this`;
+  }
   function deriveRefs(stack = []) {
     const refs = [];
     for (const frame of stack) {
+      if (frame.recvId) refs.push({ from: thisDotId(frame.id), to: frame.recvId });
       for (const slot of frame.vars ?? []) {
         if (slot.ref) refs.push({ from: slot.id, to: slot.ref });
       }
@@ -2525,18 +2573,58 @@ ${result.runtimeError}`.trim(),
     return s.replace(/[&<>]/g, (c) => c === "&" ? "&amp;" : c === "<" ? "&lt;" : "&gt;");
   }
 
+  // src/core/template.ts
+  function placeholdersOf(template) {
+    const out = [];
+    for (const m of String(template).matchAll(/\{(\w+)\}/g)) {
+      if (!out.includes(m[1])) out.push(m[1]);
+    }
+    return out;
+  }
+  function fill(template, vars) {
+    return String(template).replace(
+      /\{(\w+)\}/g,
+      (whole, key) => Object.prototype.hasOwnProperty.call(vars, key) ? String(vars[key]) : whole
+    );
+  }
+  function missingPlaceholders(english, candidate) {
+    const have = placeholdersOf(candidate);
+    return placeholdersOf(english).filter((p) => !have.includes(p));
+  }
+  function mergeTemplates(defaults, overrides) {
+    const merged = { ...defaults };
+    const issues = [];
+    if (!overrides) return { merged, issues };
+    for (const key of Object.keys(overrides)) {
+      const value = overrides[key];
+      if (typeof value !== "string") continue;
+      if (!Object.prototype.hasOwnProperty.call(defaults, key)) {
+        merged[key] = value;
+        continue;
+      }
+      const missing = missingPlaceholders(defaults[key], value);
+      if (missing.length) {
+        issues.push({ key, missing });
+        continue;
+      }
+      merged[key] = value;
+    }
+    return { merged, issues };
+  }
+
   // src/dom/heapcards-view.ts
   var HeapCardsView = class {
-    constructor(uid) {
+    constructor(uid, labels = DEFAULT_VIZ_LABELS) {
       // Arrow paths reused across renders (keyed "from->to"), so a reference that
       // stays put keeps its path and only its geometry updates - no flicker.
       this.refPaths = /* @__PURE__ */ new Map();
       // Bumped each render; the redraw loop stops once its generation is stale.
       this.arrowGen = 0;
+      this.labels = labels;
       this.markerId = `clmv-hp-ah-${uid}`;
       this.el = document.createElement("div");
       this.el.className = "cl-mv-region cl-mv-heapcards";
-      this.el.innerHTML = `<span class="cl-mv-tag">MEMORY <span>\xB7 the call stack on the left, objects on the heap on the right</span></span><div class="cl-mv-hp-statics" data-hpstatics></div><div class="cl-mv-hp-cols"><div class="cl-mv-hp-roots" data-hproots></div><div class="cl-mv-hp-objs" data-hpobjs></div><svg class="cl-mv-hp-arrows"><defs><marker id="${this.markerId}" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#2563eb" stroke="none" /></marker></defs></svg></div>`;
+      this.el.innerHTML = `<span class="cl-mv-tag">${esc3(labels.hpMemory)} <span>\xB7 ${esc3(labels.hpMemoryNote)}</span></span><div class="cl-mv-hp-statics" data-hpstatics></div><div class="cl-mv-hp-cols"><div class="cl-mv-hp-roots" data-hproots></div><div class="cl-mv-hp-objs" data-hpobjs></div><svg class="cl-mv-hp-arrows"><defs><marker id="${this.markerId}" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#2563eb" stroke="none" /></marker></defs></svg></div>`;
       this.statics = this.el.querySelector("[data-hpstatics]");
       this.roots = this.el.querySelector("[data-hproots]");
       this.objs = this.el.querySelector("[data-hpobjs]");
@@ -2549,10 +2637,10 @@ ${result.runtimeError}`.trim(),
       this.drawArrows(model.refs);
     }
     render(model) {
-      this.statics.innerHTML = staticsHtml(model.globals ?? [], model.rodata ?? []);
+      this.statics.innerHTML = staticsHtml(model.globals ?? [], model.rodata ?? [], this.labels);
       const stack = model.stack ?? [];
       const frames = stack.map((f, i) => ({ ...f, active: i === stack.length - 1 }));
-      reconcile(this.roots, frames, frameNode);
+      reconcile(this.roots, frames, (f, existing) => frameNode(f, this.labels, existing));
       reconcile(this.objs, (model.heap ?? []).map((o) => ({ ...o })), objNode);
       (model.heap ?? []).forEach((o) => {
         const card = this.el.querySelector(`[data-obj="${o.id}"]`);
@@ -2622,10 +2710,10 @@ ${result.runtimeError}`.trim(),
   function now() {
     return typeof performance !== "undefined" && typeof performance.now === "function" ? performance.now() : Date.now();
   }
-  function staticsHtml(globals, rodata) {
+  function staticsHtml(globals, rodata, labels) {
     return [
-      globals.length ? staticGroupHtml("STATICS", "values shared across the program", globals, true) : "",
-      rodata.length ? staticGroupHtml("CONSTANTS", "fixed at compile time", rodata, false) : ""
+      globals.length ? staticGroupHtml(labels.hpStatics, labels.hpStaticsNote, globals, true) : "",
+      rodata.length ? staticGroupHtml(labels.hpConstants, labels.hpConstantsNote, rodata, false) : ""
     ].join("");
   }
   function staticGroupHtml(title, note, slots, allowHot) {
@@ -2636,30 +2724,53 @@ ${result.runtimeError}`.trim(),
     const hot = allowHot && slot.hot ? " is-changed" : "";
     return `<div class="cl-mv-hp-row${hot}"><span class="cl-mv-hp-name">${esc3(slot.k)}</span><span class="cl-mv-hp-val">${esc3(slot.v)}</span></div>`;
   }
-  function kindLabel(kind) {
+  function kindLabel(kind, labels) {
     switch (kind) {
       case "entry":
-        return "entry point";
+        return labels.hpKindEntry;
       case "static":
-        return "static method";
+        return labels.hpKindStatic;
       case "method":
-        return "instance method";
+        return labels.hpKindMethod;
       case "ctor":
-        return "constructor";
+        return labels.hpKindCtor;
       default:
         return "";
     }
   }
-  function frameNode(f, existing) {
+  function frameNode(f, labels, existing) {
     const el = existing ?? document.createElement("div");
     el.className = "cl-mv-hp-frame" + (f.active ? " is-active" : " is-caller");
-    const label = kindLabel(f.kind);
+    const label = kindLabel(f.kind, labels);
     const badge = label ? `<span class="cl-mv-hp-fkind">${esc3(label)}</span>` : "";
-    const recv = f.recv ? `<div class="cl-mv-hp-frecv">on ${esc3(f.recv)}</div>` : "";
-    const paused = !f.active && typeof f.line === "number" ? `<div class="cl-mv-hp-fpaused">paused at line ${f.line}</div>` : "";
-    const rows = (f.vars ?? []).map(rowHtml3).join("");
-    el.innerHTML = `<div class="cl-mv-hp-fname"><span class="cl-mv-hp-fn">${esc3(f.name ?? f.id)}</span>${badge}</div>` + recv + paused + `<div class="cl-mv-hp-rows">${rows}</div>`;
+    const paused = !f.active && typeof f.line === "number" ? `<div class="cl-mv-hp-fpaused">${esc3(fill(labels.hpPaused, { line: f.line }))}</div>` : "";
+    el.innerHTML = `<div class="cl-mv-hp-fname"><span class="cl-mv-hp-fn">${esc3(f.name ?? f.id)}</span>${badge}</div>` + paused + `<div class="cl-mv-hp-rows">${frameBody(f, labels)}</div>`;
     return el;
+  }
+  function frameBody(f, labels) {
+    const vars = f.vars ?? [];
+    const thisRow = f.recvId ? section("", [refRowHtml(thisDotId(f.id), labels.hpThis, f.recv)], "is-this") : f.recv ? `<div class="cl-mv-hp-frecv">${esc3(fill(labels.hpOn, { recv: f.recv }))}</div>` : "";
+    const params = vars.filter((v) => v.role === "param");
+    const locals = vars.filter((v) => v.role === "local");
+    if (params.length === 0 && locals.length === 0) {
+      return thisRow + vars.map(rowHtml3).join("");
+    }
+    const rest = vars.filter((v) => v.role !== "param" && v.role !== "local");
+    return thisRow + section(labels.hpSecParams, params.map(rowHtml3), "is-params") + section(labels.hpSecLocals, locals.map(rowHtml3), "is-locals") + rest.map(rowHtml3).join("");
+  }
+  function section(head, rows, cls) {
+    if (rows.length === 0) return "";
+    const title = head ? `<div class="cl-mv-hp-sechead">${esc3(head)}</div>` : "";
+    return `<div class="cl-mv-hp-sec ${cls}">${title}${rows.join("")}</div>`;
+  }
+  function refRowHtml(dotId, name, recv) {
+    const who = recv ? `<span class="cl-mv-hp-refname">${instanceHtml(recv)}</span>` : "";
+    return `<div class="cl-mv-hp-row is-ref is-this"><span class="cl-mv-hp-name">${esc3(name)}</span><span class="cl-mv-hp-ref-cell"><span class="cl-mv-hp-arrowglyph">\u2192</span><span class="cl-mv-hp-dot" data-dot="${esc3(dotId)}"></span>${who}</span></div>`;
+  }
+  function instanceHtml(label) {
+    const m = /^(.*?)(\s*#\d+)$/.exec(label);
+    if (!m) return `<span class="cl-mv-hp-ty">${esc3(label)}</span>`;
+    return `<span class="cl-mv-hp-ty">${esc3(m[1])}</span><span class="cl-mv-hp-instno">${esc3(m[2].trim())}</span>`;
   }
   function rowHtml3(v) {
     const kind = slotKind(v);
@@ -2679,12 +2790,12 @@ ${result.runtimeError}`.trim(),
     const el = existing ?? document.createElement("div");
     el.className = "cl-mv-hp-card" + (o.dim ? " is-dim" : "");
     el.setAttribute("data-obj", o.id);
-    const no = typeof o.no === "number" ? ` <span class="cl-mv-hp-no">#${o.no}</span>` : "";
+    const no = typeof o.no === "number" ? `<span class="cl-mv-hp-no">#${o.no}</span>` : "";
     const fields = (o.fields ?? []).map((field) => {
       const isHot = (o.hotFields ?? []).includes(field[0]);
       return `<div class="cl-mv-hp-field${isHot ? " is-hot" : ""}"><span class="cl-mv-hp-fkey">${esc3(field[0])}</span><span class="cl-mv-hp-fval">${esc3(field[1])}</span></div>`;
     }).join("");
-    el.innerHTML = `<div class="cl-mv-hp-type">${esc3(o.type)}${no}</div>` + fields;
+    el.innerHTML = `<div class="cl-mv-hp-type"><span class="cl-mv-hp-tyname">${esc3(o.type)}</span>${no}</div>` + fields;
     return el;
   }
   function esc3(s) {
@@ -2751,17 +2862,18 @@ ${result.runtimeError}`.trim(),
 
   // src/dom/console-view.ts
   var ConsoleView = class {
-    constructor() {
+    constructor(labels = DEFAULT_VIZ_LABELS) {
+      this.labels = labels;
       this.el = document.createElement("div");
       this.el.className = "cl-mv-console";
-      this.el.innerHTML = `<div class="cl-mv-console-head">Console</div><pre class="cl-mv-console-body" data-out></pre>`;
+      this.el.innerHTML = `<div class="cl-mv-console-head">${esc4(labels.consoleHead)}</div><pre class="cl-mv-console-body" data-out></pre>`;
       this.body = this.el.querySelector("[data-out]");
     }
     sync(ctx) {
       const output = ctx.model.output ?? "";
       const printed = ctx.model.printed ?? "";
       if (output === "") {
-        this.body.innerHTML = `<span class="cl-mv-console-idle">Nothing printed yet.</span>`;
+        this.body.innerHTML = `<span class="cl-mv-console-idle">${esc4(this.labels.consoleIdle)}</span>`;
         return;
       }
       if (printed && output.endsWith(printed)) {
@@ -6523,9 +6635,9 @@ ${written}` : written;
         code: (_spec, ctx) => new CodePanel(ctx.code),
         vartable: () => new VarTableView(),
         callstack: () => new CallStackView(),
-        heapcards: (_spec, ctx) => new HeapCardsView(ctx.uid),
+        heapcards: (_spec, ctx) => new HeapCardsView(ctx.uid, ctx.vizLabels),
         narration: (_spec, ctx) => new NarrationView(ctx.vizLabels),
-        console: () => new ConsoleView(),
+        console: (_spec, ctx) => new ConsoleView(ctx.vizLabels),
         agent: (spec, ctx) => new AgentView(spec.fan, ctx.vizLabels),
         agentloop: () => new AgentLoopView(),
         memoryshelf: () => new MemoryShelfView(),
@@ -6761,8 +6873,42 @@ ${written}` : written;
     }
   };
 
+  // src/core/trace-narration.ts
+  var DEFAULT_TRACE_NARRATION = {
+    entered: "Entered `{name}`",
+    calledCtor: "Called the `{type}` constructor",
+    calledOn: "Called `{method}` on `{recv}`",
+    called: "Called `{method}`",
+    ctorFinishedBack: "The `{type}` constructor finished - back in `{caller}`",
+    ctorFinished: "The `{type}` constructor finished",
+    returnedTo: "`{method}` returned to `{caller}`",
+    returned: "`{method}` returned",
+    printed: "Printed `{text}`",
+    printedBlank: "Printed a blank line",
+    setToNew: "Set `{name}` to a new `{type}`",
+    createdNumbered: "Created a `{type}` (`{label}`)",
+    created: "Created a `{type}`",
+    pointedAt: "Pointed `{name}` at `{label}`",
+    setTo: "Set `{name}` to `{value}`",
+    runningLine: "Running this line: `{line}`",
+    running: "Running the program.",
+    // Singular and plural are separate templates rather than one string with an
+    // "s" glued on: not every language pluralises by adding a letter, and the
+    // English original had the suffix baked into the sentence.
+    finishedPrintedOne: "The program finished. It printed {n} line.",
+    finishedPrintedMany: "The program finished. It printed {n} lines.",
+    finishedNoPrint: "The program finished without printing anything.",
+    truncated: "Stopped early - there were too many steps to show the rest.",
+    anObject: "an object"
+  };
+  function resolveNarration(overrides) {
+    const { merged, issues } = mergeTemplates(DEFAULT_TRACE_NARRATION, overrides);
+    return { narration: merged, issues };
+  }
+
   // src/core/exec-tracer-model.ts
-  function traceToSteps(trace) {
+  function traceToSteps(trace, narration) {
+    const t = resolveNarration(narration).narration;
     const src = trace.code ?? [];
     const steps = collapseCallEntries(trace.steps ?? []);
     const out = [];
@@ -6787,7 +6933,7 @@ ${written}` : written;
       const prevFrames = i > 0 ? steps[i - 1].frames ?? [] : [];
       const prevHeapIds = new Set((i > 0 ? steps[i - 1].heap ?? [] : []).map((o) => o.id));
       const step = {
-        narr: describeStep(prevFrames, ts, stack, heap, prevHeapIds, globals, printed, src),
+        narr: describeStep(prevFrames, ts, stack, heap, prevHeapIds, globals, printed, src, t),
         pc: typeof ts.line === "number" && ts.line > 0 ? ts.line - 1 : -1,
         codeLive: true,
         stack,
@@ -6817,7 +6963,7 @@ ${written}` : written;
       const rodata = globalSlots(lastTs.consts ?? []);
       const printedLines = prevStdout ? prevStdout.replace(/\n+$/, "").split("\n").length : 0;
       const terminal = {
-        narr: trace.truncated ? "Stopped early - there were too many steps to show the rest." : printedLines > 0 ? `The program finished. It printed ${printedLines} line${printedLines === 1 ? "" : "s"}.` : "The program finished without printing anything.",
+        narr: trace.truncated ? t.truncated : printedLines > 0 ? fill(printedLines === 1 ? t.finishedPrintedOne : t.finishedPrintedMany, { n: printedLines }) : t.finishedNoPrint,
         pc: -1,
         codeLive: true,
         stack,
@@ -6857,11 +7003,13 @@ ${written}` : written;
       const slot = { id, k: v.name, hot };
       if (v.ref != null) slot.ref = v.ref;
       else slot.v = v.value ?? "";
+      if (v.role) slot.role = v.role;
       return slot;
     });
     const frame = { id: f.id, name: f.name, vars };
     if (f.kind) frame.kind = f.kind;
     if (f.recv) frame.recv = f.recv;
+    if (f.recvId) frame.recvId = f.recvId;
     if (typeof f.line === "number") frame.line = f.line;
     return frame;
   }
@@ -6894,69 +7042,70 @@ ${written}` : written;
   function refDisplay(v) {
     return v.ref != null ? `\u2192${v.ref}` : v.value ?? "null";
   }
-  function describeStep(prevFrames, ts, stack, heap, prevHeapIds, globals, printed, src) {
+  function describeStep(prevFrames, ts, stack, heap, prevHeapIds, globals, printed, src, t) {
     const curFrames = ts.frames ?? [];
     const prevLen = prevFrames.length;
     const curLen = curFrames.length;
-    if (curLen > prevLen) return callNarration(curFrames[curLen - 1]);
-    if (curLen < prevLen) return returnNarration(prevFrames[prevLen - 1], curFrames[curLen - 1]);
-    if (printed) return printedNarration(printed);
+    if (curLen > prevLen) return callNarration(curFrames[curLen - 1], t);
+    if (curLen < prevLen) return returnNarration(prevFrames[prevLen - 1], curFrames[curLen - 1], t);
+    if (printed) return printedNarration(printed, t);
     const topFrame = stack[stack.length - 1];
     const hotSlot = topFrame ? topFrame.vars.find((v) => v.hot) : void 0;
     const created = heap.find((o) => !prevHeapIds.has(o.id));
     if (created && hotSlot && hotSlot.ref != null && hotSlot.ref === created.id) {
-      return "Set `" + hotSlot.k + "` to a new `" + created.type + "`";
+      return fill(t.setToNew, { name: hotSlot.k ?? "", type: created.type });
     }
     if (created) {
       const label = typeof created.no === "number" ? `${created.type} #${created.no}` : created.type;
-      return typeof created.no === "number" ? "Created a `" + created.type + "` (`" + label + "`)" : "Created a `" + created.type + "`";
+      return typeof created.no === "number" ? fill(t.createdNumbered, { type: created.type, label }) : fill(t.created, { type: created.type });
     }
     if (hotSlot) {
-      if (hotSlot.ref != null) return "Pointed `" + hotSlot.k + "` at `" + heapLabel(hotSlot.ref, heap) + "`";
-      return "Set `" + hotSlot.k + "` to `" + (hotSlot.v ?? "") + "`";
+      if (hotSlot.ref != null)
+        return fill(t.pointedAt, { name: hotSlot.k ?? "", label: heapLabel(hotSlot.ref, heap, t) });
+      return fill(t.setTo, { name: hotSlot.k ?? "", value: hotSlot.v ?? "" });
     }
     const g = globals.find((s) => s.hot);
-    if (g) return "Set `" + g.k + "` to `" + g.v + "`";
-    return runningNarration(ts.line, src);
+    if (g) return fill(t.setTo, { name: g.k, value: g.v });
+    return runningNarration(ts.line, src, t);
   }
-  function callNarration(top) {
-    if (top.kind === "entry") return "Entered `" + (top.name || "Main") + "`";
+  function callNarration(top, t) {
+    if (top.kind === "entry") return fill(t.entered, { name: top.name || "Main" });
     if (top.kind === "ctor") {
       const type = (top.name || "").replace(/^new\s+/, "") || "object";
-      return "Called the `" + type + "` constructor";
+      return fill(t.calledCtor, { type });
     }
     const m = methodLabel(top);
-    return top.recv ? "Called `" + m + "` on `" + top.recv + "`" : "Called `" + m + "`";
+    return top.recv ? fill(t.calledOn, { method: m, recv: top.recv }) : fill(t.called, { method: m });
   }
-  function returnNarration(left, back) {
+  function returnNarration(left, back, t) {
     const backName = back ? back.name : null;
     if (left.kind === "ctor") {
       const type = (left.name || "").replace(/^new\s+/, "") || "object";
-      return backName ? "The `" + type + "` constructor finished - back in `" + backName + "`" : "The `" + type + "` constructor finished";
+      return backName ? fill(t.ctorFinishedBack, { type, caller: backName }) : fill(t.ctorFinished, { type });
     }
     const m = methodLabel(left);
-    return backName ? "`" + m + "` returned to `" + backName + "`" : "`" + m + "` returned";
+    return backName ? fill(t.returnedTo, { method: m, caller: backName }) : fill(t.returned, { method: m });
   }
   function methodLabel(f) {
     const name = f.name || "?";
     return name.endsWith(")") ? name : name + "()";
   }
-  function printedNarration(printed) {
+  function printedNarration(printed, t) {
     const parts = printed.replace(/\n+$/, "").split("\n");
     const first = (parts[0] ?? "").replace(/`/g, "");
-    if (first === "") return "Printed a blank line";
+    if (first === "") return t.printedBlank;
     const shown = parts.length > 1 ? first + " \u2026" : first;
-    return "Printed `" + shown + "`";
+    return fill(t.printed, { text: shown });
   }
-  function heapLabel(ref, heap) {
+  function heapLabel(ref, heap, t) {
     const o = heap.find((h) => h.id === ref);
-    if (!o) return "an object";
+    if (!o) return t.anObject;
     return typeof o.no === "number" ? `${o.type} #${o.no}` : o.type;
   }
-  function runningNarration(line, src) {
+  function runningNarration(line, src, t) {
     const text = typeof line === "number" && line > 0 ? (src[line - 1] ?? "").trim() : "";
-    if (!text) return "Running the program.";
-    return "Running this line: `" + text + "`";
+    if (!text) return t.running;
+    return fill(t.runningLine, { line: text });
   }
 
   // src/dom/error-panel.ts
@@ -6975,15 +7124,15 @@ ${written}` : written;
   function renderErrorPanel(errors, labels = {}, options = {}) {
     const l = { ...DEFAULT_LABELS3, ...labels };
     const isWarning = options.kind === "warning";
-    const section = document.createElement("section");
-    section.className = isWarning ? "cl-errors cl-errors--warning" : "cl-errors";
+    const section2 = document.createElement("section");
+    section2.className = isWarning ? "cl-errors cl-errors--warning" : "cl-errors";
     const heading = document.createElement("h3");
     heading.textContent = isWarning ? l.warningHeading : l.heading;
-    section.appendChild(heading);
+    section2.appendChild(heading);
     const note = document.createElement("p");
     note.className = "cl-errors-note";
     note.textContent = isWarning ? l.warningNote : l.note;
-    section.appendChild(note);
+    section2.appendChild(note);
     const list = document.createElement("ul");
     for (const e of errors) {
       const li = document.createElement("li");
@@ -7024,8 +7173,8 @@ ${written}` : written;
       }
       list.appendChild(li);
     }
-    section.appendChild(list);
-    return section;
+    section2.appendChild(list);
+    return section2;
   }
   function showErrorPanel(host, errors, labels, options) {
     host.textContent = "";
@@ -7036,6 +7185,48 @@ ${written}` : written;
     host.appendChild(renderErrorPanel(errors, labels, options));
     host.hidden = false;
     return true;
+  }
+
+  // src/core/viz-trace-outcome.ts
+  function classifyTraceOutcome(result) {
+    if (!result.compiled) {
+      return { status: "did-not-compile", truncated: false, errors: result.errors ?? [] };
+    }
+    const trace = result.trace;
+    const truncated = trace?.truncated === true;
+    const runtimeError = result.runtimeError ?? void 0;
+    if (!trace || (trace.steps?.length ?? 0) === 0) {
+      const empty = { status: "empty", truncated, errors: [] };
+      if (trace) empty.trace = trace;
+      if (runtimeError) empty.runtimeError = runtimeError;
+      return empty;
+    }
+    const status = runtimeError ? "threw" : truncated ? "budget" : "traced";
+    const outcome = { status, trace, truncated, errors: [] };
+    if (runtimeError) outcome.runtimeError = runtimeError;
+    return outcome;
+  }
+  function tracerFailedOutcome(message) {
+    return { status: "failed", truncated: false, errors: [], failure: message };
+  }
+
+  // src/core/wait-progress.ts
+  function bootWait(labels, phase, percent) {
+    if (phase === "download") {
+      const pct = Math.max(0, Math.min(100, Math.round(percent)));
+      return { label: fill(labels.vlBootDownload, { percent: pct }), percent: pct };
+    }
+    return {
+      label: phase === "start" ? labels.vlBootStart : labels.vlBootWarm,
+      percent: null
+    };
+  }
+  function traceWait(labels, elapsedMs) {
+    const secs = Math.floor(Math.max(0, elapsedMs) / 1e3);
+    return {
+      label: secs < 1 ? labels.vlTracing : fill(labels.vlTracingSecs, { secs }),
+      percent: null
+    };
   }
 
   // src/dom/viz-lab.ts
@@ -7065,11 +7256,21 @@ ${written}` : written;
       this.lastSteps = null;
       this.viz = null;
       this.ready = false;
+      this.mounted = false;
+      this.pendingSource = null;
+      this.traceTimer = null;
       this.legend = config.legend;
       this.language = config.language ?? "csharp";
+      this.labels = mergeTemplates(DEFAULT_VIZ_LABELS, config.labels).merged;
+      this.narration = config.narration;
+      this.onTrace = config.onTrace;
       this.runner = new IframeRunner({
         url: config.runnerUrl,
-        readyTimeout: config.readyTimeout ?? 18e4
+        readyTimeout: config.readyTimeout ?? 18e4,
+        // The runtime is ~30MB, so this wait is tens of seconds on a slow line.
+        // Reporting the phase is what answers "is it stuck?" - only the download
+        // has a number, and it is the phase most likely to be the slow one.
+        onProgress: (progress) => this.showBootPhase(progress.phase, progress.percent)
       });
       this.root = document.createElement("div");
       this.root.className = "cl-vl";
@@ -7080,8 +7281,9 @@ ${written}` : written;
       this.vizBtn = document.createElement("button");
       this.vizBtn.type = "button";
       this.vizBtn.className = "cl-btn cl-primary cl-vl-run";
-      this.vizBtn.textContent = "Preparing compiler...";
+      this.vizBtn.textContent = this.labels.vlPreparing;
       this.vizBtn.disabled = true;
+      this.vizBtn.setAttribute("aria-busy", "true");
       this.vizBtn.setAttribute("data-viz", "");
       this.vizBtn.addEventListener("click", () => void this.visualize());
       this.statusEl = document.createElement("span");
@@ -7094,7 +7296,7 @@ ${written}` : written;
       editorPane.append(toolbar, this.editorHost);
       this.stage = document.createElement("div");
       this.stage.className = "cl-vl-stage";
-      this.showHint("Write a small program, then press Visualize to watch it run.");
+      this.showHint(this.labels.vlHint);
       this.root.append(editorPane, this.stage);
       host.appendChild(this.root);
       void this.boot(config.starter ?? DEFAULT_STARTER);
@@ -7102,58 +7304,131 @@ ${written}` : written;
     static create(host, config) {
       return new _VizLab(host, config);
     }
+    /** Paint a wait inside the button: a label naming the phase, over a bar.
+     *
+     *  `percent` null means "no measurable progress" - the bar then animates
+     *  instead of filling, because a fake percentage that creeps to 90% and stops
+     *  is worse than an honest "this is still going". Every wait longer than a
+     *  second lands here, so none of them can look like a hang. */
+    showWait(label, percent) {
+      let bar = this.vizBtn.querySelector(".cl-vl-wait-fill");
+      let text = this.vizBtn.querySelector(".cl-vl-wait-label");
+      if (!bar || !text) {
+        this.vizBtn.textContent = "";
+        const wrap = document.createElement("span");
+        wrap.className = "cl-vl-wait";
+        text = document.createElement("span");
+        text.className = "cl-vl-wait-label";
+        const track = document.createElement("span");
+        track.className = "cl-vl-wait-bar";
+        bar = document.createElement("span");
+        bar.className = "cl-vl-wait-fill";
+        track.appendChild(bar);
+        wrap.append(text, track);
+        this.vizBtn.appendChild(wrap);
+      }
+      text.textContent = label;
+      if (percent === null) {
+        bar.classList.add("is-indeterminate");
+        bar.style.width = "";
+        this.vizBtn.removeAttribute("aria-valuenow");
+      } else {
+        const pct = Math.max(0, Math.min(100, Math.round(percent)));
+        bar.classList.remove("is-indeterminate");
+        bar.style.width = pct + "%";
+        this.vizBtn.setAttribute("aria-valuenow", String(pct));
+      }
+    }
+    /** Put the button back to a plain label, ending whatever wait it was showing. */
+    endWait(label) {
+      if (this.traceTimer !== null) {
+        clearInterval(this.traceTimer);
+        this.traceTimer = null;
+      }
+      this.vizBtn.textContent = label;
+      this.vizBtn.removeAttribute("aria-busy");
+      this.vizBtn.removeAttribute("aria-valuenow");
+    }
+    showBootPhase(phase, percent) {
+      if (this.ready) return;
+      const wait = bootWait(this.labels, phase, percent);
+      this.showWait(wait.label, wait.percent);
+    }
     async boot(starter) {
       await loadMonaco();
       await this.editor.mount(this.editorHost, {
-        value: starter,
+        value: this.pendingSource ?? starter,
         language: this.language,
         readOnly: false,
         autoHeight: { minHeight: 220, maxHeight: 640 }
       });
+      this.mounted = true;
+      if (this.pendingSource !== null) {
+        this.editor.setValue(this.pendingSource);
+        this.pendingSource = null;
+      }
       try {
         await this.runner.warm();
       } catch {
       } finally {
         this.ready = true;
         this.vizBtn.disabled = false;
-        this.vizBtn.textContent = "Visualize";
+        this.endWait(this.labels.vlVisualize);
       }
     }
     async visualize() {
       if (!this.ready) return;
       const code = this.editor.getValue();
       this.vizBtn.disabled = true;
-      this.vizBtn.textContent = "Tracing...";
+      this.vizBtn.setAttribute("aria-busy", "true");
+      const startedAt = Date.now();
+      const tick = () => {
+        const wait = traceWait(this.labels, Date.now() - startedAt);
+        this.showWait(wait.label, wait.percent);
+      };
+      tick();
+      if (this.traceTimer !== null) clearInterval(this.traceTimer);
+      this.traceTimer = setInterval(tick, 1e3);
       this.setStatus("");
+      let report = null;
       try {
-        const outcome = await this.runner.trace(code);
-        if (!outcome.compiled) {
-          const errors = normalizeErrors(outcome.errors);
+        const result = await this.runner.trace(code);
+        report = classifyTraceOutcome({
+          compiled: result.compiled,
+          trace: result.trace,
+          runtimeError: result.runtimeError,
+          errors: normalizeErrors(result.errors)
+        });
+        if (!result.compiled) {
+          const errors = normalizeErrors(result.errors);
           this.showErrors(errors);
-          this.setStatus("Did not compile.");
+          this.setStatus(this.labels.vlDidNotCompile);
           if (this.editor.setMarkers) this.editor.setMarkers(errors);
           return;
         }
         if (this.editor.setMarkers) this.editor.setMarkers([]);
-        if (!outcome.trace || outcome.trace.steps.length === 0) {
-          this.showHint("That program produced no steps to show. Add a statement or two inside Main.");
-          this.setStatus("Nothing to trace.");
+        if (!result.trace || result.trace.steps.length === 0) {
+          this.showHint(this.labels.vlNoStepsHint);
+          this.setStatus(this.labels.vlNoSteps);
           return;
         }
-        this.lastTrace = outcome.trace;
-        this.lastSteps = traceToSteps(outcome.trace);
+        this.lastTrace = result.trace;
+        this.lastSteps = traceToSteps(result.trace, this.narration);
         this.render();
         const n = Math.max(0, this.lastSteps.length - 1);
-        let msg = `Traced ${n} step${n === 1 ? "" : "s"}.`;
-        if (outcome.trace.truncated) msg += " Stopped early - the program ran too long.";
-        if (outcome.runtimeError) msg += ` It threw: ${outcome.runtimeError}`;
+        let msg = fill(n === 1 ? this.labels.vlTracedOne : this.labels.vlTracedMany, { n });
+        if (result.trace.truncated) msg += this.labels.vlTruncated;
+        if (result.runtimeError) msg += fill(this.labels.vlThrew, { message: result.runtimeError });
         this.setStatus(msg);
       } catch (err) {
-        this.showHint("The tracer took too long or could not load. Try again.");
-        this.setStatus(String(err.message || err));
+        const message = String(err.message || err);
+        report = tracerFailedOutcome(message);
+        this.showHint(this.labels.vlFailedHint);
+        this.setStatus(message);
       } finally {
         this.vizBtn.disabled = false;
-        this.vizBtn.textContent = "Visualize";
+        this.endWait(this.labels.vlVisualize);
+        if (report) this.onTrace?.(report);
       }
     }
     /** The one layout: the memory view (call stack + heap objects) in the wide
@@ -7183,6 +7458,7 @@ ${written}` : written;
         steps: this.lastSteps,
         layout: layout2,
         legend: this.legend,
+        labels: this.labels,
         deriveRefs: true,
         autoDim: true,
         onStep: (info) => this.editor.highlightLine?.(info.pc)
@@ -7211,6 +7487,26 @@ ${written}` : written;
     }
     setStatus(text) {
       this.statusEl.textContent = text;
+    }
+    /** Load a different exercise into the editor without tearing the widget down,
+     *  so a lesson can move between cards while keeping the one warmed compiler
+     *  this surface owns. Clears the stage back to its hint - the picture on
+     *  screen belongs to the code that produced it, never to the next exercise. */
+    setSource(code) {
+      if (!this.mounted) {
+        this.pendingSource = code;
+        return;
+      }
+      this.editor.setValue(code);
+      if (this.editor.setMarkers) this.editor.setMarkers([]);
+      this.setStatus("");
+      this.showHint(this.labels.vlHint);
+    }
+    /** The learner's current code. A host grades the trace, not the text; this is
+     *  for saving work and for restoring it, not for marking. */
+    getSource() {
+      if (!this.mounted) return this.pendingSource ?? "";
+      return this.editor.getValue();
     }
     destroy() {
       this.teardownViz();
@@ -7505,7 +7801,7 @@ ${written}` : written;
     xpLine: " +{xp} XP.",
     courseXp: "Course XP: {xp}"
   };
-  function fill(tpl, vars) {
+  function fill2(tpl, vars) {
     return tpl.replace(/\{(\w+)\}/g, (_m, k) => k in vars ? String(vars[k]) : `{${k}}`);
   }
   var CONCEPT_PROGRESS_KEY = "course_concept_progress";
@@ -7603,7 +7899,7 @@ ${written}` : written;
       this.els.result.classList.remove("is-pass", "is-fail");
       this.els.submit.hidden = false;
       this.els.retry.hidden = true;
-      this.els.progress.textContent = this.store.hasPassed() ? fill(this.labels.progressPassed, { n: this.plan.questions.length }) : fill(this.labels.progressFresh, { n: this.plan.questions.length, m: this.plan.needed });
+      this.els.progress.textContent = this.store.hasPassed() ? fill2(this.labels.progressPassed, { n: this.plan.questions.length }) : fill2(this.labels.progressFresh, { n: this.plan.questions.length, m: this.plan.needed });
     }
     renderQuestions() {
       this.els.questions.innerHTML = "";
@@ -7634,7 +7930,7 @@ ${written}` : written;
         this.els.result.hidden = false;
         this.els.result.classList.remove("is-pass", "is-fail");
         this.els.resultTitle.textContent = this.labels.answerAll;
-        this.els.resultBody.textContent = fill(this.labels.stillNeeds, { n: missing + 1 });
+        this.els.resultBody.textContent = fill2(this.labels.stillNeeds, { n: missing + 1 });
         this.els.continue.innerHTML = "";
         const block = this.els.questions.children[missing];
         if (block) block.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -7677,8 +7973,8 @@ ${written}` : written;
       this.els.result.classList.toggle("is-pass", passed);
       this.els.result.classList.toggle("is-fail", !passed);
       this.els.resultTitle.textContent = passed ? this.labels.passTitle : this.labels.failTitle;
-      const xpLine = passed && this.awardAmount ? fill(this.labels.xpLine, { xp: this.awardAmount }) : "";
-      this.els.resultBody.innerHTML = fill(this.labels.scoredLine, { score, total, needed: this.plan.needed }) + (passed ? xpLine + this.labels.passTail : this.labels.failTail);
+      const xpLine = passed && this.awardAmount ? fill2(this.labels.xpLine, { xp: this.awardAmount }) : "";
+      this.els.resultBody.innerHTML = fill2(this.labels.scoredLine, { score, total, needed: this.plan.needed }) + (passed ? xpLine + this.labels.passTail : this.labels.failTail);
       this.els.continue.innerHTML = "";
       if (passed && this.cfg.nextHref) {
         const link = document.createElement("a");
@@ -7689,14 +7985,14 @@ ${written}` : written;
       }
       this.els.submit.hidden = true;
       this.els.retry.hidden = false;
-      this.els.progress.textContent = fill(this.labels.progressScored, { score, total });
+      this.els.progress.textContent = fill2(this.labels.progressScored, { score, total });
       this.els.result.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
     /** Report the current XP to the host, which owns any XP label. */
     refreshXpLabel() {
       this.cfg.onXpChange?.(this.store.getXP());
       const label = document.getElementById("courseXpLabel");
-      if (label) label.textContent = fill(this.labels.courseXp, { xp: this.store.getXP() });
+      if (label) label.textContent = fill2(this.labels.courseXp, { xp: this.store.getXP() });
     }
   };
   return __toCommonJS(src_exports);
