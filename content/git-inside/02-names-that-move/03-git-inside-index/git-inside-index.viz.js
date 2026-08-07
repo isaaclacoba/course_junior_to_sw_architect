@@ -38,7 +38,7 @@
     },
     steps: [
       {
-        narr: "Lesson three showed that adding a file writes a blob, and the index is what names that blob so `git fsck` does not report it as dangling. The index was the answer to a question, but the file itself was never opened. Here it becomes the subject.",
+        narr: "`HEAD` names the ref that moves when a commit is saved. Nothing so far says what that commit will hold. The file at **`.git/index`** decides, and it is the one file in this lesson that is not readable text.",
         objects: { lens: "chain", acts: [WRITE, STORE], fresh: 1, note: "one file added" }
       },
       {

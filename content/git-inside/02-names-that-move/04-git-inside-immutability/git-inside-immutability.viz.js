@@ -59,7 +59,7 @@
         objects: { lens: "chain", acts: TWO_COMMITS.concat(RESET), fresh: 1, note: "reset moved the ref back" }
       },
       {
-        narr: "An unreachable commit does not disappear immediately. The reflog names it - `HEAD@{1}` still points at the commit `main` used to reach - which is why `git fsck` does not report it as dangling. Only when the reflog expires does the commit become truly unreachable, and even then it stays in the store until garbage collection runs.",
+        narr: "An unreachable commit does not disappear immediately. The reflog still names it - `HEAD@{1}` points at the commit `main` used to reach - so from git\u2019s side something does reach it, and it is not treated as garbage. Only when the reflog expires does the commit become truly unreachable, and even then it stays in the store until garbage collection runs.",
         objects: { lens: "chain", acts: SETUP.concat(AMEND), fresh: 0, note: "reflog keeps it reachable" }
       },
       {

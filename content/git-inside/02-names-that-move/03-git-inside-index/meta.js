@@ -6,7 +6,7 @@ window.LESSON_META = {
   eyebrow: "Inside git · Part two · Names that move",
   title: "What is the staging area, as a file?",
   intro: [
-    "Lesson three established that adding a file writes a blob to the object store, and that the index is what reaches the blob so it does not show up as dangling. But the index itself was never opened - it existed only as the answer to why an added file does not disappear. Here it becomes the thing being examined, and the file it leads to is no longer a mystery."
+    "Part two has been about names. A ref names a commit, and `HEAD` names the ref that moves when a commit is saved. None of that says what the commit will actually contain. One more file decides that - and it is the only file in `.git` you cannot read as text."
   ],
   blurb: "Open the index and see what staging really writes. It is a binary file mapping paths to blob ids and file modes, nothing more.",
   links: [{ href: "index.html", label: "Back to the course" }],
