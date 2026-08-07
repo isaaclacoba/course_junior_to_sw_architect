@@ -1,5 +1,5 @@
 # Teaching the object model - class vs instance, constructors, parameters
-Status: design accepted - build not started  -  Design: [docs/architecture/object-model-teaching.md](../architecture/object-model-teaching.md)
+Status: building - phase 1 of 4  -  Design: [docs/architecture/object-model-teaching.md](../architecture/object-model-teaching.md)
 
 ## Goal
 Students finish Part 1 unable to tell a class from an instance and cannot say what a
@@ -72,3 +72,9 @@ Phase 4 - close
 - 2026-08-06 - Design round run with the owner: 8 decisions ratified, grounded on a
   141-task measurement, a proven tracer, and two measured mockups. Design of record and
   this brief written. No code yet.
+- 2026-08-07 - Bookkeeping so the factory can track this feature. The grounding really
+  happened but was never written to the journal, so the FSM was skipping the feature as
+  pre-FSM. Recorded the 141-task measurement (`audit`) and the tracer/mockup runs (`poc`)
+  as retro-labelled output rows, removed the slug from `docs/journal/factory-config.json`,
+  and set the feature status to `building`. The ladder now reads
+  `recall/grounding/deciding/specifying` green and `building` at 8/25. Starting phase 1.
