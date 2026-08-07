@@ -241,7 +241,7 @@
       var count = m.parts.reduce(function (n, p) { return n + p.lessons.length; }, 0);
       var word = count === 1 ? tr("landing.lesson", "lesson") : tr("landing.lessons", "lessons");
       return '<button type="button" class="c-sub-btn' + (m.id === selected ? " is-active" : "") +
-        '" data-track="' + m.id + '" role="tab" aria-selected="' + (m.id === selected) + '">' +
+        '" data-track="' + m.id + '" role="tab" aria-selected="' + (m.id === selected) + '">' + // i18n-ignore: markup and attribute names, not text a learner reads.
         txt.groupLabel + '<small>' + count + " " + word + "</small></button>";
     }).join("");
   }

@@ -32,7 +32,7 @@
 
     return {
       id: "theme",
-      title: tr("settings.theme", "Theme"),
+      title: function () { return tr("settings.theme", "Theme"); },
       options: function () {
         var active = CourseTheme.get();
         return Themes.list().map(function (t) {

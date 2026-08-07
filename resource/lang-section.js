@@ -29,7 +29,7 @@
 
     return {
       id: "language",
-      title: t("settings.language", "Language"),
+      title: function () { return t("settings.language", "Language"); },
       options: function () {
         var active = pref.get();
         return pref.values.map(function (id) {

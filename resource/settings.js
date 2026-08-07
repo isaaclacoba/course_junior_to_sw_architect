@@ -13,6 +13,11 @@
 (function (global) {
   "use strict";
 
+  function tr(key, fallback) {
+    var C = (typeof window !== "undefined") && window.LessonCommon;
+    return (C && typeof C.t === "function") ? C.t(key, fallback) : fallback;
+  }
+
   function create(opts) {
     var sections = (opts && opts.sections) || [];
     var root = null;
@@ -31,6 +36,15 @@
     function optionsOf(sec) {
       var o = sec.options;
       return (typeof o === "function" ? o() : o) || [];
+    }
+
+    // A section's title may be a plain string or a function. A function is
+    // re-evaluated on every render, which is what lets the panel come out in the
+    // new language after a locale switch - a string captured at create() time
+    // would stay in whatever language was loaded when the section was built.
+    function titleOf(sec) {
+      var t = sec.title;
+      return (typeof t === "function" ? t() : t) || "";
     }
 
     function renderItem(container, sec, opt, ctx) {
@@ -69,6 +83,20 @@
       container.appendChild(item);
     }
 
+    // The gear button's own label. Painted here rather than at mount() so a
+    // locale switch repaints it too - it is the one control that is visible
+    // without opening the panel, so an English "Settings" next to a Spanish page
+    // is the first thing a learner sees.
+    function renderButton() {
+      if (!root) return;
+      var btn = root.querySelector(".c-settings-btn");
+      if (!btn) return;
+      var label = tr("settings.title", "Settings");
+      btn.setAttribute("aria-label", label);
+      var span = btn.querySelector("span");
+      if (span) span.textContent = label;
+    }
+
     function renderPanel() {
       if (!panel) return;
       panel.innerHTML = "";
@@ -79,7 +107,7 @@
         group.className = "c-settings-group";
         var title = document.createElement("p");
         title.className = "c-settings-title";
-        title.textContent = sec.title || "";
+        title.textContent = titleOf(sec);
         group.appendChild(title);
         var body = document.createElement("div");
         body.className = "c-settings-body";
@@ -103,11 +131,10 @@
       btn.className = "c-settings-btn";
       btn.setAttribute("aria-haspopup", "true");
       btn.setAttribute("aria-expanded", "false");
-      btn.setAttribute("aria-label", "Settings");
       btn.innerHTML =
         '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">' +
         '<path fill="currentColor" d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm8.4 3.5c0-.5-.05-.98-.13-1.45l1.87-1.46-1.9-3.29-2.2.9a7.6 7.6 0 0 0-2.5-1.45L15 2.5H9l-.44 2.25a7.6 7.6 0 0 0-2.5 1.45l-2.2-.9-1.9 3.29 1.87 1.46a7.7 7.7 0 0 0 0 2.9L2 14.41l1.9 3.29 2.2-.9c.74.62 1.58 1.11 2.5 1.45L9 20.5h6l.44-2.25a7.6 7.6 0 0 0 2.5-1.45l2.2.9 1.9-3.29-1.87-1.46c.08-.47.13-.95.13-1.45Z"/>' +
-        "</svg><span>Settings</span>";
+        "</svg><span></span>";
       btn.addEventListener("click", function (e) {
         e.stopPropagation();
         setOpen(!open);
@@ -121,6 +148,7 @@
       root.appendChild(btn);
       root.appendChild(panel);
       document.body.appendChild(root);
+      renderButton();
       renderPanel();
 
       document.addEventListener("click", function (e) {
@@ -131,7 +159,12 @@
       });
     }
 
-    return { mount: mount, refresh: renderPanel };
+    function refresh() {
+      renderButton();
+      renderPanel();
+    }
+
+    return { mount: mount, refresh: refresh };
   }
 
   global.SiteSettings = { create: create };

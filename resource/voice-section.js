@@ -30,7 +30,7 @@
 
     return {
       id: "voice",
-      title: t("settings.voice", "Reading voice"),
+      title: function () { return t("settings.voice", "Reading voice"); },
       options: function () {
         var active = pref.get();
         return pref.values.map(function (id) {

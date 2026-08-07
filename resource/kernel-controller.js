@@ -217,6 +217,10 @@
     var myGen = ++gen;
     return Promise.all([manager.init(), loadChrome(langPref.get()), ensureConceptData(langPref.get())]).then(function (arr) {
       if (myGen !== gen) return; // superseded by a newer selection
+      // Repaint Settings a SECOND time, now that the new chrome strings are in.
+      // The synchronous refresh above only moved the active-row highlight; the
+      // labels themselves could not have changed language yet.
+      if (settings) settings.refresh();
       bind(arr[0]); // refresh PAGE.hero.intro + LESSON_CONFIG once, before the fan-out
       buildConceptSource(langPref.get()); // gen-guarded: never sets a stale source
       surfaces.forEach(function (s) {

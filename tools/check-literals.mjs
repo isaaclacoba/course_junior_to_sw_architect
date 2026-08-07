@@ -44,7 +44,7 @@ const root = path.resolve(__dirname, "..");
 // Files whose strings a learner can read. page-shell.js is generated from
 // kernel/page-shell/*, so the SOURCE is checked and the artefact is skipped.
 export const JS_ROOTS = ["."];
-export const JS_DIRS = ["kernel/page-shell", "kernel/grading", "kernel/engine", "kernel/engine/plugins"];
+export const JS_DIRS = ["kernel/page-shell", "kernel/grading", "kernel/engine", "kernel/engine/plugins", "resource"];
 export const HTML_FILES = ["index.html"];
 
 // Files this linter deliberately does not read. Keep this list SHORT and keep it
