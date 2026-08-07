@@ -30,8 +30,7 @@
     code: [],
     legend: [
       { sw: "#1f6f5f", label: "an object, and everything inside it" },
-      { sw: "#55c86a", label: "stored just now" },
-      { sw: "#8b98a5", label: "dashed - nothing points at it yet" }
+      { sw: "#55c86a", label: "stored just now" }
     ],
     layout: {
       visual: [{ type: "objects" }],

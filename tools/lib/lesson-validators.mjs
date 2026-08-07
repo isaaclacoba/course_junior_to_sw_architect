@@ -372,6 +372,22 @@ export function createValidators(deps) {
               bad(`step ${i + 1} objects: ${out.acts.length} act(s) changed nothing - check the act names`);
               allOk = false;
             }
+            // A `focus` key that matches nothing is silent in a browser: the
+            // band simply does not appear, and the card ships pointing at a
+            // line nobody drew. `objectFocusKeys` is the widget's own list of
+            // what each step draws, so this cannot drift from the picture.
+            const focus = out.focus || [];
+            if (focus.length && typeof CL.objectFocusKeys === "function") {
+              // Lens-aware: the chain lens draws objects and refs, the folder
+              // lens draws the rest of `.git` too, so `HEAD` is a real key on
+              // one and a silent no-op on the other.
+              const known = new Set(CL.objectFocusKeys(replay, out.detail, out.lens));
+              const unknown = focus.filter((k) => !known.has(k));
+              if (unknown.length) {
+                bad(`step ${i + 1} objects: focus ${unknown.map((k) => `"${k}"`).join(", ")} matches nothing drawn by the "${out.lens}" lens here`);
+                allOk = false;
+              }
+            }
           }
         }
         catch (e) { bad(`step ${i + 1} ${field} resolver threw: ${e.message}`); allOk = false; }

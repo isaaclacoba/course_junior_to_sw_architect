@@ -8,7 +8,6 @@
   "intro.0": "Un blob guarda bytes y olvida todo lo demás. El objeto que recuerda que tu archivo se llamaba `notes.md` es el tree - y además anota un bit de permisos, anida un objeto por directorio, y cambia su propio id en cuanto cambia cualquier cosa por debajo.",
   "legend.0": "un objeto, y todo lo que lleva dentro",
   "legend.1": "escrito ahora mismo",
-  "legend.2": "a rayas - todavía no apunta nada hacia él",
   "step.0.narr": "Los blobs llevan bytes y ningún nombre, así que por sí solos no pueden reconstruir una carpeta. Git cubre ese hueco con un segundo tipo de objeto, el **tree**, cuyas filas emparejan un nombre con el id de los bytes que van debajo.",
   "step.1.narr": "Aquí hay uno, con los dos archivos dentro. El objeto entero son esas filas - un tree no guarda fechas, ni tamaños, ni historial. Responde a una sola pregunta: qué nombres tiene esta carpeta y qué hay bajo cada uno.",
   "step.2.narr": "Cada fila empieza además con un número. Git no guarda casi nada sobre permisos - solo si un archivo está pensado para ejecutarse, más a qué clase de cosa lleva la fila. Con cinco valores se cubren todos los casos, y esa forma tan rara viene heredada de Unix.",

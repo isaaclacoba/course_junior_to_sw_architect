@@ -53,27 +53,27 @@
     steps: [
       {
         narr: "Every name so far has come from bytes. A blob, a tree and a commit are each named by the SHA-1 of what is inside them, so nobody picks those names - the contents decide. That leaves git with no word a person can say out loud. A **ref** is that word.",
-        objects: { lens: "folder", acts: ONE, fresh: 1, note: "one commit, and one name for it" }
+        objects: { lens: "folder", acts: ONE, fresh: 1, focus: ["main"], note: "one commit, and one name for it" }
       },
       {
         narr: "A ref is a file. **`.git/refs/heads/main`** sits in the hidden `.git` folder, and the word `main` is its filename - chosen by a person, typed by hand, with no SHA-1 anywhere in it.",
-        objects: { lens: "folder", acts: ONE, fresh: 0, note: "refs/heads/main - a file with a chosen name" }
+        objects: { lens: "folder", acts: ONE, fresh: 0, focus: ["main", "refs/heads/"], note: "refs/heads/main - a file with a chosen name" }
       },
       {
         narr: "Inside that file is one commit id and nothing else. No message, no date, no tree, no list of earlier commits. All of that lives in the commit itself; the ref only says which commit.",
-        objects: { lens: "folder", acts: ONE, fresh: 0, open: "commit", note: "all of this is in the commit, not the ref" }
+        objects: { lens: "folder", acts: ONE, fresh: 0, open: "commit", focus: ["main", "commit"], note: "all of this is in the commit, not the ref" }
       },
       {
         narr: "The file is **41 bytes**: forty hexadecimal characters, then one newline. A SHA-1 is always 160 bits, so that size never varies - and the branch's name is the filename rather than part of the contents, so a branch called `fix` and one called `release-candidate-2026` both store exactly 41 bytes.",
-        objects: { lens: "both", acts: ONE, fresh: 0, note: "41 bytes, whatever the branch is called" }
+        objects: { lens: "both", acts: ONE, fresh: 0, focus: ["main"], note: "41 bytes, whatever the branch is called" }
       },
       {
         narr: "A second commit arrives, and `main` is rewritten to hold the new id. The filename never changed - the 41 bytes inside it did. That rewrite is the whole of what people call moving a branch.",
-        objects: { lens: "folder", acts: MOVED, fresh: 3, note: "same filename, different 41 bytes" }
+        objects: { lens: "folder", acts: MOVED, fresh: 3, focus: ["main"], note: "same filename, different 41 bytes" }
       },
       {
         narr: "Nothing stops a second file naming an older commit. `fix` holds the first commit's id while `main` holds the second, and both commits sit untouched in the store. Which commits a repository can still reach is decided entirely by these small files - and the next lesson opens the one that decides which of them git writes to next.",
-        objects: { lens: "folder", acts: TWO_NAMES, fresh: 1, note: "two names, two commits, one store" }
+        objects: { lens: "folder", acts: TWO_NAMES, fresh: 1, focus: ["main", "fix"], note: "two names, two commits, one store" }
       }
     ]
   };

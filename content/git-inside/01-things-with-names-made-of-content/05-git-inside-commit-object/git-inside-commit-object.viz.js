@@ -57,7 +57,7 @@
       },
       {
         narr: "Nothing about naming changes for this object either. The same header goes in front - `commit 180` for a body of 180 bytes - and SHA-1 over the lot gives **089528ab9685d519f68fcfc73b52c17237b1990f**. That id therefore covers the message, the timestamps, the tree, and through the tree every byte of every file.",
-        objects: { lens: "chain", acts: NAMED, fresh: 0, open: "commit", openRaw: true, note: "the same header rule, applied to a commit" }
+        objects: { lens: "chain", acts: NAMED, fresh: 0, open: "commit", openRaw: true, focus: ["commit"], note: "the same header rule, applied to a commit" }
       },
       {
         narr: "A second save writes a commit with one line the first could not have: **`parent`**, holding the id of the save before it. Each commit naming the one before turns a heap of saves into a chain that can be followed backwards, and nothing else in git is needed to make history exist.",

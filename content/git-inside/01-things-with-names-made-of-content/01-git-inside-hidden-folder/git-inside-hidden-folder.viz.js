@@ -36,19 +36,19 @@
       },
       {
         narr: "Most of that can be set aside. `config` holds settings for this one repository, `description` is used by a single old web viewer, and `hooks/` is a dozen sample scripts, all switched off. **Three things** carry the whole idea: `objects/`, `refs/heads/` and `HEAD`.",
-        objects: { lens: "folder", acts: [], fresh: 0, note: "the three parts the rest of this track is about" }
+        objects: { lens: "folder", acts: [], fresh: 0, focus: ["objects/", "refs/heads/", "HEAD"], note: "the three parts the rest of this track is about" }
       },
       {
         narr: "Only one of the three has anything in it. `HEAD` is a text file holding **a single line** - `ref: refs/heads/main`. It carries no work of its own; it names a file in `refs/heads/`, and that file does not exist yet. A branch, before its first save, is a name git is expecting rather than a thing git has.",
-        objects: { lens: "folder", acts: [], fresh: 0, note: "HEAD names a file that is not there yet" }
+        objects: { lens: "folder", acts: [], fresh: 0, focus: ["HEAD", "refs/heads/"], note: "HEAD names a file that is not there yet" }
       },
       {
         narr: "`objects/` is where everything git keeps ends up, one file per thing, and it stays empty while the work does not. New files appear in the folder alongside `.git` and nowhere inside it. Git watches nothing; something has to hand a file over before git holds a copy.",
-        objects: { lens: "folder", acts: [NOTES, TODO], fresh: 2, note: "two files here, and nothing yet in objects/" }
+        objects: { lens: "folder", acts: [NOTES, TODO], fresh: 2, focus: ["objects/", "your folder"], note: "two files here, and nothing yet in objects/" }
       },
       {
         narr: "A repository, then, is three parts: a place for things, a place for names, and one line saying which name is current. At this point two are empty and one is expecting. What fills `objects/` first, and where its name comes from, is the next lesson.",
-        objects: { lens: "folder", acts: [NOTES, TODO], fresh: 0, note: "a repository, before its first save" }
+        objects: { lens: "folder", acts: [NOTES, TODO], fresh: 0, focus: ["objects/", "refs/heads/", "HEAD"], note: "a repository, before its first save" }
       }
     ]
   };

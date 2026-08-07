@@ -6,7 +6,6 @@
   "intro.0": "La lección anterior decía que git nombra una cosa aplicando un hash a su contenido. Aplica tú el hash a tu archivo y te sale un número distinto del que sacó git. Algo entra en ese hash que tú nunca ves - y cuando sepas qué es, también podrás explicar por qué editar un carácter duplica un archivo entero, y por qué cambiar los permisos de un archivo no cuesta absolutamente nada.",
   "legend.0": "un objeto, y todo lo que lleva dentro",
   "legend.1": "guardado ahora mismo",
-  "legend.2": "a rayas - todavía no apunta nada hacia él",
   "step.0.narr": "El objeto de la lección anterior tiene una clase, y git la llama **blob**. Una fila, un id, un cometido: guardar el contenido de un solo archivo.",
   "step.1.narr": "Abierto, contiene `hello world` y ahí se acaba. Ni `notes.md`, ni fecha, ni autor, ni carpeta, ni permisos - falta todo lo que cualquiera llamaría información *sobre* el archivo. Solo sobrevivieron los bytes del propio archivo.",
   "step.2.narr": "Lo cual plantea un problema. SHA-1 sobre exactamente esos bytes devuelve **22596363b3de40b06f981fb85d82312e8c0ed511**, y el blob se llama `3b18e51`. Si el objeto guarda solo el contenido, el id no se calculó solo a partir del contenido.",

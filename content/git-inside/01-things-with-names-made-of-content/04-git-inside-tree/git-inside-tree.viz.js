@@ -30,8 +30,7 @@
     code: [],
     legend: [
       { sw: "#1f6f5f", label: "an object, and everything inside it" },
-      { sw: "#55c86a", label: "written just now" },
-      { sw: "#8b98a5", label: "dashed - nothing points at it yet" }
+      { sw: "#55c86a", label: "written just now" }
     ],
     layout: {
       visual: [{ type: "objects" }],
@@ -56,7 +55,7 @@
       },
       {
         narr: "Because names come from contents, a change never stays where it happened. A different byte in `docs/guide.md` makes a different blob id, which changes a row in the `docs` tree, which changes that tree's id, which changes a row in the top tree. One edit, three renamed objects - and the top id now stands for every byte beneath it.",
-        objects: { lens: "chain", acts: NESTED_EDITED, fresh: 3, note: "the top id summarises everything under it" }
+        objects: { lens: "chain", acts: NESTED_EDITED, fresh: 3, focus: ["2a1d812"], note: "the top id summarises everything under it" }
       }
     ]
   };
