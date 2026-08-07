@@ -92,6 +92,19 @@
               "pill": "gentle",
               "time": "25 min",
               "kind": "lesson"
+            },
+            {
+              "id": "many-objects",
+              "track": "practical",
+              "part": "understand-the-ideas",
+              "href": "content/practical/01-understand-the-ideas/07-many-objects/",
+              "key": "many_objects_awarded",
+              "total": 3,
+              "title": "One class, many objects",
+              "blurb": "Make several objects from one class and watch them appear in memory, each with its own values.",
+              "pill": "gentle",
+              "time": "20 min",
+              "kind": "lesson"
             }
           ]
         },

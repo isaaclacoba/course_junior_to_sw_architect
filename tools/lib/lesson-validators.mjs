@@ -31,6 +31,9 @@ const structure = require_("../../kernel/grading/structure-match.js");
 // The SAME policy the browser widget paints with, so a gate CI calls dead is the
 // gate the learner sees stay dashed - there is no second opinion to drift from.
 const gitGoals = require_("../../kernel/grading/git-goal-match.js");
+// The SAME trace-gate vocabulary the lab card grades with, for the same reason:
+// a gate this file called valid and the widget calls unknown is a row that never ticks.
+const traceMatch = require_("../../kernel/grading/trace-match.js");
 
 // Scene-panel roots a viz lesson may mount.
 export const PANEL_CLASSES = ["cl-tx", "cl-al", "cl-rg", "cl-pb", "cl-mv", "cl-ms", "cl-tr", "cl-ag"];
@@ -402,6 +405,70 @@ export function createValidators(deps) {
   }
 
   /**
+   * The lab half of "the tracker must be able to LIGHT UP".
+   *
+   * A lab gate is answered by RUNNING the learner's code, so there is no static
+   * way to prove it goes green - and pretending otherwise (scanning the solution
+   * as C# the way a build gate is scanned) reads every trace gate as empty and
+   * condemns correct content. What this asserts instead is the part that can be
+   * wrong on the page without anyone noticing:
+   *
+   *   - the card HAS gates (no gates = cannot pass, by trace-match's own rule)
+   *   - every gate is one the grader RECOGNISES - `checkGate` on an empty trace
+   *     returns the "we cannot check" message for a shape it has never heard of,
+   *     so a typo like `liveObject` is caught here rather than staying grey
+   *   - each goal row carries its own `gate`, or the live tracker has nothing
+   *     to tick while the learner types
+   *   - the type a gate names appears in the authored solution
+   */
+  function checkLabTracker(t, label) {
+    const gates = t.gates || [];
+    const goals = t.goals || [];
+    if (!gates.length && !goals.length) return true;
+
+    let ok = true;
+    const fail = (msg) => { ok = false; bad(`${label} ${msg}`); };
+
+    if (!gates.length) {
+      fail("has goals but no `gates` - a lab card with no gates can never be marked correct");
+    }
+
+    // The message trace-match returns for a shape it does not know. Compared
+    // against, not re-listed, so the vocabulary lives in exactly one file.
+    const UNKNOWN = traceMatch.checkGate({ steps: [] }, {}).message;
+    const source = String(t.solution || "");
+
+    const namedTypes = (gate) => {
+      if (typeof gate.constructed === "string") return [gate.constructed];
+      if (typeof gate.liveObjects === "string") return [gate.liveObjects];
+      if (gate.distinctField && typeof gate.distinctField === "object") return [gate.distinctField.type];
+      if (gate.calls && typeof gate.calls === "object") return [gate.calls.type];
+      return [];
+    };
+
+    const checkOne = (gate, where) => {
+      if (!gate || typeof gate !== "object") {
+        fail(`${where} has no gate - it could never tick`);
+        return;
+      }
+      if (traceMatch.checkGate({ steps: [] }, gate).message === UNKNOWN) {
+        fail(`${where} gate (${JSON.stringify(gate)}) is not a shape the trace grader knows - check the spelling against kernel/grading/trace-match.js`);
+        return;
+      }
+      namedTypes(gate).filter(Boolean).forEach((type) => {
+        if (source && !new RegExp("\\b" + type.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b").test(source)) {
+          fail(`${where} gate names \`${type}\`, which the authored solution never mentions - it could never tick`);
+        }
+      });
+    };
+
+    gates.forEach((g, i) => checkOne(g, `gates[${i}]`));
+    goals.forEach((g, i) => checkOne(g && g.gate, `goals[${i}]`));
+
+    return ok;
+  }
+
+  /**
    * The git half of "the tracker must be able to LIGHT UP".
    *
    * Same contract as checkTracker for C#, but the evidence is a REPLAY rather
@@ -525,6 +592,46 @@ export function createValidators(deps) {
     return tracker && compiled;
   }
 
+  // A lab lesson's own verify. `expected` is not part of the archetype - the card
+  // is judged by the trace, not by stdout - so the compile half is asked only
+  // whether the solution BUILDS, and a missing `expected` is not a failure.
+  function verifyLab(args) {
+    const gates = verifyLabTracker(args);
+    const compiled = verifyLabCompiled(args);
+    return gates && compiled;
+  }
+
+  function verifyLabTracker({ config }) {
+    let allOk = true;
+    (config.tasks || []).filter((t) => !t.summary).forEach((t, i) => {
+      if (checkLabTracker(t, taskLabel(t, i))) ok(`${taskLabel(t, i)} gates are checkable`);
+      else allOk = false;
+    });
+    return allOk;
+  }
+
+  function verifyLabCompiled({ config, opts }) {
+    if (opts.noDotnet) { skip("dotnet compile (--no-dotnet)"); return true; }
+    if (!deps.dotnet.available()) { skip("dotnet compile (no dotnet on PATH)"); return true; }
+    let allOk = true;
+    (config.tasks || []).filter((t) => !t.summary).forEach((t, i) => {
+      const label = taskLabel(t, i);
+      // Both halves matter: a starter that does not build hands the learner a
+      // red panel before they have typed anything.
+      [["starter", t.starter], ["solution", t.solution]].forEach(([which, src]) => {
+        if (!src) { skip(`${label} - no ${which}`); return; }
+        const run = deps.dotnet.compileRun(src);
+        if (!run.built) { bad(`${label} ${which} did not compile\n${firstError(run.errors)}`); allOk = false; return; }
+        const shown = (run.warningIds || []).filter((id) => SHOWN_WARNING_IDS.has(id));
+        if (shown.length) {
+          bad(`${label} ${which} compiles with warning(s) the learner would be shown: ${shown.join(", ")}`);
+          allOk = false;
+        } else ok(`${label} ${which} compiles clean`);
+      });
+    });
+    return allOk;
+  }
+
   const list = [
     { archetype: "build", bodyField: "tasks", verify: verifyTasks, rendered: renderedTitle },
     { archetype: "drill", bodyField: "tasks", verify: verifyTasks, rendered: renderedTitle },
@@ -533,6 +640,17 @@ export function createValidators(deps) {
     // The git body is the terminal the learner types into plus the graph it
     // grades against; furniture without them is an inert lesson.
     { archetype: "git", bodyField: "tasks", verify: verifyGit, rendered: (dom) => dom.includes("cl-term") && dom.includes("cl-git") },
+    // A lab card's body is the VizLab surface - the editor the learner types in
+    // and the memory picture their trace draws. Page furniture without `cl-vl`
+    // is a lesson with nothing to do, which is precisely the state `git` sat in
+    // while it had no validator.
+    //
+    // Verified in two halves, because a lab card is graded from a RUN and not
+    // from source text: the gates must be checkable at all (verifyLabTracker,
+    // static), and the authored solution must actually compile (verifyCompiled,
+    // dotnet). What no static check can prove is that the solution SATISFIES its
+    // gates - that needs the browser tracer - so verify-lesson does not claim it.
+    { archetype: "lab", bodyField: "tasks", verify: verifyLab, rendered: (dom) => dom.includes("cl-vl") },
   ];
 
   const byArchetype = new Map(list.map((v) => [v.archetype, v]));
@@ -554,6 +672,25 @@ export function createValidators(deps) {
     // fell back to the C# scanner on git lessons and read every git gate as
     // "(empty gate)" - 65 errors that were all the checker's fault, not the
     // content's, which is exactly the kind of noise that gets a gate switched off.
+    // The lab equivalent. A lab gate speaks the TRACE vocabulary (`liveObjects`,
+    // `distinctField`, `constructed`, `calls`, `prints`) and is answered by
+    // running the learner's code, so - unlike a build gate - it cannot be judged
+    // by scanning the solution's source. Scanning it anyway is what made the
+    // course-wide sweep report every lab gate as "(empty gate)".
+    //
+    // What CAN be asserted without running anything is the half that actually
+    // rots: that the card has gates at all, that every gate is one the grader
+    // RECOGNISES (a typo like `liveObject` is silently unknown at runtime), and
+    // that the type a gate names is a type the authored solution defines or
+    // builds. That last one is the real catch - a gate on `Kitten` in a lesson
+    // about `Cat` fails no test and ticks for nobody.
+    labTracker: ({ config }) => {
+      let allOk = true;
+      (config.tasks || []).filter((t) => !t.summary).forEach((t, i) => {
+        if (!checkLabTracker(t, taskLabel(t, i))) allOk = false;
+      });
+      return allOk;
+    },
     gitTracker: ({ config }) => {
       const git = gitRuntimeFrom(deps.codeLab());
       if (!git) {

@@ -532,6 +532,7 @@ export const ARCHETYPE_RENDER = {
   build: { prefix: true, resourceTail: applyResourceTail },
   drill: { prefix: true, resourceTail: applyResourceTail },
   git: { prefix: true, resourceTail: applyResourceTail, binder: "bind-git" },
+  lab: { prefix: true, resourceTail: applyResourceTail, binder: "bind-lab" },
   viz: { prefix: false, resourceTail: applyResourceTailViz },
   checkpoint: { prefix: false, resourceTail: applyResourceTailCheckpoint }
 };

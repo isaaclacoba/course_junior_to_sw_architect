@@ -7031,6 +7031,8 @@ ${written}` : written;
       this.lastSteps = null;
       this.viz = null;
       this.ready = false;
+      this.mounted = false;
+      this.pendingSource = null;
       this.legend = config.legend;
       this.language = config.language ?? "csharp";
       this.labels = mergeTemplates(DEFAULT_VIZ_LABELS, config.labels).merged;
@@ -7074,11 +7076,16 @@ ${written}` : written;
     async boot(starter) {
       await loadMonaco();
       await this.editor.mount(this.editorHost, {
-        value: starter,
+        value: this.pendingSource ?? starter,
         language: this.language,
         readOnly: false,
         autoHeight: { minHeight: 220, maxHeight: 640 }
       });
+      this.mounted = true;
+      if (this.pendingSource !== null) {
+        this.editor.setValue(this.pendingSource);
+        this.pendingSource = null;
+      }
       try {
         await this.runner.warm();
       } catch {
@@ -7197,6 +7204,10 @@ ${written}` : written;
      *  this surface owns. Clears the stage back to its hint - the picture on
      *  screen belongs to the code that produced it, never to the next exercise. */
     setSource(code) {
+      if (!this.mounted) {
+        this.pendingSource = code;
+        return;
+      }
       this.editor.setValue(code);
       if (this.editor.setMarkers) this.editor.setMarkers([]);
       this.setStatus("");
@@ -7205,6 +7216,7 @@ ${written}` : written;
     /** The learner's current code. A host grades the trace, not the text; this is
      *  for saving work and for restoring it, not for marking. */
     getSource() {
+      if (!this.mounted) return this.pendingSource ?? "";
       return this.editor.getValue();
     }
     destroy() {

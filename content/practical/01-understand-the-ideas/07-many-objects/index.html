@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>One class, many objects</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../../../../styles.css" />
+    <script src="../../../../theme-registry.js"></script>
+    <script src="../../../../theme-switch.js"></script>
+    <link rel="stylesheet" href="../../../../vendor/code-lab/code-lab.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <section class="hero" id="pageHero"></section>
+    </main>
+
+    <script>
+      window.PAGE = {
+        hero: {
+          eyebrow: "Understand the ideas",
+          title: "One class, many objects",
+          intro: ["You have written a class and made an object from it. So how many objects can one class make?","It is easy to read a class as if it were the thing itself - one <code>Cat</code> class, one cat. That reading holds up until the day you need a second cat, and then everything you hardcoded inside the class turns out to be shared by every cat you make.","Here you write the code and watch memory while it runs. Each <code>new</code> puts another object on screen, side by side, each with its own values - which is the difference between the blueprint and the things built from it."],
+          links: [{ href: "../../../../index.html", label: "Back to the course" }],
+        },
+        archetype: "lab",
+        prefix: "mo",
+      };
+    </script>
+
+    <script src="../../../../vendor/code-lab/code-lab.global.js"></script>
+    <script src="../../../../generated/course-data.js"></script>
+    <script src="../../../../generated/concept-index.js"></script>
+    <script src="meta.js"></script>
+    <script src="data.js"></script>
+    <script src="../../../../resource/resolver.js"></script>
+    <script src="../../../../resource/store.js"></script>
+    <script src="../../../../resource/manager.js"></script>
+    <script src="../../../../resource/settings.js"></script>
+    <script src="../../../../resource/preference.js"></script>
+    <script src="../../../../resource/theme-section.js"></script>
+    <script src="../../../../resource/voice-section.js"></script>
+    <script src="../../../../resource/lang-section.js"></script>
+    <script src="../../../../resource/concept-i18n.js"></script>
+    <script src="../../../../resource/bind-lab.js"></script>
+    <script
+      src="../../../../resource/kernel-controller.js"
+      data-page-shell="../../../../page-shell.js"
+      data-res-base="res/strings"
+      data-res-lang="en"
+      data-res-langs="en,es"
+      data-res-voices="default"
+    ></script>
+  </body>
+</html>

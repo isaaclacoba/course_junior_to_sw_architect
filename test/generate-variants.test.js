@@ -24,7 +24,7 @@ const ROOT = path.dirname(__dirname);
 const TEMPLATE = path.join(ROOT, "templates", "lesson.html.tmpl");
 const load = () => import(path.join(ROOT, "tools", "generate.mjs"));
 
-const ARCHETYPES = ["build", "drill", "viz", "checkpoint", "git"];
+const ARCHETYPES = ["build", "drill", "viz", "checkpoint", "git", "lab"];
 
 // A minimal but structurally real stand-in for the template.
 function fakeTemplate(names) {
@@ -35,7 +35,7 @@ function fakeTemplate(names) {
 
 // --- the variant map -------------------------------------------------------
 
-test("the real template yields exactly the five archetype variants", async () => {
+test("the real template yields exactly the six archetype variants", async () => {
   const { parseTemplateVariants } = await load();
   const variants = parseTemplateVariants(fs.readFileSync(TEMPLATE, "utf8"));
   assert.deepEqual(Object.keys(variants).sort(), ARCHETYPES.slice().sort());
@@ -43,7 +43,7 @@ test("the real template yields exactly the five archetype variants", async () =>
 
 test("each variant is the block that FOLLOWS its own marker, not the nth block", async () => {
   const { parseTemplateVariants } = await load();
-  const variants = parseTemplateVariants(fakeTemplate(["git", "checkpoint", "build", "viz", "drill"]));
+  const variants = parseTemplateVariants(fakeTemplate(["git", "checkpoint", "build", "viz", "drill", "lab"]));
   ARCHETYPES.forEach((n) => {
     assert.match(variants[n], new RegExp("<body>" + n + "</body>"),
       n + " must map to its own block regardless of position");
@@ -53,8 +53,8 @@ test("each variant is the block that FOLLOWS its own marker, not the nth block",
 test("a variant's markup carries the archetype it claims", async () => {
   const { parseTemplateVariants } = await load();
   const variants = parseTemplateVariants(fs.readFileSync(TEMPLATE, "utf8"));
-  // build, drill and git declare window.PAGE.archetype; viz and checkpoint do not.
-  ["build", "drill", "git"].forEach((n) => {
+  // build, drill, git and lab declare window.PAGE.archetype; viz and checkpoint do not.
+  ["build", "drill", "git", "lab"].forEach((n) => {
     assert.match(variants[n], new RegExp('archetype: "' + n + '",'),
       n + " variant must set window.PAGE.archetype to " + n);
   });
@@ -89,7 +89,16 @@ test("ARCHETYPE_RENDER and the template describe the same archetypes", async () 
 test("only the data.js card archetypes ask for an element-id prefix", async () => {
   const { ARCHETYPE_RENDER } = await load();
   const wantsPrefix = Object.keys(ARCHETYPE_RENDER).filter((k) => ARCHETYPE_RENDER[k].prefix);
-  assert.deepEqual(wantsPrefix.sort(), ["build", "drill", "git"]);
+  assert.deepEqual(wantsPrefix.sort(), ["build", "drill", "git", "lab"]);
+});
+
+test("lab takes the shared resource tail, but its own binder", async () => {
+  const { ARCHETYPE_RENDER } = await load();
+  assert.equal(ARCHETYPE_RENDER.lab.resourceTail, ARCHETYPE_RENDER.build.resourceTail);
+  // A lab card's goal list is two parallel arrays and its gates must never be
+  // translated, so it cannot ride on bind-build.
+  assert.equal(ARCHETYPE_RENDER.lab.binder, "bind-lab");
+  assert.notEqual(ARCHETYPE_RENDER.lab.binder, ARCHETYPE_RENDER.git.binder);
 });
 
 test("git takes the same resource tail as build and drill", async () => {

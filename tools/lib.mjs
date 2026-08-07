@@ -95,10 +95,11 @@ export const CONFIG_GLOBALS = {
   git: ["LESSON_CONFIG"],
   viz: ["LESSON_CONFIG"],
   checkpoint: ["LESSON_CONFIG"],
+  lab: ["LESSON_CONFIG"],
 };
 
 // The array that IS the lesson's body, per archetype.
-export const BODY_FIELD = { build: "tasks", drill: "tasks", git: "tasks", viz: "steps", checkpoint: "questions" };
+export const BODY_FIELD = { build: "tasks", drill: "tasks", git: "tasks", viz: "steps", checkpoint: "questions", lab: "tasks" };
 
 // -> { ok:true, global, config, field, count } | { ok:false, reason }
 // `reason` is written for a human reading a failing gate, and names the globals

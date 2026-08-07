@@ -94,25 +94,58 @@
     return max;
   }
 
+  // A field value the learner never chose: the slot as it stands the instant the
+  // object is born, before any assignment. The tracer renders a string field as
+  // its quoted literal, so an unset one arrives as the two characters `""`.
+  //
+  // These are excluded from the distinct count. Otherwise a half-built object is
+  // "different" from its finished sibling purely by not being finished yet, and
+  // a learner who makes two cats and names only one passes a card that asks for
+  // two different names.
+  function isUnset(value) {
+    return value === '""' || value === "" || value === "null" || value === "0";
+  }
+
   // Two objects of one type holding DIFFERENT values in the same field - the
   // evidence that the learner passed values in rather than hardcoding one.
-  // Compared within a single step, because that is when both are on screen.
+  //
+  // JUDGED AT ONE MOMENT: the LAST step at which this type reaches its fullest
+  // population. Not the best step, which is the trap - see below - and not the
+  // final step, because objects can fall out of scope before the program ends.
+  //
+  // WHY NOT THE BEST STEP OVER THE RUN. Taking a maximum rewards a difference
+  // that existed only in passing. Real trace, two cats both named "Ana":
+  //
+  //   step 3   Cat#1 "Ana"   Cat#2 ""      <- 2 distinct, and completely false
+  //   step 4   Cat#1 "Ana"   Cat#2 "Ana"   <- 1, the truth
+  //
+  // Between `new Cat()` and the line that names it, the second object holds its
+  // default. A maximum sees step 3, calls the names different, and passes the
+  // exact mistake the card exists to catch. `maxLiveObjects` IS a maximum, for
+  // the opposite and correct reason: "both alive at once" is a claim about some
+  // moment, while "they differ" is a claim about the state the learner built.
   function distinctFieldValues(trace, type, field) {
-    var best = 0;
-    steps(trace).forEach(function (step) {
-      var values = Object.create(null);
-      var count = 0;
-      (step.heap || []).forEach(function (obj) {
-        if (!obj || obj.type !== type) return;
-        (obj.fields || []).forEach(function (pair) {
-          if (!pair || pair[0] !== field) return;
-          var value = String(pair[1]);
-          if (!values[value]) { values[value] = true; count++; }
-        });
-      });
-      if (count > best) best = count;
+    var all = steps(trace);
+    var fullest = 0;
+    var at = -1;
+    all.forEach(function (step, i) {
+      var live = (step.heap || []).filter(function (obj) { return obj && obj.type === type; }).length;
+      if (live >= fullest && live > 0) { fullest = live; at = i; }
     });
-    return best;
+    if (at < 0) return 0;
+
+    var values = Object.create(null);
+    var count = 0;
+    (all[at].heap || []).forEach(function (obj) {
+      if (!obj || obj.type !== type) return;
+      (obj.fields || []).forEach(function (pair) {
+        if (!pair || pair[0] !== field) return;
+        var value = String(pair[1]);
+        if (isUnset(value)) return;
+        if (!values[value]) { values[value] = true; count++; }
+      });
+    });
+    return count;
   }
 
   // A member call on instances of a type. `kind` is "method" for an instance

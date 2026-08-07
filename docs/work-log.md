@@ -2532,3 +2532,45 @@ widget (1 fail), the header grid class dropped (1), a Run button added (2), the
 Goal heading hardcoded past the chrome catalog (2).
 
 Repo suite 576/576, validate 0 errors, gate PASS.
+
+## 2026-08-07 11:45 CEST - object-model-teaching steps 17 + 21: the lab archetype ships a lesson
+
+Step 17 (the binder) and step 21 (the first lab lesson) landed together, because
+the only honest way to verify a binder is to point a real lesson at it.
+
+Step 17 - `resource/bind-lab.js` plus the wiring an archetype needs to exist:
+a `lab` row in `ARCHETYPE_DEPS` and a `lab` branch in `bind()`
+(`resource/kernel-controller.js`), a `lab` row in `ARCHETYPE_RENDER`
+(`tools/generate.mjs`), a `@variant lab` block in `templates/lesson.html.tmpl`,
+`lab` in `CONFIG_GLOBALS`/`BODY_FIELD` (`tools/lib.mjs`), and a `lab` case in
+`tools/new-lesson.mjs`.
+
+The binder was WRONG when first written and the browser caught it. It mapped the
+goal sentence to `goals[i].text`, but the core paints the checklist from
+`task.goal` - a plain array of strings, the same field a build lesson uses. The
+result rendered perfectly and showed an EMPTY goal list. Fixed: `task.goal` is the
+prose run, `task.goals[i].code` is the tracker chip, `gate` is never touched.
+
+A second authoring error the browser caught: `concept` is painted with
+`textContent`, so it is a short LABEL ("Instance"), not a paragraph. Three
+paragraphs were showing raw backticks. The teaching prose moved into `context`,
+which the core renders with `renderProse`.
+
+Step 21 - `content/practical/01-understand-the-ideas/07-many-objects`, three lab
+cards plus a recap, EN + ES bundles at key parity (36/36). Driven end to end
+against the REAL compiler: Show Solution, Visualize, "Passed", both goals green.
+
+`tools/validate.mjs` was reporting 7 errors on the new lesson and every one was
+the checker's fault, not the content's - it scanned trace gates with the C#
+source scanner, exactly the trap the `git` dispatch above it exists to avoid.
+Added `checkLabTracker` + a `labTracker` validator that judges a lab gate by
+asking `trace-match.js` itself whether it recognises the shape, and a full `lab`
+entry in the validator registry so `verify-lesson.mjs` stops reporting a lab
+lesson as verified while checking nothing.
+
+Six sabotages watched failing before restore: three against the validator
+(typo'd gate name, gate on a type the solution never mentions, empty `gates`)
+and three against the new unit tests covering the same.
+
+Repo suite 589/589, validate 0 errors, `verify-lesson.mjs` PASS on the new
+lesson (real dotnet compiles of every starter and solution, EN + ES render).

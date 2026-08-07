@@ -427,6 +427,10 @@
       "def": "Reutilizar reclamando parentesco - una clase hija es-un tipo de su padre y recibe los miembros del padre gratis.",
       "term": "Herencia"
     },
+    "pr-instance": {
+      "def": "Un objeto hecho a partir de una clase. Varias instancias de una misma clase guardan cada una sus propios valores.",
+      "term": "Instancia"
+    },
     "pr-interface": {
       "def": "Una promesa con nombre de qué métodos ofrece un tipo, sin decir cómo funcionan.",
       "term": "Interfaz"

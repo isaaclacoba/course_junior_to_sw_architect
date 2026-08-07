@@ -3,7 +3,7 @@
  * layout content/<track>/<PP-part>/<LL-lesson>/.
  *
  *   node tools/new-lesson.mjs --new --track <t> --part <p> --id <id>
- *                             --archetype <build|drill|viz|checkpoint> --title "..."
+ *                             --archetype <build|drill|viz|checkpoint|lab> --title "..."
  *     Scaffold a brand-new empty lesson dir + stub meta.js/data.js and append a
  *     registry line in order. The track/part must already exist in
  *     course-registry.js `tracks[]`.
@@ -121,6 +121,8 @@ function scaffoldNew(args) {
     fs.writeFileSync(path.join(dir, "data.js"), "(function () {\n  \"use strict\";\n  window.LESSON_CONFIG = { prefix: \"" + id.replace(/-/g, "") + "\", tasks: [] };\n})();\n");
   } else if (archetype === "drill") {
     fs.writeFileSync(path.join(dir, "data.js"), "(function () {\n  \"use strict\";\n  window.LESSON_CONFIG = { prefix: \"" + id.replace(/-/g, "") + "\", drills: [] };\n})();\n");
+  } else if (archetype === "lab") {
+    fs.writeFileSync(path.join(dir, "data.js"), "(function () {\n  \"use strict\";\n  window.LESSON_CONFIG = { prefix: \"" + id.replace(/-/g, "") + "\", tasks: [] };\n})();\n");
   } else {
     fs.writeFileSync(path.join(dir, "data.js"), "(function () {\n  \"use strict\";\n  window.LESSON_CONFIG = { questions: [] };\n})();\n");
   }
@@ -171,7 +173,7 @@ function main() {
     process.exit(1);
   } else {
     console.error("Usage:");
-    console.error("  node tools/new-lesson.mjs --new --track <t> --part <p> --id <id> --archetype <build|drill|viz|checkpoint> --title \"...\"");
+    console.error("  node tools/new-lesson.mjs --new --track <t> --part <p> --id <id> --archetype <build|drill|viz|checkpoint|lab> --title \"...\"");
     process.exit(1);
   }
 }

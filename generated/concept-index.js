@@ -562,7 +562,9 @@
     "pr-assignment": {
       "introducedBy": "foundations",
       "revisitedBy": [],
-      "usedBy": []
+      "usedBy": [
+        "many-objects"
+      ]
     },
     "pr-boolean-logic": {
       "introducedBy": "control-flow",
@@ -578,7 +580,9 @@
     },
     "pr-class": {
       "introducedBy": "foundations",
-      "revisitedBy": [],
+      "revisitedBy": [
+        "many-objects"
+      ],
       "usedBy": [
         "class-members",
         "type-system",
@@ -759,6 +763,11 @@
       ],
       "usedBy": []
     },
+    "pr-instance": {
+      "introducedBy": "many-objects",
+      "revisitedBy": [],
+      "usedBy": []
+    },
     "pr-interface": {
       "introducedBy": "interfaces",
       "revisitedBy": [
@@ -866,6 +875,7 @@
       "introducedBy": "foundations",
       "revisitedBy": [
         "reading-objects",
+        "many-objects",
         "access-properties"
       ],
       "usedBy": [
@@ -933,7 +943,8 @@
       "revisitedBy": [],
       "usedBy": [
         "practice-the-basics",
-        "control-flow"
+        "control-flow",
+        "many-objects"
       ]
     },
     "pr-program-to-interface": {
@@ -1094,7 +1105,8 @@
         "practice-the-basics"
       ],
       "usedBy": [
-        "control-flow"
+        "control-flow",
+        "many-objects"
       ]
     },
     "th-address": {
@@ -2533,6 +2545,20 @@
         "pr-comparison"
       ]
     },
+    "many-objects": {
+      "introduces": [
+        "pr-instance"
+      ],
+      "revisits": [
+        "pr-object",
+        "pr-class"
+      ],
+      "uses": [
+        "pr-variable",
+        "pr-assignment",
+        "pr-printing"
+      ]
+    },
     "no-repeats": {
       "introduces": [
         "th-duplication"
@@ -3599,6 +3625,10 @@
     "pr-inheritance": {
       "term": "Inheritance",
       "def": "Reuse by claiming kinship - a child class is-a kind of its parent and gets the parent's members for free."
+    },
+    "pr-instance": {
+      "term": "Instance",
+      "def": "One object made from a class. Several instances of one class each hold their own values."
     },
     "pr-interface": {
       "term": "Interface",

@@ -747,6 +747,10 @@ export function checkGoalGates(migrated, rootDir, codeLab, report) {
     // (`ran`, `staged`, `commit`), so scanning it as C# reads every one of them
     // as empty and condemns content that is perfectly correct.
     if (m.meta && m.meta.archetype === "git") validators.gitTracker({ config: cfg });
+    // A lab gate is answered by RUNNING the code (`liveObjects`, `distinctField`),
+    // so the C# scanner reads every one of them as empty - the same trap the git
+    // dispatch above exists to avoid.
+    else if (m.meta && m.meta.archetype === "lab") validators.labTracker({ config: cfg });
     else validators.tracker({ config: cfg });
   }
 }

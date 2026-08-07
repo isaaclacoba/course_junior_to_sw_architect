@@ -88,6 +88,87 @@ test("distinctField sees two different values, and refuses two identical ones", 
   );
 });
 
+// VERBATIM from a real run of the real compiler host, captured while driving the
+// step-16 mockup: two cats, BOTH named "Ana". The tracer renders a string field
+// as its quoted literal, which is why an unset one is the two characters `""`.
+//
+// This shipped as a FALSE PASS. Step 3 is the moment after `new Cat()` and before
+// the line that names it, so the second cat still holds its default - and against
+// its finished sibling that looked like two different names. The card asks for
+// two different names; it was passing two identical ones.
+const HALF_BUILT_SAME_NAME = {
+  code: ['Cat b = new Cat();', 'b.Name = "Ana";'],
+  steps: [
+    { line: 1, frames: [{ id: "f0", name: "Main", kind: "entry" }], heap: [] },
+    { line: 2, frames: [{ id: "f0", name: "Main", kind: "entry" }], heap: [{ id: "o1", type: "Cat", no: 1, fields: [["Name", '""']] }] },
+    { line: 3, frames: [{ id: "f0", name: "Main", kind: "entry" }], heap: [{ id: "o1", type: "Cat", no: 1, fields: [["Name", '"Ana"']] }] },
+    { line: 4, frames: [{ id: "f0", name: "Main", kind: "entry" }], heap: [{ id: "o1", type: "Cat", no: 1, fields: [["Name", '"Ana"']] }, { id: "o2", type: "Cat", no: 2, fields: [["Name", '""']] }] },
+    { line: 5, frames: [{ id: "f0", name: "Main", kind: "entry" }], heap: [{ id: "o1", type: "Cat", no: 1, fields: [["Name", '"Ana"']] }, { id: "o2", type: "Cat", no: 2, fields: [["Name", '"Ana"']] }] },
+    { line: 6, frames: [{ id: "f0", name: "Main", kind: "entry" }], heap: [{ id: "o1", type: "Cat", no: 1, fields: [["Name", '"Ana"']] }, { id: "o2", type: "Cat", no: 2, fields: [["Name", '"Ana"']] }] },
+  ],
+};
+
+// The same run with the second cat given its own name - the pass this card wants.
+const HALF_BUILT_TWO_NAMES = {
+  code: ['Cat b = new Cat();', 'b.Name = "Bo";'],
+  steps: HALF_BUILT_SAME_NAME.steps.slice(0, 4).concat([
+    { line: 5, frames: [{ id: "f0", name: "Main", kind: "entry" }], heap: [{ id: "o1", type: "Cat", no: 1, fields: [["Name", '"Ana"']] }, { id: "o2", type: "Cat", no: 2, fields: [["Name", '"Bo"']] }] },
+  ]),
+};
+
+test("distinctField is not fooled by an object that is merely unfinished", () => {
+  assert.equal(
+    M.distinctFieldValues(HALF_BUILT_SAME_NAME, "Cat", "Name"), 1,
+    "a cat that has not been named yet is not a cat with a different name",
+  );
+  assert.equal(M.distinctFieldValues(HALF_BUILT_TWO_NAMES, "Cat", "Name"), 2);
+});
+
+test("the same-name run FAILS its gate, and the different-name run passes", () => {
+  const gates = [
+    { liveObjects: "Cat", atLeast: 2 },
+    { distinctField: { type: "Cat", field: "Name" } },
+  ];
+  const bad = M.gradeTrace(HALF_BUILT_SAME_NAME, gates);
+  assert.equal(bad.ok, false, "two cats both called Ana must not pass");
+  assert.deepEqual(bad.met, [true, false], "both alive - but not differently named");
+
+  const good = M.gradeTrace(HALF_BUILT_TWO_NAMES, gates);
+  assert.equal(good.ok, true);
+  assert.deepEqual(good.met, [true, true]);
+});
+
+// The learner who makes the second object and forgets to name it. The names DO
+// differ as strings - "Ana" against nothing - but nothing is not a name the
+// learner chose, and a card asking for two names has not been answered.
+test("a value the learner never set does not count as a different value", () => {
+  const forgot = {
+    code: ["x"],
+    steps: [{
+      line: 1, frames: [{ id: "f0", name: "Main", kind: "entry" }],
+      heap: [
+        { id: "o1", type: "Cat", no: 1, fields: [["Name", '"Ana"']] },
+        { id: "o2", type: "Cat", no: 2, fields: [["Name", '""']] },
+      ],
+    }],
+  };
+  assert.equal(M.distinctFieldValues(forgot, "Cat", "Name"), 1);
+  assert.equal(M.maxLiveObjects(forgot, "Cat"), 2, "both objects are real and both are alive");
+});
+
+// The judged moment is the LAST fullest step, not the final one: a lesson may let
+// an object fall out of scope, and the last step could hold one cat or none.
+test("distinctField judges when the objects were all there, not at the end", () => {
+  const goesOutOfScope = {
+    code: ["x"],
+    steps: [
+      { line: 1, frames: [], heap: [{ id: "o1", type: "Cat", no: 1, fields: [["Name", '"Ana"']] }, { id: "o2", type: "Cat", no: 2, fields: [["Name", '"Bo"']] }] },
+      { line: 2, frames: [], heap: [{ id: "o1", type: "Cat", no: 1, fields: [["Name", '"Ana"']] }] },
+    ],
+  };
+  assert.equal(M.distinctFieldValues(goesOutOfScope, "Cat", "Name"), 2);
+});
+
 test("calls counts a member running on each instance", () => {
   assert.equal(M.countCalls(TWO_CATS, "Cat", "Speak"), 2);
   assert.equal(M.countCalls(TWO_CATS, "Cat", "Fly"), 0);

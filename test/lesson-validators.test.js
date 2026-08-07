@@ -32,7 +32,7 @@ function recorder(extra = {}) {
   return { lines, deps };
 }
 
-const ARCHETYPES = ["build", "drill", "viz", "checkpoint", "git"];
+const ARCHETYPES = ["build", "drill", "viz", "checkpoint", "git", "lab"];
 
 test("every archetype the course ships has a validator", async () => {
   const { createValidators } = await load();
@@ -350,4 +350,88 @@ test("a step row whose source probe is absent from the solution fails validation
   const v = createValidators(deps).get("build");
   assert.equal(v.verify({ config: { tasks: [task] }, opts: { noDotnet: true } }), false);
   assert.ok(lines.bad.some((m) => /step row watching for/.test(m)), JSON.stringify(lines.bad));
+});
+
+// --- the lab gate checker --------------------------------------------------
+//
+// A lab gate is answered by RUNNING the learner's code, so none of these can
+// prove a gate goes green - the browser tracer does that. What they pin is the
+// half that rots silently on the page: a gate the grader does not recognise, a
+// gate hooked to a type the lesson never writes, and a card with no gates at
+// all. Each one leaves a checklist row grey forever while the learner stares at
+// a finished answer, and none of them throws.
+
+function labTask(over = {}) {
+  return {
+    title: "A second cat",
+    solution: "public class Cat { public string Name = \"\"; }\nclass Program { static void Main() { Cat a = new Cat(); } }",
+    gates: [{ liveObjects: "Cat", atLeast: 2 }],
+    goal: ["Two Cat objects exist at once."],
+    goals: [{ code: ["two Cat objects"], gate: { liveObjects: "Cat", atLeast: 2 } }],
+    ...over,
+  };
+}
+
+const labCheck = async (task) => {
+  const { createValidators } = await load();
+  const { lines, deps } = recorder();
+  const okAll = createValidators(deps).labTracker({ config: { tasks: [task] } });
+  return { okAll, bad: lines.bad };
+};
+
+test("a well-formed lab card passes the gate checker", async () => {
+  const { okAll, bad } = await labCheck(labTask());
+  assert.equal(okAll, true);
+  assert.deepEqual(bad, []);
+});
+
+test("a gate shape the trace grader has never heard of is caught", async () => {
+  // `liveObject` - singular. At runtime this is silently "unknown gate": the row
+  // never ticks and nothing is logged.
+  const { okAll, bad } = await labCheck(labTask({ gates: [{ liveObject: "Cat", atLeast: 2 }] }));
+  assert.equal(okAll, false);
+  assert.match(bad.join("\n"), /not a shape the trace grader knows/);
+});
+
+test("a gate on a type the solution never mentions is caught", async () => {
+  const { okAll, bad } = await labCheck(labTask({ gates: [{ liveObjects: "Kitten", atLeast: 2 }] }));
+  assert.equal(okAll, false);
+  assert.match(bad.join("\n"), /names `Kitten`/);
+});
+
+test("a card with goals but no gates cannot be marked, and says so", async () => {
+  const { okAll, bad } = await labCheck(labTask({ gates: [] }));
+  assert.equal(okAll, false);
+  assert.match(bad.join("\n"), /no `gates`/);
+});
+
+test("a goal row carrying no gate of its own is caught", async () => {
+  const { okAll, bad } = await labCheck(labTask({ goals: [{ code: ["two Cat objects"] }] }));
+  assert.equal(okAll, false);
+  assert.match(bad.join("\n"), /goals\[0\] has no gate/);
+});
+
+test("distinctField and calls are checked on their nested type too", async () => {
+  const bad1 = (await labCheck(labTask({
+    gates: [{ distinctField: { type: "Kitten", field: "Name" } }],
+  }))).bad.join("\n");
+  assert.match(bad1, /names `Kitten`/);
+  const bad2 = (await labCheck(labTask({
+    gates: [{ calls: { type: "Kitten", member: "Speak" } }],
+  }))).bad.join("\n");
+  assert.match(bad2, /names `Kitten`/);
+});
+
+test("a `prints` gate names no type, so it is not accused of naming a missing one", async () => {
+  const { okAll, bad } = await labCheck(labTask({ gates: [{ prints: "Ana" }] }));
+  assert.equal(okAll, true);
+  assert.deepEqual(bad, []);
+});
+
+test("a summary card is skipped - it has no gates by design", async () => {
+  const { createValidators } = await load();
+  const { lines, deps } = recorder();
+  const okAll = createValidators(deps).labTracker({ config: { tasks: [labTask(), { summary: true }] } });
+  assert.equal(okAll, true);
+  assert.deepEqual(lines.bad, []);
 });

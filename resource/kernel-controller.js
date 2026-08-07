@@ -154,6 +154,8 @@
       global.ResourceBindBuild.apply(R, { page: global.PAGE, config: cfg });
     } else if (arch === "git" && global.ResourceBindGit) {
       global.ResourceBindGit.apply(R, { page: global.PAGE, config: cfg });
+    } else if (arch === "lab" && global.ResourceBindLab) {
+      global.ResourceBindLab.apply(R, { page: global.PAGE, config: cfg });
     } else if (arch === "viz" && global.ResourceBindViz) {
       global.ResourceBindViz.apply(R, { page: global.PAGE, viz: cfg });
     } else if (arch === "checkpoint" && global.ResourceBindCheckpoint) {

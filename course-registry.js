@@ -69,6 +69,7 @@
     { track: "practical", part: "understand-the-ideas", id: "writing-methods", href: "content/practical/01-understand-the-ideas/04-writing-methods/", kind: "lesson", path: "content/practical/01-understand-the-ideas/04-writing-methods" },
     { track: "practical", part: "understand-the-ideas", id: "reading-objects", href: "content/practical/01-understand-the-ideas/05-reading-objects/", kind: "lesson", path: "content/practical/01-understand-the-ideas/05-reading-objects" },
     { track: "practical", part: "understand-the-ideas", id: "reuse-without-regret", href: "content/practical/01-understand-the-ideas/06-reuse-without-regret/", kind: "lesson", path: "content/practical/01-understand-the-ideas/06-reuse-without-regret" },
+    { track: "practical", part: "understand-the-ideas", id: "many-objects", href: "content/practical/01-understand-the-ideas/07-many-objects/", kind: "lesson", path: "content/practical/01-understand-the-ideas/07-many-objects" },
 
     // ---- practical / everyday-essentials ----
     { track: "practical", part: "everyday-essentials", id: "type-conversion", href: "content/practical/02-everyday-essentials/01-type-conversion/", kind: "lesson", path: "content/practical/02-everyday-essentials/01-type-conversion" },
