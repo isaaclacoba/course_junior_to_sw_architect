@@ -50,7 +50,7 @@ Phase 3 - content
 19. [ ] Rework `01-foundations` task 6: two instances, values passed in, introduces `pr-field`.
 20. [ ] New build lesson: constructors (revisits `pr-field`), after `04-writing-methods`.
 21. [x] New lab lesson: one class, many objects.
-22. [ ] Fix the parameter definition; add `pr-argument`; update `docs/concept-ledger.md`.
+22. [x] Fix the parameter definition; add `pr-argument`; update `docs/concept-ledger.md`.
 23. [ ] Registry + directory renumbering (array order is the real order, not the `NN-` prefix).
 Phase 4 - close
 24. [ ] `node tools/verify-lesson.mjs` on every changed lesson, EN+ES.

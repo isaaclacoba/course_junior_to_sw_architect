@@ -211,5 +211,9 @@
   "glossary.covered": "Covered",
   "glossary.coveredTitle": "You answered this correctly in a checkpoint",
   "glossary.countAll": "concepts across the three tracks",
-  "glossary.countCovered": "covered"
+  "glossary.countCovered": "covered",
+  "viz.vlBootDownload": "Downloading compiler... {percent}%",
+  "viz.vlBootStart": "Starting compiler...",
+  "viz.vlBootWarm": "Warming up...",
+  "viz.vlTracingSecs": "Tracing... {secs}s"
 }

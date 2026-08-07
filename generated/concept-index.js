@@ -732,8 +732,10 @@
       "usedBy": []
     },
     "pr-field": {
-      "introducedBy": "class-members",
-      "revisitedBy": [],
+      "introducedBy": "foundations",
+      "revisitedBy": [
+        "class-members"
+      ],
       "usedBy": [
         "access-properties",
         "composition"
@@ -2133,10 +2135,10 @@
       "introduces": [
         "pr-static",
         "pr-const",
-        "pr-readonly",
-        "pr-field"
+        "pr-readonly"
       ],
       "revisits": [
+        "pr-field",
         "pr-constructor"
       ],
       "uses": [
@@ -2266,7 +2268,8 @@
         "pr-assignment",
         "pr-null",
         "pr-object",
-        "pr-class"
+        "pr-class",
+        "pr-field"
       ],
       "revisits": [],
       "uses": []
@@ -3620,7 +3623,7 @@
     },
     "pr-field": {
       "term": "Field",
-      "def": "A variable that belongs to an object and holds part of its state."
+      "def": "A named box inside an object that holds part of its state. Each object made from the class gets its own."
     },
     "pr-finally": {
       "term": "finally",

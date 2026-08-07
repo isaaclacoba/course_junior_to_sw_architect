@@ -166,7 +166,7 @@
         // The sentences the core paints, and - index for index - the gates the
         // live tracker ticks them by.
         goal: [
-          "Three <code>Cat</code> objects exist at the same time.",
+          "Three `Cat` objects exist at the same time.",
           "All three cats hold different names.",
         ],
         goals: [
@@ -257,7 +257,7 @@
           { distinctField: { type: "Robot", field: "_batteryPercent", atLeast: 3 } },
         ],
         goal: [
-          "The <code>Robot</code> constructor runs three times.",
+          "The `Robot` constructor runs three times.",
           "The three robots hold different battery levels.",
         ],
         goals: [
@@ -302,8 +302,8 @@
           { prints: "9" },
         ],
         goal: [
-          "<code>Add</code> runs three times.",
-          "The program prints <code>9</code>.",
+          "`Add` runs three times.",
+          "The program prints `9`.",
         ],
         goals: [
           { code: ["three calls"], gate: { calls: { type: "Counter", member: "Add", times: 3 } } },
@@ -347,7 +347,7 @@
           { distinctField: { type: "Counter", field: "_total" } },
         ],
         goal: [
-          "Two <code>Counter</code> objects exist at the same time.",
+          "Two `Counter` objects exist at the same time.",
           "The two counters hold different totals.",
         ],
         goals: [

@@ -408,7 +408,7 @@
       "term": "Favorecer la composición"
     },
     "pr-field": {
-      "def": "Una variable que pertenece a un objeto y guarda parte de su estado.",
+      "def": "Una caja con nombre dentro de un objeto que guarda parte de su estado. Cada objeto hecho a partir de la clase recibe la suya.",
       "term": "Campo"
     },
     "pr-finally": {

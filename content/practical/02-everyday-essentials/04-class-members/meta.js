@@ -31,12 +31,12 @@ window.LESSON_META = {
       },
       {
         "id": "pr-readonly"
-      },
-      {
-        "id": "pr-field"
       }
     ],
     "revisits": [
+      {
+        "id": "pr-field"
+      },
       {
         "id": "pr-constructor"
       }

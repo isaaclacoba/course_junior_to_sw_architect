@@ -45,7 +45,5 @@
   "concept.pr-const.term": "const",
   "concept.pr-const.def": "A named value fixed where you write it and never changed, so a bare number gets a clear name.",
   "concept.pr-readonly.term": "readonly",
-  "concept.pr-readonly.def": "A field that can be set once - at its declaration or in the constructor - and never reassigned.",
-  "concept.pr-field.term": "Field",
-  "concept.pr-field.def": "A variable that belongs to an object and holds part of its state."
+  "concept.pr-readonly.def": "A field that can be set once - at its declaration or in the constructor - and never reassigned."
 }

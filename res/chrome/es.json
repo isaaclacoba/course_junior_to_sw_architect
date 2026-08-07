@@ -211,5 +211,9 @@
   "glossary.covered": "Superado",
   "glossary.coveredTitle": "Lo respondiste bien en un control.",
   "glossary.countAll": "conceptos en las tres rutas",
-  "glossary.countCovered": "superados"
+  "glossary.countCovered": "superados",
+  "viz.vlBootDownload": "Descargando el compilador... {percent}%",
+  "viz.vlBootStart": "Arrancando el compilador...",
+  "viz.vlBootWarm": "Calentando...",
+  "viz.vlTracingSecs": "Trazando... {secs}s"
 }

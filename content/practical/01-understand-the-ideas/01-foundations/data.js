@@ -160,9 +160,10 @@
       solution: "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        string? pet = null;\n        pet = \"Rex\";\n        Console.WriteLine(pet);\n    }\n}\n"
     },
     {
-      example: "class Robot\n{\n    public string Name = \"Beep\";       // state\n    public string Greet() { return \"Hi\"; }  // behaviour\n}\n// var robot = new Robot();  robot.Name is \"Beep\";  robot.Greet() is \"Hi\"",
+      example: "class Robot\n{\n    public string Name = \"\";                // state - each robot has its own\n    public string Greet() { return \"Hi\"; }  // behaviour - the same for all\n}\n// Robot first = new Robot();   first.Name = \"Beep\";\n// Robot second = new Robot();  second.Name = \"Bop\";\n// Two robots, two Names, one class.",
       expected: [
         "Rex",
+        "Bella",
         "Woof"
       ],
       requireSource: [
@@ -171,8 +172,8 @@
           message: "Keep the `Dog` class."
         },
         {
-          pattern: /public\s+string\s+Name\s*=\s*"Rex"\s*;/,
-          message: "Set the dog's state: `public string Name = \"Rex\";`."
+          pattern: /new\s+Dog\s*\(\s*\)[\s\S]*new\s+Dog\s*\(\s*\)/,
+          message: "Make two dogs, not one - `new Dog()` twice."
         },
         {
           pattern: /return\s+"Woof"\s*;/,
@@ -183,21 +184,29 @@
         {
           code: [
             "class Dog",
-            { row: "Name = \"Rex\"", writes: "Name = \"Rex\"", gone: "Name = \"\"" }
-          ],
-          gate: { type: "Dog", member: "Name" }
-        },
-        {
-          code: [
-            "class Dog",
             { row: "return \"Woof\"", writes: "return \"Woof\"", gone: "return \"\"" }
           ],
           gate: { type: "Dog", member: "Speak" }
         },
-        { gate: null }
+        {
+          code: [
+            "class Program",
+            { row: "Dog firstDog = new Dog()", writes: "new Dog()" },
+            { row: "firstDog.Name = \"Rex\"", writes: ".Name = \"Rex\"" }
+          ],
+          gate: { type: "Program", member: "Main" }
+        },
+        {
+          code: [
+            "class Program",
+            { row: "Dog secondDog = new Dog()", writes: "new Dog()" },
+            { row: "secondDog.Name = \"Bella\"", writes: ".Name = \"Bella\"" }
+          ],
+          gate: { type: "Program", member: "Main" }
+        }
       ],
-      starter: "using System;\n\nclass Dog\n{\n    // TODO: give the dog state - set Name to \"Rex\"\n    public string Name = \"\";\n\n    // TODO: give the dog behaviour - return \"Woof\"\n    public string Speak()\n    {\n        return \"\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Dog dog = new Dog();\n        Console.WriteLine(dog.Name);\n        Console.WriteLine(dog.Speak());\n    }\n}\n",
-      solution: "using System;\n\nclass Dog\n{\n    public string Name = \"Rex\";\n\n    public string Speak()\n    {\n        return \"Woof\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Dog dog = new Dog();\n        Console.WriteLine(dog.Name);\n        Console.WriteLine(dog.Speak());\n    }\n}\n"
+      starter: "using System;\n\nclass Dog\n{\n    // state - every dog gets its own Name box\n    public string Name = \"\";\n\n    // TODO: give the dog behaviour - make Speak() return \"Woof\"\n    public string Speak()\n    {\n        return \"\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        // TODO: make two dogs - call the first one Rex and the second one Bella\n        // then print the first Name, the second Name, and what the first dog says\n    }\n}\n",
+      solution: "using System;\n\nclass Dog\n{\n    public string Name = \"\";\n\n    public string Speak()\n    {\n        return \"Woof\";\n    }\n}\n\nclass Program\n{\n    static void Main()\n    {\n        Dog firstDog = new Dog();\n        firstDog.Name = \"Rex\";\n\n        Dog secondDog = new Dog();\n        secondDog.Name = \"Bella\";\n\n        Console.WriteLine(firstDog.Name);\n        Console.WriteLine(secondDog.Name);\n        Console.WriteLine(firstDog.Speak());\n    }\n}\n"
     },
     {
       summary: true

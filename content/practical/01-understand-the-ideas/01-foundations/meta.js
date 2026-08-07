@@ -43,6 +43,9 @@ window.LESSON_META = {
       },
       {
         "id": "pr-class"
+      },
+      {
+        "id": "pr-field"
       }
     ],
     "revisits": [],

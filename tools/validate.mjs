@@ -626,6 +626,43 @@ export function checkContextVerbosity(migrated, rootDir, report) {
   }
 }
 
+// Check (escaped markup): card prose is painted through LessonCommon.renderInline,
+// which ESCAPES html - so a `<code>` tag an author typed by hand reaches the
+// learner as the literal characters `<code>`. It renders, nothing throws, and the
+// only signal is a learner reading angle brackets in a goal chip. Backticks are
+// the course's markup for inline code; a raw tag in card prose is always a
+// mistake.
+//
+// The hero `intro` is the exception and is deliberately not checked: it is
+// authored as HTML and injected as HTML by the page shell.
+const MARKUP_IN_PROSE = /<\/?(?:code|strong|em|b|i|span|br|p|ul|li)\b[^>]*>/i;
+
+export function checkEscapedMarkup(migrated, rootDir, report) {
+  // Every key the ENGINE paints through renderInline. `intro.*` is absent on
+  // purpose - that one really is HTML.
+  const PROSE = /^task\.\d+\.(context|goal\.\d+|concept|title|summaryIntro|summaryItems\.\d+\.(title|text))$/;
+  for (const m of migrated) {
+    const base = (m.meta.resources && m.meta.resources.base) || "res/strings";
+    const dir = path.join(rootDir, m.path, base);
+    if (!fs.existsSync(dir)) continue;
+    for (const voice of fs.readdirSync(dir)) {
+      const vdir = path.join(dir, voice);
+      if (!fs.statSync(vdir).isDirectory()) continue;
+      for (const file of fs.readdirSync(vdir).filter((f) => f.endsWith(".json"))) {
+        let obj;
+        try { obj = JSON.parse(fs.readFileSync(path.join(vdir, file), "utf8")); } catch { continue; }
+        for (const [k, v] of Object.entries(obj)) {
+          if (!PROSE.test(k) || typeof v !== "string") continue;
+          const hit = v.match(MARKUP_IN_PROSE);
+          if (hit) {
+            report.error(`Escaped markup: "${m.registryId}" ${voice}/${file} ${k} contains \`${hit[0]}\` - card prose is escaped, so the learner reads the tag. Use \`backticks\` for inline code.`);
+          }
+        }
+      }
+    }
+  }
+}
+
 // Check (exemplary code): every C# line a lesson ships is a worked example of
 // the standard this course teaches, so the lesson's own code must not break the
 // rules its prose is selling. The full standard is judgement (see the
@@ -783,6 +820,7 @@ function main() {
   checkProseMentions(loadProseMentions(migrated, root), knownIds, report);
   checkResourceArity(loadResourceBundles(migrated, root), report);
   checkContextVerbosity(migrated, root, report);
+  checkEscapedMarkup(migrated, root, report);
   checkExemplaryCode(migrated, root, report);
   checkGoalGates(migrated, root, loadCodeLab(), report);
   checkConceptCoverage(

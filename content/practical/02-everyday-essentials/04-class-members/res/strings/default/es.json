@@ -47,7 +47,5 @@
   "concept.pr-const.term": "const",
   "concept.pr-const.def": "Un valor con nombre fijado donde lo escribes y que nunca cambia, para que un número suelto tenga un nombre claro.",
   "concept.pr-readonly.term": "readonly",
-  "concept.pr-readonly.def": "Un campo que se puede asignar una sola vez - en su declaración o en el constructor - y nunca reasignar.",
-  "concept.pr-field.def": "Una variable que pertenece a un objeto y guarda parte de su estado.",
-  "concept.pr-field.term": "Campo"
+  "concept.pr-readonly.def": "Un campo que se puede asignar una sola vez - en su declaración o en el constructor - y nunca reasignar."
 }

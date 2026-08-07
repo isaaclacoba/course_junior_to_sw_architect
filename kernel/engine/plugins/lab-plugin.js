@@ -105,6 +105,7 @@
     "consoleHead", "consoleIdle",
     "vlVisualize", "vlPreparing", "vlTracing", "vlHint", "vlNoSteps", "vlNoStepsHint",
     "vlDidNotCompile", "vlFailedHint", "vlTracedOne", "vlTracedMany", "vlTruncated", "vlThrew",
+    "vlBootDownload", "vlBootStart", "vlBootWarm", "vlTracingSecs",
   ];
 
   function labelsFromChrome() {

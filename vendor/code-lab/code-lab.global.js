@@ -1638,6 +1638,10 @@ ${result.runtimeError}`.trim(),
     vlPreparing: "Preparing compiler...",
     vlVisualize: "Visualize",
     vlTracing: "Tracing...",
+    vlBootDownload: "Downloading compiler... {percent}%",
+    vlBootStart: "Starting compiler...",
+    vlBootWarm: "Warming up...",
+    vlTracingSecs: "Tracing... {secs}s",
     vlHint: "Write a small program, then press Visualize to watch it run.",
     vlDidNotCompile: "Did not compile.",
     vlNoStepsHint: "That program produced no steps to show. Add a statement or two inside Main.",
@@ -7004,6 +7008,25 @@ ${written}` : written;
     return { status: "failed", truncated: false, errors: [], failure: message };
   }
 
+  // src/core/wait-progress.ts
+  function bootWait(labels, phase, percent) {
+    if (phase === "download") {
+      const pct = Math.max(0, Math.min(100, Math.round(percent)));
+      return { label: fill(labels.vlBootDownload, { percent: pct }), percent: pct };
+    }
+    return {
+      label: phase === "start" ? labels.vlBootStart : labels.vlBootWarm,
+      percent: null
+    };
+  }
+  function traceWait(labels, elapsedMs) {
+    const secs = Math.floor(Math.max(0, elapsedMs) / 1e3);
+    return {
+      label: secs < 1 ? labels.vlTracing : fill(labels.vlTracingSecs, { secs }),
+      percent: null
+    };
+  }
+
   // src/dom/viz-lab.ts
   function normalizeErrors(errors) {
     return errors.map((e) => ({
@@ -7033,6 +7056,7 @@ ${written}` : written;
       this.ready = false;
       this.mounted = false;
       this.pendingSource = null;
+      this.traceTimer = null;
       this.legend = config.legend;
       this.language = config.language ?? "csharp";
       this.labels = mergeTemplates(DEFAULT_VIZ_LABELS, config.labels).merged;
@@ -7040,7 +7064,11 @@ ${written}` : written;
       this.onTrace = config.onTrace;
       this.runner = new IframeRunner({
         url: config.runnerUrl,
-        readyTimeout: config.readyTimeout ?? 18e4
+        readyTimeout: config.readyTimeout ?? 18e4,
+        // The runtime is ~30MB, so this wait is tens of seconds on a slow line.
+        // Reporting the phase is what answers "is it stuck?" - only the download
+        // has a number, and it is the phase most likely to be the slow one.
+        onProgress: (progress) => this.showBootPhase(progress.phase, progress.percent)
       });
       this.root = document.createElement("div");
       this.root.className = "cl-vl";
@@ -7053,6 +7081,7 @@ ${written}` : written;
       this.vizBtn.className = "cl-btn cl-primary cl-vl-run";
       this.vizBtn.textContent = this.labels.vlPreparing;
       this.vizBtn.disabled = true;
+      this.vizBtn.setAttribute("aria-busy", "true");
       this.vizBtn.setAttribute("data-viz", "");
       this.vizBtn.addEventListener("click", () => void this.visualize());
       this.statusEl = document.createElement("span");
@@ -7073,6 +7102,56 @@ ${written}` : written;
     static create(host, config) {
       return new _VizLab(host, config);
     }
+    /** Paint a wait inside the button: a label naming the phase, over a bar.
+     *
+     *  `percent` null means "no measurable progress" - the bar then animates
+     *  instead of filling, because a fake percentage that creeps to 90% and stops
+     *  is worse than an honest "this is still going". Every wait longer than a
+     *  second lands here, so none of them can look like a hang. */
+    showWait(label, percent) {
+      let bar = this.vizBtn.querySelector(".cl-vl-wait-fill");
+      let text = this.vizBtn.querySelector(".cl-vl-wait-label");
+      if (!bar || !text) {
+        this.vizBtn.textContent = "";
+        const wrap = document.createElement("span");
+        wrap.className = "cl-vl-wait";
+        text = document.createElement("span");
+        text.className = "cl-vl-wait-label";
+        const track = document.createElement("span");
+        track.className = "cl-vl-wait-bar";
+        bar = document.createElement("span");
+        bar.className = "cl-vl-wait-fill";
+        track.appendChild(bar);
+        wrap.append(text, track);
+        this.vizBtn.appendChild(wrap);
+      }
+      text.textContent = label;
+      if (percent === null) {
+        bar.classList.add("is-indeterminate");
+        bar.style.width = "";
+        this.vizBtn.removeAttribute("aria-valuenow");
+      } else {
+        const pct = Math.max(0, Math.min(100, Math.round(percent)));
+        bar.classList.remove("is-indeterminate");
+        bar.style.width = pct + "%";
+        this.vizBtn.setAttribute("aria-valuenow", String(pct));
+      }
+    }
+    /** Put the button back to a plain label, ending whatever wait it was showing. */
+    endWait(label) {
+      if (this.traceTimer !== null) {
+        clearInterval(this.traceTimer);
+        this.traceTimer = null;
+      }
+      this.vizBtn.textContent = label;
+      this.vizBtn.removeAttribute("aria-busy");
+      this.vizBtn.removeAttribute("aria-valuenow");
+    }
+    showBootPhase(phase, percent) {
+      if (this.ready) return;
+      const wait = bootWait(this.labels, phase, percent);
+      this.showWait(wait.label, wait.percent);
+    }
     async boot(starter) {
       await loadMonaco();
       await this.editor.mount(this.editorHost, {
@@ -7092,14 +7171,22 @@ ${written}` : written;
       } finally {
         this.ready = true;
         this.vizBtn.disabled = false;
-        this.vizBtn.textContent = this.labels.vlVisualize;
+        this.endWait(this.labels.vlVisualize);
       }
     }
     async visualize() {
       if (!this.ready) return;
       const code = this.editor.getValue();
       this.vizBtn.disabled = true;
-      this.vizBtn.textContent = this.labels.vlTracing;
+      this.vizBtn.setAttribute("aria-busy", "true");
+      const startedAt = Date.now();
+      const tick = () => {
+        const wait = traceWait(this.labels, Date.now() - startedAt);
+        this.showWait(wait.label, wait.percent);
+      };
+      tick();
+      if (this.traceTimer !== null) clearInterval(this.traceTimer);
+      this.traceTimer = setInterval(tick, 1e3);
       this.setStatus("");
       let report = null;
       try {
@@ -7138,7 +7225,7 @@ ${written}` : written;
         this.setStatus(message);
       } finally {
         this.vizBtn.disabled = false;
-        this.vizBtn.textContent = this.labels.vlVisualize;
+        this.endWait(this.labels.vlVisualize);
         if (report) this.onTrace?.(report);
       }
     }
