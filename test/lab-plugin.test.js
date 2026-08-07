@@ -135,6 +135,17 @@ function labConfig(tasks) {
 
 const TRACED = { status: "traced", trace: { steps: [{}], code: ["x"] } };
 
+// The two-cats run, shaped like the tracer's real output, for the one test that
+// drives the SHIPPED matcher rather than a stub.
+const catObj = (id, no, name) => ({ id, type: "Cat", no, fields: [["_name", name]] });
+const TWO_CATS = {
+  code: ["x"],
+  steps: [
+    { line: 1, frames: [{ id: "f0", name: "Main", kind: "entry" }], heap: [catObj("o1", 1, "Ana")] },
+    { line: 2, frames: [{ id: "f0", name: "Main", kind: "entry" }], heap: [catObj("o1", 1, "Ana"), catObj("o2", 2, "Bo")] },
+  ],
+};
+
 // A matcher that says yes, so the "pass" paths are exercised without dragging in
 // the real gate vocabulary (that is its own module, with its own tests).
 const YES_MATCHER = { gradeTrace: () => ({ ok: true, reason: "ok", message: "Correct." }) };
@@ -218,18 +229,35 @@ test("a 'failed' tracer says it is our fault, and does not blame the learner's c
   });
 });
 
-test("no grading kernel loaded: the card says the check could not run", async () => {
+test("the plugin really reaches the trace matcher - not a stub, the shipped module", async () => {
+  // Under node the plugin resolves kernel/grading/trace-match.js by require, the
+  // same module the tests above exercise. Proving the wiring here means the two
+  // halves of step 14 and step 15 are genuinely connected.
+  await withDom("tt", async (dom, codeLab) => {
+    const controller = LessonEngine.create(labConfig([
+      { title: "two cats", starter: "// s", gates: [{ liveObjects: "Cat", atLeast: 2 }] },
+    ]));
+    await controller.boot();
+    codeLab._created[0].fireTrace({ status: "traced", trace: TWO_CATS });
+
+    const body = dom.getElementById("ttResultBody").textContent;
+    assert.match(body, /objects are on the right/i, "the real matcher graded it and passed it");
+  });
+});
+
+test("a broken or half-loaded grading kernel says the check could not run", async () => {
+  // The browser has no require, so a page that forgot the trace-match <script>
+  // tag - or shipped a version without gradeTrace - lands exactly here.
   await withDom("tt", async (dom, codeLab) => {
     const controller = LessonEngine.create(labConfig());
     await controller.boot();
-    // No KernelTraceMatch installed by this test - the seam is genuinely absent.
     codeLab._created[0].fireTrace(TRACED);
 
     const body = dom.getElementById("ttResultBody").textContent;
     assert.match(body, /could not run/i, "it admits the check did not happen");
     assert.match(body, /not yours/i, "and does not blame the learner");
     assert.equal(LessonCommon.storage.getItem("tt_awarded"), null, "no XP for a check nobody performed");
-  });
+  }, { matcher: {} });
 });
 
 test("a pass awards XP once, through the core - the same path a build card uses", async () => {

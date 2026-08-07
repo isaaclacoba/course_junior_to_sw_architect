@@ -41,7 +41,7 @@ Phase 2 - the `lab` archetype
 13. [~] STRUCK - the tracker is already built and shared by the build and git tracks
     (`kernel/engine/widgets/goal-tracker.js`, provider-based). Nothing to design.
 14. [x] `kernel/engine/plugins/lab-plugin.js` on the generic engine - verify: plugin tests.
-15. [ ] Trace gate vocabulary in `kernel/grading/` - verify: gate tests, every goal starts RED.
+15. [x] Trace gate vocabulary in `kernel/grading/` - verify: gate tests, every goal starts RED.
 16. [ ] Card scaffold + the P2 header grid in page-shell/styles - verify: headless render, edges align.
 17. [ ] `resource/bind-*.js` binder so a lab lesson localizes - verify: EN/ES round-trip.
 Phase 3 - content

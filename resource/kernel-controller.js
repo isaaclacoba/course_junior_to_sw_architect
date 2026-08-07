@@ -61,6 +61,10 @@
       "kernel/engine/git-progress.js",
       "kernel/engine/widgets/goal-tracker.js", "kernel/grading/git-goal-match.js",
       "kernel/engine/widgets/git-goal-provider.js"
+    ],
+    lab: [
+      "kernel/grading/trace-match.js",
+      "kernel/engine/widgets/goal-tracker.js", "kernel/engine/widgets/trace-goal-provider.js"
     ]
   };
 

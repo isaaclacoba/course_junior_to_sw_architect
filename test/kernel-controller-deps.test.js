@@ -75,6 +75,19 @@ test("git loads its graders AND the shared progress module, in that order", () =
   ]);
 });
 
+test("lab loads the trace policy BEFORE the provider that reads it", () => {
+  // A lab card is graded on the execution trace, so trace-match is both the
+  // grader and the policy the tracker reads - the two roles the build archetype
+  // splits across output-match and structure-match. The provider looks its
+  // policy up on the window, so with the order swapped the lab tracker silently
+  // draws nothing rather than failing loudly.
+  assert.deepEqual(deps().lab, [
+    "kernel/grading/trace-match.js",
+    "kernel/engine/widgets/goal-tracker.js",
+    "kernel/engine/widgets/trace-goal-provider.js",
+  ]);
+});
+
 test("the archetypes with no grading module declare nothing", () => {
   const map = deps();
   ["drill", "viz", "checkpoint"].forEach((a) => {

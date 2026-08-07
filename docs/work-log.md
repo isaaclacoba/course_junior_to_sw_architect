@@ -2473,3 +2473,32 @@ handing out XP for a check nobody performed.
 card (1 fail). Restored, 14/14. Repo suite 545/545. code-lab 550, one failure -
 the pre-existing objects-view case from another line of work, untouched. Vendored
 bundle checked by loading it in jsdom and reading the prototype, not by grepping.
+
+## 2026-08-07 10:34 CEST - step 15, the trace gate vocabulary
+`kernel/grading/trace-match.js` and `kernel/engine/widgets/trace-goal-provider.js`.
+
+Five gates - `constructed`, `liveObjects`, `distinctField`, `calls`, `prints` -
+each reading the execution trace and never the source text. `new Cat("Ana")` in a
+comment, in a branch that never ran, or in a class nobody instantiated all look
+right to a regex and are all wrong; the trace only holds what actually happened.
+
+`liveObjects` is a MAXIMUM per step, not a total: two cats made one after another
+are never two cats on screen together, and a lesson about instances that accepted
+them would teach the opposite of its point. `distinctField` is what catches the
+fault lesson 1 has today - two objects hardcoded to one name.
+
+`startsRed` exists so an author can prove every goal is red on the untouched
+starter. A goal green before the learner types is decoration that pays XP.
+
+Four sabotages watched failing before restore: liveObjects totalling instead of
+maxing (2 fail), an empty gate list passing (1), an unknown gate passing (1), the
+provider painting an unstarted card red instead of unjudged (1).
+
+The plugin's "no matcher" test was stale the moment the matcher existed - it
+asserted a condition that could no longer occur. Rewritten as two: one drives the
+SHIPPED matcher end to end through the plugin, one simulates the browser case
+this actually guards (a page that forgot the script tag). That case is real: the
+`lab` row added to kernel-controller's ARCHETYPE_DEPS is what loads it, policy
+before provider, and the deps test now pins that order.
+
+18 gate tests, 15 plugin tests, repo suite 565/565, validate 0 errors, gate PASS.
