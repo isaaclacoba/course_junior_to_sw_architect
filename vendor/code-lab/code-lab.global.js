@@ -6387,7 +6387,7 @@ ${written}` : written;
       const classes = ["cl-ob-row"];
       if (row.fresh) classes.push("cl-ob-fresh");
       if (row.unreachable) classes.push("cl-ob-orphan");
-      const kind = row.unreachable ? `${escapeHtml4(row.label)} (${escapeHtml4(labels.objUnnamed)})` : escapeHtml4(row.label);
+      const kind = escapeHtml4(row.label);
       const names = row.names.length ? ` ${escapeHtml4(labels.objNames)} ${row.names.map(
         (n) => `<span class="cl-ob-role">${escapeHtml4(n.role)}</span><span class="cl-ob-names ${tintClass(n.id, store)}">${short(n.id)}</span>`
       ).join(" ")}` : "";
