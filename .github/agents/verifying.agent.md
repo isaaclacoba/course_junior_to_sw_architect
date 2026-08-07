@@ -65,6 +65,16 @@ verifier that edits the code stops being independent.
 - DO NOT git commit or push.
 
 ## Output
-One plain sentence: what was asked, what happened. Then a `What` / `Result`
-table with the verdict bolded, a findings table, what you did not verify, and a
-short numbered list of what could happen next.
+Report with the standard factory report - `.github/agents/factory-report.md`.
+Read it. Four blocks, fixed order, every turn: **Plan** (the WHOLE plan, every
+phase, one `<- you are here`), **Done this turn** (max 5 bullets), **Next** (one
+step + its verify), **Needs you** (usually "nothing").
+
+The plan does not change. If a step is already built or impossible, stop and say
+which one - never silently re-order, merge or drop it.
+
+Before asking the owner anything: answer it from the code first, state the facts
+he cannot see, ask ONE question, and never ask permission to continue.
+
+State-specific, fold into the blocks above:
+a `What` / `Result` table with verdicts bolded, a findings table, and what you did NOT verify.

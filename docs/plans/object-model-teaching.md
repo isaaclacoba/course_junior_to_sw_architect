@@ -38,8 +38,8 @@ Phase 1 - code-lab (upstream of everything)
 11. [x] Make `traceToSteps` take translated narration templates (~14) - verify: unit test.
 12. [x] typecheck + tests + build + re-vendor - verify: the new symbols are in the vendored IIFE.
 Phase 2 - the `lab` archetype
-13. [ ] MOCKUP: the ticking trace-goal tracker (red -> green as the trace lands), owner
-    picks - verify: option chosen + journalled, before any plugin code.
+13. [~] STRUCK - the tracker is already built and shared by the build and git tracks
+    (`kernel/engine/widgets/goal-tracker.js`, provider-based). Nothing to design.
 14. [ ] `kernel/engine/plugins/lab-plugin.js` on the generic engine - verify: plugin tests.
 15. [ ] Trace gate vocabulary in `kernel/grading/` - verify: gate tests, every goal starts RED.
 16. [ ] Card scaffold + the P2 header grid in page-shell/styles - verify: headless render, edges align.
@@ -69,6 +69,15 @@ Phase 4 - close
 - How the lab lesson awards XP and counts toward track progress.
 
 ## Log
+- 2026-08-07 - Owner stopped the run: reports were long, carried no plan and no
+  position, and a question asked without context got answered on wrong premises.
+  Fixed the FSM, not this feature: `.github/agents/factory-report.md` is now the
+  fixed four-block report (whole plan every turn, <=5 done-bullets, one next step,
+  one `needs you`), wired into all 8 states. `recall` now searches the CODE before
+  the journal and reports an exists/partial/absent inventory FIRST - the miss that
+  cost an hour re-designing `visualize.html` + `CodeLab.VizLab`, which already ship
+  a working editor + real compiler + real trace + memory picture.
+  Step 13 struck: the goal tracker exists.
 - 2026-08-06 - Design round run with the owner: 8 decisions ratified, grounded on a
   141-task measurement, a proven tracer, and two measured mockups. Design of record and
   this brief written. No code yet.

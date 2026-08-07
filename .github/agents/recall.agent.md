@@ -16,7 +16,20 @@ Follow the `AGENTS.md` voice - plain, warm, `backticks` for code, spaced hyphen
 `node` is often not on PATH: `export PATH="$HOME/.nvm/versions/node/v20.19.5/bin:$PATH"`.
 
 ## The loop
-1. **Search wide before narrow.** `node tools/journal.mjs search <text>` (the
+1. **Search the CODE for the thing, before the journal.** The journal records
+   what was DECIDED; the repo holds what was BUILT, and plenty was built without
+   a decision row. Grep the widget/engine/tool names, `code-lab/src/`,
+   `kernel/`, and the root `*.html` pages, then read what you find. A working
+   proof-of-concept nobody wrote down is the most expensive thing you can miss.
+
+   This step exists because it was skipped: a design round spent an hour
+   deciding how to build an execution visualiser, while `visualize.html` and
+   `CodeLab.VizLab` - editor, real Roslyn compiler, real trace, memory picture -
+   had been shipping for a week. Nothing in the journal said so. The code did.
+
+   Report every hit as **exists / partially exists / absent**, with the file and
+   line. "Absent" is a claim; back it with what you searched.
+2. **Search wide before narrow.** `node tools/journal.mjs search <text>` (the
    text is POSITIONAL - `--q` fails). Search the topic, its synonyms, and the
    mechanism - not just the feature name. A ruling about "hooks" may be filed
    under a different feature entirely.
@@ -27,7 +40,10 @@ Follow the `AGENTS.md` voice - plain, warm, `backticks` for code, spaced hyphen
 4. **Read the artifacts, not just the rows.** If `docs/plans/<slug>.md` or
    `docs/architecture/<slug>.md` exist, read them. A decision row is a summary;
    the design-of-record is the reasoning.
-5. **Report what binds now.** For each finding: the id, what it ruled, and
+5. **Say what already EXISTS, first, before what was ruled.** The report leads
+   with the inventory - what is built and usable, what is half-built, what is
+   genuinely absent. The decision list comes after it.
+6. **Report what binds now.** For each finding: the id, what it ruled, and
    whether it still stands. Name the ones that CONSTRAIN the work ahead.
 
 ## Exit evidence (this is what the FSM checks)
@@ -68,5 +84,16 @@ failure this exists to prevent.
 - DO NOT git commit or push.
 
 ## Output
-Short. What was already ruled, what still binds, what is genuinely new, and the
-id of the row you wrote.
+Report with the standard factory report - `.github/agents/factory-report.md`.
+Read it. Four blocks, fixed order, every turn: **Plan** (the WHOLE plan, every
+phase, one `<- you are here`), **Done this turn** (max 5 bullets), **Next** (one
+step + its verify), **Needs you** (usually "nothing").
+
+The plan does not change. If a step is already built or impossible, stop and say
+which one - never silently re-order, merge or drop it.
+
+Before asking the owner anything: answer it from the code first, state the facts
+he cannot see, ask ONE question, and never ask permission to continue.
+
+State-specific, fold into the blocks above:
+what already EXISTS in the code (exists / partial / absent, with file:line) FIRST, then what was already ruled, what still binds, what is genuinely new, and the row id you wrote.
