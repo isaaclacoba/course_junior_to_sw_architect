@@ -1633,6 +1633,9 @@ ${result.runtimeError}`.trim(),
     hpKindCtor: "constructor",
     hpOn: "on {recv}",
     hpPaused: "paused at line {line}",
+    hpThis: "this",
+    hpSecParams: "handed in",
+    hpSecLocals: "declared here",
     consoleHead: "Console",
     consoleIdle: "Nothing printed yet.",
     vlPreparing: "Preparing compiler...",
@@ -1655,9 +1658,13 @@ ${result.runtimeError}`.trim(),
     vlThrew: " It threw: {message}",
     vlFailedHint: "The tracer took too long or could not load. Try again."
   };
+  function thisDotId(frameId) {
+    return `${frameId}:this`;
+  }
   function deriveRefs(stack = []) {
     const refs = [];
     for (const frame of stack) {
+      if (frame.recvId) refs.push({ from: thisDotId(frame.id), to: frame.recvId });
       for (const slot of frame.vars ?? []) {
         if (slot.ref) refs.push({ from: slot.id, to: slot.ref });
       }
@@ -2735,11 +2742,34 @@ ${result.runtimeError}`.trim(),
     el.className = "cl-mv-hp-frame" + (f.active ? " is-active" : " is-caller");
     const label = kindLabel(f.kind, labels);
     const badge = label ? `<span class="cl-mv-hp-fkind">${esc3(label)}</span>` : "";
-    const recv = f.recv ? `<div class="cl-mv-hp-frecv">${esc3(fill(labels.hpOn, { recv: f.recv }))}</div>` : "";
     const paused = !f.active && typeof f.line === "number" ? `<div class="cl-mv-hp-fpaused">${esc3(fill(labels.hpPaused, { line: f.line }))}</div>` : "";
-    const rows = (f.vars ?? []).map(rowHtml3).join("");
-    el.innerHTML = `<div class="cl-mv-hp-fname"><span class="cl-mv-hp-fn">${esc3(f.name ?? f.id)}</span>${badge}</div>` + recv + paused + `<div class="cl-mv-hp-rows">${rows}</div>`;
+    el.innerHTML = `<div class="cl-mv-hp-fname"><span class="cl-mv-hp-fn">${esc3(f.name ?? f.id)}</span>${badge}</div>` + paused + `<div class="cl-mv-hp-rows">${frameBody(f, labels)}</div>`;
     return el;
+  }
+  function frameBody(f, labels) {
+    const vars = f.vars ?? [];
+    const thisRow = f.recvId ? section("", [refRowHtml(thisDotId(f.id), labels.hpThis, f.recv)], "is-this") : f.recv ? `<div class="cl-mv-hp-frecv">${esc3(fill(labels.hpOn, { recv: f.recv }))}</div>` : "";
+    const params = vars.filter((v) => v.role === "param");
+    const locals = vars.filter((v) => v.role === "local");
+    if (params.length === 0 && locals.length === 0) {
+      return thisRow + vars.map(rowHtml3).join("");
+    }
+    const rest = vars.filter((v) => v.role !== "param" && v.role !== "local");
+    return thisRow + section(labels.hpSecParams, params.map(rowHtml3), "is-params") + section(labels.hpSecLocals, locals.map(rowHtml3), "is-locals") + rest.map(rowHtml3).join("");
+  }
+  function section(head, rows, cls) {
+    if (rows.length === 0) return "";
+    const title = head ? `<div class="cl-mv-hp-sechead">${esc3(head)}</div>` : "";
+    return `<div class="cl-mv-hp-sec ${cls}">${title}${rows.join("")}</div>`;
+  }
+  function refRowHtml(dotId, name, recv) {
+    const who = recv ? `<span class="cl-mv-hp-refname">${instanceHtml(recv)}</span>` : "";
+    return `<div class="cl-mv-hp-row is-ref is-this"><span class="cl-mv-hp-name">${esc3(name)}</span><span class="cl-mv-hp-ref-cell"><span class="cl-mv-hp-arrowglyph">\u2192</span><span class="cl-mv-hp-dot" data-dot="${esc3(dotId)}"></span>${who}</span></div>`;
+  }
+  function instanceHtml(label) {
+    const m = /^(.*?)(\s*#\d+)$/.exec(label);
+    if (!m) return `<span class="cl-mv-hp-ty">${esc3(label)}</span>`;
+    return `<span class="cl-mv-hp-ty">${esc3(m[1])}</span><span class="cl-mv-hp-instno">${esc3(m[2].trim())}</span>`;
   }
   function rowHtml3(v) {
     const kind = slotKind(v);
@@ -2759,12 +2789,12 @@ ${result.runtimeError}`.trim(),
     const el = existing ?? document.createElement("div");
     el.className = "cl-mv-hp-card" + (o.dim ? " is-dim" : "");
     el.setAttribute("data-obj", o.id);
-    const no = typeof o.no === "number" ? ` <span class="cl-mv-hp-no">#${o.no}</span>` : "";
+    const no = typeof o.no === "number" ? `<span class="cl-mv-hp-no">#${o.no}</span>` : "";
     const fields = (o.fields ?? []).map((field) => {
       const isHot = (o.hotFields ?? []).includes(field[0]);
       return `<div class="cl-mv-hp-field${isHot ? " is-hot" : ""}"><span class="cl-mv-hp-fkey">${esc3(field[0])}</span><span class="cl-mv-hp-fval">${esc3(field[1])}</span></div>`;
     }).join("");
-    el.innerHTML = `<div class="cl-mv-hp-type">${esc3(o.type)}${no}</div>` + fields;
+    el.innerHTML = `<div class="cl-mv-hp-type"><span class="cl-mv-hp-tyname">${esc3(o.type)}</span>${no}</div>` + fields;
     return el;
   }
   function esc3(s) {
@@ -6803,11 +6833,13 @@ ${written}` : written;
       const slot = { id, k: v.name, hot };
       if (v.ref != null) slot.ref = v.ref;
       else slot.v = v.value ?? "";
+      if (v.role) slot.role = v.role;
       return slot;
     });
     const frame = { id: f.id, name: f.name, vars };
     if (f.kind) frame.kind = f.kind;
     if (f.recv) frame.recv = f.recv;
+    if (f.recvId) frame.recvId = f.recvId;
     if (typeof f.line === "number") frame.line = f.line;
     return frame;
   }
@@ -6922,15 +6954,15 @@ ${written}` : written;
   function renderErrorPanel(errors, labels = {}, options = {}) {
     const l = { ...DEFAULT_LABELS3, ...labels };
     const isWarning = options.kind === "warning";
-    const section = document.createElement("section");
-    section.className = isWarning ? "cl-errors cl-errors--warning" : "cl-errors";
+    const section2 = document.createElement("section");
+    section2.className = isWarning ? "cl-errors cl-errors--warning" : "cl-errors";
     const heading = document.createElement("h3");
     heading.textContent = isWarning ? l.warningHeading : l.heading;
-    section.appendChild(heading);
+    section2.appendChild(heading);
     const note = document.createElement("p");
     note.className = "cl-errors-note";
     note.textContent = isWarning ? l.warningNote : l.note;
-    section.appendChild(note);
+    section2.appendChild(note);
     const list = document.createElement("ul");
     for (const e of errors) {
       const li = document.createElement("li");
@@ -6971,8 +7003,8 @@ ${written}` : written;
       }
       list.appendChild(li);
     }
-    section.appendChild(list);
-    return section;
+    section2.appendChild(list);
+    return section2;
   }
   function showErrorPanel(host, errors, labels, options) {
     host.textContent = "";

@@ -94,7 +94,14 @@ function serve(port, open) {
   const server = http.createServer((req, res) => {
     const url = decodeURIComponent(req.url.split("?")[0]);
 
-    if (url.startsWith(PROXY_PREFIX)) return proxy(req, res);
+    // The proxy exists because `level3-app/` is normally absent - it is a
+    // git-ignored artefact CI builds. When it IS present, it was built here on
+    // purpose, and proxying past it would silently serve the DEPLOYED compiler
+    // instead of the one under test - a change to the tracer would look like it
+    // had no effect at all.
+    if (url.startsWith(PROXY_PREFIX) && !fs.existsSync(path.join(root, url.slice(1)))) {
+      return proxy(req, res);
+    }
 
     const rel = url === "/" ? "/" + open : url;
     let file = path.join(root, rel);

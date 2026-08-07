@@ -102,6 +102,7 @@
     "textSize", "textSmall", "textDefault", "textLarge",
     "hpMemory", "hpMemoryNote", "hpStatics", "hpStaticsNote", "hpConstants", "hpConstantsNote",
     "hpKindEntry", "hpKindStatic", "hpKindMethod", "hpKindCtor", "hpOn", "hpPaused",
+    "hpThis", "hpSecParams", "hpSecLocals",
     "consoleHead", "consoleIdle",
     "vlVisualize", "vlPreparing", "vlTracing", "vlHint", "vlNoSteps", "vlNoStepsHint",
     "vlDidNotCompile", "vlFailedHint", "vlTracedOne", "vlTracedMany", "vlTruncated", "vlThrew",
