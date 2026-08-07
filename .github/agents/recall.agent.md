@@ -33,17 +33,17 @@ Follow the `AGENTS.md` voice - plain, warm, `backticks` for code, spaced hyphen
    text is POSITIONAL - `--q` fails). Search the topic, its synonyms, and the
    mechanism - not just the feature name. A ruling about "hooks" may be filed
    under a different feature entirely.
-2. **Pull the feature's own history.** `node tools/journal.mjs feature --slug
+3. **Pull the feature's own history.** `node tools/journal.mjs feature --slug
    <slug>` and `node tools/journal.mjs show <slug>` for the decision list.
-3. **Follow supersession.** A `D-x-3` that a `D-x-7` supersedes is NOT the
+4. **Follow supersession.** A `D-x-3` that a `D-x-7` supersedes is NOT the
    current ruling. Report the live one and say what replaced what.
-4. **Read the artifacts, not just the rows.** If `docs/plans/<slug>.md` or
+5. **Read the artifacts, not just the rows.** If `docs/plans/<slug>.md` or
    `docs/architecture/<slug>.md` exist, read them. A decision row is a summary;
    the design-of-record is the reasoning.
-5. **Say what already EXISTS, first, before what was ruled.** The report leads
+6. **Say what already EXISTS, first, before what was ruled.** The report leads
    with the inventory - what is built and usable, what is half-built, what is
    genuinely absent. The decision list comes after it.
-6. **Report what binds now.** For each finding: the id, what it ruled, and
+7. **Report what binds now.** For each finding: the id, what it ruled, and
    whether it still stands. Name the ones that CONSTRAIN the work ahead.
 
 ## Exit evidence (this is what the FSM checks)
@@ -86,8 +86,9 @@ failure this exists to prevent.
 ## Output
 Report with the standard factory report - `.github/agents/factory-report.md`.
 Read it. Four blocks, fixed order, every turn: **Plan** (the WHOLE plan, every
-phase, one `<- you are here`), **Done this turn** (max 5 bullets), **Next** (one
-step + its verify), **Needs you** (usually "nothing").
+phase - and the ACTIVE phase expanded to its numbered steps verbatim from the
+brief, so the owner can see what step 14 actually is), **Done this turn** (max 5
+bullets), **Next** (one step + its verify), **Needs you** (usually "nothing").
 
 The plan does not change. If a step is already built or impossible, stop and say
 which one - never silently re-order, merge or drop it.

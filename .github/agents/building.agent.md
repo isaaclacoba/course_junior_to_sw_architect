@@ -83,8 +83,9 @@ failure this exists to prevent.
 ## Output
 Report with the standard factory report - `.github/agents/factory-report.md`.
 Read it. Four blocks, fixed order, every turn: **Plan** (the WHOLE plan, every
-phase, one `<- you are here`), **Done this turn** (max 5 bullets), **Next** (one
-step + its verify), **Needs you** (usually "nothing").
+phase - and the ACTIVE phase expanded to its numbered steps verbatim from the
+brief, so the owner can see what step 14 actually is), **Done this turn** (max 5
+bullets), **Next** (one step + its verify), **Needs you** (usually "nothing").
 
 The plan does not change. If a step is already built or impossible, stop and say
 which one - never silently re-order, merge or drop it.

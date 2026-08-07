@@ -18,7 +18,12 @@ In this order. Every turn. Nothing outside them.
 ```
 **Plan** - <slug>
 Phase 1 <name>  [x] done
-Phase 2 <name>  [>] step 14 of 17   <- you are here
+Phase 2 <name>  [>] step 14 of 14-17   <- you are here
+  13. [~] STRUCK - already built, see <where>
+  14. [>] <the step, verbatim from the brief>  <- doing now
+  15. [ ] <the step, verbatim>
+  16. [ ] <the step, verbatim>
+  17. [ ] <the step, verbatim>
 Phase 3 <name>  [ ]
 Phase 4 <name>  [ ]
 
@@ -37,7 +42,13 @@ Rules that make it work:
 - **Always print the WHOLE plan**, every phase, every turn - including phases
   long finished. "The remaining steps" is not the plan; the owner is tracking a
   whole, not a window onto it.
-- **Exactly one `<- you are here`.**
+- **The ACTIVE phase expands to its numbered steps**, verbatim from the brief,
+  each with its own `[x]` / `[>]` / `[ ]` / `[~]`. A phase name alone does not
+  say what is happening - "Phase 2 the lab archetype" could be anything, and the
+  owner cannot judge a step he cannot see. Finished and future phases stay
+  collapsed to one line each.
+- **Exactly one `<- you are here`**, on the phase line, and one `<- doing now`
+  on the step.
 - **Done-this-turn is capped at 5 bullets.** More than five means it belongs in
   the commit message, not the report.
 - **Say what a thing IS before what it does.** "VizLab - the editor+compiler
