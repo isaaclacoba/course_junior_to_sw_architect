@@ -423,7 +423,17 @@ export function deriveRungs({ outputs, decisions, decisionIds, brief, activity }
   const recall = recallCitations(outputs, decisionIds);
   const seen = recallObservation(activity);
   const claimed = recall.cited.length > 0 || recall.none;
-  const grounding = outputs.filter((r) => ["audit", "subagent", "poc"].includes(r.kind));
+  // A row that merely recalls prior decisions is RECALL's exit evidence, not
+  // grounding's. Counting it here let ONE row clear TWO rungs: recall writes
+  // `--kind audit`, the ladder showed `[x] grounding`, and a design round
+  // reached "authorise 1-2 days of engine work" having never read the code -
+  // for three acts that already existed in code-lab/src/core/git-model.ts.
+  const isRecallRow = (r) =>
+    /^\s*recall:\s*none\b/im.test(`${r.title || ""}\n${r.body || ""}`) ||
+    /^\s*recall:/i.test(r.title || "");
+  const grounding = outputs.filter(
+    (r) => ["audit", "subagent", "poc"].includes(r.kind) && !isRecallRow(r),
+  );
   const active = decisions.filter((d) => d.status !== "superseded");
   const steps = brief?.steps ?? [];
   const doneSteps = steps.filter((s) => s.done).length;
