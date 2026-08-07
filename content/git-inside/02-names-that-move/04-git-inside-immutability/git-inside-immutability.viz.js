@@ -15,18 +15,19 @@
 
   var WRITE = { act: "write", path: "notes.md", text: "hello world\n" };
   var STORE = { act: "store", path: "notes.md" };
+  var LIST = { act: "list" };
   var SAVE = { act: "save", message: "first" };
-  var NAME = { act: "name", ref: "refs/heads/master", commitId: "87ab8c9" };
+  var NAME = { act: "name", ref: "refs/heads/main" };
   var AMEND = { act: "amend", message: "first, reworded" };
   
   var WRITE2 = { act: "write", path: "notes.md", text: "hello world\nsecond line\n" };
   var STORE2 = { act: "store", path: "notes.md" };
   var SAVE2 = { act: "save", message: "second" };
-  var NAME2 = { act: "name", ref: "refs/heads/master", commitId: "3c4e5f6" };
-  var RESET = { act: "reset", ref: "refs/heads/master", to: "87ab8c9" };
+  var NAME2 = { act: "name", ref: "refs/heads/main" };
+  var RESET = { act: "reset", ref: "refs/heads/main", to: "first" };
 
-  var SETUP = [WRITE, STORE, SAVE, NAME];
-  var TWO_COMMITS = [WRITE, STORE, SAVE, NAME, WRITE2, STORE2, SAVE2, NAME2];
+  var SETUP = [WRITE, STORE, LIST, SAVE, NAME];
+  var TWO_COMMITS = [WRITE, STORE, LIST, SAVE, NAME, WRITE2, STORE2, LIST, SAVE2, NAME2];
 
   window.LESSON_CONFIG = {
     code: [],
@@ -46,7 +47,7 @@
         objects: { lens: "chain", acts: SETUP, fresh: 1, note: "one commit, one id" }
       },
       {
-        narr: "Amending a commit writes a **new** commit with a new id - `f72f3c5` - and moves the ref to point at it. The original commit `87ab8c9` is not touched. Its bytes are unchanged, its id is unchanged, and it still sits in the object store exactly as it was written. The only thing that changed is that `master` no longer points at it.",
+        narr: "Amending a commit writes a **new** commit with a new id - `f72f3c5` - and moves the ref to point at it. The original commit `87ab8c9` is not touched. Its bytes are unchanged, its id is unchanged, and it still sits in the object store exactly as it was written. The only thing that changed is that `main` no longer points at it.",
         objects: { lens: "chain", acts: SETUP.concat(AMEND), fresh: 1, note: "new commit, ref moved" }
       },
       {
@@ -58,7 +59,7 @@
         objects: { lens: "chain", acts: TWO_COMMITS.concat(RESET), fresh: 1, note: "reset moved the ref back" }
       },
       {
-        narr: "An unreachable commit does not disappear immediately. The reflog names it - `HEAD@{1}` still points at the commit `master` used to reach - which is why `git fsck` does not report it as dangling. Only when the reflog expires does the commit become truly unreachable, and even then it stays in the store until garbage collection runs.",
+        narr: "An unreachable commit does not disappear immediately. The reflog names it - `HEAD@{1}` still points at the commit `main` used to reach - which is why `git fsck` does not report it as dangling. Only when the reflog expires does the commit become truly unreachable, and even then it stays in the store until garbage collection runs.",
         objects: { lens: "chain", acts: SETUP.concat(AMEND), fresh: 0, note: "reflog keeps it reachable" }
       },
       {
