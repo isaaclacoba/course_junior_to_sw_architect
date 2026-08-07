@@ -2430,3 +2430,23 @@ default parallelism - `04-ai-9`, then `03-ai-3`, always "lesson did not render".
 Each passes on its own. A runner capacity issue, not a content defect.
 
 ## 2026-08-06 12:02 CEST - end
+
+## 2026-08-07 09:18 CEST - object-model-teaching phase 1: code-lab seams (steps 9-12)
+Start. VizLab `onTrace` grading seam, `VizLabels` extended to badges/MEMORY/console
+and VizLab chrome, `traceToSteps` translated narration templates, then re-vendor.
+
+## 2026-08-07 09:49 CEST - end
+Phase 1 done. `onTrace` (six statuses, so "the tracer never loaded" cannot read as a
+wrong answer), `VizLabels` extended to the memory captions, frame badges, console and
+VizLab's own chrome, and `traceToSteps` taking translated narration - 22 generated
+captions that could not be translated at any price before. A template override that
+drops a `{slot}` is refused rather than shipped without its value.
+
+Both "no English leaks" tests passed while the code was deliberately sabotaged when
+first written: they compared rendered text against templates that still held their
+slots, which never appear literally. Rewritten to assert every caption came from the
+table, then each guard watched failing before restore.
+
+typecheck clean; 550 tests, 549 pass - the one failure is the pre-existing
+objects-view.dom case, another line of work, untouched. Vendored bundle verified by
+loading it through a script tag and calling the new seams, not by grepping for names.

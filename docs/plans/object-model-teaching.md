@@ -32,11 +32,11 @@ Phase 0 - design
 7. [x] Owner decisions 1-8 - verify: `D-object-model-teaching-1..8` in the journal.
 8. [x] Design of record - verify: docs/architecture/object-model-teaching.md.
 Phase 1 - code-lab (upstream of everything)
-9. [ ] `VizLabConfig.onTrace` so the course can grade what the widget shows - verify: unit test.
-10. [ ] `VizLabConfig.labels` + extend `VizLabels` to badges, MEMORY caption, console text,
+9. [x] `VizLabConfig.onTrace` so the course can grade what the widget shows - verify: unit test.
+10. [x] `VizLabConfig.labels` + extend `VizLabels` to badges, MEMORY caption, console text,
     VizLab's own 5 chrome strings - verify: unit test asserting no English leaks with labels set.
-11. [ ] Make `traceToSteps` take translated narration templates (~14) - verify: unit test.
-12. [ ] typecheck + tests + build + re-vendor - verify: the new symbols are in the vendored IIFE.
+11. [x] Make `traceToSteps` take translated narration templates (~14) - verify: unit test.
+12. [x] typecheck + tests + build + re-vendor - verify: the new symbols are in the vendored IIFE.
 Phase 2 - the `lab` archetype
 13. [ ] MOCKUP: the ticking trace-goal tracker (red -> green as the trace lands), owner
     picks - verify: option chosen + journalled, before any plugin code.
@@ -72,6 +72,10 @@ Phase 4 - close
 - 2026-08-06 - Design round run with the owner: 8 decisions ratified, grounded on a
   141-task measurement, a proven tracer, and two measured mockups. Design of record and
   this brief written. No code yet.
+- 2026-08-07 - Phase 1 landed: `onTrace` grading seam, `VizLabels` extended to the
+  memory captions/badges/console and VizLab's own chrome, `traceToSteps` translatable.
+  Both "no English leaks" tests passed while sabotaged at first - rewritten, then each
+  watched failing before restore. Vendored bundle verified by loading it, not grepping.
 - 2026-08-07 - Bookkeeping so the factory can track this feature. The grounding really
   happened but was never written to the journal, so the FSM was skipping the feature as
   pre-FSM. Recorded the 141-task measurement (`audit`) and the tracer/mockup runs (`poc`)
