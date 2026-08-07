@@ -15,15 +15,17 @@
 
   var WRITE = { act: "write", path: "notes.md", text: "hello world\n" };
   var STORE = { act: "store", path: "notes.md" };
+  var PICK = { act: "pick", path: "notes.md" };
   var LIST = { act: "list" };
   var SAVE = { act: "save", message: "first" };
   var NAME = { act: "name", ref: "refs/heads/main" };
   
   var WRITE2 = { act: "write", path: "plan.md", text: "next steps\n" };
   var STORE2 = { act: "store", path: "plan.md" };
+  var PICK2 = { act: "pick", path: "plan.md" };
 
-  var SETUP = [WRITE, STORE, LIST, SAVE, NAME];
-  var TWO_FILES = [WRITE, STORE, WRITE2, STORE2];
+  var SETUP = [WRITE, STORE, PICK, LIST, SAVE, NAME];
+  var TWO_FILES = [WRITE, STORE, PICK, WRITE2, STORE2, PICK2];
 
   window.LESSON_CONFIG = {
     code: [],
@@ -39,15 +41,15 @@
     steps: [
       {
         narr: "`HEAD` names the ref that moves when a commit is saved. Nothing so far says what that commit will hold. The file at **`.git/index`** decides, and it is the one file in this lesson that is not readable text.",
-        objects: { lens: "chain", acts: [WRITE, STORE], fresh: 1, note: "one file added" }
+        objects: { lens: "folder", acts: [WRITE, STORE, PICK], fresh: 2, note: "one file added, one index entry" }
       },
       {
         narr: "The path **`.git/index`** is a file - a binary file stored beside the object database and the refs. Opened in a hex editor, the first four bytes spell the letters `DIRC`, a signature that identifies the file format. Unlike the objects, which are hashed and immutable, the index is written in place every time a file is staged.",
-        objects: { lens: "folder", acts: [WRITE, STORE], fresh: 0, note: "a binary file, starts with DIRC" }
+        objects: { lens: "folder", acts: [WRITE, STORE, PICK], fresh: 0, note: "a binary file, starts with DIRC" }
       },
       {
         narr: "What the index holds is a list - one entry per staged path, and each entry maps the path to a **blob id** and a **file mode**. The mode is one bit: whether the file is executable. The id is the SHA-1 of the file's contents, the same id the object database uses. The index does not hold the file's text - it points at the blob that does.",
-        objects: { lens: "folder", acts: [WRITE, STORE], fresh: 0, note: "path -> blob id + mode" }
+        objects: { lens: "folder", acts: [WRITE, STORE, PICK], fresh: 0, note: "path -> blob id + mode" }
       },
       {
         narr: "Adding a second file appends a second entry. The index grows to hold both, and the size on disk changes - for one file it occupies 137 bytes, for two it becomes larger. The entries are sorted by path, and the file is rewritten completely every time anything is staged.",
@@ -63,7 +65,7 @@
       },
       {
         narr: "Not everything in `.git` is an object or a name. The file **`.git/config`** is plain text holding settings - INI-style sections and keys that decide how this repository behaves. One setting, `logallrefupdates`, is what controls whether git keeps a reflog at all. Config occupies 124 bytes in a fresh repository, and the file grows as settings are added.",
-        objects: { lens: "chain", acts: SETUP, fresh: 0, detail: "full", note: "config holds settings, not objects" }
+        objects: { lens: "folder", acts: SETUP, fresh: 0, detail: "full", note: "config holds settings, not objects" }
       }
     ]
   };
