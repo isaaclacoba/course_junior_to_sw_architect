@@ -123,15 +123,15 @@ agent. Sweeps are recorded to `docs/journal/factory/`, so it is measured (`D-17`
 
 ## What the owner sees
 
-Three shapes, mocked up and measured (`D-5`) - which caught what prose hid: the
-ladder wrapped at 83 columns, since refitted. The rail names the agent for the
-current state.
+Four shapes, mocked up and measured (`D-5`) - which caught the ladder wrapping at
+83 columns. The rail names the state's agent; `artifacts` fetches links first.
 
 | Shape | Lines | Widest | When |
 |---|---|---|---|
 | rail | 3 | 70 | session start |
 | gate report | 6 | 66 | only on a misstep |
 | ladder | 8 | 65 | on demand |
+| artifacts | 1/row | uncapped | a turn built something openable; URLs are copied, so never clipped |
 
 ## Risks
 

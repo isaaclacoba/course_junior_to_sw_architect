@@ -11,7 +11,7 @@ was asked a question whose context he did not have, answered it the only way the
 question allowed, and an hour went into re-designing something the repo already
 had. The report was the defect. Long is not thorough - it is unreadable.
 
-## The four blocks
+## The five blocks
 
 In this order. Every turn. Nothing outside them.
 
@@ -26,6 +26,12 @@ Phase 2 <name>  [>] step 14 of 14-17   <- you are here
   17. [ ] <the step, verbatim>
 Phase 3 <name>  [ ]
 Phase 4 <name>  [ ]
+
+**Artifacts**                        (whenever there is one - see below)
+| What   | Where                                    | Serving |
+| mockup | http://localhost:8099/_mockup-x.html     | 200     |
+| lesson | http://localhost:8099/content/.../07-x/  | 200     |
+| brief  | docs/plans/<slug>.md                     | -       |
 
 **Done this turn**
 - <what changed, not how>            (max 5 bullets, one line each)
@@ -56,6 +62,33 @@ Rules that make it work:
 - Verdicts bolded (**Yes** / **No** / **Zero**). No emojis, no filler.
 - Detail lives in the brief, the commit and the code. The report LINKS; it does
   not inline.
+
+## Artifacts - the block you do not get to skip
+
+**If the turn produced anything the owner can OPEN, the Artifacts table is
+mandatory, and you do not write it from memory. You run:**
+
+```bash
+node tools/factory.mjs artifacts --feature <slug>
+```
+
+It finds the mockups, the lesson directories the feature touched, and the brief
+and design doc; it works out which local port is actually serving THEM; and it
+fetches every URL and prints what came back. Paste the rows. If it prints
+`no artifacts`, omit the block.
+
+Two rules, both of which cost the owner an hour before they were written down:
+
+1. **Never hand over a link you have not proved.** A mockup was once reported as
+   built and the owner could not find it; when he was finally given a URL it
+   404'd. Every row carries a status for that reason. A row that is not `200`
+   is not a link - fix it, or say plainly that it does not work yet.
+2. **Never say "the mockup is ready" without the URL in the same message.** An
+   artifact the owner cannot reach in one click has not been delivered, and
+   "it is on the local server" is not a location.
+
+The tool answers only for what it can see. It does not know whether the page is
+CORRECT - that is the owner's job, and it is exactly why he needs the link.
 
 ## The plan does not change
 

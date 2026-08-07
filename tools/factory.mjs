@@ -23,6 +23,7 @@
 //   gate      [--feature SLUG] [--paths a,b,c]            6 lines, only on a misstep
 //   ladder    [--feature SLUG] [--paths a,b,c]            8 lines, on demand
 //   sweep     [--commits N] [--json] [--verbose]           replay real history (step 15)
+//   artifacts [--feature SLUG] [--port N] [--json]        what the owner can OPEN
 //   selftest                                              asserts the rules + widths
 
 import { readFile, readdir, writeFile, mkdir, rm } from "node:fs/promises";
@@ -582,6 +583,174 @@ export function renderLadder(s) {
   }
   const cur = rungs.find((r) => r.state === s.state);
   lines.push(clip(`  next: ${cur ? cur.fix : "npm run gate"}`));
+  return lines;
+}
+
+// ---------------------------------------------------------------------------
+// Artifacts - what the owner can actually OPEN
+// ---------------------------------------------------------------------------
+//
+// The report standard requires an Artifacts table whenever a turn produced
+// something viewable, and the reason it is a TOOL and not a rule in prose is
+// that prose has already failed twice on this exact point:
+//
+//   - a mockup was built, reported as built, and the owner could not find it;
+//   - when he was finally given a URL it 404'd, because the server behind it
+//     did not resolve `/dir/` to `/dir/index.html`.
+//
+// Both times the agent had honestly believed the artifact was available. So the
+// table is DERIVED - the tool finds the files, builds the URL, and actually
+// fetches it. An agent cannot report a link it has not proved, and cannot omit
+// one it does not remember building.
+//
+// Ports the course is normally served on. 8091 is the documented dev server
+// (copilot-instructions), 8099 the mockup server; the rest are common defaults
+// someone may have reached for.
+export const ARTIFACT_PORTS = [8091, 8099, 8000, 8080, 3000, 5500];
+
+// Which lesson directories a feature touched. Committed work on this branch plus
+// anything still uncommitted, because an artifact is worth showing before it is
+// committed - that is exactly when the owner's opinion is cheapest to act on.
+export function touchedPaths(base = "origin/master") {
+  const out = new Set();
+  try {
+    const merged = execFileSync("git", ["--no-optional-locks", "diff", "--name-only", `${base}...HEAD`], {
+      cwd: ROOT, encoding: "utf8", maxBuffer: 8 << 20,
+    });
+    for (const l of merged.split("\n")) if (l.trim()) out.add(l.trim());
+  } catch {
+    // No such base (a fresh clone, a detached head). Uncommitted work still counts.
+  }
+  for (const f of changedPaths()) out.add(f.path);
+  return [...out];
+}
+
+// A lesson directory is one that holds a generated index.html. Derived from the
+// touched paths rather than from the registry, so a lesson the feature only
+// EDITED shows up next to one it created.
+export function lessonDirsFrom(paths, exists = existsSync) {
+  const dirs = new Set();
+  for (const p of paths) {
+    if (!p.startsWith("content/")) continue;
+    // content/<track>/<part>/<lesson>/<file...>
+    const seg = p.split("/");
+    if (seg.length < 5) continue;
+    const dir = seg.slice(0, 4).join("/");
+    if (exists(join(ROOT, dir, "index.html"))) dirs.add(dir);
+  }
+  return [...dirs].sort();
+}
+
+// Mockups are git-ignored `_mockup-*.html` at the repo root, by the mockup-first
+// rule. They are the artifact most likely to be forgotten, because they are the
+// one thing that never appears in a diff.
+export function mockupFiles(read = readdirSync) {
+  let names = [];
+  try { names = read(ROOT); } catch { return []; }
+  return names.filter((n) => /^_mockup-.*\.html$/.test(n)).sort();
+}
+
+// The two documents a feature is built from. Not viewable in a browser, but they
+// are what the owner reads to judge whether the plan still says what he agreed.
+export function featureDocs(slug, exists = existsSync) {
+  if (!slug) return [];
+  const out = [];
+  const brief = join("docs", "plans", `${slug}.md`);
+  const design = join("docs", "architecture", `${slug}.md`);
+  if (exists(join(ROOT, brief))) out.push({ kind: "brief", path: brief });
+  if (exists(join(ROOT, design))) out.push({ kind: "design", path: design });
+  return out;
+}
+
+// Assemble the rows, in the order the owner cares about: the thing built this
+// turn first, the reading material last.
+export function collectArtifacts({ slug, paths, mockups, docs }) {
+  const rows = [];
+  for (const m of mockups) rows.push({ kind: "mockup", path: m, url: "/" + m });
+  for (const d of lessonDirsFrom(paths)) rows.push({ kind: "lesson", path: d, url: "/" + d + "/" });
+  for (const d of docs) rows.push({ kind: d.kind, path: d.path, url: null });
+  return rows;
+}
+
+// Ask the server for each URL and record what it actually said. A row with no
+// server is reported as such rather than dropped - "there is a mockup and
+// nothing is serving it" is the useful answer, and it names the fix.
+export async function probeArtifacts(rows, port, fetchFn = fetch) {
+  if (!port) return rows.map((r) => ({ ...r, status: r.url ? "no server" : "-" }));
+  const out = [];
+  for (const r of rows) {
+    if (!r.url) { out.push({ ...r, status: "-" }); continue; }
+    let status;
+    try {
+      const res = await fetchFn(`http://localhost:${port}${r.url}`, { redirect: "follow" });
+      status = res.ok ? String(res.status) : `${res.status} BROKEN`;
+    } catch (e) {
+      status = "unreachable";
+    }
+    out.push({ ...r, status, href: `http://localhost:${port}${r.url}` });
+  }
+  return out;
+}
+
+// Which port is serving THESE artifacts.
+//
+// "Is the course on this port" is NOT the question, and asking it is how the
+// first run of this tool handed back four 404s: another worktree of the same
+// repo was serving on 8091, answered the probe for `/course-registry.js`
+// perfectly, and knew nothing about the lesson we had just written. Several
+// worktrees of one repo are normal here, so a server is only the right server
+// if it serves the artifacts we are about to name.
+//
+// So the port is chosen by SCORE - how many of these rows it actually returns -
+// and a server that answers none of them is no better than no server at all.
+export async function findServer(urls = [], ports = ARTIFACT_PORTS, fetchFn = fetch) {
+  const probes = urls.filter(Boolean);
+  let best = null;
+  for (const p of ports) {
+    let alive = false;
+    let score = 0;
+    for (const u of probes.length ? probes : ["/course-registry.js"]) {
+      try {
+        const res = await fetchFn(`http://localhost:${p}${u}`, { redirect: "follow" });
+        alive = true;
+        if (res.ok) score++;
+      } catch {
+        // Nothing listening there. Move on.
+      }
+    }
+    if (!alive) continue;
+    if (score === (probes.length || 1)) return p; // serves everything - done
+    if (!best || score > best.score) best = { port: p, score };
+  }
+  return best && best.score > 0 ? best.port : null;
+}
+
+export function renderArtifacts(rows, port) {
+  if (!rows.length) return ["no artifacts - nothing built this turn the owner can open"];
+  // The header is derived from what the probe SAW, never from the port number.
+  // `--port 9999` with nothing listening printed "served on :9999", which is the
+  // same false reassurance this whole command exists to remove.
+  const viewable = rows.filter((r) => r.url);
+  const live = viewable.filter((r) => r.status === "200");
+  const head = !viewable.length
+    ? "artifacts"
+    : live.length === viewable.length
+      ? `artifacts (served on :${port})`
+      : live.length
+        ? `artifacts (:${port} serves ${live.length} of ${viewable.length})`
+        : "artifacts - NOT SERVED, the links below do not work";
+  const lines = [head];
+  for (const r of rows) {
+    // NOT clipped. Every other line in this tool is width-budgeted, but a URL is
+    // the one string the owner copies rather than reads, and "...
+    // 01-understand-t..." is a link he cannot use.
+    lines.push(`  ${r.kind.padEnd(7)} ${String(r.status).padEnd(11)} ${r.href || r.path}`);
+  }
+  if (rows.some((r) => r.status === "unreachable" || r.status === "no server")) {
+    lines.push("  nothing is serving these - node tools/mockup-server.mjs --port 8099");
+  } else if (rows.some((r) => r.status && r.status.includes("BROKEN"))) {
+    lines.push("  a BROKEN row is a link the owner must NOT be given - fix it first");
+  }
   return lines;
 }
 
@@ -1263,6 +1432,72 @@ async function selftest() {
   t("gate: no line truncated", !gate.some((l) => l.endsWith("...")), gate.find((l) => l.endsWith("...")) ?? "");
   t("ladder: <=80 cols (mockup measured 83)", widest(ladder) <= 80, `${widest(ladder)}`);
 
+  // --- artifacts
+  // Each of these pins a way the artifact table has ALREADY misled, on its very
+  // first run. They are cheap because everything is injected: no server, no git.
+  const fakeFetch = (map) => async (url) => {
+    const hit = Object.entries(map).find(([k]) => url.includes(k));
+    if (!hit) throw new Error("ECONNREFUSED");
+    return { ok: hit[1] < 400, status: hit[1] };
+  };
+
+  // A sibling worktree of the same repo answers /course-registry.js perfectly and
+  // knows nothing of this lesson. Picking it handed the owner four 404s.
+  const wrongPort = await findServer(
+    ["/content/a/b/c/", "/_mockup-x.html"],
+    [8091, 8099],
+    async (url) => {
+      const port = url.match(/:(\d+)/)[1];
+      const servesIt = port === "8099";
+      return { ok: servesIt, status: servesIt ? 200 : 404 };
+    }
+  );
+  t("artifacts: picks the port that serves THESE rows, not any course", wrongPort === 8099, `${wrongPort}`);
+
+  const noneServe = await findServer(["/x/"], [1], async () => ({ ok: false, status: 404 }));
+  t("artifacts: a server that serves none of them is no server", noneServe === null, `${noneServe}`);
+
+  const dead = await findServer(["/x/"], [1], async () => { throw new Error("ECONNREFUSED"); });
+  t("artifacts: nothing listening is no server", dead === null, `${dead}`);
+
+  // A link the owner copies must never be width-clipped, and the header must
+  // describe what the probe SAW - "--port 9999" once printed "served on :9999".
+  const longUrl = "http://localhost:8099/content/practical/01-understand-the-ideas/07-many-objects/";
+  const okRows = [{ kind: "lesson", path: "content/x", url: "/content/x/", status: "200", href: longUrl }];
+  const okOut = renderArtifacts(okRows, 8099);
+  t("artifacts: a live URL is printed WHOLE", okOut.join("\n").includes(longUrl), okOut[1]);
+  t("artifacts: a live table says served", okOut[0].includes("served on :8099"), okOut[0]);
+
+  const deadRows = [{ kind: "lesson", path: "content/x", url: "/content/x/", status: "unreachable", href: longUrl }];
+  const deadOut = renderArtifacts(deadRows, 9999);
+  t("artifacts: an unreachable table never claims it is served",
+    !deadOut[0].includes("served on") && deadOut[0].includes("NOT SERVED"), deadOut[0]);
+  t("artifacts: an unreachable table names the fix",
+    deadOut.some((l) => l.includes("mockup-server.mjs")), deadOut.join(" | "));
+
+  const mixed = renderArtifacts([
+    { kind: "lesson", path: "a", url: "/a/", status: "200", href: "http://x/a/" },
+    { kind: "mockup", path: "b", url: "/b", status: "404 BROKEN", href: "http://x/b" },
+  ], 8099);
+  t("artifacts: a partly-served table says so rather than rounding up",
+    mixed[0].includes("1 of 2"), mixed[0]);
+  t("artifacts: a BROKEN row is called out", mixed.some((l) => l.includes("must NOT be given")), mixed.join(" | "));
+
+  t("artifacts: no artifacts says so plainly",
+    renderArtifacts([], 8099)[0].startsWith("no artifacts"), renderArtifacts([], 8099)[0]);
+
+  // Docs are not viewable, so they must not drag the header into a false verdict.
+  const docsOnly = renderArtifacts([{ kind: "brief", path: "docs/plans/x.md", url: null, status: "-" }], null);
+  t("artifacts: a docs-only table claims nothing about a server",
+    docsOnly[0] === "artifacts", docsOnly[0]);
+
+  t("artifacts: a lesson dir needs a real index.html",
+    lessonDirsFrom(["content/a/b/c/data.js"], () => false).length === 0);
+  t("artifacts: a lesson dir is found from any file inside it",
+    lessonDirsFrom(["content/a/b/c/data.js", "content/a/b/c/meta.js"], () => true).join() === "content/a/b/c");
+  t("artifacts: a non-lesson content path is not a lesson",
+    lessonDirsFrom(["content/README.md"], () => true).length === 0);
+
   console.log(`factory selftest: ${fails.length ? "FAIL" : "PASS"}`);
   console.log(`  rail ${rail.length} lines / ${widest(rail)} cols   gate ${gate.length}/${widest(gate)}   ladder ${ladder.length}/${widest(ladder)}`);
   for (const f2 of fails) console.log(`  FAIL ${f2}`);
@@ -1270,7 +1505,7 @@ async function selftest() {
 }
 
 // ---- main -------------------------------------------------------------------
-const CMDS = new Set(["start", "state", "classify", "attribute", "rail", "gate", "ladder", "sweep", "history", "hook", "selftest"]);
+const CMDS = new Set(["start", "state", "classify", "attribute", "rail", "gate", "ladder", "sweep", "history", "hook", "artifacts", "selftest"]);
 
 async function main(argv) {
   const cmd = argv[0];
@@ -1280,6 +1515,7 @@ async function main(argv) {
     console.log("  start   <- START HERE. Says which state you are in and which");
     console.log("            agent to invoke. Takes --feature <slug> to resume work.");
     console.log("  state | classify | attribute | rail | gate | ladder");
+    console.log("  artifacts  <- what the owner can OPEN, with the URL proved");
     console.log("  sweep [--record] | history | hook <Event> | selftest");
     console.log("see docs/architecture/sw-factory.md");
     process.exitCode = cmd ? 2 : 0;
@@ -1297,6 +1533,21 @@ async function main(argv) {
     }
     process.stdout.write(JSON.stringify(res));
     return;
+  }
+  if (cmd === "artifacts") {
+    const briefs = await loadBriefs();
+    const attr = attribute(changedPaths(), briefs);
+    const slug = o.feature ?? pickFeature(o, attr, briefs);
+    const found = collectArtifacts({
+      slug,
+      paths: touchedPaths(o.base ?? "origin/master"),
+      mockups: mockupFiles(),
+      docs: featureDocs(slug),
+    });
+    const port = o.port ? Number(o.port) : await findServer(found.map((r) => r.url));
+    const rows = await probeArtifacts(found, port);
+    if (o.json) return console.log(JSON.stringify({ feature: slug, port, rows }, null, 2));
+    return renderArtifacts(rows, port).forEach((l) => console.log(l));
   }
   if (cmd === "history") {
     return renderHealth(await readHealth(Number(o.limit ?? 20))).forEach((l) => console.log(l));

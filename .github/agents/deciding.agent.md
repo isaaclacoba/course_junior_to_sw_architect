@@ -70,10 +70,17 @@ that continues without them is not a design round.
 
 ## Output
 Report with the standard factory report - `.github/agents/factory-report.md`.
-Read it. Four blocks, fixed order, every turn: **Plan** (the WHOLE plan, every
+Read it. Five blocks, fixed order, every turn: **Plan** (the WHOLE plan, every
 phase - and the ACTIVE phase expanded to its numbered steps verbatim from the
-brief, so the owner can see what step 14 actually is), **Done this turn** (max 5
-bullets), **Next** (one step + its verify), **Needs you** (usually "nothing").
+brief, so the owner can see what step 14 actually is), **Artifacts**, **Done this
+turn** (max 5 bullets), **Next** (one step + its verify), **Needs you** (usually
+"nothing").
+
+**Artifacts is not optional when there is one.** Run `node tools/factory.mjs
+artifacts --feature <slug>` and paste its rows - it finds the mockups and lesson
+pages, picks the port actually serving them, and FETCHES each URL so you never
+hand over a link you have not proved. Omit the block only when it prints
+`no artifacts`.
 
 The plan does not change. If a step is already built or impossible, stop and say
 which one - never silently re-order, merge or drop it.

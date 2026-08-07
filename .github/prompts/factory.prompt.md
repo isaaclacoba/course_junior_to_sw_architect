@@ -44,6 +44,19 @@ starts in a fresh context and knows none of it otherwise.
 
 Each agent hands off to the next when its rung clears. Your job ends here.
 
+## 3. Whatever the state, the report has an Artifacts table
+
+If the turn produced anything the owner can open - a mockup, a lesson page - the
+report MUST carry the table, and it is derived rather than remembered:
+
+```bash
+node tools/factory.mjs artifacts --feature <slug>
+```
+
+It picks the port actually serving those paths and fetches every URL, so a link
+that does not work is caught here and not by the owner. Full shape:
+`.github/agents/factory-report.md`.
+
 ## What you may not do
 
 - Do not skip to `building` because the task looks small. If it truly is small,
