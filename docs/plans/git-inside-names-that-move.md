@@ -27,10 +27,10 @@ Governing steer (D-7): elementary breadth-over-depth. The bar is part one - show
 2. [x] Add `detach` act to objects-scene - verify: unit test + a step using it renders (523 tests pass, +2 tests for detach with target and default)
 3. [x] Add `amend` act to objects-scene - verify: unit test + orphan visual shows (523 tests pass, orphan assertion passes)
 4. [x] Add `reset` act to objects-scene - verify: unit test + orphan visual shows (523 tests pass, orphan assertion passes)
-5. [ ] Scaffold L6 ref file, author prose - verify: lesson renders EN, compiles clean
-6. [ ] Scaffold L7 HEAD, author prose - verify: lesson renders EN, compiles clean
-7. [ ] Scaffold L8 index, author prose - verify: lesson renders EN, compiles clean
-8. [ ] Scaffold L9 immutability, author prose - verify: lesson renders EN, compiles clean
+5. [x] Scaffold L6 ref file, author prose - verify: lesson renders EN, compiles clean
+6. [x] Scaffold L7 HEAD, author prose - verify: lesson renders EN, compiles clean (7 cards, 0 imperatives, PASS)
+7. [x] Scaffold L8 index, author prose - verify: lesson renders EN, compiles clean (6 cards, 0 imperatives, PASS)
+8. [x] Scaffold L9 immutability, author prose - verify: lesson renders EN, compiles clean (7 cards, 0 imperatives, PASS)
 9. [ ] Add reflog intro card to L7 (D-10) - verify: one card, no detail, compiles clean
 10. [ ] Add config intro card to L7 or L8 (D-10) - verify: one card, compiles clean
 11. [ ] Add annotated tag intro card to L6 (D-10) - verify: one card, compiles clean

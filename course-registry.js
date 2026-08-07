@@ -194,6 +194,10 @@
     { track: "git-inside", part: "things-with-names-made-of-content", id: "git-inside-blob", href: "content/git-inside/01-things-with-names-made-of-content/03-git-inside-blob/", kind: "lesson", path: "content/git-inside/01-things-with-names-made-of-content/03-git-inside-blob" },
     { track: "git-inside", part: "things-with-names-made-of-content", id: "git-inside-tree", href: "content/git-inside/01-things-with-names-made-of-content/04-git-inside-tree/", kind: "lesson", path: "content/git-inside/01-things-with-names-made-of-content/04-git-inside-tree" },
     { track: "git-inside", part: "things-with-names-made-of-content", id: "git-inside-commit-object", href: "content/git-inside/01-things-with-names-made-of-content/05-git-inside-commit-object/", kind: "lesson", path: "content/git-inside/01-things-with-names-made-of-content/05-git-inside-commit-object" },
+    { track: "git-inside", part: "names-that-move", id: "git-inside-ref-file", href: "content/git-inside/02-names-that-move/01-git-inside-ref-file/", kind: "lesson", path: "content/git-inside/02-names-that-move/01-git-inside-ref-file" },
+    { track: "git-inside", part: "names-that-move", id: "git-inside-head", href: "content/git-inside/02-names-that-move/02-git-inside-head/", kind: "lesson", path: "content/git-inside/02-names-that-move/02-git-inside-head" },
+    { track: "git-inside", part: "names-that-move", id: "git-inside-index", href: "content/git-inside/02-names-that-move/03-git-inside-index/", kind: "lesson", path: "content/git-inside/02-names-that-move/03-git-inside-index" },
+    { track: "git-inside", part: "names-that-move", id: "git-inside-immutability", href: "content/git-inside/02-names-that-move/04-git-inside-immutability/", kind: "lesson", path: "content/git-inside/02-names-that-move/04-git-inside-immutability" },
   ];
 
   var byIdIndex = {};

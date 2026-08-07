@@ -1,0 +1,4 @@
+{
+  "concept.gt-index.term": "Index",
+  "concept.gt-index.def": "The binary file at `.git/index` that maps staged paths to blob ids and file modes. The index is the layer between the working tree and the commit - it decides what the next commit will reach. Adding a file writes the index; the commit is written later, from it. On commit, the index's current state freezes into an immutable tree object."
+}

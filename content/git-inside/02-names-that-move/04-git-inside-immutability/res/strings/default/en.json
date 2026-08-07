@@ -1,0 +1,4 @@
+{
+  "concept.gt-immutability.term": "Immutability",
+  "concept.gt-immutability.def": "Objects in git cannot be edited - their ids come from their bytes, so changing bytes would change the id. Amending a commit writes a new commit and moves a name. The original stays in the store untouched, unreachable until garbage collection removes it. Names move; bytes do not."
+}

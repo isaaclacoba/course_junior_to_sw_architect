@@ -1528,7 +1528,60 @@
           "id": "names-that-move",
           "title": "Names that move",
           "kicker": "Inside git · Part two",
-          "lessons": []
+          "lessons": [
+            {
+              "id": "git-inside-ref-file",
+              "track": "git-inside",
+              "part": "names-that-move",
+              "href": "content/git-inside/02-names-that-move/01-git-inside-ref-file/",
+              "key": "git_inside_ref_file_awarded",
+              "total": 1,
+              "title": "The ref file",
+              "blurb": "Open the refs folder and see what a branch is actually made of. It is a file holding one commit id, nothing more.",
+              "pill": "gentle",
+              "time": "15 min",
+              "kind": "lesson"
+            },
+            {
+              "id": "git-inside-head",
+              "track": "git-inside",
+              "part": "names-that-move",
+              "href": "content/git-inside/02-names-that-move/02-git-inside-head/",
+              "key": "git_inside_head_awarded",
+              "total": 1,
+              "title": "How does git know where you are?",
+              "blurb": "Open HEAD and see how git knows which branch to update. In its usual state it names a ref, and when detached it holds a commit id directly.",
+              "pill": "gentle",
+              "time": "15 min",
+              "kind": "lesson"
+            },
+            {
+              "id": "git-inside-index",
+              "track": "git-inside",
+              "part": "names-that-move",
+              "href": "content/git-inside/02-names-that-move/03-git-inside-index/",
+              "key": "git_inside_index_awarded",
+              "total": 1,
+              "title": "What is the staging area, as a file?",
+              "blurb": "Open the index and see what staging really writes. It is a binary file mapping paths to blob ids and file modes, nothing more.",
+              "pill": "gentle",
+              "time": "15 min",
+              "kind": "lesson"
+            },
+            {
+              "id": "git-inside-immutability",
+              "track": "git-inside",
+              "part": "names-that-move",
+              "href": "content/git-inside/02-names-that-move/04-git-inside-immutability/",
+              "key": "git_inside_immutability_awarded",
+              "total": 1,
+              "title": "Does editing a line change anything git kept?",
+              "blurb": "Amend a commit and watch what happens to the original. It sits in the store untouched, and the only thing that changed is what names it.",
+              "pill": "gentle",
+              "time": "15 min",
+              "kind": "lesson"
+            }
+          ]
         },
         {
           "track": "git-inside",

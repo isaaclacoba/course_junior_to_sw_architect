@@ -342,7 +342,9 @@
       "revisitedBy": [
         "git-inside-tree"
       ],
-      "usedBy": []
+      "usedBy": [
+        "git-inside-index"
+      ]
     },
     "gt-branch": {
       "introducedBy": "git-make-a-branch",
@@ -362,11 +364,15 @@
       "revisitedBy": [
         "git-where-am-i",
         "git-make-a-branch",
-        "git-fix-the-last-commit"
+        "git-fix-the-last-commit",
+        "git-inside-immutability"
       ],
       "usedBy": [
         "git-mark-a-version",
-        "git-merge-a-branch"
+        "git-merge-a-branch",
+        "git-inside-ref-file",
+        "git-inside-head",
+        "git-inside-index"
       ]
     },
     "gt-commit-object": {
@@ -419,7 +425,9 @@
     },
     "gt-head": {
       "introducedBy": "git-make-a-branch",
-      "revisitedBy": [],
+      "revisitedBy": [
+        "git-inside-head"
+      ],
       "usedBy": [
         "git-mark-a-version",
         "git-merge-a-branch",
@@ -437,6 +445,16 @@
         "git-reflog",
         "git-rebase"
       ]
+    },
+    "gt-immutability": {
+      "introducedBy": "git-inside-immutability",
+      "revisitedBy": [],
+      "usedBy": []
+    },
+    "gt-index": {
+      "introducedBy": "git-inside-index",
+      "revisitedBy": [],
+      "usedBy": []
     },
     "gt-merge": {
       "introducedBy": "git-merge-a-branch",
@@ -459,13 +477,24 @@
       "revisitedBy": [],
       "usedBy": []
     },
+    "gt-ref": {
+      "introducedBy": "git-inside-ref-file",
+      "revisitedBy": [
+        "git-inside-immutability"
+      ],
+      "usedBy": [
+        "git-inside-head"
+      ]
+    },
     "gt-reflog": {
       "introducedBy": "git-reflog",
       "revisitedBy": [
-        "git-rebase"
+        "git-rebase",
+        "git-inside-head"
       ],
       "usedBy": [
-        "git-undo-with-reset"
+        "git-undo-with-reset",
+        "git-inside-immutability"
       ]
     },
     "gt-repository": {
@@ -2353,12 +2382,45 @@
       ],
       "uses": []
     },
+    "git-inside-head": {
+      "introduces": [],
+      "revisits": [
+        "gt-head",
+        "gt-reflog"
+      ],
+      "uses": [
+        "gt-ref",
+        "gt-commit"
+      ]
+    },
     "git-inside-hidden-folder": {
       "introduces": [
         "gt-git-folder"
       ],
       "revisits": [],
       "uses": []
+    },
+    "git-inside-immutability": {
+      "introduces": [
+        "gt-immutability"
+      ],
+      "revisits": [
+        "gt-commit",
+        "gt-ref"
+      ],
+      "uses": [
+        "gt-reflog"
+      ]
+    },
+    "git-inside-index": {
+      "introduces": [
+        "gt-index"
+      ],
+      "revisits": [],
+      "uses": [
+        "gt-blob",
+        "gt-commit"
+      ]
     },
     "git-inside-names-from-content": {
       "introduces": [
@@ -2368,6 +2430,15 @@
         "gt-git-folder"
       ],
       "uses": []
+    },
+    "git-inside-ref-file": {
+      "introduces": [
+        "gt-ref"
+      ],
+      "revisits": [],
+      "uses": [
+        "gt-commit"
+      ]
     },
     "git-inside-tree": {
       "introduces": [
@@ -3489,6 +3560,14 @@
       "term": "History",
       "def": "The chain of commits behind where you stand now, each pointing back at its parent."
     },
+    "gt-immutability": {
+      "term": "Immutability",
+      "def": "Objects in git cannot be edited - their ids come from their bytes, so changing bytes would change the id. Amending a commit writes a new commit and moves a name. The original stays in the store untouched, unreachable until garbage collection removes it. Names move; bytes do not."
+    },
+    "gt-index": {
+      "term": "Index",
+      "def": "The binary file at `.git/index` that maps staged paths to blob ids and file modes. The index is the layer between the working tree and the commit - it decides what the next commit will reach. Adding a file writes the index; the commit is written later, from it. On commit, the index's current state freezes into an immutable tree object."
+    },
     "gt-merge": {
       "term": "Merge",
       "def": "Bringing another branch's commits into the one you are on, so two lines become one."
@@ -3500,6 +3579,10 @@
     "gt-rebase": {
       "term": "Rebase",
       "def": "Making the commits on your branch again on top of another branch, which leaves the history as one straight line and gives every replayed commit a new id."
+    },
+    "gt-ref": {
+      "term": "Ref",
+      "def": "A human-chosen name pointing at a commit, stored as a 41-byte text file: 40 hex characters for the commit id, then one newline. Unlike an object, changing what a ref points at does not change the ref's name, which is how a branch moves."
     },
     "gt-reflog": {
       "term": "Reflog",

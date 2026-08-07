@@ -1,0 +1,4 @@
+{
+  "concept.gt-ref.term": "Ref",
+  "concept.gt-ref.def": "A human-chosen name pointing at a commit, stored as a 41-byte text file: 40 hex characters for the commit id, then one newline. Unlike an object, changing what a ref points at does not change the ref's name, which is how a branch moves."
+}
