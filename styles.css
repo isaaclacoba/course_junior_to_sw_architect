@@ -2336,3 +2336,45 @@ input.almost {
     margin-top: 1.2rem;
   }
 }
+
+/* --- the lab practical card: full-width widget, goals in the header ----------
+   Owner-ratified from a measured mockup (docs/architecture/object-model-teaching.md,
+   "Layout"). VizLab is ALREADY a two-column widget - editor | memory - so a third
+   brief column squeezes the learner's own code: measured at 1440px, this layout
+   leaves the editor 686px and clips nothing, a left brief column clips it by
+   166px, and a Visualize tab inside the build card clips it by 214px.
+
+   The goal box goes in the card header instead, and the header grid MIRRORS the
+   widget's own columns so the box lands over the memory panel that proves it.
+   That also costs no page height: goals placed under the widget land at y=985,
+   off screen while the learner is typing. */
+.lab-head-split {
+  display: grid;
+  /* mirror .cl-vl: 43rem editor / 33rem aside, 1.4rem gap */
+  grid-template-columns: minmax(0, 43rem) minmax(33rem, 1fr);
+  gap: 1.4rem;
+  align-items: start;
+  /* .challenge-head is a flex row, so the grid must be told to fill it. */
+  flex: 1 1 100%;
+  width: 100%;
+  min-width: 0;
+}
+
+/* The badges keep the far-right position they hold on a build and a git card;
+   the goals sit under them, in the same column. */
+.lab-head-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.lab-stage {
+  margin-top: 1rem;
+}
+
+@media (max-width: 1080px) {
+  .lab-head-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

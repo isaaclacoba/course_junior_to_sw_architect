@@ -39,5 +39,7 @@
     // gitCard has no bare-name alias in the concatenation, so it is reached
     // through the module's export object.
     hero.insertAdjacentHTML("afterend", window.PageShellCards.gitCard(page.prefix));
+  } else if (page.archetype === "lab") {
+    hero.insertAdjacentHTML("afterend", window.PageShellCards.labCard(page.prefix));
   }
 

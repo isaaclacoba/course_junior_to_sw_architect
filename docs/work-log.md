@@ -2502,3 +2502,33 @@ this actually guards (a page that forgot the script tag). That case is real: the
 before provider, and the deps test now pins that order.
 
 18 gate tests, 15 plugin tests, repo suite 565/565, validate 0 errors, gate PASS.
+
+## 2026-08-07 11:05 CEST - step 16, the lab card scaffold
+`labCard` in `kernel/page-shell/card-templates.js`, its `lab` branch in `boot.js`,
+and the `.lab-head-split` grid in `styles.css`.
+
+The whole widget goes full width and the goal box sits in the card HEADER, right.
+That is the placement the design measured and ratified: VizLab is already a
+two-column widget - editor beside memory - so a third brief column squeezes the
+learner's own code, and goals placed under the widget land at y=985, off screen
+while they are typing.
+
+Measured against the REAL VizLab at 1440px, not a stand-in: brief and editor
+share both edges to 0px, goal box and memory panel share both edges to 0px, the
+editor is 688px and the widest starter line 618px, no horizontal scroll. The
+header grid mirrors `.cl-vl`'s own 43rem/33rem/1.4rem, which is why the goal box
+lands exactly over the panel that proves it.
+
+Two deliberate absences. There is no Run button: VizLab owns Visualize and that
+press IS the run this card grades, so a second button could grade nothing. And no
+"Expected output:" line, because a lab card is judged on what the trace did, not
+on what it printed.
+
+The plugin's Solution and Reset buttons had no listeners until now - the scaffold
+that emits them is what made the binding meaningful, so both landed together.
+
+Four sabotages watched failing before restore: the goal box moved under the
+widget (1 fail), the header grid class dropped (1), a Run button added (2), the
+Goal heading hardcoded past the chrome catalog (2).
+
+Repo suite 576/576, validate 0 errors, gate PASS.

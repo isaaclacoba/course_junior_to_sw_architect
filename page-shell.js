@@ -491,7 +491,74 @@
       </section>`;
   }
 
-  return { drillCard: drillCard, buildCard: buildCard, gitCard: gitCard };
+  // The lab practice scaffold. Owner-ratified from a measured mockup
+  // (docs/architecture/object-model-teaching.md, "Layout"): the whole widget goes
+  // full width and the goal tracker sits in the card HEADER, right.
+  //
+  // WHY NOT A BRIEF COLUMN LIKE build AND git
+  // VizLab is ALREADY a two-column widget - editor | memory. A third column for
+  // the brief squeezes the learner's own code from 686px to 319px, clipping it.
+  // Measured: option A (this one) 686px and no clipping; a left brief column
+  // clips by 166px; a Visualize tab inside the build card clips by 214px.
+  //
+  // The header grid mirrors the widget's own columns, so the goal box lands over
+  // the memory panel that proves it. That placement also costs no page height:
+  // goals under the widget fall to y=985 and are invisible while typing.
+  //
+  // Two deliberate absences: there is NO Run button - VizLab owns Visualize, and
+  // that press IS the run this card grades - and no Expected output line, because
+  // a lab card is graded on what the trace did, not on what it printed.
+  function labCard(p) {
+    return `
+      <section class="card card--split" aria-live="polite">
+        <header class="challenge-head">
+          <div class="lab-head-split">
+            <div>
+              <p id="${p}Meta" class="meta"></p>
+              <h2 id="${p}Title"></h2>
+              <div id="${p}Context" class="context"></div>
+            </div>
+            <div class="lab-head-aside">
+              <div class="badge-group">
+                <span id="${p}Concept" class="badge"></span>
+                <span id="${p}Progress" class="badge ghost"></span>
+              </div>
+              <section class="coach">
+                <h3${tAttr("card.goal")}>${tHtml("card.goal", "Goal")}</h3>
+                <ul id="${p}Goal" class="coach-list"></ul>
+              </section>
+            </div>
+          </div>
+        </header>
+
+        <div class="lab-stage">
+          <div id="${p}Editor" class="lab-widget-host"></div>
+
+          <section id="${p}Actions" class="actions">
+            <button id="${p}Solution" class="btn danger" type="button"${tAttr("nav.solution")}>${tHtml("nav.solution", "Show Solution")}</button>
+            <button id="${p}Reset" class="btn" type="button"${tAttr("nav.reset")}>${tHtml("nav.reset", "Reset")}</button>
+          </section>
+
+          <section id="${p}Result" class="result-panel" hidden>
+            <h3 id="${p}ResultTitle"></h3>
+            <p id="${p}ResultBody"></p>
+          </section>
+        </div>
+
+        <section id="${p}Summary" class="summary-section" hidden>
+          <p id="${p}SummaryIntro" class="context"></p>
+          <ul id="${p}SummaryList" class="summary-list"></ul>
+          <p id="${p}SummaryClose" class="summary-close"></p>
+        </section>
+
+        <footer class="nav-row">
+          <button id="${p}Prev" class="btn" type="button"${tAttr("nav.prev")}>${tHtml("nav.prev", "Previous")}</button>
+          <button id="${p}Next" class="btn primary" type="button">${tHtml("nav.next", "Next")}</button>
+        </footer>
+      </section>`;
+  }
+
+  return { drillCard: drillCard, buildCard: buildCard, gitCard: gitCard, labCard: labCard };
 });
 (function () {
   var LessonCommon = window.LessonCommon;
@@ -755,6 +822,8 @@
     // gitCard has no bare-name alias in the concatenation, so it is reached
     // through the module's export object.
     hero.insertAdjacentHTML("afterend", window.PageShellCards.gitCard(page.prefix));
+  } else if (page.archetype === "lab") {
+    hero.insertAdjacentHTML("afterend", window.PageShellCards.labCard(page.prefix));
   }
 
 })();

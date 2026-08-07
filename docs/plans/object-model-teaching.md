@@ -42,7 +42,7 @@ Phase 2 - the `lab` archetype
     (`kernel/engine/widgets/goal-tracker.js`, provider-based). Nothing to design.
 14. [x] `kernel/engine/plugins/lab-plugin.js` on the generic engine - verify: plugin tests.
 15. [x] Trace gate vocabulary in `kernel/grading/` - verify: gate tests, every goal starts RED.
-16. [ ] Card scaffold + the P2 header grid in page-shell/styles - verify: headless render, edges align.
+16. [x] Card scaffold + the P2 header grid in page-shell/styles - verify: headless render, edges align.
 17. [ ] `resource/bind-*.js` binder so a lab lesson localizes - verify: EN/ES round-trip.
 Phase 3 - content
 18. [ ] MOCKUP: ONE authored card of the new constructor lesson, real chrome, owner reads

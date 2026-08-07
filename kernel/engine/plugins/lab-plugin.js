@@ -272,6 +272,19 @@
         },
       });
 
+      // The card's own two buttons. There is no Run button to bind - VizLab owns
+      // Visualize, and that press is the run this card grades.
+      if (hosts.solution) {
+        hosts.solution.addEventListener("click", function () {
+          LabPlugin.showSolution(surface, surface.task);
+        });
+      }
+      if (hosts.reset) {
+        hosts.reset.addEventListener("click", function () {
+          LabPlugin.reset(surface, surface.task);
+        });
+      }
+
       return Promise.resolve(surface);
     },
 

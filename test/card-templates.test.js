@@ -246,11 +246,124 @@ test("every visible label in gitCard goes through a chrome key", () => {
   assert.deepEqual(texts.sort(), ["Goal", "Next", "Previous", "Reset", "Show Solution"]);
 });
 
+// ---------------------------------------------------------------- the lab card
+
+const LAB_PLUGIN_SRC = fs
+  .readFileSync(path.join(__dirname, "..", "kernel", "engine", "plugins", "lab-plugin.js"), "utf8")
+  .replace(/\/\*[\s\S]*?\*\//g, "")
+  .replace(/\/\/.*/g, "");
+
+const LAB_ROLES = [...new Set([...LAB_PLUGIN_SRC.matchAll(/\bhosts\.(\w+)/g)].map((m) => m[1]))];
+
+// `surface` is only the FALLBACK the plugin mounts into when a page has no
+// Editor host (`hosts.editor || hosts.surface`); the lab scaffold emits Editor,
+// so the scaffold is not required to emit both.
+const LAB_HOST_ROLES = LAB_ROLES.filter((r) => r !== "surface");
+
+test("the lab plugin's host roles all resolve through the engine's HOST_ROLES map", () => {
+  assert.ok(LAB_ROLES.length >= 3, `expected several host roles, got ${LAB_ROLES.join(", ")}`);
+  for (const role of LAB_ROLES) {
+    assert.ok(engine.hostRoles[role], `lab-plugin reads hosts.${role} but HOST_ROLES has no such role`);
+  }
+});
+
+test("labCard emits every host the lab plugin resolves, prefixed", () => {
+  const html = cards.labCard("lb");
+  for (const role of LAB_HOST_ROLES) {
+    const id = `lb${engine.hostRoles[role]}`;
+    assert.ok(html.includes(`id="${id}"`), `missing host for role "${role}": id="${id}"`);
+  }
+});
+
+test("labCard emits every id the engine core addresses on a card, prefixed", () => {
+  const html = cards.labCard("lb");
+  for (const id of GIT_CORE_IDS) {
+    assert.ok(html.includes(`id="lb${id}"`), `missing id="lb${id}"`);
+  }
+});
+
+// VizLab owns the Visualize button, and that press IS the run a lab card grades.
+// A second Run button would be a control that cannot grade anything - lab-plugin's
+// own grade() answers "press Visualize" precisely because there is nothing here.
+test("labCard emits no Run button and no Check button", () => {
+  const html = cards.labCard("lb");
+  assert.equal(html.includes('id="lbRun"'), false, "labCard must not emit a Run button");
+  assert.equal(html.includes(`id="lb${engine.hostRoles.check}"`), false, "labCard must not emit a Check button");
+  assert.equal(/>\s*Run\s*</.test(html), false, "labCard must not render a Run label");
+});
+
+// A lab card is graded on what the trace DID, not on what it printed, so the
+// build card's "Expected output:" line would be a promise this card never keeps.
+test("labCard emits no expected-output line and no example box", () => {
+  const html = cards.labCard("lb");
+  assert.equal(html.includes('id="lbExpected"'), false);
+  assert.equal(html.includes('id="lbExample"'), false);
+  assert.equal(html.includes("Expected"), false);
+});
+
+// The ratified layout (docs/architecture/object-model-teaching.md, "Layout"):
+// the goal box sits in the card HEADER, not under the widget where it lands off
+// screen while the learner types.
+test("labCard puts the goal list in the header, above the widget", () => {
+  const html = cards.labCard("lb");
+  const head = html.indexOf("</header>");
+  assert.ok(head > 0, "labCard must have a header");
+  assert.ok(html.indexOf('id="lbGoal"') < head, "the goal list belongs INSIDE the header");
+  assert.ok(html.indexOf('id="lbEditor"') > head, "the widget belongs under the header");
+});
+
+// The grid that mirrors VizLab's own columns. Without this class the goal box
+// still renders - just not over the memory panel that proves it - so it is
+// pinned here rather than left to the eye.
+test("labCard carries the two-column header grid and the full-width card", () => {
+  const html = cards.labCard("lb");
+  assert.ok(html.includes('class="lab-head-split"'), "the header grid class is what aligns the goal box");
+  assert.ok(html.includes('class="card card--split"'), "the widget is 76rem wide and needs the wide card");
+});
+
+test("labCard applies the prefix to every id, for more than one prefix", () => {
+  for (const p of ["lb", "labEx"]) {
+    const ids = [...cards.labCard(p).matchAll(/id="([^"]+)"/g)].map((m) => m[1]);
+    assert.ok(ids.length > 0);
+    for (const id of ids) assert.ok(id.startsWith(p), `unprefixed id: ${id}`);
+  }
+  const a = [...cards.labCard("aa").matchAll(/id="([^"]+)"/g)].map((m) => m[1]);
+  const b = new Set([...cards.labCard("bb").matchAll(/id="([^"]+)"/g)].map((m) => m[1]));
+  for (const id of a) assert.equal(b.has(id), false, `id collides across prefixes: ${id}`);
+});
+
+test("with no catalog labCard carries no i18n markers", () => {
+  const html = cards.labCard("lb");
+  assert.equal(html.includes("data-t="), false);
+  assert.ok(html.includes(">Goal</h3>"));
+  assert.ok(html.includes(">Reset</button>"));
+  assert.ok(html.includes(">Show Solution</button>"));
+});
+
+test("with a catalog labCard marks and localizes its chrome", () => {
+  const html = withCatalog({ "card.goal": "Objetivo", "nav.reset": "Reiniciar" }, () =>
+    cards.labCard("lb"),
+  );
+  assert.ok(html.includes('<h3 data-t="card.goal">Objetivo</h3>'));
+  assert.ok(html.includes(">Reiniciar</button>"));
+});
+
+test("every visible label in labCard goes through a chrome key", () => {
+  const html = withCatalog({}, () => cards.labCard("lb"));
+  const keys = [...html.matchAll(/data-t="([^"]+)"/g)].map((m) => m[1]);
+  assert.ok(keys.length >= 4, `expected the card's chrome to be marked, got ${keys.join(", ")}`);
+  for (const key of keys) assert.match(key, /^(card|nav)\./);
+  const texts = [...html.matchAll(/>([^<>{}$]+)</g)]
+    .map((m) => m[1].trim())
+    .filter(Boolean);
+  assert.deepEqual(texts.sort(), ["Goal", "Next", "Previous", "Reset", "Show Solution"]);
+});
+
 test("every archetype emits a single live-region card root", () => {
   // Matched on the role rather than the exact class string: a card may carry a
   // layout modifier (buildCard adds `card--split`), and what matters here is that
   // there is exactly ONE live region per card, not how it is skinned.
-  for (const html of [cards.buildCard("bp"), cards.drillCard("cf"), cards.gitCard("gt")]) {
+  for (const html of [cards.buildCard("bp"), cards.drillCard("cf"), cards.gitCard("gt"), cards.labCard("lb")]) {
     const roots = html.match(/<section class="card(?: [^"]*)?" aria-live="polite">/g);
     assert.equal(roots.length, 1);
   }
