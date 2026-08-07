@@ -6083,6 +6083,44 @@ ${written}` : written;
           if (target) store.refs.set(act.ref, target);
           break;
         }
+        case "switch": {
+          store.head = { kind: "ref", ref: act.ref };
+          break;
+        }
+        case "detach": {
+          const target = act.at ? savedByMessage.get(act.at) : latestCommit;
+          if (target) store.head = { kind: "detached", id: target };
+          break;
+        }
+        case "amend": {
+          if (!latestCommit) break;
+          const old = store.objects.get(latestCommit);
+          if (!old?.commit) break;
+          const replacement = store.writeCommit({
+            tree: old.commit.tree,
+            parents: old.commit.parents,
+            author: old.commit.author,
+            committer: old.commit.committer,
+            message: act.message
+          });
+          savedByMessage.set(act.message, replacement);
+          latestCommit = replacement;
+          if (store.head.kind === "ref") {
+            const ref = store.head.ref;
+            if (store.refs.has(ref)) store.refs.set(ref, replacement);
+          }
+          break;
+        }
+        case "reset": {
+          const target = savedByMessage.get(act.to);
+          if (target) {
+            store.refs.set(act.ref, target);
+            if (store.head.kind === "ref" && store.head.ref === act.ref) {
+              latestCommit = target;
+            }
+          }
+          break;
+        }
       }
       if (at >= freshFrom) {
         for (const id of store.objects.keys()) if (!before.has(id)) added.add(id);
